@@ -1,0 +1,221 @@
+<ul class="nav navbar-nav oppia-navbar-nav float-right"
+    id="skill-editor-navbar-desktop"
+    *ngIf="!isLoadingSkill()">
+  <li class="oppia-publish-button-container"
+      *ngIf="getActiveTabName() !== 'questions'">
+    <div ngbDropdown>
+      <button class="btn btn-light oppia-save-changes-button oppia-save-publish-changes-button e2e-test-save-or-publish-skill"
+              [ngClass]="{'btn-success': isSkillSaveable()}"
+              (click)="saveChanges()"
+              [disabled]="!isSkillSaveable()">
+        <span *ngIf="!isSaveInProgress()">
+          <span title="Publish Changes">
+            <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon"
+               alt="Publish Changes">
+            </i>
+            <span class="oppia-save-publish-button-label float-left">Publish Changes</span>
+            <span class="d-none d-md-block float-left oppia-changes-count-text e2e-test-changes-count-text"
+                  *ngIf="getChangeListCount() > 0">
+              ({{getChangeListCount()}})
+            </span>
+          </span>
+        </span>
+
+        <span *ngIf="isSaveInProgress()">
+          <span class="oppia-save-publish-button-label">Publishing</span>
+          <loading-dots></loading-dots>
+        </span>
+      </button>
+      <button type="button"
+              class="btn btn-light dropdown-toggle oppia-dropdown-toggle oppia-dropdown-toggle-icon"
+              [disabled]="!getChangeListCount()"
+              aria-label="Dropdown toggle"
+              ngbDropdownToggle>
+      </button>
+      <ul ngbDropdownMenu
+          class="oppia-discard-draft-button-container"
+          [ngStyle]="{ width: getChangeListCount() ? '150px' : '120px' }">
+        <li title="Discard all pending changes">
+          <a (click)="discardChanges()"
+             [ngClass]="{'oppia-disabled-link': !getChangeListCount()}"
+             class="dropdown-item">
+             Discard Draft
+          </a>
+        </li>
+      </ul>
+    </div>
+  </li>
+</ul>
+
+<div class="skill-editor-nav-mobile">
+  <div class="skill-nav-mobile">
+    <div class="skill-navbar-mobile-tabs">
+      <div class="skill-nav-dropdown-container">
+        <div class="skill-nav-skill-nav-dropdown-options"
+             *ngIf="showNavigationOptions">
+          <div class="skill-nav-dropdown-option"
+               (click)="selectMainTab()">
+            <i class="fas fa-pen navbar-tab-icon"></i>
+            <span>Editor</span>
+          </div>
+          <div class="skill-nav-dropdown-option"
+               (click)="selectQuestionsTab()">
+            <i class="fas fa-book-open navbar-tab-icon"></i>
+            <span>Questions</span>
+          </div>
+          <div class="skill-nav-dropdown-option"
+               (click)="selectPreviewTab()">
+            <i class="fas fa-play navbar-tab-icon"></i>
+            <span>Preview</span>
+          </div>
+        </div>
+        <div class="skill-nav-dropdown-content">
+          <div class="skill-nav-dropdown-text"
+               (click)="toggleWarningText()">
+            <i class="fas fa-pen"></i>
+            <span>{{activeTab}}</span>
+          </div>
+          <div class="skill-nav-dropdown-icon"
+               (click)="toggleNavigationOptions()">
+            <i class="fa fa-caret-down"></i>
+          </div>
+        </div>
+      </div>
+      <div class="skill-nav-dropdown-container save-options-dropdown">
+        <div class="skill-nav-skill-nav-dropdown-options"
+             *ngIf="showSkillEditOptions">
+          <div class="skill-nav-dropdown-option"
+               (click)="saveChanges()">
+            <i class="fas fa-save navbar-tab-icon"></i>
+            <span>Save Changes</span>
+          </div>
+        </div>
+        <div class="skill-nav-dropdown-content right-container">
+          <div class="skill-nav-dropdown-text"
+               (click)="discardChanges()">
+            Discard Changes
+            <span *ngIf="getChangeListCount() > 0">
+              ({{getChangeListCount()}})
+            </span>
+          </div>
+          <div class="skill-nav-dropdown-icon"
+               (click)="toggleSkillEditOptions()">
+            <i class="fa fa-caret-down"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<style>
+  .skill-editor-nav-mobile {
+    display: none;
+  }
+  .oppia-publish-button-container {
+    margin-right: 5px;
+    margin-top: 8px;
+  }
+  .oppia-changes-count-text {
+    margin-left: 2px;
+    opacity: 0.5;
+  }
+  .oppia-dropdown-toggle-icon {
+    height: 34px;
+  }
+  .oppia-discard-draft-button-container {
+    min-width: 125px;
+    right: inherit;
+  }
+  .oppia-save-publish-changes-button {
+    float: left;
+    width: 180px;
+  }
+
+  @media screen and (max-width: 768px) {
+    #skill-editor-navbar-desktop {
+      display: none;
+    }
+    .skill-editor-nav-mobile {
+      display: block;
+    }
+    .skill-editor-navbar-mobile-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      padding: 10px 0;
+    }
+    .discard-changes-btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      width: 50%;
+    }
+    .discard-changes-btn {
+      background-color: #008098;
+      color: #fff;
+      font-weight: bold;
+      width: 100%;
+    }
+    .publish-skill-btn {
+      background-color: #fff;
+      border: 2px solid #008098;
+      color: #008098;
+      font-weight: bold;
+    }
+    .skill-navbar-mobile-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      padding: 10px 0;
+    }
+    .skill-nav-dropdown-container {
+      position: relative;
+      text-align: left;
+      width: 45%;
+    }
+     .skill-nav-skill-nav-dropdown-options {
+      background-color: #fff;
+      border: 1px solid #000;
+      bottom: 100%;
+      position: absolute;
+      width: 100%;
+    }
+     .skill-nav-dropdown-content {
+      background-color: #fff;
+      border: 1.5px solid #6d6969;
+      border-radius: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .skill-editor-nav-mobile .navbar-tab-icon {
+      padding: 5px;
+    }
+     .right-container {
+      background-color: #419889;
+      color: #fff;
+    }
+
+     .skill-nav-dropdown-option {
+      padding: 5px 0;
+    }
+     .skill-nav-dropdown-icon {
+      align-items: center;
+      background-color: #e6e6e6;
+      border-left: 1.5px solid #6d6969;
+      color: #000;
+      display: flex;
+      justify-content: center;
+      text-align: center;
+      width: 20%;
+    }
+     .skill-nav-dropdown-text {
+      padding: 5px 10px;
+    }
+     .save-options-dropdown {
+      width: 52%;
+    }
+  }
+</style>

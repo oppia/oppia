@@ -116,6 +116,28 @@ export class LearnerGroupSyllabusBackendApiService {
     });
   }
 
+  async fetchLearnerSpecificProgressInAssignedSyllabus(
+      learnerGroupId: string
+  ): Promise<LearnerGroupUserProgress> {
+    return new Promise((resolve, reject) => {
+      const learnerGroupUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          '/learner_group_learner_specific_progress_handler/' +
+          '<learner_group_id>', {
+            learner_group_id: learnerGroupId
+          }
+        )
+      );
+
+      this.http.get<LearnerGroupUserProgressBackendDict>(
+        learnerGroupUrl).toPromise().then(progressInfo => {
+        resolve(
+          LearnerGroupUserProgress.createFromBackendDict(progressInfo)
+        );
+      });
+    });
+  }
+
   async fetchLearnerGroupSyllabus(
       learnerGroupId: string
   ): Promise<LearnerGroupSyllabus> {

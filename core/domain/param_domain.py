@@ -24,8 +24,7 @@ from core import feconf
 from core import utils
 from core.domain import value_generators_domain
 
-from typing import Dict, List, Union
-from typing_extensions import TypedDict
+from typing import Dict, List, TypedDict, Union
 
 
 class CustomizationArgsDict(TypedDict):
