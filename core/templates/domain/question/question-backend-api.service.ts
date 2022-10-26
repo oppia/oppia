@@ -48,6 +48,18 @@ interface QuestionSummariesResponse {
   more: boolean;
 }
 
+interface SkillIdToQuestionsBackendResponse {
+  'skill_id_to_questions_dict': {
+    [skillId: string]: QuestionBackendDict[];
+  };
+}
+
+interface SkillIdToQuestionsResponse {
+  skillIdToQuestionsDict: {
+    [skillId: string]: QuestionBackendDict[];
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -202,6 +214,26 @@ export class QuestionBackendApiService {
       offset: number = 0): Promise<QuestionSummariesResponse> {
     return new Promise((resolve, reject) => {
       this._fetchQuestionSummaries(skillId, offset, resolve, reject);
+    });
+  }
+
+  async fetchDiagnosticTestQuestionsAsync(
+      topicId: string
+  ): Promise<SkillIdToQuestionsResponse> {
+    return new Promise((resolve, reject) => {
+      const diagnosticTestQuestionsURL = (
+        this.urlInterpolationService.interpolateUrl(
+          '/diagnostic_test_questions_handler_url/<topic_id>', {
+            topic_id: topicId
+          }));
+
+      this.http.get<SkillIdToQuestionsBackendResponse>(
+        diagnosticTestQuestionsURL).toPromise().then((response) => {
+        resolve(
+          {skillIdToQuestionsDict: response.skill_id_to_questions_dict});
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
     });
   }
 }

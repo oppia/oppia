@@ -390,4 +390,57 @@ describe('Question backend Api service', () => {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should successfully fetch topic id to diagnostic test skill ids from ' +
+    'the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let topicId = 'topicID1';
+
+    questionBackendApiService.fetchDiagnosticTestQuestionsAsync(
+      topicId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/diagnostic_test_questions_handler_url/topicID1'
+    );
+    expect(req.request.method).toEqual('GET');
+
+
+    const backendResponse = {
+      skill_id_to_questions_dict: {
+        skillID1: sampleDataResults.question_dicts
+      }
+    };
+
+    req.flush(backendResponse);
+    flushMicrotasks();
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalledWith();
+  }));
+
+  it('should fail to fetch topic id to diagnostic test skill ids from ' +
+    'the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let topicId = 'topicID1';
+
+    questionBackendApiService.fetchDiagnosticTestQuestionsAsync(
+      topicId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/diagnostic_test_questions_handler_url/topicID1'
+    );
+    expect(req.request.method).toEqual('GET');
+
+    req.flush({
+      error: 'Error loading topic id to diagnostic test skill ids.'
+    }, {
+      status: 500, statusText: 'Internal Server Error.'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error loading topic id to diagnostic test skill ids.');
+  }));
 });
