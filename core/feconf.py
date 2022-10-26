@@ -1038,6 +1038,7 @@ SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
 DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER = (
     '/diagnostic_test_skill_assignment_handler')
+DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL = '/diagnostic_test_questions_handler_url'
 STATE_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/state'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
