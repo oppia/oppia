@@ -1164,12 +1164,24 @@ def publish_collection_and_update_user_profiles(
     contributor_ids = collection_summary.contributor_ids
     user_settings_models = []
     for contributor in contributor_ids:
-        user_settings_models.extend(
-            user_services.update_first_contribution_msec_if_not_set_in_model(
-                contributor,
-                contribution_time_msec
-            )
+        user_settings = user_services.get_user_settings(
+            contributor,
+            strict=False
         )
+        if user_settings is not None:
+            updated_user_settings = (
+                user_services.update_first_contribution_msec(
+                    user_settings,
+                    contribution_time_msec
+                )
+            )
+            if updated_user_settings is not None:
+                user_settings_models.append(
+                    user_services.convert_to_user_settings_model(
+                        updated_user_settings
+                    )
+                )
+    datastore_services.update_timestamps_multi(user_settings_models)
     datastore_services.put_multi(user_settings_models)
 
 
@@ -1212,16 +1224,16 @@ def update_collection(
 
     if (not rights_manager.is_collection_private(collection.id) and
             committer_id != feconf.MIGRATION_BOT_USER_ID):
-        user_settings_model = (
-            user_services
-            .update_first_published_collection_msec_if_not_set_in_model(
-                committer_id,
-                utils.get_current_time_in_millisecs()
+        user_settings = user_services.get_user_settings(committer_id)
+        if user_settings is not None:
+            updated_user_settings = (
+                user_services
+                .update_first_contribution_msec(
+                    user_settings,
+                    utils.get_current_time_in_millisecs()
+                )
             )
-        )
-        if user_settings_model:
-            user_settings_model.update_timestamps()
-            user_settings_model.put()
+            user_services.save_user_settings(updated_user_settings)
 
 
 def regenerate_collection_summary_with_new_contributor(

@@ -311,7 +311,7 @@ class ComputeExplorationVersionHistoryJobTests(
                     'state_name': 'A new state'
                 })
             ],
-            'A commit messages.'
+            'A commit message.'
         )
         version_history_keys = [
             datastore_services.Key(
@@ -377,7 +377,7 @@ class ComputeExplorationVersionHistoryJobTests(
                     'state_name': 'A new state'
                 })
             ],
-            'A commit messages.'
+            'A commit message.'
         )
         exp_services.revert_exploration(
             self.user_1_id, self.EXP_ID_1, 2, 1
@@ -448,7 +448,7 @@ class ComputeExplorationVersionHistoryJobTests(
                     'state_name': 'A new state'
                 })
             ],
-            'A commit messages.'
+            'A commit message.'
         )
         snapshot_metadata_model = (
             exp_models.ExplorationSnapshotMetadataModel.get(
@@ -491,7 +491,7 @@ class ComputeExplorationVersionHistoryJobTests(
                     'state_name': 'A new state'
                 })
             ],
-            'A commit messages.'
+            'A commit message.'
         )
 
         # Corrupting the commit logs manually.
@@ -583,7 +583,7 @@ class VerifyVersionHistoryModelsJobTests(
                     'state_name': 'A new state'
                 })
             ],
-            'A commit messages.'
+            'A commit message.'
         )
         exp_services.update_exploration(
             self.user_2_id,
@@ -594,7 +594,7 @@ class VerifyVersionHistoryModelsJobTests(
                     'state_name': 'A new state'
                 })
             ],
-            'A commit messages.'
+            'A commit message.'
         )
         exp_services.update_exploration(
             self.user_2_id,
@@ -635,7 +635,7 @@ class VerifyVersionHistoryModelsJobTests(
                     'state_name': 'A new state'
                 })
             ],
-            'A commit messages.'
+            'A commit message.'
         )
         exp_services.update_exploration(
             self.user_2_id,
@@ -670,7 +670,7 @@ class VerifyVersionHistoryModelsJobTests(
                     'state_name': 'A new state'
                 })
             ],
-            'A commit messages.'
+            'A commit message.'
         )
         exp_services.update_exploration(
             self.user_2_id,
@@ -785,7 +785,7 @@ class VerifyVersionHistoryModelsJobTests(
                     'state_name': 'A new state'
                 })
             ],
-            'A commit messages.'
+            'A commit message.'
         )
         snapshot_metadata_model = (
             exp_models.ExplorationSnapshotMetadataModel.get(
@@ -849,7 +849,7 @@ class DeleteExplorationVersionHistoryModelsJobTest(
                     'state_name': 'A new state'
                 })
             ],
-            'A commit messages.'
+            'A commit message.'
         )
 
         self.assert_job_output_is([

@@ -177,7 +177,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             Exception. A model with the same ID already exists.
         """
 
-        instance_id = cls.get_entity_id(exp_id)
+        instance_id = cls.generate_id(exp_id)
         training_job_instance = cls(
             id=instance_id, algorithm_id=algorithm_id,
             interaction_id=interaction_id,
@@ -244,7 +244,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         job_models = []
         job_ids = []
         for job_dict in job_dicts_list:
-            instance_id = cls.get_entity_id(job_dict['exp_id'])
+            instance_id = cls.generate_id(job_dict['exp_id'])
             training_job_instance = cls(
                 id=instance_id, algorithm_id=job_dict['algorithm_id'],
                 interaction_id=job_dict['interaction_id'],

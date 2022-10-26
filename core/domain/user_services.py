@@ -1430,33 +1430,14 @@ def update_subject_interests(
     save_user_settings(user_settings)
 
 
-def _update_first_contribution_msec(
-    user_id: str, first_contribution_msec: float
-) -> user_domain.UserSettings:
-    """Updates first_contribution_msec of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        first_contribution_msec: float. New time to set in milliseconds
-            representing user's first contribution to Oppia.
-
-    Returns:
-        UserSettingsModel. The user settings model with updated
-        first_contribution_msec.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.first_contribution_msec = first_contribution_msec
-    return user_settings
-
-
-def update_first_contribution_msec_if_not_set_in_model(
-    user_id: str, first_contribution_msec: float
-) -> user_domain.UserSettings|None:
+def update_first_contribution_msec(
+    user_settings: user_domain.UserSettings, first_contribution_msec: float
+) -> Optional[user_domain.UserSettings]:
     """Updates first_contribution_msec of user with given user_id
     if it is set to None.
 
     Args:
-        user_id: str. The unique ID of the user.
+        user_settings: UserSettings. The user settings domain object.
         first_contribution_msec: float. New time to set in milliseconds
             representing user's first contribution to Oppia.
 
@@ -1464,10 +1445,9 @@ def update_first_contribution_msec_if_not_set_in_model(
         UserSettingsModel. The user settings model with updated
         first_contribution_msec.
     """
-    user_settings = get_user_settings(user_id, strict=True)
     if user_settings.first_contribution_msec is None:
-        return _update_first_contribution_msec(
-            user_id, first_contribution_msec)
+        user_settings.first_contribution_msec = first_contribution_msec
+        return user_settings
 
 
 def update_preferred_language_codes(
@@ -1695,22 +1675,19 @@ def record_user_logged_in(user_id: str) -> None:
     save_user_settings(user_settings)
 
 
-def record_user_edited_an_exploration_in_model(
-    user_id: str
-) -> user_models.UserSettingsModel:
-    """Updates last_edited_an_exploration to the current datetime for
-    the user with given user_id.
+def record_user_edited_an_exploration(
+    user_settings: user_domain.UserSettings
+) -> user_domain.UserSettings:
+    """Updates last_edited_an_exploration to the current datetime for the user.
 
     Args:
-        user_id: str. The unique ID of the user.
+        user_settings: UserSettings. The user settings domain object.
 
     Returns:
-        UserSettingsModel. The updated UserSettingsModel.
+        UserSettings. The user settings domain object.
     """
-    user_settings = get_user_settings(user_id, strict=False)
-    if user_settings is not None:
-        user_settings.last_edited_an_exploration = datetime.datetime.utcnow()
-        return convert_to_user_settings_model(user_settings)
+    user_settings.last_edited_an_exploration = datetime.datetime.utcnow()
+    return user_settings
 
 
 def record_user_created_an_exploration(user_id: str) -> None:
@@ -1983,8 +1960,9 @@ def compute_user_contributions(
     user_id: str,
     created_exploration_ids: List[str],
     edited_exploration_ids: List[str]
-) -> user_models.UserContributionsModel:
-    """Computes new UserContributionsModel and returns it.
+) -> Optional[user_models.UserContributionsModel]:
+    """Computes new UserContributionsModel and returns it. It does not perform
+    a put operation. The caller of this method must perform the put operation.
     Note: This does not create a contributions model if the user is
     OppiaMigrationBot.
 
@@ -2067,10 +2045,10 @@ def add_created_exploration_id(user_id: str, exploration_id: str) -> None:
         _get_validated_user_contributions_model(user_contributions).put()
 
 
-def add_edited_exploration_id_to_model(
+def add_edited_exploration_id(
     user_id: str,
     exploration_id: str
-) -> user_models.UserContributionsModel:
+) -> List[user_models.UserContributionsModel]:
     """Adds an exploration_id to a user_id's UserContributionsModel collection
     of edited explorations.
 
@@ -2101,7 +2079,7 @@ def add_edited_exploration_id_to_model(
 def _get_validated_user_contributions_model(
     user_contributions: user_domain.UserContributions
 ) -> user_models.UserContributionsModel:
-    """Updates user contributions object.
+    """Constructs a valid UserContributionsModel.
 
     Args:
         user_contributions: UserContributions. Value object representing

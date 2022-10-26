@@ -495,13 +495,15 @@ def create_exp_issues_for_new_exploration(
     stats_models.ExplorationIssuesModel.create(exp_id, exp_version, [])
 
 
-def update_exp_issues_models_for_new_exp_version(
+def get_updated_exp_issues_models_for_new_exp_version(
     exploration: exp_domain.Exploration,
     exp_versions_diff: Optional[exp_domain.ExplorationVersionsDiff],
     revert_to_version: Optional[int]
 ) -> List[base_models.BaseModel]:
     """Retrieves the ExplorationIssuesModel for the old exp_version and makes
-    any required changes to the structure of the model.
+    any required changes to the structure of the model. Note: This method does
+    not perform put operations on the models. The caller of this method must do
+    so.
 
     Args:
         exploration: Exploration. Domain object for the exploration.
@@ -523,9 +525,16 @@ def update_exp_issues_models_for_new_exp_version(
         exploration.id, exploration.version - 1, strict=False
     )
     if exp_issues is None:
-        models_to_put.extend(
+        instance_id = stats_models.ExplorationIssuesModel.get_entity_id(
+            exploration.id,
+            exploration.version - 1
+        )
+        models_to_put.append(
             stats_models.ExplorationIssuesModel(
-                exploration.id, exploration.version - 1, []
+                id=instance_id,
+                exp_id=exploration.id,
+                exp_version=exploration.version,
+                unresolved_issues=[]
             )
         )
         return models_to_put
@@ -857,6 +866,23 @@ def get_playthrough_from_model(
         playthrough_model.issue_customization_args, actions)
 
 
+def get_state_stats_mapping(exploration_stats: stats_domain.ExplorationStats):
+    """Returns the state stats mapping of the given exploration stats.
+
+    Args:
+        exploration_stats: ExplorationStats. Exploration statistics domain
+            object.
+
+    Returns:
+        dict. The state stats mapping of the given exploration stats.
+    """
+    new_state_stats_mapping = {
+        state_name: exploration_stats.state_stats_mapping[state_name].to_dict()
+        for state_name in exploration_stats.state_stats_mapping
+    }
+    return new_state_stats_mapping
+
+
 def create_stats_model(exploration_stats: stats_domain.ExplorationStats) -> str:
     """Creates an ExplorationStatsModel in datastore given an ExplorationStats
     domain object.
@@ -868,10 +894,7 @@ def create_stats_model(exploration_stats: stats_domain.ExplorationStats) -> str:
     Returns:
         str. ID of the datastore instance for ExplorationStatsModel.
     """
-    new_state_stats_mapping = {
-        state_name: exploration_stats.state_stats_mapping[state_name].to_dict()
-        for state_name in exploration_stats.state_stats_mapping
-    }
+    new_state_stats_mapping = get_state_stats_mapping(exploration_stats)
     instance_id = stats_models.ExplorationStatsModel.create(
         exploration_stats.exp_id,
         exploration_stats.exp_version,

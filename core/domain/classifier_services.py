@@ -31,7 +31,7 @@ from core.domain import fs_services
 from core.domain import state_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, TypedDict
+from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -110,17 +110,22 @@ def verify_signature(
     return True
 
 
-def get_job_models_that_handle_trainable_states(
+def get_new_job_models_for_trainable_states(
     exploration: exp_domain.Exploration,
     state_names: List[str]
 ) -> List[
-    classifier_models.StateTrainingJobsMappingModel |
-    classifier_models.ClassifierTrainingJobModel
+        Union[
+            classifier_models.StateTrainingJobsMappingModel,
+            classifier_models.ClassifierTrainingJobModel
+        ]
 ]:
     """Creates ClassifierTrainingJobModel instances for all the state names
     passed into the function. If this function is called with version number 1,
     we are creating jobs for all trainable states in the exploration. Otherwise,
     a new job is being created for the states where retraining is required.
+    Note that this does not actually create models in the datastore. It just
+    creates instances of the models and returns them. The caller of this method
+    is responsible for the put operation.
 
     Args:
         exploration: Exploration. The Exploration domain object.
@@ -218,7 +223,7 @@ def get_job_models_that_handle_trainable_states(
                 state_training_job_mapping.state_name
             )
         )
-        mapping_instance = classifier_models.StateTrainingJobsMappingModel(
+        mapping_model = classifier_models.StateTrainingJobsMappingModel(
             id=instance_id, exp_id=state_training_job_mapping.exp_id,
             exp_version=state_training_job_mapping.exp_version,
             state_name=state_training_job_mapping.state_name,
@@ -226,16 +231,16 @@ def get_job_models_that_handle_trainable_states(
                 state_training_job_mapping.algorithm_ids_to_job_ids
             ))
 
-        mapping_models.append(mapping_instance)
+        mapping_models.append(mapping_model)
     models_to_put.extend(mapping_models)
     return models_to_put
 
 
-def get_job_models_that_handle_non_trainable_states(
+def get_new_job_models_for_non_trainable_states(
     exploration: exp_domain.Exploration,
     state_names: List[str],
     exp_versions_diff: exp_domain.ExplorationVersionsDiff
-) -> tuple(List[str], List[classifier_models.StateTrainingJobsMappingModel]):
+) -> Tuple[List[str], List[classifier_models.StateTrainingJobsMappingModel]]:
     """Returns list of StateTrainingJobsMappingModels for all the
     state names passed into the function. The mapping is created from the
     state in the new version of the exploration to the ClassifierTrainingJob of
@@ -247,6 +252,9 @@ def get_job_models_that_handle_non_trainable_states(
     In this method, the current_state_name refers to the name of the state in
     the current version of the exploration whereas the old_state_name refers to
     the name of the state in the previous version of the exploration.
+    Note that this does not actually create models in the datastore. It just
+    creates instances of the models and returns them. The caller of this method
+    is responsible for the put operation.
 
     Args:
         exploration: Exploration. The Exploration domain object.
@@ -314,7 +322,7 @@ def get_job_models_that_handle_non_trainable_states(
                 state_training_job_mapping.state_name
             )
         )
-        mapping_instance = classifier_models.StateTrainingJobsMappingModel(
+        mapping_model = classifier_models.StateTrainingJobsMappingModel(
             id=instance_id, exp_id=state_training_job_mapping.exp_id,
             exp_version=state_training_job_mapping.exp_version,
             state_name=state_training_job_mapping.state_name,
@@ -322,7 +330,7 @@ def get_job_models_that_handle_non_trainable_states(
                 state_training_job_mapping.algorithm_ids_to_job_ids
             ))
 
-        mapping_models.append(mapping_instance)
+        mapping_models.append(mapping_model)
 
     return (state_names_without_classifier, mapping_models)
 

@@ -1301,7 +1301,7 @@ def get_updated_version_history_model(
         return updated_version_history_model
 
 
-def _compute_models_to_put(
+def _compute_models_to_put_when_saving_new_exp_version(
     committer_id: str,
     exploration: exp_domain.Exploration,
     commit_message: Optional[str],
@@ -1354,20 +1354,12 @@ def _compute_models_to_put(
         exploration_model, exploration)
 
     change_list_dict = [change.to_dict() for change in change_list]
-    commit_type = (
-        feconf.COMMIT_TYPE_CREATE
-        if exploration_model.version == 0
-        else feconf.COMMIT_TYPE_EDIT
-    )
-    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     models_to_put.extend(
-        exploration_model.compute_models_to_commit(
+        exploration_model.get_models_to_put_values(
             feconf.MIGRATION_BOT_USERNAME,
-            commit_type,
             commit_message,
             change_list_dict,
-            additional_models={'rights_model': exploration_rights}
-        ).values()
+        )
     )
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -1395,10 +1387,10 @@ def _compute_models_to_put(
         exploration.id, exploration.version, list(exploration.states.keys()),
         exp_versions_diff, revert_to_version=None)
 
-    new_state_stats_mapping = {
-        state_name: new_exp_stats.state_stats_mapping[state_name].to_dict()
-        for state_name in new_exp_stats.state_stats_mapping
-    }
+    new_state_stats_mapping = stats_services.get_state_stats_mapping(
+        new_exp_stats
+    )
+
     new_exp_stats_instance_id = (
         stats_models.ExplorationStatsModel.get_entity_id(
             new_exp_stats.exp_id,
@@ -1434,7 +1426,7 @@ def _compute_models_to_put(
                 state_training_jobs_mapping_models_to_put
             ) = (
                 classifier_services
-                .get_job_models_that_handle_non_trainable_states(
+                .get_new_job_models_for_non_trainable_states(
                     exploration, state_names_with_unchanged_answer_groups,
                     exp_versions_diff
                 )
@@ -1444,14 +1436,14 @@ def _compute_models_to_put(
             models_to_put.extend(state_training_jobs_mapping_models_to_put)
         if state_names_to_train_classifier:
             models_to_put.extend(
-                classifier_services.get_job_models_that_handle_trainable_states(
+                classifier_services.get_new_job_models_for_trainable_states(
                     exploration, state_names_to_train_classifier
                 )
             )
 
     # Trigger exploration issues model updation.
     models_to_put.extend(
-        stats_services.update_exp_issues_models_for_new_exp_version(
+        stats_services.get_updated_exp_issues_models_for_new_exp_version(
             exploration,
             exp_versions_diff,
             None
@@ -1468,8 +1460,9 @@ def _create_exploration(
 ) -> None:
     """Ensures that rights for a new exploration are saved first.
 
-    This is because _compute_models_to_put() depends on the rights object being
-    present to tell it whether to do strict validation or not.
+    This is because _compute_models_to_put_when_saving_new_exp_version()
+    depends on the rights object being present to tell it whether to do strict
+    validation or not.
 
     Args:
         committer_id: str. The id of the user who made the commit.
@@ -1540,7 +1533,7 @@ def _create_exploration(
 
         if state_names_to_train:
             datastore_services.put_multi(
-                classifier_services.get_job_models_that_handle_trainable_states(
+                classifier_services.get_new_job_models_for_trainable_states(
                     exploration,
                     state_names_to_train
                 )
@@ -1574,10 +1567,12 @@ def save_new_exploration(
                 'category': exploration.category,
             })])
     user_services.add_created_exploration_id(committer_id, exploration.id)
-    user_services.add_edited_exploration_id_to_model(
+    user_contribution_models = user_services.add_edited_exploration_id(
         committer_id,
         exploration.id
     )
+    datastore_services.update_timestamps_multi(user_contribution_models)
+    datastore_services.put_multi(user_contribution_models)
     user_services.record_user_created_an_exploration(committer_id)
 
 
@@ -1844,14 +1839,21 @@ def publish_exploration_and_update_user_profiles(
     contributor_ids = exp_fetchers.get_exploration_summary_by_id(
         exp_id).contributor_ids
     for contributor in contributor_ids:
-        user_settings = (
-            user_services.update_first_contribution_msec_if_not_set_in_model(
-                contributor,
-                contribution_time_msec
-            )
+        contributor_user_settings = user_services.get_user_settings(
+            contributor,
+            strict=False
         )
-        if user_settings:
-            user_services.save_user_settings(user_settings)
+        if contributor_user_settings:
+            contributor_user_settings_to_put = (
+                user_services.update_first_contribution_msec(
+                    contributor_user_settings,
+                    contribution_time_msec
+                )
+            )
+            if contributor_user_settings_to_put is not None:
+                user_services.save_user_settings(
+                    contributor_user_settings_to_put
+                )
 
 
 def validate_exploration_for_story(
@@ -2018,8 +2020,7 @@ def update_exploration(
     change_list: Optional[List[exp_domain.ExplorationChange]],
     commit_message: Optional[str],
     is_suggestion: bool = False,
-    is_by_voice_artist: bool = False,
-    is_synchronous: bool = False,
+    is_by_voice_artist: bool = False
 ) -> None:
     """Update an exploration. Commits changes.
 
@@ -2039,8 +2040,6 @@ def update_exploration(
             accepted.
         is_by_voice_artist: bool. Whether the changes are made by a
             voice artist.
-        is_synchronous: bool. Whether the update should be done
-            synchronously.
 
     Raises:
         ValueError. No commit message is supplied and the exploration is public.
@@ -2056,8 +2055,7 @@ def update_exploration(
         change_list=change_list,
         commit_message=commit_message,
         is_suggestion=is_suggestion,
-        is_by_voice_artist=is_by_voice_artist,
-        is_synchronous=is_synchronous
+        is_by_voice_artist=is_by_voice_artist
     )
 
     datastore_services.update_timestamps_multi(models_to_put)
@@ -2071,9 +2069,10 @@ def compute_models_for_updating_exploration(
     commit_message: Optional[str],
     is_suggestion: bool = False,
     is_by_voice_artist: bool = False,
-    is_synchronous: bool = False,
 ) -> List[base_models.BaseModel]:
-    """Update an exploration. Commits changes.
+    """Computes the exploration and other related models for putting to
+    the datastore. This method does not perform the put operation. The caller
+    of this method needs to perform the put operation.
 
     Args:
         committer_id: str. The id of the user who is performing the update
@@ -2091,8 +2090,6 @@ def compute_models_for_updating_exploration(
             accepted.
         is_by_voice_artist: bool. Whether the changes are made by a
             voice artist.
-        is_synchronous: bool. Whether the update should be done
-            synchronously.
 
     Raises:
         ValueError. No commit message is supplied and the exploration is public.
@@ -2142,7 +2139,7 @@ def compute_models_for_updating_exploration(
     )
     updated_exploration.validate(strict=exploration_is_public)
     models_to_put.extend(
-        _compute_models_to_put(
+        _compute_models_to_put_when_saving_new_exp_version(
             committer_id,
             updated_exploration,
             commit_message,
@@ -2150,76 +2147,76 @@ def compute_models_for_updating_exploration(
         )
     )
 
-    user_data_model_to_put = get_user_data_model_with_draft_discarded(
-        exploration_id, committer_id)
-    if user_data_model_to_put:
-        models_to_put.append(user_data_model_to_put)
+    exp_user_data_model_to_put = get_exp_user_data_model_with_draft_discarded(
+        exploration_id, committer_id
+    )
+    if exp_user_data_model_to_put:
+        models_to_put.append(exp_user_data_model_to_put)
     if committer_id != feconf.MIGRATION_BOT_USER_ID:
         models_to_put.extend(
-            user_services.add_edited_exploration_id_to_model(
+            user_services.add_edited_exploration_id(
                 committer_id,
                 exploration_id
             )
         )
-        user_settings_model = user_services.get_user_settings(
+        user_settings = user_services.get_user_settings(
             committer_id,
             strict=False
         )
-        if user_settings_model:
-            models_to_put.append(
-                user_services.record_user_edited_an_exploration_in_model(
-                    committer_id
+        if user_settings is not None:
+            updated_user_settings_with_last_edit_info = (
+                user_services.record_user_edited_an_exploration(
+                    user_settings
                 )
             )
-            if not rights_manager.is_exploration_private(exploration_id):
-                updated_user_settings = (
+            if not rights_manager.is_exploration_private(exploration_id) and (
+                user_settings.first_contribution_msec is None
+            ):
+                updated_user_settings_with_first_contribution_msec = (
                     user_services
-                    .update_first_contribution_msec_if_not_set_in_model(
-                        committer_id,
+                    .update_first_contribution_msec(
+                        updated_user_settings_with_last_edit_info,
                         utils.get_current_time_in_millisecs()
                     )
                 )
-                if updated_user_settings:
-                    user_settings_model = (
-                        user_services.convert_to_user_settings_model(
-                            updated_user_settings
-                        )
+                user_settings_model = (
+                    user_services.convert_to_user_settings_model(
+                        updated_user_settings_with_first_contribution_msec
                     )
-                    models_to_put.append(user_settings_model)
+                )
+                models_to_put.append(user_settings_model)
+            else:
+                models_to_put.append(
+                    user_services.convert_to_user_settings_model(
+                        updated_user_settings_with_last_edit_info
+                    )
+                )
 
     if opportunity_services.is_exploration_available_for_contribution(
             exploration_id):
         models_to_put.extend(
             opportunity_services
-            .update_opportunity_models_with_updated_exploration(
+            .compute_opportunity_models_with_updated_exploration(
                 exploration_id
             )
         )
-
-    if is_synchronous:
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(
-            exploration_id
+    exp_rights = exp_models.ExplorationRightsModel.get_by_id(
+        exploration_id
+    )
+    exp_summary_model = exp_models.ExpSummaryModel.get(exploration_id)
+    exp_summary = update_exploration_summary(
+        updated_exploration,
+        exp_rights,
+        exp_fetchers.get_exploration_summary_from_model(exp_summary_model),
+        skip_exploration_model_last_updated=True
+    )
+    exp_summary.version += 1
+    updated_exp_summary_model: exp_models.ExpSummaryModel = (
+        populate_exp_summary_model_fields(
+            exp_summary_model, exp_summary
         )
-        exp_summary_model = exp_models.ExpSummaryModel.get(exploration_id)
-        exp_summary = update_exploration_summary(
-            updated_exploration,
-            exp_rights,
-            exp_fetchers.get_exploration_summary_from_model(exp_summary_model),
-            skip_exploration_model_last_updated=True
-        )
-        exp_summary.version += 1
-        updated_exp_summary_model: exp_models.ExpSummaryModel = (
-            populate_exp_summary_model_fields(
-                exp_summary_model, exp_summary
-            )
-        )
-        models_to_put.append(updated_exp_summary_model)
-    else:
-        # Update summary of changed exploration in a deferred task.
-        taskqueue_services.defer(
-            taskqueue_services.FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY,
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_id,
-            committer_id)
+    )
+    models_to_put.append(updated_exp_summary_model)
     return models_to_put
 
 
@@ -2592,7 +2589,7 @@ def revert_exploration(
     current_exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=current_version)
     exp_issues_models_to_put = (
-        stats_services.update_exp_issues_models_for_new_exp_version(
+        stats_services.get_updated_exp_issues_models_for_new_exp_version(
             current_exploration,
             None,
             revert_to_version
@@ -3231,7 +3228,10 @@ def discard_draft(exp_id: str, user_id: str) -> None:
         exp_user_data.put()
 
 
-def get_user_data_model_with_draft_discarded(exp_id: str, user_id: str) -> None:
+def get_exp_user_data_model_with_draft_discarded(
+    exp_id: str,
+    user_id: str
+) -> None:
     """Clears change list related fields in the ExplorationUserDataModel and
     returns it.
 

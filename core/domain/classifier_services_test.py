@@ -41,7 +41,9 @@ from typing import Dict, List, Tuple
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classifier_models
+    from mypy_imports import datastore_services
 
+datastore_services = models.Registry.import_datastore_services()
 (classifier_models,) = models.Registry.import_models([
     models.Names.CLASSIFIER
 ])
@@ -284,12 +286,16 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 3)
 
-    def test_get_job_models_that_handle_trainable_states(self) -> None:
+    def test_get_new_job_models_for_trainable_states(self) -> None:
         """Test the handle_trainable_states method."""
         exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         state_names = ['Home']
-        classifier_services.get_job_models_that_handle_trainable_states(
-            exploration, state_names)
+        job_models = (
+            classifier_services.get_new_job_models_for_trainable_states(
+                exploration, state_names
+            )
+        )
+        datastore_services.put_multi(job_models)
 
         # There should be two jobs (the first job because of the creation of the
         # exploration) in the data store now.
@@ -315,10 +321,10 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             Exception,
             'No classifier algorithm found for Invalid_id interaction'
         ):
-            classifier_services.get_job_models_that_handle_trainable_states(
+            classifier_services.get_new_job_models_for_trainable_states(
                 exploration, state_names)
 
-    def test_get_job_models_that_handle_non_trainable_states(self) -> None:
+    def test_get_new_job_models_for_non_trainable_states(self) -> None:
         """Test the get_job_models_that_handle_non_trainable_states method."""
         exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         next_scheduled_check_time = datetime.datetime.utcnow()
@@ -336,13 +342,25 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         with self.assertRaisesRegex(
             Exception, 'This method should not be called by exploration with '
                        'version number 1'):
-            classifier_services.get_job_models_that_handle_non_trainable_states(
-                exploration, state_names, exp_versions_diff)
+            (
+                _,
+                job_models
+            ) = (
+                classifier_services
+                .get_new_job_models_for_non_trainable_states(
+                    exploration, state_names, exp_versions_diff
+                )
+            )
+            datastore_services.put_multi(job_models)
 
         exploration.version += 1
         # Test that mapping cant be created if job doesn't exist.
-        classifier_services.get_job_models_that_handle_non_trainable_states(
-            exploration, state_names, exp_versions_diff)
+        (_, job_models) = (
+            classifier_services.get_new_job_models_for_non_trainable_states(
+                exploration, state_names, exp_versions_diff
+            )
+        )
+        datastore_services.put_multi(job_models)
         # There will be only one mapping (because of the creation of the
         # exploration).
         all_mappings = (
@@ -364,8 +382,12 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 2)
 
-        classifier_services.get_job_models_that_handle_non_trainable_states(
-            exploration, state_names, exp_versions_diff)
+        (_, job_models) = (
+            classifier_services.get_new_job_models_for_non_trainable_states(
+                exploration, state_names, exp_versions_diff
+            )
+        )
+        datastore_services.put_multi(job_models)
 
         # There should be three mappings (the first mapping because of the
         # creation of the exploration) in the data store now.

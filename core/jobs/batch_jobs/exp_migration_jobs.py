@@ -175,7 +175,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     updated_exp_model.id,
                     exp_changes,
                     commit_message,
-                    is_synchronous=True
                 )
             )
         datastore_services.update_timestamps_multi(list(models_to_put_values))

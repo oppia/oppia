@@ -301,9 +301,10 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         # Update the first_contribution_msec to the current time in
         # milliseconds.
         first_time_in_msecs = utils.get_current_time_in_millisecs()
+        user_settings_to_update = user_services.get_user_settings(user_id)
         user_settings = (
-            user_services.update_first_contribution_msec_if_not_set_in_model(
-                user_id,
+            user_services.update_first_contribution_msec(
+                user_settings_to_update,
                 first_time_in_msecs
             )
         )
@@ -319,13 +320,15 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         # Test that the contribution date is not changed after the first time it
         # is set.
         second_time_in_msecs = utils.get_current_time_in_millisecs()
+        user_settings_to_update = user_services.get_user_settings(user_id)
         user_settings = (
-            user_services.update_first_contribution_msec_if_not_set_in_model(
-                user_id,
+            user_services.update_first_contribution_msec(
+                user_settings_to_update,
                 second_time_in_msecs
             )
         )
-        user_services.save_user_settings(user_settings)
+        if user_settings is not None:
+            user_services.save_user_settings(user_settings)
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME)
         self.assertEqual(

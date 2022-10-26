@@ -1684,8 +1684,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         user_contributions = user_services.compute_user_contributions(
             feconf.MIGRATION_BOT_USER_ID, [], []
         )
-        user_contributions.update_timestamps()
-        user_contributions.put()
+        self.assertIsNone(user_contributions)
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='end')
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
@@ -7839,7 +7838,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
 
     def test_draft_discarded(self) -> None:
         user_data_model = (
-            exp_services.get_user_data_model_with_draft_discarded(
+            exp_services.get_exp_user_data_model_with_draft_discarded(
                 self.EXP_ID1,
                 self.USER_ID
             )

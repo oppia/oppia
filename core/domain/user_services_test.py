@@ -50,6 +50,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import auth_models
     from mypy_imports import user_models
 
+datastore_services = models.Registry.import_datastore_services()
 (auth_models, user_models, audit_models) = (models.Registry.import_models([
     models.Names.AUTH,
     models.Names.USER,
@@ -1972,7 +1973,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         for created_exp_id in created_exp_ids:
             user_services.add_created_exploration_id(user_id, created_exp_id)
         for edited_exp_id in edited_exp_ids:
-            user_services.add_edited_exploration_id_to_model(
+            user_services.add_edited_exploration_id(
                 user_id,
                 edited_exp_id
             )
@@ -2065,7 +2066,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsInstance(contributions, user_domain.UserContributions)
         self.assertIn('exp1', contributions.created_exploration_ids)
 
-    def test_add_edited_exploration_id_to_model(self) -> None:
+    def test_add_edited_exploration_id(self) -> None:
         auth_id = 'someUser'
         user_email = 'user@example.com'
 
@@ -2075,7 +2076,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertNotIn('exp1', contributions.edited_exploration_ids)
 
-        user_services.add_edited_exploration_id_to_model(user_id, 'exp1')
+        user_services.add_edited_exploration_id(user_id, 'exp1')
         contributions = user_services.get_user_contributions(
             user_id, strict=True
         )
@@ -2087,7 +2088,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         pre_add_contributions = user_services.get_user_contributions(user_id)
         self.assertIsNone(pre_add_contributions)
 
-        user_services.add_edited_exploration_id_to_model(user_id, 'exp1')
+        user_contribution_models = user_services.add_edited_exploration_id(
+            user_id, 'exp1'
+        )
+        datastore_services.update_timestamps_multi(user_contribution_models)
+        datastore_services.put_multi(user_contribution_models)
+
         contributions = user_services.get_user_contributions(
             user_id, strict=True
         )
@@ -3250,13 +3256,12 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
             user_settings.last_edited_an_exploration -
             datetime.timedelta(hours=13))
         with self.mock_datetime_utcnow(mocked_datetime_utcnow):
-            user_settings_model = (
-                user_services.record_user_edited_an_exploration_in_model(
-                    self.editor_id
+            user_settings = (
+                user_services.record_user_edited_an_exploration(
+                    user_settings
                 )
             )
-            user_settings_model.update_timestamps()
-            user_settings_model.put()
+            user_services.save_user_settings(user_settings)
 
         editor_settings = user_services.get_user_settings(self.editor_id)
         previous_last_edited_an_exploration = (

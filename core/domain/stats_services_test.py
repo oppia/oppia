@@ -586,7 +586,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             Exception,
             'ExplorationVersionsDiff cannot be None when the change'
         ):
-            stats_services.update_exp_issues_models_for_new_exp_version(
+            stats_services.get_updated_exp_issues_models_for_new_exp_version(
                 exploration, None, None
             )
 
@@ -1112,7 +1112,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exp_stats_list[1].exp_id, 'exp_id_2')
         self.assertEqual(exp_stats_list[1].exp_version, 2)
 
-    def test_update_exp_issues_models_for_new_exp_version(self) -> None:
+    def test_get_updated_exp_issues_models_for_new_exp_version(self) -> None:
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         exp = self.save_new_valid_exploration('exp_id', admin_id)
@@ -1125,10 +1125,11 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
         exp.version += 1
         models_to_put = (
-            stats_services.update_exp_issues_models_for_new_exp_version(
+            stats_services.get_updated_exp_issues_models_for_new_exp_version(
                 exp, exp_domain.ExplorationVersionsDiff([]), None
             )
         )
+        datastore_services.update_timestamps_multi(models_to_put)
         datastore_services.put_multi(models_to_put)
 
         exploration_issues_model = (

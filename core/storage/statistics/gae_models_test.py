@@ -636,12 +636,8 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.state_stats_mapping, {})
 
     def test_create_analytics_model(self) -> None:
-        model = (
-            stats_models.ExplorationStatsModel.create(
-                'exp_id1', 1, 0, 0, 0, 0, 0, 0, {}))
-        model.update_timestamps()
-        model.put()
-        model_id = model.id
+        model_id = stats_models.ExplorationStatsModel.create(
+            'exp_id1', 1, 0, 0, 0, 0, 0, 0, {})
         fetched_model = stats_models.ExplorationStatsModel.get_model(
             'exp_id1', 1)
 

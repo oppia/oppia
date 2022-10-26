@@ -272,7 +272,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
         self.assertFalse(response['changes_are_mergeable'])
         self.assertEqual(response['draft_change_list_id'], 2)
 
-    def test_get_user_data_model_with_draft_discarded(self):
+    def test_discard_draft(self):
         self.post_json(
             '/createhandler/autosave_draft/%s' % self.EXP_ID, {},
             csrf_token=self.csrf_token)

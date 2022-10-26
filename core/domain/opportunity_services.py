@@ -107,7 +107,7 @@ def get_exploration_opportunity_summary_from_model(
         {})
 
 
-def _create_opportunity_summary_models(
+def _construct_new_opportunity_summary_models(
     exploration_opportunity_summary_list: List[
         opportunity_domain.ExplorationOpportunitySummary
     ]
@@ -160,7 +160,9 @@ def _save_multi_exploration_opportunity_summary(
             summary object.
     """
     exploration_opportunity_summary_model_list = (
-        _create_opportunity_summary_models(exploration_opportunity_summary_list)
+        _construct_new_opportunity_summary_models(
+            exploration_opportunity_summary_list
+        )
     )
     (
         opportunity_models.ExplorationOpportunitySummaryModel
@@ -291,11 +293,12 @@ def _create_exploration_opportunities(
     )
 
 
-def update_opportunity_models_with_updated_exploration(
+def compute_opportunity_models_with_updated_exploration(
     exp_id: str
 ) -> List[opportunity_models.ExplorationOpportunitySummaryModel]:
-    """Updates the opportunities models with the changes made in the
-    exploration.
+    """Computes the opportunities models with the changes made in the
+    exploration. Note: This method does not perform a put operation. The caller
+    must perform the put operation.
 
     Args:
         exp_id: str. The exploration id which is also the id of the opportunity
@@ -349,7 +352,7 @@ def update_opportunity_models_with_updated_exploration(
 
     exploration_opportunity_summary.validate()
 
-    return _create_opportunity_summary_models(
+    return _construct_new_opportunity_summary_models(
         [exploration_opportunity_summary])
 
 
