@@ -1008,7 +1008,7 @@ class AdminRoleHandler(base.BaseHandler):
         )
         filter_criterion = request_data['filter_criterion']
         if filter_criterion == feconf.USER_FILTER_CRITERION_ROLE:
-            role = request_data[feconf.USER_FILTER_CRITERION_ROLE]
+            role = request_data.get(feconf.USER_FILTER_CRITERION_ROLE)
             if role is None:
                 raise Exception(
                     'The role must be provided when the filter criterion '
@@ -1023,7 +1023,7 @@ class AdminRoleHandler(base.BaseHandler):
                 )
             })
         elif filter_criterion == feconf.USER_FILTER_CRITERION_USERNAME:
-            username = request_data[feconf.USER_FILTER_CRITERION_USERNAME]
+            username = request_data.get(feconf.USER_FILTER_CRITERION_USERNAME)
             if username is None:
                 raise Exception(
                     'The username must be provided when the filter criterion '

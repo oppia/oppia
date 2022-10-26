@@ -1516,6 +1516,34 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         })
         self.logout()
 
+    def test_if_filter_criterion_is_username_and_username_is_not_provided(
+        self
+    ) -> None:
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        with self.assertRaisesRegex(
+            Exception,
+            'The username must be provided when the filter criterion is \'username\'.'
+        ):
+            self.get_json(
+                feconf.ADMIN_ROLE_HANDLER_URL,
+                params={'filter_criterion': 'username'}
+            )
+
+    def test_if_filter_criterion_is_role_and_role_is_not_provided(
+        self
+    ) -> None:
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        with self.assertRaisesRegex(
+            Exception,
+            'The role must be provided when the filter criterion is \'role\'.'
+        ):
+            self.get_json(
+                feconf.ADMIN_ROLE_HANDLER_URL,
+                params={'filter_criterion': 'role'}
+            )
+
     def test_invalid_username_in_filter_criterion_and_update_role(self) -> None:
         username = 'myinvaliduser'
 
