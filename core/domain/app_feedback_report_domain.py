@@ -90,26 +90,23 @@ class AppFeedbackReport:
         """Constructs an AppFeedbackReport domain object.
 
         Args:
-            report_id: str. The unique ID of the report.
-            schema_version: int. The schema version of this feedback report.
-            platform: str. The platform this report is for.
-            submitted_on_timestamp: datetime.datetime. Timestamp in seconds
-                since epoch (in UTC) of when the report was submitted by the
-                user.
-            local_timezone_offset_hrs: int. The number of hours offset from UTC
-                for the user's local time.
-            ticket_id: str|None. The unique ID that this ticket is assigned to;
-                None if this report is not yet ticketed.
-            scrubbed_by: str|None. The unique ID of the user that scrubbed this
-                report, or feconf.REPORT_SCRUBBER_BOT_ID if scrubbed by the
-                cron job.
-            user_supplied_feedback: UserSuppliedFeedback. An object representing
-                the information fileld out by the user in the report.
-            device_system_context: DeviceSystemContext. An object representing
-                the user's device and system information used to submit the
-                report.
-            app_context: AppContext. An object representing the user's Oppia
-                app state when they submitted the report.
+            report_id: The unique ID of the report.
+            schema_version: The schema version of this feedback report.
+            platform: The platform this report is for.
+            submitted_on_timestamp: Timestamp in seconds since epoch (in UTC)
+                of when the report was submitted by the user.
+            local_timezone_offset_hrs: The number of hours offset from UTC for
+                the user's local time.
+            ticket_id: The unique ID that this ticket is assigned to; None if
+                this report is not yet ticketed.
+            scrubbed_by: The unique ID of the user that scrubbed this report, or
+                feconf.REPORT_SCRUBBER_BOT_ID if scrubbed by the cron job.
+            user_supplied_feedback: An object representing the information
+                filled out by the user in the report.
+            device_system_context: An object representing the user's device and
+                system information used to submit the report.
+            app_context: An object representing the user's Oppia app state when
+                they submitted the report.
         """
         self.report_id = report_id
         self.schema_version = schema_version
@@ -126,7 +123,7 @@ class AppFeedbackReport:
         """Returns a dict representing this AppFeedbackReport domain object.
 
         Returns:
-            dict. A dict, mapping all fields of AppFeedbackReport instance.
+            A dict, mapping all fields of AppFeedbackReport instance.
         """
         return {
             'report_id': self.report_id,
@@ -193,7 +190,7 @@ class AppFeedbackReport:
         """Checks whether the platform is valid.
 
         Args:
-            platform: str. The platform to validate.
+            platform: The platform to validate.
 
         Raises:
             ValidationError. No platform supplied.
@@ -214,8 +211,8 @@ class AppFeedbackReport:
         platform.
 
         Args:
-            platform: str. The platform to validate the schema version for.
-            schema_version: int. The schema version to validate.
+            platform: The platform to validate the schema version for.
+            schema_version: The schema version to validate.
 
         Raises:
             ValidationError. No schema version supplied.
@@ -240,7 +237,7 @@ class AppFeedbackReport:
         """Checks whether the scrubbed_by user is valid.
 
         Args:
-            scrubber_id: str. The user id to validate.
+            scrubber_id: The user id to validate.
 
         Raises:
             ValidationError. The user id is not a string.
@@ -263,12 +260,11 @@ class AppFeedbackReport:
         an incoming feedback report request.
 
         Args:
-            report_dict: dict. A dict representing the incoming feedback report
+            report_dict: A dict representing the incoming feedback report
                 sent in a request.
 
         Returns:
-            AppFeedbackReport. The corresponding AppFeedbackReport domain
-            object.
+            The corresponding AppFeedbackReport domain object.
 
         Raises:
             NotImplementedError. Domain objects for web reports not implemented.
@@ -288,11 +284,11 @@ class AppFeedbackReport:
         report.
 
         Args:
-            report_dict: dict. A dict representing the Android feedback report.
+            report_dict: A dict representing the Android feedback report.
 
         Returns:
-            AppFeedbackReport. The corresponding AppFeedbackReport domain
-            object for an Android report.
+            The corresponding AppFeedbackReport domain object for an Android
+            report.
         """
         user_supplied_feedback_json = report_dict['user_supplied_feedback']
         user_supplied_feedback_obj = (
@@ -352,10 +348,10 @@ class AppFeedbackReport:
         """Determines the report type based on the JSON value.
 
         Args:
-            report_type_name: str. The name of the report type.
+            report_type_name: The name of the report type.
 
         Returns:
-            REPORT_TYPE. The enum representing this report type.
+            The enum representing this report type.
         """
         for report_type in app_feedback_report_constants.ALLOWED_REPORT_TYPES:
             if report_type_name == report_type.value:
@@ -370,10 +366,10 @@ class AppFeedbackReport:
         """Determines the category based on the JSON value.
 
         Args:
-            category_name: str. The name of the report type.
+            category_name: The name of the report type.
 
         Returns:
-            CATEGORY. The enum representing this category.
+            The enum representing this category.
         """
         for category_type in app_feedback_report_constants.ALLOWED_CATEGORIES:
             if category_name == category_type.value:
@@ -388,10 +384,10 @@ class AppFeedbackReport:
         """Determines the app text size based on the JSON value.
 
         Args:
-            text_size_name: str. The name of the app's text size set.
+            text_size_name: The name of the app's text size set.
 
         Returns:
-            AndroidTextSize. The enum representing the text size.
+            The enum representing the text size.
         """
         for text_size_type in (
             app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES):
@@ -407,11 +403,10 @@ class AppFeedbackReport:
         """Determines the entry point type based on the received JSON.
 
         Args:
-            entry_point_json: dict. The JSON data of the entry point.
+            entry_point_json: The JSON data of the entry point.
 
         Returns:
-            EntryPoint. The EntryPoint domain object representing the entry
-            point.
+            The EntryPoint domain object representing the entry point.
 
         Raises:
             InvalidInputException. The given entry point is invalid.
@@ -470,10 +465,10 @@ class AppFeedbackReport:
         """Determines the network type based on the JSON value.
 
         Args:
-            network_type_name: str. The name of the network type.
+            network_type_name: The name of the network type.
 
         Returns:
-            AndroidNetworkType. The enum representing the network type.
+            The enum representing the network type.
         """
         for network_type in (
             app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES):
@@ -505,15 +500,13 @@ class UserSuppliedFeedback:
         """Constructs a UserSuppliedFeedback domain object.
 
         Args:
-            report_type: ReportType. The type of feedback submitted by the user
-                as an enum.
-            category: Category. The category enum that this specific report_type
-                is providing feedback on that correponds.
-            user_feedback_selected_items: list(str). A list of strings that
-                represent any options selected by the user for the feedback
-                they are providing in this feedback report.
-            user_feedback_other_text_input: str. The open text inputted by
-                the user.
+            report_type: The type of feedback submitted by the user as an enum.
+            category: The category enum that this specific report_type is
+                providing feedback on that correponds.
+            user_feedback_selected_items: A list of strings that represent any
+                options selected by the user for the feedback they are providing
+                in this feedback report.
+            user_feedback_other_text_input: The open text inputted by the user.
         """
         self.report_type = report_type
         self.category = category
@@ -524,7 +517,7 @@ class UserSuppliedFeedback:
         """Returns a dict representing this UserSuppliedFeedback domain object.
 
         Returns:
-            dict. A dict, mapping all fields of UserSuppliedFeedback instance.
+            A dict, mapping all fields of UserSuppliedFeedback instance.
         """
         return {
             'report_type': self.report_type.value,
@@ -562,7 +555,7 @@ class UserSuppliedFeedback:
         """Checks whether the report_type is valid.
 
         Args:
-            report_type: ReportType. The report type enum to validate.
+            report_type: The report type enum to validate.
 
         Raises:
             ValidationError. No report_type supplied.
@@ -584,7 +577,7 @@ class UserSuppliedFeedback:
         """Checks whether the category is valid.
 
         Args:
-            category: CATEGORY. The category enum to validate.
+            category: The category enum to validate.
 
         Raises:
             ValidationError. No category supplied.
@@ -609,10 +602,10 @@ class UserSuppliedFeedback:
         selected items.
 
         Args:
-            category: str. The category selected for this report.
-            selected_items: list(str). The user feedback selected items to
+            category: The category selected for this report.
+            selected_items: The user feedback selected items to
                 validate, chosen by the user in the report.
-            other_text_input: str. The user feedback other text input to
+            other_text_input: The user feedback other text input to
                 validate, provided by the user in the report.
 
         Raises:
@@ -646,7 +639,7 @@ class UserSuppliedFeedback:
         """Checks whether the user_feedback_selected_items are valid.
 
         Args:
-            selected_items: list(str). The items selected by the user to
+            selected_items: The items selected by the user to
                 validate.
 
         Raises:
@@ -676,9 +669,9 @@ class DeviceSystemContext:
         """Constructs a DeviceSystemContext domain object.
 
         Args:
-            version_name: str. The specific version of the app being used to
+            version_name: The specific version of the app being used to
                 submit the report.
-            device_country_locale_code: str. The user's country locale
+            device_country_locale_code: The user's country locale
                 represented as an ISO-3166 code.
         """
         self.version_name = version_name
@@ -690,7 +683,7 @@ class DeviceSystemContext:
         properties.
 
         Returns:
-            dict. A dict, mapping all fields of DeviceSystemContext instance.
+            A dict, mapping all fields of DeviceSystemContext instance.
         """
         return {
             'version_name': self.version_name,
@@ -759,22 +752,22 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         """Constructs an AndroidDeviceSystemContext domain object.
 
         Args:
-            version_name: str. The specific version of the app being used to
+            version_name: The specific version of the app being used to
                 submit the report.
-            package_version_code: int. The Oppia Android package version on the
+            package_version_code: The Oppia Android package version on the
                 device.
-            device_country_locale_code: str. The device's country locale code
+            device_country_locale_code: The device's country locale code
                 as an ISO-639 code, as determined in the Android device's
                 settings.
-            device_language_locale_code: str. The device's language locale code
+            device_language_locale_code: The device's language locale code
                 as an ISO-639 code, as determined in the Android device's
                 settings.
-            device_model: str. The Android device model used to send the report.
-            sdk_version: int. The Android SDK version running on the device.
-            build_fingerprint: str. The unique build fingerprint of this app
+            device_model: The Android device model used to send the report.
+            sdk_version: The Android SDK version running on the device.
+            build_fingerprint: The unique build fingerprint of this app
                 version.
-            network_type: AndroidNetworkType. The enum for the network type
-                the device was connected to.
+            network_type: The enum for the network type the device was
+                connected to.
         """
         super().__init__(
             version_name, device_country_locale_code)
@@ -790,7 +783,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         object.
 
         Returns:
-            dict. A dict, mapping all fields of AndroidDeviceSystemContext
+            A dict, mapping all fields of AndroidDeviceSystemContext
             instance.
         """
         return {
@@ -841,7 +834,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         Oppia Android.
 
         Args:
-            version_name: str. The version name for this report.
+            version_name: The version name for this report.
 
         Raises:
             ValidationError. The given app version name is not valid.
@@ -865,7 +858,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         Oppia Android.
 
         Args:
-            package_version_code: int. The package version code for this report.
+            package_version_code: The package version code for this report.
 
         Raises:
             ValidationError. The given code is not valid.
@@ -890,9 +883,9 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         """Checks whether the device's locale code is a valid  code.
 
         Args:
-            locale_type: str. The type of locale code to verify; can be either
+            locale_type: The type of locale code to verify; can be either
                 'country' or 'language'.
-            locale_code: str. The device's country locale code
+            locale_code: The device's country locale code
                 that sent the report.
 
         Raises:
@@ -915,11 +908,11 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         """Helper that checks whether the given locale code is a valid code.
 
         Args:
-            code: str. The device's country locale code that sent the report.
+            code: The device's country locale code that sent the report.
 
         Returns:
-            bool. Whether the given code is valid. Valid codes are alphabetic
-            string that may contain a number of single hyphens.
+            Whether the given code is valid. Valid codes are alphabetic string
+            that may contain a number of single hyphens.
         """
         regex_string = r'^([a-z]+[-]?[a-z]+)+$'
         return re.compile(regex_string).match(code.lower())
@@ -929,7 +922,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         """Checks that the Android device's SDK version is a positive integer.
 
         Args:
-            sdk_version: int. The SDK version of the device sending this report.
+            sdk_version: The SDK version of the device sending this report.
 
         Raises:
             ValidationError. The given SDK version  is not valid.
@@ -951,8 +944,8 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         """Checks that the Android device's network type is valid.
 
         Args:
-            network_type: AndroidNetworkType. The network type the device
-                was connected to when sending the report, as an enum.
+            network_type: The network type the device was connected to when
+                sending the report, as an enum.
 
         Raises:
             ValidationError. The given network is not a string.
@@ -988,11 +981,11 @@ class AppContext:
         """Constructs an AppContext domain object.
 
         Args:
-            entry_point: EntryPoint. An object representing The entry point that
+            entry_point: An object representing The entry point that
                 the user used to initiate the report.
-            text_language_code: str. The ISO-639 code for the text language set
+            text_language_code: The ISO-639 code for the text language set
                 in the app.
-            audio_language_code: str. The ISO-639 code for the audio language
+            audio_language_code: The ISO-639 code for the audio language
                 set in the app.
         """
         self.entry_point = entry_point
@@ -1004,7 +997,7 @@ class AppContext:
         should override this to propertly format any additional properties.
 
         Returns:
-            dict. A dict, mapping all fields of AppContext instance.
+            A dict, mapping all fields of AppContext instance.
         """
         return {
             'entry_point': self.entry_point.to_dict(),
@@ -1058,26 +1051,23 @@ class AndroidAppContext(AppContext):
         """Constructs a AndroidAppContext domain object.
 
         Args:
-            entry_point: EntryPoint. An object representing The entry point that
-                the user used to initiate the report.
-            text_language_code: str. The ISO-639 code for the text language set
-                in the app.
-            audio_language_code: str. The ISO-639 code for the audio language
-                set in the app.
-            text_size: AndroidTextSize. The enum type for text size set by
-                the user in the app.
-            only_allows_wifi_download_and_update: bool. True if the user only
-                allows downloads and updates when connected to wifi.
-            automatically_update_topics: bool. True if the user allows
-                automatically updating topics.
-            account_is_profile_admin: bool. True if user sending the report is
-                an admin account.
-            event_logs: list(str). A list of strings for the event logs
-                collected in the app; the list is empty if this instance has
-                been scrubbed.
-            logcat_logs: list(str). A list of strings for the logcat events
-                recorded in the app; the list is empty if this instance has been
-                scrubbed.
+            entry_point: An object representing The entry point that the user
+                used to initiate the report.
+            text_language_code: The ISO-639 code for the text language set in
+                the app.
+            audio_language_code: The ISO-639 code for the audio language set in
+                the app.
+            text_size: The enum type for text size set by the user in the app.
+            only_allows_wifi_download_and_update: True if the user only allows
+                downloads and updates when connected to wifi.
+            automatically_update_topics: True if the user allows automatically
+                updating topics.
+            account_is_profile_admin: True if user sending the report is an
+                admin account.
+            event_logs: A list of strings for the event logs collected in the
+                app; the list is empty if this instance has been scrubbed.
+            logcat_logs: A list of strings for the logcat events recorded in the
+                app; the list is empty if this instance has been scrubbed.
         """
         super().__init__(
             entry_point, text_language_code, audio_language_code)
@@ -1096,7 +1086,7 @@ class AndroidAppContext(AppContext):
         """Returns a dict representing this AndroidAppContext domain object.
 
         Returns:
-            dict. A dict, mapping all fields of AndroidAppContext instance.
+            A dict, mapping all fields of AndroidAppContext instance.
         """
         return {
             'entry_point': self.entry_point.to_dict(),
@@ -1156,9 +1146,9 @@ class AndroidAppContext(AppContext):
         """Checks that the language code is valid.
 
         Args:
-            language_type: str. The type of language code being validates,
+            language_type: The type of language code being validates,
                 either 'text' or 'audio'.
-            language_code: str. The language code being validated, as determined
+            language_code: The language code being validated, as determined
                 by the Oppia app.
 
         Raises:
@@ -1181,10 +1171,10 @@ class AndroidAppContext(AppContext):
         """Helper that checks whether the given language code is a valid code.
 
         Args:
-            code: str. The language code set on the app.
+            code: The language code set on the app.
 
         Returns:
-            bool. Whether the given code is valid. Valid codes are alphabetic
+            Whether the given code is valid. Valid codes are alphabetic
             string that may contain a number of single hyphens.
         """
         regex_string = r'^([a-z]+[-]?[a-z]+)+$'
@@ -1198,8 +1188,8 @@ class AndroidAppContext(AppContext):
         Oppia Android.
 
         Args:
-            text_size: AndroidTextSize. The enum type for the text size set by
-                the user in the app.
+            text_size: The enum type for the text size set by the user in
+                the app.
 
         Raises:
             ValidationError. The given text size is not valid.
@@ -1240,15 +1230,15 @@ class EntryPoint:
         """Constructs an EntryPoint domain object.
 
         Args:
-            entry_point: ENTRY_POINT. The enum type for entry point used.
-            topic_id: str|None. The id for the current topic if the report was
-                sent during a topic in a lesson or revision session.
-            story_id: str|None. The id for the current story if the report was
+            entry_point: The enum type for entry point used.
+            topic_id: The id for the current topic if the report was sent during
+                a topic in a lesson or revision session.
+            story_id: The id for the current story if the report was sent during
+                a lesson.
+            exploration_id: The id for the current exploration if the report was
                 sent during a lesson.
-            exploration_id: str|None. The id for the current exploration if the
-                report was sent during a lesson.
-            subtopic_id: int|None. The id for the current subtopic if the report
-                was sent during a revision session.
+            subtopic_id: The id for the current subtopic if the report was sent
+                during a revision session.
         """
         self.entry_point_name = entry_point.value
         self.topic_id = topic_id
@@ -1291,8 +1281,8 @@ class EntryPoint:
         """Validates this EntryPoint name.
 
         Args:
-            actual_name: str. The name used for this entry point object.
-            expected_entry_point: ENTRY_POINT. The enum type that should match
+            actual_name: The name used for this entry point object.
+            expected_entry_point: The enum type that should match
                 the given entry_point_name.
 
         Raises:
@@ -1319,8 +1309,8 @@ class EntryPoint:
         """Checks whether the exploration id is a valid one.
 
         Args:
-            exploration_id: str. The exploraiton ID to validate.
-            story_id: str. The ID of the story that has this exploration.
+            exploration_id: The exploration ID to validate.
+            story_id: The ID of the story that has this exploration.
 
         Raises:
             ValidationError. The exploration ID is not a valid ID.
@@ -1358,7 +1348,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
         object.
 
         Returns:
-            dict. A dict, mapping all fields of NavigationDrawerEntryPoint
+            A dict, mapping all fields of NavigationDrawerEntryPoint
             instance.
         """
         return {
@@ -1395,12 +1385,12 @@ class LessonPlayerEntryPoint(EntryPoint):
         """Constructs an LessonPlayerEntryPoint domain object.
 
         Args:
-            topic_id: str. The unique ID for the current topic the user is
-                playing when intiating the report.
-            story_id: str. The unique ID for the current story the user is
-                playing when intiating the report.
-            exploration_id: str. The unique ID for the current exploration the
-                user is playing when intiating the report.
+            topic_id: The unique ID for the current topic the user is
+                playing when initiating the report.
+            story_id: The unique ID for the current story the user is
+                playing when initiating the report.
+            exploration_id: The unique ID for the current exploration the
+                user is playing when initiating the report.
         """
         super().__init__(
             app_feedback_report_constants.EntryPoint.LESSON_PLAYER,
@@ -1411,7 +1401,7 @@ class LessonPlayerEntryPoint(EntryPoint):
         object.
 
         Returns:
-            dict. A dict, mapping all fields of LessonPlayerEntryPoint instance.
+            A dict, mapping all fields of LessonPlayerEntryPoint instance.
         """
         return {
             'entry_point_name': self.entry_point_name,
@@ -1454,10 +1444,10 @@ class RevisionCardEntryPoint(EntryPoint):
         """Constructs an RevisionCardEntryPoint domain object.
 
         Args:
-            topic_id: str. The unique ID for the current topic the user is
-                reviewing when intiating the report.
-            subtopic_id: int. The ID for the current subtopic the user is
-                reviewing when intiating the report.
+            topic_id: The unique ID for the current topic the user is
+                reviewing when initiating the report.
+            subtopic_id: The ID for the current subtopic the user is
+                reviewing when initiating the report.
         """
         super().__init__(
             app_feedback_report_constants.EntryPoint.REVISION_CARD,
@@ -1468,7 +1458,7 @@ class RevisionCardEntryPoint(EntryPoint):
         object.
 
         Returns:
-            dict. A dict, mapping all fields of RevisionCardEntryPoint
+            A dict, mapping all fields of RevisionCardEntryPoint
             instance.
         """
         return {
@@ -1513,7 +1503,7 @@ class CrashEntryPoint(EntryPoint):
         """Returns a dict representing this CrashEntryPoint domain object.
 
         Returns:
-            dict. A dict, mapping all fields of CrashEntryPoint
+            A dict, mapping all fields of CrashEntryPoint
             instance.
         """
         return {
@@ -1562,20 +1552,20 @@ class AppFeedbackReportTicket:
         """Constructs a AppFeedbackReportTicket domain object.
 
         Args:
-            ticket_id: str. The unique ID of the ticket.
-            ticket_name: str. The user-readable name given to this ticket.
-            platform: str. The platform that the reports in this ticket apply
+            ticket_id: The unique ID of the ticket.
+            ticket_name: The user-readable name given to this ticket.
+            platform: The platform that the reports in this ticket apply
                 to; must be one of PLATFORM_CHOICES.
-            github_issue_repo_name: str|None. The Github repository that has the
+            github_issue_repo_name: The Github repository that has the
                 issue addressing this ticket.
-            github_issue_number: int|None. The Github issue number addressing
+            github_issue_number: The Github issue number addressing
                 this ticket.
-            archived: bool. Whether this ticket is archived.
-            newest_report_creation_timestamp: datetime.datetime. Timestamp in
-                UTC of the newest submitted report that is in this ticket, or
-                None if there is no report.
-            reports: list(str). The list of IDs for the AppFeedbackReports
-                assigned to this ticket.
+            archived: Whether this ticket is archived.
+            newest_report_creation_timestamp: Timestamp in UTC of the newest
+                submitted report that is in this ticket, or None if there is
+                no report.
+            reports: The list of IDs for the AppFeedbackReports assigned to
+                this ticket.
         """
         self.ticket_id = ticket_id
         self.ticket_name = ticket_name
@@ -1591,7 +1581,7 @@ class AppFeedbackReportTicket:
         object.
 
         Returns:
-            dict. A dict, mapping all fields of AppFeedbackReportTicket
+            A dict, mapping all fields of AppFeedbackReportTicket
             instance.
         """
         return {
@@ -1641,7 +1631,7 @@ class AppFeedbackReportTicket:
         """Checks whether the ticket id is a valid one.
 
         Args:
-            ticket_id: str. The ticket id to validate.
+            ticket_id: The ticket id to validate.
 
         Raises:
             ValidationError. The id is an invalid format.
@@ -1660,7 +1650,7 @@ class AppFeedbackReportTicket:
         """Checks whether the ticket name is a valid one.
 
         Args:
-            ticket_name: str. The ticket name to validate.
+            ticket_name: The ticket name to validate.
 
         Raises:
             ValidationError. The name is an invalid format.
@@ -1684,7 +1674,7 @@ class AppFeedbackReportTicket:
         """Checks whether the reports in this ticket are valid.
 
         Args:
-            report_ids: list(str). The list of reports IDs of the reports
+            report_ids: The list of reports IDs of the reports
                 associated with this ticket.
 
         Raises:
@@ -1707,7 +1697,7 @@ class AppFeedbackReportTicket:
         """Checks whether the reports in this ticket are valid.
 
         Args:
-            repo_name: str. The name of the repo associated with the Github
+            repo_name: The name of the repo associated with the Github
                 issue.
 
         Raises:
@@ -1760,15 +1750,15 @@ class AppFeedbackReportDailyStats:
         """Constructs a AppFeedbackReportDailyStats domain object.
 
         Args:
-            stats_id: str. The unique ID for ths stats instance.
-            ticket: AppFeedbackReportTicket. The AppFeedbackReportTicket domain
-                object associated with this ticket.
-            platform: str. The platform these report stats are aggregating for.
-            stats_tracking_date: datetime.date. The date that this object is
-                aggregating stats on, in UTC.
-            total_reports_submitted: int. The total number of reports submitted
+            stats_id: The unique ID for ths stats instance.
+            ticket: The AppFeedbackReportTicket domain object associated with
+                this ticket.
+            platform: The platform these report stats are aggregating for.
+            stats_tracking_date: The date that this object is aggregating stats
+                on, in UTC.
+            total_reports_submitted: The total number of reports submitted
                 on this date for this ticket.
-            daily_param_stats: dict. A dict representing the statistics on this
+            daily_param_stats: A dict representing the statistics on this
                 date. Keys in this dict correpond to STATS_PARAMETER_NAMES
                 enums, while values are ReportStatsParameterValueCounts objects.
         """
@@ -1784,7 +1774,7 @@ class AppFeedbackReportDailyStats:
         object.
 
         Returns:
-            dict. A dict, mapping all fields of AppFeedbackReportDailyStats
+            A dict, mapping all fields of AppFeedbackReportDailyStats
             instance.
         """
         return {
@@ -1825,7 +1815,7 @@ class AppFeedbackReportDailyStats:
         """Checks whether the stats id is a valid one.
 
         Args:
-            stats_id: str. The stats id to validate.
+            stats_id: The stats id to validate.
 
         Raises:
             ValidationError. The id is an invalid format.
@@ -1844,7 +1834,7 @@ class AppFeedbackReportDailyStats:
         """Checks whether the statistics in this domain object are valid.
 
         Args:
-            param_stats: dict. The dict representing the daily stats for this
+            param_stats: The dict representing the daily stats for this
                 ticket.
 
         Raises:
@@ -1875,9 +1865,9 @@ class ReportStatsParameterValueCounts:
         """Constructs a ReportStatsParameterValueCounts domain object.
 
         Args:
-            parameter_value_counts: dict. A dict with keys that correpond to a
-                specific value for a given parameter, and integer values for the
-                number of reports that satisfy that value.
+            parameter_value_counts: A dict with keys that correspond to a
+                specific value for a given parameter, and integer values
+                for the number of reports that satisfy that value.
         """
         self.parameter_value_counts = parameter_value_counts
 
@@ -1886,7 +1876,7 @@ class ReportStatsParameterValueCounts:
         domain object.
 
         Returns:
-            dict. A dict, mapping all fields of ReportStatsParameterValueCounts
+            A dict, mapping all fields of ReportStatsParameterValueCounts
             instance.
         """
         return self.parameter_value_counts
@@ -1929,10 +1919,9 @@ class AppFeedbackReportFilter:
         """Constructs a AppFeedbackReportFilter domain object.
 
         Args:
-            filter_field: FilterFieldNames. The enum type for the filter
-                category, correponding to a field in the AppFeedbackReport
-                object.
-            filter_options: list(str). The possible values for the given filter.
+            filter_field: The enum type for the filter category, corresponding
+                to a field in the AppFeedbackReport object.
+            filter_options: The possible values for the given filter.
         """
         self.filter_field = filter_field
         self.filter_options = filter_options
@@ -1942,7 +1931,7 @@ class AppFeedbackReportFilter:
         object.
 
         Returns:
-            dict. A dict, mapping all fields of AppFeedbackReportFilter
+            A dict, mapping all fields of AppFeedbackReportFilter
             instance.
         """
         self.filter_options.sort()

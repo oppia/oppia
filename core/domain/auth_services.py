@@ -41,12 +41,12 @@ def create_profile_user_auth_details(
     """Returns a domain object for a new profile user.
 
     Args:
-        user_id: str. A user ID produced by Oppia for the new profile user.
-        parent_user_id: str. The user ID of the full user account which will own
+        user_id: A user ID produced by Oppia for the new profile user.
+        parent_user_id: The user ID of the full user account which will own
             the new profile account.
 
     Returns:
-        UserAuthDetails. Auth details for the new user.
+        Auth details for the new user.
 
     Raises:
         ValueError. The new user's parent is itself.
@@ -62,11 +62,10 @@ def get_all_profiles_by_parent_user_id(
     """Fetch the auth details of all profile users with the given parent user.
 
     Args:
-        parent_user_id: str. The user ID of the parent user.
+        parent_user_id: The user ID of the parent user.
 
     Returns:
-        list(UserAuthDetailsModel). List of UserAuthDetailsModel instances
-        with the given parent user.
+        List of UserAuthDetailsModel instances with the given parent user.
     """
     return list(
         auth_models.UserAuthDetailsModel.query(
@@ -82,10 +81,8 @@ def establish_auth_session(
     """Sets login cookies to maintain a user's sign-in session.
 
     Args:
-        request: webapp2.Request. The request with the authorization to begin a
-            new session.
-        response: webapp2.Response. The response to establish the new session
-            upon.
+        request: The request with the authorization to begin a new session.
+        response: The response to establish the new session upon.
     """
     platform_auth_services.establish_auth_session(request, response)
 
@@ -94,7 +91,7 @@ def destroy_auth_session(response: webapp2.Response) -> None:
     """Clears login cookies from the given response headers.
 
     Args:
-        response: webapp2.Response. Response to clear the cookies from.
+        response: Response to clear the cookies from.
     """
     platform_auth_services.destroy_auth_session(response)
 
@@ -105,10 +102,10 @@ def get_user_auth_details_from_model(
     """Returns a UserAuthDetails domain object from the given model.
 
     Args:
-        user_auth_details_model: UserAuthDetailsModel. The source model.
+        user_auth_details_model: The source model.
 
     Returns:
-        UserAuthDetails. The domain object with values taken from the model.
+        The domain object with values taken from the model.
     """
     return auth_domain.UserAuthDetails(
         user_auth_details_model.id,
@@ -124,11 +121,11 @@ def get_auth_claims_from_request(
     """Authenticates the request and returns claims about its authorizer.
 
     Args:
-        request: webapp2.Request. The HTTP request to authenticate.
+        request: The HTTP request to authenticate.
 
     Returns:
-        AuthClaims|None. Claims about the currently signed in user. If no user
-        is signed in, then returns None.
+        Claims about the currently signed in user. If no user is signed in, then
+        returns None.
 
     Raises:
         InvalidAuthSessionError. The request contains an invalid session.
@@ -141,7 +138,7 @@ def mark_user_for_deletion(user_id: str) -> None:
     """Marks the user, and all of their auth associations, as deleted.
 
     Args:
-        user_id: str. The unique ID of the user whose associations should be
+        user_id: The unique ID of the user whose associations should be
             deleted.
     """
     platform_auth_services.mark_user_for_deletion(user_id)
@@ -151,7 +148,7 @@ def delete_external_auth_associations(user_id: str) -> None:
     """Deletes all associations that refer to the user outside of Oppia.
 
     Args:
-        user_id: str. The unique ID of the user whose associations should be
+        user_id: The unique ID of the user whose associations should be
             deleted.
     """
     platform_auth_services.delete_external_auth_associations(user_id)
@@ -162,11 +159,11 @@ def verify_external_auth_associations_are_deleted(user_id: str) -> bool:
     external associations have been deleted.
 
     Args:
-        user_id: str. The unique ID of the user whose associations should be
+        user_id: The unique ID of the user whose associations should be
             checked.
 
     Returns:
-        bool. True if and only if we have successfully verified that all
+        True if and only if we have successfully verified that all
         external associations have been deleted.
     """
     return platform_auth_services.verify_external_auth_associations_are_deleted(
@@ -177,10 +174,10 @@ def get_auth_id_from_user_id(user_id: str) -> Optional[str]:
     """Returns the auth ID associated with the given user ID.
 
     Args:
-        user_id: str. The auth ID.
+        user_id: The auth ID.
 
     Returns:
-        str|None. The user ID associated with the given auth ID, or None if no
+        The user ID associated with the given auth ID, or None if no
         association exists.
     """
     return platform_auth_services.get_auth_id_from_user_id(user_id)
@@ -192,10 +189,10 @@ def get_multi_auth_ids_from_user_ids(
     """Returns the auth IDs associated with the given user IDs.
 
     Args:
-        user_ids: list(str). The user IDs.
+        user_ids: The user IDs.
 
     Returns:
-        list(str|None). The auth IDs associated with each of the given user IDs,
+        The auth IDs associated with each of the given user IDs,
         or None for associations which don't exist.
     """
     return platform_auth_services.get_multi_auth_ids_from_user_ids(user_ids)
@@ -208,12 +205,12 @@ def get_user_id_from_auth_id(
     """Returns the user ID associated with the given auth ID.
 
     Args:
-        auth_id: str. The auth ID.
-        include_deleted: bool. Whether to return the ID of models marked for
+        auth_id: The auth ID.
+        include_deleted: Whether to return the ID of models marked for
             deletion.
 
     Returns:
-        str|None. The user ID associated with the given auth ID, or None if no
+        The user ID associated with the given auth ID, or None if no
         association exists.
     """
     return platform_auth_services.get_user_id_from_auth_id(
@@ -226,10 +223,10 @@ def get_multi_user_ids_from_auth_ids(
     """Returns the user IDs associated with the given auth IDs.
 
     Args:
-        auth_ids: list(str). The auth IDs.
+        auth_ids: The auth IDs.
 
     Returns:
-        list(str|None). The user IDs associated with each of the given auth IDs,
+        The user IDs associated with each of the given auth IDs,
         or None for associations which don't exist.
     """
     return platform_auth_services.get_multi_user_ids_from_auth_ids(auth_ids)
@@ -241,8 +238,7 @@ def associate_auth_id_with_user_id(
     """Commits the association between auth ID and user ID.
 
     Args:
-        auth_id_user_id_pair: auth_domain.AuthIdUserIdPair. The association to
-            commit.
+        auth_id_user_id_pair: The association to commit.
 
     Raises:
         Exception. The IDs are already associated with a value.
@@ -256,8 +252,7 @@ def associate_multi_auth_ids_with_user_ids(
     """Commits the associations between auth IDs and user IDs.
 
     Args:
-        auth_id_user_id_pairs: list(auth_domain.AuthIdUserIdPair). The
-            associations to commit.
+        auth_id_user_id_pairs: The associations to commit.
 
     Raises:
         Exception. One or more auth associations already exist.
@@ -270,7 +265,7 @@ def grant_super_admin_privileges(user_id: str) -> None:
     """Grants the user super admin privileges.
 
     Args:
-        user_id: str. The Oppia user ID to promote to super admin.
+        user_id: The Oppia user ID to promote to super admin.
     """
     firebase_auth_services.grant_super_admin_privileges(user_id)
 
@@ -279,6 +274,6 @@ def revoke_super_admin_privileges(user_id: str) -> None:
     """Revokes the user's super admin privileges.
 
     Args:
-        user_id: str. The Oppia user ID to revoke privileges from.
+        user_id: The Oppia user ID to revoke privileges from.
     """
     firebase_auth_services.revoke_super_admin_privileges(user_id)

@@ -37,20 +37,20 @@ def get_full_customization_args(
     if any of the expected customization_args are missing.
 
     Args:
-        customization_args: dict. The customization dict. The keys are names
+        customization_args: The customization dict. The keys are names
             of customization_args and the values are dicts with a
             single key, 'value', whose corresponding value is the value of
             the customization arg.
-        ca_specs: list(dict). List of spec dictionaries. Is used to check if
-            some keys are missing in customization_args. Dicts have the
-            following structure:
+        ca_specs: List of spec dictionaries. Is used to check if some keys
+            are missing in customization_args. Dicts have the following
+            structure:
                 - name: str. The customization variable name.
                 - description: str. The customization variable description.
                 - default_value: *. The default value of the customization
                     variable.
 
     Returns:
-        dict. The customization_args dict where missing keys are populated
+        The customization_args dict where missing keys are populated
         with the default values.
     """
     for ca_spec in ca_specs:
@@ -79,21 +79,21 @@ def validate_customization_args_and_values(
     extra keys. It also normalizes any HTML in the customization_args dict.
 
     Args:
-        item_name: str. This is always 'interaction'.
-        item_type: str. The item_type is the ID of the interaction.
-        customization_args: dict. The customization dict. The keys are names
+        item_name: This is always 'interaction'.
+        item_type: The item_type is the ID of the interaction.
+        customization_args: The customization dict. The keys are names
             of customization_args and the values are dicts with a
             single key, 'value', whose corresponding value is the value of
             the customization arg.
-        ca_specs_to_validate_against: list(dict). List of spec dictionaries.
-            Is used to check if some keys are missing in customization_args.
-            Dicts have the following structure:
+        ca_specs_to_validate_against: List of spec dictionaries. Is used to
+            check if some keys are missing in customization_args. Dicts have
+            the following structure:
                 - name: str. The customization variable name.
                 - description: str. The customization variable description.
                 - default_value: *. The default value of the customization
                     variable.
-        fail_on_validation_errors: bool. Whether to raise errors if
-            validation fails for customization args.
+        fail_on_validation_errors: Whether to raise errors if validation fails
+            for customization args.
 
     Raises:
         ValidationError. The given 'customization_args' is not valid.

@@ -65,12 +65,12 @@ def get_report_models(
     """Fetches and returns the AppFeedbackReportModels with the given ids.
 
     Args:
-        report_ids: list(str). The ids for the models to fetch.
-        strict: bool. Whether to fail noisily if no report model with the given
+        report_ids: The ids for the models to fetch.
+        strict: Whether to fail noisily if no report model with the given
             ids exists in the datastore.
 
     Returns:
-        list(AppFeedbackReportModel). A list of models that correspond to the
+        A list of models that correspond to the
         requested reports.
 
     Raises:
@@ -98,10 +98,10 @@ def create_report_from_json(
     JSON request.
 
     Args:
-        report_json: dict. The JSON for the app feedback report.
+        report_json: The JSON for the app feedback report.
 
     Returns:
-        AppFeedbackReport. The domain object for an Android feedback report.
+        The domain object for an Android feedback report.
     """
     return (
         app_feedback_report_domain.AppFeedbackReport.from_submitted_feedback_dict(  # pylint: disable=line-too-long
@@ -111,12 +111,12 @@ def create_report_from_json(
 
 
 def store_incoming_report_stats(
-        report_obj: app_feedback_report_domain.AppFeedbackReport
+    report_obj: app_feedback_report_domain.AppFeedbackReport
 ) -> None:
     """Adds a new report's stats to the aggregate stats model.
 
     Args:
-        report_obj: AppFeedbackReport. AppFeedbackReport domain object.
+        report_obj: AppFeedbackReport domain object.
 
     Raises:
         NotImplementedError. Stats aggregation for the domain object
@@ -144,7 +144,7 @@ def store_incoming_report_stats(
 def _update_report_stats_model_in_transaction(
     ticket_id: str,
     platform: str,
-    date: datetime.datetime,
+    date: datetime.date,
     report_obj: app_feedback_report_domain.AppFeedbackReport,
     delta: int
 ) -> None:
@@ -152,11 +152,11 @@ def _update_report_stats_model_in_transaction(
     stats. Note that this currently only supports Android reports.
 
     Args:
-        ticket_id: str. The id of the ticket that we want to update stats for.
-        platform: str. The platform of the report being aggregated.
-        date: datetime.date. The date of the stats.
-        report_obj: AppFeedbackReport. AppFeedbackReport domain object.
-        delta: int. The amount to increment the stats by, depending on if the
+        ticket_id: The id of the ticket that we want to update stats for.
+        platform: The platform of the report being aggregated.
+        date: The date of the stats.
+        report_obj: AppFeedbackReport domain object.
+        delta: The amount to increment the stats by, depending on if the
             report is added or removed from the model.
     """
     # The stats we want to aggregate on.
@@ -283,16 +283,15 @@ def calculate_new_stats_count_for_parameter(
     """Helper to increment or initialize the stats count for a parameter.
 
     Args:
-        current_stats_map: dict. The current stats map for the parameter we are
+        current_stats_map: The current stats map for the parameter we are
             updating; keys correspond to the possible value for a single
             parameter.
-        current_value: str. The value for the parameter that we are updating
+        current_value: The value for the parameter that we are updating
             the stats of.
-        delta: int. The amount to increment the current count by, either -1 or
-            +1.
+        delta: The amount to increment the current count by, either -1 or +1.
 
     Returns:
-        dict. The new stats values for the given parameter.
+        The new stats values for the given parameter.
     """
     if current_value in current_stats_map:
         current_stats_map[current_value] += delta
@@ -308,18 +307,16 @@ def calculate_new_stats_count_for_parameter(
 
 
 def get_report_from_model(
-        report_model: app_feedback_report_models.AppFeedbackReportModel
+    report_model: app_feedback_report_models.AppFeedbackReportModel
 ) -> app_feedback_report_domain.AppFeedbackReport:
     """Create and return a domain object AppFeedbackReport given a model loaded
     from the the data.
 
     Args:
-        report_model: AppFeedbackReportModel. The model loaded from the
-            datastore.
+        report_model: The model loaded from the datastore.
 
     Returns:
-        AppFeedbackReport. An AppFeedbackReport domain object corresponding to
-        the given model.
+        An AppFeedbackReport domain object corresponding to the given model.
 
     Raises:
         NotImplementedError. The web report domain object needs to be
@@ -333,18 +330,17 @@ def get_report_from_model(
 
 
 def get_ticket_from_model(
-        ticket_model: app_feedback_report_models.AppFeedbackReportTicketModel
+    ticket_model: app_feedback_report_models.AppFeedbackReportTicketModel
 ) -> app_feedback_report_domain.AppFeedbackReportTicket:
     """Create and return a domain object AppFeedbackReportTicket given a model
     loaded from the the data.
 
     Args:
-        ticket_model: AppFeedbackReportTicketModel. The model loaded from the
-            datastore.
+        ticket_model: The model loaded from the datastore.
 
     Returns:
-        AppFeedbackReportTicket. An AppFeedbackReportTicket domain object
-        corresponding to the given model.
+        An AppFeedbackReportTicket domain object corresponding to the
+        given model.
     """
     return app_feedback_report_domain.AppFeedbackReportTicket(
         ticket_model.id, ticket_model.ticket_name, ticket_model.platform,
@@ -354,18 +350,17 @@ def get_ticket_from_model(
 
 
 def get_stats_from_model(
-        stats_model: app_feedback_report_models.AppFeedbackReportStatsModel
+    stats_model: app_feedback_report_models.AppFeedbackReportStatsModel
 ) -> app_feedback_report_domain.AppFeedbackReportDailyStats:
     """Create and return a domain object AppFeedbackReportDailyStats given a
     model loaded from the the storage.
 
     Args:
-        stats_model: AppFeedbackReportStatsModel. The model loaded from the
-            datastore.
+        stats_model: The model loaded from the datastore.
 
     Returns:
-        AppFeedbackReportDailyStats. An AppFeedbackReportDailyStats domain
-        object corresponding tothe given model.
+        An AppFeedbackReportDailyStats domain object corresponding to the
+        given model.
     """
     ticket_model = (
         app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
@@ -380,17 +375,17 @@ def get_stats_from_model(
 
 
 def create_app_daily_stats_from_model_json(
-        daily_param_stats: Dict[str, Dict[str, int]]
+    daily_param_stats: Dict[str, Dict[str, int]]
 ) -> Dict[str, app_feedback_report_domain.ReportStatsParameterValueCounts]:
     """Create and return a dict representing the AppFeedbackReportDailyStats
     domain object's daily_param_stats.
 
     Args:
-        daily_param_stats: dict. The stats data from the model.
+        daily_param_stats: The stats data from the model.
 
     Returns:
-        dict. A dict mapping param field names to
-        ReportStatsParameterValueCounts domain objects.
+        A dict mapping param field names to ReportStatsParameterValueCounts
+        domain objects.
     """
     stats_dict = {}
     for (stats_name, stats_values_dict) in daily_param_stats.items():
@@ -405,17 +400,16 @@ def create_app_daily_stats_from_model_json(
 
 
 def get_android_report_from_model(
-        android_report_model: app_feedback_report_models.AppFeedbackReportModel
+    android_report_model: app_feedback_report_models.AppFeedbackReportModel
 ) -> app_feedback_report_domain.AppFeedbackReport:
     """Creates a domain object that represents an Android feedback report from
     the given model.
 
     Args:
-        android_report_model: AppFeedbackReportModel. The model to convert to a
-            domain object.
+        android_report_model: The model to convert to a domain object.
 
     Returns:
-        AppFeedbackReport. The corresponding AppFeedbackReport domain object.
+        The corresponding AppFeedbackReport domain object.
 
     Raises:
         NotImplementedError. Android app feedback report migrations not added
@@ -478,9 +472,9 @@ def scrub_all_unscrubbed_expiring_reports(scrubbed_by: str) -> None:
     """Fetches the reports that are expiring and must be scrubbed.
 
     Args:
-        scrubbed_by: str. The ID of the user initiating scrubbing or
-            feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID if scrubbed by the cron
-            job.
+        scrubbed_by: The ID of the user initiating scrubbing or
+            feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID if scrubbed
+            by the cron job.
     """
     reports_to_scrub = get_all_expiring_reports_to_scrub()
     for report in reports_to_scrub:
@@ -488,12 +482,13 @@ def scrub_all_unscrubbed_expiring_reports(scrubbed_by: str) -> None:
 
 
 def get_all_expiring_reports_to_scrub() -> List[
-        app_feedback_report_domain.AppFeedbackReport]:
+    app_feedback_report_domain.AppFeedbackReport
+]:
     """Fetches the reports that are expiring and must be scrubbed.
 
     Returns:
-        list(AppFeedbackReport). The list of AppFeedbackReportModel domain
-        objects that need to be scrubbed.
+        The list of AppFeedbackReportModel domain objects that need
+        to be scrubbed.
     """
     model_class = app_feedback_report_models.AppFeedbackReportModel
     model_entities = model_class.get_all_unscrubbed_expiring_report_models()
@@ -502,15 +497,15 @@ def get_all_expiring_reports_to_scrub() -> List[
 
 
 def scrub_single_app_feedback_report(
-        report: app_feedback_report_domain.AppFeedbackReport,
-        scrubbed_by: str
+    report: app_feedback_report_domain.AppFeedbackReport,
+    scrubbed_by: str
 ) -> None:
     """Scrubs the instance of AppFeedbackReportModel with given ID, removing
     any user-entered input in the entity.
 
     Args:
-        report: AppFeedbackReport. The domain object of the report to scrub.
-        scrubbed_by: str. The id of the user that is initiating scrubbing of
+        report: The domain object of the report to scrub.
+        scrubbed_by: The id of the user that is initiating scrubbing of
             this report, or a constant
             feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID if scrubbed by the cron
             job.
@@ -530,14 +525,14 @@ def scrub_single_app_feedback_report(
 
 
 def save_feedback_report_to_storage(
-        report: app_feedback_report_domain.AppFeedbackReport,
-        new_incoming_report: bool=False
+    report: app_feedback_report_domain.AppFeedbackReport,
+    new_incoming_report: bool = False
 ) -> None:
     """Saves the AppFeedbackReport domain object to persistent storage.
 
     Args:
-        report: AppFeedbackReport. The domain object of the report to save.
-        new_incoming_report: bool. Whether the report is a new incoming report
+        report: The domain object of the report to save.
+        new_incoming_report: Whether the report is a new incoming report
             that does not have a corresponding model entity.
     """
     if report.platform == PLATFORM_WEB:
@@ -611,13 +606,13 @@ def save_feedback_report_to_storage(
 
 
 def get_all_filter_options() -> List[
-        app_feedback_report_domain.AppFeedbackReportFilter]:
+    app_feedback_report_domain.AppFeedbackReportFilter
+]:
     """Fetches all the possible values that moderators can filter reports or
     tickets by.
 
     Returns:
-        list(AppFeedbackReportFilter). A list of filters and the possible values
-        they can have.
+        A list of filters and the possible values they can have.
     """
     filter_list = []
     model_class = app_feedback_report_models.AppFeedbackReportModel
@@ -629,16 +624,15 @@ def get_all_filter_options() -> List[
 
 
 def reassign_ticket(
-        report: app_feedback_report_domain.AppFeedbackReport,
-        new_ticket: Optional[app_feedback_report_domain.AppFeedbackReportTicket]
+    report: app_feedback_report_domain.AppFeedbackReport,
+    new_ticket: Optional[app_feedback_report_domain.AppFeedbackReportTicket]
 ) -> None:
     """Reassign the ticket the report is associated with.
 
     Args:
-        report: AppFeedbackReport. The report being assigned to a new ticket.
-        new_ticket: AppFeedbackReportTicket|None. The ticket domain object to
-            reassign the report to or None if removing the report form a ticket
-            wihtout reassigning.
+        report: The report being assigned to a new ticket.
+        new_ticket: The ticket domain object to reassign the report to or None
+            if removing the report form a ticket without reassigning.
 
     Raises:
         NotImplementedError. Assigning web reports to tickets has not been
@@ -718,26 +712,26 @@ def reassign_ticket(
 
 
 def edit_ticket_name(
-        ticket: app_feedback_report_domain.AppFeedbackReportTicket,
-        new_name: str
+    ticket: app_feedback_report_domain.AppFeedbackReportTicket,
+    new_name: str
 ) -> None:
     """Updates the ticket name.
 
-    Returns:
-        ticket: AppFeedbackReportTicket. The domain object for a ticket.
-        new_name: str. The new name to assign the ticket.
+    Args:
+        ticket: The domain object for a ticket.
+        new_name: The new name to assign the ticket.
     """
     ticket.ticket_name = new_name
     _save_ticket(ticket)
 
 
 def _save_ticket(
-        ticket: app_feedback_report_domain.AppFeedbackReportTicket
+    ticket: app_feedback_report_domain.AppFeedbackReportTicket
 ) -> None:
     """Saves the ticket to persistent storage.
 
-    Returns:
-        ticket: AppFeedbackReportTicket. The domain object to save to storage.
+    Args:
+        ticket: The domain object to save to storage.
     """
     model_class = app_feedback_report_models.AppFeedbackReportTicketModel
     ticket_model = model_class.get_by_id(ticket.ticket_id)

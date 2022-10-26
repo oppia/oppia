@@ -44,13 +44,13 @@ def run_beam_job(
     """Starts a new Apache Beam job and returns metadata about its execution.
 
     Args:
-        job_name: str. The name of the job to run. If not provided, then
+        job_name: The name of the job to run. If not provided, then
             job_class must not be None.
-        job_class: type(JobBase). A subclass of JobBase to begin running. This
+        job_class: A subclass of JobBase to begin running. This
             value takes precedence over job_name.
 
     Returns:
-        BeamJobRun. Metadata about the run's execution.
+        Metadata about the run's execution.
 
     Raises:
         ValueError. Both name and class of the job are not specified.
@@ -71,10 +71,10 @@ def cancel_beam_job(job_id: str) -> beam_job_domain.BeamJobRun:
     """Cancels an existing Apache Beam job and returns its updated metadata.
 
     Args:
-        job_id: str. The Oppia-provided ID of the job.
+        job_id: The Oppia-provided ID of the job.
 
     Returns:
-        BeamJobRun. Metadata about the updated run's execution.
+        Metadata about the updated run's execution.
 
     Raises:
         ValueError. Job does not exist.
@@ -96,7 +96,7 @@ def get_beam_jobs() -> List[beam_job_domain.BeamJob]:
     """Returns the list of all registered Apache Beam jobs.
 
     Returns:
-        list(BeamJob). The list of registered Apache Beam jobs.
+        The list of registered Apache Beam jobs.
     """
     return [beam_job_domain.BeamJob(j) for j in jobs_registry.get_all_jobs()]
 
@@ -106,7 +106,7 @@ def is_state_terminal(job_state: str) -> bool:
     that the job is longer executing.
 
     Returns:
-        bool. Whether the state is a terminal state.
+        Whether the state is a terminal state.
     """
     return job_state in (
         beam_job_models.BeamJobState.CANCELLED.value,
@@ -123,10 +123,10 @@ def get_beam_job_runs(
     """Returns all of the Apache Beam job runs recorded in the datastore.
 
     Args:
-        refresh: bool. Whether to refresh the jobs' state before returning them.
+        refresh: Whether to refresh the jobs' state before returning them.
 
     Returns:
-        list(BeamJobRun). A list of every job run recorded in the datastore.
+        A list of every job run recorded in the datastore.
     """
     beam_job_run_models = list(beam_job_models.BeamJobRunModel.query())
     beam_job_runs = [
@@ -156,10 +156,10 @@ def get_beam_job_run_result(
     """Returns the result of the given Apache Beam job run.
 
     Args:
-        job_id: str. The ID of the job run to fetch.
+        job_id: The ID of the job run to fetch.
 
     Returns:
-        AggregateBeamJobRunResult. The result of the given Apache Beam job run.
+        The result of the given Apache Beam job run.
     """
     beam_job_run_result_models = beam_job_models.BeamJobRunResultModel.query(
         beam_job_models.BeamJobRunResultModel.job_id == job_id).iter()
@@ -183,14 +183,13 @@ def create_beam_job_run_model(
     """Creates a new BeamJobRunModel without putting it into storage.
 
     Args:
-        job_name: str. The name of the job class that implements the job's
+        job_name: The name of the job class that implements the job's
             logic.
-        dataflow_job_id: str|None. The ID of the dataflow job this model
-            corresponds to. If the job is run synchronously, then this value
-            should be None.
+        dataflow_job_id: The ID of the dataflow job this model corresponds to.
+            If the job is run synchronously, then this value should be None.
 
     Returns:
-        BeamJobRunModel. The model.
+        The BeamJobRunModel's instance.
     """
     model_id = beam_job_models.BeamJobRunModel.get_new_id()
     model = beam_job_models.BeamJobRunModel(
@@ -206,12 +205,12 @@ def create_beam_job_run_result_model(
     """Creates a new BeamJobRunResultModel without putting it into storage.
 
     Args:
-        job_id: str. The ID of the job run to fetch.
-        stdout: str. The standard output from a job run.
-        stderr: str. The error output from a job run.
+        job_id: The ID of the job run to fetch.
+        stdout: The standard output from a job run.
+        stderr: The error output from a job run.
 
     Returns:
-        BeamJobRunResultModel. The model.
+        The BeamJobRunResultModel's instance.
     """
     model_id = beam_job_models.BeamJobRunResultModel.get_new_id()
     model = beam_job_models.BeamJobRunResultModel(
@@ -226,10 +225,10 @@ def get_beam_job_run_from_model(
     """Returns a domain object corresponding to the given BeamJobRunModel.
 
     Args:
-        beam_job_run_model: BeamJobRunModel. The model.
+        beam_job_run_model: The BeamJobRunModel's instance.
 
     Returns:
-        BeamJobRun. The corresponding domain object.
+        The corresponding BeamJobRun domain object.
     """
     return beam_job_domain.BeamJobRun(
         beam_job_run_model.id, beam_job_run_model.job_name,

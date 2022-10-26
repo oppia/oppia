@@ -30,15 +30,14 @@ class BeamJob:
     """Encapsulates the definition of an Apache Beam job.
 
     Attributes:
-        name: str. The name of the class that implements the job's logic.
+        name: The name of the class that implements the job's logic.
     """
 
     def __init__(self, job_class: Type[base_jobs.JobBase]) -> None:
         """Initializes a new instance of BeamJob.
 
         Args:
-            job_class: type(JobBase). The JobBase subclass which implements the
-                job's logic.
+            job_class: The JobBase subclass which implements the job's logic.
         """
         self._job_class = job_class
 
@@ -47,15 +46,15 @@ class BeamJob:
         """Returns the name of the class that implements the job's logic.
 
         Returns:
-            str. The name of the job class.
+            The name of the job class.
         """
         return self._job_class.__name__
 
-    def to_dict(self) -> Dict[str, Union[str, List[str]]]:
+    def to_dict(self) -> Dict[str, str]:
         """Returns a dict representation of the BeamJob.
 
         Returns:
-            dict(str: *). The dict has the following structure:
+            The dict has the following structure:
                 name: str. The name of the class that implements the job's
                     logic.
         """
@@ -66,15 +65,12 @@ class BeamJobRun:
     """Encapsulates an individual execution of an Apache Beam job.
 
     Attributes:
-        job_id: str. The ID of the job execution.
-        job_name: str. The name of the job class that implements the job's
-            logic.
-        job_state: str. The state of the job at the time the model was last
-            updated.
-        job_started_on: datetime. The time at which the job was started.
-        job_updated_on: datetime. The time at which the job's state was last
-            updated.
-        job_is_synchronous: bool. Whether the job has been run synchronously.
+        job_id: The ID of the job execution.
+        job_name: The name of the job class that implements the job's logic.
+        job_state: The state of the job at the time the model was last updated.
+        job_started_on: The time at which the job was started.
+        job_updated_on: The time at which the job's state was last updated.
+        job_is_synchronous: Whether the job has been run synchronously.
             Synchronous jobs are similar to function calls that return
             immediately. Asynchronous jobs are similar to JavaScript Promises
             that return nothing immediately but then _eventually_ produce a
@@ -93,16 +89,13 @@ class BeamJobRun:
         """Initializes a new BeamJobRun instance.
 
         Args:
-            job_id: str. The ID of the job execution.
-            job_name: str. The name of the job class that implements the job's
-                logic.
-            job_state: str. The state of the job at the time the model was last
+            job_id: The ID of the job execution.
+            job_name: The name of the job class that implements the job's logic.
+            job_state: The state of the job at the time the model was last
                 updated.
-            job_started_on: datetime. The time at which the job was started.
-            job_updated_on: datetime. The time at which the job's state was last
-                updated.
-            job_is_synchronous: bool. Whether the job has been run
-                synchronously.
+            job_started_on: The time at which the job was started.
+            job_updated_on: The time at which the job's state was last updated.
+            job_is_synchronous: Whether the job has been run synchronously.
         """
         self.job_id = job_id
         self.job_name = job_name
@@ -115,18 +108,17 @@ class BeamJobRun:
         """Returns a dict representation of the BeamJobRun.
 
         Returns:
-            dict(str: *). The dict has the following structure:
-                job_id: str. The ID of the job execution.
-                job_name: str. The name of the job class that implements the
+            The dict has the following structure:
+                job_id: The ID of the job execution.
+                job_name: The name of the job class that implements the
                     job's logic.
-                job_state: str. The state of the job at the time the model was
+                job_state: The state of the job at the time the model was
                     last updated.
-                job_started_on_msecs: float. The number of milliseconds since
+                job_started_on_msecs: The number of milliseconds since
                     UTC epoch at which the job was created.
-                job_updated_on_msecs: float. The number of milliseconds since
+                job_updated_on_msecs: The number of milliseconds since
                     UTC epoch at which the job's state was last updated.
-                job_is_synchronous: bool. Whether the job has been run
-                    synchronously.
+                job_is_synchronous: Whether the job has been run synchronously.
         """
         return {
             'job_id': self.job_id,
@@ -144,16 +136,16 @@ class AggregateBeamJobRunResult:
     """Encapsulates the complete result of an Apache Beam job run.
 
     Attributes:
-        stdout: str. The standard output produced by the job.
-        stderr: str. The error output produced by the job.
+        stdout: The standard output produced by the job.
+        stderr: The error output produced by the job.
     """
 
     def __init__(self, stdout: str, stderr: str) -> None:
         """Initializes a new instance of AggregateBeamJobRunResult.
 
         Args:
-            stdout: str. The standard output produced by the job.
-            stderr: str. The error output produced by the job.
+            stdout: The standard output produced by the job.
+            stderr: The error output produced by the job.
         """
         self.stdout = stdout
         self.stderr = stderr
@@ -162,9 +154,9 @@ class AggregateBeamJobRunResult:
         """Returns a dict representation of the AggregateBeamJobRunResult.
 
         Returns:
-            dict(str: str). The dict structure is:
-                stdout: str. The standard output produced by the job.
-                stderr: str. The error output produced by the job.
+            The dict structure is:
+                stdout: The standard output produced by the job.
+                stderr: The error output produced by the job.
         """
         return {
             'stdout': self.stdout,

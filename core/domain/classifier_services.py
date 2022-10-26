@@ -64,12 +64,12 @@ def generate_signature(
     """Generates digital signature for given data.
 
     Args:
-        secret: bytes. The secret used to communicate with Oppia-ml.
-        message: bytes. The message payload data.
-        vm_id: str. The ID of the VM that generated the message.
+        secret: The secret used to communicate with Oppia-ml.
+        message: The message payload data.
+        vm_id: The ID of the VM that generated the message.
 
     Returns:
-        str. The signature of the payload data.
+        The signature of the payload data.
     """
     converted_vm_id = vm_id.encode('utf-8')
     if isinstance(message, str):
@@ -86,11 +86,10 @@ def verify_signature(
     """Function that checks if the signature received from the VM is valid.
 
     Args:
-        oppia_ml_auth_info: OppiaMLAuthInfo. Domain object containing
-            authentication information.
+        oppia_ml_auth_info: Domain object containing authentication information.
 
     Returns:
-        bool. Whether the incoming request is valid.
+        Whether the incoming request is valid.
     """
     secret = None
     for val in config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value:
@@ -120,8 +119,8 @@ def handle_trainable_states(
     a new job is being created for the states where retraining is required.
 
     Args:
-        exploration: Exploration. The Exploration domain object.
-        state_names: list(str). List of state names.
+        exploration: The Exploration domain object.
+        state_names: List of state names.
 
     Raises:
         Exception. No classifier algorithm found for the given interaction id.
@@ -204,18 +203,17 @@ def handle_non_retrainable_states(
     the name of the state in the previous version of the exploration.
 
     Args:
-        exploration: Exploration. The Exploration domain object.
-        state_names: list(str). List of state names.
-        exp_versions_diff: ExplorationVersionsDiff. An instance of the
-            exploration versions diff class.
+        exploration: The Exploration domain object.
+        state_names: List of state names.
+        exp_versions_diff: An instance of the exploration versions diff class.
 
     Raises:
         Exception. This method should not be called by exploration with version
             number 1.
 
     Returns:
-        list(str). State names which don't have classifier model for previous
-        version of exploration.
+        State names which don't have classifier model for previous version of
+        exploration.
     """
     exp_id = exploration.id
     current_exp_version = exploration.version
@@ -269,12 +267,11 @@ def get_classifier_training_job_from_model(
     training job model.
 
     Args:
-        classifier_training_job_model: ClassifierTrainingJobModel. Classifier
-            training job instance in datastore.
+        classifier_training_job_model: Classifier training job model instance
+            in datastore.
 
     Returns:
-        classifier_training_job: ClassifierTrainingJob. Domain object for the
-        classifier training job.
+        Domain object for the classifier training job.
     """
     return classifier_domain.ClassifierTrainingJob(
         classifier_training_job_model.id,
@@ -295,11 +292,10 @@ def get_classifier_training_job_by_id(
     """Gets a classifier training job by a job_id.
 
     Args:
-        job_id: str. ID of the classifier training job.
+        job_id: ID of the classifier training job.
 
     Returns:
-        classifier_training_job: ClassifierTrainingJob. Domain object for the
-        classifier training job.
+        Domain object for the classifier training job.
 
     Raises:
         Exception. Entity for class ClassifierTrainingJobModel with id not
@@ -318,9 +314,9 @@ def _update_classifier_training_jobs_status(
     """Checks for the existence of the model and then updates it.
 
     Args:
-        job_ids: list(str). List of ID of the ClassifierTrainingJob domain
+        job_ids: List of ID of the ClassifierTrainingJob domain
             objects.
-        status: str. The status to which the job needs to be updated.
+        status: The status to which the job needs to be updated.
 
     Raises:
         Exception. The ClassifierTrainingJobModel corresponding to the job_id
@@ -364,7 +360,7 @@ def mark_training_job_complete(job_id: str) -> None:
     """Updates the training job's status to complete.
 
     Args:
-        job_id: str. ID of the ClassifierTrainingJob.
+        job_id: ID of the ClassifierTrainingJob.
     """
     _update_classifier_training_jobs_status(
         [job_id], feconf.TRAINING_JOB_STATUS_COMPLETE)
@@ -374,7 +370,7 @@ def mark_training_jobs_failed(job_ids: List[str]) -> None:
     """Updates the training job's status to failed.
 
     Args:
-        job_ids: list(str). List of ID of the ClassifierTrainingJobs.
+        job_ids: List of ID of the ClassifierTrainingJobs.
     """
     _update_classifier_training_jobs_status(
         job_ids, feconf.TRAINING_JOB_STATUS_FAILED)
@@ -384,7 +380,7 @@ def mark_training_job_pending(job_id: str) -> None:
     """Updates the training job's status to pending.
 
     Args:
-        job_id: str. ID of the ClassifierTrainingJob.
+        job_id: ID of the ClassifierTrainingJob.
     """
     _update_classifier_training_jobs_status(
         [job_id], feconf.TRAINING_JOB_STATUS_PENDING)
@@ -394,7 +390,7 @@ def _update_scheduled_check_time_for_new_training_job(job_id: str) -> None:
     """Updates the next scheduled check time of job with status NEW.
 
     Args:
-        job_id: str. ID of the ClassifierTrainingJob.
+        job_id: ID of the ClassifierTrainingJob.
     """
     classifier_training_job_model = (
         classifier_models.ClassifierTrainingJobModel.get(job_id))
@@ -409,8 +405,8 @@ def fetch_next_job() -> Optional[classifier_domain.ClassifierTrainingJob]:
     """Gets next job model in the job queue.
 
     Returns:
-        ClassifierTrainingJob | None. Domain object of the next training Job,
-        and None if no ClassifierTrainingJobModel is found.
+        Domain object of the next training Job, or None if no
+        ClassifierTrainingJobModel is found.
     """
     classifier_training_jobs: Sequence[
         classifier_models.ClassifierTrainingJobModel
@@ -458,9 +454,9 @@ def store_classifier_data(job_id: str, classifier_data_proto: object) -> None:
     """Checks for the existence of the model and then updates it.
 
     Args:
-        job_id: str. ID of the ClassifierTrainingJob domain object.
-        classifier_data_proto: FrozenModel. The frozen model protobuf object
-            containing result of training job that needs to be stored.
+        job_id: ID of the ClassifierTrainingJob domain object.
+        classifier_data_proto: The frozen model protobuf object containing
+            result of training job that needs to be stored.
 
     Raises:
         Exception. The ClassifierTrainingJobModel corresponding to the job_id
@@ -484,7 +480,7 @@ def delete_classifier_training_job(job_id: str) -> None:
     """Deletes classifier training job model in the datastore given job_id.
 
     Args:
-        job_id: str. ID of the classifier training job.
+        job_id: ID of the classifier training job.
     """
     classifier_training_job_model = (
         classifier_models.ClassifierTrainingJobModel.get(job_id))
@@ -504,15 +500,15 @@ def get_classifier_training_job(
     given <exploration, version, state> triplet.
 
     Args:
-        exp_id: str. ID of the exploration.
-        exp_version: int. The exploration version.
-        state_name: str. The state name for which we retrieve the job.
-        algorithm_id: str. The ID of the algorithm for which classifier training
+        exp_id: ID of the exploration.
+        exp_version: The exploration version.
+        state_name: The state name for which we retrieve the job.
+        algorithm_id: The ID of the algorithm for which classifier training
             job is to be retrieved.
 
     Returns:
-        ClassifierTrainingJob|None. An instance for the classifier training job
-        or None if no such instance is found.
+        An instance for the classifier training job or None if no such
+        instance is found.
     """
     state_training_jobs_mapping_model = (
         classifier_models.StateTrainingJobsMappingModel.get_model(
@@ -533,14 +529,14 @@ def get_state_training_jobs_mapping(
     combination.
 
     Args:
-        exp_id: str. ID of the exploration.
-        exp_version: int. Version of the exploration.
-        state_name: str. Name of the state for which training job mapping model
+        exp_id: ID of the exploration.
+        exp_version: Version of the exploration.
+        state_name: Name of the state for which training job mapping model
             is to be retrieved.
 
     Returns:
-        StateTrainingJobsMapping | None. A domain object containing exploration
-        mapping model information. None, if no such instance is found.
+        A domain object containing exploration mapping model information.
+        None, if no such instance is found.
     """
     state_training_jobs_mapping_model = (
         classifier_models.StateTrainingJobsMappingModel.get_model(
@@ -583,10 +579,9 @@ def migrate_state_training_jobs(
     for given <exploration, version, state> and algorithm_id.
 
     Args:
-        state_training_jobs_mapping: StateTrainingJobsMapping. Domain
-            object containing exploration to training job id mapping. This
-            mapping is used to figure out jobs that need to be re-submitted,
-            added or removed.
+        state_training_jobs_mapping: Domain object containing exploration to
+            training job id mapping. This mapping is used to figure out jobs
+            that need to be re-submitted, added or removed.
 
     Raises:
         Exception. Interaction id does not exist for the state.
@@ -705,17 +700,15 @@ def get_classifier_training_job_maps(
     each of the given state names.
 
     Args:
-        exp_id: str. ID of the exploration.
-        exp_version: int. The exploration version.
-        state_names: list(str). The state names for which we retrieve the job
-            mappings.
+        exp_id: ID of the exploration.
+        exp_version: The exploration version.
+        state_names: The state names for which we retrieve the job mappings.
 
     Returns:
-        list(dict(str: str)|None). A list of dicts, each mapping
-        algorithm IDs to the corresponding job IDs. Each element
-        in the list corresponds to the corresponding state name in the
-        state_names input argument. None, if no StateMappingModel exists
-        for corresponding exploration id.
+        A list of dicts, each mapping algorithm IDs to the corresponding
+        job IDs. Each element in the list corresponds to the corresponding
+        state name in the state_names input argument. None, if no
+        StateMappingModel exists for corresponding exploration id.
     """
     state_training_jobs_mapping_models = (
         classifier_models.StateTrainingJobsMappingModel.get_models(
@@ -747,8 +740,8 @@ def create_classifier_training_job_for_reverted_exploration(
     """Create classifier training job model when an exploration is reverted.
 
     Args:
-        exploration: Exploration. Exploration domain object.
-        exploration_to_revert_to: Exploration. Exploration to revert to.
+        exploration: Exploration domain object.
+        exploration_to_revert_to: Exploration to revert to.
     """
     classifier_training_job_maps_for_old_version = (
         get_classifier_training_job_maps(

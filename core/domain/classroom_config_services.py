@@ -40,7 +40,7 @@ def get_all_classrooms() -> List[classroom_config_domain.Classroom]:
     """Returns all the classrooms present in the datastore.
 
     Returns:
-        list(Classroom). The list of classrooms present in the datastore.
+        The list of classrooms present in the datastore.
     """
     backend_classroom_models = classroom_models.ClassroomModel.get_all()
     classrooms: List[classroom_config_domain.Classroom] = [
@@ -55,8 +55,8 @@ def get_classroom_id_to_classroom_name_dict() -> Dict[str, str]:
     all the classrooms present in the datastore.
 
     Returns:
-        dict(str, str). A dict with classroom id as key and classroom name as
-        value for all the classrooms present in the datastore.
+        A dict with classroom id as key and classroom name as value for all the
+        classrooms present in the datastore.
     """
     classrooms = get_all_classrooms()
     return {
@@ -71,12 +71,10 @@ def get_classroom_from_classroom_model(
     from the datastore.
 
     Args:
-        classroom_model: ClassroomModel. The classroom model loaded from the
-            datastore.
+        classroom_model: The classroom model loaded from the datastore.
 
     Returns:
-        Classroom. A classroom domain object corresponding to the given
-        classroom model.
+        A classroom domain object corresponding to the given classroom model.
     """
     return classroom_config_domain.Classroom(
         classroom_model.id,
@@ -113,12 +111,12 @@ def get_classroom_by_id(
     """Returns a domain object representing a classroom.
 
     Args:
-        classroom_id: str. ID of the classroom.
-        strict: bool. Fails noisily if the model doesn't exist.
+        classroom_id: ID of the classroom.
+        strict: Fails noisily if the model doesn't exist.
 
     Returns:
-        Classroom or None. The domain object representing a classroom with the
-        given id, or None if it does not exist.
+        The domain object representing a classroom with the given id,
+        or None if it does not exist.
     """
     classroom_model = classroom_models.ClassroomModel.get(
         classroom_id, strict=strict)
@@ -134,11 +132,11 @@ def get_classroom_by_url_fragment(
     """Returns a domain object representing a classroom.
 
     Args:
-        url_fragment: str. The url fragment of the classroom.
+        url_fragment: The url fragment of the classroom.
 
     Returns:
-        Classroom or None. The domain object representing a classroom with the
-        given id, or None if it does not exist.
+        The domain object representing a classroom with the given id,
+        or None if it does not exist.
     """
     classroom_model = classroom_models.ClassroomModel.get_by_url_fragment(
         url_fragment)
@@ -152,7 +150,7 @@ def get_new_classroom_id() -> str:
     """Returns a new classroom ID.
 
     Returns:
-        str. A new classroom ID.
+        A new classroom ID.
     """
     return classroom_models.ClassroomModel.generate_new_classroom_id()
 
@@ -164,9 +162,8 @@ def _update_classroom(
     """Saves a Clasroom domain object to the datastore.
 
     Args:
-        classroom: Classroom. The classroom domain object for the given
-            classroom.
-        classroom_model: ClassroomModel. The classroom model instance.
+        classroom: The classroom domain object for the given classroom.
+        classroom_model: The classroom model instance.
     """
     classroom.validate()
     classroom_model.name = classroom.name
@@ -186,8 +183,7 @@ def _create_new_classroom(
     """Creates a new classroom model from using the classroom domain object.
 
     Args:
-        classroom: Classroom. The classroom domain object for the given
-            classroom.
+        classroom: The classroom domain object for the given classroom.
     """
     classroom.validate()
     classroom_models.ClassroomModel.create(
@@ -219,6 +215,6 @@ def delete_classroom(classroom_id: str) -> None:
     """Deletes the classroom model.
 
     Args:
-        classroom_id: str. ID of the classroom which is to be deleted.
+        classroom_id: ID of the classroom which is to be deleted.
     """
     classroom_models.ClassroomModel.get(classroom_id).delete()

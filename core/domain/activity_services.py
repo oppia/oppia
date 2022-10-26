@@ -39,8 +39,8 @@ def get_featured_activity_references(
     """Gets a list of ActivityReference domain models.
 
     Returns:
-        list(ActivityReference). A list of all ActivityReference domain objects
-        that are currently featured.
+        A list of all ActivityReference domain objects that are currently
+        featured.
     """
     featured_model_instance = (
         activity_models.ActivityReferencesModel.get_or_create(
@@ -57,9 +57,8 @@ def update_featured_activity_references(
     """Updates the current list of featured activity references.
 
     Args:
-        featured_activity_references: list(ActivityReference). A list of
-            ActivityReference domain objects representing the full list of
-            'featured' activities.
+        featured_activity_references: A list of ActivityReference domain objects
+            representing the full list of 'featured' activities.
 
     Raises:
         Exception. The input list of ActivityReference domain objects has
@@ -88,8 +87,8 @@ def remove_featured_activity(activity_type: str, activity_id: str) -> None:
     activity references.
 
     Args:
-        activity_type: str. The type of the activity to remove.
-        activity_id: str. The id of the activity to remove.
+        activity_type: The type of the activity to remove.
+        activity_id: The id of the activity to remove.
     """
     remove_featured_activities(activity_type, [activity_id])
 
@@ -101,8 +100,8 @@ def remove_featured_activities(
     activity references.
 
     Args:
-        activity_type: str. The type of the activities to remove.
-        activity_ids: list(str). The ids of the activities to remove.
+        activity_type: The type of the activities to remove.
+        activity_ids: The ids of the activities to remove.
     """
     featured_references = get_featured_activity_references()
 
@@ -133,13 +132,13 @@ def split_by_type(
     in the input list.
 
     Args:
-        activity_references: list(ActivityReference). The domain object
-            containing exploration ids and collection ids.
+        activity_references: The domain object containing exploration ids and
+            collection ids.
 
     Returns:
-        tuple(list(str), list(str)). A 2-tuple whose first element is a list of
-        all exploration ids represented in the input list, and whose second
-        element is a list of all collection ids represented in the input list.
+        A 2-tuple whose first element is a list of all exploration ids
+        represented in the input list, and whose second element is a list
+        of all collection ids represented in the input list.
 
     Raises:
         Exception. The activity reference type is invalid.

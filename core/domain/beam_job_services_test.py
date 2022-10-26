@@ -70,14 +70,14 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         """Returns a new BeamJobRunModel with convenient default values.
 
         Args:
-            dataflow_job_id: str|None. The ID of the dataflow job corresponding
+            dataflow_job_id: The ID of the dataflow job corresponding
                 to the BeamJobRun. When this value is None, that signals that
                 the job has been run synchronously (like a function call), and
                 cannot be polled for updates.
-            job_id: str|None. The ID of the job. If None, a value is generated.
-            job_name: str. The name of the job class that implements the
+            job_id: The ID of the job. If None, a value is generated.
+            job_name: The name of the job class that implements the
                 job's logic.
-            job_state: str. The state of the job at the time the model was last
+            job_state: The state of the job at the time the model was last
                 updated.
 
         Returns:
@@ -97,8 +97,8 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         """Asserts that the domain objects have the same values as the models.
 
         Args:
-            beam_job_runs: list(BeamJobRun). The domain objects.
-            beam_job_run_models: list(BeamJobRunModel). The models.
+            beam_job_runs: The domain objects.
+            beam_job_run_models: The models.
 
         Raises:
             AssertionError. At least one domain object and model pair has at

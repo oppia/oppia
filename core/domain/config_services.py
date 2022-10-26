@@ -33,9 +33,9 @@ def set_property(committer_id: str, name: str, value: Any) -> None:
     """Sets a property value. The property must already be registered.
 
     Args:
-        committer_id: str. The user ID of the committer.
-        name: str. The name of the property.
-        value: Any. The value of the property.
+        committer_id: The user ID of the committer.
+        name: The name of the property.
+        value: The value of the property.
 
     Raises:
         Exception. No config property with the specified name is found.
@@ -52,8 +52,8 @@ def revert_property(committer_id: str, name: str) -> None:
     """Reverts a property value to the default value.
 
     Args:
-        committer_id: str. The user ID of the committer.
-        name: str. The name of the property.
+        committer_id: The user ID of the committer.
+        name: The name of the property.
 
     Raises:
         Exception. No config property with the specified name is found.

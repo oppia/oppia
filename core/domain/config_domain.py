@@ -356,10 +356,10 @@ class ConfigProperty:
         necessary.
 
         Args:
-            value: str. The value of the configuration property.
+            value: The value of the configuration property.
 
         Returns:
-            instance. The normalized object.
+            The normalized object.
         """
         email_validators = [{'id': 'does_not_contain_email'}]
         normalized_value: AllowedDefaultValueTypes = (
@@ -383,8 +383,8 @@ class Registry:
         values as instances of the specified property.
 
         Args:
-            name: str. The name of the configuration property.
-            instance: *. The instance of the configuration property.
+            name: The name of the configuration property.
+            instance: The instance of the configuration property.
         """
         cls._config_registry[name] = instance
 
@@ -394,10 +394,10 @@ class Registry:
         property.
 
         Args:
-            name: str. The name of the configuration property.
+            name: The name of the configuration property.
 
         Returns:
-            instance. The instance of the specified configuration property.
+            The instance of the specified configuration property.
         """
         return cls._config_registry.get(name)
 
@@ -424,7 +424,7 @@ class Registry:
         """Return a list of all the config property names.
 
         Returns:
-            list. The list of all config property names.
+            The list of all config property names.
         """
         return list(cls._config_registry)
 

@@ -57,14 +57,13 @@ class Classroom:
         """Constructs a Classroom domain object.
 
         Args:
-            classroom_id: str. The ID of the classroom.
-            name: str. The name of the classroom.
-            url_fragment: str. The url fragment of the classroom.
-            course_details: str. Course details for the classroom.
-            topic_list_intro: str. Topic list introduction for the classroom.
-            topic_id_to_prerequisite_topic_ids: dict(str, list(str)). A dict
-                with topic ID as key and a list of prerequisite topic IDs as
-                value.
+            classroom_id: The ID of the classroom.
+            name: The name of the classroom.
+            url_fragment: The url fragment of the classroom.
+            course_details: Course details for the classroom.
+            topic_list_intro: Topic list introduction for the classroom.
+            topic_id_to_prerequisite_topic_ids: A dict with topic ID as
+                key and a list of prerequisite topic IDs as value.
         """
         self.classroom_id = classroom_id
         self.name = name
@@ -79,11 +78,10 @@ class Classroom:
         """Returns a classroom domain object from a dict.
 
         Args:
-            classroom_dict: dict. The dict representation of the Classroom
-                object.
+            classroom_dict: The dict representation of the Classroom object.
 
         Returns:
-            Classroom. The classroom object instance.
+            The classroom object instance.
         """
         return cls(
             classroom_dict['classroom_id'],
@@ -98,7 +96,7 @@ class Classroom:
         """Returns a dict representing a classroom domain object.
 
         Returns:
-            dict. A dict, mapping all fields of classroom instance.
+            A dict, mapping all fields of classroom instance.
         """
         return {
             'classroom_id': self.classroom_id,
@@ -115,7 +113,7 @@ class Classroom:
         """Checks whether the name of the classroom is a valid one.
 
         Args:
-            name: str. The name to validate.
+            name: The name to validate.
         """
         if not isinstance(name, str):
             raise utils.ValidationError(
@@ -135,7 +133,7 @@ class Classroom:
         """Checks whether the url fragment of the classroom is a valid one.
 
         Args:
-            url_fragment: str. The url fragment to validate.
+            url_fragment: The url fragment to validate.
         """
         if not isinstance(url_fragment, str):
             raise utils.ValidationError(

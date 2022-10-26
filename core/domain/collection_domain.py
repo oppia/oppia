@@ -349,7 +349,7 @@ class CollectionNode:
         """Initializes a CollectionNode domain object.
 
         Args:
-            exploration_id: str. A valid ID of an exploration referenced by
+            exploration_id: A valid ID of an exploration referenced by
                 this node.
         """
         self.exploration_id = exploration_id
@@ -358,9 +358,8 @@ class CollectionNode:
         """Returns a dict representing this CollectionNode domain object.
 
         Returns:
-            dict. A dict, mapping all fields (exploration_id,
-            prerequisite_skill_ids, acquired_skill_ids) of CollectionNode
-            instance.
+            A dict, mapping all fields (exploration_id, prerequisite_skill_ids,
+            acquired_skill_ids) of CollectionNode instance.
         """
         return {
             'exploration_id': self.exploration_id
@@ -373,10 +372,10 @@ class CollectionNode:
         """Return a CollectionNode domain object from a dict.
 
         Args:
-            node_dict: dict. The dict representation of CollectionNode object.
+            node_dict: The dict representation of CollectionNode object.
 
         Returns:
-            CollectionNode. The corresponding CollectionNode domain object.
+            The corresponding CollectionNode domain object.
         """
         return cls(node_dict['exploration_id'])
 
@@ -397,11 +396,10 @@ class CollectionNode:
         """Returns a CollectionNode domain object with default values.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: The id of the exploration.
 
         Returns:
-            CollectionNode. The CollectionNode domain object with default
-            value.
+            The CollectionNode domain object with default value.
         """
         return cls(exploration_id)
 
@@ -467,21 +465,18 @@ class Collection:
         process, ensuring it represents the latest schema version.
 
         Args:
-            collection_id: str. The unique id of the collection.
-            title: str. The title of the collection.
-            category: str. The category of the collection.
-            objective: str. The objective of the collection.
-            language_code: str. The language code of the collection (like 'en'
+            collection_id: The unique id of the collection.
+            title: The title of the collection.
+            category: The category of the collection.
+            objective: The objective of the collection.
+            language_code: The language code of the collection (like 'en'
                 for English).
-            tags: list(str). The list of tags given to the collection.
-            schema_version: int. The schema version for the collection.
-            nodes: list(CollectionNode). The list of nodes present in the
-                collection.
-            version: int. The version of the collection.
-            created_on: datetime.datetime. Date and time when the collection is
-                created.
-            last_updated: datetime.datetime. Date and time when the
-                collection was last updated.
+            tags: The list of tags given to the collection.
+            schema_version: The schema version for the collection.
+            nodes: The list of nodes present in the collection.
+            version: The version of the collection.
+            created_on: Date and time when the collection is created.
+            last_updated: Date and time when the collection was last updated.
         """
         self.id = collection_id
         self.title = title
@@ -499,7 +494,7 @@ class Collection:
         """Returns a dict representing this Collection domain object.
 
         Returns:
-            dict. A dict, mapping all fields of Collection instance.
+            A dict, mapping all fields of Collection instance.
         """
         return {
             'id': self.id,
@@ -526,16 +521,15 @@ class Collection:
         """Returns a Collection domain object with default values.
 
         Args:
-            collection_id: str. The unique id of the collection.
-            title: str. The title of the collection.
-            category: str. The category of the collection.
-            objective: str. The objective of the collection.
-            language_code: str. The language code of the collection (like 'en'
+            collection_id: The unique id of the collection.
+            title: The title of the collection.
+            category: The category of the collection.
+            objective: The objective of the collection.
+            language_code: The language code of the collection (like 'en'
                 for English).
 
         Returns:
-            Collection. The Collection domain object with the default
-            values.
+            The Collection domain object with the default values.
         """
         return cls(
             collection_id, title, category, objective, language_code, [],
@@ -552,16 +546,14 @@ class Collection:
         """Return a Collection domain object from a dict.
 
         Args:
-            collection_dict: dict. The dictionary representation of the
-                collection.
-            collection_version: int. The version of the collection.
-            collection_created_on: datetime.datetime. Date and time when the
-                collection is created.
-            collection_last_updated: datetime.datetime. Date and time when
-                the collection is updated last time.
+            collection_dict: The dictionary representation of the collection.
+            collection_version: The version of the collection.
+            collection_created_on: Date and time when the collection is created.
+            collection_last_updated: Date and time when the collection is
+                updated last time.
 
         Returns:
-            Collection. The corresponding Collection domain object.
+            The corresponding Collection domain object.
         """
         collection = cls(
             collection_dict['id'], collection_dict['title'],
@@ -581,12 +573,12 @@ class Collection:
         """Returns a Collection domain object decoded from a JSON string.
 
         Args:
-            json_string: str. A JSON-encoded string that can be
-                decoded into a dictionary representing a Collection.
-                Only call on strings that were created using serialize().
+            json_string: A JSON-encoded string that can be decoded into a
+                dictionary representing a Collection. Only call on strings
+                that were created using serialize().
 
         Returns:
-            Collection. The corresponding Collection domain object.
+            The corresponding Collection domain object.
         """
         collection_dict = json.loads(json_string)
 
@@ -610,7 +602,7 @@ class Collection:
         """Returns the object serialized as a JSON string.
 
         Returns:
-            str. JSON-encoded str encoding all of the information composing
+            JSON-encoded str encoding all of the information composing
             the object.
         """
         # Here we use MyPy ignore because to_dict() method returns a general
@@ -645,7 +637,7 @@ class Collection:
         """Convert the Collection domain object into YAML.
 
         Returns:
-            str. The YAML representation of this Collection.
+            The YAML representation of this Collection.
         """
         collection_dict = self.to_dict()
 
@@ -670,11 +662,11 @@ class Collection:
         Adds a language code, and tags.
 
         Args:
-            collection_dict: dict. The dict representation of a collection with
-                schema version v1.
+            collection_dict: The dict representation of a collection with schema
+                version v1.
 
         Returns:
-            dict. The dict representation of the Collection domain object,
+            The dict representation of the Collection domain object,
             following schema version v2.
         """
         collection_dict['schema_version'] = 2
@@ -692,11 +684,11 @@ class Collection:
         collection_services.get_collection_from_model.
 
         Args:
-            collection_dict: dict. The dict representation of a collection with
+            collection_dict: The dict representation of a collection with
                 schema version v2.
 
         Returns:
-            dict. The dict representation of the Collection domain object,
+            The dict representation of the Collection domain object,
             following schema version v3.
         """
         collection_dict['schema_version'] = 3
@@ -773,10 +765,10 @@ class Collection:
         format.
 
         Args:
-            yaml_content: str. The YAML representation of the collection.
+            yaml_content: The YAML representation of the collection.
 
         Returns:
-            Dict. The dictionary representation of the collection in which
+            The dictionary representation of the collection in which
             the latest YAML representation of the collection and latest
             schema format is used.
 
@@ -824,11 +816,11 @@ class Collection:
         """Converts a YAML string to a Collection domain object.
 
         Args:
-            collection_id: str. The id of the collection.
-            yaml_content: str. The YAML representation of the collection.
+            collection_id: The id of the collection.
+            yaml_content: The YAML representation of the collection.
 
         Returns:
-            Collection. The corresponding collection domain object.
+            The corresponding collection domain object.
         """
         collection_dict = cls._migrate_to_latest_yaml_version(yaml_content)
 
@@ -843,11 +835,11 @@ class Collection:
         changes the language code.
 
         Args:
-            collection_contents: dict. A dict representing the collection
+            collection_contents: A dict representing the collection
                 contents object to convert.
 
         Returns:
-            dict. The updated collection_contents dict.
+            The updated collection_contents dict.
         """
         return collection_contents
 
@@ -859,11 +851,11 @@ class Collection:
         handled while loading the collection.
 
         Args:
-            collection_contents: dict. A dict representing the collection
+            collection_contents: A dict representing the collection
                 contents object to convert.
 
         Returns:
-            dict. The updated collection_contents dict.
+            The updated collection_contents dict.
         """
         return collection_contents
 
@@ -879,11 +871,11 @@ class Collection:
         nodes, and assigns them IDs.
 
         Args:
-            collection_contents: dict. A dict representing the collection
+            collection_contents: A dict representing the collection
                 contents object to convert.
 
         Returns:
-            dict. The updated collection_contents dict.
+            The updated collection_contents dict.
         """
 
         skill_names = set()
@@ -945,11 +937,11 @@ class Collection:
         actually a skill ID.
 
         Args:
-            collection_contents: dict. A dict representing the collection
+            collection_contents: A dict representing the collection
                 contents object to convert.
 
         Returns:
-            dict. The updated collection_contents dict.
+            The updated collection_contents dict.
         """
         # Here we use MyPy ignore because 'next_skill_index' key is
         # deprecated from the latest domain object and while accessing
@@ -975,11 +967,11 @@ class Collection:
         Removes skills from collection node.
 
         Args:
-            collection_contents: dict. A dict representing the collection
+            collection_contents: A dict representing the collection
                 contents object to convert.
 
         Returns:
-            dict. The updated collection_contents dict.
+            The updated collection_contents dict.
         """
         for node in collection_contents['nodes']:
             # Here we use MyPy ignore because MyPy doesn't allow key deletion
@@ -1003,11 +995,11 @@ class Collection:
         passed in is modified in-place.
 
         Args:
-            versioned_collection_contents: dict. A dict with two keys:
+            versioned_collection_contents: A dict with two keys:
                 - schema_version: int. The schema version for the collection.
                 - collection_contents: dict. The dict comprising the collection
                     contents.
-            current_version: int. The current collection schema version.
+            current_version: The current collection schema version.
 
         Raises:
             Exception. The value of the key 'schema_version' in
@@ -1036,7 +1028,7 @@ class Collection:
         collection.
 
         Returns:
-            list(str). List of exploration IDs.
+            List of exploration IDs.
         """
         return [node.exploration_id for node in self.nodes]
 
@@ -1047,7 +1039,7 @@ class Collection:
            the collection is empty, returns None.
 
         Returns:
-            str|None. The exploration ID of the first node, or None if the
+            The exploration ID of the first node, or None if the
             collection is empty.
         """
         if len(self.nodes) > 0:
@@ -1063,12 +1055,11 @@ class Collection:
            returns None.
 
         Args:
-            completed_exp_ids: list(str). List of completed exploration
-                ids.
+            completed_exp_ids: List of completed exploration ids.
 
         Returns:
-            str|None. The exploration ID of the next node,
-            or None if the collection is completed.
+            The exploration ID of the next node, or None if the collection
+            is completed.
         """
         for exp_id in self.exploration_ids:
             if exp_id not in completed_exp_ids:
@@ -1083,12 +1074,12 @@ class Collection:
            last node, None is returned.
 
         Args:
-            current_exploration_id: str. The id of exploration currently
+            current_exploration_id: The id of exploration currently
                 completed.
 
         Returns:
-            str|None. The exploration ID of the next node,
-            or None if the passed id is the last one in the collection.
+            The exploration ID of the next node, or None if the passed id is the
+            last one in the collection.
         """
         exploration_just_unlocked = None
 
@@ -1104,10 +1095,10 @@ class Collection:
         """Whether the collection id is that of a demo collection.
 
         Args:
-            collection_id: str. The id of the collection.
+            collection_id: The id of the collection.
 
         Returns:
-            bool. True if the collection is a demo else False.
+            True if the collection is a demo else False.
         """
         return collection_id in feconf.DEMO_COLLECTIONS
 
@@ -1116,7 +1107,7 @@ class Collection:
         """Whether the collection is one of the demo collections.
 
         Returs:
-            bool. True if the collection is a demo else False.
+            True if the collection is a demo else False.
         """
         return self.is_demo_collection_id(self.id)
 
@@ -1124,7 +1115,7 @@ class Collection:
         """Updates the title of the collection.
 
         Args:
-            title: str. The new title of the collection.
+            title: The new title of the collection.
         """
         self.title = title
 
@@ -1132,7 +1123,7 @@ class Collection:
         """Updates the category of the collection.
 
         Args:
-            category: str. The new category of the collection.
+            category: The new category of the collection.
         """
         self.category = category
 
@@ -1140,7 +1131,7 @@ class Collection:
         """Updates the objective of the collection.
 
         Args:
-            objective: str. The new objective of the collection.
+            objective: The new objective of the collection.
         """
         self.objective = objective
 
@@ -1148,7 +1139,7 @@ class Collection:
         """Updates the language code of the collection.
 
         Args:
-            language_code: str. The new language code of the collection.
+            language_code: The new language code of the collection.
         """
         self.language_code = language_code
 
@@ -1156,7 +1147,7 @@ class Collection:
         """Updates the tags of the collection.
 
         Args:
-            tags: list(str). The new tags of the collection.
+            tags: The new tags of the collection.
         """
         self.tags = tags
 
@@ -1165,10 +1156,10 @@ class Collection:
         id, or None if the exploration id is not in the nodes list.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: The id of the exploration.
 
         Returns:
-            int or None. The index of the corresponding node, or None if there
+            The index of the corresponding node, or None if there
             is no such node.
         """
         for ind, node in enumerate(self.nodes):
@@ -1181,11 +1172,11 @@ class Collection:
         exploration ID.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: The id of the exploration.
 
         Returns:
-            CollectionNode or None. If the list of nodes contains the given
-            exploration then it will return the corresponding node, else None.
+            If the list of nodes contains the given exploration then it will
+            return the corresponding node, else None.
         """
         for node in self.nodes:
             if node.exploration_id == exploration_id:
@@ -1197,7 +1188,7 @@ class Collection:
         exploration_id.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: The id of the exploration.
 
         Raises:
             ValueError. The exploration is already part of the colletion.
@@ -1214,8 +1205,8 @@ class Collection:
         """Swaps the values of 2 nodes in the collection.
 
         Args:
-            first_index: int. Index of one of the nodes to be swapped.
-            second_index: int. Index of the other node to be swapped.
+            first_index: Index of one of the nodes to be swapped.
+            second_index: Index of the other node to be swapped.
 
         Raises:
             ValueError. Both indices are the same number.
@@ -1233,7 +1224,7 @@ class Collection:
         collection.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: The id of the exploration.
 
         Raises:
             ValueError. The exploration is not part of the collection.
@@ -1410,30 +1401,30 @@ class CollectionSummary:
         """Constructs a CollectionSummary domain object.
 
         Args:
-            collection_id: str. The unique id of the collection.
-            title: str. The title of the collection.
-            category: str. The category of the collection.
-            objective: str. The objective of the collection.
-            language_code: str. The language code of the collection.
-            tags: list(str). The tags given to the collection.
-            status: str. The status of the collection.
-            community_owned: bool. Whether the collection is community-owned.
-            owner_ids: list(str). List of the user ids who are the owner of
+            collection_id: The unique id of the collection.
+            title: The title of the collection.
+            category: The category of the collection.
+            objective: The objective of the collection.
+            language_code: The language code of the collection.
+            tags: The tags given to the collection.
+            status: The status of the collection.
+            community_owned: Whether the collection is community-owned.
+            owner_ids: List of the user ids who are the owner of
                 this collection.
-            editor_ids: list(str). List of the user ids of the users who have
+            editor_ids: List of the user ids of the users who have
                 access to edit this collection.
-            viewer_ids: list(str). List of the user ids of the users who have
+            viewer_ids: List of the user ids of the users who have
                 view this collection.
-            contributor_ids: list(str). List of the user ids of the user who
+            contributor_ids: List of the user ids of the user who
                 have contributed to  this collection.
-            contributors_summary: dict. The summary given by the contributors
+            contributors_summary: The summary given by the contributors
                 to the collection, user id as the key and summary as value.
-            version: int. The version of the collection.
-            node_count: int. The number of nodes present in the collection.
-            collection_model_created_on: datetime.datetime. Date and time when
-                the collection model is created.
-            collection_model_last_updated: datetime.datetime. Date and time
-                when the collection model was last updated.
+            version: The version of the collection.
+            node_count: The number of nodes present in the collection.
+            collection_model_created_on: Date and time when the collection model
+                is created.
+            collection_model_last_updated: Date and time when the collection
+                model was last updated.
         """
         self.id = collection_id
         self.title = title
@@ -1457,7 +1448,7 @@ class CollectionSummary:
         """Returns a dict representing this CollectionSummary domain object.
 
         Returns:
-            dict. A dict, mapping all fields of CollectionSummary instance.
+            A dict, mapping all fields of CollectionSummary instance.
         """
         return {
             'id': self.id,
@@ -1524,10 +1515,10 @@ class CollectionSummary:
         """Checks if a given user may edit the collection.
 
         Args:
-            user_id: str. User id of the user.
+            user_id: User id of the user.
 
         Returns:
-            bool. Whether the given user may edit the collection.
+            Whether the given user may edit the collection.
         """
         return (
             user_id in self.editor_ids
@@ -1539,7 +1530,7 @@ class CollectionSummary:
         """Checks whether the collection is private.
 
         Returns:
-            bool. Whether the collection is private.
+            Whether the collection is private.
         """
         # Here mypy evaluates constants.ACTIVITY_STATUS_PRIVATE to be Any
         # and due to this, the == is returning Any. So, in order to
@@ -1550,10 +1541,10 @@ class CollectionSummary:
         """Checks whether the collection is solely owned by the user.
 
         Args:
-            user_id: str. The id of the user.
+            user_id: The id of the user.
 
         Returns:
-            bool. Whether the collection is solely owned by the user.
+            Whether the collection is solely owned by the user.
         """
         return user_id in self.owner_ids and len(self.owner_ids) == 1
 
@@ -1561,10 +1552,10 @@ class CollectionSummary:
         """Checks if a given user has any role within the collection.
 
         Args:
-            user_id: str. User id of the user.
+            user_id: User id of the user.
 
         Returns:
-            bool. Whether the given user has any role in the collection.
+            Whether the given user has any role in the collection.
         """
         return (
             user_id in self.owner_ids or
@@ -1576,7 +1567,7 @@ class CollectionSummary:
         """Add a new contributor to the contributors summary.
 
         Args:
-            contributor_id: str. ID of the contributor to be added.
+            contributor_id: ID of the contributor to be added.
         """
         # We don't want to record the contributions of system users.
         if contributor_id not in constants.SYSTEM_USER_IDS:

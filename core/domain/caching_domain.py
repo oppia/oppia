@@ -38,11 +38,11 @@ class MemoryCacheStats:
         """Initializes a Memory Cache Stats domain object.
 
         Args:
-            total_allocated_in_bytes: int. The total number of bytes allocated
-                by the memory cache.
-            peak_memory_usage_in_bytes: int. The highest number of bytes
-                allocated by the memory cache.
-            total_number_of_keys_stored: int. The number of keys stored in the
+            total_allocated_in_bytes: The total number of bytes allocated by the
+                memory cache.
+            peak_memory_usage_in_bytes: The highest number of bytes allocated by
+                the memory cache.
+            total_number_of_keys_stored: The number of keys stored in the
                 memory cache.
         """
         self.total_allocated_in_bytes = total_allocated_in_bytes

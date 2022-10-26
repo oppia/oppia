@@ -70,15 +70,15 @@ def try_upgrading_draft_to_exp_version(
     current_draft_version and to_exp_version migrate only the state schema.
 
     Args:
-        draft_change_list: list(ExplorationChange). The list of
-            ExplorationChange domain objects to upgrade.
-        current_draft_version: int. Current draft version.
-        to_exp_version: int. Target exploration version.
-        exp_id: str. Exploration id.
+        draft_change_list: The list of ExplorationChange domain objects
+            to upgrade.
+        current_draft_version: Current draft version.
+        to_exp_version: Target exploration version.
+        exp_id: Exploration id.
 
     Returns:
-        list(ExplorationChange) or None. A list of ExplorationChange domain
-        objects after upgrade or None if upgrade fails.
+        A list of ExplorationChange domain objects after upgrade or
+        None if upgrade fails.
 
     Raises:
         InvalidInputException. The current_draft_version is greater than
@@ -135,13 +135,12 @@ class DraftUpgradeUtil:
         draft change list.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
-            conversion_fn: function. The function to be used for converting the
-                HTML.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
+            conversion_fn: The function to be used for converting the HTML.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
             if not change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
@@ -322,11 +321,11 @@ class DraftUpgradeUtil:
         don't contain content IDs that were removed.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
 
         Raises:
             InvalidDraftConversionException. The conversion cannot be
@@ -367,11 +366,11 @@ class DraftUpgradeUtil:
         drafts, there should be no changes to drafts.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         return draft_change_list
 
@@ -386,11 +385,11 @@ class DraftUpgradeUtil:
         not affect drafts.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         return draft_change_list
 
@@ -403,11 +402,11 @@ class DraftUpgradeUtil:
         NumericInput interaction.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         return draft_change_list
 
@@ -419,11 +418,11 @@ class DraftUpgradeUtil:
         version 48 fixes encoding issues in HTML fields.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         conversion_fn = (
             html_validation_service.fix_incorrectly_encoded_chars)
@@ -439,11 +438,11 @@ class DraftUpgradeUtil:
         existing occurences of it to oppia-noninteractive-image tag.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         conversion_fn = (
             html_validation_service.convert_svg_diagram_tags_to_image_tags)
@@ -460,11 +459,11 @@ class DraftUpgradeUtil:
         do not contain any HTML tags. This should not affect drafts.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         return draft_change_list
 
@@ -478,11 +477,11 @@ class DraftUpgradeUtil:
         pre-existing drafts, there should be no changes to drafts.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         return draft_change_list
 
@@ -495,11 +494,11 @@ class DraftUpgradeUtil:
         state, for which there should be no changes to drafts.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         return draft_change_list
 
@@ -510,11 +509,11 @@ class DraftUpgradeUtil:
         """Converts draft change list from state version 42 to 43.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
 
         Raises:
             InvalidDraftConversionException. The conversion cannot be
@@ -541,11 +540,11 @@ class DraftUpgradeUtil:
         """Converts draft change list from state version 41 to 42.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
 
         Raises:
             InvalidDraftConversionException. The conversion cannot be
@@ -572,11 +571,11 @@ class DraftUpgradeUtil:
         """Converts draft change list from state version 40 to 41.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
 
         Raises:
             InvalidDraftConversionException. The conversion cannot be
@@ -602,11 +601,11 @@ class DraftUpgradeUtil:
         """Converts draft change list from state version 39 to 40.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
 
         Raises:
             InvalidDraftConversionException. The conversion cannot be
@@ -635,11 +634,11 @@ class DraftUpgradeUtil:
         for which there should be no changes to drafts.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         return draft_change_list
 
@@ -653,11 +652,11 @@ class DraftUpgradeUtil:
         learner, for which there should be no changes to drafts.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         return draft_change_list
 
@@ -668,11 +667,11 @@ class DraftUpgradeUtil:
         """Converts draft change list from version 36 to 37.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         for change in draft_change_list:
             if (change.property_name ==
@@ -700,11 +699,11 @@ class DraftUpgradeUtil:
         """Converts draft change list from version 35 to 36.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
 
         Raises:
             InvalidDraftConversionException. Conversion cannot be completed.
@@ -734,11 +733,11 @@ class DraftUpgradeUtil:
         be no changes to the draft for this migration.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
 
         Raises:
             InvalidDraftConversionException. Conversion cannot be completed.
@@ -773,11 +772,11 @@ class DraftUpgradeUtil:
         version 34 adds the new schema for Math components.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         conversion_fn = (
             html_validation_service.add_math_content_to_math_rte_components)
@@ -793,11 +792,11 @@ class DraftUpgradeUtil:
         MultipleChoiceInput interaction.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
@@ -829,11 +828,11 @@ class DraftUpgradeUtil:
         to drafts.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         return draft_change_list
 
@@ -846,11 +845,11 @@ class DraftUpgradeUtil:
         section of state.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
@@ -894,11 +893,11 @@ class DraftUpgradeUtil:
         tagged_skill_misconception_id.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
@@ -939,11 +938,11 @@ class DraftUpgradeUtil:
         state, for which there should be no changes to drafts.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         return draft_change_list
 
@@ -956,11 +955,11 @@ class DraftUpgradeUtil:
         recorded_voiceovers.
 
         Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
+            draft_change_list: The list of ExplorationChange domain objects
+                to upgrade.
 
         Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and

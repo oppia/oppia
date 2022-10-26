@@ -45,7 +45,7 @@ class Registry:
         """Get a list of all action types.
 
         Returns:
-            list(str). The list of all allowed action types.
+            The list of all allowed action types.
         """
         return stats_models.ALLOWED_ACTION_TYPES
 
@@ -72,7 +72,7 @@ class Registry:
         """Get a list of instances of all actions.
 
         Returns:
-            list(*). A list of all action class instances. Classes all have
+            A list of all action class instances. Classes all have
             "BaseLearnerActionSpec" as an ancestor class.
         """
         if len(cls._actions) == 0:
@@ -87,10 +87,10 @@ class Registry:
         KeyError.
 
         Args:
-            action_type: str. Type of the action.
+            action_type: Type of the action.
 
         Returns:
-            *. An instance of the corresponding action class. This class has
+            An instance of the corresponding action class. This class has
             "BaseLearnerActionSpec" as an ancestor class.
         """
         if action_type not in cls._actions:

@@ -39,8 +39,8 @@ class ActivityReference:
         """Constructs an ActivityReference domain object.
 
         Args:
-            activity_type: str. The activity type.
-            activity_id: str. The activity id.
+            activity_type: The activity type.
+            activity_id: The activity id.
         """
         self.type = activity_type
         self.id = activity_id
@@ -49,7 +49,7 @@ class ActivityReference:
         """Returns a unique string for this ActivityReference domain object.
 
         Returns:
-            str. A unique string hash for this ActivityReference domain object.
+            A unique string hash for this ActivityReference domain object.
         """
         return '%s:%s' % (self.type, self.id)
 
@@ -73,7 +73,7 @@ class ActivityReference:
         """Returns a dict representing this ActivityReference domain object.
 
         Returns:
-            dict. A dict, mapping type and id of an ActivityReference
+            A dict, mapping type and id of an ActivityReference
             instance to corresponding keys 'type' and 'id'.
         """
         return {
@@ -88,30 +88,23 @@ class ActivityReference:
         """Return the ActivityReference object from a dict.
 
         Args:
-            activity_reference_dict: dict. Dictionary representation
-                of the object.
+            activity_reference_dict: Dictionary representation of the object.
 
         Returns:
-            ActivityReference. The corresponding ActivityReference object.
+            The corresponding ActivityReference object.
         """
         return cls(
             activity_reference_dict['type'], activity_reference_dict['id'])
 
 
 class ActivityReferences:
-    """Domain object for a list of activity references.
-
-    Attributes:
-        activity_reference_list: list(ActivityReference). A list of
-            ActivityReference domain objects.
-    """
+    """Domain object for a list of activity references."""
 
     def __init__(self, activity_reference_list: List[ActivityReference]):
         """Constructs an ActivityReferences domain object.
 
         Args:
-            activity_reference_list: list(ActivityReference). A list of
-                ActivityReference domain objects.
+            activity_reference_list: A list of ActivityReference domain objects.
         """
         self.activity_reference_list = activity_reference_list
 

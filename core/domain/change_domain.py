@@ -84,12 +84,12 @@ def validate_cmd(
     the values of attributes belong to a set of allowed values if any.
 
     Args:
-        cmd_name: str. The command for which validation process is being done.
-        valid_cmd_attribute_specs: dict. A dict containing the required and
+        cmd_name: The command for which validation process is being done.
+        valid_cmd_attribute_specs: A dict containing the required and
             optional attributes for a command along with allowed values
             for attributes if any.
-        actual_cmd_attributes: dict. A dict containing the actual
-            attributes of a command with values for the attributes.
+        actual_cmd_attributes: A dict containing the actual attributes
+            of a command with values for the attributes.
 
     Raises:
         ValidationError. Any required attribute is missing or an extra attribute
@@ -188,7 +188,7 @@ class BaseChange:
         """Initializes a BaseChange object from a dict.
 
         Args:
-            change_dict: dict. The dict containing cmd name and attributes.
+            change_dict: The dict containing cmd name and attributes.
 
         Raises:
             ValidationError. The given change_dict is not valid.
@@ -219,7 +219,7 @@ class BaseChange:
         object.
 
         Args:
-            change_dict: dict. A dict of changes with keys as a cmd and the
+            change_dict: A dict of changes with keys as a cmd and the
                 attributes of a command.
 
         Raises:
@@ -261,7 +261,7 @@ class BaseChange:
         """Returns a dict representing the BaseChange domain object.
 
         Returns:
-            dict. A dict, mapping all fields of BaseChange instance.
+            A dict, mapping all fields of BaseChange instance.
         """
         base_change_dict = {}
         base_change_dict['cmd'] = self.cmd
@@ -290,11 +290,10 @@ class BaseChange:
         """Returns a BaseChange domain object from a dict.
 
         Args:
-            base_change_dict: dict. The dict representation of
-                BaseChange object.
+            base_change_dict: The dict representation of BaseChange object.
 
         Returns:
-            BaseChange. The corresponding BaseChange domain object.
+            The corresponding BaseChange domain object.
         """
         return cls(base_change_dict)
 

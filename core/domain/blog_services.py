@@ -64,11 +64,10 @@ def get_blog_post_from_model(
     from the datastore.
 
     Args:
-        blog_post_model: BlogPostModel. The blog post model loaded from the
-            datastore.
+        blog_post_model: The blog post model loaded from the datastore.
 
     Returns:
-        BlogPost. A blog post domain object corresponding to the given
+        A blog post domain object corresponding to the given
         blog post model.
     """
     return blog_domain.BlogPost(
@@ -107,11 +106,11 @@ def get_blog_post_by_id(
     """Returns a domain object representing a blog post.
 
     Args:
-        blog_post_id: str. ID of the blog post.
-        strict: bool. Fails noisily if the model doesn't exist.
+        blog_post_id: ID of the blog post.
+        strict: Fails noisily if the model doesn't exist.
 
     Returns:
-        BlogPost or None. The domain object representing a blog post with the
+        The domain object representing a blog post with the
         given id, or None if it does not exist.
     """
     blog_post_model = blog_models.BlogPostModel.get(blog_post_id, strict=strict)
@@ -127,10 +126,10 @@ def get_blog_post_by_url_fragment(
     """Returns a domain object representing a blog post.
 
     Args:
-        url_fragment: str. The url fragment of the blog post.
+        url_fragment: The url fragment of the blog post.
 
     Returns:
-        BlogPost or None. The domain object representing a blog post with the
+        The domain object representing a blog post with the
         given ID, or None if it does not exist.
     """
     blog_post_model = (
@@ -148,12 +147,11 @@ def get_blog_post_summary_from_model(
     model loaded from the datastore.
 
     Args:
-        blog_post_summary_model: BlogPostSummaryModel. The blog post model
-            loaded from the datastore.
+        blog_post_summary_model: The blog post model loaded from the datastore.
 
     Returns:
-        BlogPostSummary. A blog post summary domain object corresponding to the
-        given blog post summary model.
+        A blog post summary domain object corresponding to the given blog post
+        summary model.
     """
     return blog_domain.BlogPostSummary(
         blog_post_summary_model.id,
@@ -192,12 +190,12 @@ def get_blog_post_summary_by_id(
     """Returns a domain object representing a blog post summary.
 
     Args:
-        blog_post_id: str. ID of the blog post.
-        strict: bool. Fails noisily if the model doesn't exist.
+        blog_post_id: ID of the blog post.
+        strict: Fails noisily if the model doesn't exist.
 
     Returns:
-        BlogPostSummary or None. The domain object representing a blog post
-        summary with the given ID, or None if it does not exist.
+        The domain object representing a blog post summary with the given ID,
+        or None if it does not exist.
     """
     blog_post_summary_model = blog_models.BlogPostSummaryModel.get(
         blog_post_id, strict=strict)
@@ -216,12 +214,12 @@ def get_blog_post_summary_models_by_ids(
     domain object.
 
     Args:
-        blog_post_ids: List[str]. The list of blog post IDs for which blog post
+        blog_post_ids: The list of blog post IDs for which blog post
             summaries are to be fetched.
 
     Returns:
-        List[BlogPostSummary]. The list of blog post summary domain object
-        corresponding to the given list of blog post IDs.
+        The list of blog post summary domain object corresponding to the given
+        list of blog post IDs.
     """
     blog_post_summary_models = blog_models.BlogPostSummaryModel.get_multi(
         blog_post_ids)
@@ -238,14 +236,13 @@ def get_blog_post_summary_models_list_by_user_id(
     domain object for which user is an editor and the status matches.
 
     Args:
-        user_id: str. The user who is editor of the blog posts.
-        blog_post_is_published: bool. Whether the given blog post is
+        user_id: The user who is editor of the blog posts.
+        blog_post_is_published: Whether the given blog post is
             published or not.
 
     Returns:
-        list(BlogPostSummary). The blog post summaries of the blog posts for
-        which the user is an editor corresponding to the status
-        (draft/published).
+        The blog post summaries of the blog posts for which the user is an
+        editor corresponding to the status (draft/published).
     """
     blog_post_ids = filter_blog_post_ids(user_id, blog_post_is_published)
     blog_post_summary_models = (
@@ -276,11 +273,11 @@ def filter_blog_post_ids(
     according to the status.
 
     Args:
-        user_id: str. The user who is editor of the blog post.
-        blog_post_is_published: bool. True if blog post is published.
+        user_id: The user who is editor of the blog post.
+        blog_post_is_published: True if blog post is published.
 
     Returns:
-        list(str). The blog post IDs of the blog posts for which the user is an
+        The blog post IDs of the blog posts for which the user is an
         editor corresponding to the status(draft/published).
     """
     if blog_post_is_published:
@@ -304,11 +301,11 @@ def get_blog_post_summary_by_title(
     """Returns a domain object representing a blog post summary model.
 
     Args:
-        title: str. The title of the blog post.
+        title: The title of the blog post.
 
     Returns:
-        BlogPostSummary or None. The domain object representing a blog post
-        summary with the given title, or None if it does not exist.
+        The domain object representing a blog post summary with the given title,
+        or None if it does not exist.
     """
     blog_post_summary_model: Sequence[blog_models.BlogPostSummaryModel] = (
         blog_models.BlogPostSummaryModel.query(
@@ -326,7 +323,7 @@ def get_new_blog_post_id() -> str:
     """Returns a new blog post ID.
 
     Returns:
-        str. A new blog post ID.
+        A new blog post ID.
     """
     return blog_models.BlogPostModel.generate_new_blog_post_id()
 
@@ -338,12 +335,12 @@ def get_blog_post_rights_from_model(
     model loaded from the datastore.
 
     Args:
-        blog_post_rights_model: BlogPostRightsModel. The blog post rights model
-            loaded from the datastore.
+        blog_post_rights_model: The blog post rights model loaded from
+            the datastore.
 
     Returns:
-        BlogPostRights. A blog post rights domain object corresponding to the
-        given blog post rights model.
+        A blog post rights domain object corresponding to the given blog post
+        rights model.
     """
     return blog_domain.BlogPostRights(
         blog_post_rights_model.id,
@@ -375,12 +372,12 @@ def get_blog_post_rights(
     """Retrieves the rights object for the given blog post.
 
     Args:
-        blog_post_id: str. ID of the blog post.
-        strict: bool. Whether to fail noisily if no blog post rights model
+        blog_post_id: ID of the blog post.
+        strict: Whether to fail noisily if no blog post rights model
             with a given ID exists in the datastore.
 
     Returns:
-        BlogPostRights. The rights object associated with the given blog post.
+        The rights object associated with the given blog post.
 
     Raises:
         EntityNotFoundError. The blog post with ID blog post id was not
@@ -402,12 +399,12 @@ def get_published_blog_post_summaries_by_user_id(
     for which the given user is an editor.
 
     Args:
-        user_id: str. ID of the user.
-        max_limit: int. The number of models to be fetched.
+        user_id: ID of the user.
+        max_limit: The number of models to be fetched.
 
     Returns:
-        list(BlogPostSummary). The summary objects associated with the
-        blog posts assigned to given user.
+        The summary objects associated with the blog posts assigned
+        to given user.
     """
     blog_rights_models = (
         blog_models.BlogPostRightsModel.get_published_models_by_user(
@@ -427,10 +424,10 @@ def does_blog_post_with_url_fragment_exist(url_fragment: str) -> bool:
     """Checks if blog post with provided url fragment exists.
 
     Args:
-        url_fragment: str. The url fragment for the blog post.
+        url_fragment: The url fragment for the blog post.
 
     Returns:
-        bool. Whether the the url fragment for the blog post exists.
+        Whether the the url fragment for the blog post exists.
 
     Raises:
         Exception. Blog Post URL fragment is not a string.
@@ -447,8 +444,7 @@ def _save_blog_post(blog_post: blog_domain.BlogPost) -> None:
     """Saves a BlogPost domain object to the datastore.
 
     Args:
-        blog_post: BlogPost. The blog post domain object for the given
-            blog post.
+        blog_post: The blog post domain object for the given blog post.
     """
     model = blog_models.BlogPostModel.get(blog_post.id, strict=True)
     blog_post.validate()
@@ -467,7 +463,7 @@ def publish_blog_post(blog_post_id: str) -> None:
     """Marks the given blog post as published.
 
     Args:
-        blog_post_id: str. The ID of the given blog post.
+        blog_post_id: The ID of the given blog post.
 
     Raises:
         Exception. The given blog post does not exist.
@@ -496,7 +492,7 @@ def unpublish_blog_post(blog_post_id: str) -> None:
     """Marks the given blog post as unpublished or draft.
 
     Args:
-        blog_post_id: str. The ID of the given blog post.
+        blog_post_id: The ID of the given blog post.
 
     Raises:
         Exception. The given blog post does not exist.
@@ -524,8 +520,7 @@ def delete_blog_post(blog_post_id: str) -> None:
     """Deletes all the models related to a blog post.
 
     Args:
-        blog_post_id: str. ID of the blog post which is to be
-            deleted.
+        blog_post_id: ID of the blog post which is to be deleted.
     """
     blog_models.BlogPostModel.get(blog_post_id).delete()
     blog_models.BlogPostSummaryModel.get(blog_post_id).delete()
@@ -541,8 +536,7 @@ def _save_blog_post_summary(
     """Saves a BlogPostSummary domain object to the datastore.
 
     Args:
-        blog_post_summary: BlogPostSummary. The summary object for the given
-            blog post summary.
+        blog_post_summary: The summary object for the given blog post summary.
     """
     model = blog_models.BlogPostSummaryModel.get(
         blog_post_summary.id, strict=False)
@@ -573,8 +567,7 @@ def save_blog_post_rights(blog_post_rights: blog_domain.BlogPostRights) -> None:
     """Saves a BlogPostRights domain object to the datastore.
 
     Args:
-        blog_post_rights: BlogPostRights. The rights object for the given
-            blog post.
+        blog_post_rights: The rights object for the given blog post.
     """
     model = blog_models.BlogPostRightsModel.get(
         blog_post_rights.id, strict=True)
@@ -592,13 +585,11 @@ def check_can_edit_blog_post(
     """Checks whether the user can edit the given blog post.
 
     Args:
-        user: UserActionsInfo. Object having user_id, role and actions for
-            given user.
-        blog_post_rights: BlogPostRights or None. Rights object for the given
-            blog post.
+        user: Object having user_id, role and actions for given user.
+        blog_post_rights: Rights object for the given blog post.
 
     Returns:
-        bool. Whether the given user can edit the given blog post.
+        Whether the given user can edit the given blog post.
     """
     if blog_post_rights is None:
         return False
@@ -614,7 +605,7 @@ def deassign_user_from_all_blog_posts(user_id: str) -> None:
     """Removes the user from the list of editor_ids for all blog posts.
 
     Args:
-        user_id: str. ID to be removed from editor_ids.
+        user_id: ID to be removed from editor_ids.
     """
     blog_models.BlogPostRightsModel.deassign_user_from_all_blog_posts(
         user_id)
@@ -625,11 +616,11 @@ def generate_url_fragment(title: str, blog_post_id: str) -> str:
     post.
 
     Args:
-        title: str. The title of the blog post.
-        blog_post_id: str. The unique blog post ID.
+        title: The title of the blog post.
+        blog_post_id: The unique blog post ID.
 
     Returns:
-        str. The url fragment of the blog post.
+        The url fragment of the blog post.
     """
     lower_title = title.lower()
     hyphenated_title = lower_title.replace(' ', '-')
@@ -642,10 +633,10 @@ def generate_summary_of_blog_post(content: str) -> str:
     post.
 
     Args:
-        content: santized html str. The blog post content to be truncated.
+        content: The blog post content to be truncated.
 
     Returns:
-        str. The summary of the blog post.
+        The summary of the blog post.
     """
     raw_text = html_cleaner.strip_html_tags(content)
     max_chars_in_summary = constants.MAX_CHARS_IN_BLOG_POST_SUMMARY - 3
@@ -661,10 +652,10 @@ def compute_summary_of_blog_post(
     """Creates BlogPostSummary domain object from BlogPost domain object.
 
     Args:
-        blog_post: BlogPost. The blog post domain object.
+        blog_post: The blog post domain object.
 
     Returns:
-        BlogPostSummary. The blog post summary domain object.
+        The blog post summary domain object.
     """
     summary = generate_summary_of_blog_post(blog_post.content)
 
@@ -686,13 +677,13 @@ def apply_change_dict(
     """Applies a changelist to blog post and returns the result.
 
     Args:
-        blog_post_id: str. ID of the given blog post.
-        change_dict: dict. A dict containing all the changes keyed
+        blog_post_id: ID of the given blog post.
+        change_dict: A dict containing all the changes keyed
             by corresponding field name (title, content,
             thumbnail_filename, tags).
 
     Returns:
-        UpdatedBlogPost. The modified blog post object.
+        The modified blog post object.
     """
     blog_post = get_blog_post_by_id(blog_post_id, strict=True)
 
@@ -717,8 +708,8 @@ def update_blog_post(
     """Updates the blog post and its summary model in the datastore.
 
     Args:
-        blog_post_id: str. The ID of the blog post which is to be updated.
-        change_dict: dict. A dict containing all the changes keyed by
+        blog_post_id: The ID of the blog post which is to be updated.
+        change_dict: A dict containing all the changes keyed by
             corresponding field name (title, content, thumbnail_filename,
             tags).
     """
@@ -748,10 +739,10 @@ def create_new_blog_post(author_id: str) -> blog_domain.BlogPost:
     object.
 
     Args:
-        author_id: str. The user ID of the author for new blog post.
+        author_id: The user ID of the author for new blog post.
 
     Returns:
-        BlogPost. A newly created blog post domain object .
+        A newly created blog post domain object .
     """
     blog_post_id = get_new_blog_post_id()
     new_blog_post_model = blog_models.BlogPostModel.create(
@@ -766,20 +757,19 @@ def create_new_blog_post(author_id: str) -> blog_domain.BlogPost:
 
 
 def get_published_blog_post_summaries(
-    offset: int=0, size: Optional[int]=None
+    offset: int = 0, size: Optional[int] = None
 ) -> List[blog_domain.BlogPostSummary]:
     """Returns published BlogPostSummaries list.
 
     Args:
-        offset: int. Number of query results to skip from top.
-        size: int or None. Number of blog post summaries to return if there are
+        offset: Number of query results to skip from top.
+        size: Number of blog post summaries to return if there are
             at least that many, otherwise it contains all remaining results. If
             None, maximum number of blog post summaries to display on blog
             homepage will be returned if there are at least that many.
 
     Returns:
-        list(BlogPostSummaries). These are sorted in order of the
-        date published.
+        These are sorted in order of the date published.
     """
     if size:
         max_limit = size
@@ -811,7 +801,7 @@ def get_total_number_of_published_blog_post_summaries() -> int:
     """Returns total number of published BlogPostSummaries.
 
     Returns:
-        int. Total number of published BlogPostSummaries.
+        Total number of published BlogPostSummaries.
     """
     return blog_models.BlogPostRightsModel.query(
         blog_models.BlogPostRightsModel.blog_post_is_published == True  # pylint: disable=singleton-comparison
@@ -827,9 +817,9 @@ def update_blog_models_author_and_published_on_date(
     date provided.
 
     Args:
-        blog_post_id: str. The ID of the blog post which has to be updated.
-        author_id: str. User ID of the author.
-        date: str. The date of publishing the blog post.
+        blog_post_id: The ID of the blog post which has to be updated.
+        author_id: User ID of the author.
+        date: The date of publishing the blog post.
     """
     blog_post = get_blog_post_by_id(blog_post_id, strict=True)
     blog_post_rights = get_blog_post_rights(blog_post_id, strict=True)
@@ -858,8 +848,7 @@ def index_blog_post_summaries_given_ids(blog_post_ids: List[str]) -> None:
     """Indexes the blog post summaries corresponding to the given blog post ids.
 
     Args:
-        blog_post_ids: list(str). List of ids of the blog post summaries to be
-            indexed.
+        blog_post_ids: List of ids of the blog post summaries to be indexed.
     """
     blog_post_summaries = get_blog_post_summary_models_by_ids(blog_post_ids)
     if len(blog_post_summaries) > 0:
@@ -882,19 +871,19 @@ def get_blog_post_ids_matching_query(
     also returns a search offset.
 
     Args:
-        query_string: str. A search query string.
-        tags: list(str). The list of tags to query for. If it is empty, no tags
+        query_string: A search query string.
+        tags: The list of tags to query for. If it is empty, no tags
             filter is applied to the results. If it is not empty, then a result
             is considered valid if it matches at least one of these tags.
-        size: int. The maximum number of blog post summary domain objects to
+        size: The maximum number of blog post summary domain objects to
             be returned if there are at least that many, otherwise it contains
             all results.
-        offset: int or None. Optional offset from which to start the search
+        offset: Optional offset from which to start the search
             query. If no offset is supplied, the first N results matching
             the query are returned.
 
     Returns:
-        2-tuple of (valid_blog_post_ids, search_offset). Where:
+        A 2-tuple of (valid_blog_post_ids, search_offset). Where:
             valid_blog_post_ids : list(str). A list with all
                 blog post ids matching the given search query string,
                 as well as a search offset for future fetches.

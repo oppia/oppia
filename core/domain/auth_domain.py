@@ -69,11 +69,11 @@ class AuthClaims:
     phone number).
 
     Attributes:
-        auth_id: str. A unique identifier provided by an identity provider that
+        auth_id: A unique identifier provided by an identity provider that
             is associated with the user. The ID is only unique with respect to
             the identity provider that produced it.
-        email: str|None. The email address associated with the user, if any.
-        role_is_super_admin: bool. Whether the user has super admin privileges.
+        email: The email address associated with the user, if any.
+        role_is_super_admin: Whether the user has super admin privileges.
     """
 
     def __init__(
@@ -213,7 +213,7 @@ class UserAuthDetails:
         which identity provider the auth ID came from.
 
         Returns:
-            str. Returns firebase_auth_id if it is not None, otherwise gae_id.
+            Returns firebase_auth_id if it is not None, otherwise gae_id.
         """
         return self.firebase_auth_id or self.gae_id
 
@@ -234,8 +234,8 @@ class UserAuthDetails:
         assign to it will raise an exception.
 
         Returns:
-            dict(str:*). A dict of values from self using UserAuthDetailsModel
-            property names as keys.
+            A dict of values from self using UserAuthDetailsModel property names
+            as keys.
         """
         return {
             'gae_id': self.gae_id,

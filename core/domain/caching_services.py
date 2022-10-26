@@ -179,20 +179,20 @@ def _get_memcache_key(
     namespace and sub_namespace.
 
     Args:
-        namespace: str. The namespace under which the values associated with the
+        namespace: The namespace under which the values associated with the
             id lie. Use CACHE_NAMESPACE_DEFAULT as the namespace for ids that
             are not associated with a conceptual domain-layer entity and
             therefore don't require serialization.
-        sub_namespace: str|None. The sub-namespace further differentiates the
+        sub_namespace: The sub-namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, and Collections,
             the sub-namespace is the stringified version number of the objects.
-        obj_id: str. The id of the value to store in the memory cache.
+        obj_id: The id of the value to store in the memory cache.
 
     Raises:
         ValueError. The sub-namespace contains a ':'.
 
     Returns:
-        str. The generated key for use in the memory cache in order to
+        The generated key for use in the memory cache in order to
         differentiate a passed-in key based on namespace and sub-namespace.
     """
     sub_namespace_key_string = (sub_namespace or '')
@@ -281,25 +281,25 @@ def get_multi(
     """Get a dictionary of the {id, value} pairs from the memory cache.
 
     Args:
-        namespace: str. The namespace under which the values associated with
+        namespace: The namespace under which the values associated with
             these object ids lie. The namespace determines how the objects are
             decoded from their JSON-encoded string. Use CACHE_NAMESPACE_DEFAULT
             as the namespace for objects that are not associated with a
             conceptual domain-layer entity and therefore don't require
             serialization.
-        sub_namespace: str|None. The sub-namespace further differentiates the
+        sub_namespace: The sub-namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, and Collections,
             the sub-namespace is either None or the stringified version number
             of the objects. If the sub-namespace is not required, pass in None.
-        obj_ids: list(str). List of object ids corresponding to values to
-            retrieve from the cache.
+        obj_ids: List of object ids corresponding to values to retrieve from
+            the cache.
 
     Raises:
         ValueError. The namespace does not exist or is not recognized.
 
     Returns:
-        dict(str, Exploration|Skill|Story|Topic|Collection|str). Dictionary of
-        decoded (id, value) pairs retrieved from the platform caching service.
+        Dictionary of decoded (id, value) pairs retrieved from the platform
+        caching service.
     """
 
     result_dict: Dict[str, AllowedCacheableObjectTypes] = {}
@@ -396,23 +396,21 @@ def set_multi(
     https://redis.io/topics/data-types).
 
     Args:
-        namespace: str. The namespace under which the values associated with the
+        namespace: The namespace under which the values associated with the
             id lie. Use CACHE_NAMESPACE_DEFAULT as the namespace for objects
             that are not associated with a conceptual domain-layer entity and
             therefore don't require serialization.
-        sub_namespace: str|None. The sub-namespace further differentiates the
+        sub_namespace: The sub-namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, and Collections,
             the sub-namespace is either None or the stringified version number
             of the objects. If the sub-namespace is not required, pass in None.
-        id_value_mapping:
-            dict(str, Exploration|Skill|Story|Topic|Collection|str). A dict of
-            {id, value} pairs to set to the cache.
+        id_value_mapping: A dict of {id, value} pairs to set to the cache.
 
     Raises:
         ValueError. The namespace does not exist or is not recognized.
 
     Returns:
-        bool. Whether all operations complete successfully.
+        Whether all operations complete successfully.
     """
     if len(id_value_mapping) == 0:
         return True
@@ -439,21 +437,21 @@ def delete_multi(
     """Deletes multiple ids in the cache.
 
     Args:
-        namespace: str. The namespace under which the values associated with the
+        namespace: The namespace under which the values associated with the
             id lie. Use CACHE_NAMESPACE_DEFAULT namespace for object ids that
             are not associated with a conceptual domain-layer entity and
             therefore don't require serialization.
-        sub_namespace: str|None. The sub-namespace further differentiates the
-            values. For Explorations, Skills, Stories, Topics, and Collections,
+        sub_namespace: The sub-namespace further differentiates the values.
+            For Explorations, Skills, Stories, Topics, and Collections,
             the sub-namespace is either None or the stringified version number
             of the objects. If the sub-namespace is not required, pass in None.
-        obj_ids: list(str). A list of id strings to delete from the cache.
+        obj_ids: A list of id strings to delete from the cache.
 
     Raises:
         ValueError. The namespace does not exist or is not recognized.
 
     Returns:
-        bool. Whether all operations complete successfully.
+        Whether all operations complete successfully.
     """
     if len(obj_ids) == 0:
         return True
@@ -469,8 +467,8 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     caching service profiles its own cache.
 
     Returns:
-        MemoryCacheStats. MemoryCacheStats object containing the total allocated
-        memory in bytes, peak memory usage in bytes, and the total number of
+        MemoryCacheStats object containing the total allocated memory
+        in bytes, peak memory usage in bytes, and the total number of
         keys stored as values.
     """
     return memory_cache_services.get_memory_cache_stats()

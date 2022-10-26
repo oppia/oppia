@@ -89,16 +89,16 @@ class BlogPost:
         """Constructs a BlogPost domain object.
 
         Args:
-            blog_post_id: str. The unique ID of the blog post.
-            author_id: str. The user ID of the author.
-            title: str. The title of the blog post.
-            content: str. The html content of the blog post.
-            url_fragment: str. The url fragment for the blog post.
-            tags: list(str). The list of tags for the blog post.
-            thumbnail_filename: str|None. The thumbnail filename of blog post .
-            last_updated: datetime.datetime. Date and time when the blog post
+            blog_post_id: The unique ID of the blog post.
+            author_id: The user ID of the author.
+            title: The title of the blog post.
+            content: The html content of the blog post.
+            url_fragment: The url fragment for the blog post.
+            tags: The list of tags for the blog post.
+            thumbnail_filename: The thumbnail filename of blog post .
+            last_updated: Date and time when the blog post
                 was last updated.
-            published_on: datetime.datetime. Date and time when the blog post is
+            published_on: Date and time when the blog post is
                 last published.
         """
         self.id = blog_post_id
@@ -119,8 +119,8 @@ class BlogPost:
         one.
 
         Args:
-            thumbnail_filename: str. The thumbnail filename to validate.
-            strict: bool. Enable strict checks on the blog post when the
+            thumbnail_filename: The thumbnail filename to validate.
+            strict: Enable strict checks on the blog post when the
                 blog post is published or is going to be published.
 
         Raises:
@@ -143,7 +143,7 @@ class BlogPost:
         """Validates various properties of the blog post object.
 
         Args:
-            strict: bool. Enable strict checks on the blog post when the blog
+            strict: Enable strict checks on the blog post when the blog
                 post is published or is going to be published.
 
         Raises:
@@ -173,8 +173,8 @@ class BlogPost:
         """Validates tags for the blog post object.
 
         Args:
-            tags: list(str). The list of tags assigned to a blog post.
-            strict: bool. Enable strict checks on the blog post when the blog
+            tags: The list of tags assigned to a blog post.
+            strict: Enable strict checks on the blog post when the blog
                 post is published or is going to be published.
 
         Raises:
@@ -219,8 +219,8 @@ class BlogPost:
         """Checks whether the blog post title is a valid one.
 
         Args:
-            title: str. The title to validate.
-            strict: bool. Enable strict checks on the blog post when the blog
+            title: The title to validate.
+            strict: Enable strict checks on the blog post when the blog
                 post is published or is going to be published.
 
         Raises:
@@ -248,7 +248,7 @@ class BlogPost:
         """Checks whether the url fragment of the blog post is a valid one.
 
         Args:
-            url_fragment: str. The url fragment to validate.
+            url_fragment: The url fragment to validate.
 
         Raises:
             ValidationErrors. URL fragment provided is invalid.
@@ -278,7 +278,7 @@ class BlogPost:
         """Returns a dict representing this blog post domain object.
 
         Returns:
-            dict. A dict, mapping all fields of blog post instance.
+            A dict, mapping all fields of blog post instance.
         """
         published_on = utils.convert_naive_datetime_to_string(
             self.published_on) if self.published_on else None
@@ -301,11 +301,11 @@ class BlogPost:
         """Returns a blog post domain object from a dictionary.
 
         Args:
-            blog_post_dict: dict. The dictionary representation of blog post
+            blog_post_dict: The dictionary representation of blog post
                 object.
 
         Returns:
-            BlogPost. The corresponding blog post domain object.
+            The corresponding blog post domain object.
         """
         last_updated = utils.convert_string_to_naive_datetime_object(
             blog_post_dict['last_updated']
@@ -328,7 +328,7 @@ class BlogPost:
         """Updates the title of a blog post object.
 
         Args:
-            new_title: str. The updated title for the blog post.
+            new_title: The updated title for the blog post.
         """
         self.require_valid_title(new_title, True)
         self.title = new_title
@@ -337,7 +337,7 @@ class BlogPost:
         """Updates the url_fragment of a blog post object.
 
         Args:
-            new_url_fragment: str. The updated url fragment for the blog post.
+            new_url_fragment: The updated url fragment for the blog post.
         """
         self.require_valid_url_fragment(new_url_fragment)
         self.url_fragment = new_url_fragment
@@ -348,7 +348,7 @@ class BlogPost:
         """Updates the thumbnail filename of a blog post object.
 
         Args:
-            new_thumbnail_filename: str|None. The updated thumbnail filename
+            new_thumbnail_filename: The updated thumbnail filename
                 for the blog post.
         """
         if new_thumbnail_filename is not None:
@@ -359,7 +359,7 @@ class BlogPost:
         """Updates the content of the blog post.
 
         Args:
-            content: str. The new content of the blog post.
+            content: The new content of the blog post.
         """
         self.content = html_cleaner.clean(content)
 
@@ -367,7 +367,7 @@ class BlogPost:
         """Updates the tags list of the blog post.
 
         Args:
-            tags: list(str). New list of tags for the blog post.
+            tags: New list of tags for the blog post.
         """
         self.require_valid_tags(tags, False)
         self.tags = tags
@@ -377,7 +377,7 @@ class BlogPost:
         """Checks whether the blog id is a valid one.
 
         Args:
-            blog_id: str. The blog post id to validate.
+            blog_id: The blog post id to validate.
         """
         if len(blog_id) != BLOG_POST_ID_LENGTH:
             raise utils.ValidationError('Blog ID %s is invalid' % blog_id)
@@ -402,19 +402,19 @@ class BlogPostSummary:
         """Constructs a Blog Post Summary domain object.
 
         Args:
-            blog_post_id: str. The unique ID of the blog post.
-            author_id: str. The user ID of the author.
-            title: str. The title of the blog post.
-            summary: str. The summary content of the blog post.
-            url_fragment: str. The url fragment for the blog post.
-            tags: list(str). The list of tags for the blog post.
-            thumbnail_filename: str|None. The thumbnail filename of the blog
+            blog_post_id: The unique ID of the blog post.
+            author_id: The user ID of the author.
+            title: The title of the blog post.
+            summary: The summary content of the blog post.
+            url_fragment: The url fragment for the blog post.
+            tags: The list of tags for the blog post.
+            thumbnail_filename: The thumbnail filename of the blog
                 post.
-            last_updated: datetime.datetime. Date and time when the blog post
+            last_updated: Date and time when the blog post
                 was last updated.
-            published_on: datetime.datetime. Date and time when the blog post
+            published_on: Date and time when the blog post
                 is last published.
-            deleted: bool. Whether the blog post is deleted or not.
+            deleted: Whether the blog post is deleted or not.
         """
         self.id = blog_post_id
         self.author_id = author_id
@@ -435,8 +435,8 @@ class BlogPostSummary:
         one.
 
         Args:
-            thumbnail_filename: str. The thumbnail filename to validate.
-            strict: bool. Enable strict checks on the blog post when the
+            thumbnail_filename: The thumbnail filename to validate.
+            strict: Enable strict checks on the blog post when the
                 blog post is published or is going to be published.
 
         Raises:
@@ -459,7 +459,7 @@ class BlogPostSummary:
         """Validates various properties of the blog post summary object.
 
         Args:
-            strict: bool. Enable strict checks on the blog post summary when the
+            strict: Enable strict checks on the blog post summary when the
                 blog post is published or is going to be published.
 
         Raises:
@@ -496,7 +496,7 @@ class BlogPostSummary:
         """Checks whether the url fragment of the blog post is a valid one.
 
         Args:
-            url_fragment: str. The url fragment to validate.
+            url_fragment: The url fragment to validate.
 
         Raises:
             ValidationErrors. URL fragment provided is invalid.
@@ -527,8 +527,8 @@ class BlogPostSummary:
         """Checks whether the blog post title is a valid one.
 
         Args:
-            title: str. The title to validate.
-            strict: bool. Enable strict checks on the blog post summary when the
+            title: The title to validate.
+            strict: Enable strict checks on the blog post summary when the
                 blog post is published or is going to be published.
 
         Raises:
@@ -552,8 +552,8 @@ class BlogPostSummary:
         """Validates tags for the blog post object.
 
         Args:
-            tags: list(str). The list of tags assigned to a blog post.
-            strict: bool. Enable strict checks on the blog post when the blog
+            tags: The list of tags assigned to a blog post.
+            strict: Enable strict checks on the blog post when the blog
                 post is published or is going to be published.
 
         Raises:
@@ -597,7 +597,7 @@ class BlogPostSummary:
         """Returns a dict representing this blog post summary domain object.
 
         Returns:
-            dict. A dict, mapping all fields of blog post instance.
+            A dict, mapping all fields of blog post instance.
         """
         published_on = utils.convert_naive_datetime_to_string(
             self.published_on) if self.published_on else None
@@ -628,10 +628,10 @@ class BlogPostRights:
         """Constructs a BlogPostRights domain object.
 
         Args:
-            blog_post_id: str. The id of the blog post.
-            editor_ids: list(str). The id of the users who have been assigned
+            blog_post_id: The id of the blog post.
+            editor_ids: The id of the users who have been assigned
                 as editors for the blog post.
-            blog_post_is_published: bool. Whether the blog is published or not.
+            blog_post_is_published: Whether the blog is published or not.
         """
         self.id = blog_post_id
         self.editor_ids = editor_ids
@@ -641,7 +641,7 @@ class BlogPostRights:
         """Returns a dict suitable for use by the frontend.
 
         Returns:
-            dict. A dict version of BlogPostRights suitable for use by the
+            A dict version of BlogPostRights suitable for use by the
             frontend.
         """
         return {
@@ -650,13 +650,13 @@ class BlogPostRights:
             'blog_post_is_published': self.blog_post_is_published
         }
 
-    def is_editor(self, user_id: Optional[str]) -> bool:
+    def is_editor(self, user_id: str) -> bool:
         """Checks whether given user is an editor of the blog post.
 
         Args:
-            user_id: str or None. ID of the user.
+            user_id: ID of the user.
 
         Returns:
-            bool. Whether user is an editor of the blog post.
+            Whether user is an editor of the blog post.
         """
         return bool(user_id in self.editor_ids)

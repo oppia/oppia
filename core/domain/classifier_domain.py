@@ -52,23 +52,22 @@ class ClassifierTrainingJob:
     database upon the request from the VM.
 
     Attributes:
-        job_id: str. The unique id of the classifier training job.
-        algorithm_id: str. The id of the algorithm that will be used for
+        job_id: The unique id of the classifier training job.
+        algorithm_id: The id of the algorithm that will be used for
             generating the classifier.
-        interaction_id: str. The id of the interaction to which the algorithm
+        interaction_id: The id of the interaction to which the algorithm
             belongs.
-        exp_id: str. The id of the exploration that contains the state
+        exp_id: The id of the exploration that contains the state
             for which the classifier will be generated.
-        exp_version: int. The version of the exploration when
+        exp_version: The version of the exploration when
             the training job was generated.
-        next_scheduled_check_time: datetime.datetime. The next scheduled time to
-            check the job.
-        state_name: str. The name of the state for which the classifier will be
+        next_scheduled_check_time: The next scheduled time to check the job.
+        state_name: The name of the state for which the classifier will be
             generated.
-        status: str. The status of the training job request. This can be either
+        status: The status of the training job request. This can be either
             NEW (default value), FAILED, PENDING or COMPLETE.
-        training_data: list(dict). The training data that is used for training
-            the classifier. This field is populated lazily when the job request
+        training_data: The training data that is used for training the
+            classifier. This field is populated lazily when the job request
             is picked up by the VM. The list contains dicts where each dict
             represents a single training data group, for example:
             training_data = [
@@ -81,7 +80,7 @@ class ClassifierTrainingJob:
                     'answers': ['a2', 'a3']
                 }
             ]
-        algorithm_version: int. The version of the classifier algorithm to be
+        algorithm_version: The version of the classifier algorithm to be
             trained. The algorithm version determines the training algorithm,
             format in which trained parameters are stored along with the
             prediction algorithm to be used. We expect this to change only when
@@ -105,26 +104,25 @@ class ClassifierTrainingJob:
         """Constructs a ClassifierTrainingJob domain object.
 
         Args:
-            job_id: str. The unique id of the classifier training job.
-            algorithm_id: str. The id of the algorithm that will be used for
+            job_id: The unique id of the classifier training job.
+            algorithm_id: The id of the algorithm that will be used for
                 generating the classifier.
-            interaction_id: str. The id of the interaction to which the
-                algorithm belongs.
-            exp_id: str. The id of the exploration id that contains the state
+            interaction_id: The id of the interaction to which the algorithm
+                belongs.
+            exp_id: The id of the exploration id that contains the state
                 for which classifier will be generated.
-            exp_version: int. The version of the exploration when
-                the training job was generated.
-            next_scheduled_check_time: datetime.datetime. The next scheduled
-                time to check the job.
-            state_name: str. The name of the state for which the classifier
-                will be generated.
-            status: str. The status of the training job request. This can be
+            exp_version: The version of the exploration when the training job
+                was generated.
+            next_scheduled_check_time: The next scheduled time to check the job.
+            state_name: The name of the state for which the classifier will be
+                generated.
+            status: The status of the training job request. This can be
                 either NEW (default), PENDING (when a job has been picked up)
                 or COMPLETE.
-            training_data: list(dict). The training data that is used for
-                training the classifier. This is populated lazily when the job
-                request is picked up by the VM. The list contains dicts where
-                each dict represents a single training data group, for example:
+            training_data: The training data that is used for training the
+                classifier. This is populated lazily when the job request is
+                picked up by the VM. The list contains dicts where each dict
+                represents a single training data group, for example:
                 training_data = [
                     {
                         'answer_group_index': 1,
@@ -135,7 +133,7 @@ class ClassifierTrainingJob:
                         'answers': ['a2', 'a3']
                     }
                 ]
-            algorithm_version: int. Schema version of the classifier model to
+            algorithm_version: Schema version of the classifier model to
                 be trained. This depends on the algorithm ID.
         """
         self._job_id = job_id
@@ -154,7 +152,7 @@ class ClassifierTrainingJob:
         """Returns the job_id of the classifier training job.
 
         Returns:
-            str. The unique id of the classifier training job.
+            The unique id of the classifier training job.
         """
         return self._job_id
 
@@ -164,7 +162,7 @@ class ClassifierTrainingJob:
         the classifier.
 
         Returns:
-            str. The id of the algorithm used for generating the classifier.
+            The id of the algorithm used for generating the classifier.
         """
         return self._algorithm_id
 
@@ -173,7 +171,7 @@ class ClassifierTrainingJob:
         """Returns the interaction_id to which the algorithm belongs.
 
         Returns:
-            str. The id of the interaction to which the algorithm belongs.
+            The id of the interaction to which the algorithm belongs.
         """
         return self._interaction_id
 
@@ -183,7 +181,7 @@ class ClassifierTrainingJob:
         generated.
 
         Returns:
-            str. The id of the exploration that contains the state
+            The id of the exploration that contains the state
             for which classifier will be generated.
         """
         return self._exp_id
@@ -193,7 +191,7 @@ class ClassifierTrainingJob:
         """Returns the exploration version.
 
         Returns:
-            int. The version of the exploration when the training job was
+            The version of the exploration when the training job was
             generated.
         """
         return self._exp_version
@@ -203,7 +201,7 @@ class ClassifierTrainingJob:
         """Returns the next scheduled time to check the job.
 
         Returns:
-            datetime.datetime. The next scheduled time to check the job.
+            The next scheduled time to check the job.
         """
         return self._next_scheduled_check_time
 
@@ -212,7 +210,7 @@ class ClassifierTrainingJob:
         """Returns the state_name for which the classifier will be generated.
 
         Returns:
-            str. The name of the state for which the classifier will be
+            The name of the state for which the classifier will be
             generated.
         """
         return self._state_name
@@ -222,7 +220,7 @@ class ClassifierTrainingJob:
         """Returns the status of the training job request.
 
         Returns:
-            str. The status of the training job request. This can be either
+            The status of the training job request. This can be either
             NEW (default), PENDING (when a job has been picked up) or
             COMPLETE.
         """
@@ -233,10 +231,10 @@ class ClassifierTrainingJob:
         """Returns the training data used for training the classifier.
 
         Returns:
-            list(dict). The training data that is used for training the
-            classifier. This is populated lazily when the job request is
-            picked up by the VM. The list contains dicts where each dict
-            represents a single training data group, for example:
+            The training data that is used for training the classifier. This
+            is populated lazily when the job request is picked up by the VM.
+            The list contains dicts where each dict represents a single
+            training data group, for example:
             training_data = [
                 {
                     'answer_group_index': 1,
@@ -256,7 +254,7 @@ class ClassifierTrainingJob:
         for this training job.
 
         Returns:
-            str. The GCS file name of the classifier data.
+            The GCS file name of the classifier data.
         """
         return '%s-classifier-data.pb.xz' % (self.job_id)
 
@@ -265,7 +263,7 @@ class ClassifierTrainingJob:
         """Returns the algorithm version of the classifier.
 
         Returns:
-            int. Version of the classifier algorithm. This depends on the
+            Version of the classifier algorithm. This depends on the
             algorithm ID.
         """
         return self._algorithm_version
@@ -275,7 +273,7 @@ class ClassifierTrainingJob:
         object.
 
         Args:
-            status: str. The status of the classifier training job.
+            status: The status of the classifier training job.
 
         Raises:
             Exception. The status is not valid.
@@ -292,7 +290,7 @@ class ClassifierTrainingJob:
         """Constructs a dict representation of training job domain object.
 
         Returns:
-            dict. A dict representation of training job domain object.
+            A dict representation of training job domain object.
         """
 
         return {
@@ -367,13 +365,12 @@ class StateTrainingJobsMapping:
     interaction_id of that state.
 
     Attributes:
-        exp_id: str. ID of the exploration.
-        exp_version: int. The exploration version at the time the corresponding
+        exp_id: ID of the exploration.
+        exp_version: The exploration version at the time the corresponding
             classifier's training job was created.
-        state_name: str. The name of the state to which the classifier
-            belongs.
-        algorithm_ids_to_job_ids: dict(str, str). Mapping of algorithm IDs to
-            corresponding unique training job IDs.
+        state_name: The name of the state to which the classifier belongs.
+        algorithm_ids_to_job_ids: Mapping of algorithm IDs to corresponding
+            unique training job IDs.
     """
 
     def __init__(
@@ -386,14 +383,12 @@ class StateTrainingJobsMapping:
         """Constructs a StateTrainingJobsMapping domain object.
 
         Args:
-            exp_id: str. ID of the exploration.
-            exp_version: int. The exploration version at the time the
+            exp_id: ID of the exploration.
+            exp_version: The exploration version at the time the
                 corresponding classifier's training job was created.
-            state_name: str. The name of the state to which the classifier
-                belongs.
-            algorithm_ids_to_job_ids: dict(str, str). The mapping from
-                algorithm IDs to the IDs of their corresponding classifier
-                training jobs.
+            state_name: The name of the state to which the classifier belongs.
+            algorithm_ids_to_job_ids: The mapping from algorithm IDs to
+                the IDs of their corresponding classifier training jobs.
         """
         self._exp_id = exp_id
         self._exp_version = exp_version
@@ -405,7 +400,7 @@ class StateTrainingJobsMapping:
         """Returns the exploration id.
 
         Returns:
-            str. The id of the exploration.
+            The id of the exploration.
         """
         return self._exp_id
 
@@ -414,8 +409,8 @@ class StateTrainingJobsMapping:
         """Returns the exploration version.
 
         Returns:
-            int. The exploration version at the time the
-            corresponding classifier's training job was created.
+            The exploration version at the time the corresponding
+            classifier's training job was created.
         """
         return self._exp_version
 
@@ -424,7 +419,7 @@ class StateTrainingJobsMapping:
         """Returns the state_name to which the classifier belongs.
 
         Returns:
-            str. The name of the state to which the classifier belongs.
+            The name of the state to which the classifier belongs.
         """
         return self._state_name
 
@@ -433,8 +428,7 @@ class StateTrainingJobsMapping:
         """Returns the algorithm_ids_to_job_ids of the training jobs.
 
         Returns:
-            dict(str, str). Mapping of algorithm IDs to corresponding unique
-            training job IDs.
+            Mapping of algorithm IDs to corresponding unique training job IDs.
         """
         return self._algorithm_ids_to_job_ids
 
@@ -443,8 +437,7 @@ class StateTrainingJobsMapping:
         domain object.
 
         Returns:
-            dict. A dict representation of StateTrainingJobsMapping domain
-            object.
+            A dict representation of StateTrainingJobsMapping domain object.
         """
 
         return {
@@ -467,9 +460,9 @@ class OppiaMLAuthInfo:
     of Oppia ML.
 
     Attributes:
-        message: bytes. The message being communicated.
-        vm_id: str. The ID of the Oppia ML VM to be authenticated.
-        signature: str. The authentication signature signed by Oppia ML.
+        message: The message being communicated.
+        vm_id: The ID of the Oppia ML VM to be authenticated.
+        signature: The authentication signature signed by Oppia ML.
     """
 
     def __init__(
@@ -481,9 +474,9 @@ class OppiaMLAuthInfo:
         """Creates new OppiaMLAuthInfo object.
 
         Args:
-            message: bytes. The message being communicated.
-            vm_id: str. The ID of the Oppia ML VM to be authenticated.
-            signature: str. The authentication signature signed by Oppia ML.
+            message: The message being communicated.
+            vm_id: The ID of the Oppia ML VM to be authenticated.
+            signature: The authentication signature signed by Oppia ML.
         """
         self._message = message
         self._vm_id = vm_id
