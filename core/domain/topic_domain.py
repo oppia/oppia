@@ -1764,23 +1764,6 @@ class Topic:
         versioned_story_references['story_references'] = (
             updated_story_references)
 
-    @classmethod
-    def _convert_story_reference_v1_dict_to_v2_dict(
-        cls, story_dict: StoryReferenceDict
-    ) -> StoryReferenceDict:
-        """This currently does nothing but return what it was passed.
-        It is here to get full test coverage on the already written
-        update_story_references_from_model which isn't being used yet.
-
-        Args:
-            story_dict: dict. A dict used to initialize a Story domain
-                object.
-
-        Returns:
-            dict. The converted story_dict.
-        """
-        return story_dict
-
     def update_name(self, new_name: str) -> None:
         """Updates the name of a topic object.
 

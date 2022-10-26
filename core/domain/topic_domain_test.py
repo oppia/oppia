@@ -1150,6 +1150,16 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             None
         )
 
+    class MockTopicObject(topic_domain.Topic):
+        """Mocks Topic domain object."""
+
+        @classmethod
+        def _convert_story_reference_v1_dict_to_v2_dict(
+            cls, story_reference: topic_domain.StoryReferenceDict
+        ) -> topic_domain.StoryReferenceDict:
+            """Converts v1 story reference dict to v2."""
+            return story_reference
+
     def test_story_schema_update(self) -> None:
         story_id = 'story_id'
         story_published = True
@@ -1164,13 +1174,21 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'story_references': [story_ref_dict]
             }
         )
-        ver_story_ref2 = topic_domain.Topic.update_story_references_from_model(
-            vers_story_ref_dict,
-            schema_version
+        swap_topic_object = self.swap(
+            topic_domain,
+            'Topic',
+            self.MockTopicObject
         )
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION', 2)
+        with swap_topic_object, current_schema_version_swap:
+            topic_domain.Topic.update_story_references_from_model(
+                vers_story_ref_dict,
+                schema_version
+            )
         self.assertEqual(
-            ver_story_ref2,
-            vers_story_ref_dict
+            vers_story_ref_dict['schema_version'],
+            2
         )
 
     def test_is_valid_topic_id(self) -> None:
