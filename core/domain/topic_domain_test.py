@@ -861,16 +861,18 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         test_story_dict = {
             'story_id': 'story_id_1',
             'story_is_published': False
-            }
+        }
         story_ref_obj = (
             topic_domain.StoryReference.
-            create_default_story_reference('story_id_1'))
+            create_default_story_reference('story_id_1')
+        )
         story_ref_dict = story_ref_obj.to_dict()
         self.assertDictEqual(test_story_dict, story_ref_dict)
 
     def test_story_ref_from_dict(self) -> None:
         test_story_dict = topic_domain.StoryReference(
-            'story_id_1', False).to_dict()
+            'story_id_1', False
+        ).to_dict()
         test_story_obj = topic_domain.StoryReference.from_dict(test_story_dict)
         self.assertEqual(test_story_obj.story_id, 'story_id_1')
         self.assertEqual(test_story_obj.story_is_published, False)
@@ -883,7 +885,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             subtopic_id,
             subtopic_title,
             url_frag
-            )
+        )
         self.assertEqual(subtopic_id, subtopic_obj.id)
         self.assertEqual(subtopic_title, subtopic_obj.title)
         self.assertEqual(url_frag, subtopic_obj.url_fragment)
@@ -906,11 +908,14 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                'dummy-subtopic-one'),
+                'dummy-subtopic-one'
+            ),
             topic_domain.Subtopic(
                 2, 'Another title', ['skill_id_2'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                'dummy-subtopic-two')]
+                'dummy-subtopic-two'
+            )
+        ]
         new_filename = 'new_filename.svg'
         new_filesize = 12345
         subtopic_index = self.topic.get_subtopic_index(1)
