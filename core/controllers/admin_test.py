@@ -238,12 +238,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager2 = self.assertRaisesRegex(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'num_dummy_exps_to_publish\' must be provided when the '
             'action is generate_dummy_explorations.'
         )
-        with assert_raises_regexp_context_manager2, prod_mode_swap:
+        with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
                     'action': 'generate_dummy_explorations',
@@ -260,12 +260,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager2 = self.assertRaisesRegex(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'new_config_property_values\' must be provided when the '
             'action is save_config_properties.'
         )
-        with assert_raises_regexp_context_manager2, prod_mode_swap:
+        with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
                     'action': 'save_config_properties',
@@ -281,12 +281,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager2 = self.assertRaisesRegex(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'config_property_id\' must be provided when the action '
             'is revert_config_property.'
         )
-        with assert_raises_regexp_context_manager2, prod_mode_swap:
+        with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
                     'action': 'revert_config_property',
@@ -302,12 +302,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager2 = self.assertRaisesRegex(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'data\' must be provided when the action is '
             'upload_topic_similarities.'
         )
-        with assert_raises_regexp_context_manager2, prod_mode_swap:
+        with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
                     'action': 'upload_topic_similarities',
@@ -323,12 +323,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager2 = self.assertRaisesRegex(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'topic_id\' must be provided when the action is '
             'regenerate_topic_related_opportunities.'
         )
-        with assert_raises_regexp_context_manager2, prod_mode_swap:
+        with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
                     'action': 'regenerate_topic_related_opportunities',
@@ -344,12 +344,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager2 = self.assertRaisesRegex(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'exp_id\' must be provided when the action is '
             'rollback_exploration_to_safe_state.'
         )
-        with assert_raises_regexp_context_manager2, prod_mode_swap:
+        with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
                     'action': 'rollback_exploration_to_safe_state',
@@ -365,12 +365,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager2 = self.assertRaisesRegex(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'feature_name\' must be provided when the action is '
             'update_feature_flag_rules.'
         )
-        with assert_raises_regexp_context_manager2, prod_mode_swap:
+        with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
                     'action': 'update_feature_flag_rules',
@@ -386,12 +386,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager2 = self.assertRaisesRegex(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'new_rules\' must be provided when the action is '
             'update_feature_flag_rules.'
         )
-        with assert_raises_regexp_context_manager2, prod_mode_swap:
+        with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
                     'action': 'update_feature_flag_rules',
@@ -420,12 +420,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager2 = self.assertRaisesRegex(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'commit_message\' must be provided when the action is '
             'update_feature_flag_rules.'
         )
-        with assert_raises_regexp_context_manager2, prod_mode_swap:
+        with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
                     'action': 'update_feature_flag_rules',

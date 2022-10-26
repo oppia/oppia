@@ -406,7 +406,7 @@ def get_topic_rights(
         or None if it does not exist.
 
     Raises:
-        EntityNotFoundError. The topic with ID topic_id was not
+        EntityNotFoundError. The TopicRights with ID topic_id was not
             found in the datastore.
     """
 

@@ -3474,6 +3474,8 @@ def can_access_topic_viewer_page(
 
         Raises:
             PageNotFoundException. The given page cannot be found.
+            EntityNotFoundError. The TopicRights with ID topic_id was not
+                found in the datastore.
         """
         if topic_url_fragment != topic_url_fragment.lower():
             _redirect_based_on_return_type(

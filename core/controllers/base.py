@@ -707,7 +707,9 @@ class BaseHandler(webapp2.RequestHandler):
                 self.DELETE_HANDLER_ERROR_RETURN_TYPE, values)
         else:
             logging.warning('Not a recognized request method.')
-            self._render_exception_json_or_html(None, values)
+            self._render_exception_json_or_html(
+                feconf.HANDLER_TYPE_JSON, values
+            )
 
     def handle_exception(
         self, exception: BaseException, unused_debug_mode: bool
