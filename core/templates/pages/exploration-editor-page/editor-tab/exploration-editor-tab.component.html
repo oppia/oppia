@@ -31,10 +31,13 @@
       <div class="oppia-editor-header">
         <oppia-state-name-editor></oppia-state-name-editor>
       </div>
-      <div *ngIf="canShowExploreVersionHistoryButton()" class="explore-version-history-container">
-        <div>Latest commit by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() }}</strong></div>
+      <div *ngIf="canShowExploreVersionHistoryButton(); else elseBlock" class="explore-version-history-container">
+        <div>Latest commit by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 }}</strong></div>
         <div><a class="text-primary explore-version-history-button" (click)="onClickExploreVersionHistoryButton()">Click here to see commit history</a></div>
       </div>
+      <ng-template #elseBlock>
+        <div class="explore-version-history-container">No changes have been made after the initial commit to this state.</div>
+      </ng-template>
       <div>
         <mat-checkbox class="checkpoint-selection-checkbox e2e-test-checkpoint-selection-checkbox"
                       (change)="onChangeCardIsCheckpoint()"

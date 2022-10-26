@@ -690,7 +690,7 @@
 
   <div *ngIf="canShowExploreVersionHistoryButton()" class="col-lg-12 col-md-12 col-sm-12">
     <div class="mt-4">
-      <i>Last changed by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() }}</strong>.</i>
+      <i>Last changed by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 }}</strong>.</i>
       <a class="text-primary explore-version-history-button" (click)="onClickExploreVersionHistoryButton()"> More details.</a>
     </div>
   </div>
