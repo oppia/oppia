@@ -738,18 +738,6 @@ def wait_for_port_to_not_be_in_use(port_number: int) -> bool:
     return not is_port_in_use(port_number)
 
 
-def fix_third_party_imports() -> None:
-    """Sets up up the environment variables and corrects the system paths so
-    that the backend tests and imports work correctly.
-    """
-    # These environmental variables are required to allow Google Cloud Tasks to
-    # operate in a local development environment without connecting to the
-    # internet. These environment variables allow Cloud APIs to be instantiated.
-    os.environ['CLOUDSDK_CORE_PROJECT'] = 'dummy-cloudsdk-project-id'
-    os.environ['APPLICATION_ID'] = 'dummy-cloudsdk-project-id'
-    sys.path.insert(1, THIRD_PARTY_PYTHON_LIBS_DIR)
-
-
 class CD:
     """Context manager for changing the current working directory."""
 
