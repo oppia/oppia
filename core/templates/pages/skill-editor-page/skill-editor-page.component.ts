@@ -171,8 +171,7 @@ export class SkillEditorPageComponent implements OnInit {
   ngOnInit(): void {
     this.bottomNavbarStatusService.markBottomNavbarStatus(true);
     this.preventPageUnloadEventService.addListener(
-      this.undoRedoService.getChangeCount.bind(this.undoRedoService) ? (
-        () => true) : (() => false));
+      this.undoRedoService.getChangeCount.bind(this.undoRedoService));
     this.skillEditorStateService.loadSkill(this.urlService.getSkillIdFromUrl());
     this.skill = this.skillEditorStateService.getSkill();
     this.directiveSubscriptions.add(
