@@ -243,21 +243,6 @@ states:
           rule_type: IsGreaterThan
         tagged_skill_misconception_id: null
         training_data: []
-      - outcome:
-          dest: Numeric input
-          feedback:
-            content_id: feedback_5
-            html: <p>That's not large enough. Try guessing higher?</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 121.0
-          rule_type: IsLessThan
-        tagged_skill_misconception_id: null
-        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
