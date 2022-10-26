@@ -107,7 +107,7 @@ class BlogAdminHandler(base.BaseHandler):
     def post(self) -> None:
         """Handles POST requests."""
         result = {}
-        action = self.normalized_payload.get('action') 
+        action = self.normalized_payload.get('action')
         if action == 'save_config_properties':
             new_config_property_values = self.normalized_payload.get(
                 'new_config_property_values')
