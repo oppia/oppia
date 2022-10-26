@@ -95,9 +95,7 @@ export class ConceptCardManagerService {
   }
 
   emitLearnerStuckedness(): void {
-    console.log("Learner stuckness is emitted");
     if (!this.learnerIsReallyStuck) {
-      console.log("Andar j rhaa")
       this.learnerIsReallyStuck = true;
       this._learnerReallyStuckEventEmitter.emit();
     }
