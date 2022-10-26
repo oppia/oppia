@@ -36,6 +36,7 @@ import { AlertsService } from 'services/alerts.service';
 import { TopicDeleteCanonicalStoryChange, TopicDeleteAdditionalStoryChange }
   from 'domain/editor/undo_redo/change.model';
 import { LoaderService } from 'services/loader.service';
+import { SubtopicPageContents } from 'domain/topic/subtopic-page-contents.model';
 
 interface GroupedSkillSummaryDict {
   current: SkillSummaryBackendDict[];
@@ -90,7 +91,16 @@ export class TopicEditorStateService {
     private topicRightsBackendApiService: TopicRightsBackendApiService,
     private loaderService: LoaderService,
     private undoRedoService: UndoRedoService
-  ) {}
+  ) {
+    this._topic = new Topic(
+      'id', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+    );
+    this._topicRights = new TopicRights(false, false, false);
+    this._subtopicPage = new SubtopicPage(
+      'id', 'topic_id', SubtopicPageContents.createDefault(), 'en');
+  }
 
   private _getSubtopicPageId(topicId: string, subtopicId: number): string {
     if (topicId !== null && subtopicId !== null) {

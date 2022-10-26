@@ -120,11 +120,7 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             $scope.editableName = (
               $scope.topic ? $scope.topic.getName() : 'Topic name is loading.');
-            $scope.editableMetaTagContent = (
-              $scope.topic ?
-              $scope.topic.getMetaTagContent() :
-              'Topic meta tag content is loading.'
-            );
+            $scope.editableMetaTagContent = $scope.topic.getMetaTagContent();
             $scope.editablePageTitleFragmentForWeb = (
               $scope.topic ?
               $scope.topic.getPageTitleFragmentForWeb() :
@@ -431,10 +427,7 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.updateTopicMetaTagContent = function(newMetaTagContent) {
-            if (newMetaTagContent !==
-              $scope.topic ?
-              $scope.topic.getMetaTagContent() :
-              'Topic meta tag content is loading.') {
+            if (newMetaTagContent !== $scope.topic.getMetaTagContent()) {
               TopicUpdateService.setMetaTagContent(
                 $scope.topic, newMetaTagContent);
             }
