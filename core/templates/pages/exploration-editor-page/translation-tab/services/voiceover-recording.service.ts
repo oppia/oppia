@@ -36,7 +36,7 @@ export class VoiceoverRecordingService {
   isRecording: boolean = false;
   microphone!: MediaStreamAudioSourceNode;
   microphoneStream!: MediaStream;
-  mp3Worker!: Worker | null;
+  mp3Worker: Worker | null = null;
   processor!: ScriptProcessorNode;
   defer: EventEmitter<string> = new EventEmitter();
 
