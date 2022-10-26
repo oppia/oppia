@@ -58,12 +58,14 @@
         </mat-chip>
         <input placeholder="Add a new tag (using lowercase letters and spaces)..."
                pattern="[a-z]"
+               [maxLength]="30"
                class="e2e-test-chip-list-tags"
                [matChipInputFor]="chipList"
                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                [matChipInputAddOnBlur]="addOnBlur"
                (matChipInputTokenEnd)="add($event)">
       </mat-chip-list>
+      <mat-hint *ngIf="explorationTags.length >= 10" class="oppia-exploration-tags-error-message">Can only contain 10 tags max</mat-hint>
     </mat-form-field>
   </p>
 </div>
@@ -83,6 +85,10 @@
 <style>
   .mat-form-field {
     width: 100%;
+  }
+
+  .oppia-exploration-tags-error-message {
+    color: #f00;
   }
 
   .example-chip-list {

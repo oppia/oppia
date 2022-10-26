@@ -168,7 +168,17 @@ export class SettingsTabComponent
 
     // Add our explorationTags.
     if (value) {
-      this.explorationTags.push(value.toLowerCase());
+      if (!(this.explorationTagsService.displayed) ||
+        (this.explorationTagsService.displayed as []).length < 10) {
+        if (
+          (this.explorationTagsService.displayed as string[]).includes(value)) {
+          // Clear the input value.
+          event.input.value = '';
+          return;
+        }
+
+        this.explorationTags.push(value.toLowerCase());
+      }
     }
 
     // Clear the input value.
