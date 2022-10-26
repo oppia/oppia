@@ -38,6 +38,12 @@ export const ExplorationPlayerConstants = {
     'I18N_PLAYER_HINT_REQUEST_STRING_2',
     'I18N_PLAYER_HINT_REQUEST_STRING_3'],
 
+  // Array of i18n IDs for nudgind the learner towards checking the spelling.
+  I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS: [
+    'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_1',
+    'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_2',
+    'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_3'],
+
   /* This should match the CSS class defined in the tutor card directive. */
   AUDIO_HIGHLIGHT_CSS_CLASS: 'conversation-skin-audio-highlight',
 

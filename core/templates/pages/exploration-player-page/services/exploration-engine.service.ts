@@ -35,6 +35,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
 import { AnswerClassificationService, InteractionRulesService } from './answer-classification.service';
 import { AudioPreloaderService } from './audio-preloader.service';
 import { AudioTranslationLanguageService } from './audio-translation-language.service';
@@ -576,18 +577,13 @@ export class ExplorationEngineService {
     return answerIsCorrect;
   }
 
-  getRandomI18nKey(
-      i18nKeyPrefix: string,
-      availableKeyCount: number,
-  ): string {
-    const randomValue = Math.floor(Math.random() * availableKeyCount) + 1;
-    return i18nKeyPrefix + '_' + randomValue.toString();
-  }
-
   getFeedbackHtmlWhenAnswerMisspelled(): string {
-    const i18NKeyPrefix = 'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT';
+    let availableKeyCount = ExplorationPlayerConstants.
+      I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS.length;
+    const randomKeyIndex = Math.floor(Math.random() * availableKeyCount) + 1;
     return this.translateService.instant(
-      this.getRandomI18nKey(i18NKeyPrefix, 3));
+      ExplorationPlayerConstants[randomKeyIndex - 1]
+    );
   }
 
   isAnswerBeingProcessed(): boolean {

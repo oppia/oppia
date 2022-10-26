@@ -42,16 +42,13 @@ import { StatsReportingService } from './stats-reporting.service';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { TranslateService } from '@ngx-translate/core';
-import { MockTranslateModule } from 'tests/unit-test-utils';
+import { MockTranslateModule, MockTranslatePipe } from 'tests/unit-test-utils';
 
 
-export class MockTranslateService {
-  instant(val: string): string {
-    return val;
-  }
-
-  get(val: string): string {
-    return val;
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string): string {
+    return key;
   }
 }
 
@@ -388,7 +385,9 @@ describe('Exploration engine service ', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        MockTranslateModule
+      ],
+      declarations: [
+        MockTranslatePipe
       ],
       providers: [
         {
@@ -566,6 +565,7 @@ describe('Exploration engine service ', () => {
       spyOn(answerClassificationService, 'isAnswerOnlyMisspelled')
         .and.returnValue(true);
       spyOn(Math, 'random').and.returnValue(0.45);
+      spyOn(translateService, 'instant').and.callThrough();
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
 
@@ -578,6 +578,8 @@ describe('Exploration engine service ', () => {
       expect(submitAnswerSuccessCb).toHaveBeenCalled();
       expect(explorationEngineService.getFeedbackHtmlWhenAnswerMisspelled()).
         toBe('I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_2');
+      expect(translateService.instant).toHaveBeenCalledWith(
+        'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_2');
       expect(explorationEngineService.isAnswerBeingProcessed()).toBe(false);
       expect(isAnswerCorrect).toBe(false);
     });
@@ -995,13 +997,6 @@ describe('Exploration engine service ', () => {
     expect(() => {
       explorationEngineService.initSettingsFromEditor('Start', [paramChanges]);
     }).toThrowError('Cannot populate exploration in learner mode.');
-  });
-
-  it('should get a random i18n key', () => {
-    spyOn(Math, 'random').and.returnValue(0.45);
-
-    expect(explorationEngineService.getRandomI18nKey(
-      'KEY_PREFIX', 3)).toEqual('KEY_PREFIX_2');
   });
 
   it('should return state when calling \'getStateFromStateName\'', () => {
