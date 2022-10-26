@@ -68,7 +68,7 @@ describe('Full exploration editor', function() {
       await workflow.createExploration(true);
 
       // eslint-disable-next-line oppia/e2e-practices
-      var postTutorialPopover = $('.popover-content');
+      var postTutorialPopover = $('.joyride-step__container .popover-content');
       var stateEditButton = $('.e2e-test-edit-content-pencil-button');
       await waitFor.invisibilityOf(
         postTutorialPopover, 'Post-tutorial popover does not disappear.');

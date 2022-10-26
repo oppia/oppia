@@ -75,7 +75,7 @@ var ExplorationEditorMainTab = function() {
   var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
   var openOutcomeFeedBackEditor = $('.e2e-test-open-outcome-feedback-editor');
   // eslint-disable-next-line oppia/e2e-practices
-  var postTutorialPopover = $('.popover-content');
+  var postTutorialPopover = $('.joyride-step__container .popover-content');
   var responseBody = function(responseNum) {
     return $(`.e2e-test-response-body-${responseNum}`);
   };
