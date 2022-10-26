@@ -1030,9 +1030,6 @@ export class ConversationSkinComponent {
       clearTimeout(this.responseTimeout);
       this.responseTimeout = null;
     }
-    // console.log("\n\n");
-    // console.log(this.nextCardIfStuck);
-    // console.log("\n\n");
     this.responseTimeout = setTimeout(() => {
       if (this.nextCardIfStuck) {
         // Let the learner know about the redirection to a state
@@ -1196,7 +1193,7 @@ export class ConversationSkinComponent {
     this.playerPositionService.recordAnswerSubmission();
     let currentEngineService =
       this.explorationPlayerStateService.getCurrentEngineService();
-    this.answerIsCorrect = this.explorationEngineService.submitAnswer(
+    this.answerIsCorrect = currentEngineService.submitAnswer(
       answer, interactionRulesService, (
           nextCard, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, refresherExplorationId,

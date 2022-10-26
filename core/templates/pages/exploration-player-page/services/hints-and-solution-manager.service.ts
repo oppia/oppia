@@ -239,9 +239,8 @@ export class HintsAndSolutionManagerService {
         this.accelerateHintRelease();
       }
     }
-    else {
+    else if (this.getNumHints()){
       this.wrongAnswersAfterHintsExhausted++;
-      console.log(this.wrongAnswersAfterHintsExhausted);
       if (this.wrongAnswersAfterHintsExhausted > 2) {
         this._learnerReallyStuckEventEmitter.emit();
       }

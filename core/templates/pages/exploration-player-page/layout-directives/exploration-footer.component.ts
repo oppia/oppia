@@ -47,6 +47,7 @@ import './exploration-footer.component.css';
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 import { ConceptCardManagerService } from '../services/concept-card-manager.service';
 import { StateCard } from 'domain/state_card/state-card.model';
+import { AppConstants } from 'app.constants';
 
 
 @Component({
@@ -63,7 +64,7 @@ export class ExplorationFooterComponent {
   windowIsNarrow!: boolean;
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
-  isVisible: boolean = false;
+  isVisible: boolean = true;
 
   // Stores the number of checkpoints in an exploration.
   checkpointCount: number = 0;
@@ -322,11 +323,6 @@ export class ExplorationFooterComponent {
   }
 
   openConceptCardModal(): void {
-    // The catch at the end was needed according to this thread:
-    // https://github.com/angular-ui/bootstrap/issues/6501, where in
-    // AngularJS 1.6.3, $uibModalInstance.cancel() throws console error.
-    // The catch prevents that when clicking outside as well as for
-    // cancel.
     const modalRef = this.ngbModal.open(
       OppiaNoninteractiveSkillreviewConceptCardModalComponent,
       {backdrop: true}
