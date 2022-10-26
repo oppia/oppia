@@ -279,6 +279,114 @@ describe('Rte Helper Modal Controller', function() {
       });
   });
 
+  describe('when the editor is Link editor', function() {
+    const customizationArgSpecs = [{
+      name: 'url',
+      default_value: 'google.com'
+    }, {
+      name: 'text',
+      default_value: ''
+    }];
+
+    beforeEach(angular.mock.module('oppia'));
+
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      mockExternalRteSaveEventEmitter = new EventEmitter();
+      $provide.value('ExternalRteSaveService', {
+        onExternalRteSave: mockExternalRteSaveEventEmitter
+      });
+    }));
+
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      $timeout = $injector.get('$timeout');
+      var $rootScope = $injector.get('$rootScope');
+
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      $scope = $rootScope.$new();
+      $controller(
+        'RteHelperModalController', {
+          $scope: $scope,
+          $uibModalInstance: $uibModalInstance,
+          attrsCustomizationArgsDict: {
+            url: 'google.com',
+            text: ''
+          },
+          customizationArgSpecs: customizationArgSpecs,
+        });
+    }));
+
+    it('should load modal correctly', function() {
+      expect($scope.customizationArgSpecs).toEqual(customizationArgSpecs);
+      expect($scope.currentRteIsLinkEditor).toBeTrue();
+    });
+
+    it('should not disable save button when not in link editor', function() {
+      $scope.currentRteIsLinkEditor = false;
+
+      expect($scope.disableSaveButtonForLinkRte()).toBeFalse();
+    });
+
+    it('should disable save button when text may be misleading', function() {
+      const URLs = ['malicious.com', 'www.malicious.com',
+        'https://malicious.com', 'https://www.malicious.com'];
+      const texts = ['google.com', 'friendly.org', 'https://www.happy.gov'];
+
+      for (const URL of URLs) {
+        for (const text of texts) {
+          $scope.tmpCustomizationArgs = [{
+            name: 'url',
+            value: URL
+          }, {
+            name: 'text',
+            value: text
+          }];
+
+          expect($scope.disableSaveButtonForLinkRte()).toBeTrue();
+        }
+      }
+    });
+
+    it('should enable save button when text matches url', function() {
+      $scope.tmpCustomizationArgs = [{
+        name: 'url',
+        value: 'www.google.com'
+      }, {
+        name: 'text',
+        value: 'https://google.com'
+      }];
+
+      expect($scope.disableSaveButtonForLinkRte()).toBeFalse();
+    });
+
+    it('should enable save button when text is not a URL', function() {
+      $scope.tmpCustomizationArgs = [{
+        name: 'url',
+        value: 'www.google.com'
+      }, {
+        name: 'text',
+        value: 'click here'
+      }];
+
+      expect($scope.disableSaveButtonForLinkRte()).toBeFalse();
+    });
+
+    it('should save modal customization args when closing it', function() {
+      spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+
+      expect($scope.disableSaveButtonForLinkRte()).toBe(false);
+
+      $scope.save();
+
+      expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
+      expect($uibModalInstance.close).toHaveBeenCalledWith({
+        url: 'google.com',
+        text: 'google.com'
+      });
+    });
+  });
+
   describe('when customization args doesn\'t have a valid youtube video',
     function() {
       var customizationArgSpecs = [{
