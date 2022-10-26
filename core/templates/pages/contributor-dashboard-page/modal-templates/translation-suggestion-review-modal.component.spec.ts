@@ -374,9 +374,8 @@ describe('Translation Suggestion Review Modal Component', function() {
         .and.callFake((
             targetId, suggestionId, action, reviewMessage, commitMessage,
             successCallback, errorCallback) => {
-          let dummyErrorResponse = new Error('Error');
           return Promise.reject(
-            errorCallback(dummyErrorResponse)
+            errorCallback('Pre accept validation failed.')
           );
         });
       spyOn(alertsService, 'addWarning');
@@ -393,7 +392,7 @@ describe('Translation Suggestion Review Modal Component', function() {
           'hint section of "StateName" card', jasmine.any(Function),
           jasmine.any(Function));
       expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Invalid Suggestion: Error.');
+        'Invalid Suggestion: Pre accept validation failed.');
     });
 
     it(

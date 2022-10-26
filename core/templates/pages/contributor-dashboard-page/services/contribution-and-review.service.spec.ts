@@ -306,12 +306,12 @@ describe('Contribution and review service', () => {
     };
 
     let onSuccess: jasmine.Spy<(suggestionId: string) => void>;
-    let onFailure: jasmine.Spy<(error: unknown) => void>;
+    let onFailure: jasmine.Spy<(errorMessage: string) => void>;
 
     beforeEach(() => {
       onSuccess = jasmine.createSpy(
         'onSuccess', (suggestionId: string) => {});
-      onFailure = jasmine.createSpy('onFailure', (error) => {});
+      onFailure = jasmine.createSpy('onFailure', (errorMessage: string) => {});
     });
 
     it('should call onSuccess function on' +
@@ -334,7 +334,9 @@ describe('Contribution and review service', () => {
     it('should call onFailure function when' +
     'resolving suggestion to exploration fails', fakeAsync(() => {
       spyOn(carbas, 'reviewExplorationSuggestionAsync').and
-        .returnValue(Promise.reject());
+        .returnValue(Promise.reject({
+          error: {error: 'Backend error'}
+        }));
 
       cars.reviewExplorationSuggestion(
         'abc', 'pqr', 'accept', 'review message', 'commit message',
