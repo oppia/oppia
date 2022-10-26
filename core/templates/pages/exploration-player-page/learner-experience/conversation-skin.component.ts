@@ -79,6 +79,7 @@ import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/lear
 
 import './conversation-skin.component.css';
 import { ConceptCardManagerService } from '../services/concept-card-manager.service';
+import { TranslateService } from '@ngx-translate/core';
 
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
@@ -219,6 +220,7 @@ export class ConversationSkinComponent {
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,
     private platformFeatureService: PlatformFeatureService,
+    private translateService: TranslateService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
   ) {}
 
@@ -1034,7 +1036,9 @@ export class ConversationSkinComponent {
       if (this.nextCardIfStuck) {
         // Let the learner know about the redirection to a state
         // for clearing concepts.
-        this.playerTranscriptService.addNewResponse("Response");
+        this.playerTranscriptService.addNewResponse(
+          this.translateService.instant(
+            'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE'));
       }
       else {
         // Release solution if no separate state for addressing
@@ -1062,7 +1066,9 @@ export class ConversationSkinComponent {
     }
     // Directly trigger action for the really stuck learner.
     if (this.nextCardIfStuck) {
-      this.playerTranscriptService.addNewResponse("Response");
+      this.playerTranscriptService.addNewResponse(
+        this.translateService.instant(
+          'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE'));
       setTimeout(() => {
         this.nextCard = this.nextCardIfStuck;
         this.showPendingCard();
@@ -1070,7 +1076,6 @@ export class ConversationSkinComponent {
     }
     else {
       // Release solution
-      console.log("Release soln called.")
       this.hintsAndSolutionManagerService.releaseSolution();
     }
   }

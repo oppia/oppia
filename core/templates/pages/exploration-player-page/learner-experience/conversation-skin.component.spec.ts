@@ -79,6 +79,8 @@ import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/lear
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { ConceptCardManagerService } from '../services/concept-card-manager.service';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 
 class MockWindowRef {
   nativeWindow = {
@@ -105,7 +107,7 @@ class MockPlatformFeatureService {
   }
 }
 
-describe('Conversation skin component', () => {
+fdescribe('Conversation skin component', () => {
   let fixture: ComponentFixture<ConversationSkinComponent>;
   let componentInstance: ConversationSkinComponent;
   let alertsService: AlertsService;
@@ -160,6 +162,7 @@ describe('Conversation skin component', () => {
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   let conceptCardManagerService: ConceptCardManagerService;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
+  let translateService: TranslateService;
 
   const WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC: number = 11000;
   const WAIT_BEFORE_REALLY_STUCK_MSEC: number = 12000;
@@ -506,6 +509,10 @@ describe('Conversation skin component', () => {
         {
           provide: PlatformFeatureService,
           useClass: MockPlatformFeatureService
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -573,6 +580,7 @@ describe('Conversation skin component', () => {
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     conceptCardManagerService = TestBed.inject(ConceptCardManagerService);
+    translateService = TestBed.inject(TranslateService);
     audioTranslationLanguageService = TestBed.inject(AudioTranslationLanguageService);
     learnerDashboardBackendApiService = TestBed.inject(
       LearnerDashboardBackendApiService);
@@ -1086,6 +1094,7 @@ describe('Conversation skin component', () => {
   ' when the learner gets stuck and such a state exists after a' +
   ' predetermined time', fakeAsync(() => {
     spyOn(componentInstance, 'showPendingCard');
+    spyOn(translateService, 'instant').and.callThrough();
     spyOn(playerTranscriptService, 'addNewResponse');
 
     componentInstance.nextCardIfStuck = new StateCard(
@@ -1095,6 +1104,8 @@ describe('Conversation skin component', () => {
     componentInstance.triggerIfLearnerStuckAction();
     tick(WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
     tick(WAIT_BEFORE_REALLY_STUCK_MSEC);
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE');
     expect(componentInstance.nextCard).toEqual(componentInstance.nextCardIfStuck);
     flush();
   }));
@@ -1112,6 +1123,7 @@ describe('Conversation skin component', () => {
 
   it('should immediately direct the learner to the stuck' +
   ' when the learner gets stuck and such a state exists', fakeAsync(() => {
+    spyOn(translateService, 'instant').and.callThrough();
     spyOn(componentInstance, 'showPendingCard');
     spyOn(playerTranscriptService, 'addNewResponse');
 
@@ -1120,6 +1132,8 @@ describe('Conversation skin component', () => {
         [], [], null, null, [], 'EndExploration', null),
       [], null, null, '', null);
     componentInstance.triggerIfLearnerStuckActionDirectly();
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE');
     tick(10000);
     expect(componentInstance.nextCard).toEqual(componentInstance.nextCardIfStuck);
   }))
