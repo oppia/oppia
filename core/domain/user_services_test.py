@@ -693,10 +693,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             unused_merge_fields: Dict[str, str],
             unused_tag: str,
             *,
-            unused_can_receive_updates: bool
+            can_receive_email_updates: bool
         ) -> bool:
             """Mocks bulk_email_services.add_or_update_user_status()."""
-            return False
+            return not can_receive_email_updates
 
         send_mail_swap = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         bulk_email_swap = self.swap(

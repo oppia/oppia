@@ -53,10 +53,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                         self.tag_names: List[str] = []
 
                     def update(
-                            self,
-                            unused_id: str,
-                            unused_hash: str,
-                            tag_data: Dict[str, List[Dict[str, str]]]) -> None:
+                        self,
+                        unused_id: str,
+                        unused_hash: str,
+                        tag_data: Dict[str, List[Dict[str, str]]]
+                    ) -> None:
                         """Mocks the tag update function in mailchimp api.
 
                         Args:

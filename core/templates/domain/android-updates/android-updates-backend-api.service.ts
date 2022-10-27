@@ -36,7 +36,8 @@ export class AndroidUpdatesBackendApiService {
   constructor(private http: HttpClient) {}
 
   private async _putRequestAsync(
-      handlerUrl: string, payload: AndroidListPayload): Promise<boolean> {
+      handlerUrl: string, payload: AndroidListPayload
+  ): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.http.put<AndroidListReturnStatusData>(
         handlerUrl, payload).toPromise()
