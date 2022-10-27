@@ -107,7 +107,7 @@ class MockPlatformFeatureService {
   }
 }
 
-fdescribe('Conversation skin component', () => {
+describe('Conversation skin component', () => {
   let fixture: ComponentFixture<ConversationSkinComponent>;
   let componentInstance: ConversationSkinComponent;
   let alertsService: AlertsService;
