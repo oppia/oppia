@@ -918,6 +918,14 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         new_filename = 'new_filename.svg'
         new_filesize = 12345
         subtopic_index = self.topic.get_subtopic_index(1)
+        self.assertNotEqual(
+            new_filename,
+            self.topic.subtopics[subtopic_index].thumbnail_filename
+        )
+        self.assertNotEqual(
+            new_filesize,
+            self.topic.subtopics[subtopic_index].thumbnail_size_in_bytes
+        )
         self.topic.update_subtopic_thumbnail_filename_and_size(
             1, new_filename, new_filesize
         )
@@ -946,6 +954,11 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 2, 'Another title', ['skill_id_2'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-two')]
+        self.assertNotEqual(1, len(self.topic.subtopics))
+        self.assertNotEqual(
+            [skill_id_moved],
+            self.topic.uncategorized_skill_ids
+        )
         self.topic.delete_subtopic(subtopic_id_to_delete)
         self.assertEqual(1, len(self.topic.subtopics))
         self.assertEqual([skill_id_moved], self.topic.uncategorized_skill_ids)
@@ -971,6 +984,14 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 2, 'Another title', ['skill_id_2'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-two')]
+        self.assertNotEqual(
+            self.topic.subtopics[0].skill_ids,
+            expected_subtopic1_skills
+        )
+        self.assertNotEqual(
+            self.topic.subtopics[1].skill_ids,
+            expected_subtopic2_skills
+        )
         self.topic.move_skill_id_to_subtopic(1, 2, 'skill_id_1')
         self.assertEqual(
             self.topic.subtopics[0].skill_ids,
@@ -998,6 +1019,14 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 2, 'Another title', ['skill_id_2'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-two')]
+        self.assertNotEqual(
+            self.topic.subtopics[1].skill_ids,
+            expected_subtopic_skills
+        )
+        self.assertNotEqual(
+            self.topic.uncategorized_skill_ids,
+            expected_uncategorized_skills
+        )
         self.topic.move_skill_id_to_subtopic(None, 2, 'skill_id_3')
         self.assertEqual(
             self.topic.subtopics[1].skill_ids,
