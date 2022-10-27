@@ -452,7 +452,10 @@ class BaseHandler(webapp2.RequestHandler):
 
         try:
             if self.HANDLER_ARGS_SCHEMAS is None:
-                raise Exception
+                raise Exception(
+                    'No \'HANDLER_ARGS_SCHEMAS\' Found for the '
+                    'handler class: %s' % handler_class_name
+                )
             schema_for_request_method = self.HANDLER_ARGS_SCHEMAS[
                 request_method]
         except Exception as e:

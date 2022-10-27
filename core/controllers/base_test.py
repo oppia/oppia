@@ -284,13 +284,10 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         with self.swap(logging, 'warning', mock_logging_function):
             self.testapp.options('/mock', status=500)
-            self.assertEqual(len(observed_log_messages), 2)
+            self.assertEqual(len(observed_log_messages), 1)
             self.assertEqual(
                 observed_log_messages[0],
                 'Not a recognized request method.')
-            self.assertEqual(
-                observed_log_messages[1],
-                'Not a recognized return type: defaulting to render JSON.')
 
     def test_renders_error_page_with_iframed(self) -> None:
         # Modify the testapp to use the mock handler.
