@@ -408,8 +408,10 @@ var ExplorationEditorPage = function() {
   };
 
   this.waitForPreviewTabToLoad = async function() {
-    await waitFor.visibilityOf(
-      previewTabLearnerViewCard, 'Preview Tab learner card is not visible');
+    // We need to use browser.pause in order to wait for preview tab
+    // to load because all other method does not work in this case.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(2000);
   };
 
   this.navigateToSettingsTab = async function() {
