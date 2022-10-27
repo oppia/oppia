@@ -5,11 +5,14 @@ on:
       - develop
 
 jobs:
-  send_notifications:
-    name: Repository Dispatch
-    uses: peter-evans/repository-dispatch@v2
-    with:
-      token: ${{ secrets.REPO_ACCESS_TOKEN }}
-      repository: oppia/release-scripts
-      event-type: develop-commit
-      client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+  send_notification:
+    name: Send notification
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Repository dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: oppia/release-scripts
+          event-type: develop-commit
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
