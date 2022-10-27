@@ -1196,8 +1196,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
-        # Replace the stored instance with None in order to trigger unexpected
-        # exception during update.
+        # Here we use MyPy ignore because we are assigning a None value
+        # where instance of 'PlatformParameter' is expected, and this is
+        # done to Replace the stored instance with None in order to
+        # trigger the unexpected exception during update.
         platform_parameter_registry.Registry.parameter_registry[
             feature.name] = None  # type: ignore[assignment]
         with feature_list_ctx, feature_set_ctx:

@@ -60,7 +60,22 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
 
-from typing import Any, Dict, List, Optional, TypedDict, cast
+from typing import Dict, List, Optional, TypedDict, Union, cast
+
+
+class ClassroomPageDataDict(TypedDict):
+    """Dict representation of classroom page's data dictionary."""
+
+    course_details: str
+    name: str
+    topic_ids: List[str]
+    topic_list_intro: str
+    url_fragment: str
+
+
+AllowedAdminConfigPropertyValueTypes = Union[
+    str, bool, float, Dict[str, str], List[str], ClassroomPageDataDict
+]
 
 
 class AdminPage(base.BaseHandler):
@@ -86,7 +101,9 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     collection_id: Optional[str]
     num_dummy_exps_to_generate: Optional[int]
     num_dummy_exps_to_publish: Optional[int]
-    new_config_property_values: Optional[Dict[str, Any]]
+    new_config_property_values: Optional[
+        Dict[str, AllowedAdminConfigPropertyValueTypes]
+    ]
     config_property_id: Optional[str]
     data: Optional[str]
     topic_id: Optional[str]

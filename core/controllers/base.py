@@ -149,13 +149,13 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    # Using Dict[str, Any] here because the following schema can have a
-    # recursive structure and currently mypy doesn't support recursive type
-    # currently. See: https://github.com/python/mypy/issues/731
+    # Here we use type Any because the sub-classes of BaseHandler can contain
+    # different schemas with different types of values, like str, complex Dicts
+    # and etc.
     URL_PATH_ARGS_SCHEMAS: Optional[Dict[str, Any]] = None
-    # Using Dict[str, Any] here because the following schema can have a
-    # recursive structure and currently mypy doesn't support recursive type
-    # currently. See: https://github.com/python/mypy/issues/731
+    # Here we use type Any because the sub-classes of BaseHandler can contain
+    # different schemas with different types of values, like str, complex Dicts
+    # and etc.
     HANDLER_ARGS_SCHEMAS: Optional[Dict[str, Any]] = None
 
     def __init__(  # pylint: disable=super-init-not-called
@@ -527,6 +527,8 @@ class BaseHandler(webapp2.RequestHandler):
             not feconf.ENABLE_MAINTENANCE_MODE or
             self.current_user_is_site_maintainer)
 
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'get' method with different number of arguments and types.
     def get(self, *args: Any, **kwargs: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle GET requests."""
         logging.warning('Invalid URL requested: %s', self.request.uri)
@@ -537,6 +539,8 @@ class BaseHandler(webapp2.RequestHandler):
         }
         self._render_exception(values)
 
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'post' method with different number of arguments and types.
     def post(self, *args: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle POST requests.
 
@@ -545,6 +549,8 @@ class BaseHandler(webapp2.RequestHandler):
         """
         raise self.PageNotFoundException
 
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'put' method with different number of arguments and types.
     def put(self, *args: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle PUT requests.
 
@@ -553,6 +559,8 @@ class BaseHandler(webapp2.RequestHandler):
         """
         raise self.PageNotFoundException
 
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'delete' method with different number of arguments and types.
     def delete(self, *args: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle DELETE requests.
 
@@ -561,12 +569,16 @@ class BaseHandler(webapp2.RequestHandler):
         """
         raise self.PageNotFoundException
 
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'head' method with different number of arguments and types.
     def head(self, *args: Any, **kwargs: Any) -> None:
         """Method to handle HEAD requests. The webapp library automatically
         makes sure that HEAD only returns the headers of GET request.
         """
         return self.get(*args, **kwargs)
 
+    # Here we use type Any because the argument 'values' can accept various
+    # kinds of dictionaries that needs to be sent as a JSON response.
     def render_json(self, values: Union[str, Mapping[str, Any]]) -> None:
         """Prepares JSON response to be sent to the client.
 
@@ -821,6 +833,8 @@ class RaiseErrorOnGet:
     def __init__(self, message: str) -> None:
         self.error_message = message
 
+    # Here we use type Any because the 'get' method can accept arbitrary number
+    # of arguments with different types.
     def get(self, *args: Any, **kwargs: Any) -> None:
         """Raises an error when invoked."""
         raise ValueError(self.error_message)

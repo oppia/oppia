@@ -92,6 +92,8 @@ def open_access(
         everyone.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType,
@@ -124,6 +126,8 @@ def is_source_mailchimp(
         function. The newly decorated function.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_is_source_mailchimp(
         self: _SelfBaseHandlerType, secret: str, **kwargs: Any
@@ -164,6 +168,8 @@ def does_classroom_exist(
         function. The newly decorated function.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_does_classroom_exist(
         self: _SelfBaseHandlerType,
@@ -219,6 +225,8 @@ def can_play_exploration(
         play a given exploration.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_play(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
@@ -266,6 +274,8 @@ def can_view_skills(
         can view multiple given skills.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_view(
         self: _SelfBaseHandlerType,
@@ -317,6 +327,8 @@ def can_play_collection(
         play a given collection.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_play(
         self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any
@@ -362,6 +374,8 @@ def can_download_exploration(
         has permission to download a given exploration.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_download(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
@@ -410,6 +424,8 @@ def can_view_exploration_stats(
         has permission to view exploration stats.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_view_stats(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
@@ -457,6 +473,8 @@ def can_edit_collection(
         permission to edit a given collection.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_edit(
         self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any
@@ -506,6 +524,8 @@ def can_manage_email_dashboard(
         permission to access the email dashboard.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_manage_emails(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -548,6 +568,8 @@ def can_access_blog_admin_page(
         permission to access the blog admin page.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access_blog_admin_page(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -591,6 +613,8 @@ def can_manage_blog_post_editors(
         permission to manage blog post editors.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_manage_blog_post_editors(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -634,6 +658,8 @@ def can_access_blog_dashboard(
         permission to access the blog dashboard.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access_blog_dashboard(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -676,6 +702,8 @@ def can_delete_blog_post(
         permission to delete a given blog post.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_delete(
         self: _SelfBaseHandlerType, blog_post_id: str, **kwargs: Any
@@ -729,6 +757,8 @@ def can_edit_blog_post(
         permission to edit a given blog post.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_edit(
         self: _SelfBaseHandlerType, blog_post_id: str, **kwargs: Any
@@ -782,6 +812,8 @@ def can_access_moderator_page(
         permission to access the moderator page.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access_moderator_page(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -824,6 +856,8 @@ def can_access_release_coordinator_page(
         permission to access the release coordinator page.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access_release_coordinator_page(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -868,6 +902,8 @@ def can_manage_memcache(
         permission to manage memcache.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_manage_memcache(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -910,6 +946,8 @@ def can_run_any_job(
         permission to run any job.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_run_any_job(
         self: _SelfBaseHandlerType, *args: Any, **kwargs: Any
@@ -953,6 +991,8 @@ def can_send_moderator_emails(
         has permission to send moderator emails.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_send_moderator_emails(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -995,6 +1035,8 @@ def can_manage_own_account(
         has permission to manage their account.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_manage_account(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -1037,6 +1079,8 @@ def can_access_admin_page(
         is a super admin.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_super_admin(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -1079,6 +1123,8 @@ def can_access_contributor_dashboard_admin_page(
         access the contributor dashboard admin page.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access_contributor_dashboard_admin_page(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -1124,6 +1170,8 @@ def can_manage_contributors_role(
         can modify contributor's role for the contributor dashboard page.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_manage_contributors_role(
         self: _SelfBaseHandlerType, category: str, **kwargs: Any
@@ -1180,6 +1228,8 @@ def can_delete_any_user(
         can delete any user.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_primary_admin(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -1224,6 +1274,8 @@ def can_upload_exploration(
         has permission to upload an exploration.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_upload(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -1265,6 +1317,8 @@ def can_create_exploration(
         has permission to create an exploration.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_create(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -1307,6 +1361,8 @@ def can_create_collection(
         has permission to create a collection.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_create(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -1349,6 +1405,8 @@ def can_access_creator_dashboard(
         user has permission to access the creator dashboard page.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -1391,6 +1449,8 @@ def can_create_feedback_thread(
         has permission to create a feedback thread.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
@@ -1438,6 +1498,8 @@ def can_view_feedback_thread(
         has permission to view a feedback thread.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType, thread_id: str, **kwargs: Any
@@ -1500,6 +1562,8 @@ def can_comment_on_feedback_thread(
         has permission to comment on a given feedback thread.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType, thread_id: str, **kwargs: Any
@@ -1563,6 +1627,8 @@ def can_rate_exploration(
         has permission to rate a given exploration.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_rate(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
@@ -1603,6 +1669,8 @@ def can_flag_exploration(
         a user can flag a given exploration.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_flag(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
@@ -1642,6 +1710,8 @@ def can_subscribe_to_users(
         has permission to subscribe/unsubscribe a creator.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_subscribe(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -1680,6 +1750,8 @@ def can_edit_exploration(
         a user has permission to edit a given exploration.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_edit(
         self: _SelfBaseHandlerType,
@@ -1735,6 +1807,8 @@ def can_voiceover_exploration(
         has permission to voiceover a given exploration.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_voiceover(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
@@ -1786,6 +1860,8 @@ def can_add_voice_artist(
         has permission to add voice artist.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_add_voice_artist(
         self: _SelfBaseHandlerType,
@@ -1850,6 +1926,8 @@ def can_remove_voice_artist(
         has permission to remove voice artist.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_remove_voice_artist(
         self: _SelfBaseHandlerType,
@@ -1909,6 +1987,8 @@ def can_save_exploration(
         a user has permission to save a given exploration.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_save(
         self: _SelfBaseHandlerType,
@@ -1962,6 +2042,8 @@ def can_delete_exploration(
         permission to delete a given exploration.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_delete(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
@@ -2011,6 +2093,8 @@ def can_suggest_changes_to_exploration(
         has permission to make suggestions to an exploration.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_suggest(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
@@ -2051,6 +2135,8 @@ def can_suggest_changes(
         has permission to make suggestions.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_suggest(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -2081,6 +2167,8 @@ def can_resubmit_suggestion(
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether a user can resubmit a suggestion."""
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_resubmit_suggestion(
         self: _SelfBaseHandlerType, suggestion_id: str, **kwargs: Any
@@ -2128,6 +2216,8 @@ def can_publish_exploration(
         has permission to publish an exploration.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_publish(
         self: _SelfBaseHandlerType,
@@ -2179,6 +2269,8 @@ def can_publish_collection(
         has permission to publish a collection.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_publish_collection(
         self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any
@@ -2226,6 +2318,8 @@ def can_unpublish_collection(
         the user has permission to unpublish a collection.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_unpublish_collection(
         self: _SelfBaseHandlerType, collection_id: str, **kwargs: Any
@@ -2274,6 +2368,8 @@ def can_modify_exploration_roles(
         exploration.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_modify(
         self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
@@ -2320,6 +2416,8 @@ def can_perform_tasks_in_taskqueue(
         a superadmin of the application.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_perform(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -2366,6 +2464,8 @@ def can_perform_cron_tasks(
         a superadmin of the application.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_perform(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -2409,6 +2509,8 @@ def can_access_learner_dashboard(
         one can access the learner dashboard.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -2451,6 +2553,8 @@ def can_access_learner_groups(
         one can access the learner groups.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -2495,6 +2599,8 @@ def can_manage_question_skill_status(
         to a skill.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_manage_question_skill_status(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -2542,6 +2648,8 @@ def require_user_id_else_redirect_to_homepage(
         session.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_login(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -2568,6 +2676,8 @@ def can_edit_topic(
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
     """Decorator to check whether the user can edit given topic."""
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_edit(
         self: _SelfBaseHandlerType, topic_id: str, *args: Any, **kwargs: Any
@@ -2623,6 +2733,8 @@ def can_edit_question(
         whether the user has permission to edit a given question.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_edit(
         self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
@@ -2671,6 +2783,8 @@ def can_play_question(
         whether the user can play a given question.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_play_question(
         self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
@@ -2709,6 +2823,8 @@ def can_view_question_editor(
         if the user has permission to view any question editor.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_view_question_editor(
         self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
@@ -2759,6 +2875,8 @@ def can_delete_question(
         if the user has permission to delete a question.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_delete_question(
         self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
@@ -2806,6 +2924,8 @@ def can_add_new_story_to_topic(
         if the user has permission to add a story to a given topic.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_add_story(
         self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
@@ -2862,6 +2982,8 @@ def can_edit_story(
         a user has permission to edit a story for a given topic.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_edit_story(
         self: _SelfBaseHandlerType, story_id: str, **kwargs: Any
@@ -2923,6 +3045,8 @@ def can_edit_skill(
         the user has permission to edit a skill.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_edit_skill(
         self: _SelfBaseHandlerType, skill_id: str, **kwargs: Any
@@ -2968,6 +3092,8 @@ def can_submit_images_to_questions(
         the user has permission to submit a question.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_submit_images_to_questions(
         self: _SelfBaseHandlerType, skill_id: str, **kwargs: Any
@@ -3012,6 +3138,8 @@ def can_delete_skill(
         if the user can delete a skill.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_delete_skill(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -3056,6 +3184,8 @@ def can_create_skill(
         the user has permission to create a skill.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_create_skill(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -3102,6 +3232,8 @@ def can_delete_story(
         given topic.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_delete_story(
         self: _SelfBaseHandlerType, story_id: str, **kwargs: Any
@@ -3156,6 +3288,8 @@ def can_delete_topic(
         checks if the user can delete a given topic.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_delete_topic(
         self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
@@ -3207,6 +3341,8 @@ def can_create_topic(
         if the user can create a topic.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_create_topic(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -3253,6 +3389,8 @@ def can_access_topics_and_skills_dashboard(
         the user can access the topics and skills dashboard.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access_topics_and_skills_dashboard(
         self: _SelfBaseHandlerType, **kwargs: Any
@@ -3302,6 +3440,8 @@ def can_view_any_topic_editor(
         if the user can view any topic editor.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_view_any_topic_editor(
         self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
@@ -3354,6 +3494,8 @@ def can_manage_rights_for_topic(
         if the user can manage a given topic's rights.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_manage_topic_rights(
         self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
@@ -3402,6 +3544,8 @@ def can_change_topic_publication_status(
         if the user can publish or unpublish a topic.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_change_topic_publication_status(
         self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
@@ -3455,6 +3599,8 @@ def can_access_topic_viewer_page(
         if the user can access the given topic viewer page.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType,
@@ -3535,6 +3681,8 @@ def can_access_story_viewer_page(
         if the user can access the given story viewer page.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(
         self: _SelfBaseHandlerType,
@@ -3639,6 +3787,8 @@ def can_access_subtopic_viewer_page(
         if the user can access the given subtopic viewer page.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(  # pylint: disable=too-many-return-statements
         self: _SelfBaseHandlerType,
@@ -3768,6 +3918,8 @@ def get_decorator_for_accepting_suggestion(
             NotLoggedInException. The user is not logged in.
         """
 
+        # Here we use type Any because this method can accept arbitrary number
+        # of arguments with different types.
         @functools.wraps(handler)
         def test_can_accept_suggestion(
             self: _SelfBaseHandlerType,
@@ -3849,6 +4001,8 @@ def can_view_reviewable_suggestions(
         if the user can view reviewable suggestions.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_view_reviewable_suggestions(
         self: _SelfBaseHandlerType,
@@ -3910,6 +4064,8 @@ def can_edit_entity(
         if the user can edit the entity.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_edit_entity(
         self: _SelfBaseHandlerType,
@@ -3982,6 +4138,8 @@ def can_play_entity(
         if the user can play the entity.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_play_entity(
         self: _SelfBaseHandlerType,
@@ -4038,6 +4196,8 @@ def is_from_oppia_ml(
         request is from a valid VM instance.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_request_originates_from_valid_oppia_ml_instance(
         self: base.OppiaMLVMHandler,
@@ -4090,6 +4250,8 @@ def can_update_suggestion(
             suggestion id.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_update_suggestion(
         self: _SelfBaseHandlerType,
@@ -4178,6 +4340,8 @@ def can_fetch_contributor_dashboard_stats(
             fetch stats for the given username.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_fetch_contributor_dashboard_stats(
         self: _SelfBaseHandlerType,
@@ -4238,6 +4402,8 @@ def can_fetch_all_contributor_dashboard_stats(
             fetch stats for the given username.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_fetch_all_contributor_dashboard_stats(
         self: _SelfBaseHandlerType,
@@ -4284,6 +4450,8 @@ def is_from_oppia_android(
         function. The newly decorated function.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_is_from_oppia_android(
         self: _SelfBaseHandlerType, **kwargs: Any
