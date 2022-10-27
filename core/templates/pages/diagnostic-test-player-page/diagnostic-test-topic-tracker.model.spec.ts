@@ -298,9 +298,8 @@ describe('Diagnostic test topic tracker model', () => {
         topicID5: ['topicID4']
       };
 
-      const
-      diagnosticTestTopicTrackerModel = new DiagnosticTestTopicTrackerModel(
-        topicIdToPrerequisiteTopicIds);
+      const diagnosticTestTopicTrackerModel = (
+        new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds));
 
       expect(diagnosticTestTopicTrackerModel.getTopicIdToAncestorTopicIds())
         .toEqual(expectedTopicIdToAncestorTopicIds);

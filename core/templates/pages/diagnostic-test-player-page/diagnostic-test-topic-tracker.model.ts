@@ -235,7 +235,7 @@ export class DiagnosticTestTopicTrackerModel {
     this.removeTopicIdsFromTopicIdToSuccessorsDict(topicIdsToRemove);
   }
 
-  removeTopicIdsFromTopicIdToAncestorsDict(topicIdsToRemove: string[]) {
+  removeTopicIdsFromTopicIdToAncestorsDict(topicIdsToRemove: string[]): void {
     // Removing the given topic IDs from the topic ID to the ancestor
     // topic IDs dict.
     for (let topicId of topicIdsToRemove) {
@@ -244,11 +244,12 @@ export class DiagnosticTestTopicTrackerModel {
     for (let topicId in this._topicIdToAncestorTopicIds) {
       let ancestors = this._topicIdToAncestorTopicIds[topicId];
       this._topicIdToAncestorTopicIds[topicId] = ancestors.filter((topic) => {
-        return topicIdsToRemove.indexOf(topic) === -1
+        return topicIdsToRemove.indexOf(topic) === -1;
       });
     }
   }
-  removeTopicIdsFromTopicIdToSuccessorsDict(topicIdsToRemove: string[]) {
+
+  removeTopicIdsFromTopicIdToSuccessorsDict(topicIdsToRemove: string[]): void {
     // Removing the given topic IDs from the topic ID to the successor
     // topic IDs dict.
     for (let topicId of topicIdsToRemove) {
@@ -257,7 +258,7 @@ export class DiagnosticTestTopicTrackerModel {
     for (let topicId in this._topicIdToSuccessorTopicIds) {
       let successors = this._topicIdToSuccessorTopicIds[topicId];
       this._topicIdToSuccessorTopicIds[topicId] = successors.filter((topic) => {
-        return topicIdsToRemove.indexOf(topic) === -1
+        return topicIdsToRemove.indexOf(topic) === -1;
       });
     }
   }
