@@ -23,14 +23,9 @@
             </div>
           </div>
           <div *ngIf="stateHintsService.displayed.length > 0">
-            <!-- An HTML element marked ui-sortable should contain only one element,
-          and this element should have an ng-repeat defined on it. See the
-          ui-sortable documentation for more details. -->
             <div cdkDropList
                  (cdkDropListDropped)="drop($event)"
                  class="nav oppia-option-list-hint nav-stacked nav-pills">
-              <!-- Note that adding "track by index" here seems to mess up the final
-              index in the stop() event handler. -->
               <div [cdkDragDisabled]="stateHintsService.getActiveHintIndex() === index ? true : false"
                    cdkDrag
                    *ngFor="let hint of stateHintsService.displayed; let index = index"

@@ -134,7 +134,7 @@ module.exports = {
 
     var checkElementSelectorProtractor = function(node) {
       var thirdPartySelectorPrefixes = (
-        ['.modal', '.select2', '.CodeMirror', '.toast', '.ng-joyride', '.mat']);
+        ['.modal', '.select2', '.CodeMirror', '.toast', '.joyride', '.mat']);
       for (var i = 0; i < thirdPartySelectorPrefixes.length; i++) {
         if ((node.arguments[0].type === 'Literal') &&
           (node.arguments[0].value.startsWith(thirdPartySelectorPrefixes[i]))) {
@@ -159,7 +159,7 @@ module.exports = {
 
     var checkElementSelectorWebdriverio = function(node) {
       var thirdPartySelectorPrefixes = (
-        ['.modal', '.select2', '.CodeMirror', '.toast', '.ng-joyride', '.mat']);
+        ['.modal', '.select2', '.CodeMirror', '.toast', '.joyride', '.mat']);
       for (var i = 0; i < thirdPartySelectorPrefixes.length; i++) {
         if ((node.arguments[0].type === 'Literal') &&
           (node.arguments[0].value.startsWith(thirdPartySelectorPrefixes[i]))) {

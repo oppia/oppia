@@ -1702,25 +1702,9 @@ pre.oppia-pre-wrapped-text {
   line-height: 1.846;
 }
 
-/* Add inter-paragraph spacing to the ng-joyride tutorial contents. */
+/* Add inter-paragraph spacing to the tutorial contents. */
 .popover-content {
   padding: 10px;
-}
-.popover.ng-joyride {
-  padding: 1px;
-  width: 245px;
-}
-.popover.ng-joyride .col-md-8 {
-  padding: 0;
-}
-.popover.ng-joyride .col-md-8 > div {
-  float: left !important;
-}
-.pop-over-text.joyride-popover-text {
-  font-size: 14px;
-}
-.ng-joyride .popover-content p {
-  margin-top: 10px;
 }
 
 .popover-body.container-fluid {
@@ -2406,13 +2390,6 @@ oppia-expression-error-tag:after {
 /* Adjust the z-index for the tutorial components so that they do not go
    above the navbar.
 */
-.ng-joyride-element-static[data-original-title],
-div.ng-joyride-title {
-  z-index: 999;
-}
-.ng-joyride.uib-popover.sharp-borders {
-  z-index: 1002;
-}
 div#ng-curtain {
   z-index: 997;
 }
