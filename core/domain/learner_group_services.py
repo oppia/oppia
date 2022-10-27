@@ -47,7 +47,7 @@ def is_learner_group_feature_enabled() -> bool:
     """Checks if the learner group feature is enabled.
 
     Returns:
-        bool. Whether the learner group feature is enabled.
+        Whether the learner group feature is enabled.
     """
     return bool(config_domain.LEARNER_GROUPS_ARE_ENABLED.value)
 
@@ -64,21 +64,21 @@ def create_learner_group(
     """Creates a new learner group.
 
     Args:
-        group_id: str. The id of the learner group to be created.
-        title: str. The title of the learner group.
-        description: str. The description of the learner group.
-        facilitator_user_ids: str. List of user ids of the facilitators of the
+        group_id: The id of the learner group to be created.
+        title: The title of the learner group.
+        description: The description of the learner group.
+        facilitator_user_ids: List of user ids of the facilitators of the
             learner group.
-        invited_learner_ids: list(str). List of user ids of the learners who
-            have been invited to join the learner group.
-        subtopic_page_ids: list(str). The ids of the subtopics pages that are
-            part of the learner group syllabus. Each subtopic page id is
-            represented as a topicId:subtopicId string.
-        story_ids: list(str). The ids of the stories that are part of the
-            learner group syllabus.
+        invited_learner_ids: List of user ids of the learners who have been
+            invited to join the learner group.
+        subtopic_page_ids: The ids of the subtopics pages that are part of
+            the learner group syllabus. Each subtopic page id is represented
+            as a topicId:subtopicId string.
+        story_ids: The ids of the stories that are part of the learner group
+            syllabus.
 
     Returns:
-        LearnerGroup. The domain object of the newly created learner group.
+        The domain object of the newly created learner group.
     """
     learner_group = learner_group_domain.LearnerGroup(
         group_id,
@@ -126,24 +126,22 @@ def update_learner_group(
     """Updates a learner group if it is present.
 
     Args:
-        group_id: str. The id of the learner group to be updated.
-        title: str. The title of the learner group.
-        description: str. The description of the learner group.
-        facilitator_user_ids: str. List of user ids of the facilitators of the
+        group_id: The id of the learner group to be updated.
+        title: The title of the learner group.
+        description: The description of the learner group.
+        facilitator_user_ids: List of user ids of the facilitators of the
             learner group.
-        learner_ids: list(str). List of user ids of the learners of the
-            learner group.
-        invited_learner_ids: list(str). List of user ids of the learners who
+        learner_ids: List of user ids of the learners of the learner group.
+        invited_learner_ids: List of user ids of the learners who
             have been invited to join the learner group.
-        subtopic_page_ids: list(str). The ids of the subtopics pages that are
+        subtopic_page_ids: The ids of the subtopics pages that are
             part of the learner group syllabus. Each subtopic page id is
             represented as a topicId:subtopicId string.
-        story_ids: list(str). The ids of the stories that are part of the
-            learner group syllabus.
+        story_ids: The ids of the stories that are part of the learner group
+            syllabus.
 
     Returns:
-        learner_group: learner_group_domain.LearnerGroup. The domain object
-        of the updated learner group.
+        The domain object of the updated learner group.
     """
 
     learner_group_model = learner_group_models.LearnerGroupModel.get(
@@ -194,11 +192,11 @@ def is_user_facilitator(user_id: str, group_id: str) -> bool:
     """Checks if the user is a facilitator of the leaner group.
 
     Args:
-        user_id: str. The id of the user.
-        group_id: str. The id of the learner group.
+        user_id: The id of the user.
+        group_id: The id of the learner group.
 
     Returns:
-        bool. Whether the user is a facilitator of the learner group.
+        Whether the user is a facilitator of the learner group.
     """
     learner_group_model = learner_group_models.LearnerGroupModel.get(
         group_id, strict=True
@@ -211,11 +209,11 @@ def is_user_learner(user_id: str, group_id: str) -> bool:
     """Checks if the user is a learner of the learner group.
 
     Args:
-        user_id: str. The id of the user.
-        group_id: str. The id of the learner group.
+        user_id: The id of the user.
+        group_id: The id of the learner group.
 
     Returns:
-        bool. Whether the user is a learner of the learner group.
+        Whether the user is a learner of the learner group.
     """
     learner_group_model = learner_group_models.LearnerGroupModel.get(
         group_id, strict=True
@@ -228,7 +226,7 @@ def remove_learner_group(group_id: str) -> None:
     """Removes the learner group with of given learner group ID.
 
     Args:
-        group_id: str. The id of the learner group to be removed.
+        group_id: The id of the learner group to be removed.
     """
     learner_group_model = learner_group_models.LearnerGroupModel.get(
         group_id, strict=True
@@ -253,18 +251,18 @@ def get_matching_learner_group_syllabus_to_add(
     that can be added to the learner group.
 
     Args:
-        learner_group_id: str. The id of the learner group.
-        keyword: str. The keyword to search the syllabus. It is compared with
+        learner_group_id: The id of the learner group.
+        keyword: The keyword to search the syllabus. It is compared with
             the title of the topics, stories and subtopics.
-        search_type: str. The type of the syllabus item to search. It can be
+        search_type: The type of the syllabus item to search. It can be
             either 'Story' or 'Skill'.
-        category: str. The category of the syllabus items. It is the
-            classroom in which the stories and subtopics are to be searched.
-        language_code: str. The language of the topics in which the stories
+        category: The category of the syllabus items. It is the classroom
+            in which the stories and subtopics are to be searched.
+        language_code: The language of the topics in which the stories
             and subtopics are to be searched.
 
     Returns:
-        dict. The matching syllabus items to add to the learner group.
+        The matching syllabus items to add to the learner group.
     """
     # Default case when syllabus is being added to a new group.
     group_subtopic_page_ids: List[str] = []
@@ -379,16 +377,14 @@ def get_matching_subtopic_syllabus_item_dicts(
     that can be added to the learner group syllabus.
 
     Args:
-        topic: Topic. The topic whose subtopic subtopic items are to be
-            searched.
-        group_subtopic_page_ids: list(str). The ids of the subtopic pages of
-            the learner group.
-        keyword: Optional[str]. The keyword to search the subtopic syllabus
-            items. It is compared with the title of the subtopics if passed
-            in arguments.
+        topic: The topic whose subtopic subtopic items are to be searched.
+        group_subtopic_page_ids: The ids of the subtopic pages of the learner
+            group.
+        keyword: The keyword to search the subtopic syllabus items. It is
+            compared with the title of the subtopics if passed in arguments.
 
     Returns:
-        list(dict). The matching subtopic syllabus items of the given topic.
+        The matching subtopic syllabus items of the given topic.
     """
     matching_subtopic_syllabus_item_dicts: List[
         subtopic_page_domain.SubtopicPageSummaryDict] = []
@@ -420,13 +416,13 @@ def get_matching_story_syllabus_item_dicts(
     that can be added to the learner group syllabus.
 
     Args:
-        topic: Topic. The topic whose stories are to be searched.
-        group_story_ids: list(str). The story ids of the learner group.
-        keyword: Optional[str]. The keyword to search the stories. It is
-            compared with the title of the story if passed in arguments.
+        topic: The topic whose stories are to be searched.
+        group_story_ids: The story ids of the learner group.
+        keyword: The keyword to search the stories. It is compared with the
+            title of the story if passed in arguments.
 
     Returns:
-        list(dict). The matching story syllabus item dicts of the given topic.
+        The matching story syllabus item dicts of the given topic.
     """
     story_ids = [
         story.story_id for story in
@@ -482,9 +478,9 @@ def add_learner_to_learner_group(
     """Adds the given learner to the given learner group.
 
     Args:
-        group_id: str. The id of the learner group.
-        user_id: str. The id of the learner.
-        progress_sharing_permission: bool. The progress sharing permission of
+        group_id: The id of the learner group.
+        user_id: The id of the learner.
+        progress_sharing_permission: The progress sharing permission of
             the learner group. True if progress sharing is allowed, False
             otherwise.
 
@@ -529,10 +525,10 @@ def remove_learners_from_learner_group(
     """Removes the given learner from the given learner group.
 
     Args:
-        group_id: str. The id of the learner group.
-        user_ids: List[str]. The id of the learners to be removed.
-        update_group: bool. Flag indicating whether to update the
-            learner group or not.
+        group_id: The id of the learner group.
+        user_ids: The id of the learners to be removed.
+        update_group: Flag indicating whether to update the learner group
+            or not.
     """
     if update_group:
         learner_group_model = learner_group_models.LearnerGroupModel.get(
@@ -573,8 +569,8 @@ def invite_learners_to_learner_group(
     """Invites the given learners to the given learner group.
 
     Args:
-        group_id: str. The id of the learner group.
-        invited_learner_ids: list(str). The ids of the learners to invite.
+        group_id: The id of the learner group.
+        invited_learner_ids: The ids of the learners to invite.
     """
     learner_groups_user_models = (
         user_models.LearnerGroupsUserModel.get_multi(invited_learner_ids))
@@ -606,10 +602,10 @@ def remove_invited_learners_from_learner_group(
     """Removes the given invited learners from the given learner group.
 
     Args:
-        group_id: str. The id of the learner group.
-        learner_ids: list(str). The ids of the learners to remove.
-        update_group: bool. Flag indicating whether to update the
-            learner group or not.
+        group_id: The id of the learner group.
+        learner_ids: The ids of the learners to remove.
+        update_group: Flag indicating whether to update the learner group
+            or not.
     """
     if update_group:
         learner_group_model = learner_group_models.LearnerGroupModel.get(
@@ -646,12 +642,10 @@ def get_learner_group_from_model(
     model loaded from the datastore.
 
     Args:
-        learner_group_model: LearnerGroupModel. The learner group model
-            from the datastore.
+        learner_group_model: The learner group model from the datastore.
 
     Returns:
-        LearnerGroup. The learner group domain object corresponding to the
-        given model.
+        The learner group domain object corresponding to the given model.
     """
     return learner_group_domain.LearnerGroup(
         learner_group_model.id,
@@ -671,14 +665,15 @@ def can_user_be_invited(
     """Checks if the user can be invited to the learner group.
 
     Args:
-        user_id: str. The id of the user.
-        username: str. The username of the user.
-        group_id: str. The id of the learner group.
+        user_id: The id of the user.
+        username: The username of the user.
+        group_id: The id of the learner group.
 
     Returns:
-        bool. True if the user can be invited to the learner group. False
-        otherwise.
-        str. Error message if the user cannot be invited to the learner group.
+        A 2-tuple where:
+            1. True if the user can be invited to the learner group. False
+                otherwise.
+            2. Error message if the user cannot be invited to the learner group.
     """
     # Case of inviting to new learner group.
     if not group_id:
@@ -708,7 +703,7 @@ def remove_story_reference_from_learner_groups(story_id: str) -> None:
     reference.
 
     Args:
-        story_id: str. Story id to remove.
+        story_id: Story id to remove.
     """
     found_models: Sequence[learner_group_models.LearnerGroupModel] = (
         learner_group_models.LearnerGroupModel.get_all().filter(
@@ -736,8 +731,8 @@ def remove_subtopic_page_reference_from_learner_groups(
     reference.
 
     Args:
-        topic_id: str. Id of the topic of the subtopic page.
-        subtopic_id: int. Id of the subtopic of the subtopic page.
+        topic_id: Id of the topic of the subtopic page.
+        subtopic_id: Id of the subtopic of the subtopic page.
     """
     subtopic_page_id = '{}:{}'.format(topic_id, subtopic_id)
 
@@ -768,10 +763,10 @@ def update_progress_sharing_permission(
     """Updates the progress sharing permission of the learner group.
 
     Args:
-        user_id: str. The id of the user.
-        group_id: str. The id of the learner group.
-        new_progress_sharing_permission: bool. The new progress sharing
-            permission of the learner group.
+        user_id: The id of the user.
+        group_id: The id of the learner group.
+        new_progress_sharing_permission: The new progress sharing permission
+            of the learner group.
     """
     learner_grps_user_model = user_models.LearnerGroupsUserModel.get(
         user_id, strict=True

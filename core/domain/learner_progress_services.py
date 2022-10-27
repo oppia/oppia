@@ -121,12 +121,11 @@ def _get_completed_activities_from_model(
     activities completed model loaded from the datastore.
 
     Args:
-        completed_activities_model: CompletedActivitiesModel. The
-            activities completed model loaded from the datastore.
+        completed_activities_model: The activities completed model loaded
+            from the datastore.
 
     Returns:
-        CompletedActivities. The domain object corresponding to the
-        given model.
+        The CompletedActivities domain object corresponding to the given model.
     """
     return user_domain.CompletedActivities(
         completed_activities_model.id,
@@ -143,12 +142,11 @@ def _get_incomplete_activities_from_model(
     activities model loaded from the datastore.
 
     Args:
-        incomplete_activities_model: IncompleteActivitiesModel. The
-            incomplete activities model loaded from the datastore.
+        incomplete_activities_model: The incomplete activities model loaded
+            from the datastore.
 
     Returns:
-        IncompleteActivities. An IncompleteActivities domain object
-        corresponding to the given model.
+        An IncompleteActivities domain object corresponding to the given model.
     """
     return user_domain.IncompleteActivities(
         incomplete_activities_model.id,
@@ -165,12 +163,12 @@ def _get_last_playthrough_information(
     ExpUserLastPlaythroughModel loaded from the datastore.
 
     Args:
-        last_playthrough_model: ExpUserLastPlaythroughModel. The last
-            last playthrough information loaded from the datastore.
+        last_playthrough_model: The last last playthrough information loaded
+            from the datastore.
 
     Returns:
-        ExpUserLastPlaythrough. The last playthrough information domain object
-        corresponding to the given model.
+        The last playthrough information domain object corresponding to the
+        given model.
     """
     return user_domain.ExpUserLastPlaythrough(
         last_playthrough_model.user_id,
@@ -187,8 +185,8 @@ def _save_completed_activities(
     CompletedActivitiesModel instance in the datastore.
 
     Args:
-        activities_completed: CompletedActivities. The activities
-            completed domain object to be saved in the datastore.
+        activities_completed: The activities completed domain object to
+            be saved in the datastore.
     """
     activities_completed_dict = {
         'exploration_ids': (
@@ -216,8 +214,8 @@ def _save_incomplete_activities(
     IncompleteActivitiesModel instance in the datastore.
 
     Args:
-        incomplete_activities: IncompleteActivities. The incomplete
-            activities domain object to be saved in the datastore.
+        incomplete_activities: The incomplete activities domain object to
+            be saved in the datastore.
     """
     incomplete_activities_model = user_models.IncompleteActivitiesModel(
         id=incomplete_activities.id,
@@ -240,8 +238,8 @@ def _save_last_playthrough_information(
     ExpUserLastPlaythroughModel instance in the datastore.
 
     Args:
-        last_playthrough_information: ExpUserLastPlaythrough. The last
-            playthrough information domain object to be saved in the datastore.
+        last_playthrough_information: The last playthrough information domain
+            object to be saved in the datastore.
     """
     last_playthrough_information_model = (
         user_models.ExpUserLastPlaythroughModel(
@@ -263,8 +261,8 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
     (if present).
 
     Args:
-        user_id: str. The id of the user who has completed the exploration.
-        exp_id: str. The id of the completed exploration.
+        user_id: The id of the user who has completed the exploration.
+        exp_id: The id of the completed exploration.
     """
     completed_activities_model = (
         user_models.CompletedActivitiesModel.get(
@@ -300,8 +298,8 @@ def mark_story_as_completed(user_id: str, story_id: str) -> None:
     the incomplete list(if present).
 
     Args:
-        user_id: str. The id of the user who has completed the story.
-        story_id: str. The id of the completed story.
+        user_id: The id of the user who has completed the story.
+        story_id: The id of the completed story.
     """
 
     completed_activities_model = (
@@ -325,8 +323,8 @@ def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
     the partially learnt list and topics to learn list(if present).
 
     Args:
-        user_id: str. The id of the user who has learnt the topic.
-        topic_id: str. The id of the learnt topic.
+        user_id: The id of the user who has learnt the topic.
+        topic_id: The id of the learnt topic.
     """
 
     completed_activities_model = (
@@ -356,8 +354,8 @@ def mark_collection_as_completed(user_id: str, collection_id: str) -> None:
     list (if present).
 
     Args:
-        user_id: str. The id of the user who completed the collection.
-        collection_id: str. The id of the completed collection.
+        user_id: The id of the user who completed the collection.
+        collection_id: The id of the completed collection.
     """
     completed_activities_model = (
         user_models.CompletedActivitiesModel.get(
@@ -397,12 +395,11 @@ def mark_exploration_as_incomplete(
     learner playlist, it is removed.
 
     Args:
-        user_id: str. The id of the user who partially completed the
+        user_id: The id of the user who partially completed the exploration.
+        exploration_id: The id of the partially completed exploration.
+        state_name: The name of the state at which the user left the
             exploration.
-        exploration_id: str. The id of the partially completed exploration.
-        state_name: str. The name of the state at which the user left the
-            exploration.
-        exploration_version: int. The version of the exploration played by the
+        exploration_version: The version of the exploration played by the
             learner.
     """
     incomplete_activities_model = (
@@ -452,8 +449,8 @@ def record_story_started(user_id: str, story_id: str) -> None:
     story has been already completed by the user.
 
     Args:
-        user_id: str. The id of the user who partially completed the story.
-        story_id: str. The id of the partially completed story.
+        user_id: The id of the user who partially completed the story.
+        story_id: The id of the partially completed story.
     """
 
     incomplete_activities_model = (
@@ -481,8 +478,8 @@ def record_topic_started(user_id: str, topic_id: str) -> None:
     are updated.
 
     Args:
-        user_id: str. The id of the user who partially learnt the topic.
-        topic_id: str. The id of the partially learnt topic.
+        user_id: The id of the user who partially learnt the topic.
+        topic_id: The id of the partially learnt topic.
     """
 
     incomplete_activities_model = (
@@ -510,8 +507,8 @@ def mark_collection_as_incomplete(user_id: str, collection_id: str) -> None:
     If the collection is present in the learner playlist, it is removed.
 
     Args:
-        user_id: str. The id of the user who partially completed the collection.
-        collection_id: str. The id of the partially completed collection.
+        user_id: The id of the user who partially completed the collection.
+        collection_id: The id of the partially completed collection.
     """
     incomplete_activities_model = (
         user_models.IncompleteActivitiesModel.get(user_id, strict=False))
@@ -546,12 +543,11 @@ def validate_and_add_topic_to_learn_goal(
     goals services to add the topic to the learn list.
 
     Args:
-        user_id: str. The id of the user.
-        topic_id: str. The id of the topic to be added to the
-            learner goals.
+        user_id: The id of the user.
+        topic_id: The id of the topic to be added to the learner goals.
 
     Returns:
-        (bool, bool). The first boolean indicates whether the topic
+        A 2-tuple, the first boolean indicates whether the topic
         already exists in either of the "learnt topics" lists and
         the second boolean indicates whether the learner goals
         limit of the user has been exceeded.
@@ -582,15 +578,14 @@ def add_collection_to_learner_playlist(
     playlist services to add the collection to the play later list.
 
     Args:
-        user_id: str. The id of the user.
-        collection_id: str. The id of the collection to be added to the
+        user_id: The id of the user.
+        collection_id: The id of the collection to be added to the
             learner playlist.
-        position_to_be_inserted: int|None. If this is specified the collection
-            gets inserted at the given position. Otherwise it gets added at the
-            end.
+        position_to_be_inserted: If this is specified the collection gets
+            inserted at the given position. Otherwise it gets added at the end.
 
     Returns:
-        (bool, bool, bool). The first boolean indicates whether the collection
+        A 3-tuple, the first boolean indicates whether the collection
         already exists in either of the "completed collections" or "incomplete
         collections" lists, the second boolean indicates whether the playlist
         limit of the user has been exceeded, and the third boolean indicates
@@ -631,15 +626,14 @@ def add_exp_to_learner_playlist(
     playlist services to add the exploration to the play later list.
 
     Args:
-        user_id: str. The id of the user.
-        exploration_id: str. The id of the exploration to be added to the
+        user_id: The id of the user.
+        exploration_id: The id of the exploration to be added to the
             learner playlist.
-        position_to_be_inserted: int|None. If this is specified the exploration
-            gets inserted at the given position. Otherwise it gets added at the
-            end.
+        position_to_be_inserted: If this is specified the exploration gets
+            inserted at the given position. Otherwise it gets added at the end.
 
     Returns:
-        (bool, bool, bool). The first boolean indicates whether the exploration
+        A 3-tuple, the first boolean indicates whether the exploration
         already exists in either of the "completed explorations" or
         "incomplete explorations" lists, the second boolean indicates
         whether the playlist limit of the user has been
@@ -677,9 +671,9 @@ def _remove_activity_ids_from_playlist(
     """Removes the explorations and collections from the playlist of the user.
 
     Args:
-        user_id: str. The id of the user.
-        exploration_ids: list(str). The ids of the explorations to be removed.
-        collection_ids: list(str). The ids of the collections to be removed.
+        user_id: The id of the user.
+        exploration_ids: The ids of the explorations to be removed.
+        collection_ids: The ids of the collections to be removed.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
         user_id, strict=False)
@@ -703,8 +697,8 @@ def remove_story_from_completed_list(user_id: str, story_id: str) -> None:
     (if present).
 
     Args:
-        user_id: str. The id of the user.
-        story_id: str. The id of the story to be removed.
+        user_id: The id of the user.
+        story_id: The id of the story to be removed.
     """
 
     completed_activities_model = (
@@ -724,8 +718,8 @@ def remove_topic_from_learnt_list(user_id: str, topic_id: str) -> None:
     (if present).
 
     Args:
-        user_id: str. The id of the user.
-        topic_id: str. The id of the topic to be removed.
+        user_id: The id of the user.
+        topic_id: The id of the topic to be removed.
     """
     completed_activities_model = (
         user_models.CompletedActivitiesModel.get(
@@ -746,8 +740,8 @@ def remove_collection_from_completed_list(
     (if present).
 
     Args:
-        user_id: str. The id of the user.
-        collection_id: str. The id of the collection to be removed.
+        user_id: The id of the user.
+        collection_id: The id of the collection to be removed.
     """
     completed_activities_model = (
         user_models.CompletedActivitiesModel.get(
@@ -772,11 +766,11 @@ def _remove_activity_ids_from_completed_list(
     from the completed list of the learner.
 
     Args:
-        user_id: str. The id of the user.
-        exploration_ids: list(str). The ids of the explorations to be removed.
-        collection_ids: list(str). The ids of the collections to be removed.
-        story_ids: list(str). The ids of the stories to be removed.
-        learnt_topic_ids: list(str). The ids of the topics to be removed.
+        user_id: The id of the user.
+        exploration_ids: The ids of the explorations to be removed.
+        collection_ids: The ids of the collections to be removed.
+        story_ids: The ids of the stories to be removed.
+        learnt_topic_ids: The ids of the topics to be removed.
     """
     completed_activities_model = (
         user_models.CompletedActivitiesModel.get(
@@ -806,8 +800,8 @@ def remove_exp_from_incomplete_list(user_id: str, exploration_id: str) -> None:
     (if present).
 
     Args:
-        user_id: str. The id of the user.
-        exploration_id: str. The id of the exploration to be removed.
+        user_id: The id of the user.
+        exploration_id: The id of the exploration to be removed.
     """
     incomplete_activities_model = (
         user_models.IncompleteActivitiesModel.get(user_id, strict=False))
@@ -831,8 +825,8 @@ def remove_story_from_incomplete_list(user_id: str, story_id: str) -> None:
     """Removes the story from the incomplete list of the user(if present).
 
     Args:
-        user_id: str. The id of the user.
-        story_id: str. The id of the story to be removed.
+        user_id: The id of the user.
+        story_id: The id of the story to be removed.
     """
 
     incomplete_activities_model = (
@@ -852,8 +846,8 @@ def remove_topic_from_partially_learnt_list(
     """Removes the topic from the partially learnt list of the user(if present).
 
     Args:
-        user_id: str. The id of the user.
-        topic_id: str. The id of the topic to be removed.
+        user_id: The id of the user.
+        topic_id: The id of the topic to be removed.
     """
 
     incomplete_activities_model = (
@@ -874,8 +868,8 @@ def remove_collection_from_incomplete_list(
     (if present).
 
     Args:
-        user_id: str. The id of the user.
-        collection_id: str. The id of the collection to be removed.
+        user_id: The id of the user.
+        collection_id: The id of the collection to be removed.
     """
     incomplete_activities_model = (
         user_models.IncompleteActivitiesModel.get(user_id, strict=False))
@@ -898,11 +892,10 @@ def _remove_activity_ids_from_incomplete_list(
     from the incomplete list of the learner.
 
     Args:
-        user_id: str. The id of the user.
-        exploration_ids: list(str). The ids of the explorations to be removed.
-        collection_ids: list(str). The ids of the collections to be removed.
-        partially_learnt_topic_ids: list(str). The ids of the topics to be
-            removed.
+        user_id: The id of the user.
+        exploration_ids: The ids of the explorations to be removed.
+        collection_ids: The ids of the collections to be removed.
+        partially_learnt_topic_ids: The ids of the topics to be removed.
     """
     incomplete_activities_model = (
         user_models.IncompleteActivitiesModel.get(
@@ -929,10 +922,10 @@ def get_all_completed_exp_ids(user_id: str) -> List[str]:
     user.
 
     Args:
-        user_id: str. The id of the user.
+        user_id: The id of the user.
 
     Returns:
-        list(str). A list of the ids of the explorations completed by the
+        A list of the ids of the explorations completed by the
         learner.
     """
     completed_activities_model = (
@@ -955,13 +948,13 @@ def _get_filtered_completed_exp_summaries(
     ids of explorations that are no longer present.
 
     Args:
-        exploration_summaries: list(ExplorationSummary|None). The list of
-            exploration summary domain objects to be filtered.
-        exploration_ids: list(str). The ids of the explorations corresponding to
-            the exploration summary domain objects.
+        exploration_summaries: The list of exploration summary domain objects
+            to be filtered.
+        exploration_ids: The ids of the explorations corresponding to the
+            exploration summary domain objects.
 
     Returns:
-        tuple. A 2-tuple whose elements are as follows:
+        A 2-tuple whose elements are as follows:
         - list(ExplorationSummary). Filtered list of ExplorationSummary domain
                 objects of the completed explorations.
         - list(str). The ids of the explorations that are no longer present.
@@ -984,11 +977,10 @@ def get_all_completed_story_ids(user_id: str) -> List[str]:
     user.
 
     Args:
-        user_id: str. The id of the learner.
+        user_id: The id of the learner.
 
     Returns:
-        list(str). A list of the ids of the stories completed by the
-        learner.
+        A list of the ids of the stories completed by the learner.
     """
 
     completed_activities_model = (
@@ -1016,14 +1008,14 @@ def _get_filtered_completed_story_summaries(
     addition of nodes.
 
     Args:
-        user_id: str. The id of the learner.
-        story_summaries: list(StorySummary|None). The list of story
-            summary domain objects to be filtered.
-        story_ids: list(str). The ids of the story corresponding to
-            the story summary domain objects.
+        user_id: The id of the learner.
+        story_summaries: The list of story summary domain objects to be
+            filtered.
+        story_ids: The ids of the story corresponding to the story summary
+            domain objects.
 
     Returns:
-        tuple. A 3-tuple whose elements are as follows:
+        A 3-tuple whose elements are as follows:
         - list(StorySummary). A filtered list with the summary domain
             objects of the completed stories.
         - list(str). The ids of the stories that are no longer present.
@@ -1070,11 +1062,10 @@ def get_all_learnt_topic_ids(user_id: str) -> List[str]:
     user.
 
     Args:
-        user_id: str. The id of the learner.
+        user_id: The id of the learner.
 
     Returns:
-        list(str). A list of the ids of the topics learnt by the
-        learner.
+        A list of the ids of the topics learnt by the learner.
     """
 
     completed_activities_model = (
@@ -1102,14 +1093,14 @@ def _get_filtered_learnt_topic_summaries(
     addition of stories.
 
     Args:
-        user_id: str. The id of the learner.
-        topic_summaries: list(TopicSummary|None). The list of topic
-            summary domain objects to be filtered.
-        topic_ids: list(str). The ids of the topic corresponding to
-            the topic summary domain objects.
+        user_id: The id of the learner.
+        topic_summaries: The list of topic summary domain objects to be
+            filtered.
+        topic_ids: The ids of the topic corresponding to the topic summary
+            domain objects.
 
     Returns:
-        tuple. A 3-tuple whose elements are as follows:
+        A 3-tuple whose elements are as follows:
         - list(TopicSummary). A filtered list with the summary domain
             objects of the learnt topic.
         - list(str). The ids of the topics that are no longer present.
@@ -1162,11 +1153,10 @@ def get_all_completed_collection_ids(user_id: str) -> List[str]:
     user.
 
     Args:
-        user_id: str. The id of the learner.
+        user_id: The id of the learner.
 
     Returns:
-        list(str). A list of the ids of the collections completed by the
-        learner.
+        A list of the ids of the collections completed by the learner.
     """
     completed_activities_model = (
         user_models.CompletedActivitiesModel.get(
@@ -1195,14 +1185,14 @@ def _get_filtered_completed_collection_summaries(
     addition of explorations.
 
     Args:
-        user_id: str. The id of the learner.
-        collection_summaries: list(CollectionSummary|None). The list of
-            collection summary domain objects to be filtered.
-        collection_ids: list(str). The ids of the collection corresponding to
-            the collection summary domain objects.
+        user_id: The id of the learner.
+        collection_summaries: The list of collection summary domain objects to
+            be filtered.
+        collection_ids: The ids of the collection corresponding to the
+            collection summary domain objects.
 
     Returns:
-        tuple. A 3-tuple whose elements are as follows:
+        A 3-tuple whose elements are as follows:
         - list(CollectionSummary). A filtered list with the summary domain
             objects of the completed collections.
         - list(str). The ids of the collections that are no longer present.
@@ -1251,11 +1241,11 @@ def get_all_incomplete_exp_ids(user_id: str) -> List[str]:
     by the user.
 
     Args:
-        user_id: str. The id of the learner.
+        user_id: The id of the learner.
 
     Returns:
-        list(str). A list of the ids of the explorations partially completed by
-        the learner.
+        A list of the ids of the explorations partially completed by the
+        learner.
     """
     incomplete_activities_model = (
         user_models.IncompleteActivitiesModel.get(
@@ -1277,13 +1267,13 @@ def _get_filtered_incomplete_exp_summaries(
     of explorations that are no longer present.
 
     Args:
-        exploration_summaries: list(ExplorationSummary|None). The list of
-            exploration summary domain objects to be filtered.
-        exploration_ids: list(str). The ids of the explorations corresponding to
-            the exploration summary domain objects.
+        exploration_summaries: The list of exploration summary domain objects
+            to be filtered.
+        exploration_ids: The ids of the explorations corresponding to the
+            exploration summary domain objects.
 
     Returns:
-        tuple. A 2-tuple whose elements are as follows:
+        A 2-tuple whose elements are as follows:
         - list(ExplorationSummary). Filtered list of ExplorationSummary domain
             objects of the incomplete explorations.
         - list(str). The ids of the explorations that are no longer present.
@@ -1306,11 +1296,10 @@ def get_all_incomplete_story_ids(user_id: str) -> List[str]:
     by the user.
 
     Args:
-        user_id: str. The id of the learner.
+        user_id: The id of the learner.
 
     Returns:
-        list(str). A list of the ids of the stories partially completed by
-        the learner.
+        A list of the ids of the stories partially completed by the learner.
     """
     incomplete_activities_model = (
         user_models.IncompleteActivitiesModel.get(user_id, strict=False))
@@ -1327,11 +1316,10 @@ def get_all_partially_learnt_topic_ids(user_id: str) -> List[str]:
     by the user.
 
     Args:
-        user_id: str. The id of the learner.
+        user_id: The id of the learner.
 
     Returns:
-        list(str). A list of the ids of the topics partially learnt by
-        the learner.
+        A list of the ids of the topics partially learnt by the learner.
     """
     incomplete_activities_model = (
         user_models.IncompleteActivitiesModel.get(user_id, strict=False))
@@ -1351,13 +1339,13 @@ def _get_filtered_partially_learnt_topic_summaries(
     of topics that are no longer present.
 
     Args:
-        topic_summaries: list(TopicSummary|None). The list of topic
-            summary domain objects to be filtered.
-        topic_ids: list(str). The ids of the topic corresponding to
-            the topic summary domain objects.
+        topic_summaries: The list of topic summary domain objects to be
+            filtered.
+        topic_ids: The ids of the topic corresponding to the topic summary
+            domain objects.
 
     Returns:
-        tuple. A 2-tuple whose elements are as follows:
+        A 2-tuple whose elements are as follows:
         - list(TopicSummary). A filtered list with the summary domain
             objects of the partially_learnt topics.
         - list(str). The ids of the topics that are no longer present.
@@ -1388,11 +1376,10 @@ def get_all_incomplete_collection_ids(user_id: str) -> List[str]:
     by the user.
 
     Args:
-        user_id: str. The id of the learner.
+        user_id: The id of the learner.
 
     Returns:
-        list(str). A list of the ids of the collections partially completed by
-        the learner.
+        A list of the ids of the collections partially completed by the learner.
     """
     incomplete_activities_model = (
         user_models.IncompleteActivitiesModel.get(user_id, strict=False))
@@ -1413,13 +1400,13 @@ def _get_filtered_incomplete_collection_summaries(
     of collections that are no longer present.
 
     Args:
-        collection_summaries: list(CollectionSummary|None). The list of
-            collection summary domain objects to be filtered.
-        collection_ids: list(str). The ids of the collection corresponding to
-            the collection summary domain objects.
+        collection_summaries: The list of collection summary domain objects
+            to be filtered.
+        collection_ids: The ids of the collection corresponding to the
+            collection summary domain objects.
 
     Returns:
-        tuple. A 2-tuple whose elements are as follows:
+        A 2-tuple whose elements are as follows:
         - list(CollectionSummary). A filtered list with the summary domain
             objects of the incomplete collections.
         - list(str). The ids of the collections that are no longer present.
@@ -1448,14 +1435,14 @@ def _get_filtered_topics_to_learn_summaries(
     of topics that are no longer present.
 
     Args:
-        user_id: str. The id of the learner.
-        topic_summaries: list(TopicSummary|None). The list of topic
-            summary domain objects to be filtered.
-        topic_ids: list(str). The ids of the topics corresponding to
-            the topic summary domain objects.
+        user_id: The id of the learner.
+        topic_summaries: The list of topic summary domain objects
+            to be filtered.
+        topic_ids: The ids of the topics corresponding to the topic summary
+            domain objects.
 
     Returns:
-        tuple. A 2-tuple whose elements are as follows:
+        A 2-tuple whose elements are as follows:
         - list(TopicSummary). Filtered list of TopicSummary domain
             objects of the topics to learn.
         - list(str). The ids of the topics that are no longer present.
@@ -1503,13 +1490,13 @@ def _get_filtered_exp_playlist_summaries(
     and the ids of explorations that are no longer present.
 
     Args:
-        exploration_summaries: list(ExplorationSummary|None). The list of
-            exploration summary domain objects to be filtered.
-        exploration_ids: list(str). The ids of the explorations corresponding to
-            the exploration summary domain objects.
+        exploration_summaries: The list of exploration summary domain objects
+            to be filtered.
+        exploration_ids: The ids of the explorations corresponding to the
+            exploration summary domain objects.
 
     Returns:
-        tuple. A 2-tuple whose elements are as follows:
+        A 2-tuple whose elements are as follows:
         - list(ExplorationSummary). Filtered list of ExplorationSummary domain
             objects of the explorations in the learner playlist.
         - list(str). The ids of the explorations that are no longer present.
@@ -1535,13 +1522,13 @@ def _get_filtered_collection_playlist_summaries(
     and the ids of collections that are no longer present.
 
     Args:
-        collection_summaries: list(CollectionSummary|None). The list of
-            collection summary domain objects to be filtered.
-        collection_ids: list(str). The ids of the collections corresponding to
-            the collection summary domain objects.
+        collection_summaries: The list of collection summary domain objects
+            to be filtered.
+        collection_ids: The ids of the collections corresponding to the
+            collection summary domain objects.
 
     Returns:
-        tuple. A 2-tuple whose elements are as follows:
+        A 2-tuple whose elements are as follows:
         - list(CollectionSummary). Filtered list of CollectionSummary domain
             objects of the collections in the learner playlist.
         - list(str). The ids of the collections that are no longer present.
@@ -1570,15 +1557,15 @@ def get_all_and_untracked_topic_ids_for_user(
     not tracked for the user.
 
     Args:
-        partially_learnt_topic_ids: list(str). The ids of the topics partially
-            learnt by the user.
-        learnt_topic_ids: list(str). The ids of the topics learnt by the user.
-        topic_ids_to_learn: list(str). The ids of the topics selected by the
-            user to learn.
+        partially_learnt_topic_ids: The ids of the topics partially learnt by
+            the user.
+        learnt_topic_ids: The ids of the topics learnt by the user.
+        topic_ids_to_learn: The ids of the topics selected by the user to learn.
 
     Returns:
-        list(str). The ids of all the topics on the server.
-        list(str). The ids of all the topics not tracked for the user.
+        A 2-tuple where:
+            1. The ids of all the topics on the server.
+            2. The ids of all the topics not tracked for the user.
     """
 
     all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
@@ -1603,14 +1590,14 @@ def _get_filtered_all_topic_summaries(
     """Returns a list of summaries of the topics in the edit goals.
 
     Args:
-        topic_summaries: list(TopicSummary|None). The list of topic
-            summary domain objects to be filtered.
-        topic_ids: list(str). The ids of the topics corresponding to
-            the topic summary domain objects.
+        topic_summaries: The list of topic summary domain objects
+            to be filtered.
+        topic_ids: The ids of the topics corresponding to the topic summary
+            domain objects.
 
     Returns:
-        list(TopicSummary). Filtered list of TopicSummary domain
-        objects of the topics in the edit goals.
+        Filtered list of TopicSummary domain objects of the topics in the
+        edit goals.
     """
     filtered_all_topic_summaries = []
     all_topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
@@ -1633,14 +1620,14 @@ def _get_filtered_untracked_topic_summaries(
     and the ids of topics that are no longer present.
 
     Args:
-        topic_summaries: list(TopicSummary|None). The list of topic
-            summary domain objects to be filtered.
-        topic_ids: list(str). The ids of the topics corresponding to
-            the topic summary domain objects.
+        topic_summaries: The list of topic summary domain objects to be
+            filtered.
+        topic_ids: The ids of the topics corresponding to the topic summary
+            domain objects.
 
     Returns:
-        list(TopicSummary). Filtered list of TopicSummary domain
-        objects of the topics not tracked for the user.
+        Filtered list of TopicSummary domain objects of the topics not tracked
+        for the user.
     """
     filtered_untracked_topic_summaries = []
     all_topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
@@ -1662,12 +1649,11 @@ def get_displayable_story_summary_dicts(
     given to it.
 
     Args:
-        user_id: str. The id of the learner.
-        story_summaries: list(StorySummary). A list of the
-            summary domain objects.
+        user_id: The id of the learner.
+        story_summaries: A list of the summary domain objects.
 
     Returns:
-        list(dict). The summary dict corresponding to the given summary.
+        The summary dict corresponding to the given summary.
     """
     summary_dicts: List[DisplayableStorySummaryDict] = []
     story_ids = [story_summary.id for story_summary in story_summaries]
@@ -1714,13 +1700,12 @@ def get_displayable_untracked_topic_summary_dicts(
     given to it.
 
     Args:
-        user_id: str. The id of the learner.
-        untracked_topic_summaries: list(TopicSummary). A list of the
-            summary domain objects.
+        user_id: The id of the learner.
+        untracked_topic_summaries: A list of the summary domain objects.
 
     Returns:
-        dict(str, list(dict)). A dict with classname as the key and a list of
-        untracked topic summaries as the value.
+        A dict with classname as the key and a list of untracked topic summaries
+        as the value.
     """
 
     summary_dict: Dict[
@@ -1770,13 +1755,11 @@ def get_displayable_topic_summary_dicts(
     given to it.
 
     Args:
-        user_id: str. The id of the learner.
-        topic_summaries: list(TopicSummary). A list of the
-            summary domain objects.
+        user_id: The id of the learner.
+        topic_summaries: A list of the summary domain objects.
 
     Returns:
-        list(dict). The summary dict corresponding to the given
-        summaries.
+        The summary dict corresponding to the given summaries.
     """
     summary_dicts: List[DisplayableTopicSummaryDict] = []
     topic_ids = [topic.id for topic in topic_summaries]
@@ -1821,11 +1804,10 @@ def get_collection_summary_dicts(
     given to it.
 
     Args:
-        collection_summaries: list(CollectionSummary). A list of the
-            summary domain objects.
+        collection_summaries: A list of the summary domain objects.
 
     Returns:
-        list(dict). The summary dict objects corresponding to the given summary
+        The summary dict objects corresponding to the given summary
         domain objects.
     """
     summary_dicts: List[DisplayableCollectionSummaryDict] = []
@@ -1861,11 +1843,11 @@ def get_learner_dashboard_activities(
     incomplete section and the playlist section.
 
     Args:
-        user_id: str. The id of the learner.
+        user_id: The id of the learner.
 
     Returns:
-        ActivityIdsInLearnerDashboard. The domain object containing the ids of
-        all activities in the learner dashboard.
+        The domain object containing the ids of all activities in the learner
+        dashboard.
     """
     learner_progress_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
@@ -1983,10 +1965,9 @@ def get_topics_and_stories_progress(
     completed by the user and those in progress.
 
     Args:
-        user_id: str. The id of the learner.
+        user_id: The id of the learner.
 
     Returns:
-        (LearnerProgressInTopicsAndStories, dict).
         The first return value is the learner progress in topics and stories
         domain object corresponding to the particular learner.
         The second return value is the numbers of the activities that are
@@ -2155,10 +2136,9 @@ def get_collection_progress(
     and those in progress.
 
     Args:
-        user_id: str. The id of the learner.
+        user_id: The id of the learner.
 
     Returns:
-        (LearnerProgressInCollections, dict).
         The first return value is the learner progress in collection domain
         object corresponding to the particular learner. The second return value
         is the numbers of the activities that are no longer present.
@@ -2273,10 +2253,9 @@ def get_exploration_progress(
     and those in progress.
 
     Args:
-        user_id: str. The id of the learner.
+        user_id: The id of the learner.
 
     Returns:
-        (LearnerProgressInExplorations, dict).
         The first return value is the learner progress in exploration
         domain object corresponding to the particular learner.
         The second return value is the numbers of the activities that

@@ -56,19 +56,19 @@ class LearnerGroup:
         """Constructs a LearnerGroup domain object.
 
         Attributes:
-            group_id: str. The unique ID of the learner group.
-            title: str. The title of the learner group.
-            description: str. The description of the learner group.
-            facilitator_user_ids: List[str]. The list of user ids of
+            group_id: The unique ID of the learner group.
+            title: The title of the learner group.
+            description: The description of the learner group.
+            facilitator_user_ids: The list of user ids of
                 facilitators of the learner group.
-            learner_user_ids: List[str]. The list of user ids of learners
+            learner_user_ids: The list of user ids of learners
                 of the learner group.
-            invited_learner_user_ids: List[str]. The list of user ids of the
+            invited_learner_user_ids: The list of user ids of the
                 users invited to join the learner group as a learner.
-            subtopic_page_ids: List[str]. The list of subtopic page ids that
-                are part of the learner group syllabus. A subtopic page id is
-                depicted as topicId:subtopicId string.
-            story_ids: List[str]. The list of story ids of the learner group.
+            subtopic_page_ids: The list of subtopic page ids that
+                are part of the learner group syllabus. A subtopic
+                page id is depicted as topicId:subtopicId string.
+            story_ids: The list of story ids of the learner group.
         """
         self.group_id = group_id
         self.title = title
@@ -84,7 +84,7 @@ class LearnerGroup:
         form with its keys as the attributes of this class.
 
         Returns:
-            dict. A dictionary containing the LearnerGroup class
+            A dictionary containing the LearnerGroup class
             information in a dictionary form.
         """
 

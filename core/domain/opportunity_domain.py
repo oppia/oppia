@@ -88,26 +88,24 @@ class ExplorationOpportunitySummary:
         """Constructs a ExplorationOpportunitySummary domain object.
 
         Args:
-            exp_id: str. The unique id of the exploration.
-            topic_id: str. The unique id of the topic.
-            topic_name: str. The name of the topic.
-            story_id: str. The uniques id of the story.
-            story_title: str. The title of the story.
-            chapter_title: str. The title of the story chapter.
-            content_count: int. The total number of content available in the
+            exp_id: The unique id of the exploration.
+            topic_id: The unique id of the topic.
+            topic_name: The name of the topic.
+            story_id: The uniques id of the story.
+            story_title: The title of the story.
+            chapter_title: The title of the story chapter.
+            content_count: The total number of content available in the
                 exploration.
-            incomplete_translation_language_codes: list(str). A list of language
+            incomplete_translation_language_codes: A list of language
                 code in which the exploration translation is incomplete.
-            translation_counts: dict. A dict with language code as a key and
+            translation_counts: A dict with language code as a key and
                 number of translation available in that language as the value.
-            language_codes_needing_voice_artists: list(str). A list of language
-                code in which the exploration needs voice artist.
-            language_codes_with_assigned_voice_artists: list(str). A list of
-                language code for which a voice-artist is already assigned to
-                the exploration.
-            translation_in_review_counts: dict. A dict with language code as a
-                key and number of translation in review in that language as the
-                value.
+            language_codes_needing_voice_artists: A list of language code in
+                which the exploration needs voice artist.
+            language_codes_with_assigned_voice_artists: A list of language code
+                for which a voice-artist is already assigned to the exploration.
+            translation_in_review_counts: A dict with language code as a key and
+                number of translation in review in that language as the value.
         """
         self.id = exp_id
         self.topic_id = topic_id
@@ -130,16 +128,15 @@ class ExplorationOpportunitySummary:
     def from_dict(
         cls,
         exploration_opportunity_summary_dict: ExplorationOpportunitySummaryDict,
-    ) -> 'ExplorationOpportunitySummary':
+    ) -> ExplorationOpportunitySummary:
         """Return a ExplorationOpportunitySummary domain object from a dict.
 
         Args:
-            exploration_opportunity_summary_dict: dict. The dict representation
+            exploration_opportunity_summary_dict: The dict representation
                 of ExplorationOpportunitySummary object.
 
         Returns:
-            ExplorationOpportunitySummary. The corresponding
-            ExplorationOpportunitySummary domain object.
+            The corresponding ExplorationOpportunitySummary domain object.
         """
         return cls(
             exploration_opportunity_summary_dict['id'],
@@ -167,9 +164,9 @@ class ExplorationOpportunitySummary:
         represent the opportunity to a contributor.
 
         Returns:
-            dict. A dict mapping the fields of ExplorationOpportunitySummary
-            instance which are required to represent the opportunity to a
-            contributor.
+            A dict mapping the fields of ExplorationOpportunitySummary
+            instance which are required to represent the opportunity to
+            a contributor.
         """
         return {
             'id': self.id,
@@ -230,7 +227,7 @@ class ExplorationOpportunitySummary:
         """Validates per-language counts of translations.
 
         Args:
-            translation_counts: dict. A dict with language code as a key and
+            translation_counts: A dict with language code as a key and
                 number of translations in that language as the value.
 
         Raises:
@@ -266,9 +263,9 @@ class SkillOpportunity:
         """Constructs a SkillOpportunity domain object.
 
         Args:
-            skill_id: str. The unique id of the skill.
-            skill_description: str. The title of the skill.
-            question_count: int. The total number of questions for the skill.
+            skill_id: The unique id of the skill.
+            skill_description: The title of the skill.
+            question_count: The total number of questions for the skill.
         """
         self.id = skill_id
         self.skill_description = skill_description
@@ -294,11 +291,11 @@ class SkillOpportunity:
         """Return a SkillOpportunity domain object from a dict.
 
         Args:
-            skill_opportunity_dict: dict. The dict representation of a
+            skill_opportunity_dict: The dict representation of a
                 SkillOpportunity object.
 
         Returns:
-            SkillOpportunity. The corresponding SkillOpportunity domain object.
+            The corresponding SkillOpportunity domain object.
         """
         return cls(
             skill_opportunity_dict['id'],
@@ -310,7 +307,7 @@ class SkillOpportunity:
         necessary information to represent an opportunity.
 
         Returns:
-            dict. A dict mapping the fields of SkillOpportunity instance which
+            A dict mapping the fields of SkillOpportunity instance which
             are required to represent the opportunity to a contributor.
         """
         return {

@@ -38,12 +38,10 @@ def get_learner_goals_from_model(
     model loaded from the datastore.
 
     Args:
-        learner_goals_model: LearnerGoalsModel. The
-            learner goals model from the datastore.
+        learner_goals_model: The learner goals model from the datastore.
 
     Returns:
-        LearnerGoals. The learner goals domain object corresponding to the
-        given model.
+        The learner goals domain object corresponding to the given model.
     """
     return user_domain.LearnerGoals(
         learner_goals_model.id,
@@ -56,8 +54,8 @@ def save_learner_goals(learner_goals: user_domain.LearnerGoals) -> None:
     in the datastore.
 
     Args:
-        learner_goals: LearnerGoals. The learner goals domain object to
-            be saved in the datastore.
+        learner_goals: The learner goals domain object to be saved in the
+            datastore.
     """
     learner_goals_dict = learner_goals.to_dict()
 
@@ -79,12 +77,11 @@ def mark_topic_to_learn(user_id: str, topic_id: str) -> bool:
     feconf.MAX_CURRENT_GOALS_COUNT, the topic is not added.
 
     Args:
-        user_id: str. The id of the user.
-        topic_id: str. The id of the topic to be added to the
-            learner goals.
+        user_id: The id of the user.
+        topic_id: The id of the topic to be added to the learner goals.
 
     Returns:
-        bool. The boolean indicates whether the learner goals limit
+        The boolean indicates whether the learner goals limit
         of the user has been exceeded.
 
     Raises:
@@ -119,8 +116,8 @@ def remove_topics_from_learn_goal(
     """Removes topics from the learner goals of the user (if present).
 
     Args:
-        user_id: str. The id of the user.
-        topic_ids_to_remove: list(str). The ids of the topics to be removed.
+        user_id: The id of the user.
+        topic_ids_to_remove: The ids of the topics to be removed.
 
     Raises:
         Exception. Given topic does not exist.
@@ -146,10 +143,10 @@ def get_all_topic_ids_to_learn(user_id: str) -> List[str]:
     goals of the user.
 
     Args:
-        user_id: str. The id of the user.
+        user_id: The id of the user.
 
     Returns:
-        list(str). A list of the ids of the topics that are in the
+        A list of the ids of the topics that are in the
         learner goals of the user.
     """
     learner_goals_model = user_models.LearnerGoalsModel.get(

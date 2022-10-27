@@ -43,12 +43,10 @@ def get_learner_playlist_from_model(
     model loaded from the datastore.
 
     Args:
-        learner_playlist_model: LearnerPlaylistModel. The
-            learner playlist model from the datastore.
+        learner_playlist_model: The learner playlist model from the datastore.
 
     Returns:
-        LearnerPlaylist. The learner playlist domain object corresponding to the
-        given model.
+        The learner playlist domain object corresponding to the given model.
     """
     return user_domain.LearnerPlaylist(
         learner_playlist_model.id,
@@ -63,8 +61,8 @@ def save_learner_playlist(
     in the datastore.
 
     Args:
-        learner_playlist: LearnerPlaylist. The learner playlist domain object to
-            be saved in the datastore.
+        learner_playlist: The learner playlist domain object to be saved in
+            the datastore.
     """
     learner_playlist_dict = {
         'exploration_ids': learner_playlist.exploration_ids,
@@ -96,15 +94,15 @@ def mark_exploration_to_be_played_later(
     feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT, the exploration is not added.
 
     Args:
-        user_id: str. The id of the user.
-        exploration_id: str. The id of the exploration to be added to the
+        user_id: The id of the user.
+        exploration_id: The id of the exploration to be added to the
             learner playlist.
-        position_to_be_inserted: int|None. If this is specified the exploration
-            gets inserted at the given position. Otherwise it gets added at the
+        position_to_be_inserted: If this is specified the exploration gets
+            inserted at the given position. Otherwise it gets added at the
             end.
 
     Returns:
-        (bool, bool). The first boolean indicates whether the playlist limit
+        A 2-tuple, the first boolean indicates whether the playlist limit
         of the user has been exceeded, and the second boolean indicates
         whether the exploration is among one of the created or edited
         explorations of the user.
@@ -163,15 +161,15 @@ def mark_collection_to_be_played_later(
     feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT, the collection is not added.
 
     Args:
-        user_id: str. The id of the user.
-        collection_id: str. The id of the collection to be added to the
+        user_id: The id of the user.
+        collection_id: The id of the collection to be added to the
             learner playlist.
-        position_to_be_inserted: int|None. If this is specified the collection
-            gets inserted at the given position. Otherwise it gets added at
+        position_to_be_inserted: If this is specified the collection gets
+            inserted at the given position. Otherwise it gets added at
             the end.
 
     Returns:
-        (bool, bool). The first boolean indicates whether the playlist limit of
+        A 2-tuple, the first boolean indicates whether the playlist limit of
         the user has been exceeded, and the second boolean indicates whether the
         collection is among one of the created or edited collections of the
         user.
@@ -223,8 +221,8 @@ def remove_exploration_from_learner_playlist(
     (if present).
 
     Args:
-        user_id: str. The id of the user.
-        exploration_id: str. The id of the exploration to be removed.
+        user_id: The id of the user.
+        exploration_id: The id of the exploration to be removed.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
         user_id, strict=False)
@@ -244,8 +242,8 @@ def remove_collection_from_learner_playlist(
     (if present).
 
     Args:
-        user_id: str. The id of the user.
-        collection_id: str. The id of the collection to be removed.
+        user_id: The id of the user.
+        collection_id: The id of the collection to be removed.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
         user_id, strict=False)
@@ -263,10 +261,10 @@ def get_all_exp_ids_in_learner_playlist(user_id: str) -> List[str]:
     playlist of the user.
 
     Args:
-        user_id: str. The id of the user.
+        user_id: The id of the user.
 
     Returns:
-        list(str). A list of the ids of the explorations that are in the
+        A list of the ids of the explorations that are in the
         learner playlist of the user.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
@@ -286,10 +284,10 @@ def get_all_collection_ids_in_learner_playlist(user_id: str) -> List[str]:
     playlist of the user.
 
     Args:
-        user_id: str. The id of the user.
+        user_id: The id of the user.
 
     Returns:
-        list(str). A list of the ids of the collections that are in the
+        A list of the ids of the collections that are in the
         learner playlist of the user.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(

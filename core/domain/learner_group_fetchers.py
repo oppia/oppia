@@ -37,7 +37,7 @@ def get_new_learner_group_id() -> str:
     """Returns a new learner group id.
 
     Returns:
-        str. A new learner group id.
+        A new learner group id.
     """
     return learner_group_models.LearnerGroupModel.get_new_id()
 
@@ -48,11 +48,11 @@ def get_learner_group_by_id(
     """Returns the learner group domain object given the learner group id.
 
     Args:
-        group_id: str. The id of the learner group.
+        group_id: The id of the learner group.
 
     Returns:
-        LearnerGroup or None. The learner group domain object corresponding to
-        the given id or None if no learner group exists for the given group id.
+        The learner group domain object corresponding to the given id or None
+        if no learner group exists for the given group id.
     """
     learner_group_model = learner_group_models.LearnerGroupModel.get(
         group_id, strict=False)
@@ -70,10 +70,10 @@ def get_learner_groups_of_facilitator(
     """Returns a list of learner groups of the given facilitator.
 
     Args:
-        user_id: str. The id of the facilitator.
+        user_id: The id of the facilitator.
 
     Returns:
-        list(LearnerGroup). A list of learner groups of the given facilitator.
+        A list of learner groups of the given facilitator.
     """
     learner_grp_models = (
         learner_group_models.LearnerGroupModel.get_by_facilitator_id(user_id))
@@ -111,14 +111,14 @@ def get_learner_group_models_by_ids(
     """Returns a list of learner_groups_user models matching the IDs provided.
 
     Args:
-        user_ids: list(str). The user ids of the learners of the group.
-        strict: bool. Whether to fail noisily if no LearnerGroupsUserModel
+        user_ids: The user ids of the learners of the group.
+        strict: Whether to fail noisily if no LearnerGroupsUserModel
             exists with a given ID exists in the datastore.
 
     Returns:
-        list(LearnerGroupsUserModel|None). The list of learner_groups_user
-        models corresponding to given ids.  If a LearnerGroupsUserModel does
-        not exist, the corresponding returned list element is None.
+        The list of learner_groups_user models corresponding to given ids.
+        If a LearnerGroupsUserModel does not exist, the corresponding returned
+        list element is None.
 
     Raises:
         Exception. No LearnerGroupsUserModel exists for the given user_id.
@@ -148,11 +148,11 @@ def can_multi_learners_share_progress(
     group.
 
     Args:
-        user_ids: list(str). The user ids of the learners of the group.
-        group_id: str. The id of the learner group.
+        user_ids: The user ids of the learners of the group.
+        group_id: The id of the learner group.
 
     Returns:
-        list(bool). True if a user has progress sharing permission of the
+        True if a user has progress sharing permission of the
         given group as True, False otherwise.
     """
     learner_group_user_models = get_learner_group_models_by_ids(
@@ -178,11 +178,11 @@ def get_invited_learner_groups_of_learner(
     invited to join.
 
     Args:
-        user_id: str. The id of the learner.
+        user_id: The id of the learner.
 
     Returns:
-        list(LearnerGroup). A list of learner groups that the given learner
-        has been invited to join.
+        A list of learner groups that the given learner has been invited
+        to join.
     """
     learner_grp_models = (
         learner_group_models.LearnerGroupModel.get_by_invited_learner_user_id(
@@ -203,11 +203,10 @@ def get_learner_groups_joined_by_learner(
     """Returns a list of learner groups that the given learner has joined.
 
     Args:
-        user_id: str. The id of the learner.
+        user_id: The id of the learner.
 
     Returns:
-        list(LearnerGroup). A list of learner groups that the given learner
-        is part of.
+        A list of learner groups that the given learner is part of.
     """
     learner_grp_models = (
         learner_group_models.LearnerGroupModel.get_by_learner_user_id(user_id))
