@@ -100,21 +100,20 @@ export class DiagnosticTestTopicTrackerModel {
       let unprocessedAncestorTopicIds: string[] = cloneDeep(
         this._topicIdToPrerequisiteTopicIds[topicId]);
 
-      let visitedTopicIdsForCurrentTopic = [];
+      let visitedTopicIdsForCurrentTopic: string[] = [];
       let lastTopicId: string;
 
       while (unprocessedAncestorTopicIds.length > 0) {
         lastTopicId = unprocessedAncestorTopicIds.pop() || '';
+
         if (ancestorTopicIds.indexOf(lastTopicId) === -1) {
           ancestorTopicIds.push(lastTopicId);
         }
 
-        if (visitedTopicIdsForCurrentTopic.indexOf(lastTopicId) !== -1) {
-          continue;
-        }
-
         unprocessedAncestorTopicIds = unprocessedAncestorTopicIds.concat(
-          this._topicIdToPrerequisiteTopicIds[lastTopicId]);
+          this._topicIdToPrerequisiteTopicIds[lastTopicId].filter(
+            (topic) => visitedTopicIdsForCurrentTopic.indexOf(topic) === -1
+          ));
         visitedTopicIdsForCurrentTopic.push(lastTopicId);
       }
       this._topicIdToAncestorTopicIds[topicId] = ancestorTopicIds.sort();
@@ -142,24 +141,23 @@ export class DiagnosticTestTopicTrackerModel {
 
     for (let topicId in topicIdToChildTopicId) {
       let successorTopicIds: string[] = [];
-      let unprocessedChildrenTopicIds: string[] = cloneDeep(
+      let unprocessedSuccessorTopicIds: string[] = cloneDeep(
         topicIdToChildTopicId[topicId]);
 
-      let visitedTopicIdsForCurrentTopic = [];
+      let visitedTopicIdsForCurrentTopic: string[] = [];
       let lastTopicId: string;
 
-      while (unprocessedChildrenTopicIds.length > 0) {
-        lastTopicId = unprocessedChildrenTopicIds.pop() || '';
+      while (unprocessedSuccessorTopicIds.length > 0) {
+        lastTopicId = unprocessedSuccessorTopicIds.pop() || '';
 
         if (successorTopicIds.indexOf(lastTopicId) === -1) {
           successorTopicIds.push(lastTopicId);
         }
 
-        if (visitedTopicIdsForCurrentTopic.indexOf(lastTopicId) !== -1) {
-          continue;
-        }
-        unprocessedChildrenTopicIds = unprocessedChildrenTopicIds.concat(
-          topicIdToChildTopicId[lastTopicId]);
+        unprocessedSuccessorTopicIds = unprocessedSuccessorTopicIds.concat(
+          topicIdToChildTopicId[lastTopicId].filter(
+            (topicId) => visitedTopicIdsForCurrentTopic.indexOf(topicId) === -1
+          ));
         visitedTopicIdsForCurrentTopic.push(lastTopicId);
       }
       this._topicIdToSuccessorTopicIds[topicId] = successorTopicIds.sort();

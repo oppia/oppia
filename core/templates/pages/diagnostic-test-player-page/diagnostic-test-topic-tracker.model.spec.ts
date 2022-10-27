@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Test for the diagnostic test model.
+ * @fileoverview Test for the diagnostic test topic tracker model.
  */
 
 import { TestBed } from '@angular/core/testing';
