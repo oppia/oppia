@@ -218,13 +218,16 @@ export class NumericInputValidationService {
       value: string, decimalSeparator: string
   ): string | undefined {
     value = value.toString().trim();
+    const invalidChars = /[^0-9e.-]/g;
     const trailingDot = /[\.|\,|\u066B]\d/g;
     const twoDecimals = /.*[\.|\,|\u066B].*[\.|\,|\u066B]/g;
     const trailingMinus = /(^-)|(e-)/g;
     const extraMinus = /-.*-/g;
     const extraExponent = /e.*e/g;
 
-    if (value.includes(decimalSeparator) && !value.match(trailingDot)) {
+    if (value.match(invalidChars)) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS';
+    } else if (value.includes(decimalSeparator) && !value.match(trailingDot)) {
       return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_TRAILING_DECIMAL';
     } else if (value.match(twoDecimals)) {
       return 'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_DECIMAL';
