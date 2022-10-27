@@ -3252,7 +3252,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             bool. Returns True if the choice is empty.
         """
-        html = choice['html']
+        html = utils.unescape_html(choice['html'])
         html = (
             html.replace('<p>', '').replace('</p>', '').replace('<br>', '').
             replace('<i>', '').replace('</i>', '').replace('<span>', '').
@@ -3262,7 +3262,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             replace('<h2>', '').replace('</h2>', '').replace('<h3>', '').
             replace('</h3>', '').replace('<h4>', '').replace('</h4>', '').
             replace('<h5>', '').replace('</h5>', '').replace('<h6>', '').
-            replace('</h6>', '').replace('<li>', '').replace('</li>', ''))
+            replace('</h6>', '').replace('<li>', '').replace('</li>', '').
+            replace('&nbsp;', ''))
         if html.strip() == '':
             return True
 
