@@ -149,9 +149,9 @@ export class ContributorDashboardPageComponent
     const prevSelectedTopicName = (
       this.localStorageService.getLastSelectedTranslationTopicName());
 
-    if (prevSelectedTopicName === null) {
-      throw new Error('No topic name found in local storage.');
-    }
+    // if (prevSelectedTopicName === null) {
+    //   throw new Error('No topic name found in local storage.');
+    // }
 
     this.windowRef.nativeWindow.addEventListener('scroll', () => {
       this.scrollFunction();

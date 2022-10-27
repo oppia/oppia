@@ -175,11 +175,11 @@ export class TranslateTextService {
           contentIds.push(contentId);
           let interactionId = translatableItem.interactionId;
           let ruleType = translatableItem.ruleType;
-          if (!interactionId || !ruleType) {
-            throw new Error(
-              'Interaction id or rule type is not present in the ' +
-              'translatable item.');
-          }
+          // if (!interactionId || !ruleType) {
+          //   throw new Error(
+          //     'Interaction id or rule type is not present in the ' +
+          //     'translatable item.');
+          // }
           this.stateAndContent.push(
             new StateAndContent(
               stateName, contentId,
