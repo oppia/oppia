@@ -505,6 +505,13 @@ oppia-top-navigation-bar .oppia-tick-mark {
   }
 }
 
+@media screen and (max-width: 355px) {
+  oppia-top-navigation-bar .oppia-navbar-profile {
+    float: right;
+    margin-top: -58px;
+  }
+}
+
 @media screen and (min-width: 300px) and (max-width: 768px) {
   .nav-mobile-header-text-container {
     display: inline-block;
