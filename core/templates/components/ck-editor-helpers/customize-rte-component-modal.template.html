@@ -15,6 +15,9 @@
         </div>
       </div>
     </form>
+    <div ng-if="disableSaveButtonForLinkRte()" class="link-error-message">
+      It seems like clicking on this link will lead the user to a different URL than the text specifies. Please change the text.
+    </div>
   </div>
 
   <div class="modal-footer">
@@ -24,7 +27,8 @@
            ng-if="!defaultRTEComponent"
            ng-click="delete()">
     <input type="submit" class="btn btn-secondary e2e-test-cancel-rich-text-editor" value="Cancel" ng-click="cancel()">
-    <input ng-if="!currentRteIsMathExpressionEditor" type="submit" class="btn btn-success e2e-test-close-rich-text-component-editor" value="Done" ng-click="save()" ng-disabled="form.schemaForm.$invalid">
+    <input ng-if="!currentRteIsMathExpressionEditor && !currentRteIsLinkEditor" type="submit" class="btn btn-success e2e-test-close-rich-text-component-editor" value="Done" ng-click="save()" ng-disabled="form.schemaForm.$invalid">
+    <input ng-if="currentRteIsLinkEditor" type="submit" class="btn btn-success e2e-test-close-rich-text-component-editor" value="Done" ng-click="save()" ng-disabled="form.schemaForm.$invalid || disableSaveButtonForLinkRte()">
     <input ng-if="currentRteIsMathExpressionEditor" type="submit" class="btn btn-success e2e-test-close-rich-text-component-editor" value="Done" ng-click="save()" ng-disabled="form.schemaForm.$invalid || disableSaveButtonForMathRte()">
   </div>
 </div>
@@ -34,5 +38,10 @@
   }
   .oppia-customization-arg-form-container .oppia-customization-arg-editor-inner {
     margin-top: 15px;
+  }
+  .oppia-customization-arg-form-container .link-error-message {
+    color: #f00;
+    display: block;
+    font-size: 0.8em;
   }
 </style>
