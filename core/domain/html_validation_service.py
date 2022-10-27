@@ -44,7 +44,7 @@ def wrap_with_siblings(tag: bs4.element.Tag, p: bs4.element.Tag) -> None:
         p: bs4.element.Tag. The new p tag in soup in which the tag and
             its siblings are to be wrapped.
     """
-    independent_parents = ['p', 'pre', 'ol', 'ul', 'blockquote']
+    independent_parents = ['h1', 'p', 'pre', 'ol', 'ul', 'blockquote']
     prev_sib = list(tag.previous_siblings)
     next_sib = list(tag.next_siblings)
     index_of_first_unwrapped_sibling = -1

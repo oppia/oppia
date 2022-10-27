@@ -280,6 +280,7 @@ export default {
   },
 
   "ALLOWED_IMAGE_FORMATS": ["svg", "png", "jpeg", "jpg", "gif"],
+  "MAX_ALLOWED_IMAGE_SIZE_IN_KB": 100,
 
   "TASK_TYPE_HIGH_BOUNCE_RATE": "high_bounce_rate",
   "TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP": "ineffective_feedback_loop",
@@ -4946,6 +4947,8 @@ export default {
     "Sport": "#893327",
     "Welcome": "#992a2b"
   },
+
+  "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": ["tabs", "skillreview"],
 
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
   "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],

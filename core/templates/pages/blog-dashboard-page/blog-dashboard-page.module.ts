@@ -20,6 +20,7 @@ import { APP_INITIALIZER, NgModule, StaticProvider, DoBootstrap} from '@angular/
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -55,6 +56,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     ToastrModule.forRoot(toastrConfig),
     MatTabsModule,
     MatMenuModule,
+    MatTooltipModule,
     MatButtonToggleModule,
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
