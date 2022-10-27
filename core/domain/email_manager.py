@@ -537,9 +537,9 @@ def require_sender_id_is_valid(intent: str, sender_id: str) -> None:
     if the given sender is not allowed to send this type of email.
 
     Args:
-        intent: str. The intent string, i.e. the purpose of the email.
+        intent: The intent string, i.e. the purpose of the email.
             Valid intent strings are defined in feconf.py.
-        sender_id: str. The ID of the user sending the email.
+        sender_id: The ID of the user sending the email.
 
     Raises:
         Exception. The email intent is invalid.
@@ -582,20 +582,19 @@ def _send_email(
     initiated by moderator actions.
 
     Args:
-        recipient_id: str. The user ID of the recipient.
-        sender_id: str. The user ID of the sender.
-        intent: str. The intent string for the email, i.e. the purpose/type.
-        email_subject: str. The subject of the email.
-        email_html_body: str. The body (message) of the email.
-        sender_email: str. The sender's email address.
-        bcc_admin: bool. Whether to send a copy of the email to the admin's
+        recipient_id: The user ID of the recipient.
+        sender_id: The user ID of the sender.
+        intent: The intent string for the email, i.e. the purpose/type.
+        email_subject: The subject of the email.
+        email_html_body: The body (message) of the email.
+        sender_email: The sender's email address.
+        bcc_admin: Whether to send a copy of the email to the admin's
             email address.
-        sender_name: str or None. The name to be shown in the "sender" field of
-            the email.
-        recipient_email: str or None. Override for the recipient email.
-            This should only be used when the user with user_id equal to
-            recipient_id does not exist or is deleted and their email cannot be
-            retrieved via get_email_from_user_id.
+        sender_name: The name to be shown in the "sender" field of the email.
+        recipient_email: Override for the recipient email. This should only be
+            used when the user with user_id equal to recipient_id does not
+            exist or is deleted and their email cannot be retrieved via
+            get_email_from_user_id.
     """
 
     if sender_name is None:
@@ -659,15 +658,14 @@ def _send_bulk_mail(
     """Sends an email to all given recipients.
 
     Args:
-        recipient_ids: list(str). The user IDs of the email recipients.
-        sender_id: str. The ID of the user sending the email.
-        intent: str. The intent string, i.e. the purpose of the email.
-        email_subject: str. The subject of the email.
-        email_html_body: str. The body (message) of the email.
-        sender_email: str. The sender's email address.
-        sender_name: str. The name to be shown in the "sender" field of the
-            email.
-        instance_id: str. The ID of the BulkEmailModel entity instance.
+        recipient_ids: The user IDs of the email recipients.
+        sender_id: The ID of the user sending the email.
+        intent: The intent string, i.e. the purpose of the email.
+        email_subject: The subject of the email.
+        email_html_body: The body (message) of the email.
+        sender_email: The sender's email address.
+        sender_name: The name to be shown in the "sender" field of the email.
+        instance_id: The ID of the BulkEmailModel entity instance.
     """
     require_sender_id_is_valid(intent, sender_id)
 
@@ -693,7 +691,7 @@ def _send_bulk_mail(
         """Sends the emails in bulk to the recipients.
 
         Args:
-            instance_id: str. The ID of the BulkEmailModel entity instance.
+            instance_id: The ID of the BulkEmailModel entity instance.
         """
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
 
@@ -713,7 +711,7 @@ def send_job_failure_email(job_id: str) -> None:
     specificed on the admin config page.
 
     Args:
-        job_id: str. The Job ID of the failing job.
+        job_id: The Job ID of the failing job.
     """
     mail_subject = 'Failed ML Job'
     mail_body = ((
@@ -737,7 +735,7 @@ def send_dummy_mail_to_admin(username: str) -> None:
     """Send an email from the specified email address to admin.
 
     Args:
-        username: str. Username of the sender.
+        username: Username of the sender.
     """
 
     email_body = 'This is a test mail from %s.' % (username)
@@ -756,8 +754,8 @@ def send_mail_to_admin(email_subject: str, email_body: str) -> None:
     The email is sent to the ADMIN_EMAIL_ADDRESS set in feconf.py.
 
     Args:
-        email_subject: str. Subject of the email.
-        email_body: str. Body (message) of the email.
+        email_subject: Subject of the email.
+        email_body: Body (message) of the email.
     """
 
     app_id = app_identity_services.get_application_id()
@@ -779,8 +777,8 @@ def send_post_signup_email(
     feconf.CAN_SEND_EMAILS is False).
 
     Args:
-        user_id: str. User ID of the user that signed up.
-        test_for_duplicate_email: bool. For testing duplicate emails.
+        user_id: User ID of the user that signed up.
+        test_for_duplicate_email: For testing duplicate emails.
     """
 
     if not test_for_duplicate_email:
@@ -815,8 +813,8 @@ def get_moderator_unpublish_exploration_email() -> str:
     the frontend that no email will be sent.
 
     Returns:
-        str. Draft of the email body for an email sent after the moderator
-        unpublishes an exploration, or an empty string if no email should
+        Draft of the email body for an email sent after the moderator
+        unpublished an exploration, or an empty string if no email should
         be sent.
     """
 
@@ -868,12 +866,12 @@ def send_moderator_action_email(
     feconf.CAN_SEND_EMAILS is False).
 
     Args:
-        sender_id: str. User ID of the sender.
-        recipient_id: str. User ID of the recipient.
-        intent: str. The intent string (cause/purpose) of the email.
-        exploration_title: str. The title of the exploration on which the
+        sender_id: User ID of the sender.
+        recipient_id: User ID of the recipient.
+        intent: The intent string (cause/purpose) of the email.
+        exploration_title: The title of the exploration on which the
             moderator action was taken.
-        email_body: str. The email content/message.
+        email_body: The email content/message.
     """
 
     require_moderator_email_prereqs_are_satisfied()
@@ -921,14 +919,13 @@ def send_role_notification_email(
     'can_receive_editor_role_email' is set True in recipent's preferences).
 
     Args:
-        inviter_id: str. ID of the user who invited the recipient to the new
-            role.
-        recipient_id: str. User ID of the recipient.
-        recipient_role: str. Role given to the recipient. Must be defined in
+        inviter_id: ID of the user who invited the recipient to the new role.
+        recipient_id: User ID of the recipient.
+        recipient_role: Role given to the recipient. Must be defined in
             EDITOR_ROLE_EMAIL_HTML_ROLES.
-        exploration_id: str. ID of the exploration for which the recipient has
+        exploration_id: ID of the exploration for which the recipient has
             been given the new role.
-        exploration_title: str. Title of the exploration for which the recipient
+        exploration_title: Title of the exploration for which the recipient
             has been given the new role.
 
     Raises:
@@ -1002,11 +999,11 @@ def send_emails_to_subscribers(
     publishes an exploration.
 
     Args:
-        creator_id: str. The id of the creator who has published an exploration
+        creator_id: The id of the creator who has published an exploration
             and to whose subscribers we are sending emails.
-        exploration_id: str. The id of the exploration which the creator has
+        exploration_id: The id of the exploration which the creator has
             published.
-        exploration_title: str. The title of the exploration which the creator
+        exploration_title: The title of the exploration which the creator
             has published.
     """
 
@@ -1057,9 +1054,8 @@ def send_feedback_message_email(
     """Sends an email when creator receives feedback message to an exploration.
 
     Args:
-        recipient_id: str. User ID of recipient.
-        feedback_messages: dict. Contains feedback messages. Example:
-
+        recipient_id: User ID of recipient.
+        feedback_messages: Contains feedback messages. Example:
             {
                 'exploration_id': {
                     'title': 'Exploration 1234',
@@ -1130,12 +1126,12 @@ def can_users_receive_thread_email(
     """Returns if users can receive email.
 
     Args:
-        recipient_ids: list(str). IDs of persons that should receive the email.
-        exploration_id: str. ID of exploration that received new message.
-        has_suggestion: bool. True if thread contains suggestion.
+        recipient_ids: IDs of persons that should receive the email.
+        exploration_id: ID of exploration that received new message.
+        has_suggestion: True if thread contains suggestion.
 
     Returns:
-        list(bool). True if user can receive the email, False otherwise.
+        True if user can receive the email, False otherwise.
     """
     users_global_prefs = (
         user_services.get_users_email_preferences(recipient_ids))
@@ -1172,11 +1168,11 @@ def send_suggestion_email(
     incoming feedback message emails.
 
     Args:
-        exploration_title: str. Title of the exploration with the new
+        exploration_title: Title of the exploration with the new
             suggestion.
-        exploration_id: str. The ID of the exploration with the new suggestion.
-        author_id: str. The user ID of the author of the suggestion.
-        recipient_list: list(str). The user IDs of the email recipients.
+        exploration_id: The ID of the exploration with the new suggestion.
+        author_id: The user ID of the author of the suggestion.
+        recipient_list: The user IDs of the email recipients.
     """
 
     email_subject = 'New suggestion for "%s"' % exploration_title
@@ -1230,13 +1226,13 @@ def send_instant_feedback_message_email(
     the thread's status is changed.
 
     Args:
-        recipient_id: str. The user ID of the recipient.
-        sender_id: str. The user ID of the sender.
-        message: str. The message text or status change text from the sender.
-        email_subject: str. The subject line to be sent in the email.
-        exploration_title: str. The title of the exploration.
-        exploration_id: str. ID of the exploration the feedback thread is about.
-        thread_title: str. The title of the feedback thread.
+        recipient_id: The user ID of the recipient.
+        sender_id: The user ID of the sender.
+        message: The message text or status change text from the sender.
+        email_subject: The subject line to be sent in the email.
+        exploration_title: The title of the exploration.
+        exploration_id: ID of the exploration the feedback thread is about.
+        thread_title: The title of the feedback thread.
     """
 
     email_body_template = (
@@ -1281,10 +1277,10 @@ def send_flag_exploration_email(
     """Send an email to all moderators when an exploration is flagged.
 
     Args:
-        exploration_title: str. The title of the flagged exporation.
-        exploration_id: str. The ID of the flagged exploration.
-        reporter_id: str. The user ID of the reporter.
-        report_text: str. The message entered by the reporter.
+        exploration_title: The title of the flagged exporation.
+        exploration_id: The ID of the flagged exploration.
+        reporter_id: The user ID of the reporter.
+        report_text: The message entered by the reporter.
     """
     email_subject = 'Exploration flagged by user: "%s"' % exploration_title
 
@@ -1324,8 +1320,8 @@ def send_query_completion_email(recipient_id: str, query_id: str) -> None:
     the query results.
 
     Args:
-        recipient_id: str. The recipient ID.
-        query_id: str. The query ID.
+        recipient_id: The recipient ID.
+        query_id: The query ID.
     """
     email_subject = 'Query %s has successfully completed' % query_id
 
@@ -1358,9 +1354,9 @@ def send_query_failure_email(
     """Send an email to the initiator of a failed bulk email query.
 
     Args:
-        recipient_id: str. The recipient ID.
-        query_id: str. The query ID.
-        query_params: dict. The parameters of the query, as key:value.
+        recipient_id: The recipient ID.
+        query_id: The query ID.
+        query_params: The parameters of the query, as key:value.
     """
     email_subject = 'Query %s has failed' % query_id
 
@@ -1405,14 +1401,14 @@ def send_user_query_email(
     """Sends an email to all the recipients of the query.
 
     Args:
-        sender_id: str. The ID of the user sending the email.
-        recipient_ids: list(str). The user IDs of the email recipients.
-        email_subject: str. The subject of the email.
-        email_body: str. The body of the email.
-        email_intent: str. The intent string, i.e. the purpose of the email.
+        sender_id: The ID of the user sending the email.
+        recipient_ids: The user IDs of the email recipients.
+        email_subject: The subject of the email.
+        email_body: The body of the email.
+        email_intent: The intent string, i.e. the purpose of the email.
 
     Returns:
-        bulk_email_model_id: str. The ID of the bulk email model.
+        The ID of the bulk email model.
     """
     bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
     sender_name = user_services.get_username(sender_id)
@@ -1431,9 +1427,9 @@ def send_test_email_for_bulk_emails(
     """Sends a test email to the tester.
 
     Args:
-        tester_id: str. The user ID of the tester.
-        email_subject: str. The subject of the email.
-        email_body: str. The body of the email.
+        tester_id: The user ID of the tester.
+        email_subject: The subject of the email.
+        email_body: The body of the email.
     """
     tester_name = user_services.get_username(tester_id)
     tester_email = user_services.get_email_from_user_id(tester_id)
@@ -1448,9 +1444,9 @@ def send_mail_to_onboard_new_reviewers(
     """Sends an email to users who have crossed the threshold score.
 
     Args:
-        recipient_id: str. The ID of the user who is being offered to become a
+        recipient_id: The ID of the user who is being offered to become a
             reviewer.
-        category: str. The category that the user is being offered to review.
+        category: The category that the user is being offered to review.
     """
 
     email_subject = 'Invitation to review suggestions'
@@ -1499,9 +1495,9 @@ def send_mail_to_notify_users_to_review(
     agreed to review for.
 
     Args:
-        recipient_id: str. The id of the user who is being pinged to review
+        recipient_id: The id of the user who is being pinged to review
             suggestions.
-        category: str. The category of the suggestions to review.
+        category: The category of the suggestions to review.
     """
 
     email_subject = 'Notification to review suggestions'
@@ -1546,14 +1542,12 @@ def _create_html_for_reviewable_suggestion_email_info(
     email.
 
     Args:
-        reviewable_suggestion_email_info: ReviewableSuggestionEmailInfo. The
-            information about the suggestion that will be used to form the
-            html for the email. This includes the suggestion type, language,
-            content and review submission date.
+        reviewable_suggestion_email_info: The information about the suggestion
+            that will be used to form the html for the email. This includes the
+            suggestion type, language, content and review submission date.
 
     Returns:
-        str. A string containing the html that represents the suggestion
-        information.
+        A string containing the html that represents the suggestion information.
     """
     # Get the language of the suggestion.
     language = utils.get_supported_audio_language_description(
@@ -1611,18 +1605,15 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
     by the suggestion's review wait time.
 
     Args:
-        admin_ids: list(str). The user ids of the admins to notify.
-        translation_admin_ids: list(str). The user ids of the translation
-            admins to notify.
-        question_admin_ids: list(str). The user ids of the question admins
-            to notify.
-        reviewable_suggestion_email_infos: list(ReviewableSuggestionEmailInfo).
-            list(ReviewableSuggestionEmailContentInfo). A list of suggestion
-            email content info objects that represent suggestions
-            that have been waiting too long for review to notify the admins
-            about. Each object contains includes the suggestion type, language,
-            content and review submission date. The objects are sorted in
-            descending order based on review wait time.
+        admin_ids: The user ids of the admins to notify.
+        translation_admin_ids: The user ids of the translation admins to notify.
+        question_admin_ids: The user ids of the question admins to notify.
+        reviewable_suggestion_email_infos: A list of suggestion email content
+            info objects that represent suggestions that have been waiting too
+            long for review to notify the admins about. Each object contains
+            includes the suggestion type, language, content and review
+            submission date. The objects are sorted in descending order based
+            on review wait time.
     """
     if not feconf.CAN_SEND_EMAILS:
         logging.error('This app cannot send emails to users.')
@@ -1696,8 +1687,8 @@ def _send_suggestions_waiting_too_long_email(
     that allows sending of emails to the list of admin ids provided.
 
     Args:
-        admin_ids: list(str). The user ids of the admins to notify.
-        list_of_suggestion_descriptions: str. Suggestion descriptions HTML to
+        admin_ids: The user ids of the admins to notify.
+        list_of_suggestion_descriptions: Suggestion descriptions HTML to
             send in the email.
     """
     email_subject = (
@@ -1748,15 +1739,13 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
     of the admins' email preferences.
 
     Args:
-        admin_ids: list(str). The user ids of the admins to notify.
-        translation_admin_ids: list(str). The user ids of the translation
-            admins to notify.
-        question_admin_ids: list(str). The user ids of the question admins
-            to notify.
-        suggestion_types_needing_reviewers: dict. A dictionary where the keys
-            are suggestion types and each value corresponds to a set that
-            contains the language codes within the suggestion type that need
-            more reviewers. For example, for translation suggestions, the value
+        admin_ids: The user ids of the admins to notify.
+        translation_admin_ids: The user ids of the translation admins to notify.
+        question_admin_ids: The user ids of the question admins to notify.
+        suggestion_types_needing_reviewers: A dictionary where the keys are
+            suggestion types and each value corresponds to a set that contains
+            the language codes within the suggestion type that need more
+            reviewers. For example, for translation suggestions, the value
             would be a set of language codes that translations are offered in
             that need more reviewers.
     """
@@ -1849,9 +1838,9 @@ def _send_reviews_needed_email_to_admins(
     that allows sending email to the provided admin ids.
 
     Args:
-        admin_ids: list(str). The user ids of the admins to notify.
-        suggestions_needing_reviewers_html: str. The HTML representing
-            the suggestion needing reviewers.
+        admin_ids: The user ids of the admins to notify.
+        suggestions_needing_reviewers_html: The HTML representing the suggestion
+            needing reviewers.
     """
     email_subject = ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
         'email_subject']
@@ -1892,14 +1881,13 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
     that the reviewer has permission to review.
 
     Args:
-        reviewer_ids: list(str). A list of the Contributor Dashboard reviewer
-            user ids to notify.
-        reviewers_suggestion_email_infos:
-            list(list(ReviewableSuggestionEmailInfo)). A list of suggestion
-            email content info objects for each reviewer. These suggestion
-            email content info objects contain the key information about the
-            suggestions we're notifying reviewers about and will be used to
-            compose the email body for each reviewer.
+        reviewer_ids: A list of the Contributor Dashboard reviewer user ids
+            to notify.
+        reviewers_suggestion_email_infos: A list of suggestion email content
+            info objects for each reviewer. These suggestion email content info
+            objects contain the key information about the suggestions we're
+            notifying reviewers about and will be used to compose the email body
+            for each reviewer.
     """
     email_subject = CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA[
         'email_subject']
@@ -1969,14 +1957,15 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
 
 def send_mail_to_notify_contributor_ranking_achievement(
     contributor_ranking_email_info: (
-        suggestion_registry.ContributorMilestoneEmailInfo)) -> None:
+        suggestion_registry.ContributorMilestoneEmailInfo
+    )
+) -> None:
     """Sends an email to translation/question submitters and reviewers when
     they achieve a new rank.
 
     Args:
-        contributor_ranking_email_info:
-            ContributorMilestoneEmailInfo. An object with contributor ranking
-            email information.
+        contributor_ranking_email_info: An object with contributor ranking email
+            information.
     """
     if not feconf.CAN_SEND_EMAILS:
         logging.error('This app cannot send emails to users.')
@@ -2033,11 +2022,11 @@ def send_accepted_voiceover_application_email(
     application.
 
     Args:
-        recipient_id: str. The id of the user whose voiceover application got
+        recipient_id: The id of the user whose voiceover application got
             accepted.
-        lesson_title: str. The title of the lessons for which the voiceover
+        lesson_title: The title of the lessons for which the voiceover
             application got accepted.
-        language_code: str. The language code for which the voiceover
+        language_code: The language code for which the voiceover
             application got accepted.
     """
     email_subject = '[Accepted] Updates on submitted voiceover application'
@@ -2084,13 +2073,13 @@ def send_rejected_voiceover_application_email(
     application.
 
     Args:
-        recipient_id: str. The id of the user whose voiceover application got
+        recipient_id: The id of the user whose voiceover application got
             accepted.
-        lesson_title: str. The title of the lessons for which the voiceover
+        lesson_title: The title of the lessons for which the voiceover
             application got accepted.
-        language_code: str. The language code in which for which the voiceover
+        language_code: The language code in which for which the voiceover
             application got accepted.
-        rejection_message: str. The message left by the reviewer while rejecting
+        rejection_message: The message left by the reviewer while rejecting
             the voiceover application.
     """
     email_subject = 'Updates on submitted voiceover application'
@@ -2130,8 +2119,8 @@ def send_account_deleted_email(user_id: str, user_email: str) -> None:
     """Sends an email to user whose account was deleted.
 
     Args:
-        user_id: str. The id of the user whose account got deleted.
-        user_email: str. The email of the user whose account got deleted.
+        user_id: The id of the user whose account got deleted.
+        user_email: The email of the user whose account got deleted.
     """
     email_subject = 'Account deleted'
 
@@ -2157,8 +2146,8 @@ def send_account_deletion_failed_email(user_id: str, user_email: str) -> None:
     delete the user.
 
     Args:
-        user_id: str. The id of the user whose account failed to get deleted.
-        user_email: str. The email of the user whose account failed to
+        user_id: The id of the user whose account failed to get deleted.
+        user_email: The email of the user whose account failed to
             get deleted.
     """
     email_subject = 'WIPEOUT: Account deletion failed'
@@ -2177,9 +2166,9 @@ def send_email_to_new_contribution_reviewer(
     """Sends an email to user who is assigned as a reviewer.
 
     Args:
-        recipient_id: str. The ID of the user.
-        review_category: str. The category in which user can review.
-        language_code: None|str. The language code for a language if the review
+        recipient_id: The ID of the user.
+        review_category: The category in which user can review.
+        language_code: The language code for a language if the review
             item is translation or voiceover else None.
 
     Raises:
@@ -2253,10 +2242,10 @@ def send_email_to_removed_contribution_reviewer(
     """Sends an email to user who is removed from the reviewer position.
 
     Args:
-        user_id: str. The ID of the user.
-        review_category: str. The category which for which review role is
+        user_id: The ID of the user.
+        review_category: The category which for which review role is
             removed.
-        language_code: None|str. The language code for a language if the review
+        language_code: The language code for a language if the review
             item is translation or voiceover else None.
 
     Raises:
@@ -2333,14 +2322,14 @@ def send_not_mergeable_change_list_to_admin_for_review(
     to improve the functionality in future if possible.
 
     Args:
-        exp_id: str. The ID of an exploration on which the change list was
+        exp_id: The ID of an exploration on which the change list was
             to be applied.
-        frontend_version: int. Version of an exploration from frontend on
+        frontend_version: Version of an exploration from frontend on
             which a user is working.
-        backend_version: int. Latest version of an exploration on which the
+        backend_version: Latest version of an exploration on which the
             change list can not be applied.
-        change_list_dict: dict. Dict of the changes made by the
-            user on the frontend, which are not mergeable.
+        change_list_dict: Dict of the changes made by the user on the frontend,
+            which are not mergeable.
     """
     email_subject = 'Some changes were rejected due to a conflict'
     email_body_template = (

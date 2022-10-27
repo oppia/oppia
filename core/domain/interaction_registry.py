@@ -91,10 +91,10 @@ class Registry:
         KeyError.
 
         Args:
-            interaction_id: Optional[str]. The interaction id.
+            interaction_id: The interaction id.
 
         Returns:
-            BaseInteraction. An interaction for the given interaction_id.
+            An interaction for the given interaction_id.
 
         Raises:
             Exception. No interaction exists for the None interaction_id.
@@ -141,15 +141,15 @@ class Registry:
         error depending on can_fetch_latest_specs.
 
         Args:
-            state_schema_version: int. The state schema version to retrieve
+            state_schema_version: The state schema version to retrieve
                 interaction specs for.
-            can_fetch_latest_specs: boolean. Whether to fetch the latest specs
+            can_fetch_latest_specs: Whether to fetch the latest specs
                 if the legacy specs file is not found.
 
         Returns:
-            dict. The interaction specs for the given state schema
-            version, in the form of a mapping of interaction id to the
-            interaction specs. See interaction_specs.json for an example.
+            The interaction specs for the given state schema version,
+            in the form of a mapping of interaction id to the interaction
+            specs. See interaction_specs.json for an example.
 
         Raises:
             OSError. No interaction specs json file found for the given state

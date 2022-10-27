@@ -72,27 +72,27 @@ class FeedbackThread:
     """Domain object for a feedback thread.
 
     Attributes:
-        thread_id: str. The feedback thread ID.
-        entity_type: str. The type of entity the feedback thread is linked to.
-        entity_id: str. The id of the entity.
-        state_name: str|None. The name of the state associated with
+        thread_id: The feedback thread ID.
+        entity_type: The type of entity the feedback thread is linked to.
+        entity_id: The id of the entity.
+        state_name: The name of the state associated with
             the feedback thread or None, if no state is associated.
-        original_author_id: str. The ID of the original author.
-        status: str. The current status of the thread. Status should
+        original_author_id: The ID of the original author.
+        status: The current status of the thread. Status should
             be one of core.storage.feedback.gae_models.STATUS_CHOICES.
-        subject: str. The subject of the feedback thread.
-        summary: str. A summary of the feedback thread.
-        has_suggestion: bool. Whether the feedback thread includes a
+        subject: The subject of the feedback thread.
+        summary: A summary of the feedback thread.
+        has_suggestion: Whether the feedback thread includes a
             suggestion.
-        message_count: int. The number of messages posted onto the thread.
-        created_on: datetime.datetime. The time when the feedback thread was
+        message_count: The number of messages posted onto the thread.
+        created_on: The time when the feedback thread was
             created.
-        last_updated: datetime.datetime. The time when the feedback thread
+        last_updated: The time when the feedback thread
             was last updated.
-        last_nonempty_message_text: str|None. Cached text of the last message in
+        last_nonempty_message_text: Cached text of the last message in
             the thread with non-empty content, or None if there is no such
             message.
-        last_nonempty_message_author_id: str|None. Cached ID for the user of the
+        last_nonempty_message_author_id: Cached ID for the user of the
             last message in the thread with non-empty content, or None if the
             message was made anonymously or if there is no such message.
     """
@@ -136,7 +136,7 @@ class FeedbackThread:
         """Returns a dict representation of this FeedbackThread object.
 
         Returns:
-            dict. A dict representation of the FeedbackThread object.
+            A dict representation of the FeedbackThread object.
         """
         return {
             'last_updated_msecs': (
@@ -157,11 +157,11 @@ class FeedbackThread:
         """Returns the full id of the message.
 
         Args:
-            message_id: int. The id of the message for which we have to fetch
+            message_id: The id of the message for which we have to fetch
                 the complete message id.
 
         Returns:
-            str. The full id corresponding to the given message id.
+            The full id corresponding to the given message id.
         """
         return '.'.join([self.id, str(message_id)])
 
@@ -171,7 +171,7 @@ class FeedbackThread:
         None.
 
         Returns:
-            list(str|None). The ids of the last two messages of the thread. If
+            The ids of the last two messages of the thread. If
             the message does not exist, None is returned.
         """
         return [
@@ -184,19 +184,17 @@ class FeedbackMessage:
     """Domain object for a feedback message.
 
     Attributes:
-        full_message_id: str. The ID of the feedback message.
-        thread_id: str. The ID of the feedback thread containing this
+        full_message_id: The ID of the feedback message.
+        thread_id: The ID of the feedback thread containing this
             message.
-        message_id: int. The ID of the feedback thread message.
-        author_id: str. The ID of the message's author.
-        updated_status: str. The new status of the feedback thread.
-        updated_subject: str. The new feedback thread subject.
-        text: str. The text for the full feedback thread message.
-        created_on: datetime.datetime. The time when the feedback message was
-            created.
-        last_updated: datetime.datetime. The time when the feedback message
-            was last updated.
-        received_via_email: bool. Whether the feedback was received via email.
+        message_id: The ID of the feedback thread message.
+        author_id: The ID of the message's author.
+        updated_status: The new status of the feedback thread.
+        updated_subject: The new feedback thread subject.
+        text: The text for the full feedback thread message.
+        created_on: The time when the feedback message was created.
+        last_updated: The time when the feedback message was last updated.
+        received_via_email: Whether the feedback was received via email.
     """
 
     def __init__(
@@ -228,7 +226,7 @@ class FeedbackMessage:
         """Returns the entity ID corresponding to this FeedbackMessage instance.
 
         Returns:
-            str. The entity_id.
+            The entity_id.
         """
         return self.id.split('.')[1]
 
@@ -238,7 +236,7 @@ class FeedbackMessage:
         instance.
 
         Returns:
-            str. The entity_type.
+            The entity_type.
         """
         return self.id.split('.')[0]
 
@@ -246,7 +244,7 @@ class FeedbackMessage:
         """Returns a dict representation of this FeedbackMessage object.
 
         Returns:
-            dict. Dict representation of the FeedbackMessage object.
+            Dict representation of the FeedbackMessage object.
         """
         return {
             'author_id': self.author_id,
@@ -265,8 +263,8 @@ class FullyQualifiedMessageIdentifier:
     feedback thread.
 
     Attributes:
-        thread_id: str. The ID of the thread.
-        message_id: int. The ID of a message beloning to the thread.
+        thread_id: The ID of the thread.
+        message_id: The ID of a message beloning to the thread.
     """
 
     def __init__(
@@ -282,11 +280,10 @@ class FeedbackAnalytics:
     """Domain object representing feedback analytics for a specific entity.
 
     Attributes:
-        entity_type: str. The type of entity the feedback thread is linked to.
-        entity_id: str. The id of the entity.
-        num_open_threads: int. The number of open threads associated with the
-            entity.
-        num_total_threads: int. The total number of threads associated with the
+        entity_type: The type of entity the feedback thread is linked to.
+        entity_id: The id of the entity.
+        num_open_threads: The number of open threads associated with the entity.
+        num_total_threads: The total number of threads associated with the
             entity (regardless of status).
     """
 
@@ -308,7 +305,7 @@ class FeedbackAnalytics:
         """Returns the numbers of threads in the FeedbackAnalytics object.
 
         Attributes:
-            dict. Dict representation of the numbers of threads in the
+            Dict representation of the numbers of threads in the
                 FeedbackAnalytics object.
         """
         return {
@@ -330,10 +327,10 @@ class FeedbackMessageReference:
     """Domain object for feedback message references.
 
     Attributes:
-        entity_type: str. The type of entity the feedback thread is linked to.
-        entity_id: str. The id of the entity.
-        thread_id: str. The ID of the feedback thread.
-        message_id: int. The ID of the feedback thread message.
+        entity_type: The type of entity the feedback thread is linked to.
+        entity_id: The id of the entity.
+        thread_id: The ID of the feedback thread.
+        message_id: The ID of the feedback thread message.
     """
 
     def __init__(
@@ -353,7 +350,7 @@ class FeedbackMessageReference:
         """Returns dict representation of the FeedbackMessageReference object.
 
         Returns:
-            dict. Dict representation of the FeedbackMessageReference object.
+            Dict representation of the FeedbackMessageReference object.
         """
         return {
             'entity_type': self.entity_type,
@@ -367,22 +364,21 @@ class FeedbackThreadSummary:
     """Domain object for the summary of a particular thread.
 
     Attributes:
-        status: str. The status of the thread.
-        original_author_id: str. The id of the original author of the thread.
-        last_updated: datetime.datetime. When was the thread last updated.
-        last_message_text: str. The text of the last message.
-        total_message_count: int. The total number of messages in the thread.
-        last_message_is_read: bool. Whether the last message is read by the
-            user.
-        second_last_message_is_read: bool. Whether the second last message is
+        status: The status of the thread.
+        original_author_id: The id of the original author of the thread.
+        last_updated: When was the thread last updated.
+        last_message_text: The text of the last message.
+        total_message_count: The total number of messages in the thread.
+        last_message_is_read: Whether the last message is read by the user.
+        second_last_message_is_read: Whether the second last message is
             read by the user,
-        author_last_message: str. The name of the author of the last message.
-        author_second_last_message: str. The name of the author of the second
+        author_last_message: The name of the author of the last message.
+        author_second_last_message: The name of the author of the second
             last message and None if no second-to-last message exists.
-        exploration_title: str. The title of the exploration to which
+        exploration_title: The title of the exploration to which
             exploration belongs.
-        exploration_id: str. The id of the exploration associated to the thread.
-        thread_id: str. The id of the thread this dict is describing.
+        exploration_id: The id of the exploration associated to the thread.
+        thread_id: The id of the thread this dict is describing.
     """
 
     def __init__(
@@ -417,7 +413,7 @@ class FeedbackThreadSummary:
         """Returns dict representation of the FeedbackThreadSummary object.
 
         Returns:
-            dict. Dict representation of the FeedbackThreadSummary object.
+            Dict representation of the FeedbackThreadSummary object.
         """
         return {
             'status': self.status,

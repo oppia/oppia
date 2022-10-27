@@ -54,17 +54,17 @@ class GeneralFileSystem:
     """The parent class which is inherited by GcsFileSystem.
 
     Attributes:
-        entity_name: str. The name of the entity (eg: exploration, topic etc).
-        entity_id: str. The ID of the corresponding entity.
+        entity_name: The name of the entity (eg: exploration, topic etc).
+        entity_id: The ID of the corresponding entity.
     """
 
     def __init__(self, entity_name: str, entity_id: str) -> None:
         """Constructs a GeneralFileSystem object.
 
         Args:
-            entity_name: str. The name of the entity
+            entity_name: The name of the entity
                 (eg: exploration, topic etc).
-            entity_id: str. The ID of the corresponding entity.
+            entity_id: The ID of the corresponding entity.
         """
         self._validate_entity_parameters(entity_name, entity_id)
         self._assets_path = '%s/%s/assets' % (entity_name, entity_id)
@@ -75,9 +75,9 @@ class GeneralFileSystem:
         """Checks whether the entity_id and entity_name passed in are valid.
 
         Args:
-            entity_name: str. The name of the entity
+            entity_name: The name of the entity
                 (eg: exploration, topic etc).
-            entity_id: str. The ID of the corresponding entity.
+            entity_id: The ID of the corresponding entity.
 
         Raises:
             ValidationError. When parameters passed in are invalid.
@@ -99,7 +99,7 @@ class GeneralFileSystem:
         """Returns the path of the parent folder of assets.
 
         Returns:
-            str. The path.
+            The path.
         """
         return self._assets_path
 
@@ -118,11 +118,11 @@ class GcsFileSystem(GeneralFileSystem):
         """Returns the constructed GCS file URL.
 
         Args:
-            filepath: str. The path to the relevant file within the entity's
+            filepath: The path to the relevant file within the entity's
                 assets folder.
 
         Returns:
-            str. The GCS file URL.
+            The GCS file URL.
         """
         # Upload to GCS bucket with filepath
         # "<entity>/<entity-id>/assets/<filepath>".
@@ -133,7 +133,7 @@ class GcsFileSystem(GeneralFileSystem):
         """Raises an error if a filepath is invalid.
 
         Args:
-            filepath: str. The path to the relevant file within the entity's
+            filepath: The path to the relevant file within the entity's
                 assets folder.
 
         Raises:
@@ -151,11 +151,11 @@ class GcsFileSystem(GeneralFileSystem):
         """Checks if the file with the given filepath exists in the GCS.
 
         Args:
-            filepath: str. The path to the relevant file within the entity's
+            filepath: The path to the relevant file within the entity's
                 assets folder.
 
         Returns:
-            bool. Whether the file exists in GCS.
+            Whether the file exists in GCS.
         """
         self._check_filepath(filepath)
         return storage_services.isfile(
@@ -165,11 +165,11 @@ class GcsFileSystem(GeneralFileSystem):
         """Gets a file as an unencoded stream of raw bytes.
 
         Args:
-            filepath: str. The path to the relevant file within the entity's
+            filepath: The path to the relevant file within the entity's
                 assets folder.
 
         Returns:
-            bytes. A stream of raw bytes if the file exists.
+            A stream of raw bytes if the file exists.
 
         Raises:
             OSError. Given file does not exist.
@@ -189,10 +189,10 @@ class GcsFileSystem(GeneralFileSystem):
         """Commit raw_bytes to the relevant file in the entity's assets folder.
 
         Args:
-            filepath: str. The path to the relevant file within the entity's
+            filepath: The path to the relevant file within the entity's
                 assets folder.
-            raw_bytes: bytes. The content to be stored in the file.
-            mimetype: Optional[str]. The content-type of the cloud file.
+            raw_bytes: The content to be stored in the file.
+            mimetype: The content-type of the cloud file.
         """
         # Note that textual data needs to be converted to bytes so that it can
         # be stored in a file opened in binary mode. However, it is not
@@ -211,7 +211,7 @@ class GcsFileSystem(GeneralFileSystem):
         """Deletes a file and the metadata associated with it.
 
         Args:
-            filepath: str. The path to the relevant file within the entity's
+            filepath: The path to the relevant file within the entity's
                 assets folder.
 
         Raises:
@@ -227,9 +227,9 @@ class GcsFileSystem(GeneralFileSystem):
         """Copy images from source_path.
 
         Args:
-            source_assets_path: str. The path to the source entity's assets
+            source_assets_path: The path to the source entity's assets
                 folder.
-            filepath: str. The path to the relevant file within the entity's
+            filepath: The path to the relevant file within the entity's
                 assets folder.
         """
         source_file_url = ('%s/%s' % (source_assets_path, filepath))
@@ -241,11 +241,11 @@ class GcsFileSystem(GeneralFileSystem):
         """Lists all files in a directory.
 
         Args:
-            dir_name: str. The directory whose files should be listed. This
+            dir_name: The directory whose files should be listed. This
                 should not start with '/' or end with '/'.
 
         Returns:
-            list(str). A lexicographically-sorted list of filenames.
+            A lexicographically-sorted list of filenames.
 
         Raises:
             OSError. The directory name starts or ends with '/'.
@@ -280,13 +280,12 @@ def save_original_and_compressed_versions_of_image(
     """Saves the three versions of the image file.
 
     Args:
-        filename: str. The name of the image file.
-        entity_type: str. The type of the entity.
-        entity_id: str. The id of the entity.
-        original_image_content: bytes. The content of the original image.
-        filename_prefix: str. The string to prefix to the filename.
-        image_is_compressible: bool. Whether the image can be compressed or
-            not.
+        filename: The name of the image file.
+        entity_type: The type of the entity.
+        entity_id: The id of the entity.
+        original_image_content: The content of the original image.
+        filename_prefix: The string to prefix to the filename.
+        image_is_compressible: Whether the image can be compressed or not.
     """
     filepath = '%s/%s' % (filename_prefix, filename)
 
@@ -349,9 +348,9 @@ def save_classifier_data(
     """Store classifier model data in a file.
 
     Args:
-        exp_id: str. The id of the exploration.
-        job_id: str. The id of the classifier training job model.
-        classifier_data_proto: Object. Protobuf object of the classifier data
+        exp_id: The id of the exploration.
+        job_id: The id of the classifier training job model.
+        classifier_data_proto: Protobuf object of the classifier data
             to be stored.
     """
     filepath = '%s-classifier-data.pb.xz' % (job_id)
@@ -371,8 +370,8 @@ def delete_classifier_data(exp_id: str, job_id: str) -> None:
     """Delete the classifier data from file.
 
     Args:
-        exp_id: str. The id of the exploration.
-        job_id: str. The id of the classifier training job model.
+        exp_id: The id of the exploration.
+        job_id: The id of the classifier training job model.
     """
     filepath = '%s-classifier-data.pb.xz' % (job_id)
     fs = GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
@@ -390,11 +389,11 @@ def copy_images(
     """Copy images from source to destination.
 
     Args:
-        source_entity_type: str. The entity type of the source.
-        source_entity_id: str. The type of the source entity.
-        destination_entity_id: str. The id of the destination entity.
-        destination_entity_type: str. The entity type of the destination.
-        filenames: list(str). The list of filenames to copy.
+        source_entity_type: The entity type of the source.
+        source_entity_id: The type of the source entity.
+        destination_entity_id: The id of the destination entity.
+        destination_entity_type: The entity type of the destination.
+        filenames: The list of filenames to copy.
     """
     source_fs = GcsFileSystem(source_entity_type, source_entity_id)
     destination_fs = GcsFileSystem(

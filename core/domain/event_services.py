@@ -388,7 +388,7 @@ def handle_exploration_start(exp_id: str) -> None:
     """Handles a user's start of an exploration.
 
     Args:
-        exp_id: str. The exploration which has been started.
+        exp_id: The exploration which has been started.
     """
     exp_summary = exp_fetchers.get_exploration_summary_by_id(
         exp_id, strict=False
@@ -404,11 +404,10 @@ def handle_exploration_rating(
     """Handles a new rating for an exploration.
 
     Args:
-        exp_id: str. The exploration which has been rated.
-        rating: int. The new rating of the exploration.
-        old_rating: int|None. The old rating of the exploration before
-            refreshing, or None if the exploration hasn't been rated by the user
-            yet.
+        exp_id: The exploration which has been rated.
+        rating: The new rating of the exploration.
+        old_rating: The old rating of the exploration before refreshing, or
+            None if the exploration hasn't been rated by the user yet.
     """
     exp_summary = exp_fetchers.get_exploration_summary_by_id(
         exp_id, strict=False
@@ -425,11 +424,10 @@ def _refresh_average_ratings_transactional(
     """Refreshes the average rating for a user.
 
     Args:
-        user_id: str. The id of the user.
-        new_rating: int. The new rating of the exploration.
-        old_rating: int|None. The old rating of the exploration before
-            refreshing, or None if the exploration hasn't been rated by the user
-            yet.
+        user_id: The id of the user.
+        new_rating: The new rating of the exploration.
+        old_rating: The old rating of the exploration before refreshing, or
+            None if the exploration hasn't been rated by the user yet.
     """
     user_stats_model = user_models.UserStatsModel.get(user_id, strict=False)
     if user_stats_model is None:
@@ -460,7 +458,7 @@ def _increment_total_plays_count_transactional(user_id: str) -> None:
     """Increments the total plays count of the exploration.
 
     Args:
-        user_id: str. The id of the user.
+        user_id: The id of the user.
     """
     user_stats_model = user_models.UserStatsModel.get(user_id, strict=False)
     if user_stats_model is None:

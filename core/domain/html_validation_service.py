@@ -39,10 +39,10 @@ def wrap_with_siblings(tag: bs4.element.Tag, p: bs4.element.Tag) -> None:
     """This function wraps a tag and its unwrapped sibling in p tag.
 
     Args:
-        tag: bs4.element.Tag. The tag which is to be wrapped in p tag
-            along with its unwrapped siblings.
-        p: bs4.element.Tag. The new p tag in soup in which the tag and
-            its siblings are to be wrapped.
+        tag: The tag which is to be wrapped in p tag along with its
+            unwrapped siblings.
+        p: The new p tag in soup in which the tag and its siblings
+            are to be wrapped.
     """
     independent_parents = ['p', 'pre', 'ol', 'ul', 'blockquote']
     prev_sib = list(tag.previous_siblings)
@@ -398,12 +398,12 @@ def validate_rte_format(
     valid for given RTE format.
 
     Args:
-        html_list: list(str). List of html strings to be validated.
-        rte_format: str. The type of RTE for which html string is
+        html_list: List of html strings to be validated.
+        rte_format: The type of RTE for which html string is
             to be validated.
 
     Returns:
-        dict. Dictionary of all the error relations and strings.
+        Dictionary of all the error relations and strings.
     """
     # err_dict is a dictionary to store the invalid tags and the
     # invalid parent-child relations that we find.
@@ -466,13 +466,13 @@ def validate_soup_for_rte(
     """Validate content in given soup for given RTE format.
 
     Args:
-        soup: bs4.BeautifulSoup. The html soup whose content is to be validated.
-        rte_format: str. The type of RTE for which html string is
+        soup: The html soup whose content is to be validated.
+        rte_format: The type of RTE for which html string is
             to be validated.
-        err_dict: dict. The dictionary which stores invalid tags and strings.
+        err_dict: The dictionary which stores invalid tags and strings.
 
     Returns:
-        bool. Boolean indicating whether a html string is valid for given RTE.
+        Boolean indicating whether a html string is valid for given RTE.
     """
     if rte_format == feconf.RTE_FORMAT_TEXTANGULAR:
         rte_type = 'RTE_TYPE_TEXTANGULAR'
@@ -516,11 +516,11 @@ def validate_customization_args(html_list: List[str]) -> Dict[str, List[str]]:
     html string.
 
     Args:
-        html_list: list(str). List of html strings to be validated.
+        html_list: List of html strings to be validated.
 
     Returns:
-        dict. Dictionary of all the invalid customisation args where
-        key is a Rich Text Component and value is the invalid html string.
+        Dictionary of all the invalid customization args where key is a Rich
+        Text Component and value is the invalid html string.
     """
     # Dictionary to hold html strings in which customization arguments
     # are invalid.
@@ -552,10 +552,10 @@ def validate_customization_args_in_tag(tag: bs4.element.Tag) -> Iterator[str]:
     """Validates customization arguments of Rich Text Components in a soup.
 
     Args:
-        tag: bs4.element.Tag. The html tag to be validated.
+        tag: The html tag to be validated.
 
     Yields:
-        str. Error message if the attributes of tag are invalid.
+        Error message if the attributes of tag are invalid.
     """
 
     component_types_to_component_classes = rte_component_registry.Registry.get_component_types_to_component_classes() # pylint: disable=line-too-long
@@ -604,12 +604,12 @@ def validate_svg_filenames_in_math_rich_text(
     returns a list of all invalid math tags in the given HTML.
 
     Args:
-        entity_type: str. The type of the entity.
-        entity_id: str. The ID of the entity.
-        html_string: str. The HTML string.
+        entity_type: The type of the entity.
+        entity_id: The ID of the entity.
+        html_string: The HTML string.
 
     Returns:
-        list(str). A list of invalid math tags in the HTML string.
+        A list of invalid math tags in the HTML string.
     """
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     error_list = []
@@ -636,11 +636,11 @@ def validate_math_content_attribute_in_html(
     and returns a list of all invalid math tags in the given HTML.
 
     Args:
-        html_string: str. The HTML string.
+        html_string: The HTML string.
 
     Returns:
-        list(dict(str, str)). A list of dicts each having the invalid tags in
-        the HTML string and the corresponding exception raised.
+        A list of dicts each having the invalid tags in the HTML string and
+        the corresponding exception raised.
     """
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     error_list = []
@@ -667,10 +667,10 @@ def does_svg_tag_contains_xmlns_attribute(
     attribute.
 
     Args:
-        svg_string: str|bytes. The SVG string.
+        svg_string: The SVG string.
 
     Returns:
-        bool. Whether the svg tag in the given svg string contains the xmlns
+        Whether the svg tag in the given svg string contains the xmlns
         attribute.
     """
     # We don't need to encode the svg_string here because, beautiful soup can
@@ -691,12 +691,11 @@ def get_invalid_svg_tags_and_attrs(
     """Returns a set of all invalid tags and attributes for the provided SVG.
 
     Args:
-        svg_string: str|bytes. The SVG string.
+        svg_string: The SVG string.
 
     Returns:
-        tuple(list(str), list(str)). A 2-tuple, the first element of which
-        is a list of invalid tags, and the second element of which is a
-        list of invalid tag-specific attributes.
+        A 2-tuple, the first element of which is a list of invalid tags, and the
+        second element of which is a list of invalid tag-specific attributes.
         The format for the second element is <tag>:<attribute>, where the
         <tag> represents the SVG tag for which the attribute is invalid
         and <attribute> represents the invalid attribute.
@@ -727,10 +726,10 @@ def check_for_svgdiagram_component_in_html(html_string: str) -> bool:
     """Checks for existence of SvgDiagram component tags inside an HTML string.
 
     Args:
-        html_string: str. HTML string to check.
+        html_string: HTML string to check.
 
     Returns:
-        bool. Whether the given HTML string contains SvgDiagram component tag.
+        Whether the given HTML string contains SvgDiagram component tag.
     """
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     svgdiagram_tags = soup.findAll(name='oppia-noninteractive-svgdiagram')
@@ -742,10 +741,10 @@ def extract_svg_filenames_in_math_rte_components(html_string: str) -> List[str]:
     an HTML string.
 
     Args:
-        html_string: str. The HTML string.
+        html_string: The HTML string.
 
     Returns:
-        list(str). A list of svg_filenames present in the HTML.
+        A list of svg_filenames present in the HTML.
     """
 
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
@@ -769,10 +768,10 @@ def add_math_content_to_math_rte_components(html_string: str) -> str:
     be an empty string.
 
     Args:
-        html_string: str. HTML string to modify.
+        html_string: HTML string to modify.
 
     Returns:
-        str. Updated HTML string with all Math component tags having the new
+        Updated HTML string with all Math component tags having the new
         attribute.
 
     Raises:
@@ -847,10 +846,10 @@ def validate_math_tags_in_html(html_string: str) -> List[str]:
     """Returns a list of all invalid math tags in the given HTML.
 
     Args:
-        html_string: str. The HTML string.
+        html_string: The HTML string.
 
     Returns:
-        list(str). A list of invalid math tags in the HTML string.
+        A list of invalid math tags in the HTML string.
     """
 
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
@@ -881,10 +880,10 @@ def validate_math_tags_in_html_with_attribute_math_content(
     reference to SVGs.
 
     Args:
-        html_string: str. The HTML string.
+        html_string: The HTML string.
 
     Returns:
-        list(str). A list of invalid math tags in the HTML string.
+        A list of invalid math tags in the HTML string.
     """
 
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
@@ -910,10 +909,10 @@ def is_parsable_as_xml(xml_string: bytes) -> bool:
     """Checks if input string is parsable as XML.
 
     Args:
-        xml_string: bytes. The XML string in bytes.
+        xml_string: The XML string in bytes.
 
     Returns:
-        bool. Whether xml_string is parsable as XML or not.
+        Whether xml_string is parsable as XML or not.
     """
     if not isinstance(xml_string, bytes):
         return False
@@ -932,10 +931,10 @@ def convert_svg_diagram_to_image_for_soup(
     soup context.
 
     Args:
-        soup_context: bs4.BeautifulSoup. The bs4 soup context.
+        soup_context: The bs4 soup context.
 
     Returns:
-        str. The updated html string.
+        The updated html string.
     """
     for svg_image in soup_context.findAll(
             name='oppia-noninteractive-svgdiagram'):
@@ -952,10 +951,10 @@ def convert_svg_diagram_tags_to_image_tags(html_string: str) -> str:
     oppia-noninteractive-image and changes corresponding attributes.
 
     Args:
-        html_string: str. The HTML string to check.
+        html_string: The HTML string to check.
 
     Returns:
-        str. The updated html string.
+        The updated html string.
     """
     return str(
         _process_string_with_components(
@@ -970,10 +969,10 @@ def _replace_incorrectly_encoded_chars(soup_context: bs4.BeautifulSoup) -> str:
     HTML string.
 
     Args:
-        soup_context: bs4.BeautifulSoup. The bs4 soup context.
+        soup_context: The bs4 soup context.
 
     Returns:
-        str. The updated html string.
+        The updated html string.
     """
     html_string = str(soup_context)
     char_mapping_tuples = CHAR_MAPPINGS + [
@@ -991,10 +990,10 @@ def fix_incorrectly_encoded_chars(html_string: str) -> str:
     HTML string.
 
     Args:
-        html_string: str. The HTML string to modify.
+        html_string: The HTML string to modify.
 
     Returns:
-        str. The updated html string.
+        The updated html string.
     """
     return str(
         _process_string_with_components(
@@ -1011,12 +1010,12 @@ def _process_string_with_components(
     components.
 
     Args:
-        html_string: str. The HTML string to modify.
-        conversion_fn: function. The conversion function to be applied on
+        html_string: The HTML string to modify.
+        conversion_fn: The conversion function to be applied on
             the HTML.
 
     Returns:
-        str. The updated html string.
+        The updated html string.
     """
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')

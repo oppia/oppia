@@ -28,11 +28,11 @@ def inform_subscribers(
     publishes an exploration.
 
     Args:
-        creator_id: str. The id of the creator who has published an exploration
+        creator_id: The id of the creator who has published an exploration
             and to whose subscribers we are sending emails.
-        exploration_id: str. The id of the exploration which the creator has
+        exploration_id: The id of the exploration which the creator has
             published.
-        exploration_title: str. The title of the exploration which the creator
+        exploration_title: The title of the exploration which the creator
             has published.
     """
 

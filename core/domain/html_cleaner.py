@@ -48,12 +48,12 @@ def filter_a(tag: str, name: str, value: str) -> bool:
     whitelisted.
 
     Args:
-        tag: str. The name of the tag passed.
-        name: str. The name of the attribute.
-        value: str. The value of the attribute.
+        tag: The name of the tag passed.
+        name: The name of the attribute.
+        value: The value of the attribute.
 
     Returns:
-        bool. Whether the given attribute should be whitelisted.
+        Whether the given attribute should be whitelisted.
 
     Raises:
         Exception. The 'tag' is not as expected.
@@ -102,10 +102,10 @@ def clean(user_submitted_html: str) -> str:
     This only allows HTML from a restricted set of tags, attrs and styles.
 
     Args:
-        user_submitted_html: str. An untrusted HTML string.
+        user_submitted_html: An untrusted HTML string.
 
     Returns:
-        str. The HTML string that results after stripping out unrecognized tags
+        The HTML string that results after stripping out unrecognized tags
         and attributes.
     """
     oppia_custom_tags = (
@@ -125,10 +125,10 @@ def strip_html_tags(html_string: str) -> str:
     """Strips all HTML markup from an HTML string.
 
     Args:
-        html_string: str. An HTML string.
+        html_string: An HTML string.
 
     Returns:
-        str. The HTML string that results after all the tags and attributes are
+        The HTML string that results after all the tags and attributes are
         stripped out.
     """
     return bleach.clean(html_string, tags=[], attributes={}, strip=True)
@@ -140,10 +140,10 @@ def get_image_filenames_from_html_strings(html_strings: List[str]) -> List[str]:
     passed in.
 
     Args:
-        html_strings: list(str). List of HTML strings.
+        html_strings: List of HTML strings.
 
     Returns:
-        list(str). List of image filenames from html_strings.
+        List of image filenames from html_strings.
     """
     all_rte_components = []
     filenames = []
@@ -167,10 +167,10 @@ def get_rte_components(html_string: str) -> List[ComponentsDict]:
     """Extracts the RTE components from an HTML string.
 
     Args:
-        html_string: str. An HTML string.
+        html_string: An HTML string.
 
     Returns:
-        list(dict). A list of dictionaries, each representing an RTE component.
+        A list of dictionaries, each representing an RTE component.
         Each dict in the list contains:
         - id: str. The name of the component, i.e. 'oppia-noninteractive-link'.
         - customization_args: dict. Customization arg specs for the component.
@@ -202,9 +202,9 @@ def _raise_validation_errors_for_escaped_html_tag(
     """Raises validation for the errored escaped html tag.
 
     Args:
-        tag: bs4.BeautifulSoup. The tag which needs to be validated.
-        attr: str. The attribute name that needs to be validated inside the tag.
-        tag_name: str. The tag name.
+        tag: The tag which needs to be validated.
+        attr: The attribute name that needs to be validated inside the tag.
+        tag_name: The tag name.
 
     Raises:
         ValidationError. Tag does not have the attribute.
@@ -227,9 +227,9 @@ def _raise_validation_errors_for_unescaped_html_tag(
     """Raises validation for the errored unescaped html tag.
 
     Args:
-        tag: bs4.BeautifulSoup. The tag which needs to be validated.
-        attr: str. The attribute name that needs to be validated inside the tag.
-        tag_name: str. The tag name.
+        tag: The tag which needs to be validated.
+        attr: The attribute name that needs to be validated inside the tag.
+        tag_name: The tag name.
 
     Raises:
         ValidationError. Tag does not have the attribute.
@@ -253,8 +253,8 @@ def validate_rte_tags(
     """Validate all the RTE tags.
 
     Args:
-        html_data: str. The RTE content of the state.
-        is_tag_nested_inside_tabs_or_collapsible: bool. True when we
+        html_data: The RTE content of the state.
+        is_tag_nested_inside_tabs_or_collapsible: True when we
             validate tags inside `Tabs` or `Collapsible` tag.
 
     Raises:
@@ -476,9 +476,8 @@ def _raise_validation_errors_for_empty_tabs_content(
     """Raises error when the content inside the tabs tag is empty.
 
     Args:
-        content_dict: Dict[str]. The dictionary containing the content of
-            tags tag.
-        name: str. The content name that needs to be validated.
+        content_dict: The dictionary containing the content of tags tag.
+        name: The content name that needs to be validated.
 
     Raises:
         ValidationError. Content not present in the dictionary.
@@ -499,7 +498,7 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
     """Validates `Tabs` and `Collapsible` RTE tags
 
     Args:
-        html_data: str. The RTE content of the state.
+        html_data: The RTE content of the state.
 
     Raises:
         ValidationError. No tabs present inside the tab_contents attribute.

@@ -147,7 +147,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             'type: dict' inside a schema.
 
             Args:
-                schema: dict. The schema to traverse.
+                schema: The schema to traverse.
             """
             if 'name' in schema:
                 ca_names_in_schema.append(schema['name'])
@@ -186,8 +186,8 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             SubtitledUnicode contained or nested in value.
 
             Args:
-                value: *. The value of the customization argument.
-                schema: dict. The customization argument schema.
+                value: The value of the customization argument.
+                schema: The customization argument schema.
             """
             is_subtitled_html_spec = (
                 schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and

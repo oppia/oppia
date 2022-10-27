@@ -164,10 +164,10 @@ def clean_math_expression(math_expression: str) -> str:
     with the new interactions' validators.
 
     Args:
-        math_expression: str. The string representing the math expression.
+        math_expression: The string representing the math expression.
 
     Returns:
-        str. The correctly formatted string representing the math expression.
+        The correctly formatted string representing the math expression.
     """
     unicode_to_text = {
         u'\u221a': 'sqrt',
@@ -893,14 +893,14 @@ class TransientCheckpointUrl:
         """Initializes a TransientCheckpointUrl domain object.
 
         Args:
-            exploration_id: str. Id of the exploration.
-            furthest_reached_checkpoint_state_name: str. State name of the
+            exploration_id: Id of the exploration.
+            furthest_reached_checkpoint_state_name: State name of the
                 furthest reached checkpoint in the exploration.
-            furthest_reached_checkpoint_exp_version: int. Exploration version
+            furthest_reached_checkpoint_exp_version: Exploration version
                 in which the user has completed most checkpoints.
-            most_recently_reached_checkpoint_state_name: str. State name of
+            most_recently_reached_checkpoint_state_name: State name of
                 the most recently reached checkpoint in the exploration.
-            most_recently_reached_checkpoint_exp_version: int. Exploration
+            most_recently_reached_checkpoint_exp_version: Exploration
                 version in which a checkpoint was most recently reached.
         """
         self.exploration_id = exploration_id
@@ -918,7 +918,7 @@ class TransientCheckpointUrl:
         form with its keys as the attributes of this class.
 
         Returns:
-            dict. A dictionary containing the TransientCheckpointUrl class
+            A dictionary containing the TransientCheckpointUrl class
             information in a dictionary form.
         """
 
@@ -1010,28 +1010,26 @@ class ExplorationCommitLogEntry:
         """Initializes a ExplorationCommitLogEntry domain object.
 
         Args:
-            created_on: datetime.datetime. Date and time when the exploration
-                commit was created.
-            last_updated: datetime.datetime. Date and time when the exploration
-                commit was last updated.
-            user_id: str. User id of the user who has made the commit.
-            exploration_id: str. Id of the exploration.
-            commit_type: str. The type of commit.
-            commit_message: str. A description of changes made to the
-                exploration.
-            commit_cmds: list(dict). A list of commands, describing changes
+            created_on: Date and time when the exploration commit was created.
+            last_updated: Date and time when the exploration commit was last
+                updated.
+            user_id: User id of the user who has made the commit.
+            exploration_id: Id of the exploration.
+            commit_type: The type of commit.
+            commit_message: A description of changes made to the exploration.
+            commit_cmds: A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains the following
                 key:
                     - cmd: str. Unique command.
                 and then additional arguments for that command.
-            version: int. The version of the exploration after the commit.
-            post_commit_status: str. The new exploration status after the
+            version: The version of the exploration after the commit.
+            post_commit_status: The new exploration status after the
                 commit.
-            post_commit_community_owned: bool. Whether the exploration is
+            post_commit_community_owned: Whether the exploration is
                 community-owned after the edit event.
-            post_commit_is_private: bool. Whether the exploration is private
-                after the edit event.
+            post_commit_is_private: Whether the exploration is private after
+                the edit event.
         """
         self.created_on = created_on
         self.last_updated = last_updated
@@ -1051,9 +1049,9 @@ class ExplorationCommitLogEntry:
         (derived from user_id).
 
         Returns:
-            dict. A dict, mapping all fields of ExplorationCommitLogEntry
-            instance, except created_on, user_id and commit_cmds fields and
-            adding username (derived from user_id).
+            A dict, mapping all fields of ExplorationCommitLogEntry instance,
+            except created_on, user_id and commit_cmds fields and adding
+            username (derived from user_id).
         """
         return {
             'last_updated': utils.get_time_in_millisecs(self.last_updated),
@@ -1081,8 +1079,8 @@ class ExpVersionReference:
         """Initializes an ExpVersionReference domain object.
 
         Args:
-            exp_id: str. ID of the exploration.
-            version: int. Version of the exploration.
+            exp_id: ID of the exploration.
+            version: Version of the exploration.
         """
         self.exp_id = exp_id
         self.version = version
@@ -1092,7 +1090,7 @@ class ExpVersionReference:
         """Returns a dict representing this ExpVersionReference domain object.
 
         Returns:
-            dict. A dict, mapping all fields of ExpVersionReference instance.
+            A dict, mapping all fields of ExpVersionReference instance.
         """
         return {
             'exp_id': self.exp_id,
@@ -1120,16 +1118,16 @@ class ExplorationVersionsDiff:
     exploration.
 
     Attributes:
-        added_state_names: list(str). Names of the states added to the
-            exploration from prev_exp_version to current_exp_version. It stores
-            the newest names of the added states.
-        deleted_state_names: list(str). Name sof the states deleted from the
-            exploration from prev_exp_version to current_exp_version. It stores
-            the initial names of the deleted states from pre_exp_version.
-        new_to_old_state_names: dict. Dictionary mapping state names of
+        added_state_names: Names of the states added to the exploration from
+            prev_exp_version to current_exp_version. It stores the newest names
+            of the added states.
+        deleted_state_names: Name sof the states deleted from the exploration
+            from prev_exp_version to current_exp_version. It stores the initial
+            names of the deleted states from pre_exp_version.
+        new_to_old_state_names: Dictionary mapping state names of
             current_exp_version to the state names of prev_exp_version.
             It doesn't include the name changes of added/deleted states.
-        old_to_new_state_names: dict. Dictionary mapping state names of
+        old_to_new_state_names: Dictionary mapping state names of
             prev_exp_version to the state names of current_exp_version.
             It doesn't include the name changes of added/deleted states.
     """
@@ -1138,9 +1136,8 @@ class ExplorationVersionsDiff:
         """Constructs an ExplorationVersionsDiff domain object.
 
         Args:
-            change_list: list(ExplorationChange). A list of all of the commit
-                cmds from the old version of the exploration up to the next
-                version.
+            change_list: A list of all of the commit cmds from the old version
+                of the exploration up to the next version.
         """
 
         added_state_names: List[str] = []
@@ -1194,8 +1191,8 @@ class VersionedExplorationInteractionIdsMapping:
         object.
 
         Args:
-            version: int. The version of the exploration.
-            state_interaction_ids_dict: dict. A dict where each key-value pair
+            version: The version of the exploration.
+            state_interaction_ids_dict: A dict where each key-value pair
                 represents, respectively, a state name and an interaction id.
         """
         self.version = version
@@ -1285,35 +1282,31 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Initializes an Exploration domain object.
 
         Args:
-            exploration_id: str. The exploration id.
-            title: str. The exploration title.
-            category: str. The category of the exploration.
-            objective: str. The objective of the exploration.
-            language_code: str. The language code of the exploration.
-            tags: list(str). The tags given to the exploration.
-            blurb: str. The blurb of the exploration.
-            author_notes: str. The author notes.
-            states_schema_version: int. Tbe schema version of the exploration.
-            init_state_name: str. The name for the initial state of the
-                exploration.
-            states_dict: dict. A dict where each key-value pair represents,
+            exploration_id: The exploration id.
+            title: The exploration title.
+            category: The category of the exploration.
+            objective: The objective of the exploration.
+            language_code: The language code of the exploration.
+            tags: The tags given to the exploration.
+            blurb: The blurb of the exploration.
+            author_notes: The author notes.
+            states_schema_version: The schema version of the exploration.
+            init_state_name: The name for the initial state of the exploration.
+            states_dict: A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
-            param_specs_dict: dict. A dict where each key-value pair represents
+            param_specs_dict: A dict where each key-value pair represents
                 respectively, a param spec name and a dict used to initialize a
                 ParamSpec domain object.
-            param_changes_list: list(dict). List of dict where each dict is
+            param_changes_list: List of dict where each dict is
                 used to initialize a ParamChange domain object.
-            version: int. The version of the exploration.
-            auto_tts_enabled: bool. True if automatic text-to-speech is
+            version: The version of the exploration.
+            auto_tts_enabled: True if automatic text-to-speech is enabled.
+            correctness_feedback_enabled: True if correctness feedback is
                 enabled.
-            correctness_feedback_enabled: bool. True if correctness feedback is
-                enabled.
-            edits_allowed: bool. True when edits to the exploration is allowed.
-            created_on: datetime.datetime. Date and time when the exploration
-                is created.
-            last_updated: datetime.datetime. Date and time when the exploration
-                was last updated.
+            edits_allowed: True when edits to the exploration is allowed.
+            created_on: Date and time when the exploration is created.
+            last_updated: Date and time when the exploration was last updated.
         """
         self.id = exploration_id
         self.title = title
@@ -1351,8 +1344,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Get all translatable fields/objects in the exploration.
 
         Returns:
-            translatable_contents_collection: TranslatableContentsCollection.
-            An instance of TranslatableContentsCollection class.
+            TranslatableContentsCollection. An instance of
+            TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
@@ -1384,12 +1377,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         initializated to 0.
 
         Args:
-            exploration_id: str. The id of the exploration.
-            title: str. The exploration title.
-            init_state_name: str. The name of the initial state.
-            category: str. The category of the exploration.
-            objective: str. The objective of the exploration.
-            language_code: str. The language code of the exploration.
+            exploration_id: The id of the exploration.
+            title: The exploration title.
+            init_state_name: The name of the initial state.
+            category: The category of the exploration.
+            objective: The objective of the exploration.
+            language_code: The language code of the exploration.
 
         Returns:
             Exploration. The Exploration domain object with default
@@ -1420,16 +1413,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Return a Exploration domain object from a dict.
 
         Args:
-            exploration_dict: dict. The dict representation of Exploration
-                object.
-            exploration_version: int. The version of the exploration.
-            exploration_created_on: datetime.datetime. Date and time when the
-                exploration is created.
-            exploration_last_updated: datetime.datetime. Date and time when the
-                exploration was last updated.
+            exploration_dict: The dict representation of Exploration object.
+            exploration_version: The version of the exploration.
+            exploration_created_on: Date and time when the exploration is
+                created.
+            exploration_last_updated: Date and time when the exploration was
+                last updated.
 
         Returns:
-            Exploration. The corresponding Exploration domain object.
+            The corresponding Exploration domain object.
 
         Raises:
             Exception. Some parameter was used in a state but not declared
@@ -1543,7 +1535,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Validates name string.
 
         Args:
-            name: str. The name to validate.
+            name: The name to validate.
         """
         utils.require_valid_name(name, 'a state name')
 
@@ -1551,7 +1543,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Validates various properties of the Exploration.
 
         Args:
-            strict: bool. If True, the exploration is assumed to be published,
+            strict: If True, the exploration is assumed to be published,
                 and the validation checks are stricter.
 
         Raises:
@@ -2069,11 +2061,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Return the content for a given content id of a state.
 
         Args:
-            state_name: str. The name of the state.
-            content_id: str. The id of the content.
+            state_name: The name of the state.
+            content_id: The id of the content.
 
         Returns:
-            str. The html content corresponding to the given content id of a
+            The html content corresponding to the given content id of a
             state.
 
         Raises:
@@ -2090,7 +2082,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """The state which forms the start of this exploration.
 
         Returns:
-            State. The corresponding State domain object.
+            The corresponding State domain object.
         """
         return self.states[self.init_state_name]
 
@@ -2099,7 +2091,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """A dict of param specs, each represented as Python dicts.
 
         Returns:
-            dict. Dict of parameter specs.
+            Dict of parameter specs.
         """
         return {ps_name: ps_val.to_dict()
                 for (ps_name, ps_val) in self.param_specs.items()}
@@ -2109,7 +2101,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """A list of param changes, represented as JSONifiable Python dicts.
 
         Returns:
-            list(dict). List of dicts, each representing a parameter change.
+            List of dicts, each representing a parameter change.
         """
         return [param_change.to_dict() for param_change in self.param_changes]
 
@@ -2118,10 +2110,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Whether the given exploration id is a demo exploration.
 
         Args:
-            exploration_id: str. The exploration id.
+            exploration_id: The exploration id.
 
         Returns:
-            bool. Whether the corresponding exploration is a demo exploration.
+            Whether the corresponding exploration is a demo exploration.
         """
         return exploration_id in feconf.DEMO_EXPLORATIONS
 
@@ -2130,7 +2122,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Whether the exploration is one of the demo explorations.
 
         Returns:
-            bool. True is the current exploration is a demo exploration.
+            True is the current exploration is a demo exploration.
         """
         return self.is_demo_exploration_id(self.id)
 
@@ -2138,10 +2130,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Whether the exploration has a state with the given state name.
 
         Args:
-            state_name: str. The name of the state.
+            state_name: The name of the state.
 
         Returns:
-            bool. Returns true if the exploration has the given state name.
+            Returns true if the exploration has the given state name.
         """
         state_names = list(self.states.keys())
         return state_name in state_names
@@ -2152,10 +2144,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Returns the interaction id of the state.
 
         Args:
-            state_name: str. The name of the state.
+            state_name: The name of the state.
 
         Returns:
-            str|None. The ID of the interaction.
+            The ID of the interaction.
         """
         return self.states[state_name].interaction.id
 
@@ -2163,7 +2155,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Update the exploration title.
 
         Args:
-            title: str. The exploration title to set.
+            title: The exploration title to set.
         """
         self.title = title
 
@@ -2171,7 +2163,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Update the exploration category.
 
         Args:
-            category: str. The exploration category to set.
+            category: The exploration category to set.
         """
         self.category = category
 
@@ -2179,7 +2171,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Update the exploration objective.
 
         Args:
-            objective: str. The exploration objective to set.
+            objective: The exploration objective to set.
         """
         self.objective = objective
 
@@ -2187,7 +2179,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Update the exploration language code.
 
         Args:
-            language_code: str. The exploration language code to set.
+            language_code: The exploration language code to set.
         """
         self.language_code = language_code
 
@@ -2195,7 +2187,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Update the tags of the exploration.
 
         Args:
-            tags: list(str). List of tags to set.
+            tags: List of tags to set.
         """
         self.tags = tags
 
@@ -2203,7 +2195,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Update the blurb of the exploration.
 
         Args:
-            blurb: str. The blurb to set.
+            blurb: The blurb to set.
         """
         self.blurb = blurb
 
@@ -2211,7 +2203,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Update the author notes of the exploration.
 
         Args:
-            author_notes: str. The author notes to set.
+            author_notes: The author notes to set.
         """
         self.author_notes = author_notes
 
@@ -2221,7 +2213,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Update the param spec dict.
 
         Args:
-            param_specs_dict: dict. A dict where each key-value pair represents
+            param_specs_dict: A dict where each key-value pair represents
                 respectively, a param spec name and a dict used to initialize a
                 ParamSpec domain object.
         """
@@ -2236,7 +2228,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Update the param change dict.
 
         Args:
-            param_changes: list(ParamChange). List of ParamChange objects.
+            param_changes: List of ParamChange objects.
         """
         self.param_changes = param_changes
 
@@ -2244,7 +2236,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Update the name for the initial state of the exploration.
 
         Args:
-            init_state_name: str. The new name of the initial state.
+            init_state_name: The new name of the initial state.
 
         Raises:
             Exception. Invalid initial state name.
@@ -2264,7 +2256,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Update whether automatic text-to-speech is enabled.
 
         Args:
-            auto_tts_enabled: bool. Whether automatic text-to-speech
+            auto_tts_enabled: Whether automatic text-to-speech
                 is enabled or not.
         """
         self.auto_tts_enabled = auto_tts_enabled
@@ -2275,7 +2267,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Update whether correctness feedback is enabled.
 
         Args:
-            correctness_feedback_enabled: bool. Whether correctness feedback
+            correctness_feedback_enabled: Whether correctness feedback
                 is enabled or not.
         """
         self.correctness_feedback_enabled = correctness_feedback_enabled
@@ -2285,7 +2277,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Adds multiple states to the exploration.
 
         Args:
-            state_names: list(str). List of state names to add.
+            state_names: List of state names to add.
 
         Raises:
             ValueError. At least one of the new state names already exists in
@@ -2303,8 +2295,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Renames the given state.
 
         Args:
-            old_state_name: str. The old name of state to rename.
-            new_state_name: str. The new state name.
+            old_state_name: The old name of state to rename.
+            new_state_name: The new state name.
 
         Raises:
             ValueError. The old state name does not exist or the new state name
@@ -2339,7 +2331,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Deletes the given state.
 
         Args:
-            state_name: str. The state name to be deleted.
+            state_name: The state name to be deleted.
 
         Raises:
             ValueError. The state does not exist or is the initial state of the
@@ -2371,12 +2363,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         language.
 
         Args:
-            language_code: str. The language code in which translation is
+            language_code: The language code in which translation is
                 required.
 
         Returns:
-            dict(str, dict(str, str)). A dict where state_name is the key and a
-            dict with content_id as the key and html content as value.
+            A dict where state_name is the key and a dict with content_id
+            as the key and html content as value.
         """
         state_names_to_content_id_mapping = {}
         for state_name, state in self.states.items():
@@ -2398,12 +2390,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         to the name of the state in the previous version of the exploration.
 
         Args:
-            old_states: dict. Dictionary containing all State domain objects.
-            exp_versions_diff: ExplorationVersionsDiff. An instance of the
-                exploration versions diff class.
+            old_states: Dictionary containing all State domain objects.
+            exp_versions_diff: An instance of the exploration versions
+                diff class.
 
         Returns:
-            dict. The trainable states dict. This dict has three keys
+            The trainable states dict. This dict has three keys
             representing state names with changed answer groups and
             unchanged answer groups respectively.
         """
@@ -2455,7 +2447,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         is 100%.
 
         Returns:
-            list(str). A list of language code in which the translation for the
+            A list of language code in which the translation for the
             exploration is complete i.e, 100%.
         """
         content_count = self.get_content_count()
@@ -2472,7 +2464,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration.
 
         Returns:
-            dict(str, int). A dict with language code as a key and number of
+            A dict with language code as a key and number of
             translation available in that language as the value.
         """
         exploration_translation_counts: Dict[
@@ -2493,7 +2485,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         (The content field includes state content, feedback, hints, solutions.)
 
         Returns:
-            int. The total number of distinct content fields available inside
+            The total number of distinct content fields available inside
             the exploration.
         """
         content_count = 0
@@ -2524,12 +2516,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         updated.
 
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
+            states_dict: A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
 
         Returns:
-            dict. The converted states_dict.
+            The converted states_dict.
         """
 
         @overload
@@ -2572,13 +2564,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
             content_ids for equality.
 
             Args:
-                new_type: str. The type to migrate to.
-                value: *. The value to migrate.
-                choices: list(dict). The list of subtitled html dicts to extract
+                new_type: The type to migrate to.
+                value: The value to migrate.
+                choices: The list of subtitled html dicts to extract
                     content ids from.
 
             Returns:
-                *. The migrated rule input.
+                The migrated rule input.
             """
 
             def extract_content_id_from_choices(html: str) -> str:
@@ -2586,10 +2578,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 which is a list of subtitled html dicts.
 
                 Args:
-                    html: str. The html to find the content id of.
+                    html: The html to find the content id of.
 
                 Returns:
-                    str. The content id of html.
+                    The content id of html.
                 """
                 for subtitled_html_dict in choices:
                     if subtitled_html_dict['html'] == html:
@@ -2765,12 +2757,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         division operation.
 
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
+            states_dict: A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
 
         Returns:
-            dict. The converted states_dict.
+            The converted states_dict.
         """
         for state_dict in states_dict.values():
             interaction_id = state_dict['interaction']['id']
@@ -2799,13 +2791,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
         mark a state as a checkpoint for the learners
 
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
+            states_dict: A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initalize a
                 State domain object.
-            init_state_name: str. Name of the first state.
+            init_state_name: Name of the first state.
 
         Returns:
-            dict. The converted states_dict.
+            The converted states_dict.
         """
         for (state_name, state_dict) in states_dict.items():
             state_dict['card_is_checkpoint'] = bool(
@@ -2820,12 +2812,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         linked skill id.
 
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
+            states_dict: A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
 
         Returns:
-            dict. The converted states_dict.
+            The converted states_dict.
         """
 
         for state_dict in states_dict.values():
@@ -2841,12 +2833,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         tags and the data_format is unicode.
 
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
+            states_dict: A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
 
         Returns:
-            dict. The converted states_dict.
+            The converted states_dict.
         """
 
         for state_dict in states_dict.values():
@@ -2900,12 +2892,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         it to oppia-noninteractive-image tag.
 
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
+            states_dict: A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
 
         Returns:
-            dict. The converted states_dict.
+            The converted states_dict.
         """
 
         for state_dict in states_dict.values():
@@ -2926,12 +2918,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         HTML fields.
 
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
+            states_dict: A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
 
         Returns:
-            dict. The converted states_dict.
+            The converted states_dict.
         """
 
         for state_dict in states_dict.values():
@@ -2954,12 +2946,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         than or equal to zero.
 
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
+            states_dict: A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
 
         Returns:
-            dict. The converted states_dict.
+            The converted states_dict.
         """
 
         for state_dict in states_dict.values():
@@ -2984,12 +2976,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         `customOskLetters` cust arg to `allowedVariables`.
 
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
+            states_dict: A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
 
         Returns:
-            dict. The converted states_dict.
+            The converted states_dict.
         """
         for state_dict in states_dict.values():
             if state_dict['interaction']['id'] in MATH_INTERACTION_TYPES:
@@ -3029,12 +3021,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         to a state for strengthening concepts when they get really stuck.
 
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
+            states_dict: A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
 
         Returns:
-            dict. The converted states_dict.
+            The converted states_dict.
         """
         for state_dict in states_dict.values():
             answer_groups = state_dict['interaction']['answer_groups']
@@ -3058,12 +3050,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         translations and voiceovers were not updated.
 
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
+            states_dict: A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
 
         Returns:
-            dict. The converted states_dict.
+            The converted states_dict.
         """
         for state_dict in states_dict.values():
             interaction = state_dict['interaction']
@@ -3158,15 +3150,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
         in-place.
 
         Args:
-            versioned_exploration_states: dict. A dict with two keys:
-                - states_schema_version: int. The states schema version for
+            versioned_exploration_states: A dict with two keys:
+                - states_schema_version: The states schema version for
                     the exploration.
-                - states: dict. The dict of states which is contained in the
+                - states: The dict of states which is contained in the
                     exploration. The keys are state names and the values are
                     dicts used to initialize a State domain object.
-            current_states_schema_version: int. The current states
+            current_states_schema_version: The current states
                 schema version.
-            init_state_name: str. Name of initial state.
+            init_state_name: Name of initial state.
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
@@ -3197,11 +3189,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         inputs will store content ids of html rather than the raw html.
 
         Args:
-            exploration_dict: dict. The dict representation of an exploration
+            exploration_dict: The dict representation of an exploration
                 with schema version v46.
 
         Returns:
-            dict. The dict representation of the Exploration domain object,
+            The dict representation of the Exploration domain object,
             following schema version v47.
         """
         exploration_dict['schema_version'] = 47
@@ -3223,11 +3215,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         instead of a fraction for the division operation.
 
         Args:
-            exploration_dict: dict. The dict representation of an exploration
+            exploration_dict: The dict representation of an exploration
                 with schema version v47.
 
         Returns:
-            dict. The dict representation of the Exploration domain object,
+            The dict representation of the Exploration domain object,
             following schema version v48.
         """
         exploration_dict['schema_version'] = 48
@@ -3247,11 +3239,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         learners.
 
         Args:
-            exploration_dict: dict. The dict representation of an exploration
+            exploration_dict: The dict representation of an exploration
                 with schema version v48.
 
         Returns:
-            dict. The dict representation of the Exploration domain object,
+            The dict representation of the Exploration domain object,
             following schema version v49.
         """
         exploration_dict['schema_version'] = 49
@@ -3269,11 +3261,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Version 50 contains linked skill id to exploration state.
 
         Args:
-            exploration_dict: dict. The dict representation of an exploration
+            exploration_dict: The dict representation of an exploration
                 with schema version v49.
 
         Returns:
-            dict. The dict representation of the Exploration domain object,
+            The dict representation of the Exploration domain object,
             following schema version v50.
         """
 
@@ -3294,11 +3286,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         HTML tags and have data_format field set to unicode.
 
         Args:
-            exploration_dict: dict. The dict representation of an exploration
+            exploration_dict: The dict representation of an exploration
                 with schema version v50.
 
         Returns:
-            dict. The dict representation of the Exploration domain object,
+            The dict representation of the Exploration domain object,
             following schema version v51.
         """
 
@@ -3319,11 +3311,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         existing occurences of it to oppia-noninteractive-image tag.
 
         Args:
-            exploration_dict: dict. The dict representation of an exploration
+            exploration_dict: The dict representation of an exploration
                 with schema version v51.
 
         Returns:
-            dict. The dict representation of the Exploration domain object,
+            The dict representation of the Exploration domain object,
             following schema version v52.
         """
 
@@ -3343,11 +3335,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Version 53 fixes encoding issues in HTML fields.
 
         Args:
-            exploration_dict: dict. The dict representation of an exploration
+            exploration_dict: The dict representation of an exploration
                 with schema version v51.
 
         Returns:
-            dict. The dict representation of the Exploration domain object,
+            The dict representation of the Exploration domain object,
             following schema version v52.
         """
 
@@ -3368,11 +3360,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         which allows creators to set input greator than or equal to zero.
 
         Args:
-            exploration_dict: dict. The dict representation of an exploration
+            exploration_dict: The dict representation of an exploration
                 with schema version v53.
 
         Returns:
-            dict. The dict representation of the Exploration domain object,
+            The dict representation of the Exploration domain object,
             following schema version v54.
         """
         exploration_dict['schema_version'] = 54
@@ -3393,11 +3385,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         `customOskLetters` cust arg to `allowedVariables`.
 
         Args:
-            exploration_dict: dict. The dict representation of an exploration
+            exploration_dict: The dict representation of an exploration
                 with schema version v54.
 
         Returns:
-            dict. The dict representation of the Exploration domain object,
+            The dict representation of the Exploration domain object,
             following schema version v55.
         """
         exploration_dict['schema_version'] = 55
@@ -3418,11 +3410,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         they get really stuck.
 
         Args:
-            exploration_dict: dict. The dict representation of an exploration
+            exploration_dict: The dict representation of an exploration
                 with schema version v55.
 
         Returns:
-            dict. The dict representation of the Exploration domain object,
+            The dict representation of the Exploration domain object,
             following schema version v56.
         """
         exploration_dict['schema_version'] = 56
@@ -3442,11 +3434,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for voiceovers.
 
         Args:
-            exploration_dict: dict. The dict representation of an exploration
+            exploration_dict: The dict representation of an exploration
                 with schema version v56.
 
         Returns:
-            dict. The dict representation of the Exploration domain object,
+            The dict representation of the Exploration domain object,
             following schema version v57.
         """
         exploration_dict['schema_version'] = 57
@@ -3465,11 +3457,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         format.
 
         Args:
-            yaml_content: str. The YAML representation of the exploration.
+            yaml_content: The YAML representation of the exploration.
 
         Returns:
-            exploration_dict. The dict 'exploration_dict' is the representation
-            of the Exploration.
+            The dict 'exploration_dict' is the representation of the
+            Exploration.
 
         Raises:
             InvalidInputException. The 'yaml_content' or the schema version
@@ -3562,11 +3554,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         schema versions 10 and later.
 
         Args:
-            exploration_id: str. The id of the exploration.
-            yaml_content: str. The YAML representation of the exploration.
+            exploration_id: The id of the exploration.
+            yaml_content: The YAML representation of the exploration.
 
         Returns:
-            Exploration. The corresponding exploration domain object.
+            The corresponding exploration domain object.
 
         Raises:
             InvalidInputException. The initial schema version of exploration is
@@ -3581,7 +3573,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Convert the exploration domain object into YAML string.
 
         Returns:
-            str. The YAML representation of this exploration.
+            The YAML representation of this exploration.
         """
         exp_dict = self.to_dict()
         # Here we use MyPy ignore because the dictionary returned by `to_dict()`
@@ -3604,7 +3596,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         necessary information to represent the exploration.
 
         Returns:
-            dict. A dict mapping all fields of Exploration instance.
+            A dict mapping all fields of Exploration instance.
         """
         exploration_dict: ExplorationDict = ({
             'id': self.id,
@@ -3632,7 +3624,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Returns the object serialized as a JSON string.
 
         Returns:
-            str. JSON-encoded str encoding all of the information composing
+            JSON-encoded str encoding all of the information composing
             the object.
         """
         # Here we use MyPy ignore because to_dict() method returns a general
@@ -3668,12 +3660,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Returns an Exploration domain object decoded from a JSON string.
 
         Args:
-            json_string: str. A JSON-encoded string that can be
+            json_string: A JSON-encoded string that can be
                 decoded into a dictionary representing a Exploration.
                 Only call on strings that were created using serialize().
 
         Returns:
-            Exploration. The corresponding Exploration domain object.
+            The corresponding Exploration domain object.
         """
         exploration_dict = json.loads(json_string)
         created_on = (
@@ -3697,7 +3689,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         learner view.
 
         Returns:
-            dict. A dict mapping some fields of Exploration instance. The
+            A dict mapping some fields of Exploration instance. The
             fields inserted in the dict (as key) are:
                 - init_state_name: str. The name for the initial state of the
                     exploration.
@@ -3732,7 +3724,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Gets all html content strings used in this exploration.
 
         Returns:
-            list(str). The list of html content strings.
+            The list of html content strings.
         """
         html_list = []
         for state in self.states.values():
@@ -3782,42 +3774,42 @@ class ExplorationSummary:
         """Initializes a ExplorationSummary domain object.
 
         Args:
-            exploration_id: str. The exploration id.
-            title: str. The exploration title.
-            category: str. The exploration category.
-            objective: str. The exploration objective.
-            language_code: str. The code that represents the exploration
+            exploration_id: The exploration id.
+            title: The exploration title.
+            category: The exploration category.
+            objective: The exploration objective.
+            language_code: The code that represents the exploration
                 language.
-            tags: list(str). List of tags.
-            ratings: dict. Dict whose keys are '1', '2', '3', '4', '5' and
+            tags: List of tags.
+            ratings: Dict whose keys are '1', '2', '3', '4', '5' and
                 whose values are nonnegative integers representing frequency
                 counts. Note that the keys need to be strings in order for this
                 dict to be JSON-serializable.
-            scaled_average_rating: float. The average rating.
-            status: str. The status of the exploration.
-            community_owned: bool. Whether the exploration is community-owned.
-            owner_ids: list(str). List of the users ids who are the owners of
+            scaled_average_rating: The average rating.
+            status: The status of the exploration.
+            community_owned: Whether the exploration is community-owned.
+            owner_ids: List of the users ids who are the owners of
                 this exploration.
-            editor_ids: list(str). List of the users ids who have access to
+            editor_ids: List of the users ids who have access to
                 edit this exploration.
-            voice_artist_ids: list(str). List of the users ids who have access
+            voice_artist_ids: List of the users ids who have access
                 to voiceover this exploration.
-            viewer_ids: list(str). List of the users ids who have access to
+            viewer_ids: List of the users ids who have access to
                 view this exploration.
-            contributor_ids: list(str). List of the users ids of the user who
+            contributor_ids: List of the users ids of the user who
                 have contributed to this exploration.
-            contributors_summary: dict. A summary about contributors of current
+            contributors_summary: A summary about contributors of current
                 exploration. The keys are user ids and the values are the
                 number of commits made by that user.
-            version: int. The version of the exploration.
-            exploration_model_created_on: datetime.datetime. Date and time when
-                the exploration model is created.
-            exploration_model_last_updated: datetime.datetime. Date and time
-                when the exploration model was last updated.
-            first_published_msec: float|None. Time in milliseconds since the
-                Epoch, when the exploration was first published, or None if
-                Exploration is not published yet.
-            deleted: bool. Whether the exploration is marked as deleted.
+            version: The version of the exploration.
+            exploration_model_created_on: Date and time when the exploration
+                model is created.
+            exploration_model_last_updated: Date and time when the exploration
+                model was last updated.
+            first_published_msec: Time in milliseconds since the Epoch, when the
+                exploration was first published, or None if Exploration is not
+                published yet.
+            deleted: Whether the exploration is marked as deleted.
         """
         self.id = exploration_id
         self.title = title
@@ -4003,7 +3995,7 @@ class ExplorationSummary:
         id, title and objective of the exploration.
 
         Returns:
-            dict. A metadata dict for the given exploration summary.
+            A metadata dict for the given exploration summary.
             The metadata dict has three keys:
                 - 'id': str. The exploration ID.
                 - 'title': str. The exploration title.
@@ -4019,7 +4011,7 @@ class ExplorationSummary:
         """Checks whether the exploration is private.
 
         Returns:
-            bool. Whether the exploration is private.
+            Whether the exploration is private.
         """
         return bool(self.status == constants.ACTIVITY_STATUS_PRIVATE)
 
@@ -4027,10 +4019,10 @@ class ExplorationSummary:
         """Checks whether the exploration is solely owned by the user.
 
         Args:
-            user_id: str. The id of the user.
+            user_id: The id of the user.
 
         Returns:
-            bool. Whether the exploration is solely owned by the user.
+            Whether the exploration is solely owned by the user.
         """
         return user_id in self.owner_ids and len(self.owner_ids) == 1
 
@@ -4038,10 +4030,10 @@ class ExplorationSummary:
         """Checks if a given user has any role within the exploration.
 
         Args:
-            user_id: str. User id of the user.
+            user_id: User id of the user.
 
         Returns:
-            bool. Whether the given user has any role in the exploration.
+            Whether the given user has any role in the exploration.
         """
         return (
             user_id in self.owner_ids or
@@ -4054,7 +4046,7 @@ class ExplorationSummary:
         """Add a new contributor to the contributors summary.
 
         Args:
-            contributor_id: str. ID of the contributor to be added.
+            contributor_id: ID of the contributor to be added.
         """
         # We don't want to record the contributions of system users.
         if contributor_id not in constants.SYSTEM_USER_IDS:
@@ -4068,19 +4060,19 @@ class ExplorationChangeMergeVerifier:
     """Class to check for mergeability.
 
     Attributes:
-        added_state_names: list(str). Names of the states added to the
+        added_state_names: Names of the states added to the
             exploration from prev_exp_version to current_exp_version. It
             stores the latest name of the added state.
-        deleted_state_names: list(str). Names of the states deleted from
+        deleted_state_names: Names of the states deleted from
             the exploration from prev_exp_version to current_exp_version.
             It stores the initial name of the deleted state from
             pre_exp_version.
-        new_to_old_state_names: dict. Dictionary mapping state names of
+        new_to_old_state_names: Dictionary mapping state names of
             current_exp_version to the state names of prev_exp_version.
             It doesn't include the name changes of added/deleted states.
-        changed_properties: dict. List of all the properties changed
+        changed_properties: List of all the properties changed
             according to the state and property name.
-        changed_translations: dict. List of all the translations changed
+        changed_translations: List of all the translations changed
             according to the state and content_id name.
     """
 
@@ -4178,11 +4170,10 @@ class ExplorationChangeMergeVerifier:
         """Returns property name from content id.
 
         Args:
-            content_id: string. Id of the content.
+            content_id: Id of the content.
 
         Returns:
-            string. Name of the property of which the
-            content is part of.
+            Name of the property of which the content is part of.
         """
         property_name_to_content_id_identifier: Dict[
             str, Callable[[str], bool]
@@ -4215,8 +4206,7 @@ class ExplorationChangeMergeVerifier:
         add the property name in the lists defined above.
 
         Args:
-            change: ExplorationChange. A change from the
-                composite_change_list.
+            change: A change from the composite_change_list.
         """
         if change.cmd == CMD_ADD_STATE:
             self.added_state_names.append(change.state_name)
@@ -4273,20 +4263,19 @@ class ExplorationChangeMergeVerifier:
         exploration can be merged on the latest version of an exploration.
 
         Args:
-            change_list: list(ExplorationChange). List of the changes made
-                by the user on the frontend, which needs to be checked
-                for mergeability.
-            exp_at_change_list_version: obj. Old version of an exploration.
-            current_exploration: obj. Exploration on which the change list
-                is to be applied.
+            change_list: List of the changes made by the user on the frontend,
+                which needs to be checked for mergeability.
+            exp_at_change_list_version: Old version of an exploration.
+            current_exploration: Exploration on which the change list is to be
+                applied.
 
         Returns:
-            tuple(boolean, boolean). A tuple consisting of two fields.
-            1. boolean. Whether the given change list is mergeable on
-            the current_exploration or not.
-            2. boolean. Whether we need to send the change list to the
-            admin to review for the future improvement of the cases
-            to merge the change list.
+            A tuple consisting of two fields:
+                1. Whether the given change list is mergeable on
+                the current_exploration or not.
+                2. Whether we need to send the change list to the
+                admin to review for the future improvement of the cases
+                to merge the change list.
         """
         old_to_new_state_names = {
             value: key for key, value in self.new_to_old_state_names.items()
@@ -4534,26 +4523,23 @@ class ExplorationMetadata:
         """Initializes an ExplorationMetadata domain object.
 
         Args:
-            title: str. The exploration title.
-            category: str. The category of the exploration.
-            objective: str. The objective of the exploration.
-            language_code: str. The language code of the exploration.
-            tags: list(str). The tags given to the exploration.
-            blurb: str. The blurb of the exploration.
-            author_notes: str. The author notes.
-            states_schema_version: int. Tbe schema version of the exploration.
-            init_state_name: str. The name for the initial state of the
+            title: The exploration title.
+            category: The category of the exploration.
+            objective: The objective of the exploration.
+            language_code: The language code of the exploration.
+            tags: The tags given to the exploration.
+            blurb: The blurb of the exploration.
+            author_notes: The author notes.
+            states_schema_version: Tbe schema version of the exploration.
+            init_state_name: The name for the initial state of the
                 exploration.
-            param_specs: dict(str, ParamSpec). A dict where each key-value pair
-                represents respectively, a param spec name and a ParamSpec
-                domain object.
-            param_changes: list(ParamChange). List of ParamChange domain
-                objects.
-            auto_tts_enabled: bool. True if automatic text-to-speech is
+            param_specs: A dict where each key-value pair represents
+                respectively, a param spec name and a ParamSpec domain object.
+            param_changes: List of ParamChange domain objects.
+            auto_tts_enabled: True if automatic text-to-speech is enabled.
+            correctness_feedback_enabled: True if correctness feedback is
                 enabled.
-            correctness_feedback_enabled: bool. True if correctness feedback is
-                enabled.
-            edits_allowed: bool. True when edits to the exploration is allowed.
+            edits_allowed: True when edits to the exploration is allowed.
         """
         self.title = title
         self.category = category
@@ -4574,7 +4560,7 @@ class ExplorationMetadata:
         """Gets the dict representation of ExplorationMetadata domain object.
 
         Returns:
-            dict. The dict representation of the ExplorationMetadata
+            The dict representation of the ExplorationMetadata
             domain object.
         """
         return {
@@ -4605,9 +4591,9 @@ class MetadataVersionHistory:
     exploration metadata.
 
     Attributes:
-        last_edited_version_number: int. The version number of the
+        last_edited_version_number: The version number of the
             exploration in which the metadata was last edited.
-        last_edited_committer_id: str. The user id of the user who committed
+        last_edited_committer_id: The user id of the user who committed
             the latest changes to the exploration metadata.
     """
 
@@ -4619,9 +4605,9 @@ class MetadataVersionHistory:
         """Initializes the MetadataVersionHistory domain object.
 
         Args:
-            last_edited_version_number: int. The version number of the
+            last_edited_version_number: The version number of the
                 exploration in which the metadata was last edited.
-            last_edited_committer_id: str. The user id of the user who
+            last_edited_committer_id: The user id of the user who
                 committed the latest changes to the exploration metadata.
         """
         self.last_edited_version_number = last_edited_version_number
@@ -4632,7 +4618,7 @@ class MetadataVersionHistory:
         object.
 
         Returns:
-            dict. The dict representation of the MetadataVersionHistory domain
+            The dict representation of the MetadataVersionHistory domain
             object.
         """
         return {
@@ -4647,12 +4633,11 @@ class MetadataVersionHistory:
         """Returns an MetadataVersionHistory domain object from a dict.
 
         Args:
-            metadata_version_history_dict: dict. The dict representation of
+            metadata_version_history_dict: The dict representation of
                 MetadataVersionHistory object.
 
         Returns:
-            MetadataVersionHistory. The corresponding MetadataVersionHistory
-            domain object.
+            The corresponding MetadataVersionHistory domain object.
         """
         return cls(
             metadata_version_history_dict['last_edited_version_number'],
@@ -4665,14 +4650,14 @@ class ExplorationVersionHistory:
     particular version.
 
     Attributes:
-        exploration_id: str. The id of the exploration.
-        exploration_version: int. The version number of the exploration.
-        state_version_history: Dict[str, StateVersionHistory].
-            The mapping of state names and StateVersionHistory domain objects.
-        metadata_version_history: MetadataVersionHistory. The details of the
-            last commit on the exploration metadata.
-        committer_ids: List[str]. A list of user ids who made the
-            'previous commit' on each state and the exploration metadata.
+        exploration_id: The id of the exploration.
+        exploration_version: The version number of the exploration.
+        state_version_history: The mapping of state names and
+            StateVersionHistory domain objects.
+        metadata_version_history: The details of the last commit on the
+            exploration metadata.
+        committer_ids: A list of user ids who made the 'previous commit'
+            on each state and the exploration metadata.
     """
 
     def __init__(
@@ -4689,16 +4674,16 @@ class ExplorationVersionHistory:
         """Initializes the ExplorationVersionHistory domain object.
 
         Args:
-            exploration_id: str. The id of the exploration.
-            exploration_version: int. The version number of the exploration.
-            state_version_history_dict: dict. The mapping of state names and
+            exploration_id: The id of the exploration.
+            exploration_version: The version number of the exploration.
+            state_version_history_dict: The mapping of state names and
                 dicts of StateVersionHistory domain objects.
-            metadata_last_edited_version_number: int. The version number of the
+            metadata_last_edited_version_number: The version number of the
                 exploration in which the metadata was last edited.
-            metadata_last_edited_committer_id: str. The user id of the user who
+            metadata_last_edited_committer_id: The user id of the user who
                 committed the latest changes to the exploration metadata.
-            committer_ids: List[str]. A list of user ids who made the
-                'previous commit' on each state and the exploration metadata.
+            committer_ids: A list of user ids who made the 'previous commit'
+                on each state and the exploration metadata.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
@@ -4717,7 +4702,7 @@ class ExplorationVersionHistory:
         domain object.
 
         Returns:
-            dict. A dict representation of the ExplorationVersionHistory
+            A dict representation of the ExplorationVersionHistory
             domain object.
         """
         return {

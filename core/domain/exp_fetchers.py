@@ -63,12 +63,12 @@ def _migrate_states_schema(
     for that new version.
 
     Args:
-        versioned_exploration_states: dict. A dict with two keys:
-            - states_schema_version: int. the states schema version for the
+        versioned_exploration_states: A dict with two keys:
+            - states_schema_version: the states schema version for the
                 exploration.
             - states: the dict of states comprising the exploration. The keys in
                 this dict are state names.
-        init_state_name: str. Name of initial state.
+        init_state_name: Name of initial state.
 
     Raises:
         Exception. The given states_schema_version is invalid.
@@ -97,7 +97,7 @@ def get_new_exploration_id() -> str:
     """Returns a new exploration id.
 
     Returns:
-        str. A new exploration id.
+        A new exploration id.
     """
     return exp_models.ExplorationModel.get_new_id('')
 
@@ -106,7 +106,7 @@ def get_new_unique_progress_url_id() -> str:
     """Returns a new unique progress url id.
 
     Returns:
-        str. A new unique progress url id.
+        A new unique progress url id.
     """
     return exp_models.TransientCheckpointUrlModel.get_new_progress_id()
 
@@ -119,12 +119,11 @@ def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
     objects corresponding to the specified versions.
 
     Args:
-        exp_id: str. ID of the exploration.
-        version_numbers: list(int). List of version numbers.
+        exp_id: ID of the exploration.
+        version_numbers: List of version numbers.
 
     Returns:
-        list(VersionedExplorationInteractionIdsMapping). List of Exploration
-        domain objects.
+        List of VersionedExplorationInteractionIdsMapping domain objects.
 
     Raises:
         Exception. One or more of the given versions of the exploration could
@@ -173,12 +172,12 @@ def get_exploration_from_model(
     migration works correctly, and it should never be changed otherwise.
 
     Args:
-        exploration_model: ExplorationModel. An exploration storage model.
-        run_conversion: bool. When True, updates the exploration to the latest
+        exploration_model: An exploration storage model.
+        run_conversion: When True, updates the exploration to the latest
             states_schema_version if necessary.
 
     Returns:
-        Exploration. The exploration domain object corresponding to the given
+        The exploration domain object corresponding to the given
         exploration model.
     """
 
@@ -236,13 +235,13 @@ def get_exploration_summary_by_id(
     """Returns a domain object representing an exploration summary.
 
     Args:
-        exploration_id: str. The id of the ExplorationSummary to be returned.
-        strict: bool. Whether to fail noisily if no exploration with a given id
+        exploration_id: The id of the ExplorationSummary to be returned.
+        strict: Whether to fail noisily if no exploration with a given id
             exists.
 
     Returns:
-        ExplorationSummary|None. The summary domain object corresponding to the
-        given exploration, and none if no ExpSummaryModel exists for given id.
+        The summary domain object corresponding to the given exploration, and
+        none if no ExpSummaryModel exists for given id.
     """
     # TODO(msl): Maybe use memcache similarly to get_exploration_by_id.
     exp_summary_model = exp_models.ExpSummaryModel.get(
@@ -261,11 +260,10 @@ def get_exploration_summaries_from_models(
     keyed by their exploration id.
 
     Args:
-        exp_summary_models: list(ExplorationSummary). List of ExplorationSummary
-            model instances.
+        exp_summary_models: List of ExplorationSummary model instances.
 
     Returns:
-        dict. The keys are exploration ids and the values are the corresponding
+        The keys are exploration ids and the values are the corresponding
         ExplorationSummary domain objects.
     """
     exploration_summaries = [
@@ -283,12 +281,11 @@ def get_exploration_summary_from_model(
     """Returns an ExplorationSummary domain object.
 
     Args:
-        exp_summary_model: ExplorationSummary. An ExplorationSummary model
-            instance.
+        exp_summary_model: An ExplorationSummary model instance.
 
     Returns:
-        ExplorationSummary. The summary domain object correspoding to the
-        given exploration summary model.
+        The summary domain object corresponding to the given exploration
+        summary model.
     """
 
     return exp_domain.ExplorationSummary(
@@ -316,12 +313,12 @@ def get_exploration_summaries_matching_ids(
     list of exploration ids.
 
     Args:
-        exp_ids: list(str). List of exploration ids.
+        exp_ids: List of exploration ids.
 
     Returns:
-        list(ExplorationSummary|None). List of ExplorationSummary domain objects
-        corresponding to the given exploration ids. If an ExplorationSummary
-        does not exist, the corresponding returned list element is None.
+        List of ExplorationSummary domain objects corresponding to the
+        given exploration ids. If an ExplorationSummary does not exist,
+        the corresponding returned list element is None.
     """
     return [get_exploration_summary_from_model(model) if model else None
             for model in exp_models.ExpSummaryModel.get_multi(exp_ids)]
@@ -334,11 +331,10 @@ def get_exploration_summaries_subscribed_to(
     subscribes to.
 
     Args:
-        user_id: str. The id of the user.
+        user_id: The id of the user.
 
     Returns:
-        list(ExplorationSummary). List of ExplorationSummary domain objects that
-        the user subscribes to.
+        List of ExplorationSummary domain objects that the user subscribes to.
     """
     return [
         summary for summary in
@@ -388,15 +384,14 @@ def get_exploration_by_id(
     """Returns an Exploration domain object.
 
     Args:
-        exploration_id: str. The id of the exploration to be returned.
-        strict: bool. Whether to fail noisily if no exploration with a given id
+        exploration_id: The id of the exploration to be returned.
+        strict: Whether to fail noisily if no exploration with a given id
             exists.
-        version: int or None. The version of the exploration to be returned.
-            If None, the latest version of the exploration is returned.
+        version: The version of the exploration to be returned. If None,
+            the latest version of the exploration is returned.
 
     Returns:
-        Exploration|None. The domain object corresponding to the given
-        exploration.
+        The domain object corresponding to the given exploration.
     """
     sub_namespace = str(version) if version else None
     cached_exploration = caching_services.get_multi(
@@ -431,12 +426,12 @@ def get_multiple_explorations_by_id(
     return dict.
 
     Args:
-        exp_ids: list(str). List of ids of the exploration to be returned.
-        strict: bool. If True, a ValueError is raised when any exploration id
+        exp_ids: List of ids of the exploration to be returned.
+        strict: If True, a ValueError is raised when any exploration id
             is invalid.
 
     Returns:
-        dict. Maps exploration ids to the corresponding Exploration domain
+        Maps exploration ids to the corresponding Exploration domain
         objects. Any invalid exploration ids are omitted.
 
     Raises:
@@ -494,11 +489,10 @@ def get_exploration_summaries_where_user_has_role(
     some role.
 
     Args:
-        user_id: str. The id of the user.
+        user_id: The id of the user.
 
     Returns:
-        list(ExplorationSummary). List of ExplorationSummary domain objects
-        where the user has some role.
+        List of ExplorationSummary domain objects where the user has some role.
     """
     exp_summary_models: Sequence[exp_models.ExpSummaryModel] = (
         exp_models.ExpSummaryModel.query(
@@ -523,13 +517,13 @@ def get_exploration_user_data(
     """Returns an ExplorationUserData domain object.
 
     Args:
-        user_id: str. The Id of the user.
-        exp_id: str. The Id of the exploration.
+        user_id: The Id of the user.
+        exp_id: The Id of the exploration.
 
     Returns:
-        ExplorationUserData or None. The domain object corresponding to the
-        given user and exploration. If the model corresponsing to given user
-        and exploration is not found, return None.
+        The domain object corresponding to the given user and exploration.
+        If the model corresponding to given user and exploration is not
+        found, return None.
     """
     exp_user_data_model = user_models.ExplorationUserDataModel.get(
         user_id, exp_id)
@@ -561,13 +555,13 @@ def get_logged_out_user_progress(
     """Returns an TransientCheckpointUrl domain object.
 
     Args:
-        unique_progress_url_id: str. The 6 digit long unique id
-            assigned to the progress made by a logged-out user.
+        unique_progress_url_id: The 6 digit long unique id assigned to the
+            progress made by a logged-out user.
 
     Returns:
-        TransientCheckpointUrl or None. The domain object corresponding to the
-        given unique_progress_url_id. If the model corresponding to given
-        unique_progress_url_id is not found, return None.
+        The domain object corresponding to the given unique_progress_url_id.
+        If the model corresponding to given unique_progress_url_id is not found,
+        return None.
     """
     logged_out_user_progress_model = (
         exp_models.TransientCheckpointUrlModel.get(
@@ -594,12 +588,12 @@ def get_exploration_version_history(
     ExplorationVersionHistoryModel for the given exploration id and version.
 
     Args:
-        exp_id: str. The id of the exploration.
-        exp_version: int. The version number of the exploration.
+        exp_id: The id of the exploration.
+        exp_version: The version number of the exploration.
 
     Returns:
-        ExplorationVersionHistory. The exploration version history domain
-        object for the ExplorationVersionHistoryModel corresponding to the
+        The exploration version history domain object for the
+        ExplorationVersionHistoryModel corresponding to the
         given exploration id and version.
     """
     version_history_model_id = (

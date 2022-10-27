@@ -36,10 +36,10 @@ def _is_email_valid(email_address: str) -> bool:
     """Determines whether an email address is valid.
 
     Args:
-        email_address: str. Email address to check.
+        email_address: Email address to check.
 
     Returns:
-        bool. Whether the specified email address is valid.
+        Whether the specified email address is valid.
     """
     if not isinstance(email_address, str):
         return False
@@ -59,10 +59,10 @@ def _is_sender_email_valid(sender_email: str) -> bool:
     'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or 'email_address'.
 
     Args:
-        sender_email: str. The email address of the sender.
+        sender_email: The email address of the sender.
 
     Returns:
-        bool. Whether the sender_email is valid.
+        Whether the sender_email is valid.
     """
     split_sender_email = sender_email.split(' ')
     if len(split_sender_email) < 2:
@@ -89,17 +89,17 @@ def send_mail(
     email_manager._send_email().
 
     Args:
-        sender_email: str. The email address of the sender. This should be in
+        sender_email: The email address of the sender. This should be in
             the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
             'SENDER_EMAIL_ADDRESS'. Format must be utf-8.
-        recipient_email: str. The email address of the recipient. Format must
+        recipient_email: The email address of the recipient. Format must
             be utf-8.
-        subject: str. The subject line of the email. Format must be utf-8.
-        plaintext_body: str. The plaintext body of the email. Format must be
+        subject: The subject line of the email. Format must be utf-8.
+        plaintext_body: The plaintext body of the email. Format must be
             utf-8.
-        html_body: str. The HTML body of the email. Must fit in a datastore
+        html_body: The HTML body of the email. Must fit in a datastore
             entity. Format must be utf-8.
-        bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the email.
+        bcc_admin: Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the email.
 
     Raises:
         Exception. The configuration in feconf.py forbids emails from being
@@ -144,15 +144,15 @@ def send_bulk_mail(
     email_manager._send_bulk_mail().
 
     Args:
-        sender_email: str. The email address of the sender. This should be in
+        sender_email: The email address of the sender. This should be in
             the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
             'SENDER_EMAIL_ADDRESS'. Format must be utf-8.
-        recipient_emails: list(str). List of the email addresses of recipients.
+        recipient_emails: List of the email addresses of recipients.
             Format must be utf-8.
-        subject: str. The subject line of the email. Format must be utf-8.
-        plaintext_body: str. The plaintext body of the email. Format must be
+        subject: The subject line of the email. Format must be utf-8.
+        plaintext_body: The plaintext body of the email. Format must be
             utf-8.
-        html_body: str. The HTML body of the email. Must fit in a datastore
+        html_body: The HTML body of the email. Must fit in a datastore
             entity. Format must be utf-8.
 
     Raises:

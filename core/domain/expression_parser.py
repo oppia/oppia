@@ -63,10 +63,10 @@ def contains_balanced_brackets(expression: str) -> bool:
     """Checks if the given expression contains a balanced bracket sequence.
 
     Args:
-        expression: str. A math expression (algebraic/numeric).
+        expression: A math expression (algebraic/numeric).
 
     Returns:
-        bool. Whether the given expression contains a balanced bracket sequence.
+        Whether the given expression contains a balanced bracket sequence.
     """
     openers, closers = '({[', ')}]'
     stack = []
@@ -87,10 +87,10 @@ def contains_at_least_one_variable(expression: str) -> bool:
     (latin letter or greek symbol name).
 
     Args:
-        expression: str. A math expression.
+        expression: A math expression.
 
     Returns:
-        bool. Whether the given expression contains at least one single latin
+        Whether the given expression contains at least one single latin
         letter or greek symbol name.
 
     Raises:
@@ -109,10 +109,10 @@ def tokenize(expression: str) -> List[Token]:
     definitions.
 
     Args:
-        expression: str. A math expression.
+        expression: A math expression.
 
     Returns:
-        list(Token). A list containing token objects formed from the given math
+        A list containing token objects formed from the given math
         expression.
 
     Raises:
@@ -186,10 +186,10 @@ def get_variables(expression: str) -> List[str]:
     """Extracts all variables along with pi and e from a given expression.
 
     Args:
-        expression: str. A math expression.
+        expression: A math expression.
 
     Returns:
-        list(str). A list containing all the variables present in the given
+        A list containing all the variables present in the given
         expression.
     """
     if '=' in expression:
@@ -212,7 +212,7 @@ class Token:
         """Initializes a Token object.
 
         Args:
-            text: str. String representation of the token.
+            text: String representation of the token.
 
         Raises:
             Exception. Invalid token.
@@ -235,10 +235,10 @@ class Token:
         """Checks if the given token represents a valid math function.
 
         Args:
-            text: str. String representation of the token.
+            text: String representation of the token.
 
         Returns:
-            bool. Whether the given string represents a valid math function.
+            Whether the given string represents a valid math function.
         """
         return text in constants.MATH_FUNCTION_NAMES
 
@@ -248,10 +248,10 @@ class Token:
         greek letter represented by the symbol name.
 
         Args:
-            text: str. String representation of the token.
+            text: String representation of the token.
 
         Returns:
-            bool. Whether the given string represents a valid identifier.
+            Whether the given string represents a valid identifier.
         """
         return text in constants.VALID_ALGEBRAIC_IDENTIFIERS
 
@@ -260,10 +260,10 @@ class Token:
         '+'/'-' sign. 'pi' and 'e' are also considered as numeric values.
 
         Args:
-            text: str. String representation of the token.
+            text: String representation of the token.
 
         Returns:
-            bool. Whether the given string represents a valid real number.
+            Whether the given string represents a valid real number.
         """
         return text.replace('.', '', 1).isdigit() or text in ('pi', 'e')
 
@@ -271,10 +271,10 @@ class Token:
         """Checks if the given token represents a valid math operator.
 
         Args:
-            text: str. String representation of the token.
+            text: String representation of the token.
 
         Returns:
-            bool. Whether the given string represents a valid math operator.
+            Whether the given string represents a valid math operator.
         """
         return text in _VALID_OPERATORS
 
@@ -295,7 +295,7 @@ class Node:
         '+' and children as ['a', 'b'].
 
         Args:
-            children: list(Node). Child nodes of the current node.
+            children: Child nodes of the current node.
         """
         self.children = children
 
@@ -307,8 +307,8 @@ class AdditionOperatorNode(Node):
         """Initializes an AdditionOperatorNode object.
 
         Args:
-            left: Node. Left child of the operator.
-            right: Node. Right child of the operator.
+            left: Left child of the operator.
+            right: Right child of the operator.
         """
         super().__init__([left, right])
 
@@ -320,8 +320,8 @@ class SubtractionOperatorNode(Node):
         """Initializes an SubtractionOperatorNode object.
 
         Args:
-            left: Node. Left child of the operator.
-            right: Node. Right child of the operator.
+            left: Left child of the operator.
+            right: Right child of the operator.
         """
         super().__init__([left, right])
 
@@ -333,8 +333,8 @@ class MultiplicationOperatorNode(Node):
         """Initializes an MultiplicationOperatorNode object.
 
         Args:
-            left: Node. Left child of the operator.
-            right: Node. Right child of the operator.
+            left: Left child of the operator.
+            right: Right child of the operator.
         """
         super().__init__([left, right])
 
@@ -346,8 +346,8 @@ class DivisionOperatorNode(Node):
         """Initializes an DivisionOperatorNode object.
 
         Args:
-            left: Node. Left child of the operator.
-            right: Node. Right child of the operator.
+            left: Left child of the operator.
+            right: Right child of the operator.
         """
         super().__init__([left, right])
 
@@ -359,8 +359,8 @@ class PowerOperatorNode(Node):
         """Initializes an PowerOperatorNode object.
 
         Args:
-            left: Node. Left child of the operator.
-            right: Node. Right child of the operator.
+            left: Left child of the operator.
+            right: Right child of the operator.
         """
         super().__init__([left, right])
 
@@ -375,7 +375,7 @@ class IdentifierNode(Node):
         """Initializes an IdentifierNode object.
 
         Args:
-            token: Token. The token representing the identifier.
+            token: The token representing the identifier.
         """
         self.token = token
         super().__init__([])
@@ -388,7 +388,7 @@ class NumberNode(Node):
         """Initializes a NumberNode object.
 
         Args:
-            token: Token. The token representing a real number.
+            token: The token representing a real number.
         """
         self.token = token
         super().__init__([])
@@ -403,8 +403,8 @@ class UnaryFunctionNode(Node):
         """Initializes a UnaryFunctionNode object.
 
         Args:
-            token: Token. The token representing the math function.
-            child: Node. The parameter of the function.
+            token: The token representing the math function.
+            child: The parameter of the function.
         """
         self.token = token
         super().__init__([child])
@@ -431,10 +431,10 @@ class Parser:
         of tokens present in the expression and calls the _parse_expr method.
 
         Args:
-            expression: str. String representing the math expression.
+            expression: String representing the math expression.
 
         Returns:
-            Node. Root node of the generated parse tree.
+            Root node of the generated parse tree.
 
         Raises:
             Exception. Invalid syntax: Unexpected end of expression.
@@ -463,11 +463,11 @@ class Parser:
         <expr> ::= <mul_expr> (('+' | '-') <mul_expr>)*
 
         Args:
-            token_list: list(Token). A list containing token objects formed from
+            token_list: A list containing token objects formed from
                 the given math expression.
 
         Returns:
-            Node. Root node of the generated parse tree.
+            Root node of the generated parse tree.
         """
         parsed_expr = self._parse_mul_expr(token_list)
         operator_token = self._get_next_token_if_text_in(
@@ -487,11 +487,11 @@ class Parser:
         <mul_expr> ::= <pow_expr> (('*' | '/') <pow_expr>)*
 
         Args:
-            token_list: list(Token). A list containing token objects formed from
+            token_list: A list containing token objects formed from
                 the given math expression.
 
         Returns:
-            Node. Root node of the generated parse tree.
+            Root node of the generated parse tree.
         """
         parsed_expr = self._parse_pow_expr(token_list)
         operator_token = self._get_next_token_if_text_in(
@@ -513,11 +513,11 @@ class Parser:
         <unit> ('^' <pow_expr>)?
 
         Args:
-            token_list: list(Token). A list containing token objects formed from
+            token_list: A list containing token objects formed from
                 the given math expression.
 
         Returns:
-            Node. Root node of the generated parse tree.
+            Root node of the generated parse tree.
         """
         # Eliminate any leading unary '+' or '-' operators, because they
         # are syntactically irrelevant.
@@ -538,11 +538,11 @@ class Parser:
         <function> '(' <expr> ')'
 
         Args:
-            token_list: list(Token). A list containing token objects formed from
+            token_list: A list containing token objects formed from
                 the given math expression.
 
         Returns:
-            Node. Root node of the generated parse tree.
+            Root node of the generated parse tree.
 
         Raises:
             Exception. Invalid token.
@@ -576,11 +576,11 @@ class Parser:
         increment the _next_token_index.
 
         Args:
-            token_list: list(Token). A list containing token objects formed from
+            token_list: A list containing token objects formed from
                 the given math expression.
 
         Returns:
-            Token. Token at the next position.
+            Token at the next position.
 
         Raises:
             Exception. Invalid syntax: Unexpected end of expression.
@@ -600,13 +600,13 @@ class Parser:
         If true, returns the token; otherwise, returns None.
 
         Args:
-            allowed_token_texts: list(str). List of strings containing the
+            allowed_token_texts: List of strings containing the
                 allowed token texts at the next position.
-            token_list: list(Token). A list containing token objects formed from
+            token_list: A list containing token objects formed from
                 the given math expression.
 
         Returns:
-            Token|None. Token at the next position. Returns None if there are no
+            Token at the next position. Returns None if there are no
             more tokens left or the next token text is not in the
             allowed_token_texts.
         """
@@ -623,10 +623,10 @@ def is_valid_expression(expression: str) -> bool:
     """Checks if the given math expression is syntactically valid.
 
     Args:
-        expression: str. String representation of the math expression.
+        expression: String representation of the math expression.
 
     Returns:
-        bool. Whether the given math expression is syntactically valid.
+        Whether the given math expression is syntactically valid.
     """
     try:
         Parser().parse(expression)

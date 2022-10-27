@@ -33,11 +33,11 @@ def validate_image_and_filename(
     """Validates the image data and its filename.
 
     Args:
-        raw_image: Union[str, bytes]. The image content.
-        filename: str. The filename for the image.
+        raw_image: The image content.
+        filename: The filename for the image.
 
     Returns:
-        str. The file format of the image.
+        The file format of the image.
 
     Raises:
         ValidationError. Image or filename supplied fails one of the

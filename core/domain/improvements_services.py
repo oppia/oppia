@@ -47,13 +47,12 @@ def _yield_all_tasks_ordered_by_status(
     """Yields all of the tasks corresponding to the given entity in storage.
 
     Args:
-        composite_entity_id: str. The identifier for the specific entity being
+        composite_entity_id: The identifier for the specific entity being
             queried. Must be generated from:
             TaskEntryModel.generate_composite_entity_id.
 
     Yields:
-        improvements_domain.TaskEntry. All of the tasks corresponding to the
-        given composite_entity_id.
+        All of the tasks corresponding to the given composite_entity_id.
     """
     results: Sequence[improvements_models.TaskEntryModel] = []
     query = improvements_models.TaskEntryModel.query(
@@ -75,11 +74,11 @@ def get_task_entry_from_model(
     """Returns a domain object corresponding to the given task entry model.
 
     Args:
-        task_entry_model: improvements_models.TaskEntryModel. The task entry
-            model to get the corresponding domain object.
+        task_entry_model: The task entry model to get the corresponding
+            domain object.
 
     Returns:
-        improvements_domain.TaskEntry. The corresponding domain object.
+        The corresponding TaskEntry domain object.
     """
     return improvements_domain.TaskEntry(
         task_entry_model.entity_type, task_entry_model.entity_id,
@@ -96,10 +95,10 @@ def fetch_exploration_tasks(
     exploration.
 
     Args:
-        exploration: exp_domain.Exploration. The exploration to fetch tasks for.
+        exploration: The exploration to fetch tasks for.
 
     Returns:
-        tuple. Contains the following 2 items:
+        A tuple containing the following 2 items:
             open_tasks: list(improvements_domain.TaskEntry). The list of open
                 tasks.
             resolved_task_types_by_state_name: dict(str: list(str)). Maps state
@@ -134,14 +133,13 @@ def fetch_exploration_task_history_page(
     """Fetches a page from the given exploration's history of resolved tasks.
 
     Args:
-        exploration: exp_domain.Exploration. The exploration to fetch the
-            history page for.
-        urlsafe_start_cursor: str or None. Starting point for the search. When
-            None, the starting point is the very beginning of the history
+        exploration: The exploration to fetch the history page for.
+        urlsafe_start_cursor: Starting point for the search. When None,
+            the starting point is the very beginning of the history
             results (i.e. starting from the most recently resolved task entry).
 
     Returns:
-        tuple. Contains the following 3 items:
+        A tuple containing the following 3 items:
             results: list(improvements_domain.TaskEntry). The query results.
             urlsafe_cursor: str or None. a query cursor pointing to the "next"
                 batch of results. If there are no more results, this might be
@@ -190,9 +188,8 @@ def put_tasks(
     then that model will not be updated as part of the put operation.
 
     Args:
-        tasks: list(improvements_domain.TaskEntry). Domain objects for each task
-            being placed into storage.
-        update_last_updated_time: bool. Whether to update the last_updated field
+        tasks: Domain objects for each task being placed into storage.
+        update_last_updated_time: Whether to update the last_updated field
             of the task models.
     """
     task_models = improvements_models.TaskEntryModel.get_multi(
@@ -228,13 +225,13 @@ def apply_changes_to_model(
     """Makes changes to the given model when differences are found.
 
     Args:
-        task_entry: improvements_domain.TaskEntry. The TaskEntry domain object
-            to be check if changes made to the TaskEntry model.
-        task_entry_model: improvements_models.TaskEntryModel. The TaskEntry
-            model object to be compared with TaskEntry domain object.
+        task_entry: The TaskEntry domain object to be check if changes made
+            to the TaskEntry model.
+        task_entry_model: The TaskEntry model object to be compared with
+            TaskEntry domain object.
 
     Returns:
-        bool. Whether any change was made to the model.
+        Whether any change was made to the model.
 
     Raises:
         Exception. Wrong model provided.

@@ -60,13 +60,13 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
         """Constructs a new default obsolete task with the provided values.
 
         Args:
-            state_name: str. The name of the state the task should target.
-            task_type: str. The type of the task.
-            exploration_version: int. The version of the exploration the task
+            state_name: The name of the state the task should target.
+            task_type: The type of the task.
+            exploration_version: The version of the exploration the task
                 should target.
 
         Returns:
-            improvements_domain.TaskEntry. A new obsolete task entry.
+            A new obsolete task entry.
         """
         return improvements_domain.TaskEntry(
             entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
@@ -89,13 +89,13 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
         """Constructs a new default open task with the provided values.
 
         Args:
-            state_name: str. The name of the state the task should target.
-            task_type: str. The type of the task.
-            exploration_version: int. The version of the exploration the task
+            state_name: The name of the state the task should target.
+            task_type: The type of the task.
+            exploration_version: The version of the exploration the task
                 should target.
 
         Returns:
-            improvements_domain.TaskEntry. A new open task entry.
+            A new open task entry.
         """
         return improvements_domain.TaskEntry(
             entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
@@ -118,13 +118,13 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
         """Constructs a new default resolved task with the provided values.
 
         Args:
-            state_name: str. The name of the state the task should target.
-            task_type: str. The type of the task.
-            exploration_version: int. The version of the exploration the task
+            state_name: The name of the state the task should target.
+            task_type: The type of the task.
+            exploration_version: The version of the exploration the task
                 should target.
 
         Returns:
-            improvements_domain.TaskEntry. A new resolved task entry.
+            A new resolved task entry.
         """
         return improvements_domain.TaskEntry(
             entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
