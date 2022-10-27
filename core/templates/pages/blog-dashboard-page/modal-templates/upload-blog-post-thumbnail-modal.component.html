@@ -1,11 +1,10 @@
 <div class="oppia-thumbnail-picture-container">
   <div class="mt-5 mb-1 mx-3">
     <h3>{{ 'I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD' | translate }}</h3>
-    <h4 class="image-upload-rules">
-      {{ 'I18N_BLOG_POST_THUMBNAIL_ALLOWED_MAX_FILE_SIZE' | translate }}
+    <h4 class="image-upload-rules" [innerHTML]="'I18N_BLOG_POST_THUMBNAIL_ALLOWED_MAX_FILE_SIZE' | translate: { imageSize: AppConstants.MAX_ALLOWED_IMAGE_SIZE_IN_KB}">
     </h4>
     <h4 class="image-upload-rules">
-      {{ 'I18N_BLOG_POST_THUMBNAIL_ALLOWED_EXTENSIONS' | translate }}
+      {{ 'I18N_BLOG_POST_THUMBNAIL_ALLOWED_EXTENSIONS' | translate }} : {{ AllowedImageExtensions }}
     </h4>
   </div>
 

@@ -19,6 +19,7 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'oppia-blog-post-thumbnail-upload-modal',
@@ -26,6 +27,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class UploadBlogPostThumbnailModalComponent
   extends ConfirmOrCancelModal {
+  AllowedImageExtensions = AppConstants.ALLOWED_IMAGE_FORMATS;
   constructor(
       ngbActiveModal: NgbActiveModal,
   ) {
