@@ -1971,12 +1971,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             pre_add_contributions.edited_exploration_ids)
 
         for created_exp_id in created_exp_ids:
-            user_services.add_created_exploration_id(user_id, created_exp_id)
+            pre_add_contributions.add_created_exploration_id(
+                created_exp_id
+            )
         for edited_exp_id in edited_exp_ids:
-            user_services.add_edited_exploration_id(
-                user_id,
+            pre_add_contributions.add_edited_exploration_id(
                 edited_exp_id
             )
+        user_services.save_user_contributions(pre_add_contributions)
 
         contributions = user_services.get_user_contributions(
             user_id, strict=True
@@ -2044,7 +2046,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertNotIn('exp1', contributions.created_exploration_ids)
 
-        user_services.add_created_exploration_id(user_id, 'exp1')
+        contributions.add_created_exploration_id('exp1')
+        user_services.save_user_contributions(contributions)
         contributions = user_services.get_user_contributions(
             user_id, strict=True
         )
@@ -2057,8 +2060,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_id, strict=False
         )
         self.assertIsNone(pre_add_contributions)
+        assert pre_add_contributions is not None
 
-        user_services.add_created_exploration_id(user_id, 'exp1')
+        pre_add_contributions.add_created_exploration_id('exp1')
+        user_services.save_user_contributions(pre_add_contributions)
         contributions = user_services.get_user_contributions(
             user_id, strict=True
         )
@@ -2076,7 +2081,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertNotIn('exp1', contributions.edited_exploration_ids)
 
-        user_services.add_edited_exploration_id(user_id, 'exp1')
+        contributions.add_edited_exploration_id('exp1')
+        user_services.save_user_contributions(contributions)
         contributions = user_services.get_user_contributions(
             user_id, strict=True
         )
@@ -2087,12 +2093,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         pre_add_contributions = user_services.get_user_contributions(user_id)
         self.assertIsNone(pre_add_contributions)
+        assert pre_add_contributions is not None
 
-        user_contribution_models = user_services.add_edited_exploration_id(
-            user_id, 'exp1'
-        )
-        datastore_services.update_timestamps_multi(user_contribution_models)
-        datastore_services.put_multi(user_contribution_models)
+        pre_add_contributions.add_edited_exploration_id('exp1')
+        user_services.save_user_contributions(pre_add_contributions)
 
         contributions = user_services.get_user_contributions(
             user_id, strict=True
@@ -3256,11 +3260,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
             user_settings.last_edited_an_exploration -
             datetime.timedelta(hours=13))
         with self.mock_datetime_utcnow(mocked_datetime_utcnow):
-            user_settings = (
-                user_services.record_user_edited_an_exploration(
-                    user_settings
-                )
-            )
+            user_settings.record_user_edited_an_exploration()
             user_services.save_user_settings(user_settings)
 
         editor_settings = user_services.get_user_settings(self.editor_id)

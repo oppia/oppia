@@ -31,7 +31,7 @@ from core.domain import question_services
 from core.domain import stats_domain
 from core.platform import models
 
-from typing import List, Literal, Optional, Sequence, overload
+from typing import Dict, List, Literal, Optional, Sequence, overload
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -501,9 +501,10 @@ def get_updated_exp_issues_models_for_new_exp_version(
     revert_to_version: Optional[int]
 ) -> List[base_models.BaseModel]:
     """Retrieves the ExplorationIssuesModel for the old exp_version and makes
-    any required changes to the structure of the model. Note: This method does
-    not perform put operations on the models. The caller of this method must do
-    so.
+    any required changes to the structure of the model.
+
+    Note: This method does not perform put operations on the models. The caller
+    of this method must do so.
 
     Args:
         exploration: Exploration. Domain object for the exploration.
@@ -520,7 +521,7 @@ def get_updated_exp_issues_models_for_new_exp_version(
         list(BaseModel). A list of model instances related to exploration
         issues that were updated.
     """
-    models_to_put = []
+    models_to_put: List[base_models.BaseModel] = []
     exp_issues = get_exp_issues(
         exploration.id, exploration.version - 1, strict=False
     )
@@ -866,7 +867,9 @@ def get_playthrough_from_model(
         playthrough_model.issue_customization_args, actions)
 
 
-def get_state_stats_mapping(exploration_stats: stats_domain.ExplorationStats):
+def get_state_stats_mapping(
+    exploration_stats: stats_domain.ExplorationStats
+) -> Dict[str, Dict[str, int]]:
     """Returns the state stats mapping of the given exploration stats.
 
     Args:

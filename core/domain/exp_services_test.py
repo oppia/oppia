@@ -7843,6 +7843,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                 self.USER_ID
             )
         )
+        assert user_data_model is not None
         user_data_model.update_timestamps()
         user_data_model.put()
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(

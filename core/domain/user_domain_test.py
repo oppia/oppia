@@ -576,9 +576,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
             user_services.compute_user_contributions(
                 feconf.MIGRATION_BOT_USER_ID, [], []))
 
-    def test_update_user_contributions(self) -> None:
-        user_services.update_user_contributions(self.owner_id, ['e1'], ['e2'])
-
+    def test_save_user_contributions(self) -> None:
         contributions = user_services.get_user_contributions(
             self.owner_id, strict=True
         )

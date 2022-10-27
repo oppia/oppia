@@ -302,13 +302,10 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         # milliseconds.
         first_time_in_msecs = utils.get_current_time_in_millisecs()
         user_settings_to_update = user_services.get_user_settings(user_id)
-        user_settings = (
-            user_services.update_first_contribution_msec(
-                user_settings_to_update,
-                first_time_in_msecs
-            )
+        user_settings_to_update.update_first_contribution_msec(
+            first_time_in_msecs
         )
-        user_services.save_user_settings(user_settings)
+        user_services.save_user_settings(user_settings_to_update)
 
         # Test the contribution date correctly changes to current_time_in_msecs.
         response_dict = self.get_json(
@@ -321,14 +318,10 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         # is set.
         second_time_in_msecs = utils.get_current_time_in_millisecs()
         user_settings_to_update = user_services.get_user_settings(user_id)
-        user_settings = (
-            user_services.update_first_contribution_msec(
-                user_settings_to_update,
-                second_time_in_msecs
-            )
+        user_settings_to_update.update_first_contribution_msec(
+            second_time_in_msecs
         )
-        if user_settings is not None:
-            user_services.save_user_settings(user_settings)
+        user_services.save_user_settings(user_settings_to_update)
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME)
         self.assertEqual(

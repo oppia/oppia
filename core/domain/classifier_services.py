@@ -138,7 +138,12 @@ def get_new_job_models_for_trainable_states(
         list(ClassifierTrainingJobModel|StateTrainingJobsMappingModel). The list
         of job models corresponding to trainable states in the exploration.
     """
-    models_to_put = []
+    models_to_put: List[
+        Union[
+            classifier_models.ClassifierTrainingJobModel,
+            classifier_models.StateTrainingJobsMappingModel
+        ]
+    ] = []
     job_dicts_list: List[JobInfoDict] = []
     exp_id = exploration.id
     exp_version = exploration.version

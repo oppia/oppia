@@ -959,11 +959,10 @@ def _create_new_user_transactional(
             corresponding to the newly created user.
     """
     save_user_settings(user_settings)
-    user_contributions = compute_user_contributions(
-        user_settings.user_id, [], []
+    user_contributions = get_or_create_new_user_contributions(
+        user_settings.user_id
     )
-    user_contributions.update_timestamps()
-    user_contributions.put()
+    save_user_contributions(user_contributions)
     auth_services.associate_auth_id_with_user_id(
         auth_domain.AuthIdUserIdPair(auth_id, user_settings.user_id))
 
@@ -1430,26 +1429,6 @@ def update_subject_interests(
     save_user_settings(user_settings)
 
 
-def update_first_contribution_msec(
-    user_settings: user_domain.UserSettings, first_contribution_msec: float
-) -> Optional[user_domain.UserSettings]:
-    """Updates first_contribution_msec of user with given user_id
-    if it is set to None.
-
-    Args:
-        user_settings: UserSettings. The user settings domain object.
-        first_contribution_msec: float. New time to set in milliseconds
-            representing user's first contribution to Oppia.
-
-    Returns:
-        UserSettingsModel. The user settings model with updated
-        first_contribution_msec.
-    """
-    if user_settings.first_contribution_msec is None:
-        user_settings.first_contribution_msec = first_contribution_msec
-        return user_settings
-
-
 def update_preferred_language_codes(
     user_id: str, preferred_language_codes: List[str]
 ) -> None:
@@ -1673,21 +1652,6 @@ def record_user_logged_in(user_id: str) -> None:
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_logged_in = datetime.datetime.utcnow()
     save_user_settings(user_settings)
-
-
-def record_user_edited_an_exploration(
-    user_settings: user_domain.UserSettings
-) -> user_domain.UserSettings:
-    """Updates last_edited_an_exploration to the current datetime for the user.
-
-    Args:
-        user_settings: UserSettings. The user settings domain object.
-
-    Returns:
-        UserSettings. The user settings domain object.
-    """
-    user_settings.last_edited_an_exploration = datetime.datetime.utcnow()
-    return user_settings
 
 
 def record_user_created_an_exploration(user_id: str) -> None:
@@ -1990,7 +1954,43 @@ def compute_user_contributions(
 
     user_contributions = user_domain.UserContributions(
         user_id, created_exploration_ids, edited_exploration_ids)
-    return _get_validated_user_contributions_model(user_contributions)
+    return get_validated_user_contributions_model(user_contributions)
+
+
+def get_or_create_new_user_contributions(
+    user_id: str
+) -> user_domain.UserContributions:
+    """Gets domain object representing the contributions for the given user_id.
+    If the domain object does not exist, it is created.
+
+    Args:
+        user_id: str. The unique ID of the user.
+
+    Returns:
+        UserContributions. The UserContributions domain object corresponding to
+        the given user_id.
+    """
+    user_contributions = get_user_contributions(user_id, strict=False)
+    if user_contributions is None:
+        user_contributions = user_domain.UserContributions(
+            user_id, [], [])
+    return user_contributions
+
+
+def save_user_contributions(
+    user_contributions: user_domain.UserContributions
+) -> None:
+    """Saves a user contributions object to the datastore.
+
+    Args:
+        user_contributions: UserContributions. The user contributions object to
+            be saved.
+    """
+    user_contributions_model = get_validated_user_contributions_model(
+        user_contributions
+    )
+    user_contributions_model.update_timestamps()
+    user_contributions_model.put()
 
 
 def update_user_contributions(
@@ -2020,66 +2020,15 @@ def update_user_contributions(
     user_contributions.created_exploration_ids = created_exploration_ids
     user_contributions.edited_exploration_ids = edited_exploration_ids
 
-    _get_validated_user_contributions_model(user_contributions).put()
+    get_validated_user_contributions_model(user_contributions).put()
 
 
-def add_created_exploration_id(user_id: str, exploration_id: str) -> None:
-    """Adds an exploration_id to a user_id's UserContributionsModel collection
-    of created explorations.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        exploration_id: str. The exploration id.
-    """
-    user_contributions = get_user_contributions(user_id, strict=False)
-
-    if not user_contributions:
-        updated_user_contributions = compute_user_contributions(
-            user_id, [exploration_id], []
-        )
-        updated_user_contributions.update_timestamps()
-        updated_user_contributions.put()
-    elif exploration_id not in user_contributions.created_exploration_ids:
-        user_contributions.created_exploration_ids.append(exploration_id)
-        user_contributions.created_exploration_ids.sort()
-        _get_validated_user_contributions_model(user_contributions).put()
-
-
-def add_edited_exploration_id(
-    user_id: str,
-    exploration_id: str
-) -> List[user_models.UserContributionsModel]:
-    """Adds an exploration_id to a user_id's UserContributionsModel collection
-    of edited explorations.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        exploration_id: str. The exploration id.
-
-    Returns:
-        UserContributionsModel. The updated UserContributionsModel.
-    """
-    user_contribution_models = []
-    user_contributions = get_user_contributions(user_id, strict=False)
-
-    if not user_contributions:
-        user_contribution_models.append(
-            compute_user_contributions(user_id, [], [exploration_id])
-        )
-
-    elif exploration_id not in user_contributions.edited_exploration_ids:
-        user_contributions.edited_exploration_ids.append(exploration_id)
-        user_contributions.edited_exploration_ids.sort()
-        user_contribution_models.append(
-            _get_validated_user_contributions_model(user_contributions)
-        )
-    return user_contribution_models
-
-
-def _get_validated_user_contributions_model(
+def get_validated_user_contributions_model(
     user_contributions: user_domain.UserContributions
 ) -> user_models.UserContributionsModel:
-    """Constructs a valid UserContributionsModel.
+    """Constructs a valid UserContributionsModel from the given domain object.
+
+    This function does not save anything to the datastore.
 
     Args:
         user_contributions: UserContributions. Value object representing

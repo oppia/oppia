@@ -170,7 +170,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         models_to_put_values = []
         with datastore_services.get_ndb_context():
             models_to_put_values = (
-                exp_services.compute_models_for_updating_exploration(
+                exp_services.compute_models_to_put_when_saving_new_exp_version(
                     feconf.MIGRATION_BOT_USERNAME,
                     updated_exp_model.id,
                     exp_changes,

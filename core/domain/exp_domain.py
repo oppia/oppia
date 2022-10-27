@@ -1134,7 +1134,7 @@ class ExplorationVersionsDiff:
             It doesn't include the name changes of added/deleted states.
     """
 
-    def __init__(self, change_list: List[ExplorationChange]) -> None:
+    def __init__(self, change_list: Sequence[ExplorationChange]) -> None:
         """Constructs an ExplorationVersionsDiff domain object.
 
         Args:

@@ -415,7 +415,7 @@ def update_exploration_voiceover_opportunities(
             assigned_voice_artist_in_language_code))
     exploration_opportunity_summary.validate()
     _save_multi_exploration_opportunity_summary(
-        exploration_opportunity_summary
+        [exploration_opportunity_summary]
     )
 
 

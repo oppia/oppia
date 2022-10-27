@@ -1262,8 +1262,10 @@ class VersionedModel(BaseModel):
     def get_models_to_put_values(
         self,
         committer_id: str,
-        commit_message: str,
-        commit_cmds: List[Dict[str, Union[str, int]]]
+        commit_message: Optional[str],
+        commit_cmds: Sequence[
+            Mapping[str, change_domain.AcceptableChangeDictTypes]
+        ]
     ) -> List[BaseModel]:
         """Returns the models which should be put.
 
@@ -1289,14 +1291,14 @@ class VersionedModel(BaseModel):
         )
 
         models_to_put = self.compute_models_to_commit(
-                committer_id,
-                commit_type,
-                commit_message,
-                commit_cmds,
-                self._prepare_additional_models()
-            )
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            self._prepare_additional_models()
+        ).values()
         models_to_put_values = []
-        for model_to_put in models_to_put.values():
+        for model_to_put in models_to_put:
             # Here, we are narrowing down the type from object to BaseModel.
             assert isinstance(model_to_put, BaseModel)
             models_to_put_values.append(model_to_put)
@@ -1342,13 +1344,13 @@ class VersionedModel(BaseModel):
                 raise Exception(
                     'Invalid change list command: %s' % commit_cmd['cmd'])
 
-        models_to_put_values = self.get_models_to_put_values(
+        models_to_put = self.get_models_to_put_values(
             committer_id,
             commit_message,
             commit_cmds
         )
-        BaseModel.update_timestamps_multi(models_to_put_values)
-        BaseModel.put_multi_transactional(models_to_put_values)
+        BaseModel.update_timestamps_multi(models_to_put)
+        BaseModel.put_multi_transactional(models_to_put)
 
     @classmethod
     def revert(
