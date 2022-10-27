@@ -280,6 +280,7 @@ export default {
   },
 
   "ALLOWED_IMAGE_FORMATS": ["svg", "png", "jpeg", "jpg", "gif"],
+  "MAX_ALLOWED_IMAGE_SIZE_IN_KB": 100,
 
   "TASK_TYPE_HIGH_BOUNCE_RATE": "high_bounce_rate",
   "TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP": "ineffective_feedback_loop",

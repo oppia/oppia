@@ -278,7 +278,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
               AppConstants.VALID_RTE_COMPONENTS_FOR_ANDROID.indexOf(
                 componentDefn.id) === -1);
       if (!(
-        hideComplexExtensionFlag || notSupportedOnAndroidFlag ||
+        hideComplexExtensionFlag ||
+        notSupportedOnAndroidFlag ||
         this.isInvalidForBlogPostEditorRTE(componentDefn)
       )) {
         names.push(componentDefn.id);
@@ -537,15 +538,16 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     });
   }
 
-  // Returns true if a rte component should not be shown in blog post editor
-  // RTE to remove it from rte configuration for the blog post editor RTE.
+  // Returns whether the component should be shown in the 'Blog Post Editor
+  // RTE'. Return true if component should be hidden in the RTE.
   isInvalidForBlogPostEditorRTE(compDefn: RteComponentSpecs): boolean {
-    var invalidComponents = (
+    let invalidComponents = (
       AppConstants.INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR);
     return (
       this.contextService.isInBlogPostEditorPage() && (
         invalidComponents.some(
-          (invalidComponents) => invalidComponents === compDefn.id)
+          (invalidComponents) => invalidComponents === compDefn.id
+        )
       )
     );
   }
