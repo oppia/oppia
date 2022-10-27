@@ -1015,7 +1015,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 replace('</h3>', '').replace('<h4>', '').replace('</h4>', '').
                 replace('<h5>', '').replace('</h5>', '').replace('<h6>', '').
                 replace('</h6>', '').replace('<li>', '').replace('</li>', '').
-                replace('&nbsp;', ''))
+                replace('&nbsp;', '').replace('<em>', '').replace('</em>', '').
+                replace('<strong>', '').replace('</strong>', ''))
             if html.strip() == '':
                 raise utils.ValidationError(
                     'Choices should be non empty.'
