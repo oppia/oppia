@@ -838,7 +838,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic.move_skill_id_to_subtopic(1, 2, 'skill_not_exist')
 
     def test_validate_topic_bad_story_reference(self) -> None:
-        topic = self.topic
         self.topic.canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id'),
@@ -855,7 +854,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Invalid story ID: story_id_2#'
         ):
-            topic.validate()
+            self.topic.validate()
 
     def test_story_ref_to_dict(self) -> None:
         test_story_dict = {
@@ -1038,27 +1037,36 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(2, len(self.topic.subtopics))
 
     def test_update_practice_tab_is_displayed(self) -> None:
+        self.assertFalse(self.topic.practice_tab_is_displayed)
         self.topic.update_practice_tab_is_displayed(True)
         self.assertTrue(self.topic.practice_tab_is_displayed)
 
     def test_update_page_title_fragment_for_web(self) -> None:
         updated_frag = 'updated fragment'
+        self.assertNotEqual(
+            self.topic.page_title_fragment_for_web,
+            updated_frag
+        )
         self.topic.update_page_title_fragment_for_web(updated_frag)
         self.assertEqual(self.topic.page_title_fragment_for_web, updated_frag)
 
     def test_update_meta_tag_content(self) -> None:
         updated_meta_tag = 'updated meta tag'
+        self.assertNotEqual(self.topic.meta_tag_content, updated_meta_tag)
         self.topic.update_meta_tag_content(updated_meta_tag)
         self.assertEqual(self.topic.meta_tag_content, updated_meta_tag)
 
     def test_update_description(self) -> None:
         updated_desc = 'updated description'
+        self.assertNotEqual(self.topic.description, updated_desc)
         self.topic.update_description(updated_desc)
         self.assertEqual(self.topic.description, updated_desc)
 
     def test_update_thumbnail_file_and_size(self) -> None:
         updated_file_name = 'file_name.svg'
         updated_size = 1234
+        self.assertNotEqual(self.topic.thumbnail_filename, updated_file_name)
+        self.assertNotEqual(self.topic.thumbnail_size_in_bytes, updated_size)
         self.topic.update_thumbnail_filename_and_size(
             updated_file_name,
             updated_size
@@ -1068,11 +1076,13 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_url_fragment(self) -> None:
         url_frag = 'url fragment'
+        self.assertNotEqual(self.topic.url_fragment, url_frag)
         self.topic.update_url_fragment(url_frag)
         self.assertEqual(self.topic.url_fragment, url_frag)
 
     def test_update_name(self) -> None:
         updated_name = 'updated name'
+        self.assertNotEqual(self.topic.name, updated_name)
         self.topic.update_name(updated_name)
         self.assertEqual(self.topic.name, updated_name)
 
@@ -1082,9 +1092,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Name should be a string.'
         ):
-            # Here we use MyPy ignore because we need to pass
-            # a non-string to test the full function.
-            self.topic.update_name(updated_name) # type: ignore
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
+            self.topic.update_name(updated_name) # type: ignore[arg-type]
 
     @classmethod
     def _schema_update_vers_dict(
