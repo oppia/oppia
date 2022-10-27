@@ -134,7 +134,7 @@ module.exports = {
 
     var checkElementSelectorProtractor = function(node) {
       var thirdPartySelectorPrefixes = (
-        ['.modal', '.select2', '.CodeMirror', '.toast', '.mat']);
+        ['.modal', '.select2', '.CodeMirror', '.toast', '.joyride', '.mat']);
       for (var i = 0; i < thirdPartySelectorPrefixes.length; i++) {
         if ((node.arguments[0].type === 'Literal') &&
           (node.arguments[0].value.startsWith(thirdPartySelectorPrefixes[i]))) {

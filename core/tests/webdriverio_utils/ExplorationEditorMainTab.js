@@ -74,7 +74,6 @@ var ExplorationEditorMainTab = function() {
   var nodeLabelLocator = '.e2e-test-node-label';
   var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
   var openOutcomeFeedBackEditor = $('.e2e-test-open-outcome-feedback-editor');
-  // eslint-disable-next-line oppia/e2e-practices
   var postTutorialPopover = $('.joyride .popover-content');
   var responseBody = function(responseNum) {
     return $(`.e2e-test-response-body-${responseNum}`);
