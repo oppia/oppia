@@ -654,7 +654,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Renders an error page, or an error JSON response.
 
         Args:
-            return_type: str|None. Indicator to return JSON or HTML.
+            return_type: str. Indicator to return JSON or HTML.
             values: dict. The key-value pairs to include in the response.
         """
 
