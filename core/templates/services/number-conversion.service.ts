@@ -44,15 +44,6 @@ export class NumberConversionService {
     return decimalSeparator;
   }
 
-  getInputValidationRegex(): RegExp {
-    const decimalSeparator: string = this.currentDecimalSeparator();
-    // Match anything that isn't a number,
-    // minus sign, exponent (e) sign or a decimal separator.
-    let regexString = '[^e0-9\\' + decimalSeparator + '\\-]';
-
-    let regex = new RegExp(regexString, 'g');
-    return regex;
-  }
 
   convertToEnglishDecimal(number: string): (null | number) {
     const decimalSeparator = this.currentDecimalSeparator();
