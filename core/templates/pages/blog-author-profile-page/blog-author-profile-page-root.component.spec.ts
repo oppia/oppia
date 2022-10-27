@@ -116,6 +116,11 @@ describe('Blog Author Profile Page Root', () => {
     spyOn(loaderService, 'hideLoadingScreen');
 
     component.ngOnInit();
+    // We first call asynchronous function userService.canUserEditBlogPosts to
+    // check if the user can edit blog posts and then validate access to
+    // page using another asynchronous function
+    // accessValidationBackendApiService.validateAccessToBlogAuthorProfilePage.
+    // Therefore we require 2 ticks here.
     tick();
     tick();
 
@@ -140,6 +145,11 @@ describe('Blog Author Profile Page Root', () => {
       spyOn(loaderService, 'hideLoadingScreen');
 
       component.ngOnInit();
+      // We first call asynchronous function userService.canUserEditBlogPosts to
+      // check if the user can edit blog posts and then validate access to page
+      // using another asynchronous function in
+      // validateAccessToBlogAuthorProfilePage in
+      // AccessValidationBackendApiService. Therefore we require 2 ticks here.
       tick();
       tick();
 
@@ -250,5 +260,6 @@ describe('Blog Author Profile Page Root', () => {
     component.ngOnDestroy();
 
     expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+    expect(component.directiveSubscriptions.closed).toBeTrue();
   });
 });
