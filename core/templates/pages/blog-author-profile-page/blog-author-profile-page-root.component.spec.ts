@@ -255,11 +255,11 @@ describe('Blog Author Profile Page Root', () => {
   });
 
   it('should unsubscribe on component destruction', () => {
-    spyOn(component.directiveSubscriptions, 'unsubscribe');
+    component.ngOnInit();
+    expect(component.directiveSubscriptions.closed).toBeFalse();
 
     component.ngOnDestroy();
 
-    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
     expect(component.directiveSubscriptions.closed).toBeTrue();
   });
 });
