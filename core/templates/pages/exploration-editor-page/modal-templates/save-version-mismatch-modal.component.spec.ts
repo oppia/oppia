@@ -17,7 +17,7 @@
  */
 
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SaveVersionMismatchModalComponent } from './save-version-mismatch-modal.component';
@@ -129,7 +129,7 @@ describe('Save Version Mismatch Modal Component', () => {
   });
 
   it('should remove exploration draft from local storage when modal is closed',
-    () => {
+    fakeAsync(() => {
       const reloadSpy = jasmine.createSpy('reload');
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
         location: {
@@ -138,13 +138,14 @@ describe('Save Version Mismatch Modal Component', () => {
       });
 
       component.discardChanges();
+      tick(component.MSECS_TO_REFRESH);
       fixture.detectChanges();
 
       waitForAsync(() => {
         expect(explorationDataService.discardDraftAsync).toHaveBeenCalled();
         expect(reloadSpy).toHaveBeenCalled();
       });
-    });
+    }));
 
   it('should contain correct modal header', () => {
     const modalHeader =
