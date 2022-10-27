@@ -20,11 +20,11 @@ from __future__ import annotations
 
 import multiprocessing
 import os
+import re
 
 from core.tests import test_utils
 
-from typing import Pattern, Tuple
-from typing_extensions import Final
+from typing import Final, Pattern, Tuple
 
 from . import general_purpose_linter
 from . import pre_commit_linter
@@ -61,6 +61,8 @@ INVALID_FILEOVERVIEW_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_fileoverview.ts')
 INVALID_BYPASS_FLAG: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_bypass_flag.ts')
+VALID_SERVICE_FILE_PATH = os.path.join(
+    LINTER_TESTS_DIR, 'valid-backend-api.service.ts')
 
 # PY filepaths.
 INVALID_REQUEST_FILEPATH: Final = os.path.join(
@@ -94,6 +96,8 @@ CONSTANTS_FILEPATH: Final = os.path.join(
 )
 VALID_PY_IGNORE_PRAGMA_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid_py_ignore_pragma.py')
+VALID_PY_FILE_PATH = os.path.join(
+    LINTER_TESTS_DIR, 'valid.py')
 
 
 class HTMLLintTests(test_utils.LinterTestBase):
@@ -331,9 +335,16 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assertEqual('Newline at EOF', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
+    def test_file_with_newline_at_eof(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [VALID_PY_FILE_PATH], FILE_CACHE)
+        lint_task_report = linter.check_newline_at_eof()
+        self.assertEqual('Newline at EOF', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
+
     def test_file_with_disallow_flags_raise_messsage(self) -> None:
         linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_BYPASS_FLAG], FILE_CACHE)
+            [VALID_SERVICE_FILE_PATH, INVALID_BYPASS_FLAG], FILE_CACHE)
         lint_task_report = linter.check_disallowed_flags()
         self.assert_same_list_elements(
             ['Please do not use "no-bypass-security-phrase" flag. It is only '
@@ -409,3 +420,20 @@ class GeneralLintTests(test_utils.LinterTestBase):
             [VALID_PY_IGNORE_PRAGMA_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
         self.assertFalse(lint_task_report.failed)
+
+    def test_check_bad_patterns_in_excluded_dirs(self) -> None:
+        bad_pattern_regexp: general_purpose_linter.BadPatternRegexpDict = {
+            'regexp': re.compile(r'[ \t]+$'),
+            'message': 'There should not be any trailing whitespaces.',
+            'excluded_files': (),
+            'excluded_dirs': (LINTER_TESTS_DIR,)
+        }
+        check_status, error_messages = (
+            general_purpose_linter.check_bad_pattern_in_file(
+                os.path.join(LINTER_TESTS_DIR, 'some_file.py'),
+                'unused_variable = 5 \n',
+                bad_pattern_regexp
+            )
+        )
+        self.assertFalse(check_status)
+        self.assertEqual(error_messages, [])

@@ -422,11 +422,11 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       AppConstants.ACTION_ACCEPT_SUGGESTION,
       this.reviewMessage, this.finalCommitMessage,
       this.resolveSuggestionAndUpdateModal.bind(this),
-      (error) => {
-        this.rejectAndReviewNext('Invalid Suggestion');
+      (errorMessage) => {
+        this.rejectAndReviewNext(`Invalid Suggestion: ${errorMessage}`);
         this.alertsService.clearWarnings();
         this.alertsService.addWarning(
-          `Invalid Suggestion: ${error.message}.`);
+          `Invalid Suggestion: ${errorMessage}`);
       });
   }
 
