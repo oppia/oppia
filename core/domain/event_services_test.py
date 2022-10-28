@@ -26,6 +26,7 @@ import re
 from core import feconf
 from core.domain import event_services
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import stats_services
@@ -435,6 +436,39 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
         assert model is not None
         self.assertEqual(model.exp_id, exp_id)
         self.assertEqual(model.exp_version, exploration.version)
+
+    def test_cannot_update_stats_events_for_older_exp_version(self) -> None:
+        all_models = (
+            stats_models.ExplorationStatsModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        exp_id = 'eid1'
+        self.save_new_valid_exploration(exp_id, self.OWNER_EMAIL)
+        exp_services.update_exploration(
+            self.OWNER_EMAIL, exp_id, [exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': 'content',
+                'html': 'content 1'
+            },
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+            })], 'Update 1')
+
+        event_services.StatsEventsHandler.record(
+            exp_id, 1, {
+                'state_stats_mapping': {
+                    'Introduction': {}
+                }
+            }
+        )
+
+        all_models = stats_models.ExplorationStatsModel.get_all()
+        self.assertEqual(all_models.count(), 2)
 
 
 class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
