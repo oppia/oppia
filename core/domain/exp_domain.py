@@ -1893,28 +1893,30 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         continue
                     curr_state_name = curr_queue[0]
                     curr_queue = curr_queue[1:]
-                    if not curr_state_name in processed_state_names:
-                        processed_state_names.add(curr_state_name)
-                        curr_state = new_states[curr_state_name]
+                    # We do not need to check if 'curr_state' is already
+                    # processed because we only append unprocessed states
+                    # in the 'curr_queue'.
+                    processed_state_names.add(curr_state_name)
+                    curr_state = new_states[curr_state_name]
 
-                        # We do not need to check if the current state is
-                        # terminal or not before getting all outcomes, as when
-                        # we find a terminal state in an outcome, we break out
-                        # of the for loop and raise a validation error.
-                        all_outcomes = (
-                            curr_state.interaction.get_all_outcomes())
-                        for outcome in all_outcomes:
-                            dest_state = outcome.dest
-                            # Ruling out the possibility of None for mypy type
-                            # checking, because above we are already validating
-                            # if outcome exists then it should have destination.
-                            assert dest_state is not None
-                            if self.states[dest_state].interaction.is_terminal:
-                                excluded_state_is_bypassable = True
-                                break
-                            if (dest_state not in curr_queue and
-                                    dest_state not in processed_state_names):
-                                curr_queue.append(dest_state)
+                    # We do not need to check if the current state is
+                    # terminal or not before getting all outcomes, as when
+                    # we find a terminal state in an outcome, we break out
+                    # of the for loop and raise a validation error.
+                    all_outcomes = (
+                        curr_state.interaction.get_all_outcomes())
+                    for outcome in all_outcomes:
+                        dest_state = outcome.dest
+                        # Ruling out the possibility of None for mypy type
+                        # checking, because above we are already validating
+                        # if outcome exists then it should have destination.
+                        assert dest_state is not None
+                        if self.states[dest_state].interaction.is_terminal:
+                            excluded_state_is_bypassable = True
+                            break
+                        if (dest_state not in curr_queue and
+                                dest_state not in processed_state_names):
+                            curr_queue.append(dest_state)
                     if excluded_state_is_bypassable:
                         raise utils.ValidationError(
                             'Cannot make %s a checkpoint as it is bypassable'
@@ -2003,21 +2005,22 @@ class Exploration(translation_domain.BaseTranslatableObject):
             curr_state_name = curr_queue[0]
             curr_queue = curr_queue[1:]
 
-            if not curr_state_name in processed_queue:
-                processed_queue.append(curr_state_name)
+            # We do not need to check if 'curr_state_name' is already processed
+            # because we only append unprocessed states in the 'curr_queue'.
+            processed_queue.append(curr_state_name)
 
-                curr_state = self.states[curr_state_name]
+            curr_state = self.states[curr_state_name]
 
-                if not curr_state.interaction.is_terminal:
-                    all_outcomes = curr_state.interaction.get_all_outcomes()
-                    for outcome in all_outcomes:
-                        dest_state = outcome.dest
-                        if (
-                            dest_state is not None and
-                            dest_state not in curr_queue and
-                            dest_state not in processed_queue
-                        ):
-                            curr_queue.append(dest_state)
+            if not curr_state.interaction.is_terminal:
+                all_outcomes = curr_state.interaction.get_all_outcomes()
+                for outcome in all_outcomes:
+                    dest_state = outcome.dest
+                    if (
+                        dest_state is not None and
+                        dest_state not in curr_queue and
+                        dest_state not in processed_queue
+                    ):
+                        curr_queue.append(dest_state)
 
         if len(self.states) != len(processed_queue):
             unseen_states = list(
@@ -2045,18 +2048,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
             curr_state_name = curr_queue[0]
             curr_queue = curr_queue[1:]
 
-            if not curr_state_name in processed_queue:
-                processed_queue.append(curr_state_name)
+            # We do not need to check if 'curr_state_name' is already processed
+            # because we only append unprocessed states in the 'curr_queue'.
+            processed_queue.append(curr_state_name)
 
-                for (state_name, state) in self.states.items():
-                    if (state_name not in curr_queue
-                            and state_name not in processed_queue):
-                        all_outcomes = (
-                            state.interaction.get_all_outcomes())
-                        for outcome in all_outcomes:
-                            if outcome.dest == curr_state_name:
-                                curr_queue.append(state_name)
-                                break
+            for (state_name, state) in self.states.items():
+                if (state_name not in curr_queue
+                        and state_name not in processed_queue):
+                    all_outcomes = (
+                        state.interaction.get_all_outcomes())
+                    for outcome in all_outcomes:
+                        if outcome.dest == curr_state_name:
+                            curr_queue.append(state_name)
+                            break
 
         if len(self.states) != len(processed_queue):
             dead_end_states = list(
@@ -4203,7 +4207,10 @@ class ExplorationChangeMergeVerifier:
                     content_id[:10] == 'rule_input')),
         }
 
-        for prop_name, identifier_function in (
+        # We add a 'no branch' flag because items() method will always return.
+        # This is because 'property_name_to_content_id_identifier' is
+        # hard-coded and its value will always remain the same.
+        for prop_name, identifier_function in ( # pragma: no branch
                 property_name_to_content_id_identifier.items()):
             if identifier_function(content_id):
                 property_name = prop_name

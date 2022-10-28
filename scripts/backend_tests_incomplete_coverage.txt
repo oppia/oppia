@@ -29,6 +29,7 @@ core.domain.app_feedback_report_services_test
 core.domain.auth_services_test
 core.domain.blog_domain_test
 core.domain.calculation_registry_test
+core.domain.classifier_services_test
 core.domain.collection_domain_test
 core.domain.change_domain_test
 core.domain.collection_services_test

@@ -478,7 +478,7 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
 
     def test_initialization(self) -> None:
         """Testing init method."""
-
+        self.transient_checkpoint_url.validate()
         self.assertEqual(self.transient_checkpoint_url.exploration_id, 'exp_id')
         self.assertEqual(
             self.transient_checkpoint_url
