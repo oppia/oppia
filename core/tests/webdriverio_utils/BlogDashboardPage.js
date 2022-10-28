@@ -379,6 +379,7 @@ var BlogDashboardPage = function() {
     var newThumbnailSource = await this.getThumbnailSource();
     expect(newThumbnailSource).not.toEqual('');
     await waitFor.visibilityOfSuccessToast('Thumbnail Saved Successfully.');
+    await waitFor.invisibilityOfSuccessToast('Thumbnail Saved Successfully.');
   };
 };
 

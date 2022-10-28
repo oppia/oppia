@@ -4,9 +4,9 @@
       <img mat-card-avatar
            [src]="authorProfilePicUrl"
            alt="Profile image of the author"
-           class="authorProfilePic">
+           class="authorProfilePic e2e-test-author-profile-photo">
       <mat-card-title class="w-100 d-flex flex-column" [ngClass]="{'align-items-center mt-2': isSmallScreenViewActive()}">
-        <span class="blog-author-name">
+        <span class="blog-author-name e2e-test-author-name">
           {{ authorName }}
         </span>
         <span class="total-blog-post-number-display"
@@ -18,7 +18,7 @@
       </mat-card-subtitle>
     </mat-card-header>
   </mat-card>
-  <mat-card class="oppia-blog-author-page-card oppia-page-card py-5">
+  <mat-card class="oppia-blog-author-page-card oppia-page-card py-5 e2e-test-oppia-author-profile-page-card">
     <div *ngIf="!noResultsFound && !showBlogPostCardsLoadingScreen"
          class="oppia-blog-post-card-container">
       <div class="d-flex align-items-baseline">
@@ -40,8 +40,8 @@
           </ng-template>
         </ngb-pagination>
       </div>
-      <div *ngFor="let blogPostSummary of blogPostSummariesToShow" class="blog-post-card">
-        <oppia-blog-card class="d-flex justify-content-center"
+      <div *ngFor="let blogPostSummary of blogPostSummariesToShow" class="blog-post-card e2e-test-blog-post-list">
+        <oppia-blog-card class="d-flex justify-content-center e2e-test-blog-post-tile-item"
                          [blogPostSummary]="blogPostSummary"
                          [authorProfilePicDataUrl]="blogPostSummary.authorProfilePicUrl"
                          [shownOnblogPostPage]="false">
