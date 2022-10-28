@@ -43,7 +43,8 @@ export class DiagnosticTestTopicTrackerModel {
   _topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds;
 
   // A dict with topic ID as key and a list of ancestor topic IDs as value.
-  // Example graph: A --> B --> C, therefore the ancestor of C is both A and B.
+  // Example graph: A --> B --> C, therefore the ancestors of C are both
+  // A and B.
   _topicIdToAncestorTopicIds: TopicIdToRelatedTopicIds;
 
   // A dict with topic ID as key and a list of successor topic IDs as value.
@@ -120,24 +121,37 @@ export class DiagnosticTestTopicTrackerModel {
     }
   }
 
+  _generateTopicIdToChildTopicId(
+      topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds
+  ): TopicIdToRelatedTopicIds {
+    // The method generates a dict with topic ID as the key and its immediate
+    // successor topic IDs as value. The successor's list is generated using
+    // the prerequisite dependency graph.
+    // Example: A -> B -> C, here the topic ID to child topic IDs dict will
+    // look like: {A: [B], B: [C], C: []}.
+    let topicIdToChildTopicId: TopicIdToRelatedTopicIds = {};
+
+    for (let topicId in topicIdToPrerequisiteTopicIds) {
+      topicIdToChildTopicId[topicId] = [];
+    }
+
+    for (let topicId in topicIdToPrerequisiteTopicIds) {
+      let prereqTopicIds = topicIdToPrerequisiteTopicIds[topicId];
+      for (let prereqTopicId of prereqTopicIds) {
+        topicIdToChildTopicId[prereqTopicId].push(topicId);
+      }
+    }
+    return topicIdToChildTopicId;
+  }
+
   generateTopicIdToSuccessorTopicIds(): void {
     // The method generates a dict with topic ID as the key and all of its
     // successor topic IDs as value. The successor's list is generated using
     // the prerequisite dependency graph.
     // Example: A -> B -> C, here the topic ID to successor topic IDs dict will
     // look like: {A: [B, C], B: [C], C: []}.
-    let topicIdToChildTopicId: TopicIdToRelatedTopicIds = {};
-
-    for (let topicId in this._topicIdToPrerequisiteTopicIds) {
-      topicIdToChildTopicId[topicId] = [];
-    }
-
-    for (let topicId in this._topicIdToPrerequisiteTopicIds) {
-      let prereqTopicIds = this._topicIdToPrerequisiteTopicIds[topicId];
-      for (let prereqTopicId of prereqTopicIds) {
-        topicIdToChildTopicId[prereqTopicId].push(topicId);
-      }
-    }
+    let topicIdToChildTopicId: TopicIdToRelatedTopicIds = (
+      this._generateTopicIdToChildTopicId(this._topicIdToPrerequisiteTopicIds));
 
     for (let topicId in topicIdToChildTopicId) {
       let successorTopicIds: string[] = [];
@@ -174,8 +188,8 @@ export class DiagnosticTestTopicTrackerModel {
       let successorTopicIds = this._topicIdToSuccessorTopicIds[topicId];
 
       // Considering a given topic, the assured number of topics that will be
-      // removed from the eligible topic IDs after testing, is the minimum
-      // between its ancestors and successors.
+      // removed from the eligible topic IDs after testing, is the minimum of
+      // the counts of its ancestors and successors.
       topicIdToLengthOfRelatedTopicIds[topicId] = Math.min(
         ancestorTopicIds.length, successorTopicIds.length);
     }

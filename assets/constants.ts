@@ -5850,12 +5850,6 @@ export default {
 
   "MAX_CURRENT_GOALS_COUNT": 5,
 
-  // The maximum number of questions can exceed this by at most 3
-  // (i.e., 18 questions) in some special cases when the user has attempted 14
-  // questions and another topic is tested for more accurate results. For all
-  // other cases, 15 questions is the upper limit.
-  "MAX_ALLOWED_QUESTIONS_IN_THE_DIAGNOSTIC_TEST": 15,
-
   "ACTIVITY_STATUS_PRIVATE": "private",
   "ACTIVITY_STATUS_PUBLIC": "public",
 

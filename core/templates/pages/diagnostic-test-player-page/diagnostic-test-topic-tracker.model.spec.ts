@@ -148,13 +148,13 @@ describe('Diagnostic test topic tracker model', () => {
         ['topicID1', 'topicID2', 'topicID3', 'topicID4', 'topicID5']);
 
       // Assuming L = min(length of ancestors, length of successors). Among all
-      // the eligible topic IDs, topic2, topic3 has the maximum value for L.
+      // the eligible topic IDs, topic2 and topic3 have the maximum value for L.
       // Since topic2 appears before topic3, thus topic2 should be selected as
       // the next eligible topic ID.
       expect(diagnosticTestTopicTrackerModel.selectNextTopicIdToTest())
         .toEqual('topicID2');
 
-      // None of the topic is currently failed.
+      // None of the topics are currently failed.
       expect(diagnosticTestTopicTrackerModel.getFailedTopicIds()).toEqual([]);
 
       // Marking the current topic (topic2) as failed, will remove the current
