@@ -91,6 +91,35 @@ class FailedMLTest(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, expected_subject)
 
+    def test_send_failed_ml_email_only_to_admin(self) -> None:
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            # Make sure there are no emails already sent.
+            messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+            messages = (
+                self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL))
+            self.assertEqual(len(messages), 0)
+
+            # Send job failure email with mock Job ID.
+            with self.swap(
+                email_manager, 'NOTIFICATION_USER_IDS_FOR_FAILED_TASKS',
+                config_domain.ConfigProperty(
+                    'fake_notification_user_ids_for_failed_tasks',
+                    email_manager.NOTIFICATION_USER_IDS_LIST_SCHEMA,
+                    'User IDs to notify if an ML training task fails',
+                    [])
+            ):
+                email_manager.send_job_failure_email('123ABC')
+
+            # Make sure emails are sent.
+            messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
+            expected_subject = 'Failed ML Job'
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].subject, expected_subject)
+            messages = (
+                self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL))
+            self.assertEqual(len(messages), 0)
+
 
 class EmailToAdminTest(test_utils.EmailTestBase):
     """Test that emails are correctly sent to the admin."""
@@ -1533,6 +1562,54 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION)
 
+    def test_suggestion_emails_are_not_sent_if_user_cannot_recieve_email(
+            self) -> None:
+        expected_email_html_body = (
+            'Hi editor,<br>'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, '
+            '<a href="https://www.oppia.org/create/A">"Title"</a>.<br>'
+            'You can accept or reject this suggestion by visiting the '
+            '<a href="https://www.oppia.org/create/A#/feedback">'
+            'feedback page</a> '
+            'for your exploration.<br>'
+            '<br>'
+            'Thanks!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi editor,\n'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, "Title".\n'
+            'You can accept or reject this suggestion by visiting the '
+            'feedback page for your exploration.\n'
+            '\n'
+            'Thanks!\n'
+            '- The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        user_services.update_email_preferences(
+            self.new_user_id, False, False, False, False)
+        new_recipient_list = self.recipient_list
+        new_recipient_list.append(self.new_user_id)
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            email_manager.send_suggestion_email(
+                self.exploration.title, self.exploration.id, self.new_user_id,
+                new_recipient_list)
+
+            # Make sure correct email is sent to editor.
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
+            # Make sure email is not sent to new user.
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
+            self.assertEqual(messages, [])
+
 
 class SubscriptionEmailTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
@@ -1742,6 +1819,21 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION)
 
+    def test_feedback_message_emails_are_not_sent_if_user_cannot_recieve_email(
+            self) -> None:
+        user_services.update_email_preferences(
+            self.new_user_id, False, False, False, False)
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            email_manager.send_instant_feedback_message_email(
+                self.new_user_id, self.editor_id, 'editor message',
+                'New Oppia message in "a subject"', self.exploration.title,
+                self.exploration.id, 'a subject')
+
+            # Make sure that email is not sent.
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
+            self.assertEqual(messages, [])
+
 
 class FlagExplorationEmailTest(test_utils.EmailTestBase):
     """Test that emails are sent to moderators when explorations are flagged."""
@@ -1937,6 +2029,18 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
 
+    def test_reviewer_onboard_emails_are_not_sent_if_user_cannot_recieve_email(
+            self) -> None:
+        user_services.update_email_preferences(
+            self.reviewer_id, False, False, False, False)
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_onboard_new_reviewers(
+                self.reviewer_id, 'Algebra')
+
+            # Make sure email is not sent.
+            messages = self._get_sent_email_messages(self.REVIEWER_EMAIL)
+            self.assertEqual(messages, [])
+
 
 class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
     """Test that correct email is sent while notifying reviewers."""
@@ -2006,6 +2110,18 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS)
 
+    def test_review_notifications_are_not_sent_if_user_cannot_recieve_email(
+            self) -> None:
+        user_services.update_email_preferences(
+            self.reviewer_id, False, False, False, False)
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_notify_users_to_review(
+                self.reviewer_id, 'Algebra')
+
+            # Make sure email is not sent.
+            messages = self._get_sent_email_messages(self.REVIEWER_EMAIL)
+            self.assertEqual(messages, [])
+
 
 class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
     """Test that correct email is sent when notifying contributor
@@ -2038,6 +2154,23 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             self.USER_EMAIL)
 
         self.assertEqual(len(messages), 0)
+
+    def test_achievements_emails_are_not_sent_if_user_cannot_recieve_email(
+            self) -> None:
+        user_services.update_email_preferences(
+            self.user_id, False, False, False, False)
+        contributor_ranking_email_info = (
+            suggestion_registry.ContributorMilestoneEmailInfo(
+                self.user_id, 'translation', 'acceptance', 'hi',
+                'Initial Contributor'
+            ))
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_notify_contributor_ranking_achievement(
+                contributor_ranking_email_info)
+
+            # Make sure email is not sent.
+            messages = self._get_sent_email_messages(self.USER_EMAIL)
+            self.assertEqual(messages, [])
 
     def test_that_email_not_sent_if_user_can_not_receive_emails(self) -> None:
         user_services.update_email_preferences(
@@ -5702,6 +5835,25 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
             self.APPLICANT_EMAIL)
         self.assertEqual(len(messages), 0)
 
+    def test_emails_are_not_sent_if_user_cannot_recieve_email(self) -> None:
+        user_services.update_email_preferences(
+            self.applicant_id, False, False, False, False)
+        with self.can_send_emails_ctx:
+            email_manager.send_accepted_voiceover_application_email(
+                self.applicant_id, 'Lesson to voiceover', 'en')
+
+            # Make sure email is not sent.
+            messages = self._get_sent_email_messages(self.applicant_id)
+            self.assertEqual(messages, [])
+
+            email_manager.send_rejected_voiceover_application_email(
+                self.applicant_id, 'Lesson to voiceover', 'en',
+                'A rejection message!')
+
+            # Make sure email is not sent.
+            messages = self._get_sent_email_messages(self.applicant_id)
+            self.assertEqual(messages, [])
+
     def test_that_correct_accepted_voiceover_application_email_is_sent(
         self
     ) -> None:
@@ -6225,6 +6377,30 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         messages = self._get_sent_email_messages(
             self.TRANSLATION_REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
+
+    def test_emails_are_not_sent_if_user_cannot_recieve_email(self) -> None:
+        user_services.update_email_preferences(
+            self.translation_reviewer_id, False, False, False, False)
+        with self.can_send_emails_ctx:
+            email_manager.send_email_to_new_contribution_reviewer(
+                self.translation_reviewer_id,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                language_code='hi')
+
+            # Make sure email is not sent.
+            messages = self._get_sent_email_messages(
+                self.TRANSLATION_REVIEWER_EMAIL)
+            self.assertEqual(messages, [])
+
+            email_manager.send_email_to_removed_contribution_reviewer(
+                self.translation_reviewer_id,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                language_code='hi')
+
+            # Make sure email is not sent.
+            messages = self._get_sent_email_messages(
+                self.TRANSLATION_REVIEWER_EMAIL)
+            self.assertEqual(messages, [])
 
     def test_without_language_code_email_not_sent_to_new_translation_reviewer(
         self
