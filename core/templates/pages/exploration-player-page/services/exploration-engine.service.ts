@@ -42,6 +42,7 @@ import { AudioTranslationLanguageService } from './audio-translation-language.se
 import { ContentTranslationLanguageService } from './content-translation-language.service';
 import { ImagePreloaderService } from './image-preloader.service';
 import { ExplorationParams, LearnerParamsService } from './learner-params.service';
+import { MisspelledAnswerResponseUtilityService } from './misspelled-answer-response-utility.service';
 import { PlayerTranscriptService } from './player-transcript.service';
 import { StatsReportingService } from './stats-reporting.service';
 
@@ -93,7 +94,7 @@ export class ExplorationEngineService {
       ReadOnlyExplorationBackendApiService,
     private statsReportingService: StatsReportingService,
     private urlService: UrlService,
-    private translateService: TranslateService
+    private misspelledAnswerResponseService: MisspelledAnswerResponseUtilityService
   ) {
     this.setExplorationProperties();
   }
@@ -558,7 +559,7 @@ export class ExplorationEngineService {
         isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
       if (answerIsOnlyMisspelled) {
         // Change the feedbackHtml.
-        feedbackHtml = this.getFeedbackHtmlWhenAnswerMisspelled();
+        feedbackHtml = this.misspelledAnswerResponseService.getFeedbackHtmlWhenAnswerMisspelled();
       }
     }
 
@@ -576,15 +577,6 @@ export class ExplorationEngineService {
       (oldStateName === this.exploration.initStateName), isFirstHit, false,
       _nextFocusLabel);
     return answerIsCorrect;
-  }
-
-  getFeedbackHtmlWhenAnswerMisspelled(): string {
-    let availableKeyCount = ExplorationPlayerConstants.
-      I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS.length;
-    const randomKeyIndex = Math.floor(Math.random() * availableKeyCount) + 1;
-    return this.translateService.instant(
-      ExplorationPlayerConstants[randomKeyIndex - 1]
-    );
   }
 
   isAnswerBeingProcessed(): boolean {
