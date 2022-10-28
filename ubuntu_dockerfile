@@ -48,12 +48,12 @@ RUN : \
         software-properties-common \
     && add-apt-repository -y ppa:deadsnakes \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        python3.7-venv \
+        python3.8-venv \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && :
 
-RUN python3.7 -m venv /home/venv
+RUN python3.8 -m venv /home/venv
 ENV PATH=/home/venv/bin:$PATH
 
 # Fix certificate issues
@@ -112,7 +112,7 @@ RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> \
 /etc/sudoers
 USER docker
 
-RUN sudo chmod -R go=rwx /home/opensource/
+RUN git config --global --add safe.directory /home/opensource/oppia
 
 # RUN addgroup --gid 1000 dockergrp
 # # add user to the docker group
@@ -130,4 +130,6 @@ RUN sudo chmod -R go=rwx /home/opensource/
 
 # (Narrow down the list of files for which permissions are to be given for.sl)
 # Once you're in run `sudo chmod -R go=rwx /home/` to give execution permissions
+# Try sudo chmod -R go=x /home/venv/ to give execution permissions to the venv directory
+# Try sudo chmod -R go=rw /home/opensource/ to give execution permissions to the oppia directory
 # and `python -m scripts.start --no_browser` to start the server.
