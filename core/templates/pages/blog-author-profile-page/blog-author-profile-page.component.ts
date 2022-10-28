@@ -23,11 +23,11 @@ import { BlogAuthorProfilePageData, BlogHomePageBackendApiService } from 'domain
 import { BlogAuthorProfilePageConstants } from './blog-author-profile-page.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoaderService } from 'services/loader.service';
-
-import './blog-author-profile-page.component.css';
 import { UrlService } from 'services/contextual/url.service';
 import { AlertsService } from 'services/alerts.service';
 import { AppConstants } from 'app.constants';
+
+import './blog-author-profile-page.component.css';
 
 @Component({
   selector: 'oppia-blog-author-page',

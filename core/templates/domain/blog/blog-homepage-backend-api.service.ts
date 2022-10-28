@@ -27,6 +27,7 @@ import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { BlogAuthorProfilePageConstants } from 'pages/blog-author-profile-page/blog-author-profile-page.constants';
 import { BlogAuthorDetailsBackendDict } from './blog-dashboard-backend-api.service';
+
 export interface BlogHomePageBackendResponse {
   'no_of_blog_post_summaries': number;
   'blog_post_summary_dicts': BlogPostSummaryBackendDict[];

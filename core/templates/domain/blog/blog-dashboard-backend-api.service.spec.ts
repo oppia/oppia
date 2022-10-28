@@ -18,7 +18,13 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { BlogAuthorDetails, BlogAuthorDetailsBackendDict, BlogDashboardBackendApiService, BlogDashboardBackendResponse, BlogDashboardData } from 'domain/blog/blog-dashboard-backend-api.service';
+import {
+  BlogAuthorDetails,
+  BlogAuthorDetailsBackendDict,
+  BlogDashboardBackendApiService,
+  BlogDashboardBackendResponse,
+  BlogDashboardData,
+} from 'domain/blog/blog-dashboard-backend-api.service';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogPostSummary, BlogPostSummaryBackendDict } from 'domain/blog/blog-post-summary.model';
 
