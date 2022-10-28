@@ -427,7 +427,11 @@ def main(args=None):
         # https://stackoverflow.com/q/10095037 for more details.
         sys.path.insert(1, directory)
 
-    common.fix_third_party_imports()
+    # These environmental variables are required to allow Google Cloud Tasks to
+    # operate in a local development environment without connecting to the
+    # internet. These environment variables allow Cloud APIs to be instantiated.
+    os.environ['CLOUDSDK_CORE_PROJECT'] = 'dummy-cloudsdk-project-id'
+    os.environ['APPLICATION_ID'] = 'dummy-cloudsdk-project-id'
 
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')

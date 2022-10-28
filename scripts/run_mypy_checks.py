@@ -311,7 +311,6 @@ def main(args: Optional[List[str]] = None) -> int:
         sys.path.insert(1, directory)
 
     install_third_party_libraries(parsed_args.skip_install)
-    common.fix_third_party_imports()
 
     print('Installing Mypy and stubs for third party libraries.')
     return_code, mypy_exec_path = install_mypy_prerequisites(
