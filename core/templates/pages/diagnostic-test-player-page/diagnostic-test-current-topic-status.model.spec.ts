@@ -23,7 +23,7 @@ import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { DiagnosticTestCurrentTopicStatusModel, SkillIdToQuestionsDict } from './diagnostic-test-current-topic-status.model';
 
 
-fdescribe('Diagnostic test current topic status model', () => {
+describe('Diagnostic test current topic status model', () => {
   let question1: Question, question2: Question, question3: Question;
   let question4: Question, question5: Question, question6: Question;
   let stateObject: StateObjectFactory;
@@ -121,7 +121,7 @@ fdescribe('Diagnostic test current topic status model', () => {
         new DiagnosticTestCurrentTopicStatusModel(skillIdToQuestionsDict));
 
       expect(diagnosticTestCurrentTopicStatusModel._eligibleSKillIds).toEqual(
-      ['skillID1', 'skillID2', 'skillID3']);
+        ['skillID1', 'skillID2', 'skillID3']);
 
       let currentSkillId = diagnosticTestCurrentTopicStatusModel.getNextSkill();
 

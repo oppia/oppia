@@ -23,8 +23,8 @@ import { Question } from 'domain/question/QuestionObjectFactory';
 
 export interface SkillIdToQuestionsDict {
   [skillId: string]: {
-    mainQuestion: Question,
-    backupQuestion: Question
+    mainQuestion: Question;
+    backupQuestion: Question;
   };
 }
 
@@ -45,10 +45,10 @@ export class DiagnosticTestCurrentTopicStatusModel {
 
   // A boolean variable that keeps track of whether a wrong attempt has
   // already been made in any previous questions. This lifeline option
-  // provides learners to attempt another question from the same skill
+  // allows learners to attempt another question from the same skill
   // (back up question) if the earlier one has been attempted incorrectly.
-  // Attempting a question incorrectly after the lifeline has been used,
-  // then the topic is marked as failed.
+  // Attempting a question incorrectly after the lifeline has been used results
+  // in the topic being marked as failed.
   _lifelineIsConsumed: boolean;
 
   // A dict with skill ID as key and a boolean as value. The boolean value
@@ -57,7 +57,7 @@ export class DiagnosticTestCurrentTopicStatusModel {
   // correctly, otherwise the skill is marked as failed. Initially, all the
   // skill ID keys map to false values, which represent that the skills are
   // not yet passed.
-  _skillIdToTestStatus = {};
+  _skillIdToTestStatus: {[skillId: string]: boolean} = {};
 
   constructor(skillIdToQuestionsDict: SkillIdToQuestionsDict) {
     this._eligibleSKillIds = Object.keys(skillIdToQuestionsDict);
@@ -69,11 +69,11 @@ export class DiagnosticTestCurrentTopicStatusModel {
     }
   }
 
-  recordCorrectAttempt(skillId): void {
+  recordCorrectAttempt(skillId: string): void {
     this._skillIdToTestStatus[skillId] = true;
   }
 
-  recordIncorrectAttempt(skillId): void {
+  recordIncorrectAttempt(skillId: string): void {
     if (this._lifelineIsConsumed) {
       this._skillIdToTestStatus[skillId] = false;
       // Attempting two incorrect answers should mark the topic as failed so
@@ -85,10 +85,10 @@ export class DiagnosticTestCurrentTopicStatusModel {
   }
 
   getNextSkill(): string {
-    return this._eligibleSKillIds.shift();
+    return this._eligibleSKillIds.shift() || '';
   }
 
-  getNextQuestion(skillId): Question {
+  getNextQuestion(skillId: string): Question {
     if (this._lifelineIsConsumed) {
       return this._skillIdToQuestionsDict[skillId].backupQuestion;
     } else {
