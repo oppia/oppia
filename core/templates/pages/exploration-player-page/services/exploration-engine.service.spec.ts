@@ -41,16 +41,7 @@ import { PlayerTranscriptService } from './player-transcript.service';
 import { StatsReportingService } from './stats-reporting.service';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
-import { TranslateService } from '@ngx-translate/core';
-import { MockTranslateModule, MockTranslatePipe } from 'tests/unit-test-utils';
 
-
-class MockTranslateService {
-  onLangChange: EventEmitter<string> = new EventEmitter();
-  instant(key: string): string {
-    return key;
-  }
-}
 
 describe('Exploration engine service ', () => {
   let alertsService: AlertsService;
@@ -71,7 +62,6 @@ describe('Exploration engine service ', () => {
     ReadOnlyExplorationBackendApiService;
   let statsReportingService: StatsReportingService;
   let urlService: UrlService;
-  let translateService: TranslateService;
   let paramChangeObjectFactory: ParamChangeObjectFactory;
   let textInputService: InteractionRulesService;
   let outcomeObjectFactory: OutcomeObjectFactory;
@@ -385,16 +375,7 @@ describe('Exploration engine service ', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-      ],
-      declarations: [
-        MockTranslatePipe
-      ],
-      providers: [
-        {
-          provide: TranslateService,
-          useClass: MockTranslateService
-        }
-      ],
+      ]
     });
 
     alertsService = TestBed.inject(AlertsService);
@@ -421,7 +402,6 @@ describe('Exploration engine service ', () => {
     paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
     textInputService = TestBed.get(TextInputRulesService);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
-    translateService = TestBed.inject(TranslateService);
   });
 
   beforeEach(() => {
@@ -565,7 +545,6 @@ describe('Exploration engine service ', () => {
       spyOn(answerClassificationService, 'isAnswerOnlyMisspelled')
         .and.returnValue(true);
       spyOn(Math, 'random').and.returnValue(0.45);
-      spyOn(translateService, 'instant').and.callThrough();
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
 
@@ -576,10 +555,6 @@ describe('Exploration engine service ', () => {
         answer, textInputService, submitAnswerSuccessCb);
 
       expect(submitAnswerSuccessCb).toHaveBeenCalled();
-      expect(explorationEngineService.getFeedbackHtmlWhenAnswerMisspelled()).
-        toBe('I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_2');
-      expect(translateService.instant).toHaveBeenCalledWith(
-        'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_2');
       expect(explorationEngineService.isAnswerBeingProcessed()).toBe(false);
       expect(isAnswerCorrect).toBe(false);
     });

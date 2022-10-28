@@ -18,7 +18,6 @@
 
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
@@ -35,7 +34,6 @@ import { UrlService } from 'services/contextual/url.service';
 import { ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
 import { AnswerClassificationService, InteractionRulesService } from './answer-classification.service';
 import { AudioPreloaderService } from './audio-preloader.service';
 import { AudioTranslationLanguageService } from './audio-translation-language.service';
@@ -46,7 +44,7 @@ import { MisspelledAnswerResponseUtilityService } from './misspelled-answer-resp
 import { PlayerTranscriptService } from './player-transcript.service';
 import { StatsReportingService } from './stats-reporting.service';
 
-const TEXTINPUT: string = 'TextInput'
+const TEXTINPUT: string = 'TextInput';
  @Injectable({
    providedIn: 'root'
  })
@@ -94,7 +92,8 @@ export class ExplorationEngineService {
       ReadOnlyExplorationBackendApiService,
     private statsReportingService: StatsReportingService,
     private urlService: UrlService,
-    private misspelledAnswerResponseService: MisspelledAnswerResponseUtilityService
+    private misspelledAnswerResponseService:
+      MisspelledAnswerResponseUtilityService
   ) {
     this.setExplorationProperties();
   }
@@ -559,7 +558,8 @@ export class ExplorationEngineService {
         isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
       if (answerIsOnlyMisspelled) {
         // Change the feedbackHtml.
-        feedbackHtml = this.misspelledAnswerResponseService.getFeedbackHtmlWhenAnswerMisspelled();
+        feedbackHtml = this.misspelledAnswerResponseService.
+          getFeedbackHtmlWhenAnswerMisspelled();
       }
     }
 
