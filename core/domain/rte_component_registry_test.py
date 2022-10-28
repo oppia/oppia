@@ -34,8 +34,7 @@ from core.domain import object_registry
 from core.domain import rte_component_registry
 from core.tests import test_utils
 
-from typing import List, Tuple, Type
-from typing_extensions import Final
+from typing import Final, List, Tuple, Type
 
 # File names ending in any of these suffixes will be ignored when checking for
 # RTE component validity.
@@ -109,7 +108,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                             ca_spec['schema']['obj_type']))
                     self.assertEqual(
                         ca_spec['default_value'],
-                        obj_class.normalize(ca_spec['default_value']))  # type: ignore[no-untyped-call]
+                        obj_class.normalize(ca_spec['default_value']))
 
     def _listdir_omit_ignored(self, directory: str) -> List[str]:
         """List all files and directories within 'directory', omitting the ones
@@ -159,7 +158,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isdir(component_dir))
 
             # In this directory there should be a /directives directory, an
-            # an icon .png file, webdriverio.js file and a protractor.js file,
+            # an icon .png file, webdriverio.js file,
             # and an optional preview .png file.
             # In /directives directory should be HTML file, a JS file,
             # there could be multiple JS and HTML files.
@@ -168,12 +167,11 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
             directives_dir = os.path.join(component_dir, 'directives')
             png_file = os.path.join(component_dir, '%s.png' % component_id)
-            protractor_file = os.path.join(component_dir, 'protractor.js')
+
             webdriverio_file = os.path.join(component_dir, 'webdriverio.js')
 
             self.assertTrue(os.path.isdir(directives_dir))
             self.assertTrue(os.path.isfile(png_file))
-            self.assertTrue(os.path.isfile(protractor_file))
             self.assertTrue(os.path.isfile(webdriverio_file))
 
             main_ts_file = os.path.join(

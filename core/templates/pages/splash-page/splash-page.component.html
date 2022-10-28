@@ -7,14 +7,14 @@
       </div>
       <div class="oppia-splash-button-container">
         <button type="submit" (click)="onClickBrowseLessonsButton()"
-                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_ACTION_VISIT_WEB_CLASSROOM' | translate">
+                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200">
+          {{ 'I18N_ACTION_BROWSE_LESSONS' | translate }}
         </button>
       </div>
-      <div class="oppia-splash-button-container">
+      <div *ngIf="androidPageIsEnabled" class="oppia-splash-button-container">
         <button type="submit" (click)="onClickAccessAndroidButton()"
-                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_ACTION_ACCESS_ANDROID_APP' | translate">
+                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200">
+          {{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}
         </button>
       </div>
     </div>

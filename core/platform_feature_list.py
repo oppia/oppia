@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core.domain import platform_parameter_list as params
 
+from typing import List
 
 ParamNames = params.ParamNames
 
@@ -41,24 +42,25 @@ ParamNames = params.ParamNames
 
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
-DEV_FEATURES_LIST = [
+DEV_FEATURES_LIST: List[ParamNames] = [
     params.ParamNames.DUMMY_FEATURE
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
 # be in test stage otherwise it will cause a test error in the backend test.
-TEST_FEATURES_LIST = [
+TEST_FEATURES_LIST: List[ParamNames] = [
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
 # be in prod stage otherwise it will cause a test error in the backend test.
-PROD_FEATURES_LIST = [
+PROD_FEATURES_LIST: List[ParamNames] = [
     params.ParamNames.END_CHAPTER_CELEBRATION,
-    params.ParamNames.CHECKPOINT_CELEBRATION
+    params.ParamNames.CHECKPOINT_CELEBRATION,
+    params.ParamNames.ANDROID_BETA_LANDING_PAGE
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
 # completed and no longer gated because their functionality is permanently
 # built into the codebase.
-DEPRECATED_FEATURE_NAMES = [
+DEPRECATED_FEATURE_NAMES: List[ParamNames] = [
 ]

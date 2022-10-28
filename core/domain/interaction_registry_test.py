@@ -29,8 +29,7 @@ from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
 
-from typing import Any, Dict
-from typing_extensions import Final
+from typing import Any, Dict, Final
 
 EXPECTED_TERMINAL_INTERACTIONS_COUNT: Final = 1
 
@@ -60,15 +59,6 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
             interaction_registry.Registry.get_deduplicated_dependency_ids(
                 ['CodeRepl', 'AlgebraicExpressionInput']),
             ['skulpt', 'codemirror', 'guppy', 'nerdamer'])
-
-    def test_dependency_loads_in_exploration_player_page(self) -> None:
-        exp_id = '0'
-
-        exp_services.load_demo(exp_id)
-
-        # Ensure that dependencies are added in the exploration reader page.
-        response = self.get_html_response('/explore/%s' % exp_id)
-        response.mustcontain('dependency_html.html')
 
     def test_no_dependencies_in_non_exploration_pages(self) -> None:
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)

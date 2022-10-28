@@ -6,19 +6,15 @@
           <div class="oppia-android-main-text oppia-android-text-color">
             <img class="oppia-android-logo" src="/assets/images/logo/48x48_logo_mint.svg" alt="">
             <span>ppia’s Android App—<br>
-              &nbsp;&nbsp;available for download.
+              &nbsp;&nbsp;{{ 'I18N_ANDROID_PAGE_AVAILABLE_FOR_DOWNLOAD_TEXT' | translate }}
             </span>
           </div>
           <div class="oppia-android-beta-description-container">
-            <p class="oppia-android-beta-description">
-              A beta version of the Android app is now available in <strong>English</strong>,<br>
-              <strong>Brazilian</strong>,
-              <strong>Portuguese</strong>, and
-              <strong> Swahili</strong>. The app is free, and no<br>
-              subscription is needed.
+            <p class="oppia-android-beta-description"
+               [innerHTML]="'I18N_ANDROID_PAGE_BETA_DESCRIPTION' | translate">
             </p>
-            <p class="oppia-android-support-text">
-              We support all Android versions going back to Lollipop (Android 5).
+            <p class="oppia-android-support-text"
+               [innerHTML]="'I18N_ANDROID_PAGE_VERSIONS_SUPPORTED_TEXT' | translate">
             </p>
             <a [href]="ANDROID_APP_URL" target="_blank" rel="noopener">
               <img class="oppia-android-google-play-logo"
@@ -34,38 +30,34 @@
     </div>
 
     <div class="oppia-mobile-only oppia-android-features">
-      <span class="oppia-android-features-main-text">
-        Education<br>
-        for everyone.
+      <span class="oppia-android-features-main-text"
+            [innerHTML]="'I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER' | translate">
       </span>
       <div class="oppia-android-key-feature-image-container">
         <img *ngIf="featuresShown === 1" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="">
-        <img *ngIf="featuresShown === 2 || featuresShown === 3" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="">
+        <img *ngIf="featuresShown === 2" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="">
+        <img *ngIf="featuresShown === 3" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-3.svg" alt="">
         <img *ngIf="featuresShown >= 4" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-4.svg" alt="">
       </div>
       <div class="oppia-android-key-feature-container">
         <div class="oppia-android-key-feature-description">
           <div *ngIf="featuresShown === 1" [@fadeIn] class="oppia-android-key-feature">
-            <div class="oppia-android-key-feature-text oppia-android-text-color">Learn through engaging stories</div>
-            <div class="oppia-android-key-feature-subtext">And try our helpful hints to guide you along</div>
+            <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_1' | translate }}</div>
+            <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_1' | translate }}</div>
           </div>
           <div *ngIf="featuresShown === 2" [@fadeIn] class="oppia-android-key-feature">
-            <div class="oppia-android-key-feature-text oppia-android-text-color">Learn anytime, anywhere</div>
-            <div class="oppia-android-key-feature-subtext">Play lessons even without an Internet connection.</div>
+            <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_2' | translate }}</div>
+            <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_2' | translate }}</div>
           </div>
           <div *ngIf="featuresShown === 3" [@fadeIn] class="oppia-android-key-feature">
-            <div class="oppia-android-key-feature-text oppia-android-text-color">Learn in your language</div>
-            <div class="oppia-android-key-feature-subtext">
-              For now, the app is available in <strong>English</strong>, <strong>Brazilian</strong><br>
-              <strong>Portuguese</strong>, and
-              <strong> Swahili</strong>.<br>
-              <br>
-              More languages will be added soon!
+            <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_3' | translate }}</div>
+            <div class="oppia-android-key-feature-subtext"
+                 [innerHTML]="'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_3' | translate">
             </div>
           </div>
           <div *ngIf="featuresShown === 4" [@fadeIn] class="oppia-android-key-feature">
-            <div class="oppia-android-key-feature-text oppia-android-text-color">Switch between learners</div>
-            <div class="oppia-android-key-feature-subtext">Create and maintain up to 10 profiles on one device.</div>
+            <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_4' | translate }}</div>
+            <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_4' | translate }}</div>
           </div>
         </div>
         <div class="oppia-android-carousel-item-container">
@@ -79,38 +71,36 @@
 
     <div #featuresMainText class="oppia-web-only oppia-android-empty-div"></div>
     <div class="oppia-android-features oppia-web-only" [ngClass]="{ 'oppia-android-features-sticky': !androidUpdatesSectionIsSeen }">
-      <span *ngIf="featuresMainTextIsSeen" [@delayedFadeIn] class="oppia-android-features-main-text">
-        Education<br>
-        for everyone.
+      <span *ngIf="featuresMainTextIsSeen"
+            [@delayedFadeIn]
+            [innerHTML]="'I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER' | translate"
+            class="oppia-android-features-main-text">
       </span>
       <div class="oppia-android-key-feature-container">
         <div class="oppia-android-key-feature-description">
           <div *ngIf="featuresShown > 0" [@fadeIn] class="oppia-android-key-feature">
-            <div class="oppia-android-key-feature-text oppia-android-text-color">Learn through engaging stories</div>
-            <div class="oppia-android-key-feature-subtext">And try our helpful hints to guide you along</div>
+            <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_1' | translate }}</div>
+            <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_1' | translate }}</div>
           </div>
           <div *ngIf="featuresShown > 1" [@fadeIn] class="oppia-android-key-feature">
-            <div class="oppia-android-key-feature-text oppia-android-text-color">Learn anytime, anywhere</div>
-            <div class="oppia-android-key-feature-subtext">Play lessons even without an Internet connection.</div>
+            <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_2' | translate }}</div>
+            <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_2' | translate }}</div>
           </div>
           <div *ngIf="featuresShown > 2" [@fadeIn] class="oppia-android-key-feature">
-            <div class="oppia-android-key-feature-text oppia-android-text-color">Learn in your language</div>
-            <div class="oppia-android-key-feature-subtext">
-              For now, the app is available in <strong>English</strong>, <strong>Brazilian</strong><br>
-              <strong>Portuguese</strong>, and
-              <strong> Swahili</strong>.<br>
-              <br>
-              More languages will be added soon!
+            <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_3' | translate }}</div>
+            <div class="oppia-android-key-feature-subtext"
+                 [innerHTML]="'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_3' | translate">
             </div>
           </div>
           <div *ngIf="featuresShown > 3" [@fadeIn] class="oppia-android-key-feature">
-            <div class="oppia-android-key-feature-text oppia-android-text-color">Switch between learners</div>
-            <div class="oppia-android-key-feature-subtext">Create and maintain up to 10 profiles on one device.</div>
+            <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_4' | translate }}</div>
+            <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_4' | translate }}</div>
           </div>
         </div>
         <div class="oppia-android-key-feature-image-container oppia-web-only">
           <img *ngIf="featuresShown === 1" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="">
-          <img *ngIf="featuresShown === 2 || featuresShown === 3" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="">
+          <img *ngIf="featuresShown === 2" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="">
+          <img *ngIf="featuresShown === 3" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-3.svg" alt="">
           <img *ngIf="featuresShown >= 4" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-4.svg" alt="">
         </div>
       </div>
@@ -128,19 +118,17 @@
     <div #androidUpdatesSection class="oppia-android-app-updates-container oppia-android-app-updates-background">
       <div *ngIf="false" class="d-flex">
         <div class="oppia-android-updates-text-container">
-          <div class="oppia-android-updates-main-text">
-            Want updates on<br>
-            Oppia and the app?
+          <div class="oppia-android-updates-main-text"
+               [innerHTML]="'I18N_ANDROID_PAGE_UPDATES_MAIN_TEXT' | translate">
           </div>
-          <div class="oppia-android-sub-text oppia-android-updates-sub-text">
-            And want to hear when the app is available<br>
-            in your language? <span class="oppia-android-bold-text">We'll notify you!</span>
+          <div class="oppia-android-sub-text oppia-android-updates-sub-text"
+               [innerHTML]="'I18N_ANDROID_PAGE_UPDATES_SUBTEXT' | translate">
           </div>
         </div>
         <div class="oppia-android-updates-input-container">
           <div>
             <div class="oppia-android-updates-input-label">
-              Email address
+              {{ 'I18N_ANDROID_PAGE_EMAIL_FIELD_LABEL' | translate }}
               <span class="oppia-android-updates-asterisk-color">*</span>
             </div>
             <input class="oppia-android-updates-input"
@@ -150,7 +138,7 @@
                    required="true">
           </div>
           <div class="oppia-android-updates-input-padding">
-            <div class="oppia-android-updates-input-label">Name</div>
+            <div class="oppia-android-updates-input-label">{{ 'I18N_ANDROID_PAGE_NAME_FIELD_LABEL' | translate }}</div>
             <input class="oppia-android-updates-input"
                    type="text"
                    [(ngModel)]="name"
@@ -160,19 +148,18 @@
           <div class="oppia-android-updates-input-padding">
             <input class="oppia-android-updates-checkbox" type="checkbox">
             <span class="oppia-android-updates-checkbox-label">
-              You confirm that you are over the age of 18 or that you have consent
-              and approval from your legal parent or guardian.
+              {{ 'I18N_ANDROID_PAGE_CONSENT_CHECKBOX_LABEL' | translate }}
               <span class="oppia-android-updates-asterisk-color">*</span>
             </span>
           </div>
           <div class="oppia-android-updates-input-padding text-center">
-            <button class="btn oppia-android-updates-button">Notify Me</button>
+            <button class="btn oppia-android-updates-button">{{ 'I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT' | translate }}</button>
           </div>
         </div>
       </div>
       <div class="oppia-android-speech-bubble">
-        <div class="oppia-android-speech-bubble-text">
-          Let us know at <strong class="oppia-android-bold-text">android@oppia.org</strong><br>if you have any feedback.
+        <div class="oppia-android-speech-bubble-text"
+             [innerHTML]="'I18N_ANDROID_PAGE_FEEDBACK_TEXT' | translate">
         </div>
       </div>
       <div>

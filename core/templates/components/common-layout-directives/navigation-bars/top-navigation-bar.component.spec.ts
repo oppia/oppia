@@ -38,6 +38,16 @@ import { CookieService } from 'ngx-cookie';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+
+class MockPlatformFeatureService {
+  status = {
+    AndroidBetaLandingPage: {
+      isEnabled: false
+    }
+  };
+}
 
 class MockWindowRef {
   nativeWindow = {
@@ -50,6 +60,10 @@ class MockWindowRef {
       }
     },
     localStorage: {
+      last_uploaded_audio_lang: 'en',
+      removeItem: (name: string) => {}
+    },
+    sessionStorage: {
       last_uploaded_audio_lang: 'en',
       removeItem: (name: string) => {}
     },
@@ -81,8 +95,10 @@ describe('TopNavigationBarComponent', () => {
   let debouncerService: DebouncerService;
   let sidebarStatusService: SidebarStatusService;
   let classroomBackendApiService: ClassroomBackendApiService;
+  let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let i18nService: I18nService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   let mockResizeEmitter: EventEmitter<void>;
 
@@ -116,6 +132,10 @@ describe('TopNavigationBarComponent', () => {
             getResizeEvent: () => mockResizeEmitter,
             isWindowNarrow: () => false
           }
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -135,6 +155,8 @@ describe('TopNavigationBarComponent', () => {
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     i18nService = TestBed.inject(I18nService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    learnerGroupBackendApiService = TestBed.inject(
+      LearnerGroupBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     accessValidationBackendApiService = TestBed
       .inject(AccessValidationBackendApiService);
@@ -431,6 +453,18 @@ describe('TopNavigationBarComponent', () => {
       langCode);
   });
 
+  it('should check if learner groups feature is enabled', fakeAsync(() => {
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(
+      learnerGroupBackendApiService, 'isLearnerGroupFeatureEnabledAsync')
+      .and.resolveTo(true);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBe(true);
+  }));
+
   it('should check if classroom promos are enabled', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
     spyOn(
@@ -576,5 +610,16 @@ describe('TopNavigationBarComponent', () => {
     hackyStoryTitleTranslationIsDisplayed =
       component.isHackyTopicTitleTranslationDisplayed(0);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
+  });
+
+  it('should show android button if the feature is enabled', () => {
+    // The androidPageIsEnabled property is set when the component is
+    // constructed and the value is not modified after that so there is no
+    // pre-check for this test.
+    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
+
+    const component = TestBed.createComponent(TopNavigationBarComponent);
+
+    expect(component.componentInstance.androidPageIsEnabled).toBeTrue();
   });
 });

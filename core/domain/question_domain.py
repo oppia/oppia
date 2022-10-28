@@ -37,8 +37,8 @@ from extensions import domain
 
 from pylatexenc import latex2text
 
-from typing import Dict, List, Optional, Set, Union, cast, overload
-from typing_extensions import Final, Literal, TypedDict
+from typing import (
+    Dict, Final, List, Literal, Optional, Set, TypedDict, Union, cast, overload)
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -768,7 +768,7 @@ class Question(translation_domain.BaseTranslatableObject):
         # interaction_specs.json to ensure that this migration remains
         # stable even when interaction_specs.json is changed.
         ca_specs = [
-            domain.CustomizationArgSpec(  # type: ignore[no-untyped-call]
+            domain.CustomizationArgSpec(
                 ca_spec_dict['name'],
                 ca_spec_dict['description'],
                 ca_spec_dict['schema'],
@@ -801,7 +801,14 @@ class Question(translation_domain.BaseTranslatableObject):
 
             if is_subtitled_unicode_spec:
                 # Default is a SubtitledHtml dict or SubtitleUnicode dict.
-                new_value = copy.deepcopy(ca_spec.default_value)
+                # Here we use cast because in this if is_subtitled_unicode_spec
+                # clause, default_value can only be of SubtitledUnicodeDict
+                # type. So, to narrow down the type from various default_value
+                # types, we used cast here.
+                default_value = cast(
+                    state_domain.SubtitledUnicodeDict, ca_spec.default_value
+                )
+                new_value = copy.deepcopy(default_value)
 
                 # If available, assign value to html or unicode_str.
                 if ca_name in ca_dict:
@@ -815,26 +822,37 @@ class Question(translation_domain.BaseTranslatableObject):
 
                 ca_dict[ca_name] = {'value': new_value}
             elif is_subtitled_html_list_spec:
-                new_value = []
+                new_subtitled_html_list_value: (
+                    List[state_domain.SubtitledHtmlDict]
+                ) = []
 
                 if ca_name in ca_dict:
                     # Assign values to html fields.
                     for html in ca_dict[ca_name]['value']:
-                        new_value.append({
-                            'html': html, 'content_id': None
+                        new_subtitled_html_list_value.append({
+                            'html': html, 'content_id': ''
                         })
                 else:
                     # Default is a list of SubtitledHtml dict.
-                    new_value.extend(copy.deepcopy(ca_spec.default_value))
+                    # Here we use cast because in this 'else' clause
+                    # default_value can only be of List[SubtitledHtmlDict]
+                    # type. So, to narrow down the type from various
+                    # default_value types, we used cast here.
+                    new_subtitled_html_list_value.extend(
+                        cast(
+                            List[state_domain.SubtitledHtmlDict],
+                            ca_spec.default_value
+                        )
+                    )
 
                 # Assign content_ids.
-                for subtitled_html_dict in new_value:
+                for subtitled_html_dict in new_subtitled_html_list_value:
                     subtitled_html_dict['content_id'] = (
                         content_id_counter
                         .generate_content_id(content_id_prefix)
                     )
 
-                ca_dict[ca_name] = {'value': new_value}
+                ca_dict[ca_name] = {'value': new_subtitled_html_list_value}
             elif ca_name not in ca_dict:
                 ca_dict[ca_name] = {'value': ca_spec.default_value}
 
@@ -1756,7 +1774,13 @@ class Question(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected the question to have a solution'
             )
-        self.question_state_data.validate({}, False)
+        # Here the variable `tagged_skill_misconception_id_required`
+        # represents that the tagged skill misconception id field is
+        # required for it.
+        self.question_state_data.validate(
+            {},
+            False,
+            tagged_skill_misconception_id_required=True)
 
     def validate(self) -> None:
         """Validates the Question domain object before it is saved."""

@@ -228,20 +228,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
-    def test_get_voiceover_opportunity_data(self):
-        response = self.get_json(
-            '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={'language_code': 'en'})
-
-        self.assertEqual(len(response['opportunities']), 3)
-        self.assertEqual(
-            response['opportunities'], [
-                self.expected_opportunity_dict_1,
-                self.expected_opportunity_dict_2,
-                self.expected_opportunity_dict_3])
-        self.assertFalse(response['more'])
-        self.assertIsInstance(response['next_cursor'], str)
-
     def test_get_skill_opportunity_data_pagination(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
@@ -362,41 +348,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertFalse(next_response['more'])
             self.assertIsInstance(next_response['next_cursor'], str)
 
-    def test_get_voiceover_opportunity_data_pagination(self):
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
-            response = self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'en'})
-            self.assertEqual(len(response['opportunities']), 1)
-            self.assertEqual(
-                response['opportunities'], [self.expected_opportunity_dict_1])
-            self.assertTrue(response['more'])
-            self.assertIsInstance(response['next_cursor'], str)
-
-            next_cursor = response['next_cursor']
-            next_response = self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'en', 'cursor': next_cursor})
-
-            self.assertEqual(len(next_response['opportunities']), 1)
-            self.assertEqual(
-                next_response['opportunities'],
-                [self.expected_opportunity_dict_2])
-            self.assertTrue(next_response['more'])
-            self.assertIsInstance(next_response['next_cursor'], str)
-
-            next_cursor = next_response['next_cursor']
-            next_response = self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'en', 'cursor': next_cursor})
-
-            self.assertEqual(len(next_response['opportunities']), 1)
-            self.assertEqual(
-                next_response['opportunities'],
-                [self.expected_opportunity_dict_3])
-            self.assertFalse(next_response['more'])
-            self.assertIsInstance(next_response['next_cursor'], str)
-
     def test_get_translation_opportunity_with_invalid_language_code(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
@@ -408,19 +359,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                expected_status_int=400)
-
-    def test_get_voiceover_opportunity_with_invalid_language_code(self):
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
-            self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'invalid_lang_code'},
-                expected_status_int=400)
-
-    def test_get_voiceover_opportunity_without_language_code(self):
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
-            self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
 
     def test_get_translation_opportunities_without_topic_name_returns_all_topics( # pylint: disable=line-too-long
@@ -489,12 +427,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self
     ):
         # Create a new exploration and linked story.
-        multiple_choice_state_name = 'Multiple choice state'
+        continue_state_name = 'continue state'
         exp_100 = self.save_new_linear_exp_with_state_names_and_interactions(
             '100',
             self.owner_id,
-            ['Introduction', multiple_choice_state_name, 'End state'],
-            ['TextInput', 'MultipleChoiceInput'],
+            ['Introduction', continue_state_name, 'End state'],
+            ['TextInput', 'Continue'],
             category='Algebra',
             correctness_feedback_enabled=True
         )
@@ -503,44 +441,17 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id, self.admin_id, 'story_id_100', self.topic_id,
             exp_100.id)
 
-        # Add two pieces of content to the exploration multiple choice
-        # interaction state.
-        exp_services.update_exploration(
-            self.owner_id, exp_100.id, [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': multiple_choice_state_name,
-                    'new_value': {
-                        'choices': {
-                            'value': [{
-                                'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
-                            }, {
-                                'content_id': 'ca_choices_1',
-                                'html': '<p>Option B</p>'
-                            }]
-                        },
-                        'showChoicesInShuffledOrder': {'value': False}
-                    }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': multiple_choice_state_name,
-                    'new_value': 1
-                })], 'Add state name')
-
-        # Create a translation suggestion for the first multiple choice text
-        # content.
+        # Create a translation suggestion for continue text.
+        continue_state = exp_100.states['continue state']
+        content_id_of_continue_button_text = (
+            continue_state.interaction.customization_args[
+                'buttonText'].value.content_id)
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'ca_choices_0',
+            'content_id': content_id_of_continue_button_text,
             'language_code': 'hi',
-            'content_html': '<p>Option A</p>',
-            'state_name': multiple_choice_state_name,
+            'content_html': 'Continue',
+            'state_name': continue_state_name,
             'translation_html': '<p>Translation for content.</p>'
         }
         suggestion_services.create_suggestion(
@@ -562,8 +473,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'topic_name': 'topic',
                 'story_title': 'title story_id_100',
                 'chapter_title': 'Node1',
-                # Introduction + Multiple choice with 2 options + End state.
-                'content_count': 5,
+                # Introduction + Continue + End state.
+                'content_count': 4,
                 'translation_counts': {},
                 'translation_in_review_counts': {}
             }]
@@ -583,7 +494,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_DELETE_STATE,
-                    'state_name': 'Multiple choice state',
+                    'state_name': 'continue state',
                 }),
             ], 'delete state')
 
@@ -599,12 +510,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self
     ):
         # Create a new exploration and linked story.
-        multiple_choice_state_name = 'Multiple choice state'
+        continue_state_name = 'continue state'
         exp_100 = self.save_new_linear_exp_with_state_names_and_interactions(
             '100',
             self.owner_id,
-            ['Introduction', multiple_choice_state_name, 'End state'],
-            ['TextInput', 'MultipleChoiceInput'],
+            ['Introduction', continue_state_name, 'End state'],
+            ['TextInput', 'Continue'],
             category='Algebra',
             correctness_feedback_enabled=True
         )
@@ -613,44 +524,17 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id, self.admin_id, 'story_id_100', self.topic_id,
             exp_100.id)
 
-        # Add two pieces of content to the exploration multiple choice
-        # interaction state.
-        exp_services.update_exploration(
-            self.owner_id, exp_100.id, [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': multiple_choice_state_name,
-                    'new_value': {
-                        'choices': {
-                            'value': [{
-                                'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
-                            }, {
-                                'content_id': 'ca_choices_1',
-                                'html': '<p>Option B</p>'
-                            }]
-                        },
-                        'showChoicesInShuffledOrder': {'value': False}
-                    }
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name':
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                    'state_name': multiple_choice_state_name,
-                    'new_value': 1
-                })], 'Add state name')
-
-        # Create a translation suggestion for the second multiple choice
-        # text content.
+        # Create a translation suggestion for the continue text.
+        continue_state = exp_100.states['continue state']
+        content_id_of_continue_button_text = (
+            continue_state.interaction.customization_args[
+                'buttonText'].value.content_id)
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'ca_choices_1',
+            'content_id': content_id_of_continue_button_text,
             'language_code': 'hi',
-            'content_html': '<p>Option B</p>',
-            'state_name': multiple_choice_state_name,
+            'content_html': 'Continue',
+            'state_name': continue_state_name,
             'translation_html': '<p>Translation for content.</p>'
         }
         suggestion_services.create_suggestion(
@@ -674,7 +558,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'story_title': 'title story_id_100',
                 'chapter_title': 'Node1',
                 # Introduction + Multiple choice with 2 options + End state.
-                'content_count': 5,
+                'content_count': 4,
                 'translation_counts': {},
                 'translation_in_review_counts': {}
             }]
@@ -686,17 +570,16 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name':
                         exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': multiple_choice_state_name,
+                    'state_name': continue_state_name,
                     'new_value': {
-                        'choices': {
-                            'value': [{
-                                'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
-                            }]
-                        },
-                        'showChoicesInShuffledOrder': {'value': False}
+                        'buttonText': {
+                            'value': {
+                                'content_id': 'choices_0',
+                                'unicode_str': 'Continua'
+                            }
+                        }
                     }
-                })], 'Remove multiple choice option')
+                })], 'Update continue cust args')
 
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,

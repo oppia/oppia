@@ -35,7 +35,6 @@
              placement="bottom">
         </div>
       </div>
-      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
     <div class="oppia-opportunities-progress-label">
       <span class="e2e-test-opportunity-list-item-progress-percentage"
@@ -52,7 +51,6 @@
             ngbTooltip="Percentage of accepted questions for skill out of target number of questions per skill ({{targetNumQuestionsPerSkill}})">
         ({{ progressPercentage }})
       </span>
-      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
   </div>
 </ng-template>
@@ -70,7 +68,6 @@
             [hidden]="opportunityDataIsLoading">
         {{ opportunity?.subheading | wrapTextWithEllipsis : 25 }}
       </span>
-      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
     <div class="oppia-opportunities-heading oppia-animate-fadein">
       <span class="e2e-test-opportunity-list-item-heading"
@@ -78,7 +75,6 @@
             [hidden]="opportunityDataIsLoading">
         {{ opportunity?.heading | wrapTextWithEllipsis : opportunityHeadingTruncationLength }}
       </span>
-      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
   </div>
 </ng-template>
@@ -92,7 +88,6 @@
             [hidden]="opportunityDataIsLoading">
           {{ labelText }}
       </span>
-      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
   </div>
 </ng-template>
@@ -114,8 +109,13 @@
   </div>
 </ng-template>
 
+<div class="oppia-lazy-loading-container"
+     [hidden]="!opportunityDataIsLoading">
+  <lazy-loading></lazy-loading>
+</div>
+
 <!-- Desktop -->
-<div *ngIf="!onMobile"
+<div *ngIf="!onMobile && !opportunityDataIsLoading"
      class="oppia-opportunities-list-item oppia-desktop-list-item e2e-test-opportunity-list-item">
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
@@ -124,7 +124,7 @@
 </div>
 
 <!-- Mobile -->
-<div *ngIf="showOpportunityButton && onMobile"
+<div *ngIf="showOpportunityButton && onMobile && !opportunityDataIsLoading"
      class="oppia-opportunities-list-item e2e-test-opportunity-list-item">
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
@@ -132,7 +132,7 @@
   <ng-template [ngTemplateOutlet]="OpportunitiesButton"></ng-template>
 </div>
 
-<button *ngIf="!showOpportunityButton && onMobile"
+<button *ngIf="!showOpportunityButton && onMobile && !opportunityDataIsLoading"
         class="oppia-opportunities-list-item oppia-button-list-item e2e-test-opportunity-list-item"
         [hidden]="opportunityDataIsLoading || correspondingOpportunityDeleted"
         [disabled]="opportunityButtonDisabled"
@@ -143,6 +143,12 @@
 </button>
 
 <style>
+  .oppia-lazy-loading-container {
+    height: 120px;
+    margin-bottom: -20px;
+    margin-top: 12px;
+    width: 100%;
+  }
   .oppia-subheading-large {
     display: block;
   }

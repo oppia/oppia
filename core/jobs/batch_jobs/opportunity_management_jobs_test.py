@@ -26,8 +26,7 @@ from core.jobs.batch_jobs import opportunity_management_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Type
-from typing_extensions import Final
+from typing import Final, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -855,3 +854,172 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.translation_counts, {})
         self.assertEqual(
             opportunity_model.language_codes_needing_voice_artists, ['en'])
+
+    def test_generation_job_ignores_contents_only_consisting_of_digits(
+        self
+    ) -> None:
+        self.topic_model.canonical_story_references.append({
+            'story_id': self.STORY_2_ID,
+            'story_is_published': False
+        })
+        self.topic_model.update_timestamps()
+
+        story_model = self.create_model(
+            story_models.StoryModel,
+            id=self.STORY_2_ID,
+            title='story 2 title',
+            language_code='en',
+            story_contents_schema_version=1,
+            corresponding_topic_id=self.TOPIC_1_ID,
+            url_fragment='story',
+            story_contents={
+                'nodes': [{
+                    'id': 'node',
+                    'outline': 'outline',
+                    'title': 'node 2 title',
+                    'description': 'description',
+                    'destination_node_ids': ['123'],
+                    'acquired_skill_ids': [],
+                    'exploration_id': self.EXP_2_ID,
+                    'prerequisite_skill_ids': [],
+                    'outline_is_finalized': True
+                }],
+                'initial_node_id': 'abc',
+                'next_node_id': 'efg'
+            },
+            notes='note')
+        story_model.update_timestamps()
+
+        init_state = state_domain.State.create_default_state(
+            'state1', is_initial_state=True)
+        # Set the content.
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            })
+        )
+        # Set the multiple choice interaction.
+        init_state.update_interaction_id('MultipleChoiceInput')
+        state_interaction_cust_args: state_domain.CustomizationArgsDictType = {
+            'showChoicesInShuffledOrder': {
+                'value': True
+            },
+            'choices': {
+                'value': [
+                    {
+                        'content_id': 'ca_choices_0',
+                        'html': '<p>option 1</p>'
+                    },
+                    {
+                        'content_id': 'ca_choices_1',
+                        'html': '<p>1,000</p>'
+                    },
+                    {
+                        'content_id': 'ca_choices_2',
+                        'html': '<p>100</p>'
+                    }
+                ]
+            }
+        }
+        init_state.update_interaction_customization_args(
+            state_interaction_cust_args)
+        # Set the default outcome.
+        default_outcome = state_domain.Outcome(
+            'Introduction', None, state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+        init_state.update_interaction_default_outcome(default_outcome)
+        # Set the translations for contents not only consisting of digits.
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': '<p>content in Hindi</p>',
+                        'needs_update': False
+                    }
+                },
+                'default_outcome': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': '<p>default_outcome in Hindi</p>',
+                        'needs_update': False
+                    }
+                },
+                'ca_choices_0': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': '<p>option 1 in Hindi</p>',
+                        'needs_update': False
+                    }
+                },
+                'ca_choices_1': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': '<p>1,000 in Hindi</p>',
+                        'needs_update': False
+                    }
+                },
+                'ca_choices_2': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+        init_state.update_written_translations(written_translations)
+
+        exp_model = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_2_ID,
+            title='exploration 2 title',
+            category='category',
+            objective='objective',
+            language_code='en',
+            init_state_name='state1',
+            states_schema_version=48,
+            states={
+                'state': init_state.to_dict()
+            }
+        )
+        exp_model.update_timestamps()
+
+        datastore_services.put_multi([self.topic_model, story_model, exp_model])
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 0)
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+        ])
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 2)
+
+        opportunity_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                self.EXP_2_ID)
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert opportunity_model is not None
+        self.assertEqual(opportunity_model.topic_id, self.TOPIC_1_ID)
+        self.assertEqual(opportunity_model.topic_name, 'topic title')
+        self.assertEqual(opportunity_model.story_id, self.STORY_2_ID)
+        self.assertEqual(opportunity_model.story_title, 'story 2 title')
+        self.assertEqual(opportunity_model.chapter_title, 'node 2 title')
+        # Choice 2 should not be counted as its value is numeric.
+        self.assertEqual(opportunity_model.content_count, 4)
+        # Translations in Hindi should be completed without translating the
+        # content only consisting of digits.
+        self.assertItemsEqual(
+            opportunity_model.incomplete_translation_language_codes,
+            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} -
+            {'en', 'hi'}
+        )
+        self.assertEqual(opportunity_model.translation_counts, {'hi': 4})
+        self.assertItemsEqual(
+            opportunity_model.language_codes_needing_voice_artists,
+            ['en', 'hi']
+        )

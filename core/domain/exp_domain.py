@@ -41,10 +41,8 @@ from core.domain import translation_domain
 from extensions.objects.models import objects
 
 from typing import (
-    Callable, Dict, List, Mapping, Optional, Sequence,
-    Set, Tuple, Union, cast, overload
-)
-from typing_extensions import Final, Literal, TypedDict
+    Callable, Dict, Final, List, Literal, Mapping, Optional, Sequence, Set,
+    Tuple, TypedDict, Union, cast, overload)
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -1613,8 +1611,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 raise utils.ValidationError(
                     'Adjacent whitespace in tags should be collapsed, '
                     'received \'%s\'' % tag)
+
+            if len(tag) > 30:
+                raise utils.ValidationError(
+                    'Tag text length should not be more than 30.')
         if len(set(self.tags)) != len(self.tags):
             raise utils.ValidationError('Some tags duplicate each other')
+        if len(self.tags) > 10:
+            raise utils.ValidationError(
+                'Total number of tags should be less than 10.')
 
         if not isinstance(self.blurb, str):
             raise utils.ValidationError(
@@ -1634,7 +1639,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             self._validate_state_name(state_name)
             state.validate(
                 self.param_specs,
-                allow_null_interaction=not strict)
+                allow_null_interaction=not strict,
+                tagged_skill_misconception_id_required=False)
             # The checks below perform validation on the Outcome domain object
             # that is specific to answer groups in explorations, but not
             # questions. This logic is here because the validation checks in
@@ -3072,7 +3078,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     for param_name, value in rule_spec['inputs'].items():
                         interaction_id = interaction['id']
                         param_type = (
-                            interaction_registry.Registry.get_interaction_by_id( # type: ignore[no-untyped-call]
+                            interaction_registry.Registry.get_interaction_by_id(
                                 interaction_id
                             ).get_rule_param_type(
                                 rule_spec['rule_type'], param_name

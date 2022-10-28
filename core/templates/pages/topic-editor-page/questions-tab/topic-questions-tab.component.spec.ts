@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,250 +16,222 @@
  * @fileoverview Unit tests for topic questions tab.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { QuestionsListService } from 'services/questions-list.service';
 import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TopicRights } from 'domain/topic/topic-rights.model';
 import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TopicQuestionsTabComponent } from './topic-questions-tab.component';
+import { TopicEditorStateService } from '../services/topic-editor-state.service';
+import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 
-describe('Topic questions tab', function() {
-  var $rootScope = null;
-  var $scope = null;
-  var $window = null;
-  var TopicEditorStateService = null;
-  var TopicObjectFactory = null;
-  var ctrl = null;
-  var focusManagerService = null;
-  var qls = null;
-  var subtopic1 = null;
-  var topic = null;
-  var topicInitializedEventEmitter = null;
-  var topicReinitializedEventEmitter = null;
+let skillSummaryBackendDict: SkillSummaryBackendDict = {
+  id: 'test_id',
+  description: 'description',
+  language_code: 'sadf',
+  version: 10,
+  misconception_count: 0,
+  worked_examples_count: 1,
+  skill_model_created_on: 2,
+  skill_model_last_updated: 3
+};
 
-  let skillSummaryBackendDict: SkillSummaryBackendDict = {
-    id: 'test_id',
-    description: 'description',
-    language_code: 'sadf',
-    version: 10,
-    misconception_count: 0,
-    worked_examples_count: 1,
-    skill_model_created_on: 2,
-    skill_model_last_updated: 3
+let categorizedSkillsDictData: {
+  topicName: {
+    uncategorized: [];
+    test: [];
   };
+};
 
-  let categorizedSkillsDictData: {
-    topicName: {
-      uncategorized: [];
-      test: [];
-    };
-  };
+let skillIdToRubricsObject = {};
 
-  let skillIdToRubricsObject = {};
+let untriagedSkillSummariesData: SkillSummary[] = (
+  [SkillSummary.createFromBackendDict(skillSummaryBackendDict)]);
 
-  let untriagedSkillSummariesData: SkillSummary[] = (
-    [SkillSummary.createFromBackendDict(skillSummaryBackendDict)]);
-
-  const topicsAndSkillsDashboardData: TopicsAndSkillDashboardData = {
-    allClassroomNames: [
-      'math'
-    ],
-    canDeleteTopic: true,
-    canCreateTopic: true,
-    canDeleteSkill: true,
-    canCreateSkill: true,
-    untriagedSkillSummaries: untriagedSkillSummariesData,
-    mergeableSkillSummaries: [
-      {
-        id: 'ho60YBh7c3Sn',
-        description: 'terst',
-        languageCode: 'en',
-        version: 1,
-        misconceptionCount: 0,
-        workedExamplesCount: 0,
-        skillModelCreatedOn: 1622827020924.104,
-        skillModelLastUpdated: 1622827020924.109
-      }
-    ],
-    totalSkillCount: 1,
-    topicSummaries: null,
-    categorizedSkillsDict: categorizedSkillsDictData
-  };
-
-  class MockTopicsAndSkillsDashboardBackendApiService {
-    success: boolean = true;
-    fetchDashboardDataAsync() {
-      return {
-        then: (callback: (resp) => void) => {
-          callback(topicsAndSkillsDashboardData);
-        }
-      };
+const topicsAndSkillsDashboardData: TopicsAndSkillDashboardData = {
+  allClassroomNames: [
+    'math'
+  ],
+  canDeleteTopic: true,
+  canCreateTopic: true,
+  canDeleteSkill: true,
+  canCreateSkill: true,
+  untriagedSkillSummaries: untriagedSkillSummariesData,
+  mergeableSkillSummaries: [
+    {
+      id: 'ho60YBh7c3Sn',
+      description: 'terst',
+      languageCode: 'en',
+      version: 1,
+      misconceptionCount: 0,
+      workedExamplesCount: 0,
+      skillModelCreatedOn: 1622827020924.104,
+      skillModelLastUpdated: 1622827020924.109
     }
+  ],
+  totalSkillCount: 1,
+  topicSummaries: null,
+  categorizedSkillsDict: categorizedSkillsDictData
+};
+
+class MockTopicsAndSkillsDashboardBackendApiService {
+  success: boolean = true;
+  fetchDashboardDataAsync() {
+    return {
+      then: (callback: (resp) => void) => {
+        callback(topicsAndSkillsDashboardData);
+      }
+    };
   }
+}
 
-  importAllAngularServices();
+describe('Topic questions tab', () => {
+  let component: TopicQuestionsTabComponent;
+  let fixture: ComponentFixture<TopicQuestionsTabComponent>;
+  let topicEditorStateService: TopicEditorStateService;
+  let topicObjectFactory: TopicObjectFactory;
+  let focusManagerService: FocusManagerService;
+  let qls: QuestionsListService;
+  let subtopic1: Subtopic;
+  let topic: Topic;
+  let topicInitializedEventEmitter: EventEmitter<void>;
+  let topicReinitializedEventEmitter: EventEmitter<void>;
 
-  beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [TopicQuestionsTabComponent],
       providers: [
         TopicsAndSkillsDashboardBackendApiService,
         {
           provide: TopicsAndSkillsDashboardBackendApiService,
           useClass: MockTopicsAndSkillsDashboardBackendApiService
         }
-      ]
-    });
-    qls = TestBed.get(QuestionsListService);
-    focusManagerService = TestBed.get(FocusManagerService);
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $window = $injector.get('$window');
-    TopicEditorStateService = $injector.get('TopicEditorStateService');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TopicQuestionsTabComponent);
+    component = fixture.componentInstance;
+    qls = TestBed.inject(QuestionsListService);
+    focusManagerService = TestBed.inject(FocusManagerService);
+    topicEditorStateService = TestBed.inject(TopicEditorStateService);
+    topicObjectFactory = TestBed.inject(TopicObjectFactory);
     topicInitializedEventEmitter = new EventEmitter();
     topicReinitializedEventEmitter = new EventEmitter();
 
-    ctrl = $componentController('questionsTab', {
-      $scope: $scope,
-    });
-
-    topic = TopicObjectFactory.createInterstitialTopic();
+    topic = topicObjectFactory.createInterstitialTopic();
     subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic1.addSkill('skill1', 'subtopic1 skill');
-    topic.getSubtopics = function() {
+    topic.getSubtopics = () => {
       return [subtopic1];
     };
 
-    spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
     spyOn(focusManagerService, 'setFocus');
-    spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
-      function() {
+    spyOnProperty(topicEditorStateService, 'onTopicInitialized').and.callFake(
+      () => {
         return topicInitializedEventEmitter;
       });
     spyOnProperty(
-      TopicEditorStateService, 'onTopicReinitialized').and.callFake(
-      function() {
+      topicEditorStateService, 'onTopicReinitialized').and.callFake(
+      () => {
         return topicReinitializedEventEmitter;
       });
-    ctrl.$onInit();
-  }));
-
-  afterEach(() => {
-    ctrl.$onDestroy();
+    component.ngOnInit();
   });
 
-  it('should initialize the variables when topic is initialized', function() {
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
+
+  it('should initialize the variables when topic is initialized', () => {
     const topicRights = TopicRights.createInterstitialRights();
     const allSkillSummaries = subtopic1.getSkillSummaries();
-    spyOn(TopicEditorStateService, 'getSkillIdToRubricsObject').and
+    spyOn(topicEditorStateService, 'getSkillIdToRubricsObject').and
       .returnValue(skillIdToRubricsObject);
 
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
       'selectSkillField');
-    expect($scope.selectedSkillId).toBeNull();
-    expect($scope.question).toBeNull();
-    expect($scope.skillId).toBeNull();
-    expect($scope.topic).toBe(topic);
-    expect($scope.topicRights).toEqual(topicRights);
-    expect($scope.skillIdToRubricsObject).toEqual(skillIdToRubricsObject);
-    expect($scope.allSkillSummaries).toEqual(allSkillSummaries);
-    expect($scope.getSkillsCategorizedByTopics).toBe(categorizedSkillsDictData);
-    expect($scope.getUntriagedSkillSummaries)
+    expect(component.selectedSkillId).toBeUndefined();
+    expect(component.topic).toBe(topic);
+    expect(component.topicRights).toEqual(topicRights);
+    expect(component.skillIdToRubricsObject).toEqual(skillIdToRubricsObject);
+    expect(component.allSkillSummaries).toEqual(allSkillSummaries);
+    expect(
+      component.getSkillsCategorizedByTopics).toBe(categorizedSkillsDictData);
+    expect(component.getUntriagedSkillSummaries)
       .toBe(untriagedSkillSummariesData);
-    expect($scope.canEditQuestion).toBe(false);
-    expect($scope.misconceptions).toEqual([]);
-    expect($scope.questionIsBeingUpdated).toBe(false);
-    expect($scope.questionIsBeingSaved).toBe(false);
-    expect($scope.emptyMisconceptionsList).toEqual([]);
+    expect(component.canEditQuestion).toBe(false);
   });
 
-  it('should setFocus on selectSkillField when screen loads', function() {
-    $window.onload();
+  it('should setFocus on selectSkillField when screen loads', () => {
+    component.ngAfterViewInit();
 
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
       'selectSkillField');
   });
 
-  it('should initialize tab when topic is initialized', function() {
-    // Setup.
-    const topicRights = TopicRights.createInterstitialRights();
-    const allSkillSummaries = subtopic1.getSkillSummaries();
-    $scope.allSkillSummaries = null;
-    $scope.topicRights = null;
-    $scope.topic = null;
+  it('should unsubscribe when component is destroyed', () => {
+    spyOn(component.directiveSubscriptions, 'unsubscribe').and.callThrough();
 
-    // Baseline verification.
-    expect($scope.allSkillSummaries).toBeNull();
-    expect($scope.topicRights).toBeNull();
-    expect($scope.topic).toBeNull();
+    expect(component.directiveSubscriptions.closed).toBe(false);
 
-    // Action.
-    topicInitializedEventEmitter.emit();
+    component.ngOnDestroy();
 
-    // Endline verification.
-    expect($scope.allSkillSummaries).toEqual(allSkillSummaries);
-    expect($scope.topicRights).toEqual(topicRights);
-    expect($scope.topic).toBe(topic);
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+    expect(component.directiveSubscriptions.closed).toBe(true);
   });
 
-  it('should initialize tab when topic is reinitialized', function() {
-    const topicRights = TopicRights.createInterstitialRights();
-    const allSkillSummaries = subtopic1.getSkillSummaries();
-    $scope.allSkillSummaries = null;
-    $scope.topicRights = null;
-    $scope.topic = null;
-
-    expect($scope.allSkillSummaries).toBeNull();
-    expect($scope.topicRights).toBeNull();
-    expect($scope.topic).toBeNull();
-
-
-    topicInitializedEventEmitter.emit();
-    expect($scope.allSkillSummaries).toEqual(allSkillSummaries);
-    expect($scope.topicRights).toEqual(topicRights);
-    expect($scope.topic).toBe(topic);
-    $scope.allSkillSummaries = null;
-    $scope.topicRights = null;
-    $scope.topic = null;
-    topicReinitializedEventEmitter.emit();
-
-    expect($scope.allSkillSummaries).toEqual(allSkillSummaries);
-    expect($scope.topicRights).toEqual(topicRights);
-    expect($scope.topic).toBe(topic);
-  });
-
-  it('should unsubscribe when component is destroyed', function() {
-    spyOn(ctrl.directiveSubscriptions, 'unsubscribe').and.callThrough();
-
-    expect(ctrl.directiveSubscriptions.closed).toBe(false);
-
-    ctrl.$onDestroy();
-
-    expect(ctrl.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
-    expect(ctrl.directiveSubscriptions.closed).toBe(true);
-  });
-
-  it('should reinitialize questions list when a skill is selected', function() {
+  it('should reinitialize questions list when a skill is selected', () => {
     spyOn(qls, 'resetPageNumber').and.callThrough();
     spyOn(qls, 'getQuestionSummariesAsync');
     qls.incrementPageNumber();
     qls.incrementPageNumber();
 
-    expect($scope.selectedSkillId).toBeNull();
+    expect(component.selectedSkillId).toBeUndefined();
     expect(qls.getCurrentPageNumber()).toBe(2);
 
-    $scope.reinitializeQuestionsList('1');
+    component.reinitializeQuestionsList('1');
 
-    expect($scope.selectedSkillId).toEqual('1');
+    expect(component.selectedSkillId).toEqual('1');
     expect(qls.resetPageNumber).toHaveBeenCalled();
     expect(qls.getCurrentPageNumber()).toBe(0);
     expect(qls.getQuestionSummariesAsync).toHaveBeenCalledWith('1', true, true);
+  });
+
+  it('should initialize tab when topic is initialized', () => {
+    // Setup.
+    const topicRights = TopicRights.createInterstitialRights();
+    const allSkillSummaries = subtopic1.getSkillSummaries();
+
+    // Action.
+    topicInitializedEventEmitter.emit();
+
+    // Endline verification.
+    expect(component.allSkillSummaries).toEqual(allSkillSummaries);
+    expect(component.topicRights).toEqual(topicRights);
+    expect(component.topic).toBe(topic);
+  });
+
+  it('should initialize tab when topic is reinitialized', () => {
+    const topicRights = TopicRights.createInterstitialRights();
+    const allSkillSummaries = subtopic1.getSkillSummaries();
+
+    topicInitializedEventEmitter.emit();
+    expect(component.allSkillSummaries).toEqual(allSkillSummaries);
+    expect(component.topicRights).toEqual(topicRights);
+    expect(component.topic).toBe(topic);
+    topicReinitializedEventEmitter.emit();
+
+    expect(component.allSkillSummaries).toEqual(allSkillSummaries);
+    expect(component.topicRights).toEqual(topicRights);
+    expect(component.topic).toBe(topic);
   });
 });

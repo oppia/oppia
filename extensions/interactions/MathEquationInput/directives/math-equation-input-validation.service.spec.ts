@@ -241,4 +241,31 @@ describe('MathEquationInputValidationService', () => {
       message: 'The number of custom letters cannot be more than 10.'
     }]);
   });
+
+  it('should warn if there are inputs with unsupported functions', function() {
+    answerGroups[0].rules = [
+      rof.createFromBackendDict({
+        rule_type: 'IsEquivalentTo',
+        inputs: {
+          x: 'x+log(y)=tan(x) - sqrt(y)'
+        }
+      }, 'MathEquationInput')
+    ];
+    customizationArgs = {
+      useFractionForDivision: false,
+      allowedVariables: {
+        value: ['x', 'y']
+      }
+    };
+
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+
+    expect(warnings).toEqual([{
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'Input for rule 1 from answer group 1 uses these function(s) that ' +
+        'aren\'t supported: [log,tan] The supported functions are: [sqrt,abs]')
+    }]);
+  });
 });
