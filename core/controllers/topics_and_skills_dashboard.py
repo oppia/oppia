@@ -526,7 +526,7 @@ class TopicIdToDiagnosticTestSkillIdsHandler(base.BaseHandler):
         }
     }
 
-    @acl_decorators.can_access_topics_and_skills_dashboard
+    @acl_decorators.open_access
     def get(self):
         topic_ids = self.normalized_request.get(
             'comma_separated_topic_ids')
