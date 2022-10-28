@@ -30,6 +30,9 @@ import { LoggerService } from 'services/contextual/logger.service';
 export class ExplorationCorrectnessFeedbackService extends
   ExplorationPropertyService {
   propertyName: string = 'correctness_feedback_enabled';
+  // This property is initialized using init method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   savedMemento!: string | boolean;
 
   constructor(

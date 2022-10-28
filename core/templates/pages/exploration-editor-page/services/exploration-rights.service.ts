@@ -30,6 +30,9 @@ import { ExplorationRightsBackendData } from './exploration-rights-backend-api.s
   providedIn: 'root'
 })
 export class ExplorationRightsService {
+  // These properties are initialized using init method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   ownerNames!: string[];
   editorNames!: string[];
   voiceArtistNames!: string[];

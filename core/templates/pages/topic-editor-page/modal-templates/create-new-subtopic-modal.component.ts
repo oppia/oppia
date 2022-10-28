@@ -34,6 +34,9 @@ import { SubtopicValidationService } from 'pages/topic-editor-page/services/subt
 
 export class CreateNewSubtopicModalComponent
   extends ConfirmOrCancelModal implements OnInit {
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   hostname!: string;
   classroomUrlFragment!: string;
   topic!: Topic;
@@ -46,6 +49,7 @@ export class CreateNewSubtopicModalComponent
   allowedBgColors!: readonly string[];
   subtopicId!: number;
   subtopicTitle!: string;
+  // Null when no error is raised.
   errorMsg!: string | null;
   subtopicUrlFragmentExists!: boolean;
   subtopicPage!: SubtopicPage;
@@ -126,8 +130,7 @@ export class CreateNewSubtopicModalComponent
 
   cancel(): void {
     this.topicEditorStateService.deleteSubtopicPage(
-      this.topic.getId(),
-      this.subtopicId);
+      this.topic.getId(), this.subtopicId);
     this.topicUpdateService.deleteSubtopic(this.topic, this.subtopicId);
     this.topicEditorStateService.onTopicReinitialized.emit();
     this.ngbActiveModal.dismiss('cancel');

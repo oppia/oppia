@@ -36,7 +36,7 @@ import { LearnerLocalNavBackendApiService } from '../services/learner-local-nav-
 })
 export class LearnerLocalNavComponent implements OnInit {
   canEdit: boolean = false;
-  // The following two properties are set to null when the
+  // The following property is set to null when the
   // user is not logged in.
   username: string | null = '';
   feedbackOptionIsShown: boolean = true;
@@ -91,14 +91,13 @@ export class LearnerLocalNavComponent implements OnInit {
   ngOnInit(): void {
     this.explorationId = this.explorationEngineService.getExplorationId();
     let version = this.explorationEngineService.getExplorationVersion();
-    // if (version === null) {
-    //   throw new Error('Version should not be null.');
-    // }
-    this.readOnlyExplorationBackendApiService
-      .loadExplorationAsync(this.explorationId, version)
-      .then((exploration) => {
-        this.canEdit = exploration.can_edit;
-      });
+    if (version) {
+      this.readOnlyExplorationBackendApiService
+        .loadExplorationAsync(this.explorationId, version)
+        .then((exploration) => {
+          this.canEdit = exploration.can_edit;
+        });
+    }
     this.loaderService.showLoadingScreen('Loading');
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.username = userInfo.getUsername();

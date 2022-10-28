@@ -67,6 +67,9 @@ export class ExplorationFooterComponent {
   // Used to update the number of checkpoints completed
   // and decide the completed width of the progress bar.
   checkpointArray: number[] = [0];
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   expInfo!: LearnerExplorationSummaryBackendDict;
   expStates!: StateObjectsBackendDict;
   completedCheckpointsCount: number = 0;

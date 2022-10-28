@@ -27,6 +27,9 @@ import { LearnerViewRatingBackendApiService } from './learner-view-rating-backen
   providedIn: 'root'
 })
 export class LearnerViewRatingService {
+  // This property is initialized using int method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   userRating!: number;
   private _ratingUpdatedEventEmitter: EventEmitter<void> = new EventEmitter();
 

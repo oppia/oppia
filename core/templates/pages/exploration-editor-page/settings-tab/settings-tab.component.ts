@@ -65,15 +65,13 @@ import { AppConstants } from 'app.constants';
 })
 export class SettingsTabComponent
   implements OnInit, OnDestroy {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() currentUserIsCurriculumAdmin!: boolean;
   @Input() currentUserIsModerator!: boolean;
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
-  CREATOR_DASHBOARD_PAGE_URL: string = '/creator-dashboard';
-  EXPLORE_PAGE_PREFIX: string = '/explore/';
-  directiveSubscriptions = new Subscription();
-  explorationIsLinkedToStory: boolean = false;
-  isSuperAdmin: boolean = false;
   rolesSaveButtonEnabled!: boolean;
   errorMessage!: string;
   isRolesFormOpen!: boolean;
@@ -90,6 +88,21 @@ export class SettingsTabComponent
   controlsCardIsShown!: boolean;
   voiceArtistsCardIsShown!: boolean;
   EXPLORATION_TITLE_INPUT_FOCUS_LABEL!: string;
+  stateNames!: string[];
+  formStyle!: string;
+  canDelete!: boolean;
+  canModifyRoles!: boolean;
+  canReleaseOwnership!: boolean;
+  canUnpublish!: boolean;
+  canManageVoiceArtist!: boolean;
+  explorationId!: string;
+  loggedInUser!: string | null;
+  TAG_REGEX!: string;
+  CREATOR_DASHBOARD_PAGE_URL: string = '/creator-dashboard';
+  EXPLORE_PAGE_PREFIX: string = '/explore/';
+  directiveSubscriptions = new Subscription();
+  explorationIsLinkedToStory: boolean = false;
+  isSuperAdmin: boolean = false;
   ROLES = [{
     name: 'Manager (can edit permissions)',
     value: 'owner'
@@ -106,16 +119,6 @@ export class SettingsTabComponent
     text: string;
   } [];
 
-  stateNames!: string[];
-  formStyle!: string;
-  canDelete!: boolean;
-  canModifyRoles!: boolean;
-  canReleaseOwnership!: boolean;
-  canUnpublish!: boolean;
-  canManageVoiceArtist!: boolean;
-  explorationId!: string;
-  loggedInUser!: string | null;
-  TAG_REGEX!: string;
   addOnBlur: boolean = true;
 
   constructor(

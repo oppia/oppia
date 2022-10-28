@@ -54,12 +54,17 @@ export class ExplorationPlayerStateService {
   private _oppiaFeedbackAvailableEventEmitter: EventEmitter<void> = (
     new EventEmitter());
 
-  currentEngineService!: ExplorationEngineService | QuestionPlayerEngineService;
   explorationMode: string = ExplorationPlayerConstants.EXPLORATION_MODE.OTHER;
+  // These properties are initialized using private method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  currentEngineService!: ExplorationEngineService | QuestionPlayerEngineService;
   editorPreviewMode!: boolean;
   questionPlayerMode!: boolean;
   explorationId!: string;
+  // Null if an exploration version can't be retrieved from the URL.
   version!: number | null;
+  // Null if story url fragment can't be retrieved from the URL.
   storyUrlFragment!: string | null;
   lastCompletedCheckpoint!: string;
   isLoggedOutProgressTracked: boolean = false;
@@ -140,15 +145,14 @@ export class ExplorationPlayerStateService {
       callback: (stateCard: StateCard, str: string) => void
   ): void {
     let collectionUrl = this.urlService.getCollectionIdFromExplorationUrl();
-    // if (collectionUrl === null) {
-    //   throw new Error('Collection ID should not be null.');
-    // }
     // For some cases, version is set only after
     // ReadOnlyExplorationBackendApiService.loadExploration() has completed.
     // Use returnDict.version for non-null version value.
-    this.statsReportingService.initSession(
-      this.explorationId, returnDict.exploration.title, returnDict.version,
-      returnDict.session_id, collectionUrl);
+    if (collectionUrl) {
+      this.statsReportingService.initSession(
+        this.explorationId, returnDict.exploration.title, returnDict.version,
+        returnDict.session_id, collectionUrl);
+    }
     this.playthroughService.initSession(
       this.explorationId, returnDict.version,
       returnDict.record_playthrough_probability);
@@ -269,9 +273,9 @@ export class ExplorationPlayerStateService {
         this.explorationId, this.version) :
       this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
         this.explorationId);
-    // if (this.storyUrlFragment === null) {
-    //   throw new Error('Story URL fragment should not be null.');
-    // }
+    if (this.storyUrlFragment === null) {
+      return;
+    }
     Promise.all([
       explorationDataPromise,
       this.pretestQuestionBackendApiService.fetchPretestQuestionsAsync(

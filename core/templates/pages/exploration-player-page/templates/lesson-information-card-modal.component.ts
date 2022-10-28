@@ -67,7 +67,6 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   expInfo!: LearnerExplorationSummaryBackendDict;
   completedCheckpointsCount!: number;
   checkpointStatusArray!: string[];
-  userIsLoggedIn: boolean = false;
   infoCardBackgroundCss!: {'background-color': string};
   infoCardBackgroundImageUrl!: string;
   averageRating!: number | null;
@@ -75,13 +74,16 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   lastUpdatedString!: string;
   explorationIsPrivate!: boolean;
   explorationTags!: ExplorationTagSummary;
-  lessonAuthorsSubmenuIsShown: boolean = false;
+  // Unique progress tracking ID is null until the first state of the
+  // exploration is loaded.
   loggedOutProgressUniqueUrlId!: string | null;
   loggedOutProgressUniqueUrl!: string;
-  saveProgressMenuIsShown: boolean = false;
   // The below property is defined only when the learner is on a
   // checkpointed state, and is undefined otherwise.
   translatedCongratulatoryCheckpointMessage!: string | undefined;
+  userIsLoggedIn: boolean = false;
+  lessonAuthorsSubmenuIsShown: boolean = false;
+  saveProgressMenuIsShown: boolean = false;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

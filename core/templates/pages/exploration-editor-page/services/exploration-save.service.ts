@@ -63,6 +63,9 @@ export class ExplorationSaveService {
   // at any one time.
   modalIsOpen: boolean = false;
 
+  // This property is initialized using private methods and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   diffData!: DiffNodeData;
   _initExplorationPageEventEmitter = new EventEmitter();
 

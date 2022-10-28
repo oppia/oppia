@@ -29,6 +29,9 @@ import { StateParamChangesService } from
   styleUrls: []
 })
 export class StateParamChangesEditorComponent implements OnInit {
+  // This property below is initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   spcs!: StateParamChangesService;
   constructor(public stateParamChangesService: StateParamChangesService) {}
 

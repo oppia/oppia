@@ -41,6 +41,9 @@ interface ClassificationInterface {
 })
 export class TrainingPanelComponent
   implements OnInit {
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() answer!: InteractionAnswer;
   // The classification input is an object with two keys:
   //   -answerGroupIndex: This refers to which answer group the answer
@@ -55,10 +58,9 @@ export class TrainingPanelComponent
   //      response should be created for the trained answer.
   @Input() classification!: ClassificationInterface;
   @Input() addingNewResponse!: boolean;
-
-  answerTemplate: string = '';
   selectedAnswerGroupIndex!: number;
   allOutcomes!: Outcome[];
+  answerTemplate: string = '';
 
   constructor(
     private stateEditorService: StateEditorService,

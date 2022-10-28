@@ -55,7 +55,18 @@ import { InteractionRuleInputs } from 'interactions/rule-input-defs';
   templateUrl: './state-responses.component.html'
 })
 export class StateResponsesComponent implements OnInit, OnDestroy {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() addState!: (value: string) => void;
+  inapplicableSkillMisconceptionIds!: string[];
+  // If the interaction is terminal, then the default outcome is null.
+  defaultOutcome!: Outcome | null;
+  misconceptionsBySkill!: MisconceptionSkillMap;
+  activeAnswerGroupIndex!: number;
+  // State name is null if their is no state selected or have no active state.
+  // This is the case when the user is creating a new state.
+  stateName!: string | null;
   @Output() onResponsesInitialized = new EventEmitter<void>();
   @Output() onSaveInteractionAnswerGroups = (
     new EventEmitter<AnswerGroup[] | AnswerGroup>());
@@ -74,16 +85,10 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     new EventEmitter<string[]>());
 
   directiveSubscriptions = new Subscription();
-
-  inapplicableSkillMisconceptionIds!: string[];
   activeEditOption: boolean = false;
-  misconceptionsBySkill!: MisconceptionSkillMap;
   answerGroups: AnswerGroup[] = [];
-  defaultOutcome!: Outcome | null;
-  activeAnswerGroupIndex!: number;
   SHOW_TRAINABLE_UNRESOLVED_ANSWERS: boolean = false;
   responseCardIsShown: boolean = false;
-  stateName!: string | null;
   enableSolicitAnswerDetailsFeature: boolean = false;
   containsOptionalMisconceptions: boolean = false;
 

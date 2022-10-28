@@ -39,8 +39,13 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 export class ContributorDashboardPageComponent
   implements OnInit {
   OPPIA_AVATAR_LINK_URL: string | null = AppConstants.OPPIA_AVATAR_LINK_URL;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   defaultHeaderVisible!: boolean;
   profilePictureDataUrl!: SafeUrl | string;
+  // The following is property is set to null when the
+  // user is not logged in.
   username!: string | null;
   userInfoIsLoading!: boolean;
   userIsLoggedIn!: boolean;
@@ -149,10 +154,6 @@ export class ContributorDashboardPageComponent
     const prevSelectedTopicName = (
       this.localStorageService.getLastSelectedTranslationTopicName());
 
-    // if (prevSelectedTopicName === null) {
-    //   throw new Error('No topic name found in local storage.');
-    // }
-
     this.windowRef.nativeWindow.addEventListener('scroll', () => {
       this.scrollFunction();
     });
@@ -209,7 +210,10 @@ export class ContributorDashboardPageComponent
           return;
         }
         this.topicName = topicNames[0];
-        if (topicNames.indexOf(prevSelectedTopicName) !== -1) {
+        if (
+          prevSelectedTopicName &&
+          topicNames.indexOf(prevSelectedTopicName) !== -1
+        ) {
           this.topicName = prevSelectedTopicName;
         }
         this.translationTopicService.setActiveTopicName(this.topicName);

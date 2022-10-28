@@ -46,23 +46,32 @@ export class TopicsAndSkillsDashboardPageComponent {
   directiveSubscriptions: Subscription = new Subscription();
   totalTopicSummaries: CreatorTopicSummary[] = [];
   topicSummaries: CreatorTopicSummary[] = [];
-  totalEntityCountToDisplay!: number;
-  currentCount!: number;
-  totalSkillCount!: number;
-  skillsCategorizedByTopics!: CategorizedSkills;
   editableTopicSummaries: CreatorTopicSummary[] = [];
   untriagedSkillSummaries: SkillSummary[] = [];
   totalUntriagedSkillSummaries: SkillSummary[] = [];
   mergeableSkillSummaries: SkillSummary[] = [];
   skillSummaries: SkillSummary[] = [];
-
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  totalEntityCountToDisplay!: number;
+  currentCount!: number;
+  totalSkillCount!: number;
+  skillsCategorizedByTopics!: CategorizedSkills;
   userCanCreateTopic!: boolean;
   userCanCreateSkill!: boolean;
   userCanDeleteTopic!: boolean;
   userCanDeleteSkill!: boolean;
 
-  TAB_NAME_TOPICS: string = 'topics';
   activeTab!: string;
+  filterBoxIsShown!: boolean;
+  filterObject!: TopicsAndSkillsDashboardFilter;
+  fetchSkillsDebounced!: () => void;
+  lastPage!: number;
+  moreSkillsPresent!: boolean;
+  nextCursor!: string | null;
+  firstTimeFetchingSkills!: boolean;
+  TAB_NAME_TOPICS: string = 'topics';
   MOVE_TO_NEXT_PAGE: string = 'next_page';
   MOVE_TO_PREV_PAGE: string = 'prev_page';
   TAB_NAME_SKILLS: string = 'skills';
@@ -72,16 +81,9 @@ export class TopicsAndSkillsDashboardPageComponent {
   skillPageNumber: number = 0;
   lastSkillPage: number = 0;
   itemsPerPageChoice: number[] = [10, 15, 20];
-  filterBoxIsShown!: boolean;
-  filterObject!: TopicsAndSkillsDashboardFilter;
   classrooms: string[] = [];
   sortOptions: string[] = [];
   statusOptions: ETopicPublishedOptions[] = [];
-  fetchSkillsDebounced!: () => void;
-  lastPage!: number;
-  moreSkillsPresent!: boolean;
-  nextCursor!: string | null;
-  firstTimeFetchingSkills!: boolean;
   displayedTopicSummaries: CreatorTopicSummary[] = [];
   displayedSkillSummaries: SkillSummary[] = [];
   skillStatusOptions: string[] = [];
@@ -217,14 +219,10 @@ export class TopicsAndSkillsDashboardPageComponent {
   }
 
   fetchSkills(): void {
-    if (this.moreSkillsPresent) {
-      let nextCursor = this.nextCursor;
-      // if (nextCursor === null) {
-      //   throw new Error('Next cursor is null');
-      // }
+    if (this.moreSkillsPresent && this.nextCursor) {
       this.topicsAndSkillsDashboardBackendApiService
         .fetchSkillsDashboardDataAsync(
-          this.filterObject, this.itemsPerPage, nextCursor).then(
+          this.filterObject, this.itemsPerPage, this.nextCursor).then(
           (response) => {
             this.moreSkillsPresent = response.more;
             this.nextCursor = response.nextCursor;

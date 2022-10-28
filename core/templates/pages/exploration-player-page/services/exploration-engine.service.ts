@@ -47,27 +47,30 @@ import { StatsReportingService } from './stats-reporting.service';
    providedIn: 'root'
  })
 export class ExplorationEngineService {
-  private _explorationId!: string;
-  private _editorPreviewMode!: boolean;
-  private _questionPlayerMode!: boolean;
   private _updateActiveStateIfInEditorEventEmitter: EventEmitter<string> = (
     new EventEmitter()
   );
 
-  answerIsBeingProcessed: boolean = false;
-  alwaysAskLearnersForAnswerDetails: boolean = false;
+  // These properties are initialized using private method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private _explorationId!: string;
+  private _editorPreviewMode!: boolean;
+  private _questionPlayerMode!: boolean;
   exploration!: Exploration;
-
   // This list may contain duplicates. A state name is added to it each time
   // the learner moves to a new card.
   visitedStateNames: string[] = [];
   currentStateName!: string;
   nextStateName!: string;
-
   // Param changes to be used ONLY in editor preview mode.
   manualParamChanges!: ParamChange[];
   initStateName!: string;
-  version!: number | null;
+  version!: number;
+  answerIsBeingProcessed: boolean = false;
+  alwaysAskLearnersForAnswerDetails: boolean = false;
+
+
 
   constructor(
     private alertsService: AlertsService,
@@ -113,12 +116,9 @@ export class ExplorationEngineService {
     if (explorationContext) {
       this._explorationId = this.contextService.getExplorationId();
       const version = this.urlService.getExplorationVersionFromUrl();
-      // if (version === null) {
-      //   throw new Error('Invalid version.');
-      // } else {
-      //   this.version = version;
-      // }
-      this.version = version;
+      if (version) {
+        this.version = version;
+      }
       this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
       this._questionPlayerMode = this.contextService.isInQuestionPlayerMode();
       if (
@@ -273,9 +273,10 @@ export class ExplorationEngineService {
         this.exploration.initStateName, newParams);
     }
 
-    // if (interactionHtml === null) {
-    //   throw new Error('Interaction HTML not found.');
-    // }
+    if (interactionHtml === null) {
+      this.alertsService.addWarning('Expression parsing error.');
+      return;
+    }
 
     let contentId = initialState.content.contentId;
     if (contentId === null) {
@@ -377,8 +378,8 @@ export class ExplorationEngineService {
   */
   init(
       explorationDict: ExplorationBackendDict,
-      explorationVersion: number | null,
-      preferredAudioLanguage: string | null,
+      explorationVersion: number,
+      preferredAudioLanguage: string,
       autoTtsEnabled: boolean,
       preferredContentLanguageCodes: string[],
       successCallback: (stateCard: StateCard, label: string) => void
@@ -455,7 +456,7 @@ export class ExplorationEngineService {
     return this.exploration.title;
   }
 
-  getExplorationVersion(): number | null {
+  getExplorationVersion(): number {
     return this.version;
   }
 

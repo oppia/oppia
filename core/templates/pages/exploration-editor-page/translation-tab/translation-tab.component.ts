@@ -55,6 +55,9 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
   _ID_TUTORIAL_TRANSLATION_OVERVIEW: string = (
     '#tutorialTranslationOverview');
 
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   isTranslationTabBusy!: boolean;
   tutorialInProgress!: boolean;
   showTranslationTabSubDirectives!: boolean;

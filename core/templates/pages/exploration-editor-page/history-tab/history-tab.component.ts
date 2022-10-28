@@ -59,21 +59,18 @@ export class HistoryTabComponent
   implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  firstVersion!: string | null;
-  secondVersion!: string | null;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   hideHistoryGraph!: boolean;
   selectedVersionsArray!: number[];
-
+  // Below properties are null if their is no version selected.
+  firstVersion!: string | null;
+  secondVersion!: string | null;
   // Letiable explorationSnapshots is a list of all snapshots for the
   // exploration in ascending order.
   explorationSnapshots!: ExplorationSnapshot[];
-  currentPage: number = 0;
   explorationVersionMetadata!: VersionMetadata[];
-  versionCheckboxArray: {
-    vnum: number;
-    selected: boolean;
-  }[] | null = [];
-
   username!: string;
   displayedCurrentPageNumber!: number;
   versionNumbersToDisplay!: number | number[];
@@ -99,6 +96,11 @@ export class HistoryTabComponent
   compareVersionsButtonIsHidden!: boolean;
   compareVersions!: object;
   diffData!: Metadata | null;
+  currentPage: number = 0;
+  versionCheckboxArray: {
+    vnum: number;
+    selected: boolean;
+  }[] | null = [];
 
   constructor(
     private checkRevertService: CheckRevertService,

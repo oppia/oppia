@@ -189,6 +189,7 @@ export class RouterService {
     }
   }
 
+  // New state name is null when navigating to the main tab.
   _actuallyNavigate(pathType: string, newStateName: string | null): void {
     if (newStateName) {
       this.stateEditorService.setActiveStateName(newStateName);

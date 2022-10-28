@@ -47,17 +47,20 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     private questionObjectFactory: QuestionObjectFactory
   ) {}
 
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   displayedCard!: StateCard;
   skillId!: string;
   questionTextFilter!: string;
   interactionFilter!: string;
-  displayCardIsInitialized: boolean = false;
   questionsFetched!: boolean;
-  ALLOWED_QUESTION_INTERACTIONS: string[] = [];
   skill!: Skill;
   htmlData!: string;
   questionDicts!: QuestionBackendDict[];
   displayedQuestions!: QuestionBackendDict[];
+  displayCardIsInitialized: boolean = false;
+  ALLOWED_QUESTION_INTERACTIONS: string[] = [];
   QUESTION_COUNT: number = 20;
   INTERACTION_TYPES = {
     ALL: 'All',

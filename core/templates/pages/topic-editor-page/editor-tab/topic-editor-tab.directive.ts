@@ -118,21 +118,15 @@ angular.module('oppia').directive('topicEditorTab', [
               $scope.$applyAsync();
               FocusManagerService.setFocus('addStoryBtn');
             }
-            $scope.editableName = (
-              $scope.topic.getName());
+            $scope.editableName = $scope.topic.getName();
             $scope.editableMetaTagContent = $scope.topic.getMetaTagContent();
             $scope.editablePageTitleFragmentForWeb = (
               $scope.topic.getPageTitleFragmentForWeb());
             $scope.editablePracticeIsDisplayed = (
               $scope.topic.getPracticeTabIsDisplayed());
-            $scope.initialTopicName = (
-              $scope.topic.getName());
-            $scope.initialTopicUrlFragment = (
-              $scope.topic.getUrlFragment()
-            );
-            $scope.editableTopicUrlFragment = (
-              $scope.topic.getUrlFragment()
-            );
+            $scope.initialTopicName = $scope.topic.getName();
+            $scope.initialTopicUrlFragment = $scope.topic.getUrlFragment();
+            $scope.editableTopicUrlFragment = $scope.topic.getUrlFragment();
             $scope.editableDescription = $scope.topic.getDescription();
             $scope.allowedBgColors = (
               topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
@@ -243,8 +237,7 @@ angular.module('oppia').directive('topicEditorTab', [
           // editor, it gets assigned to that topic, and to reflect that
           // change, we need to fetch the topic again from the backend.
           $scope.refreshTopic = function() {
-            TopicEditorStateService.loadTopic(
-              $scope.topic.getId());
+            TopicEditorStateService.loadTopic($scope.topic.getId());
           };
 
           $scope.getStaticImageUrl = function(imagePath) {
@@ -373,8 +366,7 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.updateTopicThumbnailFilename = function(newThumbnailFilename) {
-            if (newThumbnailFilename ===
-              $scope.topic.getThumbnailFilename()) {
+            if (newThumbnailFilename === $scope.topic.getThumbnailFilename()) {
               return;
             }
             TopicUpdateService.setTopicThumbnailFilename(
@@ -383,8 +375,7 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.updateTopicThumbnailBgColor = function(newThumbnailBgColor) {
-            if (newThumbnailBgColor ===
-              $scope.topic.getThumbnailBgColor()) {
+            if (newThumbnailBgColor === $scope.topic.getThumbnailBgColor()) {
               return;
             }
             TopicUpdateService.setTopicThumbnailBgColor(
@@ -393,8 +384,7 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.updateTopicDescription = function(newDescription) {
-            if (newDescription !==
-              $scope.topic.getDescription()) {
+            if (newDescription !== $scope.topic.getDescription()) {
               TopicUpdateService.setTopicDescription(
                 $scope.topic, newDescription);
             }
@@ -409,8 +399,7 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.updateTopicPageTitleFragmentForWeb = function(
               newTopicPageTitleFragmentForWeb) {
-            let currentValue =
-            $scope.topic.getPageTitleFragmentForWeb();
+            let currentValue = $scope.topic.getPageTitleFragmentForWeb();
             if (newTopicPageTitleFragmentForWeb !== currentValue) {
               TopicUpdateService.setPageTitleFragmentForWeb(
                 $scope.topic, newTopicPageTitleFragmentForWeb);
@@ -469,8 +458,7 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.deleteSubtopic = function(subtopicId) {
             TopicEditorStateService.deleteSubtopicPage(
-              $scope.topic.getId(),
-              subtopicId);
+              $scope.topic.getId(), subtopicId);
             TopicUpdateService.deleteSubtopic($scope.topic, subtopicId);
             ctrl.initEditor();
           };
@@ -497,7 +485,7 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.getPreviewFooter = function() {
             var canonicalStoriesLength = (
-              ($scope.topic.getCanonicalStoryIds()).length);
+              $scope.topic.getCanonicalStoryIds().length);
             if (canonicalStoriesLength === 0 || canonicalStoriesLength > 1) {
               return canonicalStoriesLength + ' Stories';
             }

@@ -59,6 +59,16 @@ export class StateAndContent {
   providedIn: 'root'
 })
 export class TranslateTextService {
+  // This property is initialized using int method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  activeExpId!: string;
+  activeExpVersion!: string;
+  // Below properties are null for the first time when the page is loaded.
+  activeContentId!: string | null;
+  activeStateName!: string | null;
+  activeContentText!: string | string[] | null;
+  activeContentStatus!: Status;
   STARTING_INDEX: number = -1;
   PENDING: Status = 'pending';
   SUBMITTED: Status = 'submitted';
@@ -67,12 +77,6 @@ export class TranslateTextService {
   stateNamesList: string[] = [];
   stateAndContent: StateAndContent[] = [];
   activeIndex = this.STARTING_INDEX;
-  activeExpId!: string;
-  activeExpVersion!: string;
-  activeContentId!: string | null;
-  activeStateName!: string | null;
-  activeContentText!: string | string[] | null;
-  activeContentStatus!: Status;
 
   constructor(
     private translateTextBackedApiService:
@@ -175,22 +179,19 @@ export class TranslateTextService {
           contentIds.push(contentId);
           let interactionId = translatableItem.interactionId;
           let ruleType = translatableItem.ruleType;
-          // if (!interactionId || !ruleType) {
-          //   throw new Error(
-          //     'Interaction id or rule type is not present in the ' +
-          //     'translatable item.');
-          // }
-          this.stateAndContent.push(
-            new StateAndContent(
-              stateName, contentId,
-              translatableItem.content,
-              this.PENDING,
-              this._isSetDataFormat(translatableItem.dataFormat) ? [] : '',
-              translatableItem.dataFormat,
-              translatableItem.contentType,
-              interactionId, ruleType
-            )
-          );
+          if (interactionId && ruleType) {
+            this.stateAndContent.push(
+              new StateAndContent(
+                stateName, contentId,
+                translatableItem.content,
+                this.PENDING,
+                this._isSetDataFormat(translatableItem.dataFormat) ? [] : '',
+                translatableItem.dataFormat,
+                translatableItem.contentType,
+                interactionId, ruleType
+              )
+            );
+          }
           stateHasText = true;
         }
 

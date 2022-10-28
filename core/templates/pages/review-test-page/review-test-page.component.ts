@@ -36,6 +36,9 @@ import { QuestionPlayerConfig } from 'pages/exploration-player-page/learner-expe
 })
 export class ReviewTestPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   questionPlayerConfig!: QuestionPlayerConfig;
   storyName!: string;
 

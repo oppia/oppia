@@ -29,9 +29,11 @@ import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
   templateUrl: './test-interaction-panel.component.html'
 })
 export class TestInteractionPanel implements OnInit {
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() inputTemplate!: string;
   @Input() stateName!: string;
-
   interactionIsInline!: boolean;
 
   constructor(

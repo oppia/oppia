@@ -43,19 +43,22 @@ interface CategoryChoices {
 })
 export class ExplorationMetadataModalComponent
   extends ConfirmOrCancelModal implements OnInit {
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   categoryLocalValue!: string;
   objectiveHasBeenPreviouslyEdited!: boolean;
   requireTitleToBeSpecified!: boolean;
   requireObjectiveToBeSpecified!: boolean;
   requireCategoryToBeSpecified!: boolean;
   askForLanguageCheck!: boolean;
-  isValueHasbeenUpdated: boolean = false;
   askForTags!: boolean;
+  newCategory!: CategoryChoices;
+  CATEGORY_LIST_FOR_SELECT2!: CategoryChoices[];
+  isValueHasbeenUpdated: boolean = false;
   addOnBlur: boolean = true;
   explorationTags: string[] = [];
-  CATEGORY_LIST_FOR_SELECT2!: CategoryChoices[];
   filteredChoices: CategoryChoices[] = [];
-  newCategory!: CategoryChoices;
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
   constructor(

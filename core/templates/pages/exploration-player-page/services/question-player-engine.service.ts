@@ -41,6 +41,9 @@ import { AudioTranslationLanguageService } from
 export class QuestionPlayerEngineService {
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
+  // These properties are initialized using private method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private currentIndex!: number;
   private nextIndex!: number;
 
@@ -242,13 +245,20 @@ export class QuestionPlayerEngineService {
       answer: InteractionAnswer,
       interactionRulesService: InteractionRulesService,
       successCallback: (
+          // Null if the current card is terminal.
           nextCard: StateCard | null,
           refreshInteraction: boolean,
           feedbackHtml: string,
           feedbackAudioTranslations: BindableVoiceovers,
+          // Below property is null if no refresher exploration is available for
+          // the current state.
           refresherExplorationId: string | null,
+          // Below property is null if no missing prerequisite skill is
+          // available for the current state.
           missingPrerequisiteSkillId: string | null,
           remainOnCurrentCard: boolean,
+          // Below property is null if no skill misconception is tagged to the
+          // current state.
           taggedSkillMisconceptionId: string | null,
           wasOldStateInitial: boolean,
           isFirstHit: boolean,

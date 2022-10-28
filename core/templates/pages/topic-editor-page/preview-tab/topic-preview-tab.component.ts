@@ -32,11 +32,14 @@ export class TopicPreviewTabComponent {
   private _TAB_STORY: string = 'story';
   private _TAB_SUBTOPIC: string = 'subtopic';
   private _TAB_PRACTICE: string = 'practice';
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   topic!: Topic;
   topicName!: string;
   subtopics!: Subtopic[];
-  activeTab: string = this._TAB_STORY;
   cannonicalStorySummaries!: StorySummary[];
+  activeTab: string = this._TAB_STORY;
   chapterCount: number = 0;
 
   constructor(
@@ -46,8 +49,7 @@ export class TopicPreviewTabComponent {
 
   ngOnInit(): void {
     this.topic = this.topicEditorStateService.getTopic();
-    this.topicName = (
-      this.topic.getName());
+    this.topicName = this.topic.getName();
     this.subtopics = this.topic.getSubtopics();
     this.cannonicalStorySummaries = (
       this.topicEditorStateService.getCanonicalStorySummaries());

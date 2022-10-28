@@ -30,14 +30,17 @@ declare global {
   providedIn: 'root'
 })
 export class VoiceoverRecordingService {
+  // These properties are initialized using init method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   audioContextAvailable!: typeof AudioContext;
   definedAudioContext!: AudioContext; // Will be defined audio context.
   isAvailable!: boolean;
   isRecording: boolean = false;
   microphone!: MediaStreamAudioSourceNode;
   microphoneStream!: MediaStream;
-  mp3Worker: Worker | null = null;
   processor!: ScriptProcessorNode;
+  mp3Worker: Worker | null = null;
   defer: EventEmitter<string> = new EventEmitter();
 
   constructor(

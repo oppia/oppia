@@ -101,6 +101,9 @@ export class TranslationError {
   templateUrl: './translation-modal.component.html'
 })
 export class TranslationModalComponent {
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() opportunity!: TranslationOpportunity;
   activeDataFormat!: string;
   activeWrittenTranslation: string | string[] = '';
@@ -112,8 +115,10 @@ export class TranslationModalComponent {
   loadingData: boolean = true;
   moreAvailable: boolean = false;
   textToTranslate: string | string[] = '';
+  // Language description is null when active language code is invalid.
   languageDescription!: string | null;
   activeStatus!: Status;
+  activeLanguageCode!: string;
   HTML_SCHEMA!: {
     'type': string;
     'ui_config': UiConfig;
@@ -128,7 +133,6 @@ export class TranslationModalComponent {
   };
 
   TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
-  activeLanguageCode!: string;
   isActiveLanguageReviewer: boolean = false;
   hadCopyParagraphError: boolean = false;
   hasImgTextError: boolean = false;

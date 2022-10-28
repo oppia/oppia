@@ -34,8 +34,13 @@ import { AssignedSkillTopicData, SkillEditorStateService } from '../services/ski
 })
 export class SkillEditorMainTabComponent implements OnInit,
  AfterContentChecked {
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   subtopicName!: string;
   topicName!: string;
+  // Assigned skill topic data is null when the skill is not assigned to any
+  // topic.
   assignedSkillTopicData!: AssignedSkillTopicData | null;
   skill!: Skill;
   selectedTopic!: Topic;

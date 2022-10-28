@@ -44,7 +44,11 @@ import { Rule } from 'domain/exploration/RuleObjectFactory';
 
 interface UpdateActiveAnswerGroupDest {
   dest: string;
+  // Below property is null if no refresher exploration is available for
+  // the current state.
   refresherExplorationId: string | null;
+  // Below property is null if no missing prerequisite skill is available
+  // for the current state.
   missingPrerequisiteSkillId: string | null;
 }
 
@@ -72,7 +76,11 @@ type UpdateActiveAnswerGroup = (
   providedIn: 'root',
 })
 export class ResponsesService {
+  // These properties are initialized using private method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _answerGroupsMemento!: AnswerGroup[];
+  // If the interaction is terminal, then the default outcome is null.
   private _defaultOutcomeMemento!: Outcome | null;
   private _confirmedUnclassifiedAnswersMemento!: readonly InteractionAnswer[];
 
@@ -80,11 +88,12 @@ export class ResponsesService {
   // index equal to the number of answer groups (answerGroups.length), then it
   // is referring to the default outcome.
   private _activeAnswerGroupIndex!: number;
-  private _activeRuleIndex: number = -1;
   private _answerGroups!: AnswerGroup[];
+  // If the interaction is terminal, then the default outcome is null.
   private _defaultOutcome!: Outcome | null;
   private _confirmedUnclassifiedAnswers!: readonly InteractionAnswer[];
   private _answerChoices!: AnswerChoice[];
+  private _activeRuleIndex: number = -1;
   private _answerGroupsChangedEventEmitter = new EventEmitter();
   private _initializeAnswerGroupsEventEmitter = new EventEmitter();
 

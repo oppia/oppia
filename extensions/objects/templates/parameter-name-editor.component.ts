@@ -29,9 +29,12 @@ import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/serv
   templateUrl: './parameter-name-editor.component.html'
 })
 export class ParameterNameEditorComponent implements OnInit {
-  @Input() value: string | null;
   @Output() valueChanged = new EventEmitter();
-  @Output() validityChange = new EventEmitter<Record<'error', boolean>>();
+  @Output() validityChange = new EventEmitter<Record<'error', boolean>>();4
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() value!: string | null;
   availableParamNames!: string[];
   SCHEMA!: { type: 'unicode'; choices: string[] };
   constructor(

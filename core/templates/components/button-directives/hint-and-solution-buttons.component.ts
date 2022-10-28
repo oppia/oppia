@@ -38,11 +38,16 @@ import './hint-and-solution-buttons.component.css';
 })
 export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _editorPreviewMode!: boolean;
-  hintIndexes: number[] = [];
+  // Active hint index is null when no hint is active. Otherwise, it is the
+  // index of the active hint.
   activeHintIndex!: number | null;
-  solutionModalIsActive: boolean = false;
   displayedCard!: StateCard;
+  hintIndexes: number[] = [];
+  solutionModalIsActive: boolean = false;
   currentlyOnLatestCard: boolean = true;
   isVisible: boolean = true;
 
@@ -66,11 +71,10 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
         (newCard: StateCard) => {
           this.displayedCard = newCard;
           const solution = newCard.getSolution();
-          // if (solution === null) {
-          //   throw new Error('Solution is null');
-          // }
-          this.hintsAndSolutionManagerService.reset(
-            newCard.getHints(), solution);
+          if (solution) {
+            this.hintsAndSolutionManagerService.reset(
+              newCard.getHints(), solution);
+          }
           this.resetLocalHintsArray();
         }
       )

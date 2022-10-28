@@ -222,11 +222,11 @@ export class StateEditorComponent implements OnInit, OnDestroy {
               'received ' + this.stateName);
           }
           let interactionId = this.stateData.interaction.id;
-          // if (interactionId === null) {
-          //   throw new Error(
-          //     'Expected interactionId to be defined but ' +
-          //     'received ' + interactionId);
-          // }
+          if (interactionId === null) {
+            throw new Error(
+              'Expected interactionId to be defined but ' +
+              'received ' + interactionId);
+          }
           this.stateEditorService.setInteraction(stateData.interaction);
           this.stateContentService.init(
             this.stateName, stateData.content);

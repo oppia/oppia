@@ -82,9 +82,14 @@ export class TrainingDataEditorPanelComponent
    extends ConfirmOrCancelModal implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  _state!: State;
+  // State name is null if their is no state selected or have no active state.
+  // This is the case when the user is creating a new state.
   _stateName!: string | null;
   stateName!: string | null;
-  _state!: State;
   answerGroupIndex!: number;
   FOCUS_LABEL_TEST_INTERACTION_INPUT!: string;
   trainingData!: TrainingData[];

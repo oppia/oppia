@@ -115,14 +115,23 @@ export class VersionDiffVisualizationComponent implements OnInit {
   // - v1States: the states dict for the earlier version of the
   // exploration
   // - v2States: the states dict for the later version of the exploration.
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() diffData!: DiffNodeData;
 
   // The header for the pane of the state comparison modal corresponding
   // to the earlier version of the exploration.
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() earlierVersionHeader!: string;
 
   // The header for the pane of the state comparison modal corresponding
   // to the later version of the exploration.
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() laterVersionHeader!: string;
 
   // Constants for color of nodes in diff graph.
@@ -150,8 +159,10 @@ export class VersionDiffVisualizationComponent implements OnInit {
   // the diff graph. (Will be used to generate legend).
   _stateTypeUsed: Record<string, boolean> = {};
   diffGraphNodes: Record<string, string> = {};
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   nodesData!: NodesData;
-
   diffGraphData!: DiffGraphData;
   diffGraphNodeColors!: DiffGraphNodeColors;
   v1InitStateId!: number;
@@ -186,7 +197,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
   //
   // Arguments:
   // - stateName is the name of the state in the newer version.
-  // - oldStateName is undefined if the name of the state is unchanged
+  // - oldStateName is null if the name of the state is unchanged
   //     between the 2 versions, or the name of the state in the older
   //     version if the state name is changed.
   // - stateProperty is whether the state is added, changed, unchanged or
@@ -315,6 +326,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
       finalStateIds: this.diffData.finalStateIds
     };
 
+    // Last used state type is null by default.
     let _lastUsedStateType: string | null = null;
     for (let stateProperty in this._stateTypeUsed) {
       if (this._stateTypeUsed[stateProperty]) {

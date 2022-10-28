@@ -93,6 +93,9 @@ import './tutor-card.component.css';
   ]
 })
 export class TutorCardComponent {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @ViewChild('checkMark') checkMarkComponent!: EndChapterCheckMarkComponent;
   @ViewChild('confetti') confettiComponent!: EndChapterConfettiComponent;
   @Input() displayedCard!: StateCard;
@@ -110,9 +113,7 @@ export class TutorCardComponent {
   @Input() nextLessonLink!: string;
   @Input() completedChaptersCount!: number;
   @Input() milestoneMessageIsToBeDisplayed!: boolean;
-  directiveSubscriptions = new Subscription();
   private _editorPreviewMode!: boolean;
-  arePreviousResponsesShown: boolean = false;
   lastAnswer!: string | null;
   conceptCardIsBeingShown!: boolean;
   interactionIsActive!: boolean;
@@ -124,6 +125,8 @@ export class TutorCardComponent {
   OPPIA_AVATAR_IMAGE_URL!: string;
   OPPIA_AVATAR_LINK_URL!: string | null;
   profilePicture!: string;
+  directiveSubscriptions = new Subscription();
+  arePreviousResponsesShown: boolean = false;
   nextMilestoneChapterCount: number | null = null;
   checkMarkHidden: boolean = true;
   animationHasPlayedOnce: boolean = false;

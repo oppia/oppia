@@ -19,12 +19,13 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { Subtopic } from 'domain/topic/subtopic.model';
-import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { SubtopicValidationService } from './subtopic-validation.service';
 import { TopicEditorStateService } from './topic-editor-state.service';
 
 describe('Subtopic validation service', () => {
   let subtopicValidationService: SubtopicValidationService;
+  let topicEditorStateService: TopicEditorStateService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -40,12 +41,23 @@ describe('Subtopic validation service', () => {
 
   beforeEach(() => {
     subtopicValidationService = TestBed.inject(SubtopicValidationService);
+    topicEditorStateService = TestBed.inject(TopicEditorStateService);
+
+    let topic = new Topic(
+      'id', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+    );
     let subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic1.setUrlFragment('subtopic-one');
     let subtopic2 = Subtopic.createFromTitle(1, 'Subtopic2');
     subtopic2.setUrlFragment('subtopic-two');
     let subtopic3 = Subtopic.createFromTitle(1, 'Subtopic3');
     subtopic3.setUrlFragment('subtopic-three');
+    topic.getSubtopics = () => {
+      return [subtopic1, subtopic2, subtopic3];
+    };
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
   });
 
   it('should validate subtopic name correctly', () => {

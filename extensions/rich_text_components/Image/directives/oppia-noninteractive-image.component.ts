@@ -56,19 +56,22 @@ interface Dimension {
   styleUrls: []
 })
 export class NoninteractiveImage implements OnInit, OnChanges {
-  @Input() filepathWithValue!: string;
   @Input() altWithValue: string = '';
   @Input() captionWithValue: string = '';
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() filepathWithValue!: string;
   filepath!: string;
+  dimensions!: ImageDimensions;
+  imageContainerStyle!: Dimension;
+  loadingIndicatorStyle!: Dimension;
   imageUrl: SafeResourceUrl | string = '';
   imageAltText: string = '';
   imageCaption: string = '';
   loadingIndicatorUrl: string = '';
   isLoadingIndicatorShown: boolean = false;
   isTryAgainShown: boolean = false;
-  dimensions!: ImageDimensions;
-  imageContainerStyle!: Dimension;
-  loadingIndicatorStyle!: Dimension;
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,

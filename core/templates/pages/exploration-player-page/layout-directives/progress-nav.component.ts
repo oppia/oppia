@@ -55,9 +55,24 @@ import { InteractionCustomizationArgs, ItemSelectionInputCustomizationArgs } fro
   ]
 })
 export class ProgressNavComponent {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() isLearnAgainButton!: boolean;
   @Input() displayedCard!: StateCard;
   @Input() submitButtonIsShown!: boolean;
+  displayedCardIndex!: number;
+  hasPrevious!: boolean;
+  hasNext!: boolean;
+  conceptCardIsBeingShown!: boolean;
+  interactionCustomizationArgs!: InteractionCustomizationArgs | null;
+  interactionId!: string | null;
+  helpCardHasContinueButton!: boolean;
+  isIframed!: boolean;
+  lastDisplayedCard!: StateCard;
+  explorationId!: string;
+  newCardStateName!: string;
+  currentCardIndex!: number;
   @Output() submit: EventEmitter<void> = (
     new EventEmitter());
 
@@ -74,19 +89,6 @@ export class ProgressNavComponent {
 
   SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE: string[] = [
     'ItemSelectionInput', 'MultipleChoiceInput'];
-
-  displayedCardIndex!: number;
-  hasPrevious!: boolean;
-  hasNext!: boolean;
-  conceptCardIsBeingShown!: boolean;
-  interactionCustomizationArgs!: InteractionCustomizationArgs | null;
-  interactionId!: string | null;
-  helpCardHasContinueButton!: boolean;
-  isIframed!: boolean;
-  lastDisplayedCard!: StateCard;
-  explorationId!: string;
-  newCardStateName!: string;
-  currentCardIndex!: number;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,

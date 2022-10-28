@@ -35,6 +35,9 @@ import { PracticeSessionsBackendApiService } from './practice-session-backend-ap
 })
 export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   topicName!: string;
   stringifiedSubtopicIds!: string;
   questionPlayerConfig!: QuestionPlayerConfig;

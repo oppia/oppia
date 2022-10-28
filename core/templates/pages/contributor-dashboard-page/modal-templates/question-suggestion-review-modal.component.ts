@@ -97,28 +97,30 @@ interface ActiveContributionDict {
 })
 export class QuestionSuggestionReviewModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() reviewable!: boolean;
-  @Input() suggestionId!: string;
-  @Input() misconceptionsBySkill!: MisconceptionSkillMap;
-
   @Output() editSuggestionEmitter = (
     new EventEmitter<QuestionSuggestionModalValue>());
 
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() reviewable!: boolean;
+  @Input() suggestionId!: string;
+  @Input() misconceptionsBySkill!: MisconceptionSkillMap;
   reviewMessage!: string;
   questionStateData!: State;
+  // Question id is null when it is not used in the backend.
   questionId!: string | null;
   canEditQuestion!: boolean;
   skillDifficultyLabel!: string;
   skillRubricExplanations!: string | string[];
   suggestionIsRejected!: boolean;
+  // Below property is null if their is no error.
   validationError!: string | null;
   allContributions!: Record<string, ActiveContributionDict>;
   suggestion!: ActiveSuggestionDict;
   question!: Question;
   skillDifficulty!: number;
   currentSuggestionId!: string;
-  isFirstItem: boolean = true;
-  isLastItem: boolean = true;
   remainingContributionIdStack!: string[];
   skippedContributionIds!: string[];
   showQuestion: boolean = true;
@@ -128,6 +130,8 @@ export class QuestionSuggestionReviewModalComponent
   contentHtml!: string;
   questionHeader!: string;
   authorName!: string;
+  isFirstItem: boolean = true;
+  isLastItem: boolean = true;
 
   constructor(
     private contextService: ContextService,

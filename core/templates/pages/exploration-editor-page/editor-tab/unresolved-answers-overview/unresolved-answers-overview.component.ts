@@ -39,6 +39,9 @@ import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 export class UnresolvedAnswersOverviewComponent
   implements OnInit {
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   unresolvedAnswersOverviewIsShown!: boolean;
   SHOW_TRAINABLE_UNRESOLVED_ANSWERS!: boolean;
 
@@ -61,10 +64,8 @@ export class UnresolvedAnswersOverviewComponent
 
   isUnresolvedAnswersOverviewShown(): boolean {
     let activeStateName = this.stateEditorService.getActiveStateName();
-    // if (activeStateName === null) {
-    //   throw new Error('State name should not be null.');
-    // }
-    return this.stateTopAnswersStatsService.hasStateStats(activeStateName) &&
+    return Boolean(activeStateName) &&
+      this.stateTopAnswersStatsService.hasStateStats(activeStateName) &&
       this.isStateRequiredToBeResolved(activeStateName);
   }
 

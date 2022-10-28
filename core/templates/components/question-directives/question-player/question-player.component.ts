@@ -85,9 +85,10 @@ export interface QuestionPlayerConfig {
   templateUrl: './question-player.component.html'
 })
 export class QuestionPlayerComponent implements OnInit, OnDestroy {
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() questionPlayerConfig!: QuestionPlayerConfig;
-
-  componentSubscription = new Subscription();
   resultsLoaded!: boolean;
   currentQuestion!: number;
   totalQuestions!: number;
@@ -101,6 +102,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   failedSkillIds!: string[];
   userIsLoggedIn!: boolean;
   canCreateCollections!: boolean;
+  componentSubscription = new Subscription();
 
   constructor(
     private contextService: ContextService,

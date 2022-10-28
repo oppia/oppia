@@ -39,7 +39,6 @@ export class LearnerAnswerInfoService {
   // These properties are initialized using init method and we need to do
   // non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  private submittedAnswerInfoCount: number = 0;
   private currentEntityId!: string;
   // Name is null before saving a state.
   private stateName!: string | null;
@@ -47,6 +46,7 @@ export class LearnerAnswerInfoService {
   private interactionId!: string | null;
   private currentAnswer!: string;
   private currentInteractionRulesService!: InteractionRulesService;
+  private submittedAnswerInfoCount: number = 0;
   private canAskLearnerForAnswerInfo: boolean = false;
   private visitedStates: string[] = [];
   private probabilityIndexes = {

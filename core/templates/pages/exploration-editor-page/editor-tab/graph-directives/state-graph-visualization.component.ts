@@ -82,6 +82,14 @@ interface OpacityMap {
 })
 export class StateGraphVisualization
   implements OnInit, OnDestroy {
+  // Function called when node is clicked. Should take a parameter
+  // node.id.
+  @Output() onClickFunction = new EventEmitter<string>();
+  @Output() onDeleteFunction = new EventEmitter<string>();
+  @Output() onMaximizeFunction = new EventEmitter<void>();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @ViewChild('MainScreen') mainScreen!: ElementRef;
 
   @Input() allowPanning!: boolean;
@@ -107,29 +115,14 @@ export class StateGraphVisualization
   // values are secondary labels. If this is undefined, it means no nodes
   // have secondary labels.
   @Input() nodeSecondaryLabels!: NodeSecondaryLabels;
-  // Function called when node is clicked. Should take a parameter
-  // node.id.
-  @Output() onClickFunction = new EventEmitter<string>();
-  @Output() onDeleteFunction = new EventEmitter<string>();
-  @Output() onMaximizeFunction = new EventEmitter<void>();
   // Object whose keys are ids of nodes, and whose values are the
   // corresponding node opacities.
   @Input() opacityMap!: OpacityMap;
   @Input() showWarningSign!: boolean;
   @Input() showTranslationWarnings!: boolean;
 
-  directiveSubscriptions = new Subscription();
-  graphBounds = {
-    bottom: 0,
-    left: 0,
-    top: 0,
-    right: 0
-  };
-
   initStateId!: string;
   finalStateIds!: string[];
-  // The translation applied when the graph is first loaded.
-  origTranslations: number[] = [0, 0];
   graphLoaded!: boolean;
   GRAPH_HEIGHT!: number;
   GRAPH_WIDTH!: number;
@@ -143,6 +136,16 @@ export class StateGraphVisualization
   graphData!: GraphData;
   overallTransformStr!: string;
   innerTransformStr!: string;
+  directiveSubscriptions = new Subscription();
+  graphBounds = {
+    bottom: 0,
+    left: 0,
+    top: 0,
+    right: 0
+  };
+
+  // The translation applied when the graph is first loaded.
+  origTranslations: number[] = [0, 0];
   switch: boolean = false;
   check: boolean = false;
 

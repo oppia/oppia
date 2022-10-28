@@ -39,6 +39,9 @@ import { ExplorationTaskType } from 'domain/improvements/exploration-task.model'
   providedIn: 'root'
 })
 export class ExplorationImprovementsService implements OnInit {
+  // These properties are initialized using int method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   initializationHasStarted!: boolean;
   openHbrTasks!: HighBounceRateTask[];
   ngrTasksOpenSinceInit!: NeedsGuidingResponsesTask[];

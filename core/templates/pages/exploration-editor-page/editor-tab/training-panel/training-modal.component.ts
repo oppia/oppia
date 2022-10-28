@@ -47,7 +47,6 @@ import { NumericInputRulesService } from 'interactions/NumericInput/directives/n
 import { PencilCodeEditorRulesService } from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { SetInputRulesService } from 'interactions/SetInput/directives/set-input-rules.service';
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 export const RULES_SERVICE_MAPPING = {
   AlgebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,
@@ -67,7 +66,7 @@ export const RULES_SERVICE_MAPPING = {
 
 interface classification {
   answerGroupIndex: number;
-  newOutcome: Outcome;
+  newOutcome: Outcome | null;
 }
 
 @Component({
@@ -76,14 +75,29 @@ interface classification {
 })
 export class TrainingModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() unhandledAnswer!: InteractionAnswer;
   @Output() finishTrainingCallback: EventEmitter<void> =
     new EventEmitter();
+
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() unhandledAnswer!: InteractionAnswer;
+  // The classification is an object with two keys:
+  //   -answerGroupIndex: This refers to which answer group the answer
+  //      being trained has been classified to (for displaying feedback
+  //      to the creator). If answerGroupIndex is equal to the number of
+  //      answer groups, then it represents the default outcome feedback.
+  //      This index is changed by the panel when the creator specifies
+  //      which feedback should be associated with the answer.
+  //   -newOutcome: This refers to an outcome structure (containing a
+  //      list of feedback and a destination state name) which is
+  //      non-null if, and only if, the creator has specified that a new
+  //      response should be created for the trained answer.
+  classification!: classification;
 
   trainingDataAnswer: InteractionAnswer | string = '';
   // See the training panel directive in ExplorationEditorTab for an
   // explanation on the structure of this object.
-  classification!: classification;
   addingNewResponse: boolean = false;
 
   constructor(
@@ -106,9 +120,7 @@ export class TrainingModalComponent
   ngOnInit(): void {
     this.classification = {
       answerGroupIndex: 0,
-      newOutcome: new Outcome(
-        '', '', new SubtitledHtml('html', 'html'),
-        false, [], '', '')
+      newOutcome: null,
     };
     this.addingNewResponse = false;
 

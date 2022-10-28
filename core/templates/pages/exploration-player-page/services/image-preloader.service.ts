@@ -29,6 +29,8 @@ import { ContextService } from 'services/context.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 interface ImageCallback {
+  // This property will be null when the SVG uploaded is not valid or when
+  // the image is not yet uploaded.
   resolveMethod: (src: string | SafeResourceUrl | null) => void;
   rejectMethod: () => void;
 }
@@ -51,10 +53,13 @@ export class ImagePreloaderService {
         ExtractImageFilenamesFromModelService,
       private svgSanitizerService: SvgSanitizerService) {}
 
+  // This property is initialized using int method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private exploration!: Exploration;
   private filenamesOfImageCurrentlyDownloading: string[] = [];
   private filenamesOfImageToBeDownloaded: string[] = [];
   private filenamesOfImageFailedToDownload: string[] = [];
-  private exploration!: Exploration;
   private imagePreloaderServiceHasStarted: boolean = false;
   // Variable imageLoadedCallback is an object of objects (identified by the
   // filenames which are being downloaded at the time they are required by the

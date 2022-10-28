@@ -139,6 +139,9 @@ describe('Topic Editor Navbar', () => {
     expect(componentInstance.topicSkillIds).toEqual(['skill_1']);
     expect(componentInstance.discardChangesButtonIsShown).toBeFalse();
     expect(componentInstance.validationIssues).toEqual([]);
+    expect(componentInstance.topicRights).toEqual(
+      new TopicRights(false, false, false)
+    );
   });
 
   it('should validate topic when topic is initialised', () => {

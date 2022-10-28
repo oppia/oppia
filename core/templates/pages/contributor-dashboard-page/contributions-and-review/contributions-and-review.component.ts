@@ -108,10 +108,14 @@ export class ContributionsAndReview
    implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   SUGGESTION_TYPE_QUESTION!: string;
   SUGGESTION_TYPE_TRANSLATE!: string;
   TAB_TYPE_CONTRIBUTIONS!: string;
   TAB_TYPE_REVIEWS!: string;
+  // Below property is null if their is no active exploration.
   activeExplorationId!: string | null;
   contributions!: Record<string, SuggestionDetails>;
   userDetailsLoading!: boolean;
@@ -120,14 +124,14 @@ export class ContributionsAndReview
   activeSuggestionType!: string;
   dropdownShown!: boolean;
   activeDropdownTabChoice!: string;
-  reviewTabs: TabDetails[] = [];
-  contributionTabs: TabDetails[] = [];
   tabNameToOpportunityFetchFunction!: {
     [key: string]: {
       [key: string]: Function;
     };
   };
 
+  reviewTabs: TabDetails[] = [];
+  contributionTabs: TabDetails[] = [];
   SUGGESTION_LABELS = {
     review: {
       text: 'Awaiting review',

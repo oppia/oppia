@@ -159,6 +159,10 @@ interface LearnerDashboardLearnerGroups {
 
 export interface AddMessagePayload {
   'updated_status': boolean;
+  // Subject for frontend instances of thread message domain objects
+  // are null and are only required to be supplied if the message is first
+  // message of the thread. Otherwise, these properties are only non-null
+  // when the subject changes.
   'updated_subject': string | null;
   'text': string;
 }

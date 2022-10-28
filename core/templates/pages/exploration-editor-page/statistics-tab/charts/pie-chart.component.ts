@@ -29,6 +29,9 @@ export type ChartLegendPosition = (
   templateUrl: './pie-chart.component.html'
 })
 export class PieChartComponent implements OnInit, OnDestroy, AfterViewInit {
+   // These properties are initialized using Angular lifecycle hooks
+   // and we need to do non-null assertion. For more information, see
+   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
    @ViewChild('pieChart') pieChart!: ElementRef;
 
    // A read-only array representing the table of chart data.
@@ -49,8 +52,8 @@ export class PieChartComponent implements OnInit, OnDestroy, AfterViewInit {
      width: number;
    };
 
-   directiveSubscriptions = new Subscription();
    chart!: google.visualization.PieChart;
+   directiveSubscriptions = new Subscription();
 
    constructor(
      private windowDimensionsService: WindowDimensionsService,

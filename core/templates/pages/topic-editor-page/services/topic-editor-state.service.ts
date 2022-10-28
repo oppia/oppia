@@ -47,15 +47,18 @@ interface GroupedSkillSummaryDict {
   providedIn: 'root'
 })
 export class TopicEditorStateService {
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _topic!: Topic;
   private _topicRights!: TopicRights;
+  private _subtopicPage!: SubtopicPage;
   // The array that caches all the subtopic pages loaded by the user.
   private _cachedSubtopicPages: SubtopicPage[] = [];
   // The array that stores all the ids of the subtopic pages that were not
   // loaded from the backend i.e those that correspond to newly created
   // subtopics (and not loaded from the backend).
   private _newSubtopicPageIds: string[] = [];
-  private _subtopicPage!: SubtopicPage;
   private _topicIsInitialized: boolean = false;
   private _topicIsLoading: boolean = false;
   private _topicIsBeingSaved: boolean = false;
@@ -117,17 +120,12 @@ export class TopicEditorStateService {
     this._groupedSkillSummaries.current = [];
     this._groupedSkillSummaries.others = [];
 
-    for (let idx in groupedSkillSummaries[
-      this._topic ? this._topic.getName() : 'Topic name is loading.'
-    ]) {
+    for (let idx in groupedSkillSummaries[this._topic.getName()]) {
       this._groupedSkillSummaries.current.push(
-        groupedSkillSummaries[
-          this._topic ? this._topic.getName() : 'Topic name is loading.'
-        ][idx]);
+        groupedSkillSummaries[this._topic.getName()][idx]);
     }
     for (let name in groupedSkillSummaries) {
-      if (name === (
-        this._topic ? this._topic.getName() : 'Topic name is loading.')) {
+      if (name === this._topic.getName()) {
         continue;
       }
       let skillSummaries = groupedSkillSummaries[name];
@@ -144,15 +142,7 @@ export class TopicEditorStateService {
   }
 
   private _setTopic(topic: Topic): void {
-    if (!this._topic) {
-      // The topic is set directly for the first load.
-      this._topic = topic;
-    } else {
-      // After first initialization, the topic object will be retained for
-      // the lifetime of the editor and on every data reload or update, the new
-      // contents will be copied into the same retained object.
-      this._topic.copyFromTopic(topic);
-    }
+    this._topic.copyFromTopic(topic);
     // Reset the subtopic pages list after setting new topic.
     this._cachedSubtopicPages.length = 0;
     if (this._topicIsInitialized) {
@@ -201,15 +191,7 @@ export class TopicEditorStateService {
   }
 
   private _setSubtopicPage(subtopicPage: SubtopicPage): void {
-    if (!this._subtopicPage) {
-      // The sub topic rights are set directly for the first load.
-      this._subtopicPage = subtopicPage;
-    } else {
-      // After first initialization, the sub topic object will be retained
-      // for the lifetime of the editor and on every data reload or update,
-      // the new contents will be copied into the same retained object.
-      this._subtopicPage.copyFromSubtopicPage(subtopicPage);
-    }
+    this._subtopicPage.copyFromSubtopicPage(subtopicPage);
     this._cachedSubtopicPages.push(cloneDeep(subtopicPage));
     this._subtopicPageLoadedEventEmitter.emit();
   }
@@ -221,15 +203,7 @@ export class TopicEditorStateService {
   }
 
   private _setTopicRights(topicRights: TopicRights): void {
-    if (!this._topicRights) {
-      // The topic rights are set directly for the first load.
-      this._topicRights = topicRights;
-    } else {
-      // After first initialization, the topic rights object will be retained
-      // for the lifetime of the editor and on every data reload or update,
-      // the new contents will be copied into the same retained object.
-      this._topicRights.copyFromTopicRights(topicRights);
-    }
+    this._topicRights.copyFromTopicRights(topicRights);
   }
 
   private _updateTopicRights(
@@ -445,15 +419,7 @@ export class TopicEditorStateService {
     let pageIndex = this._getSubtopicPageIndex(subtopicPage.getId());
     if (pageIndex !== null) {
       this._cachedSubtopicPages[pageIndex] = cloneDeep(subtopicPage);
-      if (!this._subtopicPage) {
-        // The sub topic rights are set directly for the first load.
-        this._subtopicPage = subtopicPage;
-      } else {
-        // After first initialization, the sub topic object will be retained
-        // for the lifetime of the editor and on every data reload or update,
-        // the new contents will be copied into the same retained object.
-        this._subtopicPage.copyFromSubtopicPage(subtopicPage);
-      }
+      this._subtopicPage.copyFromSubtopicPage(subtopicPage);
     } else {
       this._setSubtopicPage(subtopicPage);
       this._newSubtopicPageIds.push(subtopicPage.getId());

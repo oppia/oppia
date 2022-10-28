@@ -55,16 +55,19 @@ interface UnresolvedAnswer {
 export class TeachOppiaModalComponent
   extends ConfirmOrCancelModal implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  interactionId!: string;
-  // Timeout for the toast that is shown when a response has
-  // been confirmed or fixed.
-  TOAST_TIMEOUT: number = 2000;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   _stateName!: string;
   _state!: State;
   _explorationId!: string;
   unresolvedAnswers!: UnresolvedAnswer[];
   loadingDotsAreShown!: boolean;
   rulesService!: InteractionRulesService;
+  interactionId!: string;
+  // Timeout for the toast that is shown when a response has
+  // been confirmed or fixed.
+  TOAST_TIMEOUT: number = 2000;
 
   constructor(
     private alertsService: AlertsService,

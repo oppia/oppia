@@ -91,8 +91,6 @@ import './learner-dashboard-page.component.css';
   ]
 })
 export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
-  threadIndex!: number;
-
   FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS = (
     LearnerDashboardPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
 
@@ -106,6 +104,10 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  threadIndex!: number;
   isCurrentFeedbackSortDescending!: boolean;
   currentFeedbackThreadsSortType!: string;
 
@@ -120,7 +122,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   allTopics!: LearnerTopicSummary[];
   untrackedTopics!: Record<string, LearnerTopicSummary[]>;
   subscriptionsList!: ProfileSummary[];
-  communtiyLessonsDataLoaded: boolean = false;
 
   completedToIncompleteCollections!: string[];
   learntToPartiallyLearntTopics!: string[];
@@ -132,7 +133,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   activeSubsection!: string;
   feedbackThreadActive!: boolean;
   paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
-  loadingIndicatorIsShown: boolean = false;
 
   messageSendingInProgress!: boolean;
   profilePictureDataUrl!: SafeResourceUrl;
@@ -150,6 +150,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
 
+  communtiyLessonsDataLoaded: boolean = false;
+  loadingIndicatorIsShown: boolean = false;
   homeImageUrl: string = '';
   todolistImageUrl: string = '';
   progressImageUrl: string = '';

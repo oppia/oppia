@@ -165,6 +165,9 @@ export class StateTasks implements Iterable<ExplorationTask> {
  */
 @Injectable({providedIn: 'root'})
 export class ExplorationImprovementsTaskRegistryService {
+  // These properties are initialized using int method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private config!: ExplorationImprovementsConfig;
   private expStats!: ExplorationStats;
   private tasksByState!: Map<string, StateTasks>;

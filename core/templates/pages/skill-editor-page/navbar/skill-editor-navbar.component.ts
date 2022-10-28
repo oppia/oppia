@@ -35,6 +35,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './skill-editor-navbar.component.html',
 })
 export class SkillEditorNavabarComponent implements OnInit {
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   showNavigationOptions!: boolean;
   activeTab!: string;
   showSkillEditOptions!: boolean;
