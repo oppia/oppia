@@ -2906,7 +2906,7 @@ title: Title
     # types of dictionaries that need to be sent over to the handler, those
     # dictionaries can contain any type of values. So, to allow different
     # dictionaries, we used Any type here.
-    def delete_json(  # pylint: disable=dangerous-default-value
+    def delete_json(
         self,
         url: str,
         params: Optional[Dict[str, Any]] = None,
