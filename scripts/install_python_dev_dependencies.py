@@ -55,7 +55,7 @@ def check_python_env_is_suitable() -> None:
         # GitHub Actions according to
         # https://docs.github.com/en/actions/learn-github-actions/environment-variables.
         return
-    if (os.environ.get('DOCKER_CONTAINER', False)):
+    if os.environ.get('DOCKER_CONTAINER', False):
         # The DOCKER_CONTAINER environment variable indicates we are running in
         # a Docker container.
         return
