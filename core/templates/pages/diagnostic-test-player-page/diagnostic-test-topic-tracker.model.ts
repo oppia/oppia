@@ -105,7 +105,10 @@ export class DiagnosticTestTopicTrackerModel {
       let lastTopicId: string;
 
       while (unprocessedAncestorTopicIds.length > 0) {
-        lastTopicId = unprocessedAncestorTopicIds.pop() || '';
+        // '.pop()' here can return an undefined value, but we're already
+        // checking for length > 0, so this is safe.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        lastTopicId = unprocessedAncestorTopicIds.pop()!;
 
         if (ancestorTopicIds.indexOf(lastTopicId) === -1) {
           ancestorTopicIds.push(lastTopicId);
@@ -162,7 +165,10 @@ export class DiagnosticTestTopicTrackerModel {
       let lastTopicId: string;
 
       while (unprocessedSuccessorTopicIds.length > 0) {
-        lastTopicId = unprocessedSuccessorTopicIds.pop() || '';
+        // '.pop()' here can return an undefined value, but we're already
+        // checking for length > 0, so this is safe.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        lastTopicId = unprocessedSuccessorTopicIds.pop()!;
 
         if (successorTopicIds.indexOf(lastTopicId) === -1) {
           successorTopicIds.push(lastTopicId);
