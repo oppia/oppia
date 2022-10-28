@@ -41,11 +41,11 @@ def get_multi_skills(
     """Returns a list of skills matching the skill IDs provided.
 
     Args:
-        skill_ids: list(str). List of skill IDs to get skills for.
-        strict: bool. Whether to raise an error if a skill doesn't exist.
+        skill_ids: List of skill IDs to get skills for.
+        strict: Whether to raise an error if a skill doesn't exist.
 
     Returns:
-        list(Skill). The list of skills matching the provided IDs.
+        The list of skills matching the provided IDs.
 
     Raises:
         Exception. No skill exists for given ID.
@@ -101,14 +101,14 @@ def get_skill_by_id(
     """Returns a domain object representing a skill.
 
     Args:
-        skill_id: str. ID of the skill.
-        strict: bool. Whether to fail noisily if no skill with the given
+        skill_id: ID of the skill.
+        strict: Whether to fail noisily if no skill with the given
             id exists in the datastore.
-        version: int or None. The version number of the skill to be
-            retrieved. If it is None, the latest version will be retrieved.
+        version: The version number of the skill to be retrieved.
+            If it is None, the latest version will be retrieved.
 
     Returns:
-        Skill or None. The domain object representing a skill with the
+        The domain object representing a skill with the
         given id, or None if it does not exist.
     """
     sub_namespace = str(version) if version else None
@@ -140,10 +140,10 @@ def get_skill_from_model(
     from the datastore.
 
     Args:
-        skill_model: SkillModel. The skill model loaded from the datastore.
+        skill_model: The skill model loaded from the datastore.
 
     Returns:
-        skill. A Skill domain object corresponding to the given skill model.
+        A Skill domain object corresponding to the given skill model.
     """
 
     # Ensure the original skill model does not get altered.
@@ -199,10 +199,10 @@ def get_skill_by_description(description: str) -> Optional[skill_domain.Skill]:
     """Returns a domain object representing a skill.
 
     Args:
-        description: str. The description of the skill.
+        description: The description of the skill.
 
     Returns:
-        Skill or None. The domain object representing a skill with the
+        The domain object representing a skill with the
         given description, or None if it does not exist.
     """
     skill_model = (
@@ -220,7 +220,7 @@ def _migrate_skill_contents_to_latest_schema(
     function to account for that new version.
 
     Args:
-        versioned_skill_contents: dict. A dict with two keys:
+        versioned_skill_contents: A dict with two keys:
             - schema_version: int. The schema version for the skill_contents
                 dict.
             - skill_contents: dict. The dict comprising the skill contents.
@@ -253,7 +253,7 @@ def _migrate_misconceptions_to_latest_schema(
     function to account for that new version.
 
     Args:
-        versioned_misconceptions: dict. A dict with two keys:
+        versioned_misconceptions: A dict with two keys:
             - schema_version: int. The schema version for the misconceptions
                 dict.
             - misconceptions: list(dict). The list of dicts comprising the skill
@@ -287,7 +287,7 @@ def _migrate_rubrics_to_latest_schema(
     function to account for that new version.
 
     Args:
-        versioned_rubrics: dict. A dict with two keys:
+        versioned_rubrics: A dict with two keys:
             - schema_version: int. The schema version for the rubrics dict.
             - rubrics: list(dict). The list of dicts comprising the skill
                 rubrics.

@@ -59,7 +59,7 @@ def get_merged_skill_ids() -> List[str]:
     """Returns the skill IDs of skills that have been merged.
 
     Returns:
-        list(str). List of skill IDs of merged skills.
+        List of skill IDs of merged skills.
     """
     return [skill.id for skill in skill_models.SkillModel.get_merged_skills()]
 
@@ -68,8 +68,7 @@ def get_all_skill_summaries() -> List[skill_domain.SkillSummary]:
     """Returns the summaries of all skills present in the datastore.
 
     Returns:
-        list(SkillSummary). The list of summaries of all skills present in the
-        datastore.
+        The list of summaries of all skills present in the datastore.
     """
     skill_summaries_models = skill_models.SkillSummaryModel.get_all()
     skill_summaries = [
@@ -86,23 +85,22 @@ def _get_skill_summaries_in_batches(
     """Returns the summaries of skills present in the datastore.
 
     Args:
-        num_skills_to_fetch: int. Number of skills to fetch.
-        urlsafe_start_cursor: str or None. The cursor to the next page.
-        sort_by: str|None. A string indicating how to sort the result, or None
+        num_skills_to_fetch: Number of skills to fetch.
+        urlsafe_start_cursor: The cursor to the next page.
+        sort_by: A string indicating how to sort the result, or None
             if no sort is required.
 
     Returns:
-        3-tuple(skill_summaries, new_urlsafe_start_cursor, more). where:
-            skill_summaries: list(SkillSummary). The list of skill summaries.
-                The number of returned skill summaries might include more than
-                the requested number. Hence, the cursor returned will represent
-                the point to which those results were fetched (and not the
-                "num_skills_to_fetch" point).
-            urlsafe_start_cursor: str or None. A query cursor pointing to the
-                next batch of results. If there are no more results, this might
-                be None.
-            more: bool. If True, there are (probably) more results after this
-                batch. If False, there are no further results after this batch.
+        A 3-tuple(skill_summaries, new_urlsafe_start_cursor, more). where:
+            skill_summaries: The list of skill summaries. The number of returned
+                skill summaries might include more than the requested number.
+                Hence, the cursor returned will represent the point to which
+                those results were fetched (and not the "num_skills_to_fetch"
+                point).
+            urlsafe_start_cursor: A query cursor pointing to the next batch of
+                results. If there are no more results, this might be None.
+            more: If True, there are (probably) more results after this batch.
+                If False, there are no further results after this batch.
     """
     # The fetched skills will be filtered afterwards and filtering may result
     # in having less number of skills than requested. Hence, fetching twice
@@ -129,30 +127,28 @@ def get_filtered_skill_summaries(
     """Returns all the skill summary dicts after filtering.
 
     Args:
-        num_skills_to_fetch: int. Number of skills to fetch.
-        status: str|None. The status of the skill, or None if no status is
+        num_skills_to_fetch: Number of skills to fetch.
+        status: The status of the skill, or None if no status is
             provided to filter skills id.
-        classroom_name: str|None. The classroom_name of the topic to which
+        classroom_name: The classroom_name of the topic to which
             the skill is assigned to.
-        keywords: list(str). The keywords to look for
-            in the skill description.
-        sort_by: str|None. A string indicating how to sort the result, or None
+        keywords: The keywords to look for in the skill description.
+        sort_by: A string indicating how to sort the result, or None
             if no sorting is required.
-        urlsafe_start_cursor: str or None. The cursor to the next page.
+        urlsafe_start_cursor: The cursor to the next page.
 
     Returns:
-        3-tuple(augmented_skill_summaries, new_urlsafe_start_cursor, more).
+        A 3-tuple(augmented_skill_summaries, new_urlsafe_start_cursor, more).
         Where:
-            augmented_skill_summaries: list(AugmentedSkillSummary). The list of
-                augmented skill summaries. The number of returned skills might
-                include more than the requested number. Hence, the cursor
-                returned will represent the point to which those results were
-                fetched (and not the "num_skills_to_fetch" point).
-            new_urlsafe_start_cursor: str or None. A query cursor pointing to
-                the next batch of results. If there are no more results, this
-                might be None.
-            more: bool. If True, there are (probably) more results after this
-                batch. If False, there are no further results after this batch.
+            augmented_skill_summaries: The list of augmented skill summaries.
+                The number of returned skills might include more than the
+                requested number. Hence, the cursor returned will represent
+                the point to which those results were fetched (and not the
+                "num_skills_to_fetch" point).
+            new_urlsafe_start_cursor: A query cursor pointing to the next batch
+                of results. If there are no more results, this might be None.
+            more: If True, there are (probably) more results after this batch.
+                If False, there are no further results after this batch.
     """
     augmented_skill_summaries: List[skill_domain.AugmentedSkillSummary] = []
     new_urlsafe_start_cursor = urlsafe_start_cursor
@@ -183,14 +179,12 @@ def _get_augmented_skill_summaries_in_batches(
     topic and classroom.
 
     Returns:
-        3-tuple(augmented_skill_summaries, urlsafe_start_cursor, more). Where:
-            augmented_skill_summaries: list(AugmentedSkillSummary). The list of
-                skill summaries.
-            urlsafe_start_cursor: str or None. A query cursor pointing to the
-                next batch of results. If there are no more results, this might
-                be None.
-            more: bool. If True, there are (probably) more results after this
-                batch. If False, there are no further results after this batch.
+        A 3-tuple(augmented_skill_summaries, urlsafe_start_cursor, more). Where:
+            augmented_skill_summaries: The list of skill summaries.
+            urlsafe_start_cursor: A query cursor pointing to the next batch of
+                results. If there are no more results, this might be None.
+            more: If True, there are (probably) more results after this batch.
+                If False, there are no further results after this batch.
     """
     skill_summaries, new_urlsafe_start_cursor, more = (
         _get_skill_summaries_in_batches(
@@ -253,14 +247,12 @@ def _filter_skills_by_status(
     """Returns the skill summary dicts after filtering by status.
 
     Args:
-        augmented_skill_summaries: list(AugmentedSkillSummary). The list
-            of augmented skill summaries.
-        status: str|None. The status of the skill, or None if no status is
+        augmented_skill_summaries: The list of augmented skill summaries.
+        status: The status of the skill, or None if no status is
             provided to filter skills id.
 
     Returns:
-        list(AugmentedSkillSummary). The list of AugmentedSkillSummaries
-        matching the given status.
+        The list of AugmentedSkillSummaries matching the given status.
     """
 
     if status is None or status == constants.SKILL_STATUS_OPTIONS['ALL']:
@@ -293,14 +285,12 @@ def _filter_skills_by_classroom(
     """Returns the skill summary dicts after filtering by classroom_name.
 
     Args:
-        augmented_skill_summaries: list(AugmentedSkillSummary).
-            The list of augmented skill summaries.
-        classroom_name: str|None. The classroom_name of the topic to which
-            the skill is assigned to.
+        augmented_skill_summaries: The list of augmented skill summaries.
+        classroom_name: The classroom_name of the topic to which the skill
+            is assigned to.
 
     Returns:
-        list(AugmentedSkillSummary). The list of augmented skill summaries with
-        the given classroom name.
+        The list of augmented skill summaries with the given classroom name.
     """
 
     if classroom_name is None or classroom_name == 'All':
@@ -322,13 +312,11 @@ def _filter_skills_by_keywords(
     """Returns whether the keywords match the skill description.
 
     Args:
-        augmented_skill_summaries: list(AugmentedSkillSummary). The augmented
-            skill summaries.
-        keywords: list(str). The keywords to match.
+        augmented_skill_summaries: The augmented skill summaries.
+        keywords: The keywords to match.
 
     Returns:
-        list(AugmentedSkillSummary). The list of augmented skill summaries
-        matching the given keywords.
+        The list of augmented skill summaries matching the given keywords.
     """
     if not keywords:
         return augmented_skill_summaries
@@ -349,11 +337,10 @@ def get_multi_skill_summaries(
     """Returns a list of skill summaries matching the skill IDs provided.
 
     Args:
-        skill_ids: list(str). List of skill IDs to get skill summaries for.
+        skill_ids: List of skill IDs to get skill summaries for.
 
     Returns:
-        list(SkillSummary). The list of summaries of skills matching the
-        provided IDs.
+        The list of summaries of skills matching the provided IDs.
     """
     skill_summaries_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
     skill_summaries = [
@@ -369,11 +356,11 @@ def get_rubrics_of_skills(
     """Returns a list of rubrics corresponding to given skills.
 
     Args:
-        skill_ids: list(str). The list of skill IDs.
+        skill_ids: The list of skill IDs.
 
     Returns:
-        dict, list(str). The skill rubrics of skills keyed by their
-        corresponding ids and the list of deleted skill ids, if any.
+        The skill rubrics of skills keyed by their corresponding ids and
+        the list of deleted skill ids, if any.
     """
     skills = skill_fetchers.get_multi_skills(skill_ids, strict=False)
     skill_id_to_rubrics_dict: Dict[
@@ -400,11 +387,11 @@ def get_descriptions_of_skills(
     """Returns a list of skill descriptions corresponding to the given skills.
 
     Args:
-        skill_ids: list(str). The list of skill ids.
+        skill_ids: The list of skill ids.
 
     Returns:
-        dict, list(str). The skill descriptions of skills keyed by their
-        corresponding ids and the list of deleted skill ids, if any.
+        The skill descriptions of skills keyed by their corresponding ids and
+        the list of deleted skill ids, if any.
     """
     skill_summaries = get_multi_skill_summaries(skill_ids)
     skill_id_to_description_dict: Dict[str, str] = {}
@@ -429,12 +416,11 @@ def get_skill_summary_from_model(
     skill summary model.
 
     Args:
-        skill_summary_model: SkillSummaryModel. The skill summary model object
-            to get corresponding domain object.
+        skill_summary_model: The skill summary model object to get
+            corresponding domain object.
 
     Returns:
-        SkillSummary. The domain object corresponding to given skill summmary
-        model.
+        The domain object corresponding to given skill summary model.
     """
     return skill_domain.SkillSummary(
         skill_summary_model.id, skill_summary_model.description,
@@ -451,10 +437,10 @@ def get_image_filenames_from_skill(skill: skill_domain.Skill) -> List[str]:
     """Get the image filenames from the skill.
 
     Args:
-        skill: Skill. The skill itself.
+        skill: The skill itself.
 
     Returns:
-        list(str). List containing the name of the image files in skill.
+        List containing the name of the image files in skill.
     """
     html_list = skill.get_all_html_content_strings()
     return html_cleaner.get_image_filenames_from_html_strings(html_list)
@@ -467,10 +453,10 @@ def get_all_topic_assignments_for_skill(
     assigned along with topic details.
 
     Args:
-        skill_id: str. ID of the skill.
+        skill_id: ID of the skill.
 
     Returns:
-        list(TopicAssignment). A list of TopicAssignment domain objects.
+        A list of TopicAssignment domain objects.
     """
     topic_assignments = []
     topics = topic_fetchers.get_all_topics()
@@ -495,10 +481,10 @@ def get_topic_names_with_given_skill_in_diagnostic_test(
     to that topic's diagnostic test.
 
     Args:
-        skill_id: str. ID of the skill.
+        skill_id: ID of the skill.
 
     Returns:
-        list(str). A list of topic names for which the given skill is assigned
+        A list of topic names for which the given skill is assigned
         to that topic's diagnostic test.
     """
     topics = topic_fetchers.get_all_topics()
@@ -515,9 +501,9 @@ def replace_skill_id_in_all_topics(
     """Replaces the old skill id with the new one in all the associated topics.
 
     Args:
-        user_id: str. The unique user ID of the user.
-        old_skill_id: str. The old skill id.
-        new_skill_id: str. The new skill id.
+        user_id: The unique user ID of the user.
+        old_skill_id: The old skill id.
+        new_skill_id: The new skill id.
 
     Raises:
         Exception. The new skill already present.
@@ -568,8 +554,8 @@ def remove_skill_from_all_topics(user_id: str, skill_id: str) -> None:
     """Deletes the skill with the given id from all the associated topics.
 
     Args:
-        user_id: str. The unique user ID of the user.
-        skill_id: str. ID of the skill.
+        user_id: The unique user ID of the user.
+        skill_id: ID of the skill.
     """
     all_topics = topic_fetchers.get_all_topics()
     for topic in all_topics:
@@ -619,12 +605,12 @@ def get_skill_summary_by_id(
     """Returns a domain object representing a skill summary.
 
     Args:
-        skill_id: str. ID of the skill summary.
-        strict: bool. Whether to fail noisily if no skill summary with the given
+        skill_id: ID of the skill summary.
+        strict: Whether to fail noisily if no skill summary with the given
             id exists in the datastore.
 
     Returns:
-        SkillSummary. The skill summary domain object corresponding to a skill
+        The skill summary domain object corresponding to a skill
         with the given skill_id.
     """
     skill_summary_model = skill_models.SkillSummaryModel.get(
@@ -641,7 +627,7 @@ def get_new_skill_id() -> str:
     """Returns a new skill id.
 
     Returns:
-        str. A new skill id.
+        A new skill id.
     """
     return skill_models.SkillModel.get_new_id('')
 
@@ -655,11 +641,10 @@ def _create_skill(
     """Creates a new skill.
 
     Args:
-        committer_id: str. ID of the committer.
-        skill: Skill. The skill domain object.
-        commit_message: str. A description of changes made to the skill.
-        commit_cmds: list(SkillChange). A list of change commands made to the
-            given skill.
+        committer_id: ID of the committer.
+        skill: The skill domain object.
+        commit_message: A description of changes made to the skill.
+        commit_cmds: A list of change commands made to the given skill.
     """
     skill.validate()
     model = skill_models.SkillModel(
@@ -696,10 +681,10 @@ def does_skill_with_description_exist(description: str) -> bool:
     """Checks if skill with provided description exists.
 
     Args:
-        description: str. The description for the skill.
+        description: The description for the skill.
 
     Returns:
-        bool. Whether the the description for the skill exists.
+        Whether the the description for the skill exists.
     """
     existing_skill = (
         skill_fetchers.get_skill_by_description(description))
@@ -710,8 +695,8 @@ def save_new_skill(committer_id: str, skill: skill_domain.Skill) -> None:
     """Saves a new skill.
 
     Args:
-        committer_id: str. ID of the committer.
-        skill: Skill. Skill to be saved.
+        committer_id: ID of the committer.
+        skill: Skill to be saved.
     """
     commit_message = 'New skill created.'
     _create_skill(
@@ -728,13 +713,12 @@ def apply_change_list(
     """Applies a changelist to a skill and returns the result.
 
     Args:
-        skill_id: str. ID of the given skill.
-        change_list: list(SkillChange). A change list to be applied to the given
-            skill.
-        committer_id: str. The ID of the committer of this change list.
+        skill_id: ID of the given skill.
+        change_list: A change list to be applied to the given skill.
+        committer_id: The ID of the committer of this change list.
 
     Returns:
-        Skill. The resulting skill domain object.
+        The resulting skill domain object.
 
     Raises:
         Exception. The user does not have enough rights to edit the
@@ -965,12 +949,12 @@ def populate_skill_model_fields(
     """Populate skill model with the data from skill object.
 
     Args:
-        skill_model: SkillModel. The model to populate.
-        skill: Skill. The skill domain object which should be used to
+        skill_model: The model to populate.
+        skill: The skill domain object which should be used to
             populate the model.
 
     Returns:
-        SkillModel. Populated model.
+        The Populated SkillModel.
     """
     skill_model.description = skill.description
     skill_model.language_code = skill.language_code
@@ -1005,10 +989,10 @@ def _save_skill(
     object by 1.
 
     Args:
-        committer_id: str. ID of the given committer.
-        skill: Skill. The skill domain object to be saved.
-        commit_message: str. The commit message.
-        change_list: list(SkillChange). List of changes applied to a skill.
+        committer_id: ID of the given committer.
+        skill: The skill domain object to be saved.
+        commit_message: The commit message.
+        change_list: List of changes applied to a skill.
 
     Raises:
         Exception. The skill model and the incoming skill domain object have
@@ -1055,14 +1039,13 @@ def update_skill(
     """Updates a skill. Commits changes.
 
     Args:
-        committer_id: str. The id of the user who is performing the update
-            action.
-        skill_id: str. The skill id.
-        change_list: list(SkillChange). These changes are applied in sequence to
-            produce the resulting skill.
-        commit_message: str or None. A description of changes made to the
-            skill. For published skills, this must be present; for
-            unpublished skills, it may be equal to None.
+        committer_id: The id of the user who is performing the update action.
+        skill_id: The skill id.
+        change_list: These changes are applied in sequence to produce the
+            resulting skill.
+        commit_message: A description of changes made to the skill. For
+            published skills, this must be present; for unpublished skills,
+            it may be equal to None.
 
     Raises:
         ValueError. No commit message was provided.
@@ -1109,9 +1092,9 @@ def delete_skill(
     """Deletes the skill with the given skill_id.
 
     Args:
-        committer_id: str. ID of the committer.
-        skill_id: str. ID of the skill to be deleted.
-        force_deletion: bool. If true, the skill and its history are fully
+        committer_id: ID of the committer.
+        skill_id: ID of the skill to be deleted.
+        force_deletion: If true, the skill and its history are fully
             deleted and are unrecoverable. Otherwise, the skill and all
             its history are marked as deleted, but the corresponding models are
             still retained in the datastore. This last option is the preferred
@@ -1137,7 +1120,7 @@ def delete_skill_summary(skill_id: str) -> None:
     """Delete a skill summary model.
 
     Args:
-        skill_id: str. ID of the skill whose skill summary is to
+        skill_id: ID of the skill whose skill summary is to
             be deleted.
     """
 
@@ -1154,10 +1137,10 @@ def compute_summary_of_skill(
     object and return it.
 
     Args:
-        skill: Skill. The skill object, for which the summary is to be computed.
+        skill: The skill object, for which the summary is to be computed.
 
     Returns:
-        SkillSummary. The computed summary for the given skill.
+        The computed summary for the given skill.
 
     Raises:
         Exception. No data available for when the skill was last_updated.
@@ -1190,7 +1173,7 @@ def create_skill_summary(skill_id: str) -> None:
     """Creates and stores a summary of the given skill.
 
     Args:
-        skill_id: str. ID of the skill.
+        skill_id: ID of the skill.
     """
     skill = skill_fetchers.get_skill_by_id(skill_id)
     skill_summary = compute_summary_of_skill(skill)
@@ -1204,12 +1187,12 @@ def populate_skill_summary_model_fields(
     """Populate skill summary model with the data from skill summary object.
 
     Args:
-        skill_summary_model: SkillSummaryModel. The model to populate.
-        skill_summary: SkillSummary. The skill summary domain object which
+        skill_summary_model: The model to populate.
+        skill_summary: The skill summary domain object which
             should be used to populate the model.
 
     Returns:
-        SkillSummaryModel. Populated model.
+        The Populated SkillSummaryModel.
     """
     skill_summary_dict = {
         'description': skill_summary.description,
@@ -1235,8 +1218,7 @@ def save_skill_summary(skill_summary: skill_domain.SkillSummary) -> None:
     entity in the datastore.
 
     Args:
-        skill_summary: SkillSummaryModel. The skill summary object to be saved
-            in the datastore.
+        skill_summary: The skill summary object to be saved in the datastore.
     """
     existing_skill_summary_model = (
         skill_models.SkillSummaryModel.get_by_id(skill_summary.id))
@@ -1253,9 +1235,9 @@ def create_user_skill_mastery(
     """Creates skill mastery of a user.
 
     Args:
-        user_id: str. The user ID of the user for whom to create the model.
-        skill_id: str. The unique id of the skill.
-        degree_of_mastery: float. The degree of mastery of user in the skill.
+        user_id: The user ID of the user for whom to create the model.
+        skill_id: The unique id of the skill.
+        degree_of_mastery: The degree of mastery of user in the skill.
     """
 
     user_skill_mastery = skill_domain.UserSkillMastery(
@@ -1269,7 +1251,7 @@ def save_user_skill_mastery(
     """Stores skill mastery of a user.
 
     Args:
-        user_skill_mastery: dict. The user skill mastery model of a user.
+        user_skill_mastery: The user skill mastery model of a user.
     """
     user_skill_mastery_model = user_models.UserSkillMasteryModel(
         id=user_models.UserSkillMasteryModel.construct_model_id(
@@ -1288,10 +1270,9 @@ def create_multi_user_skill_mastery(
     """Creates the mastery of a user in multiple skills.
 
     Args:
-        user_id: str. The user ID of the user.
-        degrees_of_mastery: dict(str, float). The keys are the requested
-            skill IDs. The values are the corresponding mastery degree of
-            the user.
+        user_id: The user ID of the user.
+        degrees_of_mastery: The keys are the requested skill IDs. The values
+            are the corresponding mastery degree of the user.
     """
     user_skill_mastery_models = []
 
@@ -1310,12 +1291,12 @@ def get_user_skill_mastery(user_id: str, skill_id: str) -> Optional[float]:
     """Fetches the mastery of user in a particular skill.
 
     Args:
-        user_id: str. The user ID of the user.
-        skill_id: str. Unique id of the skill for which mastery degree is
+        user_id: The user ID of the user.
+        skill_id: Unique id of the skill for which mastery degree is
             requested.
 
     Returns:
-        float or None. Mastery degree of the user for the requested skill, or
+        Mastery degree of the user for the requested skill, or
         None if UserSkillMasteryModel does not exist for the skill.
     """
     model_id = user_models.UserSkillMasteryModel.construct_model_id(
@@ -1339,14 +1320,13 @@ def get_multi_user_skill_mastery(
     """Fetches the mastery of user in multiple skills.
 
     Args:
-        user_id: str. The user ID of the user.
-        skill_ids: list(str). Skill IDs of the skill for which mastery degree is
-            requested.
+        user_id: The user ID of the user.
+        skill_ids: Skill IDs of the skill for which mastery degree is requested.
 
     Returns:
-        dict(str, float|None). The keys are the requested skill IDs. The values
-        are the corresponding mastery degree of the user or None if
-        UserSkillMasteryModel does not exist for the skill.
+        The keys are the requested skill IDs. The values are the corresponding
+        mastery degree of the user or None if UserSkillMasteryModel does not
+        exist for the skill.
     """
     degrees_of_mastery: Dict[str, Optional[float]] = {}
     model_ids = []
@@ -1373,15 +1353,15 @@ def get_multi_users_skills_mastery(
     """Fetches the mastery of user in multiple skills.
 
     Args:
-        user_ids: list(str). The user IDs of the users.
-        skill_ids: list(str). Skill IDs of the skill for which mastery degree is
+        user_ids: The user IDs of the users.
+        skill_ids: Skill IDs of the skill for which mastery degree is
             requested.
 
     Returns:
-        dict(str, dict(str, float|None)). The keys are the user IDs and values
-        are dictionaries with keys as requested skill IDs and values
-        as the corresponding mastery degree of the user or None if
-        UserSkillMasteryModel does not exist for the skill.
+        The keys are the user IDs and values are dictionaries with keys as
+        requested skill IDs and values as the corresponding mastery degree
+        of the user or None if UserSkillMasteryModel does not exist for the
+        skill.
     """
     # We need to convert the resultant object of itertools product to a list
     # to be able to use it multiple times as it otherwise gets exhausted after
@@ -1413,10 +1393,10 @@ def skill_has_associated_questions(skill_id: str) -> bool:
     """Returns whether or not any question has this skill attached.
 
     Args:
-        skill_id: str. The skill ID of the user.
+        skill_id: The skill ID of the user.
 
     Returns:
-        bool. Whether any question has this skill attached.
+        Whether any question has this skill attached.
     """
     question_ids = (
         question_models.QuestionSkillLinkModel.get_all_question_ids_linked_to_skill_id( # pylint: disable=line-too-long
@@ -1430,12 +1410,11 @@ def get_sorted_skill_ids(
     """Sort the dict based on the mastery value.
 
     Args:
-        degrees_of_mastery: dict(str, float|None). Dict mapping
-            skill ids to mastery level. The mastery level can be
-            float or None.
+        degrees_of_mastery: Dict mapping skill ids to mastery level.
+            The mastery level can be float or None.
 
     Returns:
-        list. List of the initial skill id's based on the mastery level.
+        List of the initial skill id's based on the mastery level.
     """
     skill_dict_with_float_value = {
         skill_id: degree for skill_id, degree in degrees_of_mastery.items()
@@ -1463,11 +1442,11 @@ def filter_skills_by_mastery(user_id: str, skill_ids: List[str]) -> List[str]:
     type smaller than any value, so None types will be returned first)
 
     Args:
-        user_id: str. The unique user ID of the user.
-        skill_ids: list(str). The skill_ids that are to be filtered.
+        user_id: The unique user ID of the user.
+        skill_ids: The skill_ids that are to be filtered.
 
     Returns:
-        list(str). A list of the filtered skill_ids.
+        A list of the filtered skill_ids.
     """
     degrees_of_mastery = get_multi_user_skill_mastery(user_id, skill_ids)
     filtered_skill_ids = get_sorted_skill_ids(degrees_of_mastery)
@@ -1488,15 +1467,13 @@ def get_untriaged_skill_summaries(
     """Returns a list of skill summaries for all skills that are untriaged.
 
     Args:
-        skill_summaries: list(SkillSummary). The list of all skill summary
-            domain objects.
-        skill_ids_assigned_to_some_topic: set(str). The set of skill ids which
-            are assigned to some topic.
-        merged_skill_ids: list(str). List of skill IDs of merged skills.
+        skill_summaries: The list of all skill summary domain objects.
+        skill_ids_assigned_to_some_topic: The set of skill ids which are
+            assigned to some topic.
+        merged_skill_ids: List of skill IDs of merged skills.
 
     Returns:
-        list(SkillSummary). A list of skill summaries for all skills that
-        are untriaged.
+        A list of skill summaries for all skills that are untriaged.
     """
     untriaged_skill_summaries = []
 
@@ -1515,8 +1492,8 @@ def get_categorized_skill_ids_and_descriptions(
     categorized.
 
     Returns:
-        CategorizedSkills. An instance of the CategorizedSkills domain object
-        for all the skills that are categorized.
+        An instance of the CategorizedSkills domain object for all the skills
+        that are categorized.
     """
     topics = topic_fetchers.get_all_topics()
 

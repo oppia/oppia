@@ -187,7 +187,7 @@ class LearnerAnswerInfoDict(TypedDict):
     """Dictionary representing LearnerAnswerInfo object."""
 
     id: str
-    answer: Optional[str]
+    answer: Optional[Union[str, Dict[str, str], int, bool, List[str]]]
     answer_details: str
     created_on: str
 
@@ -220,19 +220,19 @@ class ExplorationStats:
         """Constructs an ExplorationStats domain object.
 
         Args:
-            exp_id: str. ID of the exploration.
-            exp_version: int. Version of the exploration.
-            num_starts_v1: int. Number of learners who started the exploration.
-            num_starts_v2: int. As above, but for events with version 2.
-            num_actual_starts_v1: int. Number of learners who actually attempted
+            exp_id: ID of the exploration.
+            exp_version: Version of the exploration.
+            num_starts_v1: Number of learners who started the exploration.
+            num_starts_v2: As above, but for events with version 2.
+            num_actual_starts_v1: Number of learners who actually attempted
                 the exploration. These are the learners who have completed the
                 initial state of the exploration and traversed to the next
                 state.
-            num_actual_starts_v2: int. As above, but for events with version 2.
-            num_completions_v1: int. Number of learners who completed the
+            num_actual_starts_v2: As above, but for events with version 2.
+            num_completions_v1: Number of learners who completed the
                 exploration.
-            num_completions_v2: int. As above, but for events with version 2.
-            state_stats_mapping: dict. A dictionary mapping the state names of
+            num_completions_v2: As above, but for events with version 2.
+            state_stats_mapping: A dictionary mapping the state names of
                 an exploration to the corresponding StateStats domain object.
         """
         self.exp_id = exp_id
@@ -250,7 +250,7 @@ class ExplorationStats:
         """Returns the number of learners who started the exploration.
 
         Returns:
-            int. The number of learners who started the exploration.
+            The number of learners who started the exploration.
         """
         return self.num_starts_v1 + self.num_starts_v2
 
@@ -261,7 +261,7 @@ class ExplorationStats:
         state of the exploration and traversed to the next state.
 
         Returns:
-            int. The number of learners who actually attempted the exploration.
+            The number of learners who actually attempted the exploration.
         """
         return self.num_actual_starts_v1 + self.num_actual_starts_v2
 
@@ -270,7 +270,7 @@ class ExplorationStats:
         """Returns the number of learners who completed the exploration.
 
         Returns:
-            int. The number of learners who completed the exploration.
+            The number of learners who completed the exploration.
         """
         return self.num_completions_v1 + self.num_completions_v2
 
@@ -324,13 +324,13 @@ class ExplorationStats:
         0.
 
         Args:
-            exp_id: str. ID of the exploration.
-            exp_version: int. Version of the exploration.
-            state_stats_mapping: dict. A dict mapping state names to their
+            exp_id: ID of the exploration.
+            exp_version: Version of the exploration.
+            state_stats_mapping: A dict mapping state names to their
                 corresponding StateStats.
 
         Returns:
-            ExplorationStats. The exploration stats domain object.
+            The exploration stats domain object.
         """
         return cls(exp_id, exp_version, 0, 0, 0, 0, 0, 0, state_stats_mapping)
 
@@ -338,7 +338,7 @@ class ExplorationStats:
         """Compute the sum of first hit counts for the exploration stats.
 
         Returns:
-            int. Sum of first hit counts.
+            Sum of first hit counts.
         """
         sum_first_hits = 0
         for state_name in self.state_stats_mapping:
@@ -425,24 +425,21 @@ class StateStats:
         """Constructs a StateStats domain object.
 
         Args:
-            total_answers_count_v1: int. Total number of answers submitted to
-                this state.
-            total_answers_count_v2: int. As above, but for events with version
-                2.
-            useful_feedback_count_v1: int. Total number of answers that received
+            total_answers_count_v1: Total number of answers submitted to this
+                state.
+            total_answers_count_v2: As above, but for events with version 2.
+            useful_feedback_count_v1: Total number of answers that received
                 useful feedback.
-            useful_feedback_count_v2: int. As above, but for events with version
-                2.
-            total_hit_count_v1: int. Total number of times the state was
-                entered.
-            total_hit_count_v2: int. As above, but for events with version 2.
-            first_hit_count_v1: int. Number of times the state was entered for
+            useful_feedback_count_v2: As above, but for events with version 2.
+            total_hit_count_v1: Total number of times the state was entered.
+            total_hit_count_v2: As above, but for events with version 2.
+            first_hit_count_v1: Number of times the state was entered for
                 the first time.
-            first_hit_count_v2: int. As above, but for events with version 2.
-            num_times_solution_viewed_v2: int. Number of times the solution
+            first_hit_count_v2: As above, but for events with version 2.
+            num_times_solution_viewed_v2: Number of times the solution
                 button was triggered to answer a state (only for version 2).
-            num_completions_v1: int. Number of times the state was completed.
-            num_completions_v2: int. As above, but for events with version 2.
+            num_completions_v1: Number of times the state was completed.
+            num_completions_v2: As above, but for events with version 2.
         """
         self.total_answers_count_v1 = total_answers_count_v1
         self.total_answers_count_v2 = total_answers_count_v2
@@ -463,7 +460,7 @@ class StateStats:
         """Returns the total number of answers submitted to this state.
 
         Returns:
-            int. The total number of answers submitted to this state.
+            The total number of answers submitted to this state.
         """
         return self.total_answers_count_v1 + self.total_answers_count_v2
 
@@ -472,7 +469,7 @@ class StateStats:
         """Returns the total number of answers that received useful feedback.
 
         Returns:
-            int. The total number of answers that received useful feedback.
+            The total number of answers that received useful feedback.
         """
         return self.useful_feedback_count_v1 + self.useful_feedback_count_v2
 
@@ -481,7 +478,7 @@ class StateStats:
         """Returns the total number of times the state was entered.
 
         Returns:
-            int. The total number of times the state was entered.
+            The total number of times the state was entered.
         """
         return self.total_hit_count_v1 + self.total_hit_count_v2
 
@@ -490,7 +487,7 @@ class StateStats:
         """Returns the number of times the state was entered for the first time.
 
         Returns:
-            int. The number of times the state was entered for the first time.
+            The number of times the state was entered for the first time.
         """
         return self.first_hit_count_v1 + self.first_hit_count_v2
 
@@ -499,7 +496,7 @@ class StateStats:
         """Returns total number of times the state was completed.
 
         Returns:
-            int. The total number of times the state was completed.
+            The total number of times the state was completed.
         """
         return self.num_completions_v1 + self.num_completions_v2
 
@@ -508,7 +505,7 @@ class StateStats:
         """Returns the number of times the solution button was triggered.
 
         Returns:
-            int. Number of times the solution button was triggered to answer a
+            Number of times the solution button was triggered to answer a
             state only for events for schema version 2.
         """
         return self.num_times_solution_viewed_v2
@@ -524,8 +521,7 @@ class StateStats:
         """Aggregates data from the other state stats into self.
 
         Args:
-            other: StateStats | SessionStateStats. The other collection of stats
-                to aggregate from.
+            other: The other collection of stats to aggregate from.
 
         Raises:
             TypeError. Given SessionStateStats can not be aggregated from.
@@ -591,7 +587,7 @@ class StateStats:
         from v2 values.
 
         Returns:
-            str. A string representation of self.
+            A string representation of self.
         """
         props = [
             'total_answers_count_v1', 'total_answers_count_v2',
@@ -609,7 +605,7 @@ class StateStats:
         """Returns a simple representation of self, combining v1 and v2 values.
 
         Returns:
-            str. A string representation of self.
+            A string representation of self.
         """
         props = [
             'total_answers_count',
@@ -630,10 +626,10 @@ class StateStats:
         whether they both hold the same values.
 
         Args:
-            other: StateStats. The other instance to compare.
+            other: The other instance to compare.
 
         Returns:
-            bool. Whether the two instances have the same values.
+            Whether the two instances have the same values.
         """
         if not isinstance(other, StateStats):
             # https://docs.python.org/3.7/library/constants.html
@@ -740,16 +736,16 @@ class SessionStateStats:
         """Constructs a SessionStateStats domain object.
 
         Args:
-            total_answers_count: int. Total number of answers submitted to this
+            total_answers_count: Total number of answers submitted to this
                 state.
-            useful_feedback_count: int. Total number of answers that received
+            useful_feedback_count: Total number of answers that received
                 useful feedback.
-            total_hit_count: int. Total number of times the state was entered.
-            first_hit_count: int. Number of times the state was entered for the
+            total_hit_count: Total number of times the state was entered.
+            first_hit_count: Number of times the state was entered for the
                 first time.
-            num_times_solution_viewed: int. Number of times the solution button
+            num_times_solution_viewed: Number of times the solution button
                 was triggered to answer a state.
-            num_completions: int. Number of times the state was completed.
+            num_completions: Number of times the state was completed.
         """
         self.total_answers_count = total_answers_count
         self.useful_feedback_count = useful_feedback_count
@@ -791,10 +787,10 @@ class SessionStateStats:
         """Validates the SessionStateStats domain object.
 
         Args:
-            aggregated_stats: dict. The aggregated stats dict to validate.
+            aggregated_stats: The aggregated stats dict to validate.
 
         Returns:
-            aggregated_stats: dict. The validated aggregated stats dict.
+            The validated aggregated stats dict.
 
         Raises:
             ValidationError. Whether the aggregated_stats dict is invalid.
@@ -859,10 +855,10 @@ class SessionStateStats:
         returning whether they hold the same values.
 
         Args:
-            other: SessionStateStats. The other instance to compare.
+            other: The other instance to compare.
 
         Returns:
-            bool. Whether the two instances have the same values.
+            Whether the two instances have the same values.
         """
         if not isinstance(other, SessionStateStats):
             # https://docs.python.org/3.7/library/constants.html
@@ -920,10 +916,9 @@ class ExplorationIssues:
         """Constructs an ExplorationIssues domain object.
 
         Args:
-            exp_id: str. ID of the exploration.
-            exp_version: int. Version of the exploration.
-            unresolved_issues: list(ExplorationIssue). List of exploration
-                issues.
+            exp_id: ID of the exploration.
+            exp_version: Version of the exploration.
+            unresolved_issues: List of exploration issues.
         """
         self.exp_id = exp_id
         self.exp_version = exp_version
@@ -934,11 +929,11 @@ class ExplorationIssues:
         """Creates a default ExplorationIssues domain object.
 
         Args:
-            exp_id: str. ID of the exploration.
-            exp_version: int. Version of the exploration.
+            exp_id: ID of the exploration.
+            exp_version: Version of the exploration.
 
         Returns:
-            ExplorationIssues. The exploration issues domain object.
+            The exploration issues domain object.
         """
         return cls(exp_id, exp_version, [])
 
@@ -946,7 +941,7 @@ class ExplorationIssues:
         """Returns a dict representation of the ExplorationIssues domain object.
 
         Returns:
-            dict. A dict mapping of all fields of ExplorationIssues object.
+            A dict mapping of all fields of ExplorationIssues object.
         """
         unresolved_issue_dicts = [
             unresolved_issue.to_dict()
@@ -964,12 +959,11 @@ class ExplorationIssues:
         """Returns an ExplorationIssues object from a dict.
 
         Args:
-            exp_issues_dict: dict. A dict mapping of all fields of
+            exp_issues_dict: A dict mapping of all fields of
                 ExplorationIssues object.
 
         Returns:
-            ExplorationIssues. The corresponding ExplorationIssues domain
-            object.
+            The corresponding ExplorationIssues domain object.
         """
         unresolved_issues = [
             ExplorationIssue.from_dict(unresolved_issue_dict)
@@ -1013,12 +1007,12 @@ class Playthrough:
         """Constructs a Playthrough domain object.
 
         Args:
-            exp_id: str. ID of the exploration.
-            exp_version: int. Version of the exploration.
-            issue_type: str. Type of the issue.
-            issue_customization_args: dict. The customization args dict for the
+            exp_id: ID of the exploration.
+            exp_version: Version of the exploration.
+            issue_type: Type of the issue.
+            issue_customization_args: The customization args dict for the
                 given issue_type.
-            actions: list(LearnerAction). List of playthrough learner actions.
+            actions: List of playthrough learner actions.
         """
         self.exp_id = exp_id
         self.exp_version = exp_version
@@ -1030,7 +1024,7 @@ class Playthrough:
         """Returns a dict representation of the Playthrough domain object.
 
         Returns:
-            dict. A dict mapping of all fields of Playthrough object.
+            A dict mapping of all fields of Playthrough object.
         """
         action_dicts = [action.to_dict() for action in self.actions]
         return {
@@ -1047,11 +1041,11 @@ class Playthrough:
         returns a domain object instance.
 
         Args:
-            playthrough_data: dict. A dict mapping of all fields of Playthrough
+            playthrough_data: A dict mapping of all fields of Playthrough
                 object.
 
         Returns:
-            Playthrough. The corresponding Playthrough domain object.
+            The corresponding Playthrough domain object.
         """
         playthrough_properties = [
             'exp_id', 'exp_version', 'issue_type',
@@ -1133,14 +1127,14 @@ class ExplorationIssue:
         """Constructs an ExplorationIssue domain object.
 
         Args:
-            issue_type: str. Type of the issue.
-            issue_customization_args: dict. The customization dict. The keys are
+            issue_type: Type of the issue.
+            issue_customization_args: The customization dict. The keys are
                 names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
-            playthrough_ids: list(str). List of playthrough IDs.
-            schema_version: int. Schema version for the exploration issue.
-            is_valid: bool. Whether the issue and the associated playthroughs
+            playthrough_ids: List of playthrough IDs.
+            schema_version: Schema version for the exploration issue.
+            is_valid: Whether the issue and the associated playthroughs
                 are valid.
         """
         self.issue_type = issue_type
@@ -1167,7 +1161,7 @@ class ExplorationIssue:
         """Returns a dict representation of the ExplorationIssue domain object.
 
         Returns:
-            dict. A dict mapping of all fields of ExplorationIssue object.
+            A dict mapping of all fields of ExplorationIssue object.
         """
         return {
             'issue_type': self.issue_type,
@@ -1185,11 +1179,11 @@ class ExplorationIssue:
         then returns a domain object instance.
 
         Args:
-            exp_issue_dict: dict. A dict mapping of all fields of
+            exp_issue_dict: A dict mapping of all fields of
                 ExplorationIssue object.
 
         Returns:
-            ExplorationIssue. The corresponding ExplorationIssue domain object.
+            The corresponding ExplorationIssue domain object.
         """
         exp_issue_properties = [
             'issue_type', 'schema_version', 'issue_customization_args',
@@ -1219,7 +1213,7 @@ class ExplorationIssue:
         Note that the issue_dict being passed in is modified in-place.
 
         Args:
-            issue_dict: dict. Dict representing the ExplorationIssue object.
+            issue_dict: Dict representing the ExplorationIssue object.
         """
         current_issue_schema_version = issue_dict['schema_version']
         issue_dict['schema_version'] += 1
@@ -1290,12 +1284,12 @@ class LearnerAction:
         """Constructs a LearnerAction domain object.
 
         Args:
-            action_type: str. Type of the action.
-            action_customization_args: dict. The customization dict. The keys
+            action_type: Type of the action.
+            action_customization_args: The customization dict. The keys
                 are names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
-            schema_version: int. Schema version for the learner action.
+            schema_version: Schema version for the learner action.
         """
         self.action_type = action_type
         self.action_customization_args = action_customization_args
@@ -1305,7 +1299,7 @@ class LearnerAction:
         """Returns a dict representation of the LearnerAction domain object.
 
         Returns:
-            dict. A dict mapping of all fields of LearnerAction object.
+            A dict mapping of all fields of LearnerAction object.
         """
         return {
             'action_type': self.action_type,
@@ -1318,11 +1312,10 @@ class LearnerAction:
         """Returns a LearnerAction object from a dict.
 
         Args:
-            action_dict: dict. A dict mapping of all fields of LearnerAction
-                object.
+            action_dict: A dict mapping of all fields of LearnerAction object.
 
         Returns:
-            LearnerAction. The corresponding LearnerAction domain object.
+            The corresponding LearnerAction domain object.
         """
         return cls(
             action_dict['action_type'],
@@ -1338,7 +1331,7 @@ class LearnerAction:
         Note that the action_dict being passed in is modified in-place.
 
         Args:
-            action_dict: dict. Dict representing the LearnerAction object.
+            action_dict: Dict representing the LearnerAction object.
         """
         current_action_schema_version = action_dict['schema_version']
         action_dict['schema_version'] += 1
@@ -1400,17 +1393,17 @@ class StateAnswers:
         """Constructs a StateAnswers domain object.
 
         Args:
-            exploration_id: str. The ID of the exploration corresponding to
+            exploration_id: The ID of the exploration corresponding to
                 submitted answers.
-            exploration_version: int. The version of the exploration
+            exploration_version: The version of the exploration
                 corresponding to submitted answers.
-            state_name: str. The state to which the answers were submitted.
-            interaction_id: str. The ID of the interaction which created the
+            state_name: The state to which the answers were submitted.
+            interaction_id: The ID of the interaction which created the
                 answers.
-            submitted_answer_list: list. The list of SubmittedAnswer domain
+            submitted_answer_list: The list of SubmittedAnswer domain
                 objects that were submitted to the exploration and version
                 specified in this object.
-            schema_version: int. The schema version of this answers object.
+            schema_version: The schema version of this answers object.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
@@ -1511,7 +1504,7 @@ class SubmittedAnswer:
         """Returns the dict of submitted answer.
 
         Returns:
-            dict. The submitted answer dict.
+            The submitted answer dict.
         """
         submitted_answer_dict: SubmittedAnswerDict = {
             'answer': self.answer,
@@ -1539,7 +1532,7 @@ class SubmittedAnswer:
         state.
 
         Returns:
-            SubmittedAnswer. The SubmittedAnswer domin object.
+            The SubmittedAnswer domin object.
         """
         return cls(
             submitted_answer_dict['answer'],
@@ -1652,7 +1645,7 @@ class AnswerOccurrence:
         """Returns a Python dict representing the specific answer.
 
         Returns:
-            dict. The specific answer dict in the following format:
+            The specific answer dict in the following format:
             {
                 'answer': *. The answer submitted by the learner.
                 'frequency': int. The number of occurrences of the answer.
@@ -1671,7 +1664,7 @@ class AnswerOccurrence:
         some number of times.
 
         Args:
-            answer_occurrence_dict: dict. The specific answer dict in the
+            answer_occurrence_dict: The specific answer dict in the
                 following format:
                 {
                     'answer': *. The answer submitted by the learner.
@@ -1679,7 +1672,7 @@ class AnswerOccurrence:
                 }
 
         Returns:
-            AnswerOccurrence. The AnswerOccurrence domain object.
+            The AnswerOccurrence domain object.
         """
         return cls(
             answer_occurrence_dict['answer'],
@@ -1714,7 +1707,7 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         a Python dict.
 
         Returns:
-            list(dict). A list of answer occurrence dicts. Each dict has the
+            A list of answer occurrence dicts. Each dict has the
             following format:
             {
                 'answer': *. The answer submitted by the learner.
@@ -1733,15 +1726,15 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         AnswerOccurrences.
 
         Args:
-            answer_occurrence_list: list(dict). A list containing answer
-                occurrence dicts in the following format:
+            answer_occurrence_list: A list containing answer occurrence dicts
+                in the following format:
                 {
                     'answer': *. The answer submitted by the learner.
                     'frequency': int. The number of occurrences of the answer.
                 }
 
         Returns:
-            AnswerFrequencyList. The domain object for answer occurrences list.
+            The domain object for answer occurrences list.
         """
         return cls([
             AnswerOccurrence.from_raw_type(answer_occurrence_dict)
@@ -1772,7 +1765,7 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         """Returns the categorized frequency Python dict.
 
         Returns:
-            dict. A dict whose keys are category names and whose corresponding
+            A dict whose keys are category names and whose corresponding
             values are lists of answer frequency dicts. Each answer
             frequency dict has the following keys and values:
             {
@@ -1794,7 +1787,7 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         a given dict.
 
         Args:
-            categorized_frequency_dict: dict. The categorized answer frequency
+            categorized_frequency_dict: The categorized answer frequency
                 dict whose keys are category names and whose corresponding
                 values are lists of answer frequency dicts. Each answer
                 frequency dict has the following keys and values:
@@ -1804,7 +1797,7 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
                 }
 
         Returns:
-            CategorizedAnswerFrequencyLists. The domain object for categorized
+            The CategorizedAnswerFrequencyLists domain object for categorized
             answer frequency dict.
         """
         return cls({
@@ -1833,17 +1826,16 @@ class StateAnswersCalcOutput:
         """Initialize domain object for state answers calculation output.
 
         Args:
-            exploration_id: str. The ID of the exploration corresponding to the
+            exploration_id: The ID of the exploration corresponding to the
                 answer calculation output.
-            exploration_version: int. The version of the exploration
+            exploration_version: The version of the exploration
                 corresponding to the answer calculation output.
-            state_name: str. The name of the exploration state to which the
+            state_name: The name of the exploration state to which the
                 aggregated answers were submitted.
-            interaction_id: str. The ID of the interaction.
-            calculation_id: str. Which calculation was performed on the given
+            interaction_id: The ID of the interaction.
+            calculation_id: Which calculation was performed on the given
                 answer data.
-            calculation_output: AnswerCalculationOutput. The output of an
-                answer aggregation operation.
+            calculation_output: The output of an answer aggregation operation.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
@@ -1914,22 +1906,21 @@ class LearnerAnswerDetails:
         """Constructs a LearnerAnswerDetail domain object.
 
         Args:
-            state_reference: str. This field is used to refer to a state
+            state_reference: This field is used to refer to a state
                 in an exploration or question. For an exploration the value
                 will be equal to 'exp_id:state_name' & for question this will
                 be equal to 'question_id' only.
-            entity_type: str. The type of entity, for which the domain
+            entity_type: The type of entity, for which the domain
                 object is being created. The value must be one of
                 ENTITY_TYPE_EXPLORATION or ENTITY_TYPE_QUESTION.
-            interaction_id: str. The ID of the interaction, but this value
+            interaction_id: The ID of the interaction, but this value
                 should not be equal to EndExploration and
                 Continue as these interactions cannot solicit answer
                 details.
-            learner_answer_info_list: list(LearnerAnswerInfo). The list of
-                LearnerAnswerInfo objects.
-            accumulated_answer_info_json_size_bytes: int. The size of
+            learner_answer_info_list: The list of LearnerAnswerInfo objects.
+            accumulated_answer_info_json_size_bytes: The size of
                 learner_answer_info_list in bytes.
-            learner_answer_info_schema_version: int. The schema version of the
+            learner_answer_info_schema_version: The schema version of the
                 LearnerAnswerInfo dict.
         """
 
@@ -1946,7 +1937,7 @@ class LearnerAnswerDetails:
         """Returns a dict representing LearnerAnswerDetails domain object.
 
         Returns:
-            dict. A dict, mapping all fields of LearnerAnswerDetails instance.
+            A dict, mapping all fields of LearnerAnswerDetails instance.
         """
         return {
             'state_reference': self.state_reference,
@@ -1970,12 +1961,11 @@ class LearnerAnswerDetails:
         """Return a LearnerAnswerDetails domain object from a dict.
 
         Args:
-            learner_answer_details_dict: dict. The dict representation of
+            learner_answer_details_dict: The dict representation of
                 LearnerAnswerDetails object.
 
         Returns:
-            LearnerAnswerDetails. The corresponding LearnerAnswerDetails
-            domain object.
+            The corresponding LearnerAnswerDetails domain object.
         """
         return cls(
             learner_answer_details_dict['state_reference'],
@@ -2060,9 +2050,9 @@ class LearnerAnswerDetails:
         """Adds new learner answer info in the learner_answer_info_list.
 
         Args:
-            learner_answer_info: LearnerAnswerInfo. The learner answer info
-                object, which is created after the learner has submitted the
-                details of the answer.
+            learner_answer_info: The learner answer info object, which
+                is created after the learner has submitted the details
+                of the answer.
         """
         learner_answer_info_dict_size = (
             learner_answer_info.get_learner_answer_info_dict_size())
@@ -2077,9 +2067,8 @@ class LearnerAnswerDetails:
         """Delete the learner answer info from the learner_answer_info_list.
 
         Args:
-            learner_answer_info_id: str. The learner answer info
-                id, which needs to be deleted from
-                the learner_answer_info_list.
+            learner_answer_info_id: The learner answer info id, which needs to
+                be deleted from the learner_answer_info_list.
 
         Raises:
             Exception. If the learner answer info with the given id is not
@@ -2101,7 +2090,7 @@ class LearnerAnswerDetails:
         """Updates the state_reference of the LearnerAnswerDetails object.
 
         Args:
-            new_state_reference: str. The new state reference of the
+            new_state_reference: The new state reference of the
                 LearnerAnswerDetails.
         """
         self.state_reference = new_state_reference
@@ -2113,23 +2102,22 @@ class LearnerAnswerInfo:
     def __init__(
         self,
         learner_answer_info_id: str,
-        answer: Optional[str],
+        answer: Optional[Union[str, Dict[str, str], int, bool, List[str]]],
         answer_details: str,
         created_on: datetime.datetime
     ) -> None:
         """Constructs a LearnerAnswerInfo domain object.
 
         Args:
-            learner_answer_info_id: str. The id of the LearnerAnswerInfo object.
-            answer: dict or list or str or int or bool. The answer which is
-                submitted by the learner. Actually type of the answer is
-                interaction dependent, like TextInput interactions have
-                string type answer, NumericInput have int type answers etc.
-            answer_details: str. The details the learner will submit when the
+            learner_answer_info_id: The id of the LearnerAnswerInfo object.
+            answer: The answer which is submitted by the learner. Actually
+                type of the answer is interaction dependent, like TextInput
+                interactions have string type answer, NumericInput have int
+                type answers etc.
+            answer_details: The details the learner will submit when the
                 learner will be asked questions like 'Hey how did you land on
                 this answer', 'Why did you pick that answer' etc.
-            created_on: datetime. The time at which the answer details were
-                received.
+            created_on: The time at which the answer details were received.
         """
         self.id = learner_answer_info_id
         self.answer = answer
@@ -2140,7 +2128,7 @@ class LearnerAnswerInfo:
         """Returns the dict of learner answer info.
 
         Returns:
-            dict. The learner_answer_info dict.
+            The learner_answer_info dict.
         """
         learner_answer_info_dict: LearnerAnswerInfoDict = {
             'id': self.id,
@@ -2157,7 +2145,7 @@ class LearnerAnswerInfo:
         """Returns a dict representing LearnerAnswerInfo domain object.
 
         Returns:
-            dict. A dict, mapping all fields of LearnerAnswerInfo instance.
+            A dict, mapping all fields of LearnerAnswerInfo instance.
         """
 
         return cls(
@@ -2173,7 +2161,7 @@ class LearnerAnswerInfo:
         """Generates the learner answer info domain object id.
 
         Returns:
-            learner_answer_info_id: str. The id generated by the function.
+            The id generated by the function.
         """
         learner_answer_info_id = (
             utils.base64_from_int(
@@ -2217,7 +2205,7 @@ class LearnerAnswerInfo:
         info dict.
 
         Returns:
-            int. Size of the learner_answer_info_dict in bytes.
+            Size of the learner_answer_info_dict in bytes.
         """
         learner_answer_info_dict = self.to_dict()
         return sys.getsizeof(

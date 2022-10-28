@@ -119,11 +119,11 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         """Initializes a AnswerGroup domain object.
 
         Args:
-            outcome: Outcome. The outcome corresponding to the answer group.
-            rule_specs: list(RuleSpec). List of rule specifications.
-            training_data: list(*). List of answers belonging to training
-                data of this answer group.
-            tagged_skill_misconception_id: str or None. The format is
+            outcome: The outcome corresponding to the answer group.
+            rule_specs: List of rule specifications.
+            training_data: List of answers belonging to training data of this
+                answer group.
+            tagged_skill_misconception_id: The format is
                 '<skill_id>-<misconception_id>', where skill_id is the skill ID
                 of the tagged misconception and misconception_id is the id of
                 the tagged misconception for the answer group. It is not None
@@ -143,7 +143,6 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         """Get all translatable fields in the answer group.
 
         Returns:
-            translatable_contents_collection: TranslatableContentsCollection.
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
@@ -165,7 +164,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         """Returns a dict representing this AnswerGroup domain object.
 
         Returns:
-            dict. A dict, mapping all fields of AnswerGroup instance.
+            A dict, mapping all fields of AnswerGroup instance.
         """
         return {
             'rule_specs': [rule_spec.to_dict()
@@ -180,11 +179,10 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         """Return a AnswerGroup domain object from a dict.
 
         Args:
-            answer_group_dict: dict. The dict representation of AnswerGroup
-                object.
+            answer_group_dict: The dict representation of AnswerGroup object.
 
         Returns:
-            AnswerGroup. The corresponding AnswerGroup domain object.
+            The corresponding AnswerGroup domain object.
         """
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
@@ -205,11 +203,11 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         only has one classifier rule.
 
         Args:
-            interaction: BaseInteraction. The interaction object.
-            exp_param_specs_dict: dict. A dict of all parameters used in the
+            interaction: The interaction object.
+            exp_param_specs_dict: A dict of all parameters used in the
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type).
-            tagged_skill_misconception_id_required: bool. The 'tagged_skill_
+            tagged_skill_misconception_id_required: The 'tagged_skill_
                 misconception_id' is required or not.
 
         Raises:
@@ -267,11 +265,11 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         """Get all html content strings in the AnswerGroup.
 
         Args:
-            interaction_id: str. The interaction id that the answer group is
+            interaction_id: The interaction id that the answer group is
                 associated with.
 
         Returns:
-            list(str). The list of all html content strings in the interaction.
+            The list of all html content strings in the interaction.
 
         Raises:
             Exception. The Rule spec has an invalid format.
@@ -354,17 +352,16 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         according to the conversion function.
 
         Args:
-            answer_group_dict: dict. The answer group dict.
-            conversion_fn: function. The function to be used for converting the
-                HTML.
-            html_field_types_to_rule_specs: dict. A dictionary that specifies
-                the locations of html fields in rule specs. It is defined as a
-                mapping of rule input types to a dictionary containing
+            answer_group_dict: The answer group dict.
+            conversion_fn: The function to be used for converting the HTML.
+            html_field_types_to_rule_specs: A dictionary that specifies
+                the locations of html fields in rule specs. It is defined
+                as a mapping of rule input types to a dictionary containing
                 interaction id, format, and rule types. See
                 html_field_types_to_rule_specs_state_v41.json for an example.
 
         Returns:
-            dict. The converted answer group dict.
+            The converted answer group dict.
         """
         answer_group_dict['outcome']['feedback']['html'] = conversion_fn(
             answer_group_dict['outcome']['feedback']['html'])
@@ -394,7 +391,7 @@ class Hint(translation_domain.BaseTranslatableObject):
         """Constructs a Hint domain object.
 
         Args:
-            hint_content: SubtitledHtml. The hint text and ID referring to the
+            hint_content: The hint text and ID referring to the
                 other assets for this content.
         """
         self.hint_content = hint_content
@@ -405,7 +402,6 @@ class Hint(translation_domain.BaseTranslatableObject):
         """Get all translatable fields/objects in the hint.
 
         Returns:
-            translatable_contents_collection: TranslatableContentsCollection.
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
@@ -421,7 +417,7 @@ class Hint(translation_domain.BaseTranslatableObject):
         """Returns a dict representing this Hint domain object.
 
         Returns:
-            dict. A dict mapping the field of Hint instance.
+            A dict mapping the field of Hint instance.
         """
         return {
             'hint_content': self.hint_content.to_dict(),
@@ -432,10 +428,10 @@ class Hint(translation_domain.BaseTranslatableObject):
         """Return a Hint domain object from a dict.
 
         Args:
-            hint_dict: dict. The dict representation of Hint object.
+            hint_dict: The dict representation of Hint object.
 
         Returns:
-            Hint. The corresponding Hint domain object.
+            The corresponding Hint domain object.
         """
         hint_content = SubtitledHtml.from_dict(hint_dict['hint_content'])
         hint_content.validate()
@@ -453,12 +449,11 @@ class Hint(translation_domain.BaseTranslatableObject):
         according to the conversion function.
 
         Args:
-            hint_dict: dict. The hints dict.
-            conversion_fn: function. The function to be used for converting the
-                HTML.
+            hint_dict: The hints dict.
+            conversion_fn: The function to be used for converting the HTML.
 
         Returns:
-            dict. The converted hints dict.
+            The converted hints dict.
         """
         hint_dict['hint_content']['html'] = (
             conversion_fn(hint_dict['hint_content']['html']))
@@ -494,15 +489,15 @@ class Solution(translation_domain.BaseTranslatableObject):
         """Constructs a Solution domain object.
 
         Args:
-            interaction_id: str. The interaction id.
-            answer_is_exclusive: bool. True if is the only correct answer;
+            interaction_id: The interaction id.
+            answer_is_exclusive: True if is the only correct answer;
                 False if is one of possible answer.
-            correct_answer: *. The correct answer; this answer
-                enables the learner to progress to the next card. The type of
-                correct_answer is determined by the value of
+            correct_answer: The correct answer; this answer
+                enables the learner to progress to the next card.
+                The type of correct_answer is determined by the value of
                 BaseInteraction.answer_type. Some examples for the types are
                 list(set(str)), list(str), str, dict(str, str), etc.
-            explanation: SubtitledHtml. Contains text and text id to link audio
+            explanation: Contains text and text id to link audio
                 translations for the solution's explanation.
         """
         self.answer_is_exclusive = answer_is_exclusive
@@ -517,7 +512,6 @@ class Solution(translation_domain.BaseTranslatableObject):
         """Get all translatable fields/objects in the solution.
 
         Returns:
-            translatable_contents_collection: TranslatableContentsCollection.
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
@@ -533,7 +527,7 @@ class Solution(translation_domain.BaseTranslatableObject):
         """Returns a dict representing this Solution domain object.
 
         Returns:
-            dict. A dict mapping all fields of Solution instance.
+            A dict mapping all fields of Solution instance.
         """
         return {
             'answer_is_exclusive': self.answer_is_exclusive,
@@ -550,11 +544,11 @@ class Solution(translation_domain.BaseTranslatableObject):
         """Return a Solution domain object from a dict.
 
         Args:
-            interaction_id: str. The interaction id.
-            solution_dict: dict. The dict representation of Solution object.
+            interaction_id: The interaction id.
+            solution_dict: The dict representation of Solution object.
 
         Returns:
-            Solution. The corresponding Solution domain object.
+            The corresponding Solution domain object.
         """
         explanation = SubtitledHtml.from_dict(solution_dict['explanation'])
         explanation.validate()
@@ -570,7 +564,7 @@ class Solution(translation_domain.BaseTranslatableObject):
         """Validates all properties of Solution.
 
         Args:
-            interaction_id: str. The interaction id.
+            interaction_id: The interaction id.
 
         Raises:
             ValidationError. One or more attributes of the Solution are not
@@ -598,19 +592,18 @@ class Solution(translation_domain.BaseTranslatableObject):
         to the conversion function.
 
         Args:
-            interaction_id: Optional[str]. The interaction id.
-            solution_dict: dict. The Solution dict.
-            conversion_fn: function. The function to be used for converting the
-                HTML.
-            html_field_types_to_rule_specs: dict. A dictionary that specifies
-                the locations of html fields in rule specs. It is defined as a
-                mapping of rule input types to a dictionary containing
+            interaction_id: The interaction id.
+            solution_dict: The Solution dict.
+            conversion_fn: The function to be used for converting the HTML.
+            html_field_types_to_rule_specs: A dictionary that specifies
+                the locations of html fields in rule specs. It is defined
+                as a mapping of rule input types to a dictionary containing
                 interaction id, format, and rule types. See
                 html_field_types_to_rule_specs_state_v41.json for an example.
-            interaction_spec: dict. The specification for the interaction.
+            interaction_spec: The specification for the interaction.
 
         Returns:
-            dict. The converted Solution dict.
+            The converted Solution dict.
 
         Raises:
             Exception. The Solution dict has an invalid answer type.
@@ -731,22 +724,19 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """Initializes a InteractionInstance domain object.
 
         Args:
-            interaction_id: Optional[str]. The interaction id.
-            customization_args: dict. The customization dict. The keys are
+            interaction_id: The interaction id.
+            customization_args: The customization dict. The keys are
                 names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
-            answer_groups: list(AnswerGroup). List of answer groups of the
-                interaction instance.
-            default_outcome: Optional[Outcome]. The default outcome of the
-                interaction instance, or None if no default outcome exists
-                for the interaction.
-            confirmed_unclassified_answers: list(*). List of answers which have
-                been confirmed to be associated with the default outcome.
-            hints: list(Hint). List of hints for this interaction.
-            solution: Solution|None. A possible solution for the question asked
-                in this interaction, or None if no solution exists for the
-                interaction.
+            answer_groups: List of answer groups of the interaction instance.
+            default_outcome: The default outcome of the interaction instance,
+                or None if no default outcome exists for the interaction.
+            confirmed_unclassified_answers: List of answers which have been
+                confirmed to be associated with the default outcome.
+            hints: List of hints for this interaction.
+            solution: A possible solution for the question asked in this
+                interaction, or None if no solution exists for the interaction.
         """
         self.id = interaction_id
         # Customization args for the interaction's view. Parts of these
@@ -767,7 +757,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """Get all translatable fields/objects in the interaction instance.
 
         Returns:
-            translatable_contents_collection: TranslatableContentsCollection.
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
@@ -804,7 +793,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """Returns a dict representing this InteractionInstance domain object.
 
         Returns:
-            dict. A dict mapping all fields of InteractionInstance instance.
+            A dict mapping all fields of InteractionInstance instance.
         """
 
         # customization_args_dict here indicates a dict that maps customization
@@ -843,12 +832,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """Return a InteractionInstance domain object from a dict.
 
         Args:
-            interaction_dict: dict. The dict representation of
-                InteractionInstance object.
+            interaction_dict: The dict representation of InteractionInstance
+                object.
 
         Returns:
-            InteractionInstance. The corresponding InteractionInstance domain
-            object.
+            The corresponding InteractionInstance domain object.
         """
         default_outcome_dict = (
             Outcome.from_dict(interaction_dict['default_outcome'])
@@ -886,7 +874,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         this interaction, it is assumed to not be terminal.
 
         Returns:
-            bool. Whether the interaction is terminal.
+            Whether the interaction is terminal.
         """
         return bool(
             self.id and interaction_registry.Registry.get_interaction_by_id(
@@ -899,7 +887,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """Determines if this interaction type is linear.
 
         Returns:
-            bool. Whether the interaction is linear.
+            Whether the interaction is linear.
         """
         return interaction_registry.Registry.get_interaction_by_id(
             self.id).is_linear
@@ -909,7 +897,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         supported by the Android app.
 
         Returns:
-            bool. Whether the interaction is supported by the Android app.
+            Whether the interaction is supported by the Android app.
         """
         return (
             self.id is None or
@@ -923,11 +911,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         hints and solution is supported by Android app.
 
         Args:
-            require_valid_component_names: function. Function to check
-                whether the RTE tags in the html string are whitelisted.
+            require_valid_component_names: Function to check whether the RTE
+                tags in the html string are whitelisted.
 
         Returns:
-            bool. Whether the RTE content is valid.
+            Whether the RTE content is valid.
         """
         for answer_group in self.answer_groups:
             if require_valid_component_names(
@@ -957,7 +945,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         consideration every answer group and the default outcome.
 
         Returns:
-            list(Outcome). List of all outcomes of this interaction.
+            List of all outcomes of this interaction.
         """
         outcomes = []
         for answer_group in self.answer_groups:
@@ -978,12 +966,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """Sets the lower and upper bounds for the range_var.
 
         Args:
-            range_var: RangeVariableDict. Variable used to keep track of each
-                range.
-            lower_bound: float. The lower bound.
-            upper_bound: float. The upper bound.
-            lb_inclusive: bool. If lower bound is inclusive.
-            ub_inclusive: bool. If upper bound is inclusive.
+            range_var: Variable used to keep track of each range.
+            lower_bound: The lower bound.
+            upper_bound: The upper bound.
+            lb_inclusive: If lower bound is inclusive.
+            ub_inclusive: If upper bound is inclusive.
         """
         range_var['lower_bound'] = lower_bound
         range_var['upper_bound'] = upper_bound
@@ -997,14 +984,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         `base_range` variable.
 
         Args:
-            test_range: RangeVariableDictDict. It represents the variable for
-                which we have to check the range.
-            base_range: RangeVariableDictDict. It is the variable to which
-                the range is compared.
+            test_range: It represents the variable for which we have to check
+                the range.
+            base_range: It is the variable to which the range is compared.
 
         Returns:
-            bool. Returns True if test_range lies
-            within base_range.
+            Returns True if test_range lies within base_range.
         """
         if (
             base_range['lower_bound'] is None or
@@ -1037,11 +1022,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         to check for range enclosure.
 
         Args:
-            earlier_rule: RuleSpec. Previous rule.
-            later_rule: RuleSpec. Current rule.
+            earlier_rule: Previous rule.
+            later_rule: Current rule.
 
         Returns:
-            bool. Returns True if the rules passes the range criteria check.
+            Returns True if the rules passes the range criteria check.
         """
         if earlier_rule.rule_type in (
             'HasDenominatorEqualTo', 'IsEquivalentTo', 'IsLessThan',
@@ -1060,10 +1045,10 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         that we can keep track of rule's range.
 
         Args:
-            rule_spec: RuleSpec. Rule spec of an answer group.
+            rule_spec: Rule spec of an answer group.
 
         Returns:
-            rule_value_f: float. The value of the rule spec.
+            The value of the rule spec.
         """
         rule_value_f = rule_spec.inputs['f']
         value: float = (
@@ -1822,11 +1807,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """Validates various properties of the InteractionInstance.
 
         Args:
-            exp_param_specs_dict: dict. A dict of specified parameters used in
+            exp_param_specs_dict: A dict of specified parameters used in
                 the exploration. Keys are parameter names and values are
                 ParamSpec value objects with an object type property(obj_type).
                 Is used to validate AnswerGroup objects.
-            tagged_skill_misconception_id_required: bool. The 'tagged_skill_
+            tagged_skill_misconception_id_required: The 'tagged_skill_
                 misconception_id' is required or not.
 
         Raises:
@@ -1961,12 +1946,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             - confirmed_unclassified_answers: empty list;
 
         Args:
-            default_dest_state_name: str|None. The default destination state, or
+            default_dest_state_name: The default destination state, or
                 None if no default destination is provided.
 
         Returns:
-            InteractionInstance. The corresponding InteractionInstance domain
-            object with default values.
+            The corresponding InteractionInstance domain object with default
+            values.
         """
         default_outcome = Outcome(
             default_dest_state_name,
@@ -1981,7 +1966,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """Get all html content strings in the interaction.
 
         Returns:
-            list(str). The list of all html content strings in the interaction.
+            The list of all html content strings in the interaction.
 
         Raises:
             Exception. The solution has invalid type.
@@ -2057,13 +2042,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         according to the conversion function.
 
         Args:
-            interaction_dict: dict. The interaction dict.
-            ca_specs_dict: dict. The customization args dict.
-            conversion_fn: function. The function to be used for converting the
-                HTML.
+            interaction_dict: The interaction dict.
+            ca_specs_dict: The customization args dict.
+            conversion_fn: The function to be used for converting the HTML.
 
         Returns:
-            dict. The converted interaction dict.
+            The converted interaction dict.
         """
         def wrapped_conversion_fn(
             value: SubtitledHtml, schema_obj_type: str
@@ -2071,16 +2055,16 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             """Applies the conversion function to the SubtitledHtml values.
 
             Args:
-                value: SubtitledHtml|SubtitledUnicode. The value in the
-                    customization argument value to be converted.
-                schema_obj_type: str. The schema obj_type for the customization
+                value: The value in the customization argument value to be
+                    converted.
+                schema_obj_type: The schema obj_type for the customization
                     argument value, which is one of 'SubtitledUnicode' or
                     'SubtitledHtml'.
 
             Returns:
-                SubtitledHtml|SubtitledUnicode. The converted SubtitledHtml
-                object, if schema_type is 'SubititledHtml', otherwise the
-                unmodified SubtitledUnicode object.
+                The converted SubtitledHtml object, if schema_type is
+                'SubititledHtml', otherwise the unmodified SubtitledUnicode
+                object.
             """
             if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
                 value.html = conversion_fn(value.html)
@@ -2129,15 +2113,15 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         InteractionCustomizationArg domain object.
 
         Args:
-            interaction_id: str. The interaction id.
-            customization_args_dict: dict. A dictionary of customization
-                argument name to a customization argument dict, which is a dict
-                of the single key 'value' to the value of the customization
-                argument.
-            state_schema_version: int. The state schema version.
+            interaction_id: The interaction id.
+            customization_args_dict: A dictionary of customization
+                argument name to a customization argument dict, which
+                is a dict of the single key 'value' to the value of
+                the customization argument.
+            state_schema_version: The state schema version.
 
         Returns:
-            dict. A dictionary of customization argument names to the
+            A dictionary of customization argument names to the
             InteractionCustomizationArg domain object's.
         """
         all_interaction_ids = (
@@ -2182,8 +2166,8 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         """Initializes a InteractionCustomizationArg domain object.
 
         Args:
-            value: *. The value of the interaction customization argument.
-            schema: dict. The schema defining the specification of the value.
+            value: The value of the interaction customization argument.
+            schema: The schema defining the specification of the value.
         """
         self.value = value
         self.schema = schema
@@ -2195,7 +2179,6 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         args.
 
         Returns:
-            translatable_contents_collection: TranslatableContentsCollection.
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
@@ -2248,15 +2231,14 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             SubtitledHtml dicts and SubtitledUnicode to SubtitledUnicode dicts.
 
             Args:
-                ca_value: SubtitledHtml|SubtitledUnicode. A SubtitledUnicode or
-                    SubtitledHtml value found inside the customization
-                    argument value.
-                unused_schema_obj_type: str. The schema obj_type for the
-                    customization argument value, which is one
-                    of 'SubtitledUnicode' or 'SubtitledHtml'.
+                ca_value: A SubtitledUnicode or SubtitledHtml value found
+                    inside the customization argument value.
+                unused_schema_obj_type: The schema obj_type for the
+                    customization argument value, which is one of
+                    'SubtitledUnicode' or 'SubtitledHtml'.
 
             Returns:
-                dict. The customization argument value converted to a dict.
+                The customization argument value converted to a dict.
             """
             return ca_value.to_dict()
 
@@ -2281,14 +2263,12 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         unicode to SubtitledUnicode and html to SubtitledHtml where appropriate.
 
         Args:
-            ca_dict: dict. The customization argument dictionary. A dict of the
+            ca_dict: The customization argument dictionary. A dict of the
                 single key 'value' to the value of the customization argument.
-            ca_schema: dict. The schema that defines the customization argument
-                value.
+            ca_schema: The schema that defines the customization argument value.
 
         Returns:
-            InteractionCustomizationArg. The customization argument domain
-            object.
+            The customization argument domain object.
         """
         @overload
         def convert_content_to_domain_obj(
@@ -2309,13 +2289,13 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             SubtitledHtml and SubtitledUnicode dicts to SubtitledUnicode.
 
             Args:
-                ca_value: dict. Value of customization argument.
-                schema_obj_type: str. The schema obj_type for the customization
+                ca_value: Value of customization argument.
+                schema_obj_type: The schema obj_type for the customization
                     argument value, which is one of 'SubtitledUnicode' or
                     'SubtitledHtml'.
 
             Returns:
-                dict. The unmodified customization argument value.
+                The unmodified customization argument value.
             """
             if (
                     schema_obj_type ==
@@ -2343,7 +2323,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         """Get all SubtitledUnicode(s) in the customization argument.
 
         Returns:
-            list(SubtitledUnicode). A list of SubtitledUnicode.
+            A list of SubtitledUnicode.
         """
         return InteractionCustomizationArg.traverse_by_schema_and_get(
             self.schema,
@@ -2356,7 +2336,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         """Get all SubtitledHtml(s) in the customization argument.
 
         Returns:
-            list(SubtitledHtml). A list of SubtitledHtml.
+            A list of SubtitledHtml.
         """
         return InteractionCustomizationArg.traverse_by_schema_and_get(
             self.schema,
@@ -2370,7 +2350,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         customization argument.
 
         Returns:
-            list(str). A list of content_ids.
+            A list of content_ids.
         """
         return InteractionCustomizationArg.traverse_by_schema_and_get(
             self.schema,
@@ -2384,7 +2364,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         """Get all html from SubtitledHtml in the customization argument.
 
         Returns:
-            list(str). All html strings in the customization argument.
+            All html strings in the customization argument.
         """
 
         return InteractionCustomizationArg.traverse_by_schema_and_get(
@@ -2428,18 +2408,18 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         customization argument value.
 
         Args:
-            schema: dict. The customization dict to be modified: dict
-                with a single key, 'value', whose corresponding value is the
-                value of the customization arg.
-            value: dict. The current nested customization argument value to be
+            schema: The customization dict to be modified: dict
+                with a single key, 'value', whose corresponding value
+                is the value of the customization arg.
+            value: The current nested customization argument value to be
                 modified.
-            conversion_fn: function. The function to be used for converting the
+            conversion_fn: The function to be used for converting the
                 content. It is passed the customization argument value and
                 schema obj_type, which is one of 'SubtitledUnicode' or
                 'SubtitledHtml'.
 
         Returns:
-            dict. The converted customization dict.
+            The converted customization dict.
         """
         is_subtitled_html_spec = (
             schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
@@ -2489,25 +2469,26 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         extracting the value using a value_extractor function.
 
         Args:
-            schema: dict. The customization dict to be modified: dict
-                with a single key, 'value', whose corresponding value is the
-                value of the customization arg.
-            value: dict. The current nested customization argument value to be
+            schema: The customization dict to be modified: dict
+                with a single key, 'value', whose corresponding
+                value is the value of the customization arg.
+            value: The current nested customization argument value to be
                 modified.
-            obj_types_to_search_for: list(str). The obj types to search for. If
-                this list contains the current obj type, the value is passed to
-                value_extractor and the results are collected.
-            value_extractor: function. The function that extracts the wanted
-                computed value from each value that matches the obj_types. It
-                accepts one parameter, the value that matches the search object
-                type, and returns a desired computed value.
+            obj_types_to_search_for: The obj types to search for. If
+                this list contains the current obj type, the value is
+                passed to value_extractor and the results are collected.
+            value_extractor: The function that extracts the wanted
+                computed value from each value that matches the obj_types.
+                It accepts one parameter, the value that matches the search
+                object type, and returns a desired computed value.
 
         Returns:
-            list(*). A list of the extracted values returned from
-            value_extractor, which is run on any values that have a schema type
-            equal to 'custom' and have a obj_type in obj_types_to_search_for.
-            Because value_extractor can return any type, the result is a list of
-            any type.
+            A list of the extracted values returned from
+            value_extractor, which is run on any values that
+            have a schema type equal to 'custom' and have a
+            obj_type in obj_types_to_search_for. Because
+            value_extractor can return any type, the result
+            is a list of any type.
         """
         result = []
         schema_type = schema['type']
@@ -2546,14 +2527,13 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         InteractionCustomizationArg domain object.
 
         Args:
-            ca_dict: dict. A dictionary of customization
-                argument name to a customization argument dict, which is a dict
-                of the single key 'value' to the value of the customization
-                argument.
-            ca_specs_dict: dict. A dictionary of customization argument specs.
+            ca_dict: A dictionary of customization argument name to a
+                customization argument dict, which is a dict of the single
+                key 'value' to the value of the customization argument.
+            ca_specs_dict: A dictionary of customization argument specs.
 
         Returns:
-            dict. A dictionary of customization argument names to the
+            A dictionary of customization argument names to the
             InteractionCustomizationArg domain object's.
         """
         return {
@@ -2597,23 +2577,21 @@ class Outcome(translation_domain.BaseTranslatableObject):
         """Initializes a Outcome domain object.
 
         Args:
-            dest: str. The name of the destination state.
-            dest_if_really_stuck: str or None. The name of the optional state
+            dest: The name of the destination state.
+            dest_if_really_stuck: The name of the optional state
                 to redirect the learner to strengthen their concepts.
-            feedback: SubtitledHtml. Feedback to give to the user if this rule
-                is triggered.
-            labelled_as_correct: bool. Whether this outcome has been labelled
+            feedback: Feedback to give to the user if this rule is triggered.
+            labelled_as_correct: Whether this outcome has been labelled
                 by the creator as corresponding to a "correct" answer.
-            param_changes: list(ParamChange). List of exploration-level
-                parameter changes to make if this rule is triggered.
-            refresher_exploration_id: str or None. An optional exploration ID
-                to redirect the learner to if they seem to lack understanding
-                of a prerequisite concept. This should only exist if the
-                destination state for this outcome is a self-loop.
-            missing_prerequisite_skill_id: str or None. The id of the skill that
-                this answer group tests. If this is not None, the exploration
-                player would redirect to this skill when a learner receives this
-                outcome.
+            param_changes: List of exploration-level parameter changes to make
+                if this rule is triggered.
+            refresher_exploration_id: An optional exploration ID to redirect the
+                learner to if they seem to lack understanding of a prerequisite
+                concept. This should only exist if the destination state for
+                this outcome is a self-loop.
+            missing_prerequisite_skill_id: The id of the skill that this answer
+                group tests. If this is not None, the exploration player would
+                redirect to this skill when a learner receives this outcome.
         """
         # Id of the destination state.
         # TODO(sll): Check that this state actually exists.
@@ -2643,7 +2621,6 @@ class Outcome(translation_domain.BaseTranslatableObject):
         """Get all translatable fields/objects in the outcome.
 
         Returns:
-            translatable_contents_collection: TranslatableContentsCollection.
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
@@ -2659,7 +2636,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
         """Returns a dict representing this Outcome domain object.
 
         Returns:
-            dict. A dict, mapping all fields of Outcome instance.
+            A dict, mapping all fields of Outcome instance.
         """
         return {
             'dest': self.dest,
@@ -2677,10 +2654,10 @@ class Outcome(translation_domain.BaseTranslatableObject):
         """Return a Outcome domain object from a dict.
 
         Args:
-            outcome_dict: dict. The dict representation of Outcome object.
+            outcome_dict: The dict representation of Outcome object.
 
         Returns:
-            Outcome. The corresponding Outcome domain object.
+            The corresponding Outcome domain object.
         """
         feedback = SubtitledHtml.from_dict(outcome_dict['feedback'])
         feedback.validate()
@@ -2737,12 +2714,11 @@ class Outcome(translation_domain.BaseTranslatableObject):
         according to the conversion function.
 
         Args:
-            outcome_dict: dict. The outcome dict.
-            conversion_fn: function. The function to be used for converting the
-                HTML.
+            outcome_dict: The outcome dict.
+            conversion_fn: The function to be used for converting the HTML.
 
         Returns:
-            dict. The converted outcome dict.
+            The converted outcome dict.
         """
         outcome_dict['feedback']['html'] = (
             conversion_fn(outcome_dict['feedback']['html']))
@@ -2765,7 +2741,7 @@ class Voiceover:
         """Returns a dict representing this Voiceover domain object.
 
         Returns:
-            dict. A dict, mapping all fields of Voiceover instance.
+            A dict, mapping all fields of Voiceover instance.
         """
         return {
             'filename': self.filename,
@@ -2779,11 +2755,10 @@ class Voiceover:
         """Return a Voiceover domain object from a dict.
 
         Args:
-            voiceover_dict: dict. The dict representation of
-                Voiceover object.
+            voiceover_dict: The dict representation of Voiceover object.
 
         Returns:
-            Voiceover. The corresponding Voiceover domain object.
+            The corresponding Voiceover domain object.
         """
         return cls(
             voiceover_dict['filename'],
@@ -2801,13 +2776,12 @@ class Voiceover:
         """Initializes a Voiceover domain object.
 
         Args:
-            filename: str. The corresponding voiceover file path.
-            file_size_bytes: int. The file size, in bytes. Used to display
-                potential bandwidth usage to the learner before they download
-                the file.
-            needs_update: bool. Whether voiceover is marked for needing review.
-            duration_secs: float. The duration in seconds for the voiceover
-                recording.
+            filename: The corresponding voiceover file path.
+            file_size_bytes: The file size, in bytes. Used to display
+                potential bandwidth usage to the learner before they
+                download the file.
+            needs_update: Whether voiceover is marked for needing review.
+            duration_secs: The duration in seconds for the voiceover recording.
         """
         # str. The corresponding audio file path, e.g.
         # "content-en-2-h7sjp8s.mp3".
@@ -2905,10 +2879,10 @@ class WrittenTranslation:
         a list type.
 
         Args:
-            data_format: str. The format of the translation.
+            data_format: The format of the translation.
 
         Returns:
-            bool. Whether the content of translation is a list.
+            Whether the content of translation is a list.
         """
         return data_format in (
             cls.DATA_FORMAT_SET_OF_NORMALIZED_STRING,
@@ -2924,13 +2898,12 @@ class WrittenTranslation:
         """Initializes a WrittenTranslation domain object.
 
         Args:
-            data_format: str. One of the keys in
+            data_format: One of the keys in
                 DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE. Indicates the
                 type of the field (html, unicode, etc.).
-            translation: str|list(str). A user-submitted string or list of
-                strings that matches the given data format.
-            needs_update: bool. Whether the translation is marked as needing
-                review.
+            translation: A user-submitted string or list of strings that
+                matches the given data format.
+            needs_update: Whether the translation is marked as needing review.
         """
         self.data_format = data_format
         self.translation = translation
@@ -2940,7 +2913,7 @@ class WrittenTranslation:
         """Returns a dict representing this WrittenTranslation domain object.
 
         Returns:
-            dict. A dict, mapping all fields of WrittenTranslation instance.
+            A dict, mapping all fields of WrittenTranslation instance.
         """
         return {
             'data_format': self.data_format,
@@ -2955,12 +2928,11 @@ class WrittenTranslation:
         """Return a WrittenTranslation domain object from a dict.
 
         Args:
-            written_translation_dict: dict. The dict representation of
+            written_translation_dict: The dict representation of
                 WrittenTranslation object.
 
         Returns:
-            WrittenTranslation. The corresponding WrittenTranslation domain
-            object.
+            The corresponding WrittenTranslation domain object.
         """
         return cls(
             written_translation_dict['data_format'],
@@ -3022,9 +2994,9 @@ class WrittenTranslations:
         """Initializes a WrittenTranslations domain object.
 
         Args:
-            translations_mapping: dict. A dict mapping the content Ids
-                to the dicts which is the map of abbreviated code of the
-                languages to WrittenTranslation objects.
+            translations_mapping: A dict mapping the content Ids
+                to the dicts which is the map of abbreviated code
+                of the languages to WrittenTranslation objects.
         """
         self.translations_mapping = translations_mapping
 
@@ -3032,7 +3004,7 @@ class WrittenTranslations:
         """Returns a dict representing this WrittenTranslations domain object.
 
         Returns:
-            dict. A dict, mapping all fields of WrittenTranslations instance.
+            A dict, mapping all fields of WrittenTranslations instance.
         """
         translations_mapping: Dict[str, Dict[str, WrittenTranslationDict]] = {}
         for (content_id, language_code_to_written_translation) in (
@@ -3055,12 +3027,11 @@ class WrittenTranslations:
         """Return a WrittenTranslations domain object from a dict.
 
         Args:
-            written_translations_dict: dict. The dict representation of
+            written_translations_dict: The dict representation of
                 WrittenTranslations object.
 
         Returns:
-            WrittenTranslations. The corresponding WrittenTranslations domain
-            object.
+            The corresponding WrittenTranslations domain object.
         """
         translations_mapping: Dict[str, Dict[str, WrittenTranslation]] = {}
         for (content_id, language_code_to_written_translation) in (
@@ -3080,10 +3051,10 @@ class WrittenTranslations:
         available in the given language.
 
         Args:
-            language_code: str. The abbreviated code of the language.
+            language_code: The abbreviated code of the language.
 
         Returns:
-            list(str). A list of content ids in which the translations are
+            A list of content ids in which the translations are
             available in the given language.
         """
         correctly_translated_content_ids = []
@@ -3105,9 +3076,9 @@ class WrittenTranslations:
         """Adds a translation for the given content id in a given language.
 
         Args:
-            content_id: str. The id of the content.
-            language_code: str. The language code of the translated html.
-            html: str. The translated html.
+            content_id: The id of the content.
+            language_code: The language code of the translated html.
+            html: The translated html.
         """
         written_translation = WrittenTranslation(
             WrittenTranslation.DATA_FORMAT_HTML, html, False)
@@ -3121,8 +3092,8 @@ class WrittenTranslations:
         language code.
 
         Args:
-            content_id: str. The id of the content.
-            language_code: str. The language code.
+            content_id: The id of the content.
+            language_code: The language code.
         """
         self.translations_mapping[content_id][language_code].needs_update = (
             True
@@ -3135,7 +3106,7 @@ class WrittenTranslations:
         languages.
 
         Args:
-            content_id: str. The id of the content.
+            content_id: The id of the content.
         """
         for (language_code, written_translation) in (
                 self.translations_mapping[content_id].items()):
@@ -3147,8 +3118,8 @@ class WrittenTranslations:
         """Validates properties of the WrittenTranslations.
 
         Args:
-            expected_content_id_list: list(str)|None. A list of content id which
-                are expected to be inside they WrittenTranslations.
+            expected_content_id_list: A list of content id which are expected to
+                be inside they WrittenTranslations.
 
         Raises:
             ValidationError. One or more attributes of the WrittenTranslations
@@ -3195,7 +3166,7 @@ class WrittenTranslations:
         """Returns a list of content_id available for text translation.
 
         Returns:
-            list(str). A list of content id available for text translation.
+            A list of content id available for text translation.
         """
         return list(sorted(self.translations_mapping.keys()))
 
@@ -3206,11 +3177,11 @@ class WrittenTranslations:
         language.
 
         Args:
-            content_id: str. The ID of the content.
-            language_code: str. The language code for the translated content.
+            content_id: The ID of the content.
+            language_code: The language code for the translated content.
 
         Returns:
-            str. The translated content for a given content id in a language.
+            The translated content for a given content id in a language.
 
         Raises:
             Exception. Translation doesn't exist in the given language.
@@ -3236,7 +3207,7 @@ class WrittenTranslations:
         content_translation dict.
 
         Args:
-            content_id: str. The id representing a subtitled html.
+            content_id: The id representing a subtitled html.
 
         Raises:
             Exception. The content id isn't a string.
@@ -3254,7 +3225,7 @@ class WrittenTranslations:
         """Deletes a content id from the content_translation dict.
 
         Args:
-            content_id: str. The id representing a subtitled html.
+            content_id: The id representing a subtitled html.
 
         Raises:
             Exception. The content id isn't a string.
@@ -3272,7 +3243,7 @@ class WrittenTranslations:
         """Gets all html content strings used in the WrittenTranslations.
 
         Returns:
-            list(str). The list of html content strings.
+            The list of html content strings.
         """
         html_string_list = []
         for translations in self.translations_mapping.values():
@@ -3294,12 +3265,11 @@ class WrittenTranslations:
         according to the conversion function.
 
         Args:
-            written_translations_dict: dict. The written translations dict.
-            conversion_fn: function. The function to be used for converting the
-                HTML.
+            written_translations_dict: The written translations dict.
+            conversion_fn: The function to be used for converting the HTML.
 
         Returns:
-            dict. The converted written translations dict.
+            The converted written translations dict.
         """
         for content_id, language_code_to_written_translation in (
                 written_translations_dict['translations_mapping'].items()):
@@ -3363,9 +3333,9 @@ class RecordedVoiceovers:
         """Initializes a RecordedVoiceovers domain object.
 
         Args:
-            voiceovers_mapping: dict. A dict mapping the content Ids
-                to the dicts which is the map of abbreviated code of the
-                languages to the Voiceover objects.
+            voiceovers_mapping: A dict mapping the content Ids
+                to the dicts which is the map of abbreviated
+                code of the languages to the Voiceover objects.
         """
         self.voiceovers_mapping = voiceovers_mapping
 
@@ -3373,7 +3343,7 @@ class RecordedVoiceovers:
         """Returns a dict representing this RecordedVoiceovers domain object.
 
         Returns:
-            dict. A dict, mapping all fields of RecordedVoiceovers instance.
+            A dict, mapping all fields of RecordedVoiceovers instance.
         """
         voiceovers_mapping: Dict[str, Dict[str, VoiceoverDict]] = {}
         for (content_id, language_code_to_voiceover) in (
@@ -3396,12 +3366,11 @@ class RecordedVoiceovers:
         """Return a RecordedVoiceovers domain object from a dict.
 
         Args:
-            recorded_voiceovers_dict: dict. The dict representation of
+            recorded_voiceovers_dict: The dict representation of
                 RecordedVoiceovers object.
 
         Returns:
-            RecordedVoiceovers. The corresponding RecordedVoiceovers domain
-            object.
+            The corresponding RecordedVoiceovers domain object.
         """
         voiceovers_mapping: Dict[str, Dict[str, Voiceover]] = {}
         for (content_id, language_code_to_voiceover) in (
@@ -3418,7 +3387,7 @@ class RecordedVoiceovers:
         """Validates properties of the RecordedVoiceovers.
 
         Args:
-            expected_content_id_list: list(str)|None. A list of content id which
+            expected_content_id_list: A list of content id which
                 are expected to be inside the RecordedVoiceovers.
 
         Raises:
@@ -3463,7 +3432,7 @@ class RecordedVoiceovers:
         """Returns a list of content_id available for voiceover.
 
         Returns:
-            list(str). A list of content id available for voiceover.
+            A list of content id available for voiceover.
         """
         return list(self.voiceovers_mapping.keys())
 
@@ -3477,7 +3446,7 @@ class RecordedVoiceovers:
         voiceovers_mapping dict.
 
         Args:
-            content_id: str. The id representing a subtitled html.
+            content_id: The id representing a subtitled html.
 
         Raises:
             Exception. The content id isn't a string.
@@ -3497,7 +3466,7 @@ class RecordedVoiceovers:
         """Deletes a content id from the voiceovers_mapping dict.
 
         Args:
-            content_id: str. The id representing a subtitled html.
+            content_id: The id representing a subtitled html.
 
         Raises:
             Exception. The content id isn't a string.
@@ -3532,10 +3501,10 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         """Initializes a RuleSpec domain object.
 
         Args:
-            rule_type: str. The rule type, e.g. "CodeContains" or "Equals". A
+            rule_type: The rule type, e.g. "CodeContains" or "Equals". A
                 full list of rule types can be found in
                 extensions/interactions/rule_templates.json.
-            inputs: dict. The values of the parameters needed in order to fully
+            inputs: The values of the parameters needed in order to fully
                 specify the rule. The keys for this dict can be deduced from
                 the relevant description field in
                 extensions/interactions/rule_templates.json -- they are
@@ -3553,7 +3522,6 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         """Get all translatable fields/objects in the rule spec.
 
         Returns:
-            translatable_contents_collection: TranslatableContentsCollection.
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
@@ -3578,7 +3546,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         """Returns a dict representing this RuleSpec domain object.
 
         Returns:
-            dict. A dict, mapping all fields of RuleSpec instance.
+            A dict, mapping all fields of RuleSpec instance.
         """
         return {
             'rule_type': self.rule_type,
@@ -3590,10 +3558,10 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         """Return a RuleSpec domain object from a dict.
 
         Args:
-            rulespec_dict: dict. The dict representation of RuleSpec object.
+            rulespec_dict: The dict representation of RuleSpec object.
 
         Returns:
-            RuleSpec. The corresponding RuleSpec domain object.
+            The corresponding RuleSpec domain object.
         """
         return cls(
             rulespec_dict['rule_type'],
@@ -3610,14 +3578,14 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         for all the parameters the rule expects.
 
         Args:
-            rule_params_list: list(str, object(*)). A list of parameters used by
-                the rule represented by this RuleSpec instance, to be used to
-                validate the inputs of this RuleSpec. Each element of the list
-                represents a single parameter and is a tuple with two elements:
+            rule_params_list: A list of parameters used by the rule represented
+                by this RuleSpec instance, to be used to validate the inputs of
+                this RuleSpec. Each element of the list represents a single
+                parameter and is a tuple with two elements:
                     0: The name (string) of the parameter.
                     1: The typed object instance for that
                         parameter (e.g. Real).
-            exp_param_specs_dict: dict. A dict of specified parameters used in
+            exp_param_specs_dict: A dict of specified parameters used in
                 this exploration. Keys are parameter names and values are
                 ParamSpec value objects with an object type property (obj_type).
                 RuleSpec inputs may have a parameter value which refers to one
@@ -3685,17 +3653,16 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         to the conversion function.
 
         Args:
-            rule_spec_dict: dict. The Rule Spec dict.
-            conversion_fn: function. The function to be used for converting the
-                HTML.
-            html_field_types_to_rule_specs: dict. A dictionary that specifies
-                the locations of html fields in rule specs. It is defined as a
-                mapping of rule input types to a dictionary containing
+            rule_spec_dict: The Rule Spec dict.
+            conversion_fn: The function to be used for converting the HTML.
+            html_field_types_to_rule_specs: A dictionary that specifies
+                the locations of html fields in rule specs. It is defined
+                as a mapping of rule input types to a dictionary containing
                 interaction id, format, and rule types. See
                 html_field_types_to_rule_specs_state_v41.json for an example.
 
         Returns:
-            dict. The converted Rule Spec dict.
+            The converted Rule Spec dict.
 
         Raises:
             Exception. The Rule spec has an invalid format.
@@ -3817,11 +3784,11 @@ class SubtitledHtml:
         cleaning of the html.
 
         Args:
-            content_id: str. A unique id referring to the other assets for this
+            content_id: A unique id referring to the other assets for this
                 content.
-            html: str. A piece of user-submitted HTML. Note that this is NOT
-                cleaned in such a way as to contain a restricted set of HTML
-                tags. To clean it, the validate() method must be called.
+            html: A piece of user-submitted HTML. Note that this is NOT
+                cleaned in such a way as to contain a restricted set of
+                HTML tags. To clean it, the validate() method must be called.
         """
         self.content_id = content_id
         self.html = html
@@ -3830,7 +3797,7 @@ class SubtitledHtml:
         """Returns a dict representing this SubtitledHtml domain object.
 
         Returns:
-            dict. A dict, mapping all fields of SubtitledHtml instance.
+            A dict, mapping all fields of SubtitledHtml instance.
         """
         return {
             'content_id': self.content_id,
@@ -3842,11 +3809,11 @@ class SubtitledHtml:
         """Return a SubtitledHtml domain object from a dict.
 
         Args:
-            subtitled_html_dict: dict. The dict representation of SubtitledHtml
+            subtitled_html_dict: The dict representation of SubtitledHtml
                 object.
 
         Returns:
-            SubtitledHtml. The corresponding SubtitledHtml domain object.
+            The corresponding SubtitledHtml domain object.
         """
         return cls(
             subtitled_html_dict['content_id'], subtitled_html_dict['html'])
@@ -3877,11 +3844,11 @@ class SubtitledHtml:
         """Create a default SubtitledHtml domain object.
 
         Args:
-            content_id: str. The id of the content.
+            content_id: The id of the content.
 
         Returns:
-            SubtitledHtml. A default SubtitledHtml domain object, some
-            attribute of that object will be ''.
+            A default SubtitledHtml domain object, some attribute of that
+            object will be ''.
         """
         return cls(content_id, '')
 
@@ -3900,9 +3867,9 @@ class SubtitledUnicode:
         """Initializes a SubtitledUnicode domain object.
 
         Args:
-            content_id: str. A unique id referring to the other assets for this
+            content_id: A unique id referring to the other assets for this
                 content.
-            unicode_str: str. A piece of user-submitted unicode.
+            unicode_str: A piece of user-submitted unicode.
         """
         self.content_id = content_id
         self.unicode_str = unicode_str
@@ -3912,7 +3879,7 @@ class SubtitledUnicode:
         """Returns a dict representing this SubtitledUnicode domain object.
 
         Returns:
-            dict. A dict, mapping all fields of SubtitledUnicode instance.
+            A dict, mapping all fields of SubtitledUnicode instance.
         """
         return {
             'content_id': self.content_id,
@@ -3926,11 +3893,11 @@ class SubtitledUnicode:
         """Return a SubtitledUnicode domain object from a dict.
 
         Args:
-            subtitled_unicode_dict: dict. The dict representation of
+            subtitled_unicode_dict: The dict representation of
                 SubtitledUnicode object.
 
         Returns:
-            SubtitledUnicode. The corresponding SubtitledUnicode domain object.
+            The corresponding SubtitledUnicode domain object.
         """
         return cls(
             subtitled_unicode_dict['content_id'],
@@ -3960,10 +3927,10 @@ class SubtitledUnicode:
         """Create a default SubtitledUnicode domain object.
 
         Args:
-            content_id: str. The id of the content.
+            content_id: The id of the content.
 
         Returns:
-            SubtitledUnicode. A default SubtitledUnicode domain object.
+            A default SubtitledUnicode domain object.
         """
         return cls(content_id, '')
 
@@ -4003,13 +3970,13 @@ class TranslatableItem:
         """Initializes a TranslatableItem domain object.
 
         Args:
-            content: str|list(str). The translatable content text.
-            data_format: str. The data format of the translatable content.
-            content_type: str. One of `Content`, `Interaction`, ‘Rule`,
+            content: The translatable content text.
+            data_format: The data format of the translatable content.
+            content_type: One of `Content`, `Interaction`, ‘Rule`,
                 `Feedback`, `Hint`, `Solution`.
-            interaction_id: str|None. Interaction ID, e.g. `TextInput`, if the
+            interaction_id: Interaction ID, e.g. `TextInput`, if the
                 content corresponds to an InteractionInstance, else None.
-            rule_type: str|None. Rule type if content_type == `Rule`, e.g.
+            rule_type: Rule type if content_type == `Rule`, e.g.
                 “Equals”, “IsSubsetOf”, “Contains” else None.
         """
         self.content = content
@@ -4022,7 +3989,7 @@ class TranslatableItem:
         """Returns a dict representing this TranslatableItem domain object.
 
         Returns:
-            dict. A dict, mapping all fields of TranslatableItem instance.
+            A dict, mapping all fields of TranslatableItem instance.
         """
         return {
             'content': self.content,
@@ -4037,7 +4004,7 @@ class TranslatableItem:
         strings.
 
         Returns:
-            bool. Whether the data format of the translatable content is set of
+            Whether the data format of the translatable content is set of
             strings.
         """
         return self.data_format in [
@@ -4097,27 +4064,23 @@ class State(translation_domain.BaseTranslatableObject):
         """Initializes a State domain object.
 
         Args:
-            content: SubtitledHtml. The contents displayed to the reader in this
-                state.
-            param_changes: list(ParamChange). Parameter changes associated with
-                this state.
-            interaction: InteractionInstance. The interaction instance
-                associated with this state.
-            recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
-                the state contents and translations.
-            written_translations: WrittenTranslations. The written translations
-                for the state contents.
-            solicit_answer_details: bool. Whether the creator wants to ask
-                for answer details from the learner about why they picked a
-                particular answer while playing the exploration.
-            card_is_checkpoint: bool. If the card is marked as a checkpoint by
-                the creator or not.
-            next_content_id_index: int. The next content_id index to use for
+            content: The contents displayed to the reader in this state.
+            param_changes: Parameter changes associated with this state.
+            interaction: The interaction instance associated with this state.
+            recorded_voiceovers: The recorded voiceovers for the state contents
+                and translations.
+            written_translations: The written translations for the state
+                contents.
+            solicit_answer_details: Whether the creator wants to ask
+                for answer details from the learner about why they
+                picked a particular answer while playing the exploration.
+            card_is_checkpoint: If the card is marked as a checkpoint by the
+                creator or not.
+            next_content_id_index: The next content_id index to use for
                 generation of new content_ids.
-            linked_skill_id: str or None. The linked skill ID associated with
-                this state.
-            classifier_model_id: str or None. The classifier model ID
-                associated with this state, if applicable.
+            linked_skill_id: The linked skill ID associated with this state.
+            classifier_model_id: The classifier model ID associated with this
+                state, if applicable.
         """
         # The content displayed to the reader in this state.
         self.content = content
@@ -4146,7 +4109,6 @@ class State(translation_domain.BaseTranslatableObject):
         """Get all translatable fields/objects in the state.
 
         Returns:
-            translatable_contents_collection: TranslatableContentsCollection.
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
@@ -4170,14 +4132,14 @@ class State(translation_domain.BaseTranslatableObject):
         """Validates various properties of the State.
 
         Args:
-            exp_param_specs_dict: dict or None. A dict of specified parameters
-                used in this exploration. Keys are parameter names and values
-                are ParamSpec value objects with an object type
-                property(obj_type). It is None if the state belongs to a
-                question.
-            allow_null_interaction: bool. Whether this state's interaction is
+            exp_param_specs_dict: A dict of specified parameters
+                used in this exploration. Keys are parameter names
+                and values are ParamSpec value objects with an object
+                type property(obj_type). It is None if the state belongs
+                to a question.
+            allow_null_interaction: Whether this state's interaction is
                 allowed to be unspecified.
-            tagged_skill_misconception_id_required: bool. The 'tagged_skill_
+            tagged_skill_misconception_id_required: The 'tagged_skill_
                 misconception_id' is required or not.
 
         Raises:
@@ -4302,10 +4264,10 @@ class State(translation_domain.BaseTranslatableObject):
         """Returns the content belongs to a given content id of the object.
 
         Args:
-            content_id: str. The id of the content.
+            content_id: The id of the content.
 
         Returns:
-            str. The html content corresponding to the given content id.
+            The html content corresponding to the given content id.
 
         Raises:
             ValueError. The given content_id does not exist.
@@ -4321,17 +4283,17 @@ class State(translation_domain.BaseTranslatableObject):
         Android.
 
         Returns:
-            bool. Whether the RTE components in the state is valid.
+            Whether the RTE components in the state is valid.
         """
         def require_valid_component_names(html: str) -> bool:
             """Checks if the provided html string contains only whitelisted
             RTE tags.
 
             Args:
-                html: str. The html string.
+                html: The html string.
 
             Returns:
-                bool. Whether all RTE tags in the html are whitelisted.
+                Whether all RTE tags in the html are whitelisted.
             """
             component_name_prefix = 'oppia-noninteractive-'
             component_names = set(
@@ -4351,10 +4313,10 @@ class State(translation_domain.BaseTranslatableObject):
         """Retrieves training data from the State domain object.
 
         Returns:
-            list(dict). A list of dicts, each of which has two key-value pairs.
-            One pair maps 'answer_group_index' to the index of the answer
-            group and the other maps 'answers' to the answer group's
-            training data.
+            A list of dicts, each of which has two key-value pairs.
+            One pair maps 'answer_group_index' to the index of the
+            answer group and the other maps 'answers' to the answer
+            group's training data.
         """
         state_training_data_by_answer_group: List[TrainingDataDict] = []
         for (answer_group_index, answer_group) in enumerate(
@@ -4372,7 +4334,7 @@ class State(translation_domain.BaseTranslatableObject):
         for a ML model to be trained.
 
         Returns:
-            bool. True, if the conditions are satisfied.
+            True, if the conditions are satisfied.
         """
         training_examples_count = 0
         labels_count = 0
@@ -4393,12 +4355,12 @@ class State(translation_domain.BaseTranslatableObject):
         """Converts the given state dict to yaml format.
 
         Args:
-            state_dict: dict. A dict representing a state in an exploration.
-            width: int. The maximum number of characters in a line for the
+            state_dict: A dict representing a state in an exploration.
+            width: The maximum number of characters in a line for the
                 returned YAML string.
 
         Returns:
-            str. The YAML version of the state_dict.
+            The YAML version of the state_dict.
 
         Raises:
             Exception. The state dict does not represent a valid state.
@@ -4421,7 +4383,7 @@ class State(translation_domain.BaseTranslatableObject):
         per _get_all_translatable_content method.
 
         Returns:
-            dict(str, int). A dict with language code as a key and number of
+            A dict with language code as a key and number of
             translations available in that language as the value.
         """
         translation_counts: Dict[str, int] = collections.defaultdict(int)
@@ -4439,7 +4401,7 @@ class State(translation_domain.BaseTranslatableObject):
         the object.
 
         Returns:
-            int. The number of content fields available for translation in
+            The number of content fields available for translation in
             the state.
         """
         return len(self._get_all_translatable_content())
@@ -4451,12 +4413,10 @@ class State(translation_domain.BaseTranslatableObject):
         object such as recorded_voiceovers and written_translations.
 
         Args:
-            old_ids_list: list(str). A list of content ids present earlier
-                within the substructure (like answer groups, hints etc.) of
-                state.
-            new_ids_list: list(str). A list of content ids currently present
-                within the substructure (like answer groups, hints etc.) of
-                state.
+            old_ids_list: A list of content ids present earlier within the
+                substructure (like answer groups, hints etc.) of state.
+            new_ids_list: A list of content ids currently present within the
+                substructure (like answer groups, hints etc.) of state.
 
         Raises:
             Exception. The content to be deleted doesn't exist.
@@ -4501,9 +4461,9 @@ class State(translation_domain.BaseTranslatableObject):
         """Adds translation to a given content id in a specific language.
 
         Args:
-            content_id: str. The id of the content.
-            language_code: str. The language code.
-            translation_html: str. The translated html content.
+            content_id: The id of the content.
+            language_code: The language code.
+            translation_html: The translated html content.
         """
         translation_html = html_cleaner.clean(translation_html)
         self.written_translations.add_translation(
@@ -4519,10 +4479,10 @@ class State(translation_domain.BaseTranslatableObject):
         """Adds a translation for the given content id in a given language.
 
         Args:
-            content_id: str. The id of the content.
-            language_code: str. The language code of the translated html.
-            translation: str|list(str). The translated content.
-            data_format: str. The data format of the translated content.
+            content_id: The id of the content.
+            language_code: The language code of the translated html.
+            translation: The translated content.
+            data_format: The data format of the translated content.
         """
         written_translation = WrittenTranslation(
             data_format, translation, False)
@@ -4536,8 +4496,8 @@ class State(translation_domain.BaseTranslatableObject):
         language code.
 
         Args:
-            content_id: str. The id of the content.
-            language_code: str. The language code.
+            content_id: The id of the content.
+            language_code: The language code.
         """
         self.written_translations.mark_written_translation_as_needing_update(
             content_id, language_code)
@@ -4549,7 +4509,7 @@ class State(translation_domain.BaseTranslatableObject):
         languages.
 
         Args:
-            content_id: str. The id of the content.
+            content_id: The id of the content.
         """
         self.written_translations.mark_written_translations_as_needing_update(
             content_id)
@@ -4558,7 +4518,7 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the content of this state.
 
         Args:
-            content: SubtitledHtml. Representation of updated content.
+            content: Representation of updated content.
         """
         # TODO(sll): Must sanitize all content in RTE component attrs.
         self.content = content
@@ -4569,8 +4529,8 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the param_changes dict attribute.
 
         Args:
-            param_changes: list(ParamChange). List of param_change domain
-                objects that represents ParamChange domain object.
+            param_changes: List of param_change domain objects that represents
+                ParamChange domain object.
         """
         self.param_changes = param_changes
 
@@ -4578,7 +4538,7 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the interaction id attribute.
 
         Args:
-            interaction_id: str|None. The new interaction id to set.
+            interaction_id: The new interaction id to set.
         """
         if self.interaction.id:
             old_content_id_list = [
@@ -4609,7 +4569,7 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the interaction next content id index attribute.
 
         Args:
-            next_content_id_index: int. The new next content id index to set.
+            next_content_id_index: The new next content id index to set.
         """
         self.next_content_id_index = next_content_id_index
 
@@ -4617,7 +4577,7 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the state linked skill id attribute.
 
         Args:
-            linked_skill_id: str. The linked skill id to state.
+            linked_skill_id: The linked skill id to state.
         """
         self.linked_skill_id = linked_skill_id
 
@@ -4627,7 +4587,7 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the customization_args of InteractionInstance domain object.
 
         Args:
-            customization_args_dict: dict. The new customization_args to set.
+            customization_args_dict: The new customization_args to set.
 
         Raises:
             Exception. The customization arguments are not unique.
@@ -4664,8 +4624,7 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the list of AnswerGroup in InteractionInstance domain object.
 
         Args:
-            answer_groups_list: list(AnswerGroup). List of AnswerGroup domain
-                objects.
+            answer_groups_list: List of AnswerGroup domain objects.
 
         Raises:
             Exception. Type of AnswerGroup domain objects is not as expected.
@@ -4755,7 +4714,7 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the default_outcome of InteractionInstance domain object.
 
         Args:
-            default_outcome: Outcome. Object representing the new Outcome.
+            default_outcome: Object representing the new Outcome.
         """
         old_content_id_list = []
         new_content_id_list = []
@@ -4780,9 +4739,8 @@ class State(translation_domain.BaseTranslatableObject):
         domain object.
 
         Args:
-            confirmed_unclassified_answers: list(AnswerGroup). The new list of
-                answers which have been confirmed to be associated with the
-                default outcome.
+            confirmed_unclassified_answers: The new list of answers which have
+                been confirmed to be associated with the default outcome.
 
         Raises:
             Exception. Given answers is not of type list.
@@ -4798,7 +4756,7 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the list of hints.
 
         Args:
-            hints_list: list(Hint). A list of Hint objects.
+            hints_list: A list of Hint objects.
 
         Raises:
             Exception. The 'hints_list' is not a list.
@@ -4822,7 +4780,7 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the solution of interaction.
 
         Args:
-            solution: Solution|None. Object of class Solution.
+            solution: Object of class Solution.
 
         Raises:
             Exception. The 'solution' is not a domain object.
@@ -4853,8 +4811,8 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the recorded_voiceovers of a state.
 
         Args:
-            recorded_voiceovers: RecordedVoiceovers. The new RecordedVoiceovers
-                object for the state.
+            recorded_voiceovers: The new RecordedVoiceovers object for
+                the state.
         """
         self.recorded_voiceovers = recorded_voiceovers
 
@@ -4864,8 +4822,8 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the written_translations of a state.
 
         Args:
-            written_translations: WrittenTranslations. The new
-                WrittenTranslations object for the state.
+            written_translations: The new WrittenTranslations object for
+                the state.
         """
         self.written_translations = written_translations
 
@@ -4875,8 +4833,8 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the solicit_answer_details of a state.
 
         Args:
-            solicit_answer_details: bool. The new value of
-                solicit_answer_details for the state.
+            solicit_answer_details: The new value of solicit_answer_details for
+                the state.
 
         Raises:
             Exception. The argument is not of type bool.
@@ -4891,8 +4849,8 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the card_is_checkpoint field of a state.
 
         Args:
-            card_is_checkpoint: bool. The new value of
-                card_is_checkpoint for the state.
+            card_is_checkpoint: The new value of card_is_checkpoint for the
+                state.
 
         Raises:
             Exception. The argument is not of type bool.
@@ -4907,9 +4865,8 @@ class State(translation_domain.BaseTranslatableObject):
         """Returns all content which can be translated into different languages.
 
         Returns:
-            dict(str, TranslatableItem). Returns a dict with key as content
-            id and TranslatableItem as value with the appropriate data
-            format.
+            Returns a dict with key as content id and TranslatableItem as value
+            with the appropriate data format.
         """
         content_id_to_translatable_item = {}
 
@@ -5018,11 +4975,11 @@ class State(translation_domain.BaseTranslatableObject):
         content.
 
         Args:
-            content_id: str. The content ID that needs to be checked for the
+            content_id: The content ID that needs to be checked for the
                 availability.
 
         Returns:
-            bool. A boolean that indicates the availability of the content ID
+            A boolean that indicates the availability of the content ID
             in the translatable content.
         """
         available_translate_content = self._get_all_translatable_content()
@@ -5034,12 +4991,11 @@ class State(translation_domain.BaseTranslatableObject):
         """Returns all text html which can be translated in the given language.
 
         Args:
-            language_code: str. The abbreviated code of the language.
+            language_code: The abbreviated code of the language.
 
         Returns:
-            dict(str, TranslatableItem). A dict with key as content id and
-            value as TranslatableItem containing the content and the data
-            format.
+            A dict with key as content id and value as TranslatableItem
+            containing the content and the data format.
         """
         content_id_to_translatable_item = self._get_all_translatable_content()
         available_translation_content_ids = (
@@ -5057,7 +5013,7 @@ class State(translation_domain.BaseTranslatableObject):
         """Returns a dict representing this State domain object.
 
         Returns:
-            dict. A dict mapping all fields of State instance.
+            A dict mapping all fields of State instance.
         """
         return {
             'content': self.content.to_dict(),
@@ -5078,10 +5034,10 @@ class State(translation_domain.BaseTranslatableObject):
         """Return a State domain object from a dict.
 
         Args:
-            state_dict: dict. The dict representation of State object.
+            state_dict: The dict representation of State object.
 
         Returns:
-            State. The corresponding State domain object.
+            The corresponding State domain object.
         """
         content = SubtitledHtml.from_dict(state_dict['content'])
         content.validate()
@@ -5107,13 +5063,13 @@ class State(translation_domain.BaseTranslatableObject):
         """Return a State domain object with default value.
 
         Args:
-            default_dest_state_name: str|None. The default destination state, or
+            default_dest_state_name: The default destination state, or
                 None if no default destination state is defined.
-            is_initial_state: bool. Whether this state represents the initial
+            is_initial_state: Whether this state represents the initial
                 state of an exploration.
 
         Returns:
-            State. The corresponding State domain object.
+            The corresponding State domain object.
         """
         content_html = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
@@ -5142,21 +5098,21 @@ class State(translation_domain.BaseTranslatableObject):
         to migrate them to a desired state.
 
         Args:
-            state_dict: dict. The dict representation of State object.
-            conversion_fn: function. The conversion function to be applied on
+            state_dict: The dict representation of State object.
+            conversion_fn: The conversion function to be applied on
                 the states_dict.
-            state_schema_version: int. The state schema version.
-            state_uses_old_interaction_cust_args_schema: bool. Whether the
+            state_schema_version: The state schema version.
+            state_uses_old_interaction_cust_args_schema: Whether the
                 interaction customization arguments contain SubtitledHtml
                 and SubtitledUnicode dicts (should be True if prior to state
                 schema v36).
-            state_uses_old_rule_template_schema: bool. Whether the rule inputs
+            state_uses_old_rule_template_schema: Whether the rule inputs
                 contain html in the form of DragAndDropHtmlString,
                 SetOfHtmlString, or ListOfSetsOfHtmlString (shoud be True if
                 prior to state schema v42).
 
         Returns:
-            dict. The converted state_dict.
+            The converted state_dict.
         """
         state_dict['content']['html'] = (
             conversion_fn(state_dict['content']['html']))
@@ -5272,7 +5228,7 @@ class State(translation_domain.BaseTranslatableObject):
         """Get all html content strings in the state.
 
         Returns:
-            list(str). The list of all html content strings in the interaction.
+            The list of all html content strings in the interaction.
         """
         html_list = (
             self.written_translations.get_all_html_content_strings() +
@@ -5287,11 +5243,12 @@ class StateVersionHistory:
     in which the state has been edited.
 
     Attributes:
-        previously_edited_in_version: int. The version number of the
+        previously_edited_in_version: The version number of the
             exploration in which the state was previously edited.
-        state_name_in_previous_version: str. The name of the state in the
-            previously edited version. It is useful in case of state renames.
-        committer_id: str. The id of the user who committed the changes in the
+        state_name_in_previous_version: The name of the state in the
+            previously edited version. It is useful in case of state
+            renames.
+        committer_id: The id of the user who committed the changes in the
             previously edited version.
     """
 
@@ -5304,12 +5261,12 @@ class StateVersionHistory:
         """Initializes the StateVersionHistory domain object.
 
         Args:
-            previously_edited_in_version: int. The version number of the
+            previously_edited_in_version: The version number of the
                 exploration on which the state was previously edited.
-            state_name_in_previous_version: str. The name of the state in the
+            state_name_in_previous_version: The name of the state in the
                 previously edited version. It is useful in case of state
                 renames.
-            committer_id: str. The id of the user who committed the changes in
+            committer_id: The id of the user who committed the changes in
                 the previously edited version.
         """
         self.previously_edited_in_version = previously_edited_in_version
@@ -5321,8 +5278,7 @@ class StateVersionHistory:
         object.
 
         Returns:
-            dict. The dict representation of the StateVersionHistory domain
-            object.
+            The dict representation of the StateVersionHistory domain object.
         """
         return {
             'previously_edited_in_version': self.previously_edited_in_version,
@@ -5339,12 +5295,11 @@ class StateVersionHistory:
         """Return a StateVersionHistory domain object from a dict.
 
         Args:
-            state_version_history_dict: dict. The dict representation of
+            state_version_history_dict: The dict representation of
                 StateVersionHistory object.
 
         Returns:
-            StateVersionHistory. The corresponding StateVersionHistory domain
-            object.
+            The corresponding StateVersionHistory domain object.
         """
         return cls(
             state_version_history_dict['previously_edited_in_version'],

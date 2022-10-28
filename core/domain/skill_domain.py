@@ -444,16 +444,16 @@ class Misconception:
         """Initializes a Misconception domain object.
 
         Args:
-            misconception_id: int. The unique id of each misconception.
-            name: str. The name of the misconception.
-            notes: str. General advice for creators about the
-                misconception (including examples) and general notes. This
+            misconception_id: The unique id of each misconception.
+            name: The name of the misconception.
+            notes: General advice for creators about the misconception
+                (including examples) and general notes. This should be
+                an html string.
+            feedback: This can auto-populate the feedback field when an
+                answer group has been tagged with a misconception. This
                 should be an html string.
-            feedback: str. This can auto-populate the feedback field
-                when an answer group has been tagged with a misconception. This
-                should be an html string.
-            must_be_addressed: bool. Whether the misconception should
-                necessarily be addressed in all questions linked to the skill.
+            must_be_addressed: Whether the misconception should necessarily
+                be addressed in all questions linked to the skill.
         """
         self.id = misconception_id
         self.name = name
@@ -465,7 +465,7 @@ class Misconception:
         """Returns a dict representing this Misconception domain object.
 
         Returns:
-            dict. A dict, mapping all fields of Misconception instance.
+            A dict, mapping all fields of Misconception instance.
         """
         return {
             'id': self.id,
@@ -480,11 +480,10 @@ class Misconception:
         """Returns a Misconception domain object from a dict.
 
         Args:
-            misconception_dict: dict. The dict representation of
-                Misconception object.
+            misconception_dict: The dict representation of Misconception object.
 
         Returns:
-            Misconception. The corresponding Misconception domain object.
+            The corresponding Misconception domain object.
         """
         misconception = cls(
             misconception_dict['id'], misconception_dict['name'],
@@ -498,7 +497,7 @@ class Misconception:
         """Validates the misconception id for a Misconception object.
 
         Args:
-            misconception_id: int. The misconception id to be validated.
+            misconception_id: The misconception id to be validated.
 
         Raises:
             ValidationError. The misconception id is invalid.
@@ -574,9 +573,9 @@ class Rubric:
         """Initializes a Rubric domain object.
 
         Args:
-            difficulty: str. The question difficulty that this rubric addresses.
-            explanations: list(str). The different explanations for the
-                corresponding difficulty.
+            difficulty: The question difficulty that this rubric addresses.
+            explanations: The different explanations for the corresponding
+                difficulty.
         """
         self.difficulty = difficulty
         self.explanations = [
@@ -586,7 +585,7 @@ class Rubric:
         """Returns a dict representing this Rubric domain object.
 
         Returns:
-            dict. A dict, mapping all fields of Rubric instance.
+            A dict, mapping all fields of Rubric instance.
         """
         return {
             'difficulty': self.difficulty,
@@ -598,10 +597,10 @@ class Rubric:
         """Returns a Rubric domain object from a dict.
 
         Args:
-            rubric_dict: dict. The dict representation of Rubric object.
+            rubric_dict: The dict representation of Rubric object.
 
         Returns:
-            Rubric. The corresponding Rubric domain object.
+            The corresponding Rubric domain object.
         """
         rubric = cls(
             rubric_dict['difficulty'], rubric_dict['explanations'])
@@ -670,9 +669,8 @@ class WorkedExample:
         """Constructs a WorkedExample domain object.
 
         Args:
-            question: SubtitledHtml. The example question.
-            explanation: SubtitledHtml. The explanation for the above example
-                question.
+            question: The example question.
+            explanation: The explanation for the above example question.
         """
         self.question = question
         self.explanation = explanation
@@ -699,7 +697,7 @@ class WorkedExample:
         """Returns a dict representing this WorkedExample domain object.
 
         Returns:
-            dict. A dict, mapping all fields of WorkedExample instance.
+            A dict, mapping all fields of WorkedExample instance.
         """
         return {
             'question': self.question.to_dict(),
@@ -711,11 +709,11 @@ class WorkedExample:
         """Return a WorkedExample domain object from a dict.
 
         Args:
-            worked_example_dict: dict. The dict representation of
-                WorkedExample object.
+            worked_example_dict: The dict representation of WorkedExample
+                object.
 
         Returns:
-            WorkedExample. The corresponding WorkedExample domain object.
+            The corresponding WorkedExample domain object.
         """
         worked_example = cls(
             state_domain.SubtitledHtml(
@@ -760,15 +758,12 @@ class SkillContents:
         """Constructs a SkillContents domain object.
 
         Args:
-            explanation: SubtitledHtml. An explanation on how to apply the
-                skill.
-            worked_examples: list(WorkedExample). A list of worked examples
-                for the skill. Each element should be a WorkedExample object.
-            recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
-                the skill contents and their translations in different
-                languages.
-            written_translations: WrittenTranslations. A text translation of
-                the skill contents.
+            explanation: An explanation on how to apply the skill.
+            worked_examples: A list of worked examples for the skill. Each
+                element should be a WorkedExample object.
+            recorded_voiceovers: The recorded voiceovers for the skill
+                contents and their translations in different languages.
+            written_translations: A text translation of the skill contents.
         """
         self.explanation = explanation
         self.worked_examples = worked_examples
@@ -817,7 +812,7 @@ class SkillContents:
         """Returns a dict representing this SkillContents domain object.
 
         Returns:
-            dict. A dict, mapping all fields of SkillContents instance.
+            A dict, mapping all fields of SkillContents instance.
         """
         return {
             'explanation': self.explanation.to_dict(),
@@ -832,11 +827,11 @@ class SkillContents:
         """Return a SkillContents domain object from a dict.
 
         Args:
-            skill_contents_dict: dict. The dict representation of
-                SkillContents object.
+            skill_contents_dict: The dict representation of SkillContents
+                object.
 
         Returns:
-            SkillContents. The corresponding SkillContents domain object.
+            The corresponding SkillContents domain object.
         """
         skill_contents = cls(
             state_domain.SubtitledHtml(
@@ -905,37 +900,31 @@ class Skill:
         """Constructs a Skill domain object.
 
         Args:
-            skill_id: str. The unique ID of the skill.
-            description: str. Describes the observable behaviour of the skill.
-            misconceptions: list(Misconception). The list of misconceptions
-                associated with the skill.
-            rubrics: list(Rubric). The list of rubrics that explain each
-                difficulty level of a skill.
-            skill_contents: SkillContents. The object representing the contents
-                of the skill.
-            misconceptions_schema_version: int. The schema version for the
+            skill_id: The unique ID of the skill.
+            description: Describes the observable behaviour of the skill.
+            misconceptions: The list of misconceptions associated with the
+                skill.
+            rubrics: The list of rubrics that explain each difficulty level
+                of a skill.
+            skill_contents: The object representing the contents of the skill.
+            misconceptions_schema_version: The schema version for the
                 misconceptions object.
-            rubric_schema_version: int. The schema version for the
-                rubric object.
-            skill_contents_schema_version: int. The schema version for the
+            rubric_schema_version: The schema version for the rubric object.
+            skill_contents_schema_version: The schema version for the
                 skill_contents object.
-            language_code: str. The ISO 639-1 code for the language this
-                skill is written in.
-            version: int. The version of the skill.
-            next_misconception_id: int. The misconception id to be used by
-                the next misconception added.
-            superseding_skill_id: str|None. Skill ID of the skill we
-                merge this skill into. This is non null only if we indicate
-                that this skill is a duplicate and needs to be merged into
-                another one.
-            all_questions_merged: bool. Flag that indicates if all
-                questions are moved from this skill to the superseding skill.
-            prerequisite_skill_ids: list(str). The prerequisite skill IDs for
-                the skill.
-            created_on: datetime.datetime. Date and time when the skill is
-                created.
-            last_updated: datetime.datetime. Date and time when the
-                skill was last updated.
+            language_code: The ISO 639-1 code for the language this skill is
+                written in.
+            version: The version of the skill.
+            next_misconception_id: The misconception id to be used by the next
+                misconception added.
+            superseding_skill_id: Skill ID of the skill we merge this skill
+                into. This is non null only if we indicate that this skill is
+                a duplicate and needs to be merged into another one.
+            all_questions_merged: Flag that indicates if all questions are moved
+                from this skill to the superseding skill.
+            prerequisite_skill_ids: The prerequisite skill IDs for the skill.
+            created_on: Date and time when the skill is created.
+            last_updated: Date and time when the skill was last updated.
         """
         self.id = skill_id
         self.description = description
@@ -959,7 +948,7 @@ class Skill:
         """Checks whether the skill id is a valid one.
 
         Args:
-            skill_id: str. The skill id to validate.
+            skill_id: The skill id to validate.
         """
         if not isinstance(skill_id, str):
             raise utils.ValidationError('Skill id should be a string.')
@@ -972,7 +961,7 @@ class Skill:
         """Checks whether the description of the skill is a valid one.
 
         Args:
-            description: str. The description to validate.
+            description: The description to validate.
         """
         if not isinstance(description, str):
             raise utils.ValidationError('Description should be a string.')
@@ -1127,7 +1116,7 @@ class Skill:
         """Returns a dict representing this Skill domain object.
 
         Returns:
-            dict. A dict, mapping all fields of Skill instance.
+            A dict, mapping all fields of Skill instance.
         """
         return {
             'id': self.id,
@@ -1153,7 +1142,7 @@ class Skill:
         """Returns the object serialized as a JSON string.
 
         Returns:
-            str. JSON-encoded str encoding all of the information composing
+            JSON-encoded str encoding all of the information composing
             the object.
         """
         # Here we use MyPy ignore because to_dict() method returns a general
@@ -1189,12 +1178,12 @@ class Skill:
         """Returns a Skill domain object decoded from a JSON string.
 
         Args:
-            json_string: str. A JSON-encoded string that can be
-                decoded into a dictionary representing a Skill.
-                Only call on strings that were created using serialize().
+            json_string: A JSON-encoded string that can be decoded into
+                a dictionary representing a Skill. Only call on strings
+                that were created using serialize().
 
         Returns:
-            Skill. The corresponding Skill domain object.
+            The corresponding Skill domain object.
         """
         skill_dict = json.loads(json_string)
         created_on = (
@@ -1224,16 +1213,13 @@ class Skill:
         """Returns a Skill domain object from a dict.
 
         Args:
-            skill_dict: dict. The dictionary representation of skill
-                object.
-            skill_version: int. The version of the skill.
-            skill_created_on: datetime.datetime. Date and time when the
-                skill is created.
-            skill_last_updated: datetime.datetime. Date and time when the
-                skill was last updated.
+            skill_dict: The dictionary representation of skill object.
+            skill_version: The version of the skill.
+            skill_created_on: Date and time when the skill is created.
+            skill_last_updated: Date and time when the skill was last updated.
 
         Returns:
-            Skill. The corresponding Skill domain object.
+            The corresponding Skill domain object.
         """
         skill = cls(
             skill_dict['id'], skill_dict['description'],
@@ -1273,12 +1259,12 @@ class Skill:
         when the skill is created for the first time.
 
         Args:
-            skill_id: str. The unique id of the skill.
-            description: str. The initial description for the skill.
-            rubrics: list(Rubric). The list of rubrics for the skill.
+            skill_id: The unique id of the skill.
+            description: The initial description for the skill.
+            rubrics: The list of rubrics for the skill.
 
         Returns:
-            Skill. The Skill domain object with the default values.
+            The Skill domain object with the default values.
         """
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
         skill_contents = SkillContents(
@@ -1307,10 +1293,10 @@ class Skill:
         It is of the form <skill_id>-<misconception_id>.
 
         Args:
-            misconception_id: int. The id of the misconception.
+            misconception_id: The id of the misconception.
 
         Returns:
-            str. The format is '<skill_id>-<misconception_id>', where skill_id
+            The format is '<skill_id>-<misconception_id>', where skill_id
             is the skill ID of the misconception and misconception_id is
             the id of the misconception.
         """
@@ -1326,13 +1312,12 @@ class Skill:
         to migrate them to a desired state.
 
         Args:
-            skill_contents_dict: dict. The dict representation of skill
-                contents.
-            conversion_fn: function. The conversion function to be applied on
+            skill_contents_dict: The dict representation of skill contents.
+            conversion_fn: The conversion function to be applied on
                 the skill_contents_dict.
 
         Returns:
-            dict. The converted skill_contents_dict.
+            The converted skill_contents_dict.
         """
         skill_contents_dict['explanation']['html'] = conversion_fn(
             skill_contents_dict['explanation']['html'])
@@ -1358,10 +1343,10 @@ class Skill:
         the new Math components schema is introduced.
 
         Args:
-            skill_contents_dict: dict. The v1 skill_contents_dict.
+            skill_contents_dict: The v1 skill_contents_dict.
 
         Returns:
-            dict. The converted skill_contents_dict.
+            The converted skill_contents_dict.
         """
         return cls.convert_html_fields_in_skill_contents(
             skill_contents_dict,
@@ -1376,10 +1361,10 @@ class Skill:
         occurences of it to oppia-noninteractive-image tag.
 
         Args:
-            skill_contents_dict: dict. The v1 skill_contents_dict.
+            skill_contents_dict: The v1 skill_contents_dict.
 
         Returns:
-            dict. The converted skill_contents_dict.
+            The converted skill_contents_dict.
         """
         return cls.convert_html_fields_in_skill_contents(
             skill_contents_dict,
@@ -1393,10 +1378,10 @@ class Skill:
         fixes HTML encoding issues.
 
         Args:
-            skill_contents_dict: dict. The v3 skill_contents_dict.
+            skill_contents_dict: The v3 skill_contents_dict.
 
         Returns:
-            dict. The converted skill_contents_dict.
+            The converted skill_contents_dict.
         """
         return cls.convert_html_fields_in_skill_contents(
             skill_contents_dict,
@@ -1414,12 +1399,12 @@ class Skill:
         passed in is modified in-place.
 
         Args:
-            versioned_skill_contents: dict. A dict with two keys:
+            versioned_skill_contents: A dict with two keys:
                 - schema_version: str. The schema version for the
                     skill_contents dict.
                 - skill_contents: dict. The dict comprising the skill
                     contents.
-            current_version: int. The current schema version of skill_contents.
+            current_version: The current schema version of skill_contents.
         """
         versioned_skill_contents['schema_version'] = current_version + 1
 
@@ -1441,12 +1426,12 @@ class Skill:
         passed in is modified in-place.
 
         Args:
-            versioned_misconceptions: dict. A dict with two keys:
+            versioned_misconceptions: A dict with two keys:
                 - schema_version: str. The schema version for the
                     misconceptions dict.
                 - misconceptions: list(dict). The list of dicts comprising the
                     misconceptions of the skill.
-            current_version: int. The current schema version of misconceptions.
+            current_version: The current schema version of misconceptions.
         """
         versioned_misconceptions['schema_version'] = current_version + 1
 
@@ -1468,10 +1453,10 @@ class Skill:
         the field must_be_addressed has been added.
 
         Args:
-            misconception_dict: dict. The v1 misconception dict.
+            misconception_dict: The v1 misconception dict.
 
         Returns:
-            dict. The converted misconception_dict.
+            The converted misconception_dict.
         """
         misconception_dict['must_be_addressed'] = True
         return misconception_dict
@@ -1484,10 +1469,10 @@ class Skill:
         the new Math components schema is introduced.
 
         Args:
-            misconception_dict: dict. The v2 misconception dict.
+            misconception_dict: The v2 misconception dict.
 
         Returns:
-            dict. The converted misconception_dict.
+            The converted misconception_dict.
         """
         misconception_dict['notes'] = (
             html_validation_service.add_math_content_to_math_rte_components(
@@ -1506,10 +1491,10 @@ class Skill:
         occurences of it to oppia-noninteractive-image tag.
 
         Args:
-            misconception_dict: dict. The v3 misconception dict.
+            misconception_dict: The v3 misconception dict.
 
         Returns:
-            dict. The converted misconception_dict.
+            The converted misconception_dict.
         """
         misconception_dict['notes'] = (
             html_validation_service.convert_svg_diagram_tags_to_image_tags(
@@ -1527,10 +1512,10 @@ class Skill:
         fixes HTML encoding issues.
 
         Args:
-            misconception_dict: dict. The v4 misconception dict.
+            misconception_dict: The v4 misconception dict.
 
         Returns:
-            dict. The converted misconception_dict.
+            The converted misconception_dict.
         """
         misconception_dict['notes'] = (
             html_validation_service.fix_incorrectly_encoded_chars(
@@ -1548,10 +1533,10 @@ class Skill:
         multiple explanations have been added for each difficulty.
 
         Args:
-            rubric_dict: dict. The v1 rubric dict.
+            rubric_dict: The v1 rubric dict.
 
         Returns:
-            dict. The converted rubric_dict.
+            The converted rubric_dict.
         """
         # Here we use MyPy ignore because in convert functions, we allow less
         # strict typing because here we are working with previous versions of
@@ -1574,10 +1559,10 @@ class Skill:
         the new Math components schema is introduced.
 
         Args:
-            rubric_dict: dict. The v2 rubric dict.
+            rubric_dict: The v2 rubric dict.
 
         Returns:
-            dict. The converted rubric_dict.
+            The converted rubric_dict.
         """
         for explanation_index, explanation in enumerate(
                 rubric_dict['explanations']):
@@ -1595,10 +1580,10 @@ class Skill:
         occurences of it to oppia-noninteractive-image tag.
 
         Args:
-            rubric_dict: dict. The v2 rubric dict.
+            rubric_dict: The v2 rubric dict.
 
         Returns:
-            dict. The converted rubric_dict.
+            The converted rubric_dict.
         """
         for explanation_index, explanation in enumerate(
                 rubric_dict['explanations']):
@@ -1615,10 +1600,10 @@ class Skill:
         fixes HTML encoding issues.
 
         Args:
-            rubric_dict: dict. The v4 rubric dict.
+            rubric_dict: The v4 rubric dict.
 
         Returns:
-            dict. The converted rubric_dict.
+            The converted rubric_dict.
         """
         for explanation_index, explanation in enumerate(
                 rubric_dict['explanations']):
@@ -1639,12 +1624,12 @@ class Skill:
         passed in is modified in-place.
 
         Args:
-            versioned_rubrics: dict. A dict with two keys:
+            versioned_rubrics: A dict with two keys:
                 - schema_version: str. The schema version for the
                     rubrics dict.
                 - rubrics: list(dict). The list of dicts comprising the
                     rubrics of the skill.
-            current_version: int. The current schema version of rubrics.
+            current_version: The current schema version of rubrics.
         """
         versioned_rubrics['schema_version'] = current_version + 1
 
@@ -1663,7 +1648,7 @@ class Skill:
         (or any of its subcomponents).
 
         Returns:
-            list(str). The list of html contents.
+            The list of html contents.
         """
         html_content_strings = [self.skill_contents.explanation.html]
 
@@ -1685,7 +1670,7 @@ class Skill:
         """Updates the description of the skill.
 
         Args:
-            description: str. The new description of the skill.
+            description: The new description of the skill.
         """
         self.description = description
 
@@ -1693,7 +1678,7 @@ class Skill:
         """Updates the language code of the skill.
 
         Args:
-            language_code: str. The new language code of the skill.
+            language_code: The new language code of the skill.
         """
         self.language_code = language_code
 
@@ -1701,7 +1686,7 @@ class Skill:
         """Updates the superseding skill ID of the skill.
 
         Args:
-            superseding_skill_id: str. ID of the skill that supersedes this one.
+            superseding_skill_id: ID of the skill that supersedes this one.
         """
         self.superseding_skill_id = superseding_skill_id
 
@@ -1711,7 +1696,7 @@ class Skill:
         """Updates the flag value which indicates if all questions are merged.
 
         Args:
-            all_questions_merged: bool. Flag indicating if all questions are
+            all_questions_merged: Flag indicating if all questions are
                 merged to the superseding skill.
         """
         self.all_questions_merged = all_questions_merged
@@ -1722,7 +1707,7 @@ class Skill:
         """Updates the explanation of the skill.
 
         Args:
-            explanation: SubtitledHtml. The new explanation of the skill.
+            explanation: The new explanation of the skill.
         """
         old_content_ids = []
         if self.skill_contents.explanation:
@@ -1740,8 +1725,7 @@ class Skill:
         of the provided list.
 
         Args:
-            worked_examples: list(WorkedExample). The new worked examples of
-                the skill.
+            worked_examples: The new worked examples of the skill.
         """
         old_content_ids = [
             example_field.content_id
@@ -1766,10 +1750,10 @@ class Skill:
         written_translations.
 
         Args:
-            old_ids_list: list(str). A list of content ids present earlier
+            old_ids_list: A list of content ids present earlier
                 in worked_examples.
                 state.
-            new_ids_list: list(str). A list of content ids currently present
+            new_ids_list: A list of content ids currently present
                 in worked_examples.
         """
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
@@ -1791,10 +1775,10 @@ class Skill:
         id, or None if it is not in the misconceptions list.
 
         Args:
-            misconception_id: int. The id of the misconception.
+            misconception_id: The id of the misconception.
 
         Returns:
-            int or None. The index of the corresponding misconception, or None
+            The index of the corresponding misconception, or None
             if there is no such misconception.
         """
         for ind, misconception in enumerate(self.misconceptions):
@@ -1806,7 +1790,7 @@ class Skill:
         """Adds a new misconception to the skill.
 
         Args:
-            misconception: Misconception. The misconception to be added.
+            misconception: The misconception to be added.
         """
 
         self.misconceptions.append(misconception)
@@ -1820,10 +1804,10 @@ class Skill:
         array.
 
         Args:
-            skill_id_to_find: str. The skill ID to search for.
+            skill_id_to_find: The skill ID to search for.
 
         Returns:
-            int|None. The index of the skill_id, if it exists or None.
+            The index of the skill_id, if it exists or None.
         """
         for ind, skill_id in enumerate(self.prerequisite_skill_ids):
             if skill_id == skill_id_to_find:
@@ -1834,7 +1818,7 @@ class Skill:
         """Adds a prerequisite skill to the skill.
 
         Args:
-            skill_id: str. The skill ID to add.
+            skill_id: The skill ID to add.
 
         Raises:
             ValueError. The skill is already a prerequisite skill.
@@ -1847,7 +1831,7 @@ class Skill:
         """Removes a prerequisite skill from the skill.
 
         Args:
-            skill_id: str. The skill ID to remove.
+            skill_id: The skill ID to remove.
 
         Raises:
             ValueError. The skill to remove is not a prerequisite skill.
@@ -1863,8 +1847,8 @@ class Skill:
         """Adds or updates the rubric of the given difficulty.
 
         Args:
-            difficulty: str. The difficulty of the rubric.
-            explanations: list(str). The explanations for the rubric.
+            difficulty: The difficulty of the rubric.
+            explanations: The explanations for the rubric.
 
         Raises:
             ValueError. No rubric for given difficulty.
@@ -1880,11 +1864,11 @@ class Skill:
         """Returns the incremented misconception id.
 
         Args:
-            misconception_id: int. The id of the misconception to be
+            misconception_id: The id of the misconception to be
                 incremented.
 
         Returns:
-            int. The incremented misconception id.
+            The incremented misconception id.
         """
         return misconception_id + 1
 
@@ -1892,7 +1876,7 @@ class Skill:
         """Removes a misconception with the given id.
 
         Args:
-            misconception_id: int. The id of the misconception to be removed.
+            misconception_id: The id of the misconception to be removed.
 
         Raises:
             ValueError. There is no misconception with the given id.
@@ -1909,8 +1893,8 @@ class Skill:
         """Updates the name of the misconception with the given id.
 
         Args:
-            misconception_id: int. The id of the misconception to be edited.
-            name: str. The new name of the misconception.
+            misconception_id: The id of the misconception to be edited.
+            name: The new name of the misconception.
 
         Raises:
             ValueError. There is no misconception with the given id.
@@ -1928,8 +1912,8 @@ class Skill:
         given id.
 
         Args:
-            misconception_id: int. The id of the misconception to be edited.
-            must_be_addressed: bool. The new must_be_addressed value for the
+            misconception_id: The id of the misconception to be edited.
+            must_be_addressed: The new must_be_addressed value for the
                 misconception.
 
         Raises:
@@ -1950,8 +1934,8 @@ class Skill:
         """Updates the notes of the misconception with the given id.
 
         Args:
-            misconception_id: int. The id of the misconception to be edited.
-            notes: str. The new notes of the misconception.
+            misconception_id: The id of the misconception to be edited.
+            notes: The new notes of the misconception.
 
         Raises:
             ValueError. There is no misconception with the given id.
@@ -1968,8 +1952,8 @@ class Skill:
         """Updates the feedback of the misconception with the given id.
 
         Args:
-            misconception_id: int. The id of the misconception to be edited.
-            feedback: str. The html string that corresponds to the new feedback
+            misconception_id: The id of the misconception to be edited.
+            feedback: The html string that corresponds to the new feedback
                 of the misconception.
 
         Raises:
@@ -2012,18 +1996,18 @@ class SkillSummary:
         """Constructs a SkillSummary domain object.
 
         Args:
-            skill_id: str. The unique id of the skill.
-            description: str. The short description of the skill.
-            language_code: str. The language code of the skill.
-            version: int. The version of the skill.
-            misconception_count: int. The number of misconceptions associated
+            skill_id: The unique id of the skill.
+            description: The short description of the skill.
+            language_code: The language code of the skill.
+            version: The version of the skill.
+            misconception_count: The number of misconceptions associated
                 with the skill.
-            worked_examples_count: int. The number of worked examples in the
+            worked_examples_count: The number of worked examples in the
                 skill.
-            skill_model_created_on: datetime.datetime. Date and time when
-                the skill model is created.
-            skill_model_last_updated: datetime.datetime. Date and time
-                when the skill model was last updated.
+            skill_model_created_on: Date and time when the skill model
+                is created.
+            skill_model_last_updated: Date and time when the skill model
+                was last updated.
         """
         self.id = skill_id
         self.description = description
@@ -2079,7 +2063,7 @@ class SkillSummary:
         """Returns a dictionary representation of this domain object.
 
         Returns:
-            dict. A dict representing this SkillSummary object.
+            A dict representing this SkillSummary object.
         """
         return {
             'id': self.id,
@@ -2132,22 +2116,20 @@ class AugmentedSkillSummary:
         """Constructs an AugmentedSkillSummary domain object.
 
         Args:
-            skill_id: str. The unique id of the skill.
-            description: str. The short description of the skill.
-            language_code: str. The language code of the skill.
-            version: int. The version of the skill.
-            misconception_count: int. The number of misconceptions associated
+            skill_id: The unique id of the skill.
+            description: The short description of the skill.
+            language_code: The language code of the skill.
+            version: The version of the skill.
+            misconception_count: The number of misconceptions associated
                 with the skill.
-            worked_examples_count: int. The number of worked examples in the
-                skill.
-            topic_names: list(str). The names of the topics to which the skill
-                is assigned.
-            classroom_names: list(str). The names of the classrooms to which the
-                skill is assigned.
-            skill_model_created_on: datetime.datetime. Date and time when
-                the skill model is created.
-            skill_model_last_updated: datetime.datetime. Date and time
-                when the skill model was last updated.
+            worked_examples_count: The number of worked examples in the skill.
+            topic_names: The names of the topics to which the skill is assigned.
+            classroom_names: The names of the classrooms to which the skill is
+                assigned.
+            skill_model_created_on: Date and time when the skill model is
+                created.
+            skill_model_last_updated: Date and time when the skill model was
+                last updated.
         """
         self.id = skill_id
         self.description = description
@@ -2164,7 +2146,7 @@ class AugmentedSkillSummary:
         """Returns a dictionary representation of this domain object.
 
         Returns:
-            dict. A dict representing this AugmentedSkillSummary object.
+            A dict representing this AugmentedSkillSummary object.
         """
         return {
             'id': self.id,
@@ -2207,13 +2189,12 @@ class TopicAssignment:
         """Constructs a TopicAssignment domain object.
 
         Args:
-            topic_id: str. The unique id of the topic.
-            topic_name: str. The name of the topic.
-            topic_version: int. The current version of the topic to which the
+            topic_id: The unique id of the topic.
+            topic_name: The name of the topic.
+            topic_version: The current version of the topic to which the
                 skill is assigned.
-            subtopic_id: int or None. The id of the subtopic to which the skill
-                is assigned, or None if the skill is not assigned to any
-                subtopic.
+            subtopic_id: The id of the subtopic to which the skill is assigned,
+                or None if the skill is not assigned to any subtopic.
         """
         self.topic_id = topic_id
         self.topic_name = topic_name
@@ -2224,7 +2205,7 @@ class TopicAssignment:
         """Returns a dictionary representation of this domain object.
 
         Returns:
-            dict. A dict representing this TopicAssignment object.
+            A dict representing this TopicAssignment object.
         """
         return {
             'topic_id': self.topic_id,
@@ -2254,10 +2235,9 @@ class UserSkillMastery:
         """Constructs a SkillMastery domain object for a user.
 
         Args:
-            user_id: str. The user id of the user.
-            skill_id: str. The id of the skill.
-            degree_of_mastery: float. The user's mastery of the
-                corresponding skill.
+            user_id: The user id of the user.
+            skill_id: The id of the skill.
+            degree_of_mastery: The user's mastery of the corresponding skill.
         """
         self.user_id = user_id
         self.skill_id = skill_id
@@ -2267,7 +2247,7 @@ class UserSkillMastery:
         """Returns a dictionary representation of this domain object.
 
         Returns:
-            dict. A dict representing this SkillMastery object.
+            A dict representing this SkillMastery object.
         """
         return {
             'user_id': self.user_id,
@@ -2282,11 +2262,11 @@ class UserSkillMastery:
         """Returns a UserSkillMastery domain object from the given dict.
 
         Args:
-            skill_mastery_dict: dict. A dict mapping all the fields of
+            skill_mastery_dict: A dict mapping all the fields of
                 UserSkillMastery object.
 
         Returns:
-            SkillMastery. The SkillMastery domain object.
+            The SkillMastery domain object.
         """
         return cls(
             skill_mastery_dict['user_id'],
@@ -2322,9 +2302,8 @@ class CategorizedSkills:
         'uncategorized' and subtopic skills as empty lists.
 
         Args:
-            topic_name: str. The name of the topic.
-            subtopic_titles: list(str). The list of subtopic titles of the
-                topic.
+            topic_name: The name of the topic.
+            subtopic_titles: The list of subtopic titles of the topic.
 
         Raises:
             ValidationError. Topic name is already added.
@@ -2347,9 +2326,9 @@ class CategorizedSkills:
         """Adds an uncategorized skill id and description for the given topic.
 
         Args:
-            topic_name: str. The name of the topic.
-            skill_id: str. The id of the skill.
-            skill_description: str. The description of the skill.
+            topic_name: The name of the topic.
+            skill_id: The id of the skill.
+            skill_description: The description of the skill.
         """
         self.require_topic_name_to_be_added(topic_name)
         self.categorized_skills[topic_name]['uncategorized'].append(
@@ -2365,10 +2344,10 @@ class CategorizedSkills:
         """Adds a subtopic skill id and description for the given topic.
 
         Args:
-            topic_name: str. The name of the topic.
-            subtopic_title: str. The title of the subtopic.
-            skill_id: str. The id of the skill.
-            skill_description: str. The description of the skill.
+            topic_name: The name of the topic.
+            subtopic_title: The title of the subtopic.
+            skill_id: The id of the skill.
+            skill_description: The description of the skill.
         """
         self.require_topic_name_to_be_added(topic_name)
         self.require_subtopic_title_to_be_added(topic_name, subtopic_title)
@@ -2380,7 +2359,7 @@ class CategorizedSkills:
         categorized skills dict.
 
         Args:
-            topic_name: str. The name of the topic.
+            topic_name: The name of the topic.
 
         Raises:
             ValidationError. Topic name is not added.
@@ -2396,8 +2375,8 @@ class CategorizedSkills:
         categorized skills dict under the given topic name.
 
         Args:
-            topic_name: str. The name of the topic.
-            subtopic_title: str. The title of the subtopic.
+            topic_name: The name of the topic.
+            subtopic_title: The title of the subtopic.
 
         Raises:
             ValidationError. Subtopic title is not added.
@@ -2442,8 +2421,8 @@ class ShortSkillSummary:
         """Constructs a ShortSkillSummary domain object.
 
         Args:
-            skill_id: str. The id of the skill.
-            skill_description: str. The description of the skill.
+            skill_id: The id of the skill.
+            skill_description: The description of the skill.
         """
         self.skill_id = skill_id
         self.skill_description = skill_description
@@ -2452,7 +2431,7 @@ class ShortSkillSummary:
         """Returns a dictionary representation of this domain object.
 
         Returns:
-            dict. A dict representing this ShortSkillSummary object.
+            A dict representing this ShortSkillSummary object.
         """
         return {
             'skill_id': self.skill_id,
@@ -2467,10 +2446,10 @@ class ShortSkillSummary:
         summary.
 
         Args:
-            skill_summary: SkillSummary. The skill summary domain object.
+            skill_summary: The skill summary domain object.
 
         Returns:
-            ShortSkillSummary. The ShortSkillSummary domain object.
+            The ShortSkillSummary domain object.
         """
         return cls(
             skill_summary.id,
