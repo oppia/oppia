@@ -408,7 +408,7 @@ var ExplorationEditorPage = function() {
 
   this.waitForPreviewTabToLoad = async function() {
     // We need to use browser.pause in order to explicitly wait for preview tab
-    // to load because waitFor.pageToFullyLoad only works when we navigate to 
+    // to load because waitFor.pageToFullyLoad only works when we navigate to
     // preview tab for the first time.
     // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(2000);
