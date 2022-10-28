@@ -130,7 +130,11 @@ export class baseInteractionValidationService {
     // If they have the same frequency, then remove the occurrences from
     // the string and check if the remaining stripped string is empty.
 
-    const tagsToRemove = ['strong', 'em', 'p', 'ul', 'ol', 'li'];
+    const tagsToRemove = [
+      'strong', 'em', 'p', 'ul', 'ol', 'li',
+      'i', 'b', 'br', 'span',
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
+    ];
 
     for (const tag of tagsToRemove) {
       const openRegex = new RegExp(`<${tag}>`, 'g');
