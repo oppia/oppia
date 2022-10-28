@@ -272,7 +272,7 @@ class AdminHandler(base.BaseHandler):
         action = payload_data['action']
         try:
             result = {}
-            if action and action == 'reload_exploration':
+            if action == 'reload_exploration':
                 exploration_id = payload_data['exploration_id']
                 if exploration_id is None:
                     raise Exception(
@@ -280,7 +280,7 @@ class AdminHandler(base.BaseHandler):
                         ' action is reload_exploration.'
                     )
                 self._reload_exploration(exploration_id)
-            elif action and action == 'reload_collection':
+            elif action == 'reload_collection':
                 collection_id = payload_data['collection_id']
                 if collection_id is None:
                     raise Exception(
@@ -288,7 +288,7 @@ class AdminHandler(base.BaseHandler):
                         ' action is reload_collection.'
                     )
                 self._reload_collection(collection_id)
-            elif action and action == 'generate_dummy_explorations':
+            elif action == 'generate_dummy_explorations':
                 num_dummy_exps_to_generate = payload_data[
                     'num_dummy_exps_to_generate']
                 if num_dummy_exps_to_generate is None:
@@ -310,17 +310,17 @@ class AdminHandler(base.BaseHandler):
 
                 self._generate_dummy_explorations(
                     num_dummy_exps_to_generate, num_dummy_exps_to_publish)
-            elif action and action == 'clear_search_index':
+            elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
                 search_services.clear_blog_post_summaries_search_index()
-            elif action and action == 'generate_dummy_new_structures_data':
+            elif action == 'generate_dummy_new_structures_data':
                 self._load_dummy_new_structures_data()
-            elif action and action == 'generate_dummy_new_skill_data':
+            elif action == 'generate_dummy_new_skill_data':
                 self._generate_dummy_skill_and_questions()
-            elif action and action == 'generate_dummy_classroom':
+            elif action == 'generate_dummy_classroom':
                 self._generate_dummy_classroom()
-            elif action and action == 'save_config_properties':
+            elif action == 'save_config_properties':
                 new_config_property_values = payload_data[
                     'new_config_property_values']
                 if new_config_property_values is None:
@@ -333,7 +333,7 @@ class AdminHandler(base.BaseHandler):
                     (self.user_id, new_config_property_values))
                 for (name, value) in new_config_property_values.items():
                     config_services.set_property(self.user_id, name, value)
-            elif action and action == 'revert_config_property':
+            elif action == 'revert_config_property':
                 config_property_id = payload_data[
                     'config_property_id']
                 if config_property_id is None:
@@ -346,7 +346,7 @@ class AdminHandler(base.BaseHandler):
                     (self.user_id, config_property_id))
                 config_services.revert_property(
                     self.user_id, config_property_id)
-            elif action and action == 'upload_topic_similarities':
+            elif action == 'upload_topic_similarities':
                 data = payload_data['data']
                 if data is None:
                     raise Exception(
@@ -354,7 +354,7 @@ class AdminHandler(base.BaseHandler):
                         ' is upload_topic_similarities.'
                     )
                 recommendations_services.update_topic_similarities(data)
-            elif action and action == 'regenerate_topic_related_opportunities':
+            elif action == 'regenerate_topic_related_opportunities':
                 topic_id = payload_data['topic_id']
                 if topic_id is None:
                     raise Exception(
@@ -368,7 +368,7 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'opportunities_count': opportunities_count
                 }
-            elif action and action == 'rollback_exploration_to_safe_state':
+            elif action == 'rollback_exploration_to_safe_state':
                 exp_id = payload_data['exp_id']
                 if exp_id is None:
                     raise Exception(
@@ -380,7 +380,7 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'version': version
                 }
-            elif action and action == 'update_feature_flag_rules':
+            elif action == 'update_feature_flag_rules':
                 feature_name = payload_data['feature_name']
                 if feature_name is None:
                     raise Exception(
