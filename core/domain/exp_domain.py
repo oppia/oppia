@@ -3242,35 +3242,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # Fix validation errors for exploration state interaction.
     # ########################################################.
     @classmethod
-    def _is_choice_empty(cls, choice: state_domain.SubtitledHtmlDict) -> bool:
-        """Checks if the choice is empty or not.
-
-        Args:
-            choice: state_domain.SubtitledHtmlDict. The choice that
-                needs to be validated.
-
-        Returns:
-            bool. Returns True if the choice is empty.
-        """
-        html = utils.unescape_html(choice['html'])
-        html = (
-            html.replace('<p>', '').replace('</p>', '').replace('<br>', '').
-            replace('<i>', '').replace('</i>', '').replace('<span>', '').
-            replace('</span>', '').replace('<b>', '').replace('</b>', '').
-            replace('<ol>', '').replace('</ol>', '').replace('<ul>', '').
-            replace('</ul>', '').replace('<h1>', '').replace('</h1>', '').
-            replace('<h2>', '').replace('</h2>', '').replace('<h3>', '').
-            replace('</h3>', '').replace('<h4>', '').replace('</h4>', '').
-            replace('<h5>', '').replace('</h5>', '').replace('<h6>', '').
-            replace('</h6>', '').replace('<li>', '').replace('</li>', '').
-            replace('&nbsp;', '').replace('<em>', '').replace('</em>', '').
-            replace('<strong>', '').replace('</strong>', ''))
-        if html.strip() == '':
-            return True
-
-        return False
-
-    @classmethod
     def _choices_should_be_unique_and_non_empty(
         cls,
         choices: List[state_domain.SubtitledHtmlDict],
@@ -3304,7 +3275,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         choices_content = []
         for choice in choices:
             choices_content.append(choice['html'])
-            if cls._is_choice_empty(choice):
+            if html_cleaner.is_html_empty(choice['html']):
                 empty_choices.append(choice)
 
         if len(empty_choices) == 1:
@@ -4259,7 +4230,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # Fix RTE content and check for empty choices.
         empty_choices = []
         for choice_drag in choices_drag_drop:
-            if cls._is_choice_empty(choice_drag):
+            if html_cleaner.is_html_empty(choice_drag['html']):
                 empty_choices.append(choice_drag)
             choice_html = choice_drag['html']
             choice_drag['html'] = cls.fix_content(choice_html)
@@ -4580,8 +4551,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # ################################################.
     # Fix validation errors for exploration state RTE.
     # ################################################.
-    empty_values = [
-        '&quot;&quot;', '\\"&quot;&quot;\\"', '', '\'\'', '\"\"', '<p></p>']
 
     @classmethod
     def _is_tag_removed_with_invalid_attributes(
@@ -4600,7 +4569,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             tag.decompose()
             return True
 
-        if tag[attr].strip() in cls.empty_values:
+        if html_cleaner.is_html_empty(tag[attr]):
             tag.decompose()
             return True
 
@@ -4736,7 +4705,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if not tag.has_attr('text-with-value'):
                 tag['text-with-value'] = tag['url-with-value']
             else:
-                if tag['text-with-value'].strip() in cls.empty_values:
+                if html_cleaner.is_html_empty(tag['text-with-value']):
                     tag['text-with-value'] = tag['url-with-value']
 
         for tag in soup.find_all('oppia-noninteractive-math'):
@@ -4750,7 +4719,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if 'raw_latex' not in math_content_list:
                 tag.decompose()
                 continue
-            if math_content_list['raw_latex'].strip() in cls.empty_values:
+            if html_cleaner.is_html_empty(math_content_list['raw_latex']):
                 tag.decompose()
                 continue
 
@@ -4789,7 +4758,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         if is_collapsible:
             assert isinstance(content, str)
-            if content.strip() in cls.empty_values:
+            if html_cleaner.is_html_empty(content):
                 tag.decompose()
                 return True
         else:
@@ -4834,7 +4803,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         tab_content['content'],
                         is_tags_nested_inside_tabs_or_collapsible=True
                     )
-                    if tab_content['content'].strip() in cls.empty_values:
+                    if html_cleaner.is_html_empty(tab_content['content']):
                         empty_tab_contents.append(tab_content)
 
                 # Remove empty tab content from the tag.
@@ -4938,7 +4907,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             # Fix RTE content present inside the answer group's feedback.
             for answer_group in state['interaction']['answer_groups']:
                 feedback = answer_group['outcome']['feedback']['html']
-                if not feedback in cls.empty_values:
+                if not html_cleaner.is_html_empty(feedback):
                     answer_group['outcome']['feedback']['html'] = (
                         cls.fix_content(feedback))
 
@@ -4946,7 +4915,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if state['interaction']['default_outcome'] is not None:
                 default_feedback = state['interaction']['default_outcome'][
                     'feedback']['html']
-                if not default_feedback in cls.empty_values:
+                if not html_cleaner.is_html_empty(default_feedback):
                     state['interaction']['default_outcome']['feedback'][
                         'html'] = cls.fix_content(default_feedback)
 
@@ -4964,7 +4933,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for hint in hints:
                 hint_content = hint['hint_content']['html']
                 hint['hint_content']['html'] = cls.fix_content(hint_content)
-                if hint['hint_content']['html'] in cls.empty_values:
+                if html_cleaner.is_html_empty(hint['hint_content']['html']):
                     empty_hints.append(hint)
 
             for empty_hint in empty_hints:

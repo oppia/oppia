@@ -1004,20 +1004,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """
         seen_choices = []
         for choice in choices:
-            html = utils.unescape_html(choice.html)
-            html = (
-                html.replace('<p>', '').replace('</p>', '').replace('<br>', '').
-                replace('<i>', '').replace('</i>', '').replace('<span>', '').
-                replace('</span>', '').replace('<b>', '').replace('</b>', '').
-                replace('<ol>', '').replace('</ol>', '').replace('<ul>', '').
-                replace('</ul>', '').replace('<h1>', '').replace('</h1>', '').
-                replace('<h2>', '').replace('</h2>', '').replace('<h3>', '').
-                replace('</h3>', '').replace('<h4>', '').replace('</h4>', '').
-                replace('<h5>', '').replace('</h5>', '').replace('<h6>', '').
-                replace('</h6>', '').replace('<li>', '').replace('</li>', '').
-                replace('&nbsp;', '').replace('<em>', '').replace('</em>', '').
-                replace('<strong>', '').replace('</strong>', ''))
-            if html.strip() == '':
+            if html_cleaner.is_html_empty(choice.html):
                 raise utils.ValidationError(
                     'Choices should be non empty.'
                 )
