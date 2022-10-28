@@ -379,7 +379,7 @@ export class ExplorationEngineService {
   init(
       explorationDict: ExplorationBackendDict,
       explorationVersion: number,
-      preferredAudioLanguage: string,
+      preferredAudioLanguage: string | null,
       autoTtsEnabled: boolean,
       preferredContentLanguageCodes: string[],
       successCallback: (stateCard: StateCard, label: string) => void
@@ -456,7 +456,7 @@ export class ExplorationEngineService {
     return this.exploration.title;
   }
 
-  getExplorationVersion(): number {
+  getExplorationVersion(): number | null {
     return this.version;
   }
 

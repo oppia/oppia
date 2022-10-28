@@ -177,7 +177,7 @@ describe('Topic object factory', () => {
       'Url Fragment loading', 'Topic description loading', 'en',
       [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
     );
-    expect(topic.getId()).toEqual(null);
+    expect(topic.getId()).toBeNull();
     expect(topic.getName()).toEqual('Topic name loading');
     expect(topic.getDescription()).toEqual('Topic description loading');
     expect(topic.getLanguageCode()).toBe('en');

@@ -22,7 +22,7 @@ import { BlogCardPreviewModalComponent } from './blog-card-preview-modal.compone
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
-import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
+import { RichTextComponentsModule } from 'extensions/rich_text_components/rich-text-components.module';
 import { Pipe } from '@angular/core';
 import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post.model';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';

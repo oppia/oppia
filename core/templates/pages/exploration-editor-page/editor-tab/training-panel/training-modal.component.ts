@@ -157,6 +157,9 @@ export class TrainingModalComponent
     let index = this.classification.answerGroupIndex;
     if (index > this.responsesService.getAnswerGroupCount()) {
       let newOutcome = this.classification.newOutcome;
+      if (newOutcome === null) {
+        throw new Error('Cannot save new answer group.');
+      }
       let newAnswerGroup = this.answerGroupObjectFactory.createNew(
         [], cloneDeep(newOutcome), [this.unhandledAnswer], null);
       this._saveNewAnswerGroup(newAnswerGroup);
