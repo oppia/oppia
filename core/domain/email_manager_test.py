@@ -100,6 +100,7 @@ class FailedMLTest(test_utils.EmailTestBase):
                 self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL))
             self.assertEqual(len(messages), 0)
 
+            fake_notification_user_ids_for_failed_tasks: List[str] = []
             # Send job failure email with mock Job ID.
             with self.swap(
                 email_manager, 'NOTIFICATION_USER_IDS_FOR_FAILED_TASKS',
@@ -107,7 +108,7 @@ class FailedMLTest(test_utils.EmailTestBase):
                     'fake_notification_user_ids_for_failed_tasks',
                     email_manager.NOTIFICATION_USER_IDS_LIST_SCHEMA,
                     'User IDs to notify if an ML training task fails',
-                    [])
+                    fake_notification_user_ids_for_failed_tasks)
             ):
                 email_manager.send_job_failure_email('123ABC')
 
