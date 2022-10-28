@@ -28,7 +28,8 @@ import { UtilsService } from 'services/utils.service';
   providedIn: 'root'
 })
 // TODO(sll): Add validation.
-export class StateInteractionIdService extends StatePropertyService<string> {
+export class StateInteractionIdService
+  extends StatePropertyService<string | null> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveInteractionId';

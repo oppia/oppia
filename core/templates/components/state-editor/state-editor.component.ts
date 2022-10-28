@@ -171,7 +171,7 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.onSaveStateContent.emit($event);
   }
 
-  updateInteractionVisibility(newInteractionId: string): void {
+  updateInteractionVisibility(newInteractionId: string | null): void {
     this.interactionIdIsSet = Boolean(newInteractionId);
     this.currentInteractionCanHaveSolution = Boolean(
       this.interactionIdIsSet &&
@@ -222,11 +222,6 @@ export class StateEditorComponent implements OnInit, OnDestroy {
               'received ' + this.stateName);
           }
           let interactionId = this.stateData.interaction.id;
-          if (interactionId === null) {
-            throw new Error(
-              'Expected interactionId to be defined but ' +
-              'received ' + interactionId);
-          }
           this.stateEditorService.setInteraction(stateData.interaction);
           this.stateContentService.init(
             this.stateName, stateData.content);
