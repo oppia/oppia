@@ -115,7 +115,7 @@ class Registry:
         """Get component classes mapping for component types.
 
         Returns:
-            dict. A dict mapping from rte component types to rte component
+            A dict mapping from rte component types to rte component
             classes.
         """
         rte_path = [feconf.RTE_EXTENSIONS_DIR]
@@ -147,13 +147,13 @@ class Registry:
         value of a key.
 
         Args:
-            key: str. The key to be checked in component spec.
-            expected_value: bool. The expected value of the key to select
+            key: The key to be checked in component spec.
+            expected_value: The expected value of the key to select
                 the components.
 
         Returns:
-            list(str). A list of component tag names which have the expected
-            value of a key.
+            A list of component tag names which have the expected value
+            of a key.
         """
         rich_text_components_specs = cls.get_all_rte_components()
         component_tag_names = []
@@ -168,7 +168,7 @@ class Registry:
         """Get a list of inline component tag names.
 
         Returns:
-            list(str). A list of inline component tag names.
+            A list of inline component tag names.
         """
         return cls.get_component_tag_names('is_block_element', False)
 
@@ -177,7 +177,7 @@ class Registry:
         """Get a list of block component tag names.
 
         Returns:
-            list(str). A list of block component tag names.
+            A list of block component tag names.
         """
         return cls.get_component_tag_names('is_block_element', True)
 
@@ -186,7 +186,7 @@ class Registry:
         """Get a list of simple component tag names.
 
         Returns:
-            list(str). A list of simple component tag names.
+            A list of simple component tag names.
         """
         return cls.get_component_tag_names('is_complex', False)
 
@@ -195,6 +195,6 @@ class Registry:
         """Get a list of complex component tag names.
 
         Returns:
-            list(str). A list of complex component tag names.
+            A list of complex component tag names.
         """
         return cls.get_component_tag_names('is_complex', True)

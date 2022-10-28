@@ -68,8 +68,7 @@ class ParamSpec:
         """Initializes a ParamSpec object with the specified object type.
 
         Args:
-            obj_type: unicode. The object type with which the parameter is
-                initialized.
+            obj_type: The object type with which the parameter is initialized.
         """
         self.obj_type = obj_type
 
@@ -77,7 +76,7 @@ class ParamSpec:
         """Returns a dict representation of this ParamSpec.
 
         Returns:
-            dict. A dict with a single key, whose value is the type
+            A dict with a single key, whose value is the type
             of the parameter represented by this ParamSpec.
         """
         return {
@@ -89,13 +88,12 @@ class ParamSpec:
         """Creates a ParamSpec object from its dict representation.
 
         Args:
-            param_spec_dict: dict. The dictionary containing the specification
-                of the parameter. It contains the following key (object_type).
+            param_spec_dict: The dictionary containing the specification of
+                the parameter. It contains the following key (object_type).
                 `object_type` determines the data type of the parameter.
 
         Returns:
-            ParamSpec. A ParamSpec object created from the specified
-            object type.
+            A ParamSpec object created from the specified object type.
         """
         return cls(param_spec_dict['obj_type'])
 
@@ -130,10 +128,10 @@ class ParamChange:
         """Initialize a ParamChange object with the specified arguments.
 
         Args:
-            name: unicode. The name of the parameter.
-            generator_id: unicode. The type of generator used to create the
+            name: The name of the parameter.
+            generator_id: The type of generator used to create the
                 parameter, e.g., "Copier".
-            customization_args: dict. A dict containing the following keys:
+            customization_args: A dict containing the following keys:
                 (value, parse_with_jinja). `value` specifies the value of the
                 parameter, and `parse_with_jinja` indicates whether parsing is
                 to be done with the Jinja template engine. If the parameter is
@@ -152,7 +150,7 @@ class ParamChange:
         """The name of the changing parameter.
 
         Returns:
-            unicode. The name of the parameter.
+            The name of the parameter.
         """
         return self._name
 
@@ -162,7 +160,7 @@ class ParamChange:
         changing parameter.
 
         Returns:
-            subclass of BaseValueGenerator. The generator object for the
+            Subclass of BaseValueGenerator. The generator object for the
             parameter.
         """
         return value_generators_domain.Registry.get_generator_class_by_id(
@@ -174,7 +172,7 @@ class ParamChange:
         of the parameter.
 
         Returns:
-            dict: A dict specifying the following customization arguments for
+            A dict specifying the following customization arguments for
             the parameter. In case of a parameter change to a single value,
             this dict contains the value of the parameter and a key-value
             pair specifying whether parsing is done using the Jinja template
@@ -187,7 +185,7 @@ class ParamChange:
         """Returns a dict representing this ParamChange domain object.
 
         Returns:
-            dict. A dict representation of the ParamChange instance.
+            A dict representation of the ParamChange instance.
         """
         return {
             'name': self.name,
@@ -200,8 +198,8 @@ class ParamChange:
         """Create a ParamChange object with the specified arguments.
 
         Args:
-            param_change_dict: dict. A dict containing data about the
-                following keys: (customization_args(dict), name, generator_id).
+            param_change_dict: A dict containing data about the following keys:
+                (customization_args(dict), name, generator_id).
                 `customization_args` is a dict with the following keys:
                 (value, parse_with_jinja). `value` specifies the value of the
                 parameter and `parse_with_jinja` indicates whether parsing
@@ -213,9 +211,9 @@ class ParamChange:
                 generate the new value for the parameter.
 
         Returns:
-            ParamChange. The ParamChange object created from the
-            `param_change_dict` dict, which specifies the name,
-            customization arguments and the generator used.
+            The ParamChange object created from the `param_change_dict`
+            dict, which specifies the name, customization arguments and
+            the generator used.
         """
         return cls(
             param_change_dict['name'], param_change_dict['generator_id'],

@@ -262,10 +262,10 @@ def get_all_actions(roles: List[str]) -> List[str]:
     """Returns a list of all actions that can be performed by the given role.
 
     Args:
-        roles: list(str). A list of strings defining the user roles.
+        roles: A list of strings defining the user roles.
 
     Returns:
-        list(str). A list of actions accessible to the role.
+        A list of actions accessible to the role.
 
     Raises:
         Exception. The given role does not exist.
@@ -284,8 +284,8 @@ def get_role_actions() -> Dict[str, List[str]]:
     """Returns the possible role to actions items in the application.
 
     Returns:
-        dict(str, list(str)). A dict presenting key as role and values as list
-        of actions corresponding to the given role.
+        A dict presenting key as role and values as list of actions
+        corresponding to the given role.
     """
     return copy.deepcopy(_ROLE_ACTIONS)
 

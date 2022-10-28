@@ -52,9 +52,9 @@ def create_new_question(
     """Creates a new question.
 
     Args:
-        committer_id: str. ID of the committer.
-        question: Question. Question domain object.
-        commit_message: str. A description of changes made to the question.
+        committer_id: ID of the committer.
+        question: Question domain object.
+        commit_message: A description of changes made to the question.
     """
     question.validate()
     model = question_models.QuestionModel(
@@ -86,10 +86,10 @@ def link_multiple_skills_for_question(
     linked_skill_ids of the Question.
 
     Args:
-        user_id: str. ID of the creator.
-        question_id: str. ID of the question linked to the skills.
-        skill_ids: list(str). ID of the skills to which the question is linked.
-        skill_difficulties: list(float). The difficulty of the question with
+        user_id: ID of the creator.
+        question_id: ID of the question linked to the skills.
+        skill_ids: ID of the skills to which the question is linked.
+        skill_difficulties: The difficulty of the question with
             respect to a skill, represented by a float between
             0 and 1 (inclusive).
 
@@ -129,10 +129,10 @@ def create_new_question_skill_link(
     to the linked skill ids for the Question model.
 
     Args:
-        user_id: str. ID of the creator.
-        question_id: str. ID of the question linked to the skill.
-        skill_id: str. ID of the skill to which the question is linked.
-        skill_difficulty: float. The difficulty between [0, 1] of the skill.
+        user_id: ID of the creator.
+        question_id: ID of the question linked to the skill.
+        skill_id: ID of the skill to which the question is linked.
+        skill_difficulty: The difficulty between [0, 1] of the skill.
     """
     question = get_question_by_id(question_id)
 
@@ -157,9 +157,9 @@ def update_question_skill_link_difficulty(
     """Updates the difficulty value of question skill link.
 
     Args:
-        question_id: str. ID of the question.
-        skill_id: str. ID of the skill.
-        new_difficulty: float. New difficulty value.
+        question_id: ID of the question.
+        skill_id: ID of the skill.
+        new_difficulty: New difficulty value.
 
     Raises:
         Exception. Given question and skill are not linked.
@@ -186,11 +186,10 @@ def _update_linked_skill_ids_of_question(
     """Updates the question linked_skill ids in the Question model.
 
     Args:
-        user_id: str. ID of the creator.
-        question_id: str. ID of the question linked to the skill.
-        new_linked_skill_ids: list(str). New linked skill IDs of the question.
-        old_linked_skill_ids: list(str). Current linked skill IDs of the
-            question.
+        user_id: ID of the creator.
+        question_id: ID of the question linked to the skill.
+        new_linked_skill_ids: New linked skill IDs of the question.
+        old_linked_skill_ids: Current linked skill IDs of the question.
     """
     change_dict: Dict[str, Union[str, List[str]]] = {
         'cmd': 'update_question_property',
@@ -214,9 +213,9 @@ def delete_question_skill_link(
     from the Question model of question_id.
 
     Args:
-        user_id: str. ID of the creator.
-        question_id: str. ID of the question linked to the skill.
-        skill_id: str. ID of the skill to which the question is linked.
+        user_id: ID of the creator.
+        question_id: ID of the question linked to the skill.
+        skill_id: ID of the skill to which the question is linked.
     """
     question = get_question_by_id(question_id)
 
@@ -242,11 +241,10 @@ def get_total_question_count_for_skill_ids(skill_ids: List[str]) -> int:
     """Returns the number of questions assigned to the given skill_ids.
 
     Args:
-        skill_ids: list(str). Skill IDs for which the question count is
-            requested.
+        skill_ids: Skill IDs for which the question count is requested.
 
     Returns:
-        int. The total number of questions assigned to the given skill_ids.
+        The total number of questions assigned to the given skill_ids.
     """
     question_skill_link_model = question_models.QuestionSkillLinkModel
     question_count = (
@@ -264,23 +262,23 @@ def get_questions_by_skill_ids(
     """Returns constant number of questions linked to each given skill id.
 
     Args:
-        total_question_count: int. The total number of questions to return.
-        skill_ids: list(str). The IDs of the skills to which the questions
-            should be linked.
-        require_medium_difficulty: bool. Indicates whether the returned
+        total_question_count: The total number of questions to return.
+        skill_ids: The IDs of the skills to which the questions should be
+            linked.
+        require_medium_difficulty: Indicates whether the returned
             questions should be of medium difficulty.
 
     Returns:
-        list(Question). The list containing an expected number of
-        total_question_count questions linked to each given skill id.
-        question count per skill will be total_question_count divided by
-        length of skill_ids, and it will be rounded up if not evenly
-        divisible. If not enough questions for one skill, simply return
-        all questions linked to it. The order of questions will follow the
-        order of given skill ids, and the order of questions for the same
-        skill is random when require_medium_difficulty is false, otherwise
-        the order is sorted by absolute value of the difference between
-        skill difficulty and the medium difficulty.
+        The list containing an expected number of total_question_count
+        questions linked to each given skill id. question count per skill
+        will be total_question_count divided by length of skill_ids, and
+        it will be rounded up if not evenly divisible. If not enough
+        questions for one skill, simply return all questions linked to it.
+        The order of questions will follow the order of given skill ids,
+        and the order of questions for the same skill is random when
+        require_medium_difficulty is false, otherwise the order is sorted
+        by absolute value of the difference between skill difficulty and
+        the medium difficulty.
 
     Raises:
         Exception. Question count is higher than the maximum limit.
@@ -318,7 +316,7 @@ def get_new_question_id() -> str:
     """Returns a new question id.
 
     Returns:
-        str. A new question id.
+        A new question id.
     """
     return question_models.QuestionModel.get_new_id('')
 
@@ -329,8 +327,8 @@ def add_question(
     """Saves a new question.
 
     Args:
-        committer_id: str. ID of the committer.
-        question: Question. Question to be saved.
+        committer_id: ID of the committer.
+        question: Question to be saved.
     """
     commit_message = 'New question created'
     create_new_question(committer_id, question, commit_message)
@@ -342,9 +340,9 @@ def delete_question(
     """Deletes the question with the given question_id.
 
     Args:
-        committer_id: str. ID of the committer.
-        question_id: str. ID of the question.
-        force_deletion: bool. If true, the question and its history are fully
+        committer_id: ID of the committer.
+        question_id: ID of the question.
+        force_deletion: If true, the question and its history are fully
             deleted and are unrecoverable. Otherwise, the question and all
             its history are marked as deleted, but the corresponding models are
             still retained in the datastore. This last option is the preferred
@@ -381,13 +379,12 @@ def get_question_skill_link_from_model(
     """Returns domain object representing the given question skill link model.
 
     Args:
-        question_skill_link_model: QuestionSkillLinkModel. The question skill
-            link model loaded from the datastore.
-        skill_description: str. The description of skill linked to question.
+        question_skill_link_model: The question skill link model loaded
+            from the datastore.
+        skill_description: The description of skill linked to question.
 
     Returns:
-        QuestionSkillLink. The domain object representing the question skill
-        link model.
+        The domain object representing the question skill link model.
     """
 
     return question_domain.QuestionSkillLink(
@@ -420,13 +417,13 @@ def get_question_by_id(
     """Returns a domain object representing a question.
 
     Args:
-        question_id: str. ID of the question.
-        strict: bool. Whether to fail noisily if no question with the given
+        question_id: ID of the question.
+        strict: Whether to fail noisily if no question with the given
             id exists in the datastore.
 
     Returns:
-        Question or None. The domain object representing a question with the
-        given id, or None if it does not exist.
+        The domain object representing a question with the given id,
+        or None if it does not exist.
     """
     question_model = question_models.QuestionModel.get(
         question_id, strict=strict)
@@ -444,13 +441,12 @@ def get_question_skill_links_of_skill(
     a particular skill ID.
 
     Args:
-        skill_id: str. ID of the skill.
-        skill_description: str. Description of the skill.
+        skill_id: ID of the skill.
+        skill_description: Description of the skill.
 
     Returns:
-        list(QuestionSkillLink). The list of question skill link
-        domain objects that are linked to the skill ID or an empty list
-        if the skill does not exist.
+        The list of question skill link domain objects that are linked
+        to the skill ID or an empty list if the skill does not exist.
     """
 
     question_skill_links = [
@@ -465,10 +461,10 @@ def get_skills_linked_to_question(question_id: str) -> List[skill_domain.Skill]:
     """Returns a list of skills linked to a particular question.
 
     Args:
-        question_id: str. ID of the question.
+        question_id: ID of the question.
 
     Returns:
-        list(Skill). The list of skills that are linked to the question.
+        The list of skills that are linked to the question.
     """
     question = get_question_by_id(question_id)
     skills = skill_fetchers.get_multi_skills(question.linked_skill_ids)
@@ -482,9 +478,9 @@ def replace_skill_id_for_all_questions(
     skill ID.
 
     Args:
-        curr_skill_id: str. ID of the current skill.
-        curr_skill_description: str. Description of the current skill.
-        new_skill_id: str. ID of the superseding skill.
+        curr_skill_id: ID of the current skill.
+        curr_skill_description: Description of the current skill.
+        new_skill_id: ID of the superseding skill.
     """
     old_question_skill_link_models = (
         question_models.QuestionSkillLinkModel.get_models_by_skill_id(
@@ -527,17 +523,16 @@ def get_displayable_question_skill_link_details(
     descriptions linked to all the skills given by skill_ids.
 
     Args:
-        question_count: int. The number of questions to fetch.
-        skill_ids: list(str). The ids of skills for which the linked questions
+        question_count: The number of questions to fetch.
+        skill_ids: The ids of skills for which the linked questions
             are to be retrieved.
-        offset: int. Number of query results to skip.
+        offset: Number of query results to skip.
 
     Raises:
         Exception. Querying linked question summaries for more than 3 skills at
             a time is not supported currently.
 
     Returns:
-        list(QuestionSummary), list(MergedQuestionSkillLink).
         The list of questions linked to the given skill ids, the list of
         MergedQuestionSkillLink objects, keyed by question ID.
     """
@@ -587,11 +582,11 @@ def get_question_summaries_by_ids(
     """Returns a list of domain objects representing question summaries.
 
     Args:
-        question_ids: list(str). List of question ids.
+        question_ids: List of question ids.
 
     Returns:
-        list(QuestionSummary|None). A list of domain objects representing
-        question summaries with the given ids or None when the id is not valid.
+        A list of domain objects representing question summaries with the given
+        ids or None when the id is not valid.
     """
     question_summary_model_list = (
         question_models.QuestionSummaryModel.get_multi(question_ids))
@@ -611,13 +606,12 @@ def apply_change_list(
     """Applies a changelist to a pristine question and returns the result.
 
     Args:
-        question_id: str. ID of the given question.
-        change_list: list(QuestionChange). A change list to be applied to the
-            given question. Each entry in change_list is a QuestionChange
-            object.
+        question_id: ID of the given question.
+        change_list: A change list to be applied to the given question.
+            Each entry in change_list is a QuestionChange object.
 
     Returns:
-        Question. The resulting question domain object.
+        The resulting question domain object.
 
     Raises:
         Exception. The change list is not applicable to the question.
@@ -696,14 +690,11 @@ def _save_question(
     """Validates a question and commits it to persistent storage.
 
     Args:
-        committer_id: str. The id of the user who is performing the update
-            action.
-        question: Question. The domain object representing a question.
-        change_list: list(QuestionChange). A list of QuestionChange objects.
-            These changes are applied in sequence to produce the resulting
-            question.
-        commit_message: str. A description of changes made to the
-            question.
+        committer_id: The id of the user who is performing the update action.
+        question: The domain object representing a question.
+        change_list: A list of QuestionChange objects. These changes are applied
+            in sequence to produce the resulting question.
+        commit_message: A description of changes made to the question.
 
     Raises:
         Exception. Received an invalid change list.
@@ -736,14 +727,11 @@ def update_question(
     """Updates a question. Commits changes.
 
     Args:
-        committer_id: str. The ID of the user who is performing the update
-            action.
-        question_id: str. The question ID.
-        change_list: list(QuestionChange). A list of QuestionChange objects.
-            These changes are applied in sequence to produce the resulting
-            question.
-        commit_message: str. A description of changes made to the
-            question.
+        committer_id: The ID of the user who is performing the update action.
+        question_id: The question ID.
+        change_list: A list of QuestionChange objects. These changes are applied
+            in sequence to produce the resulting question.
+        commit_message: A description of changes made to the question.
 
     Raises:
         ValueError. No commit message was provided.
@@ -761,7 +749,7 @@ def create_question_summary(question_id: str) -> None:
     """Creates and stores a summary of the given question.
 
     Args:
-        question_id: str. ID of the question.
+        question_id: ID of the question.
     """
     question = get_question_by_id(question_id)
     question_summary = compute_summary_of_question(question)
@@ -775,11 +763,10 @@ def compute_summary_of_question(
     object and return it.
 
     Args:
-        question: Question. The question object for which the summary
-            is to be computed.
+        question: The question object for which the summary is to be computed.
 
     Returns:
-        QuestionSummary. The computed summary for the given question.
+        The computed summary for the given question.
 
     Raises:
         Exception. No interaction_id found for the given question.
@@ -818,8 +805,8 @@ def save_question_summary(
     entity in the datastore.
 
     Args:
-        question_summary: QuestionSummaryModel. The question summary object to
-            be saved in the datastore.
+        question_summary: The question summary object to be saved in
+            the datastore.
     """
     question_summary_model = question_models.QuestionSummaryModel(
         id=question_summary.id,
@@ -841,11 +828,11 @@ def get_question_summary_from_model(
     question summary model.
 
     Args:
-        question_summary_model: QuestionSummaryModel. The QuestionSummary model
-            object to fetch corresponding QuestionSummary domain object.
+        question_summary_model: The QuestionSummary model object to
+            fetch corresponding QuestionSummary domain object.
 
     Returns:
-        QuestionSummary. The domain object corresponding to the given question
+        The domain object corresponding to the given question
         summary model.
     """
     return question_domain.QuestionSummary(
@@ -862,10 +849,10 @@ def get_interaction_id_for_question(question_id: str) -> Optional[str]:
     """Returns the interaction id for the given question.
 
     Args:
-        question_id: str. ID of the question.
+        question_id: ID of the question.
 
     Returns:
-        str. The ID of the interaction of the question.
+        The ID of the interaction of the question.
 
     Raises:
         Exception. The question does not exists of the ID question_id.
@@ -886,10 +873,10 @@ def untag_deleted_misconceptions(
     to a skill with the provided skill_id.
 
     Args:
-        committer_id: str. The id of the user who triggered the update.
-        skill_id: str. The skill id.
-        skill_description: str. The description of the skill.
-        deleted_skill_misconception_ids: list(str). The skill misconception
+        committer_id: The id of the user who triggered the update.
+        skill_id: The skill id.
+        skill_description: The description of the skill.
+        deleted_skill_misconception_ids: The skill misconception
             ids of deleted misconceptions. The list items take the form
             <skill_id>-<misconception_id>.
     """

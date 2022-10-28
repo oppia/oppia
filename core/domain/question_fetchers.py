@@ -50,15 +50,14 @@ def get_questions_and_skill_descriptions_by_skill_ids(
     """Returns the questions linked to the given skill ids.
 
     Args:
-        question_count: int. The number of questions to return.
-        skill_ids: list(str). The ID of the skills to which the questions are
-            linked.
-        offset: int. Number of query results to skip.
+        question_count: The number of questions to return.
+        skill_ids: The ID of the skills to which the questions are linked.
+        offset: Number of query results to skip.
 
     Returns:
-        list(Question|None), list(list(str|None)). The list of questions, and
-        the corresponding linked skill descriptions which are linked to the
-        given skill ids and None when skill are not available.
+        The list of questions, and the corresponding linked skill descriptions
+        which are linked to the given skill ids and None when skill are not
+        available.
     """
     if not skill_ids:
         return [], []
@@ -92,11 +91,11 @@ def get_questions_by_ids(
     """Returns a list of domain objects representing questions.
 
     Args:
-        question_ids: list(str). List of question ids.
+        question_ids: List of question ids.
 
     Returns:
-        list(Question|None). A list of domain objects representing questions
-        with the given ids or None when the id is not valid.
+        A list of domain objects representing questions with the given
+        ids or None when the id is not valid.
     """
     question_model_list = question_models.QuestionModel.get_multi(question_ids)
     questions: List[Optional[question_domain.Question]] = []
@@ -114,11 +113,10 @@ def get_question_from_model(
     """Returns domain object representing the given question model.
 
     Args:
-        question_model: QuestionModel. The question model loaded from the
-            datastore.
+        question_model: The question model loaded from the datastore.
 
     Returns:
-        Question. The domain object representing the question model.
+        The domain object representing the question model.
     """
 
     # Ensure the original question model does not get altered.
@@ -154,11 +152,9 @@ def _migrate_state_schema(
     to account for that new version.
 
     Args:
-        versioned_question_state: dict. A dict with two keys:
-            state_schema_version: int. the state schema version for the
-                question.
-            state: The State domain object representing the question
-                state data.
+        versioned_question_state: A dict with two keys:
+            state_schema_version: the state schema version for the question.
+            state: The State domain object representing the question state data.
 
     Raises:
         Exception. The given state_schema_version is invalid.

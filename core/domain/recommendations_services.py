@@ -317,15 +317,13 @@ def get_item_similarity(
     returns 0.0 if compared_exp is private.
 
     Args:
-        reference_exp_summary: ExplorationSummary. The reference exploration
-            summary. The similarity score says how similar is
-            the compared summary to this summary.
-        compared_exp_summary: ExplorationSummary. The compared exploration
-            summary. The similarity score says how similar is this summary to
-            the reference summary.
+        reference_exp_summary: The reference exploration summary. The similarity
+            score says how similar is the compared summary to this summary.
+        compared_exp_summary: The compared exploration summary. The similarity
+            score says how similar is this summary to the reference summary.
 
     Returns:
-        float. The similarity score.
+        The similarity score.
     """
 
     similarity_score = 0.0
@@ -362,10 +360,8 @@ def set_exploration_recommendations(
     after completing the exploration keyed by exp_id.
 
     Args:
-        exp_id: str. The ID of the exploration for which to set
-            the recommendations.
-        new_recommendations: list(str). The new recommended exploration IDs
-            to set.
+        exp_id: The ID of the exploration for which to set the recommendations.
+        new_recommendations: The new recommended exploration IDs to set.
     """
 
     recommendations_models.ExplorationRecommendationsModel(
@@ -377,11 +373,10 @@ def get_exploration_recommendations(exp_id: str) -> List[str]:
     after completing the exploration keyed by exp_id.
 
     Args:
-        exp_id: str. The ID of the exploration for which to get
-            the recommendations.
+        exp_id: The ID of the exploration for which to get the recommendations.
 
     Returns:
-        list(str). List of recommended explorations IDs.
+        List of recommended explorations IDs.
     """
 
     recommendations_model = (
@@ -406,8 +401,8 @@ def delete_explorations_from_recommendations(exp_ids: List[str]) -> None:
     the given explorations from other explorations' recommendations.
 
     Args:
-        exp_ids: list(str). List of exploration IDs for which to delete
-            the recommendations.
+        exp_ids: List of exploration IDs for which to delete the
+            recommendations.
     """
     recs_model_class = (
         recommendations_models.ExplorationRecommendationsModel)

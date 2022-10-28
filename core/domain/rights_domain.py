@@ -159,7 +159,7 @@ class ActivityRights:
         """Returns a dict suitable for use by the frontend.
 
         Returns:
-            dict. A dict version of ActivityRights suitable for use by the
+            A dict version of ActivityRights suitable for use by the
             frontend.
         """
         if self.community_owned:
@@ -193,10 +193,10 @@ class ActivityRights:
         """Checks whether given user is owner of activity.
 
         Args:
-            user_id: str or None. Id of the user.
+            user_id: Id of the user.
 
         Returns:
-            bool. Whether user is an activity owner.
+            Whether user is an activity owner.
         """
         return bool(user_id in self.owner_ids)
 
@@ -204,10 +204,10 @@ class ActivityRights:
         """Checks whether given user is editor of activity.
 
         Args:
-            user_id: str or None. Id of the user.
+            user_id: Id of the user.
 
         Returns:
-            bool. Whether user is an activity editor.
+            Whether user is an activity editor.
         """
         return bool(user_id in self.editor_ids)
 
@@ -215,10 +215,10 @@ class ActivityRights:
         """Checks whether given user is voice artist of activity.
 
         Args:
-            user_id: str or None. Id of the user.
+            user_id: Id of the user.
 
         Returns:
-            bool. Whether user is an activity voice artist.
+            Whether user is an activity voice artist.
         """
         return bool(user_id in self.voice_artist_ids)
 
@@ -226,10 +226,10 @@ class ActivityRights:
         """Checks whether given user is viewer of activity.
 
         Args:
-            user_id: str or None. Id of the user.
+            user_id: Id of the user.
 
         Returns:
-            bool. Whether user is an activity viewer.
+            Whether user is an activity viewer.
         """
         return bool(user_id in self.viewer_ids)
 
@@ -237,7 +237,7 @@ class ActivityRights:
         """Checks whether activity is published.
 
         Returns:
-            bool. Whether activity is published.
+            Whether activity is published.
         """
         return self.status == ACTIVITY_STATUS_PUBLIC
 
@@ -245,7 +245,7 @@ class ActivityRights:
         """Checks whether activity is private.
 
         Returns:
-            bool. Whether activity is private.
+            Whether activity is private.
         """
         return self.status == ACTIVITY_STATUS_PRIVATE
 
@@ -253,10 +253,10 @@ class ActivityRights:
         """Checks whether the activity is solely owned by the user.
 
         Args:
-            user_id: str. The id of the user.
+            user_id: The id of the user.
 
         Returns:
-            bool. Whether the activity is solely owned by the user.
+            Whether the activity is solely owned by the user.
         """
         return user_id in self.owner_ids and len(self.owner_ids) == 1
 
@@ -264,11 +264,11 @@ class ActivityRights:
         """Assigns new role to user and removes previous role if present.
 
         Args:
-            user_id: str. The ID of the user.
-            new_role: str. The role of the user.
+            user_id: The ID of the user.
+            new_role: The role of the user.
 
         Returns:
-            str. The previous role of the user.
+            The previous role of the user.
 
         Raises:
             Exception. If previous role is assigned again.

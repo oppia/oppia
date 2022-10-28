@@ -66,16 +66,16 @@ class Registry:
         """Creates, registers and returns a platform parameter.
 
         Args:
-            name: Enum(PARAMS). The name of the platform parameter.
-            description: str. The description of the platform parameter.
-            data_type: Enum(DataTypes). The data type of the platform
-                parameter, must be one of the following: bool, number, string.
-            is_feature: bool. True if the platform parameter is a feature flag.
-            feature_stage: Enum(FeatureStages)|None. The stage of the feature,
-                required if 'is_feature' is True.
+            name: The name of the platform parameter.
+            description: The description of the platform parameter.
+            data_type: The data type of the platform parameter, must be one of
+                the following: bool, number, string.
+            is_feature: True if the platform parameter is a feature flag.
+            feature_stage: The stage of the feature, required if
+                'is_feature' is True.
 
         Returns:
-            PlatformParameter. The created platform parameter.
+            The created platform parameter.
 
         Raises:
             Exception. The data type is not supported.
@@ -115,12 +115,12 @@ class Registry:
         feature flag.
 
         Args:
-            name: Enum(PARAMS). The name of the platform parameter.
-            description: str. The description of the platform parameter.
-            stage: Enum(FeatureStages). The stage of the feature.
+            name: The name of the platform parameter.
+            description: The description of the platform parameter.
+            stage: The stage of the feature.
 
         Returns:
-            PlatformParameter. The created feature flag.
+            The created feature flag.
         """
         return cls.create_platform_parameter(
             name, description, platform_parameter_domain.DataTypes.BOOL,
@@ -136,8 +136,8 @@ class Registry:
         values as instances of the specified parameter.
 
         Args:
-            name: str. The name of the platform parameter.
-            instance: PlatformParameter. The instance of the platform parameter.
+            name: The name of the platform parameter.
+            instance: The instance of the platform parameter.
 
         Raises:
             Exception. The given name of the platform parameter already exists.
@@ -154,11 +154,10 @@ class Registry:
         parameter.
 
         Args:
-            name: str. The name of the platform parameter.
+            name: The name of the platform parameter.
 
         Returns:
-            PlatformParameter. The instance of the specified platform
-            parameter.
+            The instance of the specified platform parameter.
 
         Raises:
             Exception. The given name of the platform parameter doesn't exist.
@@ -194,11 +193,10 @@ class Registry:
         """Updates the platform parameter with new rules.
 
         Args:
-            name: str. The name of the platform parameter to update.
-            committer_id: str. ID of the committer.
-            commit_message: str. The commit message.
-            new_rules: list(PlatformParameterRule). A list of
-                PlatformParameterRule objects.
+            name: The name of the platform parameter to update.
+            committer_id: ID of the committer.
+            commit_message: The commit message.
+            new_rules: A list of PlatformParameterRule objects.
         """
         param = cls.get_platform_parameter(name)
 
@@ -234,7 +232,7 @@ class Registry:
         """Return a list of all the platform parameter names.
 
         Returns:
-            list(str). The list of all platform parameter names.
+            The list of all platform parameter names.
         """
         return list(cls.parameter_registry.keys())
 
@@ -246,10 +244,10 @@ class Registry:
         """Evaluate all platform parameters with the given context.
 
         Args:
-            context: EvaluationContext. The context for evaluation.
+            context: The context for evaluation.
 
         Returns:
-            dict. The keys are the platform parameter names and the values are
+            The keys are the platform parameter names and the values are
             results of evaluation of the corresponding parameters.
         """
         result_dict = {}
@@ -267,11 +265,11 @@ class Registry:
         dict representation of a platform parameter.
 
         Args:
-            parameter_dict: dict. A dict mapping of all fields of
+            parameter_dict: A dict mapping of all fields of
                 PlatformParameter object.
 
         Returns:
-            PlatformParameter. The created platform parameter.
+            The created platform parameter.
         """
         parameter = platform_parameter_domain.PlatformParameter.from_dict(
             parameter_dict)
@@ -287,11 +285,10 @@ class Registry:
         """Loads platform parameter from storage.
 
         Args:
-            name: str. The name of the platform parameter.
+            name: The name of the platform parameter.
 
         Returns:
-            PlatformParameter|None. The loaded instance, None if it's not found
-            in storage.
+            The loaded instance, None if it's not found in storage.
         """
         parameter_model = config_models.PlatformParameterModel.get(
             name, strict=False)
@@ -318,11 +315,10 @@ class Registry:
         """Loads cached platform parameter from memcache.
 
         Args:
-            name: str. The name of the platform parameter.
+            name: The name of the platform parameter.
 
         Returns:
-            PlatformParameter|None. The loaded instance, None if it's not found
-            in cache.
+            The loaded instance, None if it's not found in cache.
         """
         cached_parameter = caching_services.get_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None, [name]
@@ -338,10 +334,10 @@ class Registry:
         domain object.
 
         Args:
-            param: PlatformParameter. The platform parameter domain object.
+            param: The platform parameter domain object.
 
         Returns:
-            PlatformParameterModel. The corresponding storage model.
+            The corresponding storage PlatformParameterModel.
         """
         model_instance = config_models.PlatformParameterModel.get(
             param.name, strict=False)

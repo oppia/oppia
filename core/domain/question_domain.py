@@ -264,24 +264,20 @@ class Question(translation_domain.BaseTranslatableObject):
         """Constructs a Question domain object.
 
         Args:
-            question_id: str. The unique ID of the question.
-            question_state_data: State. An object representing the question
-                state data.
-            question_state_data_schema_version: int. The schema version of the
+            question_id: The unique ID of the question.
+            question_state_data: An object representing the question state data.
+            question_state_data_schema_version: The schema version of the
                 question states (equivalent to the states schema version of
                 explorations).
-            language_code: str. The ISO 639-1 code for the language this
+            language_code: The ISO 639-1 code for the language this
                 question is written in.
-            version: int. The version of the question.
-            linked_skill_ids: list(str). Skill ids linked to the question.
+            version: The version of the question.
+            linked_skill_ids: Skill ids linked to the question.
                 Note: Do not update this field manually.
-            inapplicable_skill_misconception_ids: list(str). Optional
-                misconception ids that are marked as not relevant to the
-                question.
-            created_on: datetime.datetime. Date and time when the question was
-                created.
-            last_updated: datetime.datetime. Date and time when the
-                question was last updated.
+            inapplicable_skill_misconception_ids: Optional misconception ids
+                that are marked as not relevant to the question.
+            created_on: Date and time when the question was created.
+            last_updated: Date and time when the question was last updated.
         """
         self.id = question_id
         self.question_state_data = question_state_data
@@ -301,7 +297,6 @@ class Question(translation_domain.BaseTranslatableObject):
         """Registers all of translatable fields/objects in the question.
 
         Returns:
-            translatable_contents_collection: TranslatableContentsCollection.
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
@@ -315,7 +310,7 @@ class Question(translation_domain.BaseTranslatableObject):
         """Returns a dict representing this Question domain object.
 
         Returns:
-            dict. A dict representation of the Question instance.
+            A dict representation of the Question instance.
         """
         return {
             'id': self.id,
@@ -335,7 +330,7 @@ class Question(translation_domain.BaseTranslatableObject):
         question state data.
 
         Returns:
-            State. The corresponding State domain object.
+            The corresponding State domain object.
         """
         return state_domain.State.create_default_state(
             None, is_initial_state=True)
@@ -348,11 +343,10 @@ class Question(translation_domain.BaseTranslatableObject):
         content_ids_to_audio_translations with recorded_voiceovers.
 
         Args:
-            question_state_dict: dict. The dict representation of
-                question_state_data.
+            question_state_dict: The dict representation of question_state_data.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         # Here we use MyPy ignore because in _convert_* functions, we allow less
         # strict typing because here we are working with previous versions of
@@ -377,11 +371,10 @@ class Question(translation_domain.BaseTranslatableObject):
         about why they landed on a particular answer.
 
         Args:
-            question_state_dict: dict. The dict representation of
-                question_state_data.
+            question_state_dict: The dict representation of question_state_data.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         question_state_dict['solicit_answer_details'] = False
         return question_state_dict
@@ -395,12 +388,12 @@ class Question(translation_domain.BaseTranslatableObject):
         is default to None.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         answer_groups = question_state_dict['interaction']['answer_groups']
         for answer_group in answer_groups:
@@ -425,12 +418,12 @@ class Question(translation_domain.BaseTranslatableObject):
         Voiceover model to have an initialized duration_secs attribute of 0.0.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         # Get the voiceovers_mapping metadata.
         voiceovers_mapping = (
@@ -454,12 +447,12 @@ class Question(translation_domain.BaseTranslatableObject):
         creators to add custom text to the "Add" button.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         if question_state_dict['interaction']['id'] == 'SetInput':
             customization_args = question_state_dict[
@@ -481,12 +474,12 @@ class Question(translation_domain.BaseTranslatableObject):
         answer choices to be shuffled.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         if question_state_dict['interaction']['id'] == 'MultipleChoiceInput':
             customization_args = question_state_dict[
@@ -508,12 +501,12 @@ class Question(translation_domain.BaseTranslatableObject):
         to for storing SVG filenames.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         question_state_dict = state_domain.State.convert_html_fields_in_state(
             question_state_dict,
@@ -532,12 +525,12 @@ class Question(translation_domain.BaseTranslatableObject):
         interactions.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         is_valid_algebraic_expression = schema_utils.get_validator(
             'is_valid_algebraic_expression')
@@ -674,12 +667,12 @@ class Question(translation_domain.BaseTranslatableObject):
         name from initial_code to initialCode.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         max_existing_content_id_index = -1
         translations_mapping = question_state_dict[
@@ -734,7 +727,7 @@ class Question(translation_domain.BaseTranslatableObject):
                 """Initializes a ContentIdCounter object.
 
                 Args:
-                    next_content_id_index: int. The next content id index.
+                    next_content_id_index: The next content id index.
                 """
                 self.next_content_id_index = next_content_id_index
 
@@ -743,10 +736,10 @@ class Question(translation_domain.BaseTranslatableObject):
                 the next content id index.
 
                 Args:
-                    content_id_prefix: str. The prefix of the content_id.
+                    content_id_prefix: The prefix of the content_id.
 
                 Returns:
-                    str. The generated content_id.
+                    The generated content_id.
                 """
                 content_id = '%s%i' % (
                     content_id_prefix,
@@ -885,12 +878,12 @@ class Question(translation_domain.BaseTranslatableObject):
         type CaseSensitiveEquals to Equals.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         if question_state_dict['interaction']['id'] == 'TextInput':
             answer_group_dicts = question_state_dict[
@@ -911,12 +904,12 @@ class Question(translation_domain.BaseTranslatableObject):
         that would be displayed to the learner.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         if question_state_dict['interaction']['id'] in (
                 'AlgebraicExpressionInput', 'MathEquationInput'):
@@ -956,12 +949,12 @@ class Question(translation_domain.BaseTranslatableObject):
         creators to modify the placeholder text.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         if question_state_dict['interaction']['id'] == 'NumericExpressionInput':
             customization_args = question_state_dict[
@@ -990,12 +983,12 @@ class Question(translation_domain.BaseTranslatableObject):
         inputs from NormalizedString to SetOfNormalizedString.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         if question_state_dict['interaction']['id'] == 'TextInput':
             answer_group_dicts = question_state_dict[
@@ -1031,12 +1024,12 @@ class Question(translation_domain.BaseTranslatableObject):
         objects to RuleSpec domain objects to allow for translations.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         class ContentIdCounter:
             """This helper class is used to keep track of
@@ -1048,7 +1041,7 @@ class Question(translation_domain.BaseTranslatableObject):
                 """Initializes a ContentIdCounter object.
 
                 Args:
-                    next_content_id_index: int. The next content id index.
+                    next_content_id_index: The next content id index.
                 """
                 self.new_content_ids: List[str] = []
                 self.next_content_id_index = next_content_id_index
@@ -1058,10 +1051,10 @@ class Question(translation_domain.BaseTranslatableObject):
                 the next content id index.
 
                 Args:
-                    content_id_prefix: str. The prefix of the content_id.
+                    content_id_prefix: The prefix of the content_id.
 
                 Returns:
-                    str. The generated content_id.
+                    The generated content_id.
                 """
                 content_id = '%s%i' % (
                     content_id_prefix,
@@ -1131,12 +1124,12 @@ class Question(translation_domain.BaseTranslatableObject):
         updated.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
 
         @overload
@@ -1179,13 +1172,13 @@ class Question(translation_domain.BaseTranslatableObject):
             content_ids for equality.
 
             Args:
-                new_type: str. The type to migrate to.
-                value: *. The value to migrate.
-                choices: list(dict). The list of subtitled html dicts to extract
-                    content ids from.
+                new_type: The type to migrate to.
+                value: The value to migrate.
+                choices: The list of subtitled html dicts to extract content
+                    ids from.
 
             Returns:
-                *. The migrated rule input.
+                The migrated rule input.
             """
 
             def extract_content_id_from_choices(html: str) -> str:
@@ -1193,10 +1186,10 @@ class Question(translation_domain.BaseTranslatableObject):
                 which is a list of subtitled html dicts.
 
                 Args:
-                    html: str. The html to find the content id of.
+                    html: The html to find the content id of.
 
                 Returns:
-                    str. The content id of html.
+                    The content id of html.
                 """
                 for subtitled_html_dict in choices:
                     if subtitled_html_dict['html'] == html:
@@ -1371,12 +1364,12 @@ class Question(translation_domain.BaseTranslatableObject):
         division operation.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         if question_state_dict['interaction']['id'] in [
                 'NumericExpressionInput', 'AlgebraicExpressionInput',
@@ -1400,11 +1393,10 @@ class Question(translation_domain.BaseTranslatableObject):
         mark a state as a checkpoint for the learners.
 
         Args:
-            question_state_dict: dict. A dict representation of
-                question_state_data.
+            question_state_dict: A dict representation of question_state_data.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         question_state_dict['card_is_checkpoint'] = False
         return question_state_dict
@@ -1417,12 +1409,12 @@ class Question(translation_domain.BaseTranslatableObject):
         linked skil id.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted states_dict.
+            The converted states_dict.
         """
 
         question_state_dict['linked_skill_id'] = None
@@ -1439,12 +1431,12 @@ class Question(translation_domain.BaseTranslatableObject):
         no conversion is required.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a State
+                domain object.
 
         Returns:
-            dict. The converted states_dict.
+            The converted states_dict.
         """
 
         return question_state_dict
@@ -1458,12 +1450,12 @@ class Question(translation_domain.BaseTranslatableObject):
         it to oppia-noninteractive-image tag.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted states_dict.
+            The converted states_dict.
         """
 
         state_domain.State.convert_html_fields_in_state(
@@ -1480,12 +1472,12 @@ class Question(translation_domain.BaseTranslatableObject):
         fixes encoding issues in HTML fields.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted states_dict.
+            The converted states_dict.
         """
 
         state_domain.State.convert_html_fields_in_state(
@@ -1504,12 +1496,12 @@ class Question(translation_domain.BaseTranslatableObject):
         or equal to zero.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         if question_state_dict['interaction']['id'] == 'NumericInput':
             customization_args = question_state_dict[
@@ -1531,12 +1523,12 @@ class Question(translation_domain.BaseTranslatableObject):
         `customOskLetters` cust arg to `allowedVariables`.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
         if question_state_dict[
                 'interaction']['id'] in exp_domain.MATH_INTERACTION_TYPES:
@@ -1577,12 +1569,12 @@ class Question(translation_domain.BaseTranslatableObject):
         to a state for strengthening concepts when they get really stuck.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
 
         answer_groups = question_state_dict['interaction']['answer_groups']
@@ -1604,12 +1596,12 @@ class Question(translation_domain.BaseTranslatableObject):
         question dicts.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
+            question_state_dict: A dict where each key-value pair represents
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
         Returns:
-            dict. The converted question_state_dict.
+            The converted question_state_dict.
         """
 
         return question_state_dict
@@ -1627,13 +1619,12 @@ class Question(translation_domain.BaseTranslatableObject):
         in-place.
 
         Args:
-            versioned_question_state: dict. A dict with two keys:
-                - state_schema_version: int. The state schema version for the
+            versioned_question_state: A dict with two keys:
+                - state_schema_version: The state schema version for the
                     question.
                 - state: The State domain object representing the question
                     state data.
-            current_state_schema_version: int. The current state
-                schema version.
+            current_state_schema_version: The current state schema version.
         """
         versioned_question_state['state_schema_version'] = (
             current_state_schema_version + 1)
@@ -1801,7 +1792,7 @@ class Question(translation_domain.BaseTranslatableObject):
         """Returns a Question domain object from dict.
 
         Returns:
-            Question. The corresponding Question domain object.
+            The corresponding Question domain object.
         """
         question = cls(
             question_dict['id'],
@@ -1820,11 +1811,11 @@ class Question(translation_domain.BaseTranslatableObject):
         """Returns a Question domain object with default values.
 
         Args:
-            question_id: str. The unique ID of the question.
-            skill_ids: list(str). List of skill IDs attached to this question.
+            question_id: The unique ID of the question.
+            skill_ids: List of skill IDs attached to this question.
 
         Returns:
-            Question. A Question domain object with default values.
+            A Question domain object with default values.
         """
         default_question_state_data = cls.create_default_question_state()
 
@@ -1837,7 +1828,7 @@ class Question(translation_domain.BaseTranslatableObject):
         """Updates the language code of the question.
 
         Args:
-            language_code: str. The ISO 639-1 code for the language this
+            language_code: The ISO 639-1 code for the language this
                 question is written in.
         """
         self.language_code = language_code
@@ -1846,7 +1837,7 @@ class Question(translation_domain.BaseTranslatableObject):
         """Updates the linked skill ids of the question.
 
         Args:
-            linked_skill_ids: list(str). The skill ids linked to the question.
+            linked_skill_ids: The skill ids linked to the question.
         """
         self.linked_skill_ids = list(set(linked_skill_ids))
 
@@ -1857,9 +1848,8 @@ class Question(translation_domain.BaseTranslatableObject):
         to the question.
 
         Args:
-            inapplicable_skill_misconception_ids: list(str). The optional
-                skill misconception ids marked as not applicable to the
-                question.
+            inapplicable_skill_misconception_ids: The optional skill
+                misconception ids marked as not applicable to the question.
         """
         self.inapplicable_skill_misconception_ids = list(
             set(inapplicable_skill_misconception_ids))
@@ -1870,7 +1860,7 @@ class Question(translation_domain.BaseTranslatableObject):
         """Updates the question data of the question.
 
         Args:
-            question_state_data: State. A State domain object
+            question_state_data: A State domain object
                 representing the question state data.
         """
         self.question_state_data = question_state_data
@@ -1902,17 +1892,17 @@ class QuestionSummary:
         """Constructs a Question Summary domain object.
 
         Args:
-            question_id: str. The ID of the question.
-            question_content: str. The static HTML of the question shown to
+            question_id: The ID of the question.
+            question_content: The static HTML of the question shown to
                 the learner.
-            misconception_ids: list(str). The misconception ids addressed in
-                the question. This includes tagged misconceptions ids as well
-                as inapplicable misconception ids in the question.
-            interaction_id: str. The ID of the interaction.
-            question_model_created_on: datetime.datetime. Date and time when
-                the question model is created.
-            question_model_last_updated: datetime.datetime. Date and time
-                when the question model was last updated.
+            misconception_ids: The misconception ids addressed in the question.
+                This includes tagged misconceptions ids as well as inapplicable
+                misconception ids in the question.
+            interaction_id: The ID of the interaction.
+            question_model_created_on: Date and time when the question model
+                is created.
+            question_model_last_updated: Date and time when the question model
+                was last updated.
         """
         self.id = question_id
         self.question_content = html_cleaner.clean(question_content)
@@ -1925,7 +1915,7 @@ class QuestionSummary:
         """Returns a dictionary representation of this domain object.
 
         Returns:
-            dict. A dict representing this QuestionSummary object.
+            A dict representing this QuestionSummary object.
         """
 
         return {
@@ -1989,11 +1979,10 @@ class QuestionSkillLink:
     """Domain object for Question Skill Link.
 
     Attributes:
-        question_id: str. The ID of the question.
-        skill_id: str. The ID of the skill to which the
-            question is linked.
-        skill_description: str. The description of the corresponding skill.
-        skill_difficulty: float. The difficulty between [0, 1] of the skill.
+        question_id: The ID of the question.
+        skill_id: The ID of the skill to which the question is linked.
+        skill_description: The description of the corresponding skill.
+        skill_difficulty: The difficulty between [0, 1] of the skill.
     """
 
     def __init__(
@@ -2006,10 +1995,10 @@ class QuestionSkillLink:
         """Constructs a Question Skill Link domain object.
 
         Args:
-            question_id: str. The ID of the question.
-            skill_id: str. The ID of the skill to which the question is linked.
-            skill_description: str. The description of the corresponding skill.
-            skill_difficulty: float. The difficulty between [0, 1] of the skill.
+            question_id: The ID of the question.
+            skill_id: The ID of the skill to which the question is linked.
+            skill_description: The description of the corresponding skill.
+            skill_difficulty: The difficulty between [0, 1] of the skill.
         """
         self.question_id = question_id
         self.skill_id = skill_id
@@ -2020,7 +2009,7 @@ class QuestionSkillLink:
         """Returns a dictionary representation of this domain object.
 
         Returns:
-            dict. A dict representing this QuestionSkillLink object.
+            A dict representing this QuestionSkillLink object.
         """
         return {
             'question_id': self.question_id,
@@ -2044,12 +2033,11 @@ class MergedQuestionSkillLink:
     editors.
 
     Attributes:
-        question_id: str. The ID of the question.
-        skill_ids: list(str). The skill IDs of the linked skills.
-        skill_descriptions: list(str). The descriptions of the skills to which
-            the question is linked.
-        skill_difficulties: list(float). The difficulties between [0, 1] of the
-            skills.
+        question_id: The ID of the question.
+        skill_ids: The skill IDs of the linked skills.
+        skill_descriptions: The descriptions of the skills to which the question
+            is linked.
+        skill_difficulties: The difficulties between [0, 1] of the skills.
     """
 
     def __init__(
@@ -2062,12 +2050,11 @@ class MergedQuestionSkillLink:
         """Constructs a Merged Question Skill Link domain object.
 
         Args:
-            question_id: str. The ID of the question.
-            skill_ids: list(str). The skill IDs of the linked skills.
-            skill_descriptions: list(str). The descriptions of the skills to
-                which the question is linked.
-            skill_difficulties: list(float). The difficulties between [0, 1] of
-                the skills.
+            question_id: The ID of the question.
+            skill_ids: The skill IDs of the linked skills.
+            skill_descriptions: The descriptions of the skills to which the
+                question is linked.
+            skill_difficulties: The difficulties between [0, 1] of the skills.
         """
         self.question_id = question_id
         self.skill_ids = skill_ids
@@ -2078,7 +2065,7 @@ class MergedQuestionSkillLink:
         """Returns a dictionary representation of this domain object.
 
         Returns:
-            dict. A dict representing this MergedQuestionSkillLink object.
+            A dict representing this MergedQuestionSkillLink object.
         """
         return {
             'question_id': self.question_id,

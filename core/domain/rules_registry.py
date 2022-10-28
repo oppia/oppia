@@ -51,13 +51,13 @@ class Registry:
         the specified state schema version, if available.
 
         Args:
-            state_schema_version: int|None. The state schema version to retrieve
+            state_schema_version: The state schema version to retrieve
                 the html_field_types_to_rule_specs for. If None, the current
                 state schema version's html_field_types_to_rule_specs will be
                 returned.
 
         Returns:
-            dict. The html_field_types_to_rule_specs specs for the given state
+            The html_field_types_to_rule_specs specs for the given state
             schema version.
 
         Raises:

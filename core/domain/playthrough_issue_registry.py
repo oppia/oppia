@@ -45,7 +45,7 @@ class Registry:
         """Get a list of all issue types.
 
         Returns:
-            list(str). The list of all allowed issue types.
+            The list of all allowed issue types.
         """
         return stats_models.ALLOWED_ISSUE_TYPES
 
@@ -73,7 +73,7 @@ class Registry:
         """Get a list of instances of all issues.
 
         Returns:
-            list(*). A list of all issue class instances. Classes all have
+            A list of all issue class instances. Classes all have
             "BaseExplorationIssueSpec" as an ancestor class.
         """
         if len(cls._issues) == 0:
@@ -90,10 +90,10 @@ class Registry:
         KeyError.
 
         Args:
-            issue_type: str. Type of the issue.
+            issue_type: Type of the issue.
 
         Returns:
-            *. An instance of the corresponding issue class. This class has
+            An instance of the corresponding issue class. This class has
             "BaseExplorationIssueSpec" as an ancestor class.
         """
         if issue_type not in cls._issues:

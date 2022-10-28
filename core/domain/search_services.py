@@ -80,8 +80,7 @@ def index_exploration_summaries(
     """Adds the explorations to the search index.
 
     Args:
-        exp_summaries: list(ExplorationSummary). List of Exp Summary domain
-            objects to be indexed.
+        exp_summaries: List of Exp Summary domain objects to be indexed.
     """
     platform_search_services.add_documents_to_index([
         _exp_summary_to_search_dict(exp_summary)
@@ -97,10 +96,10 @@ def _exp_summary_to_search_dict(
     be indexed for further queries or not.
 
     Args:
-        exp_summary: ExplorationSummary. ExplorationSummary domain object.
+        exp_summary: ExplorationSummary domain object.
 
     Returns:
-        dict. The representation of the given exploration, in a form that can
+        The representation of the given exploration, in a form that can
         be used by the search index.
     """
     doc: DomainSearchDict = {
@@ -122,10 +121,10 @@ def _should_index_exploration(
     search queries.
 
     Args:
-        exp_summary: ExplorationSummary. ExplorationSummary domain object.
+        exp_summary: ExplorationSummary domain object.
 
     Returns:
-        bool. Whether the given exploration should be indexed for future
+        Whether the given exploration should be indexed for future
         search queries.
     """
     return (
@@ -144,10 +143,10 @@ def get_search_rank_from_exp_summary(
     and bad ones will lower it.
 
     Args:
-        exp_summary: ExplorationSummary. ExplorationSummary domain object.
+        exp_summary: ExplorationSummary domain object.
 
     Returns:
-        int. Document's rank in search.
+        Document's rank in search.
     """
     # TODO(sll): Improve this calculation.
     rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
@@ -170,8 +169,8 @@ def index_collection_summaries(
     """Adds the collections to the search index.
 
     Args:
-        collection_summaries: list(CollectionSummary). List of collection
-            summary domain objects to be indexed.
+        collection_summaries: List of collection summary domain objects
+            to be indexed.
     """
     platform_search_services.add_documents_to_index([
         _collection_summary_to_search_dict(collection_summary)
@@ -186,11 +185,10 @@ def _collection_summary_to_search_dict(
     """Converts a collection domain object to a search dict.
 
     Args:
-        collection_summary: CollectionSummary. The collection
-            summary object to be converted.
+        collection_summary: The collection summary object to be converted.
 
     Returns:
-        dict. The search dict of the collection domain object.
+        The search dict of the collection domain object.
     """
     doc: DomainSearchDict = {
         'id': collection_summary.id,
@@ -210,10 +208,10 @@ def _should_index_collection(
     """Checks if a particular collection should be indexed.
 
     Args:
-        collection: CollectionSummary. CollectionSummary domain object.
+        collection: CollectionSummary domain object.
 
     Returns:
-        bool. Whether a particular collection should be indexed.
+        Whether a particular collection should be indexed.
     """
     rights = rights_manager.get_collection_rights(collection.id)
     return rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
@@ -229,22 +227,22 @@ def search_explorations(
     """Searches through the available explorations.
 
     Args:
-        query: str. The query string to search for.
-        categories: list(str). The list of categories to query for. If it is
-            empty, no category filter is applied to the results. If it is not
-            empty, then a result is considered valid if it matches at least one
+        query: The query string to search for.
+        categories: The list of categories to query for. If it is empty,
+            no category filter is applied to the results. If it is not empty,
+            then a result is considered valid if it matches at least one
             of these categories.
-        language_codes: list(str). The list of language codes to query for. If
-            it is empty, no language code filter is applied to the results. If
-            it is not empty, then a result is considered valid if it matches at
-            least one of these language codes.
-        size: int. The maximum number of results to return.
-        offset: int or None. A marker that is used to get the next page of
-            results. If there are more documents that match the query than
-            'size', this function will return an offset to get the next page.
+        language_codes: The list of language codes to query for. If it is empty,
+            no language code filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these language codes.
+        size: The maximum number of results to return.
+        offset: A marker that is used to get the next page of results. If there
+            are more documents that match the query than 'size', this function
+            will return an offset to get the next page.
 
     Returns:
-        tuple. A 2-tuple consisting of:
+        A 2-tuple consisting of:
             - list(str). A list of exploration ids that match the query.
             - int or None. An offset if there are more matching explorations to
               fetch, None otherwise. If an offset is returned, it will be a
@@ -263,8 +261,8 @@ def delete_explorations_from_search_index(exploration_ids: List[str]) -> None:
     search index.
 
     Args:
-        exploration_ids: list(str). A list of exploration ids whose
-            documents are to be deleted from the search index.
+        exploration_ids: A list of exploration ids whose documents are to be
+            deleted from the search index.
     """
     platform_search_services.delete_documents_from_index(
         exploration_ids, SEARCH_INDEX_EXPLORATIONS)
@@ -287,22 +285,22 @@ def search_collections(
     """Searches through the available collections.
 
     Args:
-        query: str. The query string to search for.
-        categories: list(str). The list of categories to query for. If it is
-            empty, no category filter is applied to the results. If it is not
-            empty, then a result is considered valid if it matches at least one
+        query: The query string to search for.
+        categories: The list of categories to query for. If it is empty, no
+            category filter is applied to the results. If it is not empty,
+            then a result is considered valid if it matches at least one
             of these categories.
-        language_codes: list(str). The list of language codes to query for. If
-            it is empty, no language code filter is applied to the results. If
-            it is not empty, then a result is considered valid if it matches at
-            least one of these language codes.
-        size: int. The maximum number of results to return.
-        offset: int|None. An offset, used to get the next page of results.
-            If there are more documents that match the query than 'size', this
-            function will return an offset to get the next page.
+        language_codes: The list of language codes to query for. If it is empty,
+            no language code filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these language codes.
+        size: The maximum number of results to return.
+        offset: An offset, used to get the next page of results. If there are
+            more documents that match the query than 'size', this function will
+            return an offset to get the next page.
 
     Returns:
-        2-tuple of (collection_ids, offset). Where:
+        A 2-tuple of (collection_ids, offset). Where:
             - A list of collection ids that match the query.
             - An offset if there are more matching collections to fetch, None
               otherwise. If an offset is returned, it will be a web-safe string
@@ -320,7 +318,7 @@ def delete_collections_from_search_index(collection_ids: List[str]) -> None:
     """Removes the given collections from the search index.
 
     Args:
-        collection_ids: list(str). List of IDs of the collections to be removed
+        collection_ids: List of IDs of the collections to be removed
             from the search index.
     """
     platform_search_services.delete_documents_from_index(
@@ -353,8 +351,8 @@ def index_blog_post_summaries(
     """Adds the blog post summaries to the search index.
 
     Args:
-        blog_post_summaries: list(BlogPostSummary). List of BlogPostSummary
-            domain objects to be indexed.
+        blog_post_summaries: List of BlogPostSummary domain objects to
+            be indexed.
     """
 
     docs_to_index = [
@@ -373,10 +371,10 @@ def _blog_post_summary_to_search_dict(
     to be indexed for further queries or not.
 
     Args:
-        blog_post_summary: BlogPostSummary. BlogPostSummary domain object.
+        blog_post_summary: BlogPostSummary domain object.
 
     Returns:
-        dict. The representation of the given blog post summary, in a form that
+        The representation of the given blog post summary, in a form that
         can be used by the search index.
     """
     if (
@@ -403,18 +401,17 @@ def search_blog_post_summaries(
     """Searches through the available blog post summaries.
 
     Args:
-        query: str. The query string to search for.
-        tags: list(str). The list of tags to query for. If it is
-            empty, no tags filter is applied to the results. If it is not
-            empty, then a result is considered valid if it matches at least one
-            of these tags.
-        size: int. The maximum number of results to return.
-        offset: int or None. A marker that is used to get the next page of
-            results. If there are more documents that match the query than
-            'size', this function will return an offset to get the next page.
+        query: The query string to search for.
+        tags: The list of tags to query for. If it is empty, no tags
+            filter is applied to the results. If it is not empty, then a
+            result is considered valid if it matches at least one of these tags.
+        size: The maximum number of results to return.
+        offset: A marker that is used to get the next page of results. If there
+            are more documents that match the query than 'size', this function
+            will return an offset to get the next page.
 
     Returns:
-        tuple. A 2-tuple consisting of:
+        A 2-tuple consisting of:
             - list(str). A list of blog post ids that match the query.
             - int or None. An offset if there are more matching blog post
               summaries to fetch, None otherwise. If an offset is returned, it
@@ -436,7 +433,7 @@ def delete_blog_post_summary_from_search_index(blog_post_id: str) -> None:
     search index.
 
     Args:
-        blog_post_id: str. Blog post id whose document are to be deleted from
+        blog_post_id: Blog post id whose document are to be deleted from
             the search index.
     """
     # The argument type of delete_documents_from_index() is List[str],

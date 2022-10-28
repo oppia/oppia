@@ -142,7 +142,7 @@ class EvaluationContext:
         """Returns platform type.
 
         Returns:
-            str. The platform type, e.g. 'Web', 'Android', 'Backend'.
+            The platform type, e.g. 'Web', 'Android', 'Backend'.
         """
         return self._platform_type
 
@@ -151,7 +151,7 @@ class EvaluationContext:
         """Returns client browser type.
 
         Returns:
-            str|None. The client browser type, e.g. 'Chrome', 'FireFox',
+            The client browser type, e.g. 'Chrome', 'FireFox',
             'Edge'. None if the platform type is not Web.
         """
         return self._browser_type
@@ -163,7 +163,7 @@ class EvaluationContext:
         """Returns client application version.
 
         Returns:
-            str|None. The version of native application, e.g. '1.0.0',
+            The version of native application, e.g. '1.0.0',
             None if the platform type is Web.
         """
         return self._app_version
@@ -173,8 +173,8 @@ class EvaluationContext:
         """Returns the server mode of Oppia.
 
         Returns:
-            Enum(ServerMode). The the server mode of Oppia,
-            must be one of the following: dev, test, prod.
+            The the server mode of Oppia, must be one of the following:
+            dev, test, prod.
         """
         return self._server_mode
 
@@ -188,8 +188,7 @@ class EvaluationContext:
         using this object for platform evaluation.
 
         Returns:
-            bool. Whether this context object can be used for evaluating
-            parameters.
+            Whether this context object can be used for evaluating parameters.
         """
         return (
             self._platform_type is not None and
@@ -236,12 +235,11 @@ class EvaluationContext:
         and server side context.
 
         Args:
-            client_context_dict: dict. The client side context.
-            server_context_dict: dict. The server side context.
+            client_context_dict: The client side context.
+            server_context_dict: The server side context.
 
         Returns:
-            EvaluationContext. The corresponding EvaluationContext domain
-            object.
+            The corresponding EvaluationContext domain object.
         """
         # TODO(#11208): After `app version` and `browser type` are set properly
         # in the codebase as a part of the server & client context. Please
@@ -291,7 +289,7 @@ class PlatformParameterFilter:
         """Returns filter type.
 
         Returns:
-            str. The filter type.
+            The filter type.
         """
         return self._type
 
@@ -300,9 +298,9 @@ class PlatformParameterFilter:
         """Returns filter conditions.
 
         Returns:
-            list(list(str)). The filter conditions. Each element of the list
-            contain a list with 2-elements [op, value], where op is the operator
-            for comparison, value is the value used for comparison.
+            The filter conditions. Each element of the list contain a list with
+            2-elements [op, value], where op is the operator for comparison,
+            value is the value used for comparison.
         """
         return self._conditions
 
@@ -311,10 +309,10 @@ class PlatformParameterFilter:
         value(s).
 
         Args:
-            context: EvaluationContext. The context for evaluation.
+            context: The context for evaluation.
 
         Returns:
-            bool. True if the filter is matched.
+            True if the filter is matched.
         """
         return any(
             self._evaluate_single_value(op, value, context)
@@ -331,12 +329,12 @@ class PlatformParameterFilter:
         given value.
 
         Args:
-            op: str. The operator for comparison, e.g. '='.
-            value: str. The value to match against.
-            context: EvaluationContext. The context for evaluation.
+            op: The operator for comparison, e.g. '='.
+            value: The value to match against.
+            context: The context for evaluation.
 
         Returns:
-            bool. True if the filter is matched.
+            True if the filter is matched.
 
         Raises:
             Exception. Given operator is not supported.
@@ -415,8 +413,7 @@ class PlatformParameterFilter:
         object.
 
         Returns:
-            dict. A dict mapping of all fields of PlatformParameterFilter
-            object.
+            A dict mapping of all fields of PlatformParameterFilter object.
         """
         return {
             'type': self._type,
@@ -430,12 +427,11 @@ class PlatformParameterFilter:
         """Returns an PlatformParameterFilter object from a dict.
 
         Args:
-            filter_dict: dict. A dict mapping of all fields of
+            filter_dict: A dict mapping of all fields of
                 PlatformParameterFilter object.
 
         Returns:
-            PlatformParameterFilter. The corresponding PlatformParameterFilter
-            domain object.
+            The corresponding PlatformParameterFilter domain object.
         """
         return cls(filter_dict['type'], filter_dict['conditions'])
 
@@ -448,12 +444,12 @@ class PlatformParameterFilter:
         """Tries to match the version expression against the client version.
 
         Args:
-            op: str. The operator for comparison, e.g. '=', '>'.
-            value: str. The version for comparison, e.g. '1.0.1'.
-            client_version: str|None. The client version, e.g. '1.0.1-3aebf3h'.
+            op: The operator for comparison, e.g. '=', '>'.
+            value: The version for comparison, e.g. '1.0.1'.
+            client_version: The client version, e.g. '1.0.1-3aebf3h'.
 
         Returns:
-            bool. True if the expression matches the version.
+            True if the expression matches the version.
 
         Raises:
             Exception. Given operator is not supported.
@@ -497,11 +493,11 @@ class PlatformParameterFilter:
         smaller.
 
         Args:
-            version_a: str. The version string (e.g. '1.0.0').
-            version_b: str. The version string (e.g. '1.0.0').
+            version_a: The version string (e.g. '1.0.0').
+            version_b: The version string (e.g. '1.0.0').
 
         Returns:
-            bool. True if the first version is smaller.
+            True if the first version is smaller.
         """
         splitted_version_a = version_a.split('.')
         splitted_version_b = version_b.split('.')
@@ -525,16 +521,16 @@ class PlatformParameterFilter:
         """Matches the client version flavor.
 
         Args:
-            op: str. The operator for comparison, e.g. '=', '>'.
-            flavor: str. The flavor to match, e.g. 'alpha', 'beta', 'test',
+            op: The operator for comparison, e.g. '=', '>'.
+            flavor: The flavor to match, e.g. 'alpha', 'beta', 'test',
                 'release'.
-            client_version: str. The version of the client, given in the form
+            client_version: The version of the client, given in the form
                 of '<version>-<hash>-<flavor>'. The hash and flavor of client
                 version is optional, but if absent, no flavor filter will
                 match to it.
 
         Returns:
-            bool. True is the client_version matches the given flavor using
+            True is the client_version matches the given flavor using
             the operator.
 
         Raises:
@@ -582,11 +578,11 @@ class PlatformParameterFilter:
         'test' < 'alpha' < 'beta' < 'release'.
 
         Args:
-            flavor_a: str. The version flavor.
-            flavor_b: str. The version flavor.
+            flavor_a: The version flavor.
+            flavor_b: The version flavor.
 
         Returns:
-            bool. True if the first flavor is smaller.
+            True if the first flavor is smaller.
         """
         return (
             ALLOWED_APP_VERSION_FLAVORS.index(flavor_a) <
@@ -617,7 +613,7 @@ class PlatformParameterRule:
         """Returns the filters of the rule.
 
         Returns:
-            list(PlatformParameterFilter). The filters of the rule.
+            The filters of the rule.
         """
         return self._filters
 
@@ -626,7 +622,7 @@ class PlatformParameterRule:
         """Returns the value outcome if this rule is matched.
 
         Returns:
-            *. The value outcome.
+            The value outcome.
         """
         return self._value_when_matched
 
@@ -635,10 +631,10 @@ class PlatformParameterRule:
         A rule is matched when all its filters are matched.
 
         Args:
-            context: EvaluationContext. The context for evaluation.
+            context: The context for evaluation.
 
         Returns:
-            bool. True if the rule is matched.
+            True if the rule is matched.
         """
         return all(
             filter_domain.evaluate(context)
@@ -648,7 +644,7 @@ class PlatformParameterRule:
         """Checks if the rule has a filter with type 'server_mode'.
 
         Returns:
-            bool. True if the rule has a filter with type 'server_mode'.
+            True if the rule has a filter with type 'server_mode'.
         """
         return any(
             filter_domain.type == 'server_mode'
@@ -659,8 +655,7 @@ class PlatformParameterRule:
         object.
 
         Returns:
-            dict. A dict mapping of all fields of PlatformParameterRule
-            object.
+            A dict mapping of all fields of PlatformParameterRule object.
         """
         return {
             'filters': [
@@ -680,12 +675,11 @@ class PlatformParameterRule:
         """Returns an PlatformParameterRule object from a dict.
 
         Args:
-            rule_dict: dict. A dict mapping of all fields of
+            rule_dict: A dict mapping of all fields of
                 PlatformParameterRule object.
 
         Returns:
-            PlatformParameterRule. The corresponding PlatformParameterRule
-            domain object.
+            The corresponding PlatformParameterRule domain object.
         """
         return cls(
             [
@@ -746,7 +740,7 @@ class PlatformParameter:
         """Returns the name of the platform parameter.
 
         Returns:
-            str. The name of the platform parameter.
+            The name of the platform parameter.
         """
         return self._name
 
@@ -755,7 +749,7 @@ class PlatformParameter:
         """Returns the description of the platform parameter.
 
         Returns:
-            str. The description of the platform parameter.
+            The description of the platform parameter.
         """
         return self._description
 
@@ -764,7 +758,7 @@ class PlatformParameter:
         """Returns the data type of the platform parameter.
 
         Returns:
-            DATA_TYPES. The data type of the platform parameter.
+            The data type of the platform parameter.
         """
         return self._data_type
 
@@ -773,7 +767,7 @@ class PlatformParameter:
         """Returns the rules of the platform parameter.
 
         Returns:
-            list(PlatformParameterRules). The rules of the platform parameter.
+            The rules of the platform parameter.
         """
         return self._rules
 
@@ -781,8 +775,7 @@ class PlatformParameter:
         """Sets the rules of the PlatformParameter.
 
         Args:
-            new_rules: list(PlatformParameterRules). The new rules of the
-                parameter.
+            new_rules: The new rules of the parameter.
         """
         self._rules = new_rules
 
@@ -791,7 +784,7 @@ class PlatformParameter:
         """Returns the schema version of the rules.
 
         Returns:
-            int. The schema version of the rules.
+            The schema version of the rules.
         """
         return self._rule_schema_version
 
@@ -800,7 +793,7 @@ class PlatformParameter:
         """Returns the default value of the platform parameter.
 
         Returns:
-            *. The default value of the platform parameter.
+            The default value of the platform parameter.
         """
         return self._default_value
 
@@ -809,7 +802,7 @@ class PlatformParameter:
         """Returns whether this parameter is also a feature flag.
 
         Returns:
-            bool. True if the parameter is a feature flag.
+            True if the parameter is a feature flag.
         """
         return self._is_feature
 
@@ -818,8 +811,8 @@ class PlatformParameter:
         """Returns the stage of the feature flag.
 
         Returns:
-            FeatureStages|None. The stage of the feature flag, None if the
-            parameter isn't a feature flag.
+            The stage of the feature flag, None if the parameter isn't a
+            feature flag.
         """
         return self._feature_stage
 
@@ -864,10 +857,10 @@ class PlatformParameter:
         parameter for an unrecognized or partially recognized context.
 
         Args:
-            context: EvaluationContext. The context for evaluation.
+            context: The context for evaluation.
 
         Returns:
-            *. The evaluate result of the platform parameter.
+            The evaluate result of the platform parameter.
         """
         if context.is_valid:
             for rule in self._rules:
@@ -880,7 +873,7 @@ class PlatformParameter:
         object.
 
         Returns:
-            dict. A dict mapping of all fields of PlatformParameter object.
+            A dict mapping of all fields of PlatformParameter object.
         """
         return {
             'name': self._name,
@@ -936,12 +929,11 @@ class PlatformParameter:
         """Returns an PlatformParameter object from a dict.
 
         Args:
-            param_dict: dict. A dict mapping of all fields of
-                PlatformParameter object.
+            param_dict: A dict mapping of all fields of PlatformParameter
+                object.
 
         Returns:
-            PlatformParameter. The corresponding PlatformParameter domain
-            object.
+            The corresponding PlatformParameter domain object.
 
         Raises:
             Exception. Given schema version is not supported.
@@ -978,7 +970,7 @@ class PlatformParameter:
         """Returns the object serialized as a JSON string.
 
         Returns:
-            str. JSON-encoded string encoding all of the information composing
+            JSON-encoded string encoding all of the information composing
             the object.
         """
         platform_parameter_dict = self.to_dict()
@@ -990,13 +982,12 @@ class PlatformParameter:
         string.
 
         Args:
-            json_string: str. A JSON-encoded string that can be
-                decoded into a dictionary representing a PlatformParameter.
-                Only call on strings that were created using serialize().
+            json_string: A JSON-encoded string that can be decoded into a
+                dictionary representing a PlatformParameter. Only call on
+                strings that were created using serialize().
 
         Returns:
-            PlatformParameter. The corresponding PlatformParameter domain
-            object.
+            The corresponding PlatformParameter domain object.
         """
         platform_parameter_dict = json.loads(json_string)
         platform_parameter = cls.from_dict(platform_parameter_dict)
