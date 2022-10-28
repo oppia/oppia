@@ -35,8 +35,6 @@ class ParamNames(enum.Enum):
     END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
     CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
-    # Feature flag to eneable blog home page, blog post page and blog author
-    # profile page for all users.
     BLOG_PAGES = 'blog_pages'
 
 
@@ -73,6 +71,6 @@ Registry.create_feature_flag(
 
 Registry.create_feature_flag(
     ParamNames.BLOG_PAGES,
-    'This flag is for blog home page, blg author profile page and blog post' +
+    'This flag is for blog home page, blog author profile page and blog post' +
     'page.',
     platform_parameter_domain.FeatureStages.PROD)
