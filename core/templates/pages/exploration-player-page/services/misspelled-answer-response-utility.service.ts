@@ -13,30 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Provides utility functions for
- * offering response when the learner misspells the answer.
+ * @fileoverview Provides a collection of utility functions for the
+ * checkpoint celebration feature.
  */
 
-import { Injectable} from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+ import { Injectable } from '@angular/core';
+ import { TranslateService } from '@ngx-translate/core';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
 
-
-@Injectable({
-  providedIn: 'root'
-})
-
-export class MisspelledAnswerResponseUtilityService {
-constructor(
-    private translateService: TranslateService
-) {}
-
-getFeedbackHtmlWhenAnswerMisspelled(): string {
-let availableKeyCount = ExplorationPlayerConstants.
-    I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS.length;
-const randomKeyIndex = Math.floor(Math.random() * availableKeyCount) + 1;
-return this.translateService.instant(
-    ExplorationPlayerConstants[randomKeyIndex - 1]
-);
-}
-}
+ 
+ @Injectable({
+   providedIn: 'root'
+ })
+ export class MisspelledAnswerResponseUtilityService {
+   constructor(
+     private translateService: TranslateService
+   ) {}
+ 
+   getFeedbackHtmlWhenAnswerMisspelled(): string {
+    let availableKeyCount = ExplorationPlayerConstants.
+      I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS.length;
+    const randomKeyIndex = Math.floor(Math.random() * availableKeyCount);
+    return this.translateService.instant(
+      ExplorationPlayerConstants.I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS[randomKeyIndex]
+    );
+  }
+ }
+ 
