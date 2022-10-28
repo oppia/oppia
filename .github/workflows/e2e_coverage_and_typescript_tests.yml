@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.7'
+          python-version: '3.8.12'
           architecture: 'x64'
       - uses: ./.github/actions/merge
       - name: Cache node modules
@@ -40,7 +40,7 @@ jobs:
       - name: Install chrome
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: python -m scripts.install_chrome_for_ci
-      - name: Check that all e2e test files are captured in protractor.conf.js and wdio.conf.js
+      - name: Check that all e2e test files are captured in wdio.conf.js
         run: python -m scripts.check_e2e_tests_are_captured_in_ci
       - name: Run typescript tests
         run: python -m scripts.typescript_checks

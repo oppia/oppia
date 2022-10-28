@@ -115,4 +115,58 @@ describe('Classroom admin model', () => {
     expect(existingClassroomData.getClassroomDict()).toEqual(
       expectedClassroomDict);
   });
+
+  it('should not present error for valid dependency graph', () => {
+    existingClassroomData.setTopicIdToPrerequisiteTopicId({
+      topic_id_1: ['topic_id_2', 'topic_id_3'],
+      topic_id_2: [],
+      topic_id_3: ['topic_id_2']
+    });
+
+    expect(existingClassroomData.validateDependencyGraph()).toEqual('');
+
+    existingClassroomData.setTopicIdToPrerequisiteTopicId({
+      topic_id_1: [],
+      topic_id_2: ['topic_id_1'],
+      topic_id_3: ['topic_id_2']
+    });
+
+    expect(existingClassroomData.validateDependencyGraph()).toEqual('');
+
+    existingClassroomData.setTopicIdToPrerequisiteTopicId({
+      topic_id_1: [],
+      topic_id_2: ['topic_id_1'],
+      topic_id_3: ['topic_id_2', 'topic_id_1']
+    });
+
+    expect(existingClassroomData.validateDependencyGraph()).toEqual('');
+  });
+
+  it('should be able to present error for invalid dependency graph', () => {
+    existingClassroomData.setTopicIdToPrerequisiteTopicId({
+      topic_id_1: ['topic_id_3'],
+      topic_id_2: ['topic_id_1'],
+      topic_id_3: ['topic_id_2']
+    });
+    existingClassroomData.setTopicIdToTopicName({
+      topic_id_1: 'Topic1',
+      topic_id_2: 'Topic2',
+      topic_id_3: 'Topic3'
+    });
+    const errorMsg = existingClassroomData.generateGraphErrorMsg(
+      ['Topic2', 'Topic3', 'Topic1']);
+
+    expect(existingClassroomData.validateDependencyGraph()).toEqual(errorMsg);
+  });
+
+  it('should be able to get prerequisite topic IDs', () => {
+    existingClassroomData.setTopicIdToPrerequisiteTopicId({
+      topic_id_1: ['topic_id_2', 'topic_id_3'],
+      topic_id_2: [],
+      topic_id_3: ['topic_id_2']
+    });
+
+    expect(existingClassroomData.getPrerequisiteTopicIds('topic_id_1')).toEqual(
+      ['topic_id_2', 'topic_id_3']);
+  });
 });

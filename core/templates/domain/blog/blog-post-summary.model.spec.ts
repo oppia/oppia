@@ -24,7 +24,7 @@ describe('Blog post summary object factory', () => {
   let sampleSummary: BlogPostSummary;
   let sampleSummaryBackendObject = {
     id: 'sampleId',
-    author_name: 'test_user',
+    author_username: 'test_user',
     title: 'Title',
     summary: 'Hello World',
     tags: ['news'],
@@ -32,7 +32,6 @@ describe('Blog post summary object factory', () => {
     url_fragment: 'title',
     last_updated: '3232323',
     published_on: '3232323',
-    profile_pic_url: 'sample_url',
   };
 
   beforeEach(() => {
@@ -55,6 +54,5 @@ describe('Blog post summary object factory', () => {
     expect(sampleSummary.lastUpdated).toEqual('3232323');
     expect(sampleSummary.publishedOn).toEqual('3232323');
     expect(sampleSummary.thumbnailFilename).toEqual('image.png');
-    expect(sampleSummary.authorProfilePicUrl).toEqual('sample_url');
   });
 });

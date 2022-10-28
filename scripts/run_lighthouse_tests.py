@@ -23,6 +23,8 @@ import os
 import subprocess
 import sys
 
+from typing import Final, List, Optional
+
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
@@ -32,12 +34,12 @@ from core.constants import constants  # isort:skip
 from scripts import build  # isort:skip
 from scripts import servers  # isort:skip
 
-LIGHTHOUSE_MODE_PERFORMANCE = 'performance'
-LIGHTHOUSE_MODE_ACCESSIBILITY = 'accessibility'
-SERVER_MODE_PROD = 'dev'
-SERVER_MODE_DEV = 'prod'
-GOOGLE_APP_ENGINE_PORT = 8181
-LIGHTHOUSE_CONFIG_FILENAMES = {
+LIGHTHOUSE_MODE_PERFORMANCE: Final = 'performance'
+LIGHTHOUSE_MODE_ACCESSIBILITY: Final = 'accessibility'
+SERVER_MODE_PROD: Final = 'dev'
+SERVER_MODE_DEV: Final = 'prod'
+GOOGLE_APP_ENGINE_PORT: Final = 8181
+LIGHTHOUSE_CONFIG_FILENAMES: Final = {
     LIGHTHOUSE_MODE_PERFORMANCE: {
         '1': '.lighthouserc-1.js',
         '2': '.lighthouserc-2.js'
@@ -47,12 +49,12 @@ LIGHTHOUSE_CONFIG_FILENAMES = {
         '2': '.lighthouserc-accessibility-2.js'
     }
 }
-APP_YAML_FILENAMES = {
+APP_YAML_FILENAMES: Final = {
     SERVER_MODE_PROD: 'app.yaml',
     SERVER_MODE_DEV: 'app_dev.yaml'
 }
 
-_PARSER = argparse.ArgumentParser(
+_PARSER: Final = argparse.ArgumentParser(
     description="""
 Run the script from the oppia root folder:
     python -m scripts.run_lighthouse_tests
@@ -116,7 +118,7 @@ def run_webpack_compilation() -> None:
         sys.exit(1)
 
 
-def export_url(line) -> None:
+def export_url(line: str) -> None:
     """Exports the entity ID in the given line to an environment variable, if
     the line is a URL.
 
@@ -139,7 +141,7 @@ def export_url(line) -> None:
         os.environ['skill_id'] = url_parts[4]
 
 
-def run_lighthouse_checks(lighthouse_mode, shard) -> None:
+def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
     """Runs the Lighthouse checks through the Lighthouse config.
 
     Args:
@@ -175,7 +177,7 @@ def run_lighthouse_checks(lighthouse_mode, shard) -> None:
         sys.exit(1)
 
 
-def main(args=None) -> None:
+def main(args: Optional[List[str]] = None) -> None:
     """Runs lighthouse checks and deletes reports."""
     parsed_args = _PARSER.parse_args(args=args)
 

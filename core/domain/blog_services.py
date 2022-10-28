@@ -31,8 +31,8 @@ from core.domain import search_services
 from core.domain import user_domain
 from core.platform import models
 
-from typing import Callable, List, Optional, Sequence, Tuple, overload
-from typing_extensions import Literal, TypedDict
+from typing import (
+    Callable, List, Literal, Optional, Sequence, Tuple, TypedDict, overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -766,25 +766,18 @@ def create_new_blog_post(author_id: str) -> blog_domain.BlogPost:
 
 
 def get_published_blog_post_summaries(
-    offset: int=0, size: Optional[int]=None
+    offset: int = 0
 ) -> List[blog_domain.BlogPostSummary]:
     """Returns published BlogPostSummaries list.
 
     Args:
         offset: int. Number of query results to skip from top.
-        size: int or None. Number of blog post summaries to return if there are
-            at least that many, otherwise it contains all remaining results. If
-            None, maximum number of blog post summaries to display on blog
-            homepage will be returned if there are at least that many.
 
     Returns:
         list(BlogPostSummaries). These are sorted in order of the
         date published.
     """
-    if size:
-        max_limit = size
-    else:
-        max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+    max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
     blog_post_rights_models: Sequence[blog_models.BlogPostRightsModel] = (
         blog_models.BlogPostRightsModel.query(
             blog_models.BlogPostRightsModel.blog_post_is_published == True  # pylint: disable=singleton-comparison
@@ -805,17 +798,6 @@ def get_published_blog_post_summaries(
         for model in blog_post_summary_models if model is not None
     ]
     return blog_post_summaries
-
-
-def get_total_number_of_published_blog_post_summaries() -> int:
-    """Returns total number of published BlogPostSummaries.
-
-    Returns:
-        int. Total number of published BlogPostSummaries.
-    """
-    return blog_models.BlogPostRightsModel.query(
-        blog_models.BlogPostRightsModel.blog_post_is_published == True  # pylint: disable=singleton-comparison
-    ).count()
 
 
 def update_blog_models_author_and_published_on_date(
@@ -870,7 +852,7 @@ def index_blog_post_summaries_given_ids(blog_post_ids: List[str]) -> None:
 
 
 def get_blog_post_ids_matching_query(
-    query_string: str, tags: List[str], size: int, offset: Optional[int]=None
+    query_string: str, tags: List[str], offset: Optional[int]=None
 ) -> Tuple[List[str], Optional[int]]:
     """Returns a list with all blog post ids matching the given search query
     string, as well as a search offset for future fetches.
@@ -886,9 +868,6 @@ def get_blog_post_ids_matching_query(
         tags: list(str). The list of tags to query for. If it is empty, no tags
             filter is applied to the results. If it is not empty, then a result
             is considered valid if it matches at least one of these tags.
-        size: int. The maximum number of blog post summary domain objects to
-            be returned if there are at least that many, otherwise it contains
-            all results.
         offset: int or None. Optional offset from which to start the search
             query. If no offset is supplied, the first N results matching
             the query are returned.
@@ -898,25 +877,25 @@ def get_blog_post_ids_matching_query(
             valid_blog_post_ids : list(str). A list with all
                 blog post ids matching the given search query string,
                 as well as a search offset for future fetches.
-                The list contains exactly 'size' number of results if there are
-                at least that many, otherwise it contains all remaining results.
-                (If this behaviour does not occur, an error will be logged.)
+                The list contains exactly
+                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+                results if there are at least that many, otherwise it
+                contains all remaining results. (If this behaviour does
+                not occur, an error will be logged.)
             search_offset: int. Search offset for future fetches.
     """
     valid_blog_post_ids: List[str] = []
     search_offset: Optional[int] = offset
 
     for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = size - len(valid_blog_post_ids)
+        remaining_to_fetch = (
+            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE -
+            len(valid_blog_post_ids)
+        )
 
         blog_post_ids, search_offset = (
             search_services.search_blog_post_summaries(
-                query_string,
-                tags,
-                remaining_to_fetch,
-                offset=search_offset
-            )
-        )
+            query_string, tags, remaining_to_fetch, offset=search_offset))
 
         invalid_blog_post_ids = []
         for ind, model in enumerate(

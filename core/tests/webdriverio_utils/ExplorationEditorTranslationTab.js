@@ -28,14 +28,14 @@ var ExplorationEditorTranslationTab = function() {
     '.e2e-test-translation-tab-dismiss-welcome-modal');
   var translationWelcomeModal = $('.e2e-test-translation-tab-welcome-modal');
   var buttonsSelector = function() {
-    return $$('.ng-joyride .skipBtn');
+    return $$('.joyride-step__close');
   };
   var nextTutorialStageButtonSelector = function() {
-    return $$('.ng-joyride .nextBtn');
+    return $$('.joyride-step__next-container');
   };
   var translationTabStartTutorialElement = $(
     '.e2e-test-translation-tab-start-tutorial');
-  var titleElement = $('.ng-joyride-title');
+  var titleElement = $('.e2e-test-joyride-title');
 
   this.exitTutorial = async function() {
     // If the translation welcome modal shows up, exit it.
@@ -57,7 +57,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.finishTutorial = async function() {
     // Finish the tutorial.
-    var finishTutorialButton = await $$('button=Finish');
+    var finishTutorialButton = await $$('.joyride-button=done');
     var buttons = finishTutorialButton;
     if (buttons.length === 1) {
       await action.click('Finish tutorial stage button', buttons[0]);
@@ -76,7 +76,7 @@ var ExplorationEditorTranslationTab = function() {
       'Re-record/Re-upload audio'
     ];
     for (const HEADING of tutorialTabHeadings) {
-      var tutorialTabHeadingElement = $(`.popover-title=${HEADING}`);
+      var tutorialTabHeadingElement = $(`.e2e-test-joyride-title=${HEADING}`);
       await waitFor.visibilityOf(
         tutorialTabHeadingElement, 'Tutorial: ' + HEADING + ' is not visible');
       // Progress to the next instruction in the tutorial.
@@ -183,7 +183,10 @@ var ExplorationEditorTranslationTab = function() {
     await action.click(
       'Confirm delete record button',
       confirmDeleteRecordButton);
-    await waitFor.pageToFullyLoad();
+    // We need to explicitly wait till the audio is deleted, in order
+    // to make sure there is no unsaved changes left in the exploration.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(2000);
   };
 
   this.uploadAudioRecord = async function(audioPath) {
@@ -231,7 +234,7 @@ var ExplorationEditorTranslationTab = function() {
   this.setTranslation = async function(richTextInstructions) {
     await action.click('Edit translation button', editTranslationButtton);
     // eslint-disable-next-line oppia/e2e-practices
-    var stateTranslationEditorTag = $('<state-translation-editor>');
+    var stateTranslationEditorTag = $('<oppia-state-translation-editor>');
     var stateTranslationEditor = stateTranslationEditorTag.$(
       '.e2e-test-state-translation-editor');
     await waitFor.visibilityOf(
