@@ -6179,7 +6179,6 @@ export default {
 
   "OPPORTUNITY_TYPE_SKILL": "skill",
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
-  "OPPORTUNITY_TYPE_VOICEOVER": "voiceover",
 
   // The bucket name is set to app_default_bucket which is used to store files
   // in GCS when local development server is running. This should be changed
