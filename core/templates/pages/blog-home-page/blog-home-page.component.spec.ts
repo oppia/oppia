@@ -90,7 +90,7 @@ describe('Blog home page component', () => {
   let blogPostSummary: BlogPostSummaryBackendDict = {
     id: 'sampleBlogId',
     author_username: 'test_username',
-    author_name: 'test_user',
+    displayed_author_name: 'test_user',
     title: 'sample_title',
     summary: 'hello',
     thumbnail_filename: 'image',

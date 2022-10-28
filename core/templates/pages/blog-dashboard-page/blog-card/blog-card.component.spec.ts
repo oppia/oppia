@@ -78,7 +78,7 @@ describe('Blog Dashboard Tile Component', () => {
     sampleBlogPostSummary = {
       id: 'sampleId',
       author_username: 'test_username',
-      author_name: 'test_user',
+      displayed_author_name: 'test_user',
       title: 'Title',
       summary: 'Hello World',
       tags: ['news'],
@@ -132,7 +132,7 @@ describe('Blog Dashboard Tile Component', () => {
     const invalidBlogPostSummary: BlogPostSummaryBackendDict = {
       id: 'sampleId',
       author_username: 'test_username',
-      author_name: 'test_user',
+      displayed_author_name: 'test_user',
       title: 'Title',
       summary: 'Hello World',
       tags: ['news'],

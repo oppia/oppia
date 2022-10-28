@@ -75,7 +75,7 @@ export class BlogAuthorProfilePageComponent implements OnInit {
       this.authorUsername, '0').then((data: BlogAuthorProfilePageData) => {
       if (data.numOfBlogPostSummaries) {
         this.totalBlogPosts = data.numOfBlogPostSummaries;
-        this.authorName = data.authorName;
+        this.authorName = data.displayedAuthorName;
         this.authorBio = data.authorBio;
         this.noResultsFound = false;
         this.blogPostSummaries = data.blogPostSummaries;

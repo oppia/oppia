@@ -94,7 +94,7 @@ describe('Blog Author Profile Page Root', () => {
     userService = TestBed.inject(UserService);
     translateService = TestBed.inject(TranslateService);
     urlService = TestBed.inject(UrlService);
-    mockPlatformFeatureService.status.BlogProject.isEnabled = true;
+    mockPlatformFeatureService.status.BlogPages.isEnabled = true;
     spyOn(urlService, 'getBlogAuthorUsernameFromUrl')
       .and.returnValue('author');
   });
@@ -189,7 +189,7 @@ describe('Blog Author Profile Page Root', () => {
 
   it('should initialize and validate access when blog project feature is ' +
   'disabled but user can edit blog posts', fakeAsync(() => {
-    mockPlatformFeatureService.status.BlogProject.isEnabled = false;
+    mockPlatformFeatureService.status.BlogPages.isEnabled = false;
     spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
       Promise.resolve(true));
     spyOn(

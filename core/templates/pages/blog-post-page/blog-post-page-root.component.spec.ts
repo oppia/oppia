@@ -68,7 +68,7 @@ describe('Blog Post Page Root', () => {
   let alertsService: AlertsService;
   let sampleBlogPostBackendDict: BlogPostBackendDict = {
     id: 'sampleId',
-    author_name: 'testUsername',
+    displayed_author_name: 'testUsername',
     title: 'sampleTitle',
     content: '<p>Hello</p>',
     thumbnail_filename: 'image',

@@ -522,7 +522,8 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
     author_id = datastore_services.StringProperty(indexed=True, required=True)
     # The publicly viewable name of the user to display as author name in blog
     # posts.
-    displayed_author_name = datastore_services.StringProperty(indexed=True, required=True)
+    displayed_author_name = (
+        datastore_services.StringProperty(indexed=True, required=True))
     # User specified biography to be shown on their blog author page.
     author_bio = datastore_services.TextProperty(indexed=False)
 

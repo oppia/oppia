@@ -73,7 +73,7 @@ export interface BlogPostPageData {
 }
 
 export interface BlogAuthorProfilePageData {
-  authorName: string;
+  displayedAuthorName: string;
   authorBio: string;
   numOfBlogPostSummaries: number;
   blogPostSummaries: BlogPostSummary[];
@@ -132,7 +132,7 @@ export class BlogHomePageBackendApiService {
               blogPostSummary => {
                 return BlogPostSummary.createFromBackendDict(blogPostSummary);
               })),
-          authorName: response.author_details.author_name,
+          displayedAuthorName: response.author_details.displayed_author_name,
           authorBio: response.author_details.author_bio,
           profilePictureDataUrl: response.profile_picture_data_url
         });

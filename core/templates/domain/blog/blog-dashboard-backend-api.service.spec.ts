@@ -28,7 +28,7 @@ describe('Blog Dashboard backend api service', () => {
   let successHandler: jasmine.Spy<jasmine.Func>;
   let failHandler: jasmine.Spy<jasmine.Func>;
   let authorDetials: BlogAuthorDetailsBackendDict = {
-    author_name: 'test_name',
+    displayed_author_name: 'test_name',
     author_bio: 'author bio',
   };
   let blogDashboardBackendResponse: BlogDashboardBackendResponse = {
@@ -42,7 +42,7 @@ describe('Blog Dashboard backend api service', () => {
   let blogPostSummary: BlogPostSummaryBackendDict = {
     id: 'sampleBlogId',
     author_username: 'test_sername',
-    author_name: 'test_user',
+    displayed_author_name: 'test_user',
     title: 'sample_title',
     summary: 'hello',
     thumbnail_filename: 'image',
@@ -52,7 +52,7 @@ describe('Blog Dashboard backend api service', () => {
     published_on: '1212121',
   };
   let blogDashboardDataObject: BlogDashboardData = {
-    authorName: 'test_name',
+    displayedAuthorName: 'test_name',
     authorBio: 'author bio',
     profilePictureDataUrl: (
       blogDashboardBackendResponse.profile_picture_data_url),
@@ -63,11 +63,11 @@ describe('Blog Dashboard backend api service', () => {
     draftBlogPostSummaryDicts: [] as BlogPostSummary[],
   };
   let blogAuthorBackendDetails: BlogAuthorDetailsBackendDict = {
-    author_name: 'new_author_name',
+    displayed_author_name: 'new_displayed_author_name',
     author_bio: 'general bio'
   };
   let blogAuthorDetails: BlogAuthorDetails = {
-    authorName: 'new_author_name',
+    displayedAuthorName: 'new_displayed_author_name',
     authorBio: 'general bio'
   };
   let blogPostSummaryObject = BlogPostSummary.createFromBackendDict(
@@ -180,7 +180,7 @@ describe('Blog Dashboard backend api service', () => {
   it('should successfully update author details in the backend.', fakeAsync(
     () => {
       bdbas.updateAuthorDetailsAsync(
-        blogAuthorBackendDetails.author_name,
+        blogAuthorBackendDetails.displayed_author_name,
         blogAuthorBackendDetails.author_bio
       ).then(successHandler, failHandler);
 
@@ -198,7 +198,7 @@ describe('Blog Dashboard backend api service', () => {
   ' backend fails.', fakeAsync(
     () => {
       bdbas.updateAuthorDetailsAsync(
-        blogAuthorBackendDetails.author_name,
+        blogAuthorBackendDetails.displayed_author_name,
         blogAuthorBackendDetails.author_bio
       ).then(successHandler, failHandler);
 

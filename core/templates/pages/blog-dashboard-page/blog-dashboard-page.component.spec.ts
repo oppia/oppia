@@ -179,7 +179,7 @@ describe('Blog Dashboard Page Component', () => {
   it('should initialize main tab', fakeAsync(() => {
     let defaultImageUrl = 'banner_image_url';
     let blogDashboardData = {
-      authorName: 'test_user',
+      displayedAuthorName: 'test_user',
       authorBio: '',
       profilePictureDataUrl: 'sample_url',
       numOfPublishedBlogPosts: 0,
@@ -269,7 +269,7 @@ describe('Blog Dashboard Page Component', () => {
     let summaryObject = BlogPostSummary.createFromBackendDict(
       { id: 'sampleId',
         author_username: 'test_username',
-        author_name: 'test_user',
+        displayed_author_name: 'test_user',
         title: 'Title',
         summary: 'Hello World',
         tags: ['news'],
@@ -279,7 +279,7 @@ describe('Blog Dashboard Page Component', () => {
         published_on: '3232323',
       });
     let blogDashboardData = {
-      authorName: 'test_user',
+      displayedAuthorName: 'test_user',
       authorBio: 'bio',
       profilePictureDataUrl: 'sample_url',
       numOfPublishedBlogPosts: 1,
@@ -306,7 +306,7 @@ describe('Blog Dashboard Page Component', () => {
     let summaryObject = BlogPostSummary.createFromBackendDict(
       { id: 'sampleId',
         author_username: 'test_username',
-        author_name: 'test_user',
+        displayed_author_name: 'test_user',
         title: 'Title',
         summary: 'Hello World',
         tags: ['news'],
@@ -316,7 +316,7 @@ describe('Blog Dashboard Page Component', () => {
         published_on: '3232323',
       });
     let blogDashboardData = {
-      authorName: 'test_user',
+      displayedAuthorName: 'test_user',
       authorBio: 'Bio',
       profilePictureDataUrl: 'sample_url',
       numOfPublishedBlogPosts: 0,
@@ -338,7 +338,7 @@ describe('Blog Dashboard Page Component', () => {
     let summaryObject = BlogPostSummary.createFromBackendDict(
       { id: 'sampleId',
         author_username: 'test_username',
-        author_name: 'test_user',
+        displayed_author_name: 'test_user',
         title: 'Title',
         summary: 'Hello World',
         tags: ['news'],
@@ -348,7 +348,7 @@ describe('Blog Dashboard Page Component', () => {
         published_on: '3232323',
       });
     let blogDashboardData = {
-      authorName: 'test_user',
+      displayedAuthorName: 'test_user',
       authorBio: 'Bio',
       profilePictureDataUrl: 'sample_url',
       numOfPublishedBlogPosts: 0,
@@ -388,7 +388,7 @@ describe('Blog Dashboard Page Component', () => {
     component.authorName = 'new username';
     component.authorBio = 'Oppia Blog Author';
     let BlogAuthorDetails = {
-      authorName: 'new username',
+      displayedAuthorName: 'new username',
       authorBio: 'Oppia Blog Author'
     };
     spyOn(blogDashboardBackendApiService, 'updateAuthorDetailsAsync')

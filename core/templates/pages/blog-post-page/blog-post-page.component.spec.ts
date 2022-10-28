@@ -165,7 +165,7 @@ describe('Blog home page component', () => {
   it('should initialize correctly', () => {
     let sampleBlogPostBackendDict: BlogPostBackendDict = {
       id: 'sampleBlogId',
-      author_name: 'test_user',
+      displayed_author_name: 'test_user',
       title: 'sample_title',
       content: '<p>hello</p>',
       thumbnail_filename: 'image.png',

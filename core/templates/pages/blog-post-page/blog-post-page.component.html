@@ -11,7 +11,7 @@
              alt="Profile image of the author of the blog post"
              (click)="navigateToAuthorProfilePage()">
         <mat-card-subtitle class="blog-author-name" (click)="navigateToAuthorProfilePage()">
-          {{ blogPost.authorName }}
+          {{ blogPost.displayedAuthorName }}
         </mat-card-subtitle>
         <mat-card-subtitle class="pt-2 font-weight-light mobile-published-date" (click)="navigateToAuthorProfilePage()">
           {{ publishedDateString }}

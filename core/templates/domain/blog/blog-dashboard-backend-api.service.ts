@@ -24,7 +24,7 @@ import { BlogPostSummaryBackendDict, BlogPostSummary } from 'domain/blog/blog-po
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 
 export interface BlogAuthorDetailsBackendDict {
-  'author_name': string;
+  'displayed_author_name': string;
   'author_bio': string;
 }
 export interface BlogDashboardBackendResponse {
@@ -40,7 +40,7 @@ interface NewBlogPostBackendResponse {
   'blog_post_id': string;
 }
 export interface BlogDashboardData {
-  authorName: string;
+  displayedAuthorName: string;
   authorBio: string;
   profilePictureDataUrl: string;
   numOfPublishedBlogPosts: number;
@@ -49,7 +49,7 @@ export interface BlogDashboardData {
   draftBlogPostSummaryDicts: BlogPostSummary[];
 }
 export interface BlogAuthorDetails {
-  authorName: string;
+  displayedAuthorName: string;
   authorBio: string;
 }
 @Injectable({
@@ -64,7 +64,7 @@ export class BlogDashboardBackendApiService {
         BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE).toPromise()
         .then(response => {
           resolve({
-            authorName: response.author_details.author_name,
+            displayedAuthorName: response.author_details.displayed_author_name,
             authorBio: response.author_details.author_bio,
             profilePictureDataUrl: response.profile_picture_data_url,
             numOfDraftBlogPosts: response.no_of_draft_blog_posts,
@@ -99,18 +99,18 @@ export class BlogDashboardBackendApiService {
   }
 
   async updateAuthorDetailsAsync(
-      authorName: string, authorBio: string
+      displayedAuthorName: string, authorBio: string
   ): Promise<BlogAuthorDetails> {
     return new Promise((resolve, reject) => {
       const putData = {
-        author_name: authorName,
+        displayed_author_name: displayedAuthorName,
         author_bio: authorBio
       };
       this.http.put<BlogAuthorDetailsBackendDict>(
         BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE, putData
       ).toPromise().then(() => {
         resolve({
-          authorName: authorName,
+          displayedAuthorName: displayedAuthorName,
           authorBio: authorBio
         });
       }, errorResponse => {

@@ -369,7 +369,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   getOppiaBlogUrl(): string {
-    if (this.platformFeatureService.status.BlogProject.isEnabled) {
+    if (this.platformFeatureService.status.BlogPages.isEnabled) {
       return '/blog';
     } else {
       return 'https://medium.com/oppia-org';

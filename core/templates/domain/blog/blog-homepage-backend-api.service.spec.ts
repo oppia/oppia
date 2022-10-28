@@ -38,7 +38,7 @@ describe('Blog home page backend api service', () => {
   let blogPostSummary: BlogPostSummaryBackendDict = {
     id: 'sampleBlogId',
     author_username: 'test_username',
-    author_name: 'test_user',
+    displayed_author_name: 'test_user',
     title: 'sample_title',
     summary: 'hello',
     thumbnail_filename: 'image',
@@ -50,7 +50,7 @@ describe('Blog home page backend api service', () => {
   };
   let blogPost: BlogPostBackendDict = {
     id: 'sampleBlogId',
-    author_name: 'test_user',
+    displayed_author_name: 'test_user',
     title: 'sample_title',
     content: 'hello Blog Post',
     thumbnail_filename: 'image',
@@ -70,7 +70,7 @@ describe('Blog home page backend api service', () => {
   let blogAuthorProfileDataObject: BlogAuthorProfilePageData;
   let urlSearchQuery: string;
   let blogAuthorBackendDetails: BlogAuthorDetailsBackendDict = {
-    author_name: 'new_author_name',
+    displayed_author_name: 'new_displayed_author_name',
     author_bio: 'general bio'
   };
 
@@ -129,7 +129,7 @@ describe('Blog home page backend api service', () => {
     blogAuthorProfileDataObject = {
       numOfBlogPostSummaries: 0,
       blogPostSummaries: [],
-      authorName: 'new_author_name',
+      displayedAuthorName: 'new_displayed_author_name',
       authorBio: 'general bio',
       profilePictureDataUrl: 'imageUrl',
     };

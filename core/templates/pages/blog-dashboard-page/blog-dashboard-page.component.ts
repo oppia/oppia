@@ -90,7 +90,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     this.blogDashboardBackendService.fetchBlogDashboardDataAsync().then(
       (dashboardData) => {
         this.blogDashboardData = dashboardData;
-        this.authorName = dashboardData.authorName;
+        this.authorName = dashboardData.displayedAuthorName;
         this.authorBio = dashboardData.authorBio;
         this.authorProfilePictureUrl = decodeURIComponent((
           // eslint-disable-next-line max-len

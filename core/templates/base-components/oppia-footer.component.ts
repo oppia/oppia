@@ -39,7 +39,7 @@ export class OppiaFooterComponent {
   ) {}
 
   getOppiaBlogUrl(): string {
-    if (this.platformFeatureService.status.BlogProject.isEnabled) {
+    if (this.platformFeatureService.status.BlogPages.isEnabled) {
       return '/blog';
     } else {
       return 'https://medium.com/oppia-org';

@@ -77,7 +77,7 @@ class BlogDashboardDataHandler(base.BaseHandler):
         'GET': {},
         'POST': {},
         'PUT': {
-            'author_name': {
+            'displayed_author_name': {
                 'schema': {
                     'type': 'basestring',
                 }
@@ -137,10 +137,11 @@ class BlogDashboardDataHandler(base.BaseHandler):
     @acl_decorators.can_access_blog_dashboard
     def put(self) -> None:
         """Updates author details of the user."""
-        author_name = self.normalized_payload.get('author_name')
+        displayed_author_name = self.normalized_payload.get(
+            'displayed_author_name')
         author_bio = self.normalized_payload.get('author_bio')
         blog_services.update_blog_author_details(
-            self.user_id, author_name, author_bio
+            self.user_id, displayed_author_name, author_bio
         )
         author_details = (
             blog_services.get_blog_author_details(self.user_id).to_dict())
@@ -220,11 +221,12 @@ class BlogPostHandler(base.BaseHandler):
 
         blog_post_dict = blog_post.to_dict()
         del blog_post_dict['author_id']
-        blog_post_dict['author_name'] = author_details.displayed_author_name
+        blog_post_dict['displayed_author_name'] = (
+            author_details.displayed_author_name)
 
         self.values.update({
             'blog_post_dict': blog_post_dict,
-            'author_name': author_details.displayed_author_name,
+            'displayed_author_name': author_details.displayed_author_name,
             'profile_picture_data_url': profile_picture_data_url,
             'max_no_of_tags': max_no_of_tags,
             'list_of_default_tags': list_of_default_tags

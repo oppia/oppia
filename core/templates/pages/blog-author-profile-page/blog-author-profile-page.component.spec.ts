@@ -65,7 +65,7 @@ describe('Blog home page component', () => {
 
   let blogPostSummary: BlogPostSummaryBackendDict = {
     id: 'sampleBlogId',
-    author_name: 'test_user',
+    displayed_author_name: 'test_user',
     author_username: 'test_username',
     title: 'sample_title',
     summary: 'hello',
@@ -116,7 +116,7 @@ describe('Blog home page component', () => {
       blogPostSummary
     );
     blogAuthorProfilePageDataObject = {
-      authorName: 'author',
+      displayedAuthorName: 'author',
       authorBio: 'author Bio',
       profilePictureDataUrl: 'sample-pic-url',
       numOfBlogPostSummaries: 0,

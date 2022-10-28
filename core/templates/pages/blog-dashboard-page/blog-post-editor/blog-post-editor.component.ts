@@ -124,7 +124,7 @@ export class BlogPostEditorComponent implements OnInit {
           this.authorProfilePictureUrl = decodeURIComponent((
             // eslint-disable-next-line max-len
             editorData.profilePictureDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
-          this.authorName = editorData.authorName;
+          this.authorName = editorData.displayedAuthorName;
           this.defaultTagsList = editorData.listOfDefaulTags;
           this.maxAllowedTags = editorData.maxNumOfTags;
           this.title = this.blogPostData.title;
