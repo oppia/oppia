@@ -2,13 +2,11 @@
 #
 #   pylint core --rcfile=.pylintrc -i y
 
-[GENERAL]
-init-hook='import sys; sys.path.append("../oppia_tools/google_appengine_1.9.67/google_appengine")'
-
 [MASTER]
+init-hook='import sys; sys.path.append(".")'
 
 # Checks for correct docstring style
-load-plugins=pylint.extensions.docstyle, pylint_quotes, scripts.pylint_extensions
+load-plugins=pylint.extensions.docstyle, pylint_quotes, scripts.linters.pylint_extensions
 
 string-quote=single
 triple-quote=double
@@ -26,13 +24,13 @@ method-rgx=^([_a-z][a-z0-9_]*|__[a-z0-9]+__)$
 const-rgx=^(([A-Z_][A-Z0-9_]*)|(__.*__)|([a-z_]+_models)|([a-z_]+_services))$
 
 # Good variable names which should always be accepted, separated by a comma
-good-names=e,_,d,f,i,l,p,w,fn,fs,id,pc,sc,zf,setUp,tearDown,longMessage,maxDiff
+good-names=e,_,d,f,i,l,p,w,fn,fs,id,pc,sc,zf,setUp,tearDown,longMessage,maxDiff,T
 
 # Regex for dummy variables (to prevent 'unused argument' errors)
 dummy-variables-rgx=_|unused_*
 
 # Regular expression which should match good variable names
-variable-rgx=[a-z_][a-z0-9_]*$
+variable-rgx=^(?:|_)[a-z][a-z0-9]*(_[a-z0-9]+)*$
 
 # Regular expression matching correct attribute names
 attr-rgx=[A-Za-z_][A-Za-z0-9_]*$
@@ -58,8 +56,35 @@ bad-functions=apply,input
 [FORMAT]
 
 max-line-length=80
+ignore-long-lines=^.*#\stype:\signore.*$|^\s*(# )?<?https?://\S+>?$
 
 indent-string='    '
+
+allowed-comment-prefixes=int,str,float,bool,v
+forbidden-imports=
+    *core.controllers*:
+        import core.platform*|
+        import core.storage*,
+    *core.domain*:
+        import core.controllers*,
+    *core.storage*:
+        import core.domain*,
+    *core.domain.*_domain:
+        from core.domain* import *_service*|
+        from core.domain* import *_cleaner|
+        from core.domain* import *_registry|
+        from core.domain* import *_fetchers|
+        from core.domain* import *_manager|
+        from core.platform import models
+
+disallowed-functions-and-replacements-str=
+    assertEquals=>self.assertEqual,
+    now=>datetime.datetime.utcnow,
+    beam.CombineValues=>beam.CombinePerKey
+
+disallowed-functions-and-replacements-regex=
+    \.put_async\(=>put,
+    \.put_multi_async\(=>put_multi
 
 [SIMILARITIES]
 
@@ -67,7 +92,52 @@ ignore-imports=yes
 
 [MESSAGES CONTROL]
 
-disable=consider-using-ternary,locally-disabled,locally-enabled,logging-not-lazy,abstract-method,arguments-differ,broad-except,duplicate-code,fixme,inconsistent-return-statements,len-as-condition,missing-raises-doc,multiple-constructor-doc,no-else-return,no-member,no-self-use,not-context-manager,redefined-variable-type,redundant-returns-doc,too-many-arguments,too-many-boolean-expressions,too-many-branches,too-many-instance-attributes,too-many-lines,too-many-locals,too-many-public-methods,too-many-nested-blocks,too-many-statements,wrong-import-order
+disable=abstract-method,
+        ungrouped-imports,
+        arguments-differ,
+        broad-except,
+        consider-using-ternary,
+        duplicate-code,
+        fixme,
+        inconsistent-return-statements,
+        len-as-condition,
+        locally-disabled,
+        locally-enabled,
+        logging-not-lazy,
+        multiple-constructor-doc,
+        no-else-return,
+        no-member,
+        no-self-use,
+        not-context-manager,
+        redefined-variable-type,
+        redundant-returns-doc,
+# TODO(#12912): Python interpreter migration to 3.8.12 causing failing lint check. Fix it later.
+        redundant-u-string-prefix,
+        too-many-arguments,
+        too-many-boolean-expressions,
+        too-many-branches,
+        too-many-instance-attributes,
+        too-many-lines,
+        too-many-locals,
+        too-many-nested-blocks,
+        too-many-public-methods,
+        too-many-statements,
+        wrong-import-order,
+# TODO(#12912): Remove these after the Python 3 migration.
+        arg-name-for-non-keyword-arg,
+        arguments-renamed,
+        consider-using-with,
+        import-outside-toplevel,
+        non-explicit-keyword-args,
+        not-an-iterable,
+        unnecessary-pass,
+        consider-using-f-string,
+# TODO(#14322): Reinstate this.
+        missing-type-doc,
+        # Pylint considers imports to be cyclic even when the cycle is
+        # broken by putting imports inside functions so they aren't
+        # executed upon module import.
+        cyclic-import,
 
 [REPORTS]
 

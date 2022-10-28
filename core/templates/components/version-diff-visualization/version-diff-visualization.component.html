@@ -1,0 +1,58 @@
+<div [hidden]="diffGraphData" class="oppia-align-center">
+  Loading
+  <loading-dots></loading-dots>
+</div>
+
+<div class="version-diff-container">
+  <mat-card class="diff-graph version-diff-graph e2e-test-history-graph">
+    <state-graph-visualization [versionGraphData]="diffGraphData"
+                               [nodeColors]="diffGraphNodeColors"
+                               [nodeSecondaryLabels]="diffGraphSecondaryLabels"
+                               [initStateId2]="v1InitStateId"
+                               class="version-diff-container-graph"
+                               [linkPropertyMapping]="DIFF_GRAPH_LINK_PROPERTY_MAPPING"
+                               (onClickFunction)="onClickStateInDiffGraph($event)">
+    </state-graph-visualization>
+  </mat-card>
+
+  <h4 class="exploration-graph-legend-heading">Exploration Graph Legend:</h4>
+  <div class="version-diff-graph">
+    <mat-card class="legend-graph version-diff-graph" [hidden]="!diffGraphData">
+      <state-graph-visualization [versionGraphData]="legendGraph"
+                                 [nodeColors]="LEGEND_GRAPH_COLORS"
+                                 [nodeSecondaryLabels]="LEGEND_GRAPH_SECONDARY_LABELS"
+                                 [linkPropertyMapping]="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"
+                                 id="legend-graph">
+      </state-graph-visualization>
+    </mat-card>
+  </div>
+</div>
+
+<style>
+  .version-diff-graph {
+    height: 100%;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    position: relative;
+    width: 100%;
+  }
+
+  .legend-graph .node rect {
+    pointer-events: none;
+  }
+
+  .legend-graph {
+    position: initial;
+    right: -100px;
+    top: 10px;
+  }
+
+  .exploration-graph-legend-heading {
+    font-weight: normal;
+    margin-top: 10px;
+  }
+
+  .diff-graph, .legend-graph {
+    border: 1px solid #707070;
+  }
+</style>

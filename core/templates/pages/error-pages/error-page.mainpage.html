@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @load('base-components/header.template.html', {"title": "Error - Oppia"})
+  </head>
+  <!-- Angular does not support passing data into root component like AngularJS.
+  Here errorCode attribute is used as placeholder to hold the status code
+  provided by underscore template loader. Later it is read using JavaScript.-->
+  <body errorCode="<%=htmlWebpackPlugin.options.statusCode%>">
+    <oppia-error-page-root></oppia-error-page-root>
+    @load('pages/footer_js_libs.html')
+  </body>
+</html>

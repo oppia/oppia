@@ -1,0 +1,134 @@
+<div class="topic-preview-parent">
+  <div>
+    <background-banner></background-banner>
+  </div>
+  <div class="topic-preview-container">
+    <div class="topic-preview-nav">
+      <div class="topic-preview-navbar-tabs">
+        <div class="topic-preview-navbar-tab"
+             [ngClass]="{'topic-preview-nav-active': activeTab === 'story'}"
+             (click)="changePreviewTab('story')">
+          <div class="topic-preview-icon">
+            <img alt="" class="tab-icon"
+                 [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
+          </div>
+          <div class="topic-preview-text">
+            Lessons
+          </div>
+        </div>
+        <div class="topic-preview-navbar-tab"
+             [ngClass]="{'topic-preview-nav-active': activeTab === 'practice'}"
+             (click)="changePreviewTab('practice')">
+          <div class="topic-preview-icon">
+            <img alt="" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
+          </div>
+          <div class="topic-preview-text">
+            Practice
+          </div>
+        </div>
+        <div class="topic-preview-navbar-tab"
+             [ngClass]="{'topic-preview-nav-active': activeTab === 'subtopic'}"
+             (click)="changePreviewTab('subtopic')">
+          <div class="topic-preview-icon">
+            <img alt="" class="tab-icon"
+                 [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
+          </div>
+          <div class="topic-preview-text">
+            Revision
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="activeTab === 'story'">
+      <stories-list [topicName]="topic.getName()"
+                    [topicDescription]="topic.getDescription()"
+                    [canonicalStorySummaries]="canonicalStorySummaries"
+                    [classroomUrlFragment]="''"
+                    [topicUrlFragment]="''">
+      </stories-list>
+    </div>
+    <div *ngIf="activeTab === 'subtopic'">
+      <subtopics-list [classroomUrlFragment]="''"
+                      [subtopicsList]="subtopics"
+                      [topicId]="topic.getId()"
+                      [topicName]="topicName"
+                      [topicUrlFragment]="''">
+      </subtopics-list>
+    </div>
+    <div *ngIf="activeTab === 'practice'">
+      <practice-tab [subtopicsList]="subtopics"
+                    [topicName]="topicName"
+                    [previewMode]="true">
+      </practice-tab>
+    </div>
+  </div>
+</div>
+<style>
+  .topic-preview-container {
+    background-color: #fff;
+    margin: 0 auto;
+    position: relative;
+    top: 50px;
+    width: 50%;
+  }
+  .topic-preview-parent {
+    margin-top: -40px;
+  }
+  .topic-preview-nav {
+    background-color: #00645c;
+    box-shadow: 0 2px 8px #000000cf;
+    margin-bottom: 12px;
+  }
+  .topic-preview-navbar-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .topic-preview-nav-active {
+    border-bottom: 4px solid #fff;
+  }
+  .topic-preview-navbar-tab {
+    cursor: pointer;
+    display: inline-block;
+    height: 100%;
+    padding: 20px 0;
+    text-align: center;
+    width: 25%;
+  }
+  .topic-preview-icon img {
+    height: 40px;
+  }
+  .topic-preview-text {
+    color: #fff;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 20px;
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+  .topic-preview-container md-card {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 0 rgba(0,0,0,0.24);
+    margin-top: 0;
+  }
+  .topic-preview-parent .topic-preview-container md-card {
+    box-shadow: none;
+  }
+  @media screen and (max-width: 1000px) {
+    .topic-preview-container {
+      width: 70%;
+   }
+  }
+  @media screen and (max-width: 800px) {
+    .topic-preview-container {
+      width: 80%;
+    }
+    .topic-preview-parent .background-banner-position {
+      top: 30px;
+    }
+  }
+  @media screen and (max-width: 650px) {
+    .topic-preview-container {
+      margin-top: 80px;
+      width: 100%;
+    }
+  }
+</style>

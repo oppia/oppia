@@ -14,23 +14,31 @@
 
 """Services for configuration properties."""
 
+from __future__ import annotations
+
 from core.domain import config_domain
 from core.platform import models
 
-(config_models,) = models.Registry.import_models([models.NAMES.config])
-memcache_services = models.Registry.import_memcache_services()
+from typing import Any
+
+(config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
 
-def set_property(committer_id, name, value):
+# Here we use type Any because value of a particular property can be a bool,
+# str, List[Dict], Dict, int and other types too. so, Any type has to be
+# used for value parameter.
+def set_property(committer_id: str, name: str, value: Any) -> None:
     """Sets a property value. The property must already be registered.
+
     Args:
         committer_id: str. The user ID of the committer.
         name: str. The name of the property.
-        value: str. The value of the property.
+        value: Any. The value of the property.
+
     Raises:
-        Exception: No config property with the specified name is found.
+        Exception. No config property with the specified name is found.
     """
 
     config_property = config_domain.Registry.get_config_property(name)
@@ -40,13 +48,15 @@ def set_property(committer_id, name, value):
     config_property.set_value(committer_id, value)
 
 
-def revert_property(committer_id, name):
+def revert_property(committer_id: str, name: str) -> None:
     """Reverts a property value to the default value.
+
     Args:
         committer_id: str. The user ID of the committer.
         name: str. The name of the property.
+
     Raises:
-        Exception: No config property with the specified name is found.
+        Exception. No config property with the specified name is found.
     """
 
     config_property = config_domain.Registry.get_config_property(name)

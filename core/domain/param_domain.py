@@ -16,22 +16,55 @@
 
 """Domain objects relating to parameters."""
 
+from __future__ import annotations
+
 import re
 
-from core.domain import obj_services
+from core import feconf
+from core import utils
 from core.domain import value_generators_domain
-import feconf
-import utils
+
+from typing import Dict, List, TypedDict, Union
 
 
-class ParamSpec(object):
+class CustomizationArgsDict(TypedDict):
+    """Dictionary representing the customization_args argument."""
+
+    parse_with_jinja: bool
+
+
+class CustomizationArgsDictWithValue(CustomizationArgsDict):
+    """Dictionary representing the customization_args argument
+    containing value key.
+    """
+
+    value: str
+
+
+class CustomizationArgsDictWithValueList(CustomizationArgsDict):
+    """Dictionary representing the customization_args argument
+    containing list_of_values key.
+    """
+
+    list_of_values: List[str]
+
+
+AllowedCustomizationArgsDict = Union[
+    CustomizationArgsDictWithValue,
+    CustomizationArgsDictWithValueList
+]
+
+
+class ParamSpecDict(TypedDict):
+    """Dictionary representing the ParamSpec object."""
+
+    obj_type: str
+
+
+class ParamSpec:
     """Value object for an exploration parameter specification."""
 
-    SUPPORTED_OBJ_TYPES = {
-        'UnicodeString',
-    }
-
-    def __init__(self, obj_type):
+    def __init__(self, obj_type: str) -> None:
         """Initializes a ParamSpec object with the specified object type.
 
         Args:
@@ -40,21 +73,19 @@ class ParamSpec(object):
         """
         self.obj_type = obj_type
 
-
-    def to_dict(self):
+    def to_dict(self) -> ParamSpecDict:
         """Returns a dict representation of this ParamSpec.
 
         Returns:
             dict. A dict with a single key, whose value is the type
-                of the parameter represented by this ParamSpec.
+            of the parameter represented by this ParamSpec.
         """
         return {
             'obj_type': self.obj_type,
         }
 
-
     @classmethod
-    def from_dict(cls, param_spec_dict):
+    def from_dict(cls, param_spec_dict: ParamSpecDict) -> ParamSpec:
         """Creates a ParamSpec object from its dict representation.
 
         Args:
@@ -64,29 +95,38 @@ class ParamSpec(object):
 
         Returns:
             ParamSpec. A ParamSpec object created from the specified
-                object type.
+            object type.
         """
         return cls(param_spec_dict['obj_type'])
 
-
-    def validate(self):
+    def validate(self) -> None:
         """Validate the existence of the object class."""
 
-        # Ensure that this object class exists.
-        obj_services.Registry.get_object_class_by_type(self.obj_type)
-
         # Ensure the obj_type is among the supported ParamSpec types.
-        if self.obj_type not in self.SUPPORTED_OBJ_TYPES:
+        if self.obj_type not in feconf.SUPPORTED_OBJ_TYPES:
             raise utils.ValidationError(
-                ('%s is not among the supported object types for parameters: '
-                 '{%s}.') %
-                (self.obj_type, ', '.join(sorted(self.SUPPORTED_OBJ_TYPES))))
+                '%s is not among the supported object types for parameters:'
+                ' {%s}.' %
+                (self.obj_type, ', '.join(sorted(feconf.SUPPORTED_OBJ_TYPES))))
 
 
-class ParamChange(object):
+class ParamChangeDict(TypedDict):
+    """Dictionary representing the ParamChange object."""
+
+    name: str
+    generator_id: str
+    customization_args: AllowedCustomizationArgsDict
+
+
+class ParamChange:
     """Value object for a parameter change."""
 
-    def __init__(self, name, generator_id, customization_args):
+    def __init__(
+        self,
+        name: str,
+        generator_id: str,
+        customization_args: AllowedCustomizationArgsDict
+    ) -> None:
         """Initialize a ParamChange object with the specified arguments.
 
         Args:
@@ -108,7 +148,7 @@ class ParamChange(object):
         self._customization_args = customization_args
 
     @property
-    def name(self):
+    def name(self) -> str:
         """The name of the changing parameter.
 
         Returns:
@@ -117,7 +157,7 @@ class ParamChange(object):
         return self._name
 
     @property
-    def generator(self):
+    def generator(self) -> value_generators_domain.BaseValueGenerator:
         """The value generator used to define the new value of the
         changing parameter.
 
@@ -129,7 +169,7 @@ class ParamChange(object):
             self._generator_id)()
 
     @property
-    def customization_args(self):
+    def customization_args(self) -> AllowedCustomizationArgsDict:
         """A dict containing several arguments that determine the changing value
         of the parameter.
 
@@ -143,7 +183,7 @@ class ParamChange(object):
          """
         return self._customization_args
 
-    def to_dict(self):
+    def to_dict(self) -> ParamChangeDict:
         """Returns a dict representing this ParamChange domain object.
 
         Returns:
@@ -156,7 +196,7 @@ class ParamChange(object):
         }
 
     @classmethod
-    def from_dict(cls, param_change_dict):
+    def from_dict(cls, param_change_dict: ParamChangeDict) -> ParamChange:
         """Create a ParamChange object with the specified arguments.
 
         Args:
@@ -174,28 +214,23 @@ class ParamChange(object):
 
         Returns:
             ParamChange. The ParamChange object created from the
-                `param_change_dict` dict, which specifies the name,
-                customization arguments and the generator used.
+            `param_change_dict` dict, which specifies the name,
+            customization arguments and the generator used.
         """
         return cls(
             param_change_dict['name'], param_change_dict['generator_id'],
             param_change_dict['customization_args']
         )
 
-    def _get_value(self, context_params):
+    def get_value(self, context_params: Dict[str, str]) -> str:
         """Generates a single value for a parameter change."""
-        return self.generator.generate_value(
+        value: str = self.generator.generate_value(
             context_params, **self.customization_args)
+        return value
 
-    def get_normalized_value(self, obj_type, context_params):
-        """Generates a single normalized value for a parameter change."""
-        raw_value = self._get_value(context_params)
-        return obj_services.Registry.get_object_class_by_type(
-            obj_type).normalize(raw_value)
-
-    def validate(self):
+    def validate(self) -> None:
         """Checks that the properties of this ParamChange object are valid."""
-        if not isinstance(self.name, basestring):
+        if not isinstance(self.name, str):
             raise utils.ValidationError(
                 'Expected param_change name to be a string, received %s'
                 % self.name)
@@ -204,22 +239,23 @@ class ParamChange(object):
                 'Only parameter names with characters in [a-zA-Z0-9] are '
                 'accepted.')
 
+        if not isinstance(self._generator_id, str):
+            raise utils.ValidationError(
+                'Expected generator ID to be a string, received %s '
+                % self._generator_id)
+
         try:
-            self.generator
-        except KeyError:
+            hasattr(self, 'generator')
+        except KeyError as e:
             raise utils.ValidationError(
-                'Invalid generator id %s' % self._generator_id)
-        except Exception:
-            raise utils.ValidationError(
-                'Expected generator id to be a string, received %s '
-                % (self._generator_id))
+                'Invalid generator ID %s' % self._generator_id) from e
 
         if not isinstance(self.customization_args, dict):
             raise utils.ValidationError(
                 'Expected a dict of customization_args, received %s'
                 % self.customization_args)
         for arg_name in self.customization_args:
-            if not isinstance(arg_name, basestring):
+            if not isinstance(arg_name, str):
                 raise Exception(
                     'Invalid parameter change customization_arg name: %s'
                     % arg_name)

@@ -1,0 +1,101 @@
+<div>
+  <div class="oppia-content">
+    <br>
+    <nav ngbNav #nav="ngbNav" [animation]="false">
+      <div [ngbNavItem]="1">
+        <a ngbNavLink>Recent Commits</a>
+        <ng-template ngbNavContent>
+          <h3>Recent Commits (all non-private explorations)</h3>
+          <div *ngIf="allCommits.length">
+            <table class="oppia-padded-table">
+              <tr>
+                <th>Timestamp</th>
+                <th>Exploration</th>
+                <th>Category</th>
+                <th>Username</th>
+                <th>Commit message</th>
+                <th>Community-owned?</th>
+              </tr>
+              <tr *ngFor="let commit of allCommits">
+                <td>{{ getDatetimeAsString(commit.last_updated) }}</td>
+                <td>
+                  <a [href]="getExplorationCreateUrl(commit.exploration_id)">
+                    {{ explorationData[commit.exploration_id].title }}
+                  </a>
+                </td>
+                <td>
+                  {{ explorationData[commit.exploration_id].category }}
+                </td>
+                <td>{{ commit.username }}</td>
+                <td>{{ commit.commit_message }}</td>
+                <td>{{ commit.post_commit_community_owned }}</td>
+              </tr>
+            </table>
+          </div>
+        </ng-template>
+      </div>
+
+      <div [ngbNavItem]="2">
+        <a ngbNavLink>Recent Feedback Messages</a>
+        <ng-template ngbNavContent>
+          <h3>Recent Feedback Messages</h3>
+          (Note that some of these links may be to private explorations, and thus result in authorization errors.)
+          <br>
+          <br>
+          <div *ngIf="allFeedbackMessages.length">
+            <table class="oppia-padded-table">
+              <tr>
+                <th>Timestamp</th>
+                <th>Exploration ID</th>
+                <th>Username</th>
+              </tr>
+              <tr *ngFor="let message of allFeedbackMessages">
+                <td>{{ getDatetimeAsString(message.createdOnMsecs) }}</td>
+                <td>
+                  <a *ngIf="isMessageFromExploration(message)"
+                     [href]="getExplorationCreateUrl(message.entityId)">
+                    {{ message.entityId }}
+                  </a>
+                </td>
+                <td>{{ message.authorUsername }}</td>
+              </tr>
+            </table>
+          </div>
+        </ng-template>
+      </div>
+
+      <div [ngbNavItem]="3">
+        <a ngbNavLink>Featured Activities</a>
+        <ng-template ngbNavContent>
+          <h3>Activities to feature in the library</h3>
+          <br>
+          <br>
+
+          <schema-based-editor [schema]="getSchema()"
+                               [localValue]="displayedFeaturedActivityReferences"
+                               (localValueChange)="updateDisplayedFeaturedActivityReferences($event)">
+          </schema-based-editor>
+          <br>
+          <br>
+
+          <button class="btn btn-success"
+                  (click)="saveFeaturedActivityReferences()"
+                  [disabled]="isSaveFeaturedActivitiesButtonDisabled()">
+            Save Featured Activities
+          </button>
+        </ng-template>
+      </div>
+    </nav>
+    <div [ngbNavOutlet]="nav"></div>
+  </div>
+</div>
+<style>
+  table.oppia-padded-table {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  table.oppia-padded-table th, table.oppia-padded-table td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+</style>

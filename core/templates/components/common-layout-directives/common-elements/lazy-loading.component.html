@@ -1,0 +1,16 @@
+<div class="oppia-lazy-loading-container e2e-test-lazy-loading"></div>
+<style>
+  @keyframes background_animate {
+    0% { background-position: 100% 100% }
+    50% { background-position: 0% 100% }
+    100% { background-position: 100% 100% }
+  }
+  .oppia-lazy-loading-container {
+    animation: background_animate 1.5s ease infinite;
+    background-color: #eee;
+    background-image: linear-gradient(-90deg, #eee, #ccc);
+    background-size: 400% 400%;
+    height: 75%;
+    width: 100%;
+  }
+</style>

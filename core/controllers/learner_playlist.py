@@ -14,7 +14,9 @@
 
 """Controllers for the learner playlist."""
 
-from constants import constants
+from __future__ import annotations
+
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import learner_playlist_services
@@ -24,9 +26,37 @@ from core.domain import learner_progress_services
 class LearnerPlaylistHandler(base.BaseHandler):
     """Handles operations related to the learner playlist."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'activity_type': {
+            'schema': {
+                'type': 'basestring',
+                'choices': [
+                    constants.ACTIVITY_TYPE_EXPLORATION,
+                    constants.ACTIVITY_TYPE_COLLECTION
+                ]
+            }
+        },
+        'activity_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'index': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': None
+            }
+        },
+        'DELETE': {}
+    }
+
     @acl_decorators.can_access_learner_dashboard
     def post(self, activity_type, activity_id):
-        position_to_be_inserted_in = self.payload.get('index')
+        position_to_be_inserted_in = self.normalized_payload.get('index')
 
         belongs_to_completed_or_incomplete_list = False
         playlist_limit_exceeded = False

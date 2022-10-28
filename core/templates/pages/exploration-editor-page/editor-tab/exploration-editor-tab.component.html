@@ -1,0 +1,106 @@
+<ng-template #EditorTabTourContainer>
+  <h3 class="e2e-test-joyride-title">Creating in Oppia</h3>
+  <p>Explorations are learning experiences that you create using Oppia. Think of explorations as a conversation between a student and a tutor.</p>
+</ng-template>
+
+<ng-template #EditorTabTourTutorialComplete>
+  <h3 class="e2e-test-joyride-title">Tutorial Complete</h3>
+  <div>
+    <h4>Now for the fun part...</h4>
+      That's the end of the tour! To finish up, here are some things we suggest:
+    <ul>
+      <li>
+        Create your first card!
+      </li>
+      <li>
+        Preview your exploration.
+      </li>
+      <li>
+        Check out more resources in the
+        <a href="https://oppia.github.io/#/" rel="noopener" target="_blank">
+          Help Center.
+        </a>
+      </li>
+    </ul>
+  </div>
+</ng-template>
+
+<div class="exp-editor-content-container"  joyrideStep="editorTabTourContainer" [stepContent]="EditorTabTourContainer">
+  <div class="exp-editor-main-editor">
+    <div class="oppia-editor-cards-container e2e-test-editor-cards-container">
+      <div class="oppia-editor-header">
+        <oppia-state-name-editor></oppia-state-name-editor>
+      </div>
+      <div>
+        <mat-checkbox class="checkpoint-selection-checkbox e2e-test-checkpoint-selection-checkbox"
+                      (change)="onChangeCardIsCheckpoint()"
+                      [(ngModel)]="stateCardIsCheckpointService.displayed"
+                      [disabled]="!isEditable()">
+          Set as a checkpoint for learners
+        </mat-checkbox>
+      </div>
+      <div *ngIf="areParametersEnabled()">
+        <state-param-changes-editor></state-param-changes-editor>
+      </div>
+      <oppia-state-editor [stateContentPlaceholder]="getStateContentPlaceholder()"
+                          [stateContentSaveButtonPlaceholder]="getStateContentSaveButtonPlaceholder()"
+                          [addState]="addState.bind(this)"
+                          [interactionIsShown]="interactionIsShown"
+                          [explorationIsLinkedToStory]="explorationIsLinkedToStory"
+                          (onSaveStateContent)="saveStateContent($event)"
+                          (onSaveInteractionCustomizationArgs)="saveInteractionCustomizationArgs($event)"
+                          (onSaveNextContentIdIndex)="saveNextContentIdIndex($event)"
+                          (onSaveInteractionId)="saveInteractionId($event)"
+                          (onSaveInteractionDefaultOutcome)="saveInteractionDefaultOutcome($event)"
+                          (onSaveInteractionAnswerGroups)="saveInteractionAnswerGroups($event)"
+                          (onSaveLinkedSkillId)="saveLinkedSkillId($event)"
+                          (onSaveSolution)="saveSolution($event)"
+                          (onSaveHints)="saveHints($event)"
+                          (onSaveSolicitAnswerDetails)="saveSolicitAnswerDetails($event)"
+                          (recomputeGraph)="recomputeGraph()"
+                          (showMarkAllAudioAsNeedingUpdateModalIfRequired)="showMarkAllAudioAsNeedingUpdateModalIfRequired($event)"
+                          (navigateToState)="navigateToState($event)"
+                          (refreshWarnings)="refreshWarnings()">
+      </oppia-state-editor>
+    </div>
+  </div>
+  <div class="exp-editor-overview">
+    <div class="exp-editor-overview-content">
+      <oppia-exploration-graph></oppia-exploration-graph>
+      <div class="exp-editor-content-container"  joyrideStep="editorTabTourTutorialComplete" [stepContent]="EditorTabTourTutorialComplete"></div>
+      <oppia-unresolved-answers-overview></oppia-unresolved-answers-overview>
+    </div>
+  </div>
+  <attribution-guide></attribution-guide>
+</div>
+
+<style>
+  .exp-editor-content-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .exp-editor-main-editor {
+    margin-right: 3%;
+    width: 40%;
+  }
+  .exp-editor-overview {
+    width: 30%;
+  }
+  .exp-editor-overview-content {
+    margin-top: 40px;
+  }
+  @media screen and (max-width: 768px) {
+    .exp-editor-main-editor {
+      margin-right: 0;
+      width: 100%;
+    }
+  }
+  md-checkbox.checkpoint-selection-checkbox.md-icon {
+    border-color: #0d48a1;
+    top: 2px;
+  }
+  md-checkbox.checkpoint-selection-checkbox.md-checked .md-icon {
+    background-color: rgba(71, 151, 136, 1);
+  }
+</style>

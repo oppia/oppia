@@ -1,0 +1,70 @@
+<mat-card class="oppia-editor-card-with-avatar">
+  <mat-card-header class=" oppia-mobile-collapsible-card-header"
+                   (click)="toggleSkillEditor()">
+    <mat-card-title class="oppia-exp-skill-card-header">
+      Skill
+    </mat-card-title>
+    <mat-card-actions class="arrow-button">
+      <i class="fa fa-caret-down" *ngIf="!skillEditorIsShown" aria-hidden="true"></i>
+      <i class="fa fa-caret-up" *ngIf="skillEditorIsShown" aria-hidden="true"></i>
+    </mat-card-actions>
+  </mat-card-header>
+  <mat-card-actions class="oppia-skill-button-container" *ngIf="skillEditorIsShown && !stateLinkedSkillIdService.displayed">
+    <button type="button"
+            class="btn btn-primary oppia-add-skill-button"
+            (click)="addSkill()">
+      + ADD SKILL
+    </button>
+  </mat-card-actions>
+  <mat-card-actions class="oppia-skill-button-container" *ngIf="skillEditorIsShown && stateLinkedSkillIdService.displayed">
+    <button type="button"
+            class="btn btn-primary oppia-change-skill-button"
+            (click)="addSkill()">
+      CHANGE SKILL
+    </button>
+  </mat-card-actions>
+  <mat-card-actions class="skill-description-card" *ngIf="skillEditorIsShown && stateLinkedSkillIdService.displayed && skillName">
+    <a [href]="getSkillEditorUrl()"
+       target="_blank" rel="noopener"
+       class="skill-link">{{skillName}}
+    </a>
+    <span class="oppia-delete-response-button oppia-transition-200" (click)="deleteSkill()" *ngIf="userCanEditSkills">
+      <i class="fas fa-times skill-delete-button"></i>
+    </span>
+  </mat-card-actions>
+</mat-card>
+<style>
+  .oppia-editor-card-with-avatar {
+    padding: 9px 28px 25px 17px;
+  }
+  .arrow-button {
+    cursor: pointer;
+    float: right;
+  }
+  :host /deep/ .mat-card-header-text {
+    width: 100%;
+  }
+  .oppia-skill-button-container {
+    margin-bottom: 0;
+    padding-left: 22px;
+  }
+  .skill-description-card {
+    background: rgba(0,0,0,0.05);
+    border: 1px solid #ccc;
+    display: block;
+    margin-left: 12px;
+    margin-top: 7px;
+    padding: 12px 0 0 45px;
+  }
+  .skill-link {
+    bottom: 4px;
+    color: #444;
+    position: relative;
+  }
+  .skill-delete-button {
+    color: #444;
+    cursor: pointer;
+    float: right;
+    padding-right: 10px;
+  }
+</style>

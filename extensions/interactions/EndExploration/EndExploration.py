@@ -16,7 +16,15 @@
 
 """Python configuration for EndExploration interaction."""
 
+from __future__ import annotations
+
 from extensions.interactions import base
+
+from typing import List, Optional
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
 
 
 class EndExploration(base.BaseInteraction):
@@ -27,21 +35,21 @@ class EndExploration(base.BaseInteraction):
     containing it.
     """
 
-    name = 'End Exploration'
-    description = (
+    name: str = 'End Exploration'
+    description: str = (
         'Ends the exploration, and suggests recommendations for explorations '
         'to try next.')
-    display_mode = base.DISPLAY_MODE_INLINE
-    is_terminal = True
-    _dependency_ids = []
-    instructions = None
-    narrow_instructions = None
-    needs_summary = False
+    display_mode: str = base.DISPLAY_MODE_INLINE
+    is_terminal: bool = True
+    _dependency_ids: List[str] = []
+    instructions: Optional[str] = None
+    narrow_instructions: Optional[str] = None
+    needs_summary: bool = False
     # Linear interactions are not supposed to have a solution.
-    can_have_solution = False
-    show_generic_submit_button = False
+    can_have_solution: bool = False
+    show_generic_submit_button: bool = False
 
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'recommendedExplorationIds',
         'description': (
             'IDs of explorations to recommend to the learner (at most 3 are '
@@ -52,6 +60,10 @@ class EndExploration(base.BaseInteraction):
             'items': {
                 'type': 'unicode',
             },
+            'validators': [{
+                'id': 'has_length_at_most',
+                'max_value': 3,
+            }],
             'ui_config': {
                 'add_element_text': 'Add exploration ID',
             }

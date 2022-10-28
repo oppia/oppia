@@ -1,0 +1,95 @@
+<div class="oppia-learner-group-syllabus">
+  <div *ngIf="!isAddNewSyllabusItemsModeActive()" class="assigned-syllabus-tab-title-section">
+    <div class="assigned-syllabus-tab-title">
+      <span translate="I18N_ASSIGNED_STORIES_AND_SKILLS"></span>
+    </div>
+    <div class="oppia-add-syllabus-items-button-container">
+      <div (click)="toggleAddNewSyllabusItemsMode()" class="btn oppia-add-syllabus-items-button oppia-autofocus">
+        + <span translate="I18N_ADD_NEW_SYLLABUS_ITEMS"></span>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="!isAddNewSyllabusItemsModeActive()" class="learner-group-assigned-syllabus">
+    <div *ngFor="let displayedItem of displayOrderOfSyllabusItems">
+      <div *ngIf="isDisplayedItemStory(displayedItem)" class="assigned-sylabus-card">
+        <div class="assigned-syllabus-item-image" [ngStyle]="{'background-color': storySummaries[getIndexToDisplay(displayedItem)].getThumbnailBgColor()}">
+          <img class="thumbnail-image assigned-syllabus-item-image" [src]="getStoryThumbnailUrl(storySummaries[getIndexToDisplay(displayedItem)])">
+          <div class="type-tag-pill">
+            {{'I18N_TOPIC_VIEWER_LESSONS' | translate}}
+            <div class="type-tag-pill-design"></div>
+          </div>
+        </div>
+        <div class="assigned-syllabus-info">
+          <div class="same-row-container">
+            <div class="assigned-syllabus-topic-info">
+              <span class="assigned-syllabus-topic-title">
+                {{storySummaries[getIndexToDisplay(displayedItem)].getTopicName()}}
+              </span>
+              <span> &#183; {{storySummaries[getIndexToDisplay(displayedItem)].getNodeTitles().length}} Chapters</span>
+            </div>
+            <div class="remove-syllabus-item" (click)="removeStoryIdFromSyllabus(storySummaries[getIndexToDisplay(displayedItem)].getId())">
+              {{'I18N_LEARNER_DASHBOARD_REMOVE_BUTTON' | translate}}
+            </div>
+          </div>
+          <div class="assigned-syllabus-card-title">
+            <span>{{storySummaries[getIndexToDisplay(displayedItem)].getTitle()}}</span>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="isDisplayedItemSubtopic(displayedItem)" class="assigned-sylabus-card">
+        <div class="assigned-syllabus-item-image" [ngStyle]="{'background-color': subtopicSummaries[getIndexToDisplay(displayedItem)].thumbnailBgColor}">
+          <img class="thumbnail-image assigned-syllabus-item-image" [src]="getSubtopicThumbnailUrl(subtopicSummaries[getIndexToDisplay(displayedItem)])">
+          <div class="type-tag-pill">{{'I18N_SYLLABUS_SKILL_TITLE' | translate}}</div>
+        </div>
+        <div class="assigned-syllabus-info">
+          <div class="same-row-container">
+            <div class="assigned-syllabus-topic-info assigned-syllabus-topic-title">
+              {{subtopicSummaries[getIndexToDisplay(displayedItem)].parentTopicName}}
+            </div>
+            <div class="remove-syllabus-item" (click)="removeSubtopicPageIdFromSyllabus(subtopicSummaries[getIndexToDisplay(displayedItem)].subtopicPageId)">
+              {{'I18N_LEARNER_DASHBOARD_REMOVE_BUTTON' | translate}}
+            </div>
+          </div>
+          <div class="assigned-syllabus-card-title">
+            <span>{{subtopicSummaries[getIndexToDisplay(displayedItem)].subtopicTitle}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="displayOrderOfSyllabusItems && displayOrderOfSyllabusItems.length === 0">
+      <div class="assigned-syllabus-empty-message">
+        <span translate="I18N_ASSIGNED_STORIES_AND_SKILLS_EMPTY_MESSAGE"></span>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="isAddNewSyllabusItemsModeActive()">
+    <div (click)="toggleAddNewSyllabusItemsMode()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M14 6.125H3.35125L8.2425 1.23375L7 0L0 7L7 14L8.23375 12.7662L3.35125 7.875H14V6.125Z" fill="#333333"/>
+      </svg>
+      <span class="back-to-syllabus-button"> {{'I18N_LEARNER_GROUP_BACK_TO_SYLLABUS' | translate}}</span>
+    </div>
+    <div class="add-new-syllabus-items-title">{{'I18N_LEARNER_GROUP_ADD_NEW_SYLLABUS_ITEMS' | translate}}</div>
+    <div class="add-syllabus-items-container">
+      <oppia-add-syllabus-items [learnerGroupId]="learnerGroup.id"
+                                [learnerGroup]="learnerGroup"
+                                [syllabusStorySummaries]="newlyAddedStorySummaries"
+                                [syllabusSubtopicSummaries]="newlyAddedSubtopicSummaries"
+                                [syllabusStoryIds]="newlyAddedStoryIds"
+                                [syllabusSubtopicPageIds]="newlyAddedSubtopicIds"
+                                (updateLearnerGroupStoryIds)="updateNewlyAddedStoryIds($event)"
+                                (updateLearnerGroupSubtopicIds)="updateNewlyAddedSubtopicIds($event)"
+                                (updateLearnerGroupStories)="updateNewlyAddedStorySummaries($event)"
+                                (updateLearnerGroupSubtopics)="updateNewlyAddedSubtopicSummaries($event)">
+      </oppia-add-syllabus-items>
+      <div class="add-new-syllabus-buttons">
+        <div (click)="toggleAddNewSyllabusItemsMode()" class="btn oppia-cancel-button">
+          <span translate="I18N_ADD_NEW_SYLLABUS_CANCEL_BUTTON_TEXT"></span>
+        </div>
+        <div (click)="saveNewSyllabusItems()" class="btn oppia-save-button" [ngClass]="{'disabled': !isNewSyllabusAdded()}">
+          <span translate="I18N_ADD_NEW_SYLLABUS_DONE_BUTTON_TEXT"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

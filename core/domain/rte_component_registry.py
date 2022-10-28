@@ -16,35 +16,75 @@
 
 """Registry for custom rich-text components."""
 
+from __future__ import annotations
+
 import inspect
+import os
 import pkgutil
 
-import constants
-import feconf
-import utils
+from core import constants
+from core import feconf
+from core import utils
+
+from typing import Any, Dict, List, Type, TypedDict, Union
+
+MYPY = False
+if MYPY: # pragma: no cover
+    # Here, we are importing 'components' from rich_text_components only
+    # for type checking.
+    from extensions.rich_text_components import components
 
 
-class Registry(object):
+class CustomizationArgSpecDict(TypedDict):
+    """Dictionary representing the customization_arg_specs object."""
+
+    name: str
+    description: str
+    # Here we use type Any because values in schema dictionary can be of
+    # type str, List, Dict and other types too.
+    schema: Dict[str, Any]
+    default_value: Union[str, int, List[str], Dict[str, str]]
+
+
+class RteComponentDict(TypedDict):
+    """Dictionary representing the RTE component's definition."""
+
+    backend_id: str
+    category: str
+    description: str
+    frontend_id: str
+    tooltip: str
+    icon_data_url: str
+    is_complex: bool
+    requires_internet: bool
+    requires_fs: bool
+    is_block_element: bool
+    customization_arg_specs: List[CustomizationArgSpecDict]
+
+
+class Registry:
     """Registry of all custom rich-text components."""
 
-    _rte_components = {}
+    _rte_components: Dict[str, RteComponentDict] = {}
 
     @classmethod
-    def _refresh(cls):
+    def _refresh(cls) -> None:
         """Repopulate the registry."""
         cls._rte_components.clear()
-        with open(feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r') as f:
-            cls._rte_components = constants.parse_json_from_js(f)
+        package, filepath = os.path.split(
+            feconf.RTE_EXTENSIONS_DEFINITIONS_PATH)
+        cls._rte_components = constants.parse_json_from_ts(
+            constants.get_package_file_contents(package, filepath))
 
     @classmethod
-    def get_all_rte_components(cls):
+    def get_all_rte_components(cls) -> Dict[str, RteComponentDict]:
         """Get a dictionary mapping RTE component IDs to their definitions."""
         if not cls._rte_components:
             cls._refresh()
         return cls._rte_components
 
     @classmethod
-    def get_tag_list_with_attrs(cls):
+    def get_tag_list_with_attrs(cls) -> Dict[str, List[str]]:
         """Returns a dict of HTML tag names and attributes for RTE components.
 
         The keys are tag names starting with 'oppia-noninteractive-', followed
@@ -55,7 +95,7 @@ class Registry(object):
         # TODO(sll): Cache this computation and update it on each refresh.
         # Better still, bring this into the build process so it doesn't have
         # to be manually computed each time.
-        component_list = cls.get_all_rte_components().values()
+        component_list = list(cls.get_all_rte_components().values())
 
         component_tags = {}
         for component_specs in component_list:
@@ -69,22 +109,27 @@ class Registry(object):
         return component_tags
 
     @classmethod
-    def get_component_types_to_component_classes(cls):
+    def get_component_types_to_component_classes(
+        cls
+    ) -> Dict[str, Type[components.BaseRteComponent]]:
         """Get component classes mapping for component types.
 
         Returns:
             dict. A dict mapping from rte component types to rte component
-                classes.
+            classes.
         """
         rte_path = [feconf.RTE_EXTENSIONS_DIR]
 
         for loader, name, _ in pkgutil.iter_modules(path=rte_path):
             if name == 'components':
-                module = loader.find_module(name).load_module(name)
+                fetched_module = loader.find_module(name)
+                # Ruling out the possibility of None for mypy type checking.
+                assert fetched_module is not None
+                module = fetched_module.load_module(name)
                 break
 
         component_types_to_component_classes = {}
-        component_names = cls.get_all_rte_components().keys()
+        component_names = list(cls.get_all_rte_components().keys())
         for component_name in component_names:
             for name, obj in inspect.getmembers(module):
                 if inspect.isclass(obj) and name == component_name:
@@ -95,7 +140,9 @@ class Registry(object):
         return component_types_to_component_classes
 
     @classmethod
-    def get_component_tag_names(cls, key, expected_value):
+    def get_component_tag_names(
+        cls, key: str, expected_value: bool
+    ) -> List[str]:
         """Get a list of component tag names which have the expected
         value of a key.
 
@@ -106,18 +153,18 @@ class Registry(object):
 
         Returns:
             list(str). A list of component tag names which have the expected
-                value of a key.
+            value of a key.
         """
         rich_text_components_specs = cls.get_all_rte_components()
         component_tag_names = []
         for component_spec in rich_text_components_specs.values():
-            if component_spec[key] == expected_value:
+            if component_spec.get(key) == expected_value:
                 component_tag_names.append(
                     'oppia-noninteractive-%s' % component_spec['frontend_id'])
         return component_tag_names
 
     @classmethod
-    def get_inline_component_tag_names(cls):
+    def get_inline_component_tag_names(cls) -> List[str]:
         """Get a list of inline component tag names.
 
         Returns:
@@ -126,7 +173,7 @@ class Registry(object):
         return cls.get_component_tag_names('is_block_element', False)
 
     @classmethod
-    def get_block_component_tag_names(cls):
+    def get_block_component_tag_names(cls) -> List[str]:
         """Get a list of block component tag names.
 
         Returns:
@@ -135,7 +182,7 @@ class Registry(object):
         return cls.get_component_tag_names('is_block_element', True)
 
     @classmethod
-    def get_simple_component_tag_names(cls):
+    def get_simple_component_tag_names(cls) -> List[str]:
         """Get a list of simple component tag names.
 
         Returns:
@@ -144,7 +191,7 @@ class Registry(object):
         return cls.get_component_tag_names('is_complex', False)
 
     @classmethod
-    def get_complex_component_tag_names(cls):
+    def get_complex_component_tag_names(cls) -> List[str]:
         """Get a list of complex component tag names.
 
         Returns:

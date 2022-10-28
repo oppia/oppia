@@ -16,31 +16,51 @@
 
 """Base class for visualizations of summarized learner answers."""
 
+from __future__ import annotations
+
+from core import schema_utils
+from core import utils
 from core.domain import calculation_registry
-import schema_utils
-import utils
+
+from typing import Any, Dict, List, Mapping, TypedDict, Union
+
+OptionsDictType = Mapping[str, Union[str, List[str], bool]]
 
 
-class BaseVisualization(object):
+class OptionsSpecsDict(TypedDict):
+    """Type for the _OPTIONS_SPECS class variable."""
+
+    name: str
+    description: str
+    # Here we use type Any because values in schema dictionary can be of type
+    # str, List, Dict, nested Dict and other types too.
+    schema: Dict[str, Any]
+
+
+class BaseVisualization:
     """Base class for definitions of visualizations."""
 
     # Option specifications for the visualization, including their descriptions
     # and schemas. Overridden in subclasses. Used for testing that the
     # answer_visualization_specs in visualizations are valid.
-    _OPTIONS_SPECS = []
+    _OPTIONS_SPECS: List[OptionsSpecsDict] = []
 
     @property
-    def id(self):
+    def id(self) -> str:
         """The name of the class."""
         return self.__class__.__name__
 
     def __init__(
-            self, calculation_id, options_dict, addressed_info_is_supported):
+        self,
+        calculation_id: str,
+        options_dict: OptionsDictType,
+        addressed_info_is_supported: bool
+    ) -> None:
         self.options = options_dict
         self.calculation_id = calculation_id
         self.addressed_info_is_supported = addressed_info_is_supported
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates a visualization object.
 
         This is only used in tests for the validity of interactions.
@@ -50,7 +70,8 @@ class BaseVisualization(object):
 
         # Check that the options_dict is valid.
         expected_option_names = sorted([
-            spec['name'] for spec in self._OPTIONS_SPECS])
+            spec['name'] for spec in self._OPTIONS_SPECS
+        ])
         actual_option_names = sorted(self.options.keys())
         if actual_option_names != expected_option_names:
             raise utils.ValidationError(
@@ -71,28 +92,29 @@ class BaseVisualization(object):
                 (self.id, self.addressed_info_is_supported))
 
 
-class BarChart(BaseVisualization):
-    """A visualization representing a bar chart."""
+class ClickHexbins(BaseVisualization):
+    """A visualization which overlays an image with a hexagonal grouping of
+    clicks.
 
-    _OPTIONS_SPECS = [{
-        'name': 'x_axis_label',
-        'description': 'The label for the x-axis.',
-        'schema': {
-            'type': 'unicode',
-        },
-    }, {
-        'name': 'y_axis_label',
-        'description': 'The label for the y-axis',
-        'schema': {
-            'type': 'unicode',
-        },
-    }]
+    > Why hexagons? There are many reasons for using hexagons, at least over
+      squares. Hexagons have symmetry of nearest neighbors which is lacking in
+      square bins. Hexagons are the maximum number of sides a polygon can have
+      for a regular tesselation of the plane, so in terms of packing a hexagon
+      is 13% more efficient for covering the plane than squares. This property
+      translates into better sampling efficiency at least for elliptical shapes.
+      Lastly hexagons are visually less biased for displaying densities than
+      other regular tesselations. For instance with squares our eyes are drawn
+      to the horizontal and vertical lines of the grid.
+    https://cran.r-project.org/web/packages/hexbin/vignettes/hexagon_binning.pdf
+    """
+
+    _OPTIONS_SPECS: List[OptionsSpecsDict] = []
 
 
 class FrequencyTable(BaseVisualization):
     """A visualization representing a two-column table with answer counts."""
 
-    _OPTIONS_SPECS = [{
+    _OPTIONS_SPECS: List[OptionsSpecsDict] = [{
         'name': 'column_headers',
         'description': 'The headers for the columns.',
         'schema': {
@@ -117,7 +139,7 @@ class EnumeratedFrequencyTable(BaseVisualization):
     The #1 entry is shown by default, all others start hidden.
     """
 
-    _OPTIONS_SPECS = [{
+    _OPTIONS_SPECS: List[OptionsSpecsDict] = [{
         'name': 'column_headers',
         'description': 'The headers for the columns.',
         'schema': {
@@ -131,4 +153,20 @@ class EnumeratedFrequencyTable(BaseVisualization):
         'name': 'title',
         'description': 'The title of the visualization.',
         'schema': {'type': 'unicode'}
+    }]
+
+
+class SortedTiles(BaseVisualization):
+    """A visualization for showing a small group of answers as a sequence of
+    tiles.
+    """
+
+    _OPTIONS_SPECS: List[OptionsSpecsDict] = [{
+        'name': 'header',
+        'description': 'Header for the tiles.',
+        'schema': {'type': 'unicode'}
+    }, {
+        'name': 'use_percentages',
+        'description': 'Summarize frequency through percentages',
+        'schema': {'type': 'bool'},
     }]

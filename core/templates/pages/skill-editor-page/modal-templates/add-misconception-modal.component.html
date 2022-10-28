@@ -1,0 +1,70 @@
+<style>
+  .add-misconception-modal .oppia-editor-description {
+    font-size: .8em;
+    font-style: italic;
+  }
+
+  .add-misconception-modal .oppia-misconception-editor-section {
+    padding-bottom: 10px;
+  }
+</style>
+
+<div class="add-misconception-modal e2e-test-add-misconception-modal">
+  <div class="modal-header">
+    <h3>Add Misconception</h3>
+  </div>
+
+  <div class="modal-body">
+    <div class="oppia-rule-details-header">
+      <div class="oppia-misconception-editor-section">
+        <strong>Misconception Name</strong>
+        <div>
+          <span class="oppia-editor-description">Use a name that will be easy for question creators to understand.</span>
+        </div>
+        <div>
+          <input class="form-control e2e-test-misconception-name-field"
+                 type="text" [(ngModel)]="misconceptionName"
+                 (change)="checkIfMisconceptionNameIsDuplicate()"
+                 maxlength="{{ MAX_CHARS_IN_MISCONCEPTION_NAME }}" autofocus>
+          <span *ngIf="misconceptionNameIsDuplicate" class="form-text oppia-form-error-text">
+            <em>A misconception with this name already exists.</em>
+          </span>
+        </div>
+      </div>
+      <div class="oppia-misconception-editor-section">
+        <strong>Notes for Creators</strong>
+        <div>
+          <span class="oppia-editor-description">These are additional notes for question creators to understand how handling this misconception is useful for the skill being tested.</span>
+        </div>
+        <schema-based-editor class="e2e-test-notes-textarea"
+                             [schema]="getSchemaForm()"
+                             [localValue]="misconceptionNotes"
+                             (localValueChange)="this.updateLocalForm($event)">
+        </schema-based-editor>
+      </div>
+      <div class="oppia-misconception-editor-section">
+        <strong>Default Feedback</strong>
+        <div>
+          <span class="oppia-editor-description">This is the default feedback given to learners when they have this misconception. Question creators may override this feedback.</span>
+        </div>
+        <schema-based-editor class="e2e-test-feedback-textarea"
+                             [schema]="getSchemaFeedback()"
+                             [localValue]="misconceptionFeedback"
+                             (localValueChange)="this.updateLocalFeedback($event)">
+        </schema-based-editor>
+      </div>
+      <div class="oppia-misconception-editor-section">
+        <strong>Should a response to this misconception be enforced on every question linked to this skill?</strong>
+        <input type="checkbox" [(ngModel)]="misconceptionMustBeAddressed">
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
+    <button class="btn btn-success e2e-test-confirm-add-misconception-button"
+            (click)="saveMisconception()"
+            [disabled]="!misconceptionName || misconceptionNameIsDuplicate || misconceptionFeedback.length === 0"
+    >Save</button>
+  </div>
+</div>

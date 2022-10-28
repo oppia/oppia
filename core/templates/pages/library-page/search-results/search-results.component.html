@@ -1,0 +1,52 @@
+<div>
+  <div class="oppia-search-bar-container">
+    <oppia-search-bar [enableDropup]="false"></oppia-search-bar>
+  </div>
+  <div *ngIf="!someResultsExist" class="oppia-search-results-intro">
+    <div class="oppia-search-results-no-match">
+      <picture>
+        <source type="image/webp" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.png')">
+        <img *ngIf="!profilePictureDataUrl" [src]="getStaticImageUrl('/general/no_explorations_found.png')">
+      </picture>
+      <p class="text-center">
+        <span>{{ 'I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY' | translate }}</span><br><br>
+        <a *ngIf="!userIsLoggedIn" href="" (click)="onRedirectToLogin('/creator-dashboard?mode=create')">
+          {{ 'I18N_LIBRARY_CREATE_EXPLORATION_QUESTION' | translate }}
+        </a>
+        <a *ngIf="userIsLoggedIn" href="/creator-dashboard?mode=create">
+          {{ 'I18N_LIBRARY_CREATE_EXPLORATION_QUESTION' | translate }}
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <oppia-activity-tiles-infinity-grid></oppia-activity-tiles-infinity-grid>
+</div>
+<style>
+  .oppia-search-results-no-match, .oppia-search-results-no-match p {
+    font-size: 0.85em;
+    text-align: center;
+  }
+  .oppia-search-results-intro {
+    font-size: 1.6em;
+    padding-bottom: 40px;
+    padding-top: 40px;
+  }
+  .oppia-search-bar-container {
+    height: 50px;
+    margin: 0 auto 20px;
+    width: max-content;
+  }
+  @media (max-width: 800px) {
+    .oppia-search-results-intro {
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+  }
+  @media (max-width: 767px) {
+    .oppia-search-bar-container {
+      padding-bottom: 100px;
+    }
+  }
+</style>

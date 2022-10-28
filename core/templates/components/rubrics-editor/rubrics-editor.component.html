@@ -1,0 +1,148 @@
+<div>
+  <div class="helper-text">
+    <span>
+      <i>
+        Create guidelines to help question creators make questions under a certain rubric.
+      </i>
+    </span>
+  </div>
+  <div class="form-group">
+    <span>
+      <select class="form-control rubric-options e2e-test-select-rubric-difficulty" [(ngModel)]="this.selectedRubricIndex"
+              (change)="this.onRubricSelectionChange()">
+        <option *ngFor="let option of this.rubricsOptions" [value]="option.id">{{ option.difficulty }}</option>
+      </select>
+    </span>
+  </div>
+
+  <div *ngIf="this.selectedRubricIndex != null">
+    <div *ngFor="let explanation of this.explanationsMemento[this.rubric.getDifficulty()]; index as idx">
+      <div *ngIf="!this.explanationEditorIsOpen[this.rubric.getDifficulty()][idx]">
+        <div class="oppia-readonly-rule-tile"
+             [ngClass]="{'oppia-editable-section': this.isEditable()}">
+          <div class="oppia-rule-preview">
+            <div class="oppia-click-to-start-editing" (click)="this.openExplanationEditor(this.rubric.getDifficulty(), idx)">
+              <i *ngIf="this.isEditable()"
+                 class="fas fa-pen oppia-editor-edit-icon float-right e2e-test-edit-rubric-explanation-{{this.rubric.getDifficulty()}}"
+                 title="Edit Rubric Explanation">
+              </i>
+            </div>
+            <span *ngIf="this.isExplanationEmpty(explanation) && this.selectedRubricIndex === 1 && idx === 0 && this.newSkillBeingCreated()"
+                  class="oppia-placeholder">
+            The skill description will be autofilled here
+            </span>
+            <span *ngIf="this.isExplanationEmpty(explanation) && (this.selectedRubricIndex !== 1 || (this.selectedRubricIndex === 1 && idx !== 0) || !this.newSkillBeingCreated())"
+                  class="oppia-placeholder">
+            This rubric has not yet been specified
+            </span>
+            <div class="e2e-test-rubric-explanation-{{this.rubric.getDifficulty()}}">
+              <oppia-rte-output-display [rteString]="explanation">
+              </oppia-rte-output-display>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="this.explanationEditorIsOpen[this.rubric.getDifficulty()][idx]">
+        <div class="oppia-rule-details-header">
+          <schema-based-editor class="e2e-test-rubric-explanation-text"
+                               [schema]="EXPLANATION_FORM_SCHEMA"
+                               [localValue]="this.editableExplanations[this.rubric.getDifficulty()][idx]"
+                               (localValueChange)="this.updateExplanation($event, idx)">
+          </schema-based-editor>
+        </div>
+
+        <div class="oppia-rule-save-cancel-buttons">
+          <div>
+            <button type="button"
+                    class="btn btn-danger e2e-test-delete-rubric-explanation-button"
+                    (click)="this.deleteExplanation(this.rubric.getDifficulty(), idx)"
+                    [disabled]="this.selectedRubricIndex === 1 && this.explanationsMemento[this.rubric.getDifficulty()].length <= 1">
+              Delete
+            </button>
+            <button type="button"
+                    class="btn btn-outline-secondary rubric-cancel-button"
+                    (click)="this.cancelEditExplanation(this.rubric.getDifficulty(), idx)">
+              Cancel
+            </button>
+            <button type="button"
+                    class="btn btn-success e2e-test-save-rubric-explanation-button"
+                    [disabled]="!this.isExplanationValid(this.rubric.getDifficulty(), idx)
+                      || !this.isExplanationLengthValid(this.rubric.getDifficulty(), idx)"
+                    (click)="this.saveExplanation(this.rubric.getDifficulty(), idx)">
+              Save
+            </button>
+          </div>
+          <br>
+          <div *ngIf="!this.isExplanationLengthValid(this.rubric.getDifficulty(), idx)" class="rubric-error-message">
+            Explanations should have at most 300 characters.
+          </div>
+          <div class="oppia-card-content-limit-error" *ngIf="this.hasReachedExplanationCountLimit()">
+            There can be maximum of 10 explanations across all levels.
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn add-explanation-button skill-editor-add-btn e2e-test-add-explanation-button-{{this.rubric.getDifficulty()}}"
+            type="button"
+            (click)="this.addExplanationForDifficulty(this.rubric.getDifficulty())"
+            [disabled]="this.isAnyExplanationEmptyForDifficulty(this.rubric.getDifficulty()) || this.hasReachedExplanationCountLimit()">
+      + ADD EXPLANATION FOR DIFFICULTY
+    </button>
+    <div *ngIf="this.explanationsMemento[this.skillDifficultyMedium]?.length <= 1"
+         class="helper-text">
+      There should be at least one explanation for the Medium level rubric.
+    </div>
+  </div>
+</div>
+
+<style>
+  .dropdown-option {
+    padding: 10px;
+  }
+
+  .rubric-error-message {
+    color: #f00;
+    display: block;
+    font-size: 0.8em;
+  }
+
+  .oppia-card-content-limit-error {
+    background: #fff5c8;
+    border: 0.0625rem solid #827127;
+    border-radius: 0.25rem;
+    color: #333;
+    padding-left: 0.25rem;
+  }
+
+  .helper-text {
+    color: #595959;
+    font-size: 13px;
+  }
+
+  .dropdown {
+    display: inline-block;
+  }
+
+  .rubric-options {
+    width: 200px;
+  }
+
+  .add-explanation-button {
+    background-color: #058ca6;
+    color: #fff;
+    margin-top: 1vh;
+  }
+
+  .rubric-editor {
+    margin-right: 15px;
+    margin-top: 2vh;
+  }
+
+  .oppia-rule-save-cancel-buttons {
+    text-align: right;
+  }
+  .oppia-rule-save-cancel-buttons .rubric-cancel-button {
+    border: 1px solid #999;
+    margin: 0 4px;
+  }
+</style>

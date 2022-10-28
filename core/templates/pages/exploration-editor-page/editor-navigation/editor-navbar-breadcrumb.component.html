@@ -1,0 +1,26 @@
+<ul class="nav navbar-nav d-none d-md-block oppia-navbar-breadcrumb ng-cloak">
+  <li>
+    <span class="oppia-navbar-breadcrumb-separator"></span>
+    <span ng-if="navbarTitle">
+      <[navbarTitle]>
+      <span class="oppia-navbar-breadcrumb-separator oppia-navbar-breadcrumb-separator-icon"></span>
+      <span>
+        <[getCurrentTabName()]>
+      </span>
+    </span>
+    <span ng-if="navbarTitle === ''" ng-click="editTitle()" class="oppia-untitled-exploration-text">
+      Untitled Exploration
+    </span>
+    <span class="e2e-test-loading-message" ng-if="navbarTitle === null">
+      Loading...
+    </span>
+  </li>
+</ul>
+<style>
+  editor-navbar-breadcrumb .oppia-navbar-breadcrumb-separator-icon {
+    margin-left: 5px;
+  }
+  editor-navbar-breadcrumb .oppia-untitled-exploration-text {
+    opacity: 0.8;
+  }
+</style>

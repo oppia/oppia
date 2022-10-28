@@ -1,0 +1,19 @@
+<div *ngIf="responses.length === 0">
+  <em>No choices selected.</em>
+</div>
+
+<div *ngIf="responses.length === 1">
+  <span>
+    <oppia-rte-output-display [rteString]="responses[0]">
+    </oppia-rte-output-display>
+  </span>
+</div>
+
+<ul *ngIf="responses.length > 1">
+  <li *ngFor="let response of responses; index as idx">
+    <span>
+      <oppia-rte-output-display [rteString]="response">
+      </oppia-rte-output-display>
+    </span>
+  </li>
+</ul>

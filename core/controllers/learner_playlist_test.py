@@ -14,11 +14,13 @@
 
 """Tests for the learner playlist."""
 
-from constants import constants
+from __future__ import annotations
+
+from core import feconf
+from core.constants import constants
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.tests import test_utils
-import feconf
 
 
 class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
@@ -43,7 +45,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
     COL_TITLE_4 = 'col title 4'
 
     def setUp(self):
-        super(LearnerPlaylistHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
@@ -152,7 +154,6 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                     'exp_id_%s' % exp_id), {},
                 csrf_token=csrf_token)
 
-
         # Now if we try and add an activity we should get a message saying we
         # are exceeding the limit.
         response = self.post_json(
@@ -234,7 +235,8 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['belongs_to_subscribed_activities'], True)
         self.assertEqual(
-            learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
+            learner_playlist_services
+            .get_all_collection_ids_in_learner_playlist(
                 self.viewer_id), [self.COL_ID_2, self.COL_ID_1])
 
         # Now we begin testing of not exceeding the limit of activities in the
@@ -275,29 +277,29 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 self.viewer_id), [self.EXP_ID_1, self.EXP_ID_2])
 
         # Remove an exploration.
-        self.delete_json(str(
+        self.delete_json(
             '%s/%s/%s' % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
                 constants.ACTIVITY_TYPE_EXPLORATION,
-                self.EXP_ID_1)))
+                self.EXP_ID_1))
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.viewer_id), [self.EXP_ID_2])
 
         # Removing the same exploration again has no effect.
-        self.delete_json(str('%s/%s/%s' % (
+        self.delete_json('%s/%s/%s' % (
             feconf.LEARNER_PLAYLIST_DATA_URL,
             constants.ACTIVITY_TYPE_EXPLORATION,
-            self.EXP_ID_1)))
+            self.EXP_ID_1))
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.viewer_id), [self.EXP_ID_2])
 
         # Remove the second exploration.
-        self.delete_json(str('%s/%s/%s' % (
+        self.delete_json('%s/%s/%s' % (
             feconf.LEARNER_PLAYLIST_DATA_URL,
             constants.ACTIVITY_TYPE_EXPLORATION,
-            self.EXP_ID_2)))
+            self.EXP_ID_2))
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.viewer_id), [])
@@ -317,25 +319,25 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 self.viewer_id), [self.COL_ID_1, self.COL_ID_2])
 
         # Remove a collection.
-        self.delete_json(str('%s/%s/%s' % (
+        self.delete_json('%s/%s/%s' % (
             feconf.LEARNER_PLAYLIST_DATA_URL,
-            constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_1)))
+            constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_1))
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.viewer_id), [self.COL_ID_2])
 
         # Removing the same collection again has no effect.
-        self.delete_json(str('%s/%s/%s' % (
+        self.delete_json('%s/%s/%s' % (
             feconf.LEARNER_PLAYLIST_DATA_URL,
-            constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_1)))
+            constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_1))
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.viewer_id), [self.COL_ID_2])
 
         # Remove the second collection.
-        self.delete_json(str('%s/%s/%s' % (
+        self.delete_json('%s/%s/%s' % (
             feconf.LEARNER_PLAYLIST_DATA_URL,
-            constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)))
+            constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2))
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.viewer_id), [])

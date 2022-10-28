@@ -1,0 +1,132 @@
+<div class="about-page e2e-test-about-page">
+  <div class="oppia-about-page-section-one">
+    <div class="oppia-about-page-section-one-right">
+      <picture class="oppia-about-study-image float-right">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/about/study.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/about/study.png')">
+        <img [src]="getStaticImageUrl('/about/study.png')" alt="about study image">
+      </picture>
+    </div>
+    <div class="oppia-about-page-section-one-left">
+      <h2 class="oppia-about-title oppia-about-section-title" [innerHTML]="'I18N_ABOUT_PAGE_TITLE_SECTION_ONE' | translate"></h2>
+      <p class="oppia-about-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_SECTION_ONE_CONTENT' | translate"></p>
+      <div class="oppia-about-button-container">
+        <button type="submit" (click)="onClickVisitClassroomButton()"
+                class="btn oppia-about-button oppia-about-button-browse">
+          {{ 'I18N_ACTION_BROWSE_LESSONS' | translate }}
+        </button>
+      </div>
+      <div *ngIf="androidPageIsEnabled" class="oppia-about-button-container">
+        <button type="submit" (click)="onClickAccessAndroidButton()"
+                class="btn oppia-about-button oppia-about-button-browse">
+          {{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-about-page-section-two oppia-about-section">
+    <div class="oppia-about-section-two-top oppia-about-fixed-section">
+      <div class="oppia-section-two-content">
+        <h3 class="oppia-about-title oppia-about-section-title" [innerHTML]="'I18N_ABOUT_PAGE_OUR_FEATURES' | translate"></h3>
+        <p class="oppia-about-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_OUR_FEATURES_CONTENT' | translate"></p>
+      </div>
+      <div class="oppia-about-icons">
+        <div class="oppia-about-features-container d-flex">
+          <div class="oppia-about-feature-description-container" *ngFor="let feature of features let i = index">
+            <img [src]="getStaticImageUrl(feature.imageFilename)" alt="{{feature.i18nDescription | translate}}" class="oppia-feature-icon">
+            <h4 class="oppia-about-feature-text" [innerHTML]="feature.i18nDescription | translate"></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-about-page-section-three oppia-about-section">
+    <div class="oppia-about-fixed-section">
+      <h2 class="oppia-about-outcome-title-mobile oppia-about-section-title-mobile text-white" [innerHTML]="'I18N_ABOUT_PAGE_OUR_OUTCOMES' | translate"></h2>
+      <div class="oppia-about-section-three-right oppia-about-image-right">
+        <div class="oppia-about-graph-image">
+          <img [src]="getStaticImageUrl('/about/graph.svg')" alt="graph image">
+        </div>
+      </div>
+      <div class="oppia-about-content-left">
+        <h2 class="oppia-about-outcome-title oppia-about-section-title oppia-about-title-mobile-display-none text-white" [innerHTML]="'I18N_ABOUT_PAGE_OUR_OUTCOMES' | translate"></h2>
+        <p class="oppia-about-outcome-content oppia-about-section-content text-white" [innerHTML]="'I18N_ABOUT_PAGE_OUR_OUTCOMES_CONTENT' | translate"></p>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-about-page-section-four oppia-about-section">
+    <div class="oppia-section-four oppia-about-fixed-section">
+      <h2 class="oppia-about-learn-title-mobile oppia-about-section-title-mobile" [innerHTML]="'I18N_ABOUT_PAGE_LEARN_FROM' | translate"></h2>
+      <div class="oppia-about-image-right">
+        <picture class="oppia-about-lesson-image">
+          <source type="image/webp" [srcset]="getStaticImageUrl('/about/fraction_lesson.webp')">
+          <source type="image/png" [srcset]="getStaticImageUrl('/about/fraction_lesson.png')">
+          <img [src]="getStaticImageUrl('/about/fraction_lesson.png')" class="oppia-about-lesson-image" alt="lesson image">
+        </picture>
+      </div>
+      <div class="oppia-about-content-left">
+        <h2 class="oppia-about-learn-title oppia-about-section-title oppia-about-title-mobile-display-none" [innerHTML]="'I18N_ABOUT_PAGE_LEARN_FROM' | translate"></h2>
+        <p class="oppia-about-learn-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_LEARN_FROM_CONTENT' | translate"></p>
+        <div class="oppia-about-classroom-button-container">
+          <button type="submit" (click)="onClickVisitClassroomButton()"
+                  class="btn oppia-about-button oppia-about-button-browse"
+                  [innerHTML]="'I18N_ACTION_VISIT_CLASSROOM' | translate">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-about-page-section-five oppia-about-section">
+    <div class="oppia-section-five oppia-about-fixed-section">
+      <h2 class="oppia-about-explore-lesson-title-mobile oppia-about-section-title-mobile" [innerHTML]="'I18N_ABOUT_PAGE_EXPLORE_LESSONS' | translate"></h2>
+      <div class="oppia-about-image-right">
+        <picture class="oppia-about-library-image">
+          <source type="image/webp" [srcset]="getStaticImageUrl('/about/library_layout.webp')">
+          <source type="image/png" [srcset]="getStaticImageUrl('/about/library_layout.png')">
+          <img [src]="getStaticImageUrl('/about/library_layout.png')" alt="library image">
+        </picture>
+      </div>
+      <div class="oppia-about-content-left">
+        <h2 class="oppia-about-explore-lesson-title oppia-about-section-title oppia-about-title-mobile-display-none" [innerHTML]="'I18N_ABOUT_PAGE_EXPLORE_LESSONS' | translate"></h2>
+        <p class="oppia-about-explore-lesson-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_EXPLORE_LESSONS_CONTENT' | translate"></p>
+        <div class="oppia-about-classroom-button-container">
+          <button type="submit" (click)="onClickBrowseLibraryButton()"
+                  class="btn oppia-about-button oppia-about-button-browse"
+                  [innerHTML]="'I18N_ACTION_BROWSE_LIBRARY' | translate">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-about-page-section-six oppia-about-section">
+    <div class="oppia-section-six oppia-about-fixed-section">
+      <h2 class="oppia-about-outcome-title-mobile oppia-about-section-title-mobile" [innerHTML]="'I18N_ABOUT_PAGE_EASILY_CREATE_LESSON' | translate"></h2>
+      <div class="oppia-about-section-six-image-left">
+        <picture class="oppia-about-book-image">
+          <source type="image/webp" [srcset]="getStaticImageUrl('/about/books_dsk.webp')">
+          <source type="image/png" [srcset]="getStaticImageUrl('/about/books_dsk.png')">
+          <img [src]="getStaticImageUrl('/about/books_dsk.png')" alt="book image">
+        </picture>
+      </div>
+      <div class="oppia-about-section-six-right">
+        <h2 class="oppia-about-outcome-title oppia-about-section-title oppia-about-title-mobile-display-none" [innerHTML]="'I18N_ABOUT_PAGE_EASILY_CREATE_LESSON' | translate"></h2>
+        <p class="oppia-about-outcome-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_CREATE_LESSON_CONTENT' | translate"></p>
+        <div class="oppia-about-classroom-button-container">
+          <button type="submit" (click)="onClickCreateLessonButton()"
+                  class="btn oppia-about-button oppia-about-button-browse"
+                  [innerHTML]="'I18N_ACTION_CREATE_LESSON_BUTTON' | translate">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-about-page-section-seven oppia-about-section">
+    <h2 class="oppia-get-started-title oppia-about-section-title" [innerHTML]="'I18N_ABOUT_PAGE_SECTION_SEVEN_TITLE' | translate"></h2>
+    <div class="oppia-about-classroom-button-container-one">
+      <button type="submit" (click)="onClickVisitClassroomButton()"
+              class="btn oppia-about-button oppia-about-button-browse"
+              [innerHTML]="'I18N_ACTION_EXPLORE_LESSONS' | translate">
+      </button>
+    </div>
+  </div>
+</div>

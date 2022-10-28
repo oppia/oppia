@@ -1,0 +1,28 @@
+<style>
+  .container {
+    cursor: pointer;
+    display: block;
+    font-size: 15px;
+    position: relative;
+  }
+</style>
+
+<div class="container-fluid">
+  <div *ngFor="let choice of choices;">
+    <span class="drag-and-drop-select-container">
+      <div class="row">
+        <div class="col-sm-1">
+          <input class="mr-2"
+                 type="radio"
+                 [(ngModel)]="currentValue"
+                 (ngModelChange)="updateLocalValue($event)"
+                 [value]="choice.val"
+                 name="{{ name }}">
+        </div>
+        <div class="col-sm-10">
+          <oppia-rte-output-display [rteString]="choice.id"></oppia-rte-output-display>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>

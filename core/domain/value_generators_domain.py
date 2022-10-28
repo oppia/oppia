@@ -16,16 +16,20 @@
 
 """Classes relating to value generators."""
 
+from __future__ import annotations
+
 import copy
+import importlib
 import inspect
 import os
-import pkgutil
 
-import feconf
-import utils
+from core import feconf
+from core import utils
+
+from typing import Any, Dict, Type
 
 
-class BaseValueGenerator(object):
+class BaseValueGenerator:
     """Base value generator class.
 
     A value generator is a class containing a function that takes in
@@ -40,7 +44,7 @@ class BaseValueGenerator(object):
     """
 
     @property
-    def id(self):
+    def id(self) -> str:
         """Returns the Class name as a string, i.e "BaseValueGenerator".
 
         Returns:
@@ -49,7 +53,7 @@ class BaseValueGenerator(object):
         return self.__class__.__name__
 
     @classmethod
-    def get_html_template(cls):
+    def get_html_template(cls) -> str:
         """Returns the HTML template for the class.
 
         Returns:
@@ -57,27 +61,36 @@ class BaseValueGenerator(object):
         """
         return utils.get_file_contents(os.path.join(
             os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'templates',
-            '%s.html' % cls.__name__))
+            '%s.component.html' % cls.__name__))
 
-    def generate_value(self, *args, **kwargs):
+    # Here we use type Any because child classes of BaseValueGenerator can use
+    # the 'generate_value' function with different types of arguments, 'args',
+    # 'kwargs' and return type are set to 'Any'.
+    def generate_value(
+        self,
+        *args: Any,
+        **kwargs: Any
+    ) -> Any:
         """Generates a new value, using the given customization args.
 
         The first arg should be context_params.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'generate_value() method has not yet been implemented')
 
 
-class Registry(object):
+class Registry:
     """Maintains a registry of all the value generators.
 
     Attributes:
         value_generators_dict: dict(str : BaseValueGenerator). Dictionary
             mapping value generator class names to their classes.
     """
-    value_generators_dict = {}
+
+    value_generators_dict: Dict[str, Type[BaseValueGenerator]] = {}
 
     @classmethod
-    def _refresh_registry(cls):
+    def _refresh_registry(cls) -> None:
         """Refreshes the dictionary mapping between generator_id and the
         corresponding generator classes.
         """
@@ -85,29 +98,24 @@ class Registry(object):
 
         # Assemble all generators in
         # extensions/value_generators/models/generators.py.
-        value_generator_paths = [os.path.join(
-            os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'models')]
+        module_path_parts = feconf.VALUE_GENERATORS_DIR.split(os.sep)
+        module_path_parts.extend(['models', 'generators'])
+        module = importlib.import_module('.'.join(module_path_parts))
 
-        # Crawl the directories and add new generator instances to the
-        # registries.
-        for loader, name, _ in pkgutil.iter_modules(
-                path=value_generator_paths):
-            if name.endswith('_test'):
-                continue
-            module = loader.find_module(name).load_module(name)
-            for _, clazz in inspect.getmembers(
-                    module, predicate=inspect.isclass):
-                if issubclass(clazz, BaseValueGenerator):
-                    cls.value_generators_dict[clazz.__name__] = clazz
+        for _, clazz in inspect.getmembers(module, predicate=inspect.isclass):
+            if issubclass(clazz, BaseValueGenerator):
+                cls.value_generators_dict[clazz.__name__] = clazz
 
     @classmethod
-    def get_all_generator_classes(cls):
+    def get_all_generator_classes(cls) -> Dict[str, Type[BaseValueGenerator]]:
         """Get the dict of all value generator classes."""
         cls._refresh_registry()
         return copy.deepcopy(cls.value_generators_dict)
 
     @classmethod
-    def get_generator_class_by_id(cls, generator_id):
+    def get_generator_class_by_id(
+        cls, generator_id: str
+    ) -> Type[BaseValueGenerator]:
         """Gets a generator class by its id.
 
         Refreshes once if the generator is not found; subsequently, throws an
@@ -118,10 +126,10 @@ class Registry(object):
 
         Returns:
             class(BaseValueGenerator). A generator class mapping to the
-                generator id given.
+            generator id given.
 
         Raises:
-            KeyError: The given generator_id is invalid.
+            KeyError. The given generator_id is invalid.
         """
         if generator_id not in cls.value_generators_dict:
             cls._refresh_registry()

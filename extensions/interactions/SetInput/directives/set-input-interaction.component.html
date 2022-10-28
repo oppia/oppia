@@ -1,0 +1,16 @@
+<div *ngIf="answer.length === 0">
+  <em translate="I18N_INTERACTIONS_SET_INPUT_EMPTY_SET"></em>
+</div>
+
+<div>
+  <schema-based-editor [schema]="getSchema()"
+                       [localValue]="answer"
+                       (localValueChange)="updateAnswer($event)">
+  </schema-based-editor>
+</div>
+
+<div *ngIf="errorMessage"
+     class="oppia-form-error"
+     aria-live="assertive"
+     [innerHTML]="errorMessage | translate">
+</div>

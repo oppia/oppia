@@ -14,30 +14,40 @@
 
 """Tests for the exploration voice artist work."""
 
+from __future__ import annotations
+
 import datetime
 
+from core import feconf
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class BaseVoiceArtistControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for self.VOICE_ARTIST_EMAIL."""
-        super(BaseVoiceArtistControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.signup('voiceoveradmin@app.com', 'voiceoverManager')
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            'voiceoveradmin@app.com')
+        self.add_user_role('voiceoverManager', feconf.ROLE_ID_VOICEOVER_ADMIN)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id)
 
 
 class VoiceArtistTest(BaseVoiceArtistControllerTests):
@@ -47,11 +57,13 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     RECORDED_VOICEOVERS = {
         'voiceovers_mapping': {
+            'ca_placeholder_0': {},
             'content': {
                 'en': {
                     'filename': 'testFile.mp3',
                     'file_size_bytes': 12200,
-                    'needs_update': False
+                    'needs_update': False,
+                    'duration_secs': 4.5
                 }
             },
             'default_outcome': {}
@@ -59,13 +71,18 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
     }
 
     def setUp(self):
-        super(VoiceArtistTest, self).setUp()
+        super().setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End card')
+        self.publish_exploration(self.owner_id, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
-            self.owner, self.EXP_ID, self.voice_artist_id,
-            rights_manager.ROLE_VOICE_ARTIST)
+            self.voiceover_admin,
+            self.EXP_ID,
+            self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST
+        )
         self.logout()
 
         self.login(self.VOICE_ARTIST_EMAIL)
@@ -73,10 +90,10 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
         self.csrf_token = self.get_new_csrf_token()
 
     def test_put_with_no_payload_version_raises_error(self):
-        with self.assertRaisesRegexp(
-            Exception, 'Invalid POST request: a version must be specified.'):
+        with self.assertRaisesRegex(
+            Exception, 'Missing key in handler args: version.'):
             self.put_json(
-                '%s/%s' % (feconf.VOICEOVER_DATA_PREFIX, self.EXP_ID), {
+                '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
                     'change_list': [{
                         'cmd': 'edit_state_property',
                         'state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -88,12 +105,12 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     def test_put_with_payload_version_different_from_exp_version_raises_error(
             self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Trying to update version 1 of exploration from version'
-            ' 3, which is too old. Please reload the page and try again.'):
+            ' 3, which is not possible. Please reload the page and try again.'):
 
             self.put_json(
-                '%s/%s' % (feconf.VOICEOVER_DATA_PREFIX, self.EXP_ID), {
+                '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
                     'change_list': [{
                         'cmd': 'edit_state_property',
                         'state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -106,7 +123,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     def test_voice_artist_can_save_valid_change_list(self):
         response = self.put_json(
-            '/createhandler/voiceover/%s' % self.EXP_ID, {
+            '/createhandler/data/%s' % self.EXP_ID, {
                 'change_list': [{
                     'cmd': 'edit_state_property',
                     'state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -125,7 +142,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
     def test_voice_artist_cannot_save_invalid_change_list(self):
         # Trying to change exploration objective.
         response = self.put_json(
-            '/createhandler/voiceover/%s' % self.EXP_ID, {
+            '/createhandler/data/%s' % self.EXP_ID, {
                 'change_list': [{
                     'cmd': 'edit_exploration_property',
                     'property_name': 'objective',
@@ -154,11 +171,13 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
     OLDER_DATETIME = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
     RECORDED_VOICEOVERS = {
         'voiceovers_mapping': {
+            'ca_placeholder_0': {},
             'content': {
                 'en': {
                     'filename': 'testFile.mp3',
                     'file_size_bytes': 12200,
-                    'needs_update': False
+                    'needs_update': False,
+                    'duration_secs': 4.5
                 }
             },
             'default_outcome': {}
@@ -177,13 +196,17 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
         'new_value': 'New title'}]
 
     def setUp(self):
-        super(VoiceArtistAutosaveTest, self).setUp()
+        super().setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        self.publish_exploration(self.owner_id, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
-            self.owner, self.EXP_ID, self.voice_artist_id,
-            rights_manager.ROLE_VOICE_ARTIST)
+            self.voiceover_admin,
+            self.EXP_ID,
+            self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST
+        )
         self.logout()
 
         self.login(self.VOICE_ARTIST_EMAIL)
@@ -204,7 +227,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
             'version': 1,
         }
         response = self.put_json(
-            '/createhandler/autosave_voiceover_draft/%s' % self.EXP_ID,
+            '/createhandler/autosave_draft/%s' % self.EXP_ID,
             payload, csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.voice_artist_id, self.EXP_ID))
@@ -216,7 +239,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
     def test_draft_not_updated_validation_error(self):
         response = self.put_json(
-            '/createhandler/autosave_voiceover_draft/%s' % self.EXP_ID, {
+            '/createhandler/autosave_draft/%s' % self.EXP_ID, {
                 'change_list': self.INVALID_DRAFT_CHANGELIST,
                 'version': 1,
             }, csrf_token=self.csrf_token, expected_status_int=400)
@@ -238,7 +261,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
             'version': 10,
         }
         response = self.put_json(
-            '/createhandler/autosave_voiceover_draft/%s' % self.EXP_ID,
+            '/createhandler/autosave_draft/%s' % self.EXP_ID,
             payload, csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.voice_artist_id, self.EXP_ID))
@@ -246,11 +269,12 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
             exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
         self.assertFalse(response['is_version_of_draft_valid'])
+        self.assertFalse(response['changes_are_mergeable'])
         self.assertEqual(response['draft_change_list_id'], 2)
 
     def test_discard_draft(self):
         self.post_json(
-            '/createhandler/autosave_voiceover_draft/%s' % self.EXP_ID, {},
+            '/createhandler/autosave_draft/%s' % self.EXP_ID, {},
             csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.voice_artist_id, self.EXP_ID))
@@ -261,16 +285,21 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
 class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
     """This controller tests the first time tutorial for translations."""
+
     EXP_ID = 'exp1'
 
     def setUp(self):
-        super(TranslationFirstTimeTutorialTest, self).setUp()
+        super().setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        self.publish_exploration(self.owner_id, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
-            self.owner, self.EXP_ID, self.voice_artist_id,
-            rights_manager.ROLE_VOICE_ARTIST)
+            self.voiceover_admin,
+            self.EXP_ID,
+            self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST
+        )
         self.logout()
 
         self.login(self.VOICE_ARTIST_EMAIL)
@@ -284,3 +313,106 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
             '/createhandler/started_translation_tutorial_event/%s'
             % self.EXP_ID, {}, csrf_token=self.csrf_token,
             expected_status_int=200)
+
+
+class VoiceArtistManagementTests(test_utils.GenericTestBase):
+
+    published_exp_id_1 = 'exp_1'
+    published_exp_id_2 = 'exp_2'
+    private_exp_id_1 = 'exp_3'
+    private_exp_id_2 = 'exp_4'
+
+    def setUp(self):
+        """Completes the sign-up process for self.VOICE_ARTIST_EMAIL."""
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.save_new_valid_exploration(
+            self.published_exp_id_1, self.owner_id)
+        self.save_new_valid_exploration(
+            self.published_exp_id_2, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id_1, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id_2, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id_1)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
+        user_services.add_user_role(
+            self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
+
+    def test_owner_cannot_assign_voice_artist(self):
+        self.login(self.OWNER_EMAIL)
+        params = {
+            'username': self.VOICE_ARTIST_USERNAME
+        }
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/voice_artist_management_handler/exploration/%s'
+            % self.published_exp_id_1, params,
+            csrf_token=csrf_token, expected_status_int=401)
+        self.logout()
+
+    def test_voiceover_admin_can_manage_voice_artist(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        params = {
+            'username': self.VOICE_ARTIST_USERNAME
+        }
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/voice_artist_management_handler/exploration/%s'
+            % self.published_exp_id_1, params, csrf_token=csrf_token)
+        self.logout()
+
+    def test_voiceover_admin_can_deassign_voice_artist(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        params = {
+            'username': self.VOICE_ARTIST_USERNAME
+        }
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/voice_artist_management_handler/exploration/%s'
+            % self.published_exp_id_1, params, csrf_token=csrf_token)
+        self.delete_json(
+            '/voice_artist_management_handler/exploration/%s'
+            % self.published_exp_id_1, params={
+                'voice_artist': self.VOICE_ARTIST_USERNAME})
+        self.logout()
+
+    def test_cannot_assign_voice_artist_to_random_user(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        params = {
+            'username': 'random_user'
+        }
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/voice_artist_management_handler/exploration/%s'
+            % self.published_exp_id_1, params,
+            csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Sorry, we could not find the specified user.')
+        self.logout()
+
+    def test_cannot_deassign_random_user_from_voice_artist(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        params = {
+            'username': self.VOICE_ARTIST_USERNAME
+        }
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/voice_artist_management_handler/exploration/%s'
+            % self.published_exp_id_1, params, csrf_token=csrf_token)
+        response = self.delete_json(
+            '/voice_artist_management_handler/exploration/%s'
+            % self.published_exp_id_1, params={
+                'voice_artist': 'random_user'}, expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Sorry, we could not find the specified user.')
+        self.logout()

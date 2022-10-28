@@ -1,0 +1,60 @@
+<div>
+  <div class="content-box">
+    <div class="content">
+      <span class="content-title">{{ editableTitle }}</span>
+      <div class="html-content">
+        <oppia-rte-output-display [rteString]="pageContents?.getHtml()">
+        </oppia-rte-output-display>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .content-box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 auto;
+    top: 20vh;
+    width: 70%;
+  }
+  .content {
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 30px 35px;
+    width: 65%;
+  }
+  .content-title {
+    color: #00645c;
+    display: block;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 30px;
+    margin-bottom: 15px;
+  }
+  .html-content {
+    background-color: #ecf5fc;
+    padding: 15px 25px;
+  }
+
+  @media screen and (max-width: 1100px) {
+    .content-box {
+      width: 100%;
+    }
+  }
+
+  @media screen and (max-width: 700px) {
+    .back-to-subtopic-container {
+      margin-bottom: 20px;
+      margin-left: 1%;
+      margin-top: 40px;
+    }
+    .content,
+    .content-box {
+      width: 100%;
+    }
+    .content {
+      padding: 30px;
+    }
+  }
+</style>

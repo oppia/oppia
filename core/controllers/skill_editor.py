@@ -14,19 +14,19 @@
 
 """Controllers for the skill editor."""
 
+from __future__ import annotations
+
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import dependency_registry
-from core.domain import interaction_registry
-from core.domain import obj_services
 from core.domain import role_services
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import skill_services
+from core.domain import topic_fetchers
 from core.domain import user_services
-import feconf
-import utils
-
-import jinja2
 
 
 def _require_valid_version(version_from_payload, skill_version):
@@ -40,11 +40,8 @@ def _require_valid_version(version_from_payload, skill_version):
             in the backend.
 
     Raises:
-        Exception: Invalid input.
+        Exception. Invalid input.
     """
-    if version_from_payload is None:
-        raise base.BaseHandler.InvalidInputException(
-            'Invalid POST request: a version must be specified.')
 
     if version_from_payload != skill_version:
         raise base.BaseHandler.InvalidInputException(
@@ -56,42 +53,34 @@ def _require_valid_version(version_from_payload, skill_version):
 class SkillEditorPage(base.BaseHandler):
     """The editor page for a single skill."""
 
-    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+    }
 
     @acl_decorators.can_edit_skill
     def get(self, skill_id):
         """Handles GET requests."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
         if skill is None:
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
 
-        interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
-
-        interaction_dependency_ids = (
-            interaction_registry.Registry.get_deduplicated_dependency_ids(
-                interaction_ids))
-        dependencies_html, additional_angular_modules = (
-            dependency_registry.Registry.get_deps_html_and_angular_modules(
-                interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
-
-        interaction_templates = (
-            interaction_registry.Registry.get_interaction_html(
-                interaction_ids))
-
-        self.values.update({
-            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
-            'additional_angular_modules': additional_angular_modules,
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'interaction_templates': jinja2.utils.Markup(
-                interaction_templates),
-            'dependencies_html': jinja2.utils.Markup(dependencies_html)
-        })
-
-        self.render_template('dist/skill-editor-page.mainpage.html')
+        self.render_template('skill-editor-page.mainpage.html')
 
 
 def check_can_edit_skill_description(user):
@@ -114,21 +103,34 @@ def check_can_edit_skill_description(user):
 class SkillRightsHandler(base.BaseHandler):
     """A handler for returning skill rights."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_skill
     def get(self, skill_id):
-        """Returns the SkillRights object of a skill."""
+        """Returns whether the user can edit the description of a skill."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
-        skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
         can_edit_skill_description = check_can_edit_skill_description(
             user_actions_info)
 
         self.values.update({
-            'skill_is_private': skill_rights.skill_is_private,
-            'creator_id': skill_rights.creator_id,
             'can_edit_skill_description': can_edit_skill_description,
             'skill_id': skill_id
         })
@@ -141,17 +143,89 @@ class EditableSkillDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_edit_skill
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+            'commit_message': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'change_dicts': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': skill_domain.SkillChange
+                    }
+                }
+            }
+        },
+        'DELETE': {}
+    }
+
+    @acl_decorators.open_access
     def get(self, skill_id):
         """Populates the data on the individual skill page."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+
+        skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
+
         if skill is None:
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
 
+        topics = topic_fetchers.get_all_topics()
+        grouped_skill_summary_dicts = {}
+        # It might be the case that the requested skill is not assigned to any
+        # topic, or it might be assigned to a topic and not a subtopic, or
+        # it can be assigned to multiple topics, so this dict represents
+        # a key value pair where key is topic's name and value is subtopic
+        # name which might be None indicating that the skill is assigned
+        # to that topic but not to a subtopic.
+        assigned_skill_topic_data_dict = {}
+
+        for topic in topics:
+            skill_ids_in_topic = topic.get_all_skill_ids()
+            if skill_id in skill_ids_in_topic:
+                subtopic_name = None
+                for subtopic in topic.subtopics:
+                    if skill_id in subtopic.skill_ids:
+                        subtopic_name = subtopic.title
+                        break
+                assigned_skill_topic_data_dict[topic.name] = subtopic_name
+
+            skill_summaries = skill_services.get_multi_skill_summaries(
+                skill_ids_in_topic)
+            skill_summary_dicts = [
+                summary.to_dict() for summary in skill_summaries]
+            grouped_skill_summary_dicts[topic.name] = skill_summary_dicts
+
         self.values.update({
-            'skill': skill.to_dict()
+            'skill': skill.to_dict(),
+            'assigned_skill_topic_data_dict': assigned_skill_topic_data_dict,
+            'grouped_skill_summaries': grouped_skill_summary_dicts
         })
 
         self.render_json(self.values)
@@ -159,28 +233,29 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_skill
     def put(self, skill_id):
         """Updates properties of the given skill."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
         if skill is None:
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
 
-        version = self.payload.get('version')
+        version = self.normalized_payload.get('version')
         _require_valid_version(version, skill.version)
 
-        commit_message = self.payload.get('commit_message')
-        change_dicts = self.payload.get('change_dicts')
-        change_list = [
-            skill_domain.SkillChange(change_dict)
-            for change_dict in change_dicts
-        ]
+        commit_message = self.normalized_payload.get('commit_message')
+        if (commit_message is not None and
+                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
+            raise self.InvalidInputException(
+                'Commit messages must be at most %s characters long.'
+                % constants.MAX_COMMIT_MESSAGE_LENGTH)
+
+        change_list = self.normalized_payload.get('change_dicts')
         try:
             skill_services.update_skill(
                 self.user_id, skill_id, change_list, commit_message)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        skill_dict = skill_services.get_skill_by_id(skill_id).to_dict()
+        skill_dict = skill_fetchers.get_skill_by_id(skill_id).to_dict()
 
         self.values.update({
             'skill': skill_dict
@@ -191,9 +266,11 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_skill
     def delete(self, skill_id):
         """Handles Delete requests."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
+
+        skill_services.remove_skill_from_all_topics(self.user_id, skill_id)
+
         if skill_services.skill_has_associated_questions(skill_id):
-            raise Exception(
+            raise self.InvalidInputException(
                 'Please delete all questions associated with this skill '
                 'first.')
 
@@ -216,11 +293,12 @@ class SkillDataHandler(base.BaseHandler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception, e:
-            raise self.PageNotFoundException('Invalid skill id.')
+        except utils.ValidationError as e:
+            raise self.PageNotFoundException(
+                'Invalid skill id.') from e
         try:
-            skills = skill_services.get_multi_skills(skill_ids)
-        except Exception, e:
+            skills = skill_fetchers.get_multi_skills(skill_ids)
+        except Exception as e:
             raise self.PageNotFoundException(e)
 
         skill_dicts = [skill.to_dict() for skill in skills]
@@ -231,32 +309,77 @@ class SkillDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class SkillPublishHandler(base.BaseHandler):
-    """A handler for publishing skills."""
+class FetchSkillsHandler(base.BaseHandler):
+    """A handler for accessing all skills data."""
 
-    @acl_decorators.can_publish_skill
-    def put(self, skill_id):
-        """Publishes a skill."""
-        skill = skill_services.get_skill_by_id(skill_id)
-        version = self.payload.get('version')
-        _require_valid_version(version, skill.version)
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+    }
 
-        skill_domain.Skill.require_valid_skill_id(skill_id)
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-        try:
-            skill_services.publish_skill(skill_id, self.user_id)
-        except Exception as e:
-            raise self.UnauthorizedUserException(e)
+    @acl_decorators.open_access
+    def get(self):
+        """Returns all skill IDs linked to some topic."""
 
-        skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
-        can_edit_skill_description = check_can_edit_skill_description(
-            user_actions_info)
+        skill_ids = topic_fetchers.get_all_skill_ids_assigned_to_some_topic()
 
+        skills = skill_fetchers.get_multi_skills(skill_ids, strict=False)
+
+        skill_dicts = [skill.to_dict() for skill in skills]
         self.values.update({
-            'skill_is_private': skill_rights.skill_is_private,
-            'creator_id': skill_rights.creator_id,
-            'can_edit_skill_description': can_edit_skill_description
+            'skills': skill_dicts
         })
 
+        self.render_json(self.values)
+
+
+class SkillDescriptionHandler(base.BaseHandler):
+    """A data handler for checking if a skill with given description exists."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_create_skill
+    def get(self, skill_description):
+        """Handler that receives a skill description and checks whether
+        a skill with the same description exists.
+        """
+        self.values.update({
+            'skill_description_exists': (
+                skill_services.does_skill_with_description_exist(
+                    skill_description))
+        })
+        self.render_json(self.values)
+
+
+class DiagnosticTestSkillAssignmentHandler(base.BaseHandler):
+    """A handler that returns a list of topic names for which the given skill
+    is assigned to that topic's diagnostic test.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_edit_skill
+    def get(self, skill_id: str) -> None:
+        """Returns a list of topic names for which the given skill is assigned
+        to that topic's diagnostic test.
+        """
+        self.values.update({
+            'topic_names': (
+                skill_services
+                .get_topic_names_with_given_skill_in_diagnostic_test(skill_id))
+        })
         self.render_json(self.values)

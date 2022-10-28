@@ -1,0 +1,62 @@
+<div class="oppia-thumbnail-container e2e-test-thumbnail-container"
+     [ngStyle]="{width: aspectRatio === '4:3' ? '248px' : '280px' }">
+  <oppia-thumbnail-display [classes]="['oppia-thumbnail-image']"
+                           [imgSrc]="editableThumbnailDataUrl"
+                           [background]="thumbnailBgColor"
+                           [aspectRatio]="'16:9'">
+  </oppia-thumbnail-display>
+  <div class="oppia-thumbnail-preview-title">
+      {{ name }}
+  </div>
+  <div class="oppia-thumbnail-preview-footer">
+    {{ previewFooter }}
+  </div>
+  <div class="oppia-thumbnail-preview-description">
+    {{ description }}
+  </div>
+</div>
+<style>
+  .oppia-thumbnail-container {
+    background: #2f6687;
+    border-radius: 4px 4px 4px 4px;
+    box-shadow: 0 4.5px 10px rgba(0, 0, 0, 0.25);
+    color: #fff;
+    height: 260px;
+    margin: 0 auto 15px auto;
+    max-width: 100%;
+    position: relative;
+    width: 186px;
+  }
+
+  .oppia-thumbnail-container img {
+    border-radius: 4px 4px 0 0;
+  }
+
+  .oppia-thumbnail-preview-description {
+    font-size: 16px;
+    line-height: 1.2;
+    overflow: hidden;
+    padding: 0 16px 0 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .oppia-thumbnail-preview-footer {
+    bottom: 10px;
+    font-size: 16px;
+    font-style: italic;
+    line-height: 1.2;
+    padding: 0 16px 0 16px;
+    position: absolute;
+  }
+
+  .oppia-thumbnail-preview-title {
+    font-size: 18px;
+    font-weight: bold;
+    overflow: hidden;
+    padding: 10px 16px 10px 16px;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+</style>

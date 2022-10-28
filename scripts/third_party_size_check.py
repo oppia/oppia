@@ -19,15 +19,26 @@ size limit is exceeded. The aim of this is to prevent us accidentally
 breaching the 10k file limit on App Engine.
 """
 
+from __future__ import annotations
+
+import fnmatch
 import os
 import sys
-import yaml
+
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
+
+from core import utils  # isort:skip
+
+from typing import List  # isort:skip
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
-THIRD_PARTY_SIZE_LIMIT = 7000
+THIRD_PARTY_SIZE_LIMIT = 15000
 
 
-def _get_skip_files_list():
+def get_skip_files_list() -> List[str]:
     """This function returns the list of the files which are skipped when
     Oppia is deployed to GAE.
 
@@ -35,79 +46,83 @@ def _get_skip_files_list():
         list. The list of files which are to be skipped.
 
     Raises:
-        yaml.YAMLError if failed to parse app_dev.yaml.
-        IOError if failed to open app_dev.yaml in read mode.
+        yaml.YAMLError. If failed to parse .gcloudignore.
+        IOError. If failed to open .gcloudignore in read mode.
     """
     try:
-        with open('./app_dev.yaml', 'r') as app_dev_yaml:
-            try:
-                app_dev_yaml_dict = yaml.safe_load(app_dev_yaml)
-            except yaml.YAMLError as yaml_exception:
-                print yaml_exception
-                sys.exit(1)
-            skip_files_list = app_dev_yaml_dict.get('skip_files')
+        with utils.open_file('.gcloudignore', 'r') as gcloudignore:
+            gcloudignore_lines = gcloudignore.read().split('\n')
 
-            skip_files_list = [os.getcwd() + '/' + skip_files_dir
-                               for skip_files_dir in skip_files_list]
-
+            skip_files_list = [
+                os.path.join(os.getcwd(), gcloudignore_line)
+                for gcloudignore_line in gcloudignore_lines
+                if not gcloudignore_line.strip().startswith('#')
+            ]
         return skip_files_list
     except IOError as io_error:
-        print io_error
+        print(io_error)
         sys.exit(1)
 
 
-def _check_size_in_dir(dir_path, skip_files_list):
+def _check_size_in_dir(dir_path: str, skip_files_list: List[str]) -> int:
     """Recursive method that checks the number of files inside the given
     directory.
 
     Args:
-         dir_path: str. The directory which files will be counted.
-         skip_files_list: list. The list of files which are to be skipped
-         from the file count.
+        dir_path: str. The directory which files will be counted.
+        skip_files_list: list. The list of files which are to be skipped
+            from the file count.
 
     Returns:
         int. The number of files inside the given directory.
     """
     number_of_files_in_dir = 0
     for name in os.listdir(dir_path):
-        if os.path.join(dir_path, name) in skip_files_list:
+        file_path = os.path.join(dir_path, name)
+        # The dir pattern of skip_files in app_dev.yaml ends with '/'.
+        file_path += '/' if os.path.isdir(file_path) else ''
+        if file_path in skip_files_list:
             continue
-        if os.path.isfile(os.path.join(dir_path, name)):
-            number_of_files_in_dir += 1
-        else:
-            if os.path.isdir(os.path.join(dir_path, name)):
-                number_of_files_in_dir += _check_size_in_dir(
-                    os.path.join(dir_path, name), skip_files_list)
+        if os.path.isfile(file_path):
+            matches_skip_files = any(
+                fnmatch.fnmatch(file_path, pattern)
+                for pattern in skip_files_list
+            )
+            if not matches_skip_files:
+                number_of_files_in_dir += 1
+        elif os.path.isdir(file_path):
+            number_of_files_in_dir += _check_size_in_dir(
+                file_path, skip_files_list)
     return number_of_files_in_dir
 
 
-def _check_third_party_size():
+def check_third_party_size() -> None:
     """Checks if the third-party size limit has been exceeded."""
-    skip_files_list = _get_skip_files_list()
+    skip_files_list = get_skip_files_list()
     number_of_files_in_third_party = _check_size_in_dir(
         THIRD_PARTY_PATH, skip_files_list)
-    print ''
-    print '------------------------------------------------------'
-    print '    Number of files in third-party folder: %d' % (
-        number_of_files_in_third_party)
-    print ''
+    print('')
+    print('------------------------------------------------------')
+    print('    Number of files in third-party folder: %d' % (
+        number_of_files_in_third_party))
+    print('')
     if number_of_files_in_third_party > THIRD_PARTY_SIZE_LIMIT:
         print(
             '    ERROR: The third-party folder size exceeded the %d files'
             ' limit.' % THIRD_PARTY_SIZE_LIMIT)
-        print '------------------------------------------------------'
-        print ''
+        print('------------------------------------------------------')
+        print('')
         sys.exit(1)
     else:
-        print '    The size of third-party folder is within the limits.'
-        print '------------------------------------------------------'
-        print ''
-        print 'Done!'
-        print ''
+        print('    The size of third-party folder is within the limits.')
+        print('------------------------------------------------------')
+        print('')
+        print('Done!')
+        print('')
 
 
-if __name__ == '__main__':
-    print 'Running third-party size check'
-    _check_third_party_size()
-    print 'Third-party folder size check passed.'
-    print ''
+if __name__ == '__main__': # pragma: no cover
+    print('Running third-party size check')
+    check_third_party_size()
+    print('Third-party folder size check passed.')
+    print('')

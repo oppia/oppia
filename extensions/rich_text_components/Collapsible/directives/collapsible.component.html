@@ -1,0 +1,72 @@
+<ngb-accordion #acc="ngbAccordion" class="collapsible-rte">
+  <ngb-panel id="toggle-1">
+    <ng-template ngbPanelHeader let-opened="opened">
+      <div class="panel-title fx-row d-flex justify-content-between" (click)="acc.toggle('toggle-1')">
+        <div class="e2e-test-collapsible-heading fx-main-start fx-cross-center"> {{ heading }}</div>
+        <div class="fx-main-end fx-cross-center">
+          <i class="material-icons md-18"> {{ opened ? '&#xE15C;' : '&#xE147;' }}</i>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template ngbPanelContent>
+      <div class="protractor-panel-body">
+        <oppia-rte-output-display class="e2e-test-collapsible-content" [rteString]="content">
+        </oppia-rte-output-display>
+      </div>
+    </ng-template>
+  </ngb-panel>
+</ngb-accordion>
+
+<!--
+  TODO(#7851): This styling is required since ui-bootstrap does not work
+  correctly with bootstrap 4. We need to switch from ui-bootstrap to
+  ng-bootstrap once we have upgraded the collapsible component to Angular 8.
+-->
+<style>
+  .collapsible-rte /deep/ .card {
+    background-color: #fff;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    margin-bottom: 20px;
+  }
+  .collapsible-rte /deep/ .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    padding: 10px 15px;
+  }
+  .collapsible-rte /deep/ .panel-group {
+    margin-bottom: 20px;
+  }
+  .collapsible-rte /deep/ .panel-title {
+    background-color: #fff;
+    color: inherit;
+    font-size: 16px;
+    margin-bottom: 0;
+    margin-top: 0;
+    width: 100%;
+  }
+  .collapsible-rte /deep/ .panel-title>a,
+  .collapsible-rte /deep/ .panel-title>small,
+  .collapsible-rte /deep/ .panel-title>.small,
+  .collapsible-rte /deep/ .panel-title>small>a,
+  .collapsible-rte /deep/ .panel-title>.small>a {
+    color: inherit;
+  }
+  .collapsible-rte /deep/ .panel-group .card-header {
+    border-bottom: 0;
+  }
+  .collapsible-rte /deep/ .panel-group .card {
+    border-radius: 4px;
+    margin-bottom: 0;
+  }
+  .collapsible-rte /deep/ .collapse {
+    display: none;
+  }
+  .collapsible-rte /deep/ .collapse.show {
+    display: block;
+  }
+</style>

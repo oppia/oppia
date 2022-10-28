@@ -1,0 +1,8 @@
+<div>
+  <oppia-opportunities-list [loadOpportunities]="loadOpportunities.bind(this)"
+                            (clickActionButton)="onClickSuggestQuestionButton($event)"
+                            [loadMoreOpportunities]="loadMoreOpportunities.bind(this)"
+                            [progressBarRequired]="true"
+                            [opportunityHeadingTruncationLength]="50">
+  </oppia-opportunities-list>
+</div>

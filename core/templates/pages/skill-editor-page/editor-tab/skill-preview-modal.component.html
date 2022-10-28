@@ -1,0 +1,35 @@
+<div class="skill-preview-modal">
+  <h3 class="skill-preview-modal-title">{{ skillDescription }}</h3>
+  <div class="skill-preview-modal-content">
+    <oppia-rte-output-display [rteString]="skillExplanation"></oppia-rte-output-display>
+  </div>
+  <div *ngIf="skillWorkedExamples.length">
+    <h3>Worked Examples: </h3>
+    <div *ngFor="let example of skillWorkedExamples" class="skill-preview-examples">
+      <oppia-rte-output-display class="worked-example-question"
+                                [rteString]="example.getQuestion().html">
+      </oppia-rte-output-display>
+      <oppia-rte-output-display [rteString]="example.getExplanation().html">
+      </oppia-rte-output-display>
+    </div>
+  </div>
+</div>
+
+<style>
+  .skill-preview-modal {
+    background-color: #f0ffff;
+    padding: 30px 35px;
+  }
+  .skill-preview-modal .skill-preview-modal-title {
+    font-size: 28px;
+  }
+  .skill-preview-modal .skill-preview-modal-content {
+    margin-top: 15px;
+  }
+  .skill-preview-modal .skill-preview-examples {
+    margin-bottom: 10px;
+  }
+  .skill-preview-modal .worked-example-question {
+    font-weight: bold;
+  }
+</style>

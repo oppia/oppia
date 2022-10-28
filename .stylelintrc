@@ -1,13 +1,15 @@
-{ 
-  "extends": "stylelint-config-recommended",
-  "processors": ["@mapbox/stylelint-processor-arbitrary-tags"],
+{
+  "extends": ["stylelint-config-recommended", "stylelint-config-html"],
+  "plugins": [
+    "stylelint-order"
+  ],
   "rules": {
     "no-duplicate-selectors": true,
     "no-empty-source": null,
     "selector-type-no-unknown": [
       true,
       {
-        ignore: ["custom-elements"]
+        "ignore": ["custom-elements"]
       }
     ],
     "block-closing-brace-newline-after": "always",
@@ -16,7 +18,22 @@
     "block-opening-brace-newline-after": "always-multi-line",
     "block-opening-brace-space-after": "always-single-line",
     "block-opening-brace-space-before": "always",
+    "color-hex-case": "lower",
+    "color-hex-length": "short",
     "declaration-colon-space-after": "always",
     "declaration-colon-space-before": "never",
-  }
+    "no-descending-specificity": null,
+    "order/properties-alphabetical-order": true,
+    "length-zero-no-unit": true
+  },
+
+  "overrides": [
+    {
+      "files": ["**/*.css"],
+      "rules": {
+        "indentation": 2,
+        "no-descending-specificity": true
+      }
+    }
+  ]
 }

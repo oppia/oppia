@@ -1,0 +1,59 @@
+<style>
+  .oppia-delete-example-button {
+    cursor: pointer;
+    opacity: 0.5;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 20px;
+  }
+
+ .oppia-delete-example-button:hover {
+    opacity: 1;
+  }
+
+.oppia-example-header-block {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+.left-padding {
+    padding-left: 24px;
+  }
+
+.oppia-example-header {
+    float: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 80%;
+  }
+.oppia-num-items-badge {
+    bottom: 4px;
+  }
+
+  /* This is to break the line only when screen is too narrow to have both divs
+     in same line.*/
+  @media screen and (min-width: 370px) {
+    .break-in-mobile {
+      display: none;
+    }
+  }
+</style>
+<div class="oppia-example-header-block" [ngClass]="{'left-padding': !disableSorting}">
+  <div class="oppia-example-header">
+    <span *ngIf="!isActive" [attr.title]="shortSummary">
+      {{ shortSummary }}
+      <span *ngIf="numItems > 1" class="badge badge-primary position-relative oppia-num-items-badge">
+        +{{numItems - 1 }}
+      </span>
+    </span>
+    <span *ngIf="isActive">&nbsp;</span>
+  </div>
+</div>
+
+<span class="oppia-delete-example-button e2e-test-delete-example-button oppia-transition-200"
+      *ngIf="isDeleteAvailable"
+      (click)="deleteItem($event)">
+  <i class="fas fa-times"></i>
+</span>

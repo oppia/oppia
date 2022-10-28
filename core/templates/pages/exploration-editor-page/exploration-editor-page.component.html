@@ -1,0 +1,336 @@
+<ng-template #EditorTabTourPreviewTab>
+  <h3 class="e2e-test-joyride-title">Preview</h3>
+  <p>At any time, you can click the <b>preview</b> button to play through your exploration.</p>
+</ng-template>
+
+<div class="navbar-helper">
+  <div class="navbar-tabs">
+    <div class="navbar-text">
+      {{ getNavbarText() }}
+      <span class="e2e-test-autosave-indicator autosave-indicator" *ngIf="autosaveIsInProgress">
+        &emsp;Auto Saving ...
+      </span>
+    </div>
+    <div class="navbar-icons">
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'main', 'uib-dropdown': countWarnings()}" (click)="selectMainTab()"
+          class="nav-item icon nav-list-item position-relative">
+        <a href="#" class="nav-link navbar-tab e2e-test-main-tab" [ngbTooltip]="'Editor'" placement="{{countWarnings() ? 'left' : 'bottom'}}">
+          <i class="fas fa-pen navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'main'}"></i>
+        </a>
+        <div [hidden]="!(countWarnings())" class="oppia-editor-warnings-indicator"
+             (mouseover)="isWarningsAreShown(true)"
+             (mouseleave)="isWarningsAreShown(false)"
+             [ngClass]="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
+          <span class="oppia-editor-warnings-count">
+            {{ countWarnings() }}
+          </span>
+          <ul class="uib-dropdown-menu oppia-editor-warnings-box dropdown-menu exploration-editor-warning-box" *ngIf="warningsAreShown">
+            <span class="oppia-editor-warnings-header">Warnings</span>
+            <li class="oppia-editor-warnings-text" *ngFor="let warning of getWarnings(); index as index">
+              <hr class="oppia-editor-warnings-separator">
+              <span *ngIf="warning && (warning.type === 'critical')">
+                <strong>{{ warning.message }}</strong>
+              </span>
+              <span *ngIf="warning && (warning.type !== 'critical')">
+                {{ warning.message }}
+              </span>
+            </li>
+          </ul>
+        </div>
+      </li>
+
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'translation', 'oppia-disabled-tab': !connectedToInternet || editabilityService.isLockedByAdmin()}" id="tutorialTranslationTab" class="nav-item icon nav-list-item e2e-test-translation-tab"
+          (click)="!connectedToInternet || editabilityService.isLockedByAdmin() || selectTranslationTab()" [ngbTooltip]="'Translations does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <a class="nav-link navbar-tab" [ngbTooltip]="'Translations'" placement="bottom" tabindex="0" >
+          <i class="fas fa-microphone navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'translation'}"></i>
+        </a>
+      </li>
+
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'preview', 'oppia-disabled-tab': !connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab" joyrideStep="editorTabTourPreviewTab" [stepContent]="EditorTabTourPreviewTab"
+          (click)="!connectedToInternet || selectPreviewTab()" [ngbTooltip]="'Preview does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <a class="nav-link  navbar-tab" [ngbTooltip]="'Preview'" placement="bottom" tabindex="0" >
+          <i class="fas fa-play navbar-tab-icon nav-bar-preview-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'preview'}"></i>
+        </a>
+      </li>
+
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'settings', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-settings-tab"
+          (click)="!connectedToInternet || selectSettingsTab()" [ngbTooltip]="'Settings does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <a class="nav-link  navbar-tab" [ngbTooltip]="'Settings'" placement="bottom" tabindex="0" >
+          <i class="fas fa-cog navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'settings'}"></i>
+        </a>
+      </li>
+
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'stats', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-stats-tab"
+          (click)="!connectedToInternet || selectStatsTab()" [ngbTooltip]="'Statistics does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <a class="nav-link  navbar-tab" [ngbTooltip]="'Statistics'" placement="bottom" tabindex="0" >
+          <i class="fas fa-poll navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'stats'}"></i>
+        </a>
+      </li>
+
+      <li *ngIf="isImprovementsTabEnabled() && screenIsLarge" [ngClass]="{'navbar-tab-active': getActiveTabName() === 'improvements', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-improvements-tab"
+          (click)="!connectedToInternet || selectImprovementsTab()"  [ngbTooltip]="'Improvements does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <a class="nav-link  navbar-tab" [ngbTooltip]="'Improvements'" placement="bottom" tabindex="0" >
+          <i class="material-icons navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'improvements'}">trending_up</i>
+        </a>
+      </li>
+
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'history', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-history-tab"
+          (click)="!connectedToInternet || selectHistoryTab()"  [ngbTooltip]="'History does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <a class="nav-link  navbar-tab" [ngbTooltip]="'History'" placement="bottom" tabindex="0" >
+          <i class="fas fa-clock navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'history'}"></i>
+        </a>
+      </li>
+
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'feedback', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-feedback-tab"
+          (click)="!connectedToInternet || selectFeedbackTab()" [ngbTooltip]="'Feedback does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <a class="nav-link  navbar-tab" [ngbTooltip]="'Feedback'" placement="bottom" tabindex="0" >
+          <i class="fas fa-comment-alt navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'feedback'}"></i>
+        </a>
+        <div [hidden]="!(getOpenThreadsCount())" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
+          <span class="oppia-exploration-open-threads-count">
+              {{ getOpenThreadsCount() }}
+          </span>
+        </div>
+      </li>
+
+      <li [ngClass]="{'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item" (click)="!connectedToInternet || showUserHelpModal()"
+          [ngbTooltip]="'Help does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <a href="#"
+           [ngbTooltip]="'Help'"
+           placement="bottom"
+           class="nav-link oppia-editor-navbar-tab-anchor">
+          <i class="fas fa-question-circle navbar-tab-icon"></i>
+        </a>
+      </li>
+    </div>
+  </div>
+  <div *ngIf="explorationEditorPageHasInitialized && editabilityService.isLockedByAdmin()" class="exploration-locked-for-editing-banner">
+    This exploration is currently locked to new edits. Please contact an admin for assistance.
+  </div>
+</div>
+<div class="exploration-editor-content">
+  <div class="container-fluid oppia-editor-page-container">
+    <div class="row" *ngIf="explorationRightsService.isCloned()">
+      <div class="col-lg-12 col-md-12 col-sm-12">
+        <div class="oppia-align-center uib-alert alert-warning oppia-alert-warning">
+          <strong>Note:</strong> This is a private, unpublishable copy of a
+          <a [href]="getExplorationUrl(explorationRightsService.clonedFrom())" target="_blank" rel="noopener">public exploration</a>.
+        </div>
+      </div>
+    </div>
+
+    <oppia-exploration-editor-tab [hidden]="!(getActiveTabName() === 'main')" [explorationIsLinkedToStory]="explorationIsLinkedToStory">
+    </oppia-exploration-editor-tab>
+
+    <oppia-translation-tab *ngIf="getActiveTabName() === 'translation'">
+    </oppia-translation-tab>
+    <!-- This is an *ngIf, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
+    <oppia-preview-tab *ngIf="getActiveTabName() === 'preview'" class="e2e-test-preview-tab">
+    </oppia-preview-tab>
+
+    <oppia-statistics-tab *ngIf="getActiveTabName() === 'stats'">
+    </oppia-statistics-tab>
+
+    <oppia-improvements-tab *ngIf="isImprovementsTabEnabled()"
+                            [hidden]="!(getActiveTabName() === 'improvements')">
+    </oppia-improvements-tab>
+
+    <oppia-settings-tab [hidden]="!(getActiveTabName() === 'settings')"
+                        [currentUserIsCurriculumAdmin]="currentUserIsCurriculumAdmin"
+                        [currentUserIsModerator]="currentUserIsModerator">
+    </oppia-settings-tab>
+
+    <oppia-history-tab [hidden]="!(getActiveTabName() === 'history')">
+    </oppia-history-tab>
+
+    <oppia-feedback-tab [hidden]="!(getActiveTabName() === 'feedback')">
+    </oppia-feedback-tab>
+  </div>
+</div>
+
+<oppia-on-screen-keyboard></oppia-on-screen-keyboard>
+
+<!-- These definitions must be included exactly once on the page for the graph SVGs to work in Firefox. -->
+<svg width="0" height="0">
+  <defs>
+    <marker id="arrowhead" viewBox="0 0 18 18" refX="10" refY="3"
+            markerWidth="10" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 4 L 0 8 z" fill="grey"></path>
+    </marker>
+    <marker id="arrowhead-green" viewBox="0 0 18 18" refX="10" refY="3"
+            markerWidth="10" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 4 L 0 8 z" fill="#1F7D1F"></path>
+    </marker>
+    <marker id="arrowhead-red" viewBox="0 0 18 18" refX="10" refY="3"
+            markerWidth="10" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 4 L 0 8 z" fill="#B22222"></path>
+    </marker>
+    <linearGradient id="nodegradient" x1="0%" x2="100%" y1="0%" y2="0%">
+      <stop offset="0%" class="oppia-stop"></stop>
+      <stop offset="100%" class="oppia-stop"></stop>
+    </linearGradient>
+  </defs>
+</svg>
+
+<style>
+  .autosave-indicator {
+    font-size: 75%;
+  }
+
+  .exploration-editor-content {
+    margin-top: 95px;
+  }
+
+  .exploration-locked-for-editing-banner {
+    background-color: #6c757d;
+    color: #fff;
+    padding: 5px;
+  }
+
+  .navbar-helper {
+    background-color: #00609c;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+    height: 70px;
+    margin-bottom: 20px;
+    position: fixed;
+    text-align: center;
+    top: 56px;
+    width: 100%;
+    z-index: 990;
+  }
+
+  .navbar-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+    justify-content: space-between;
+    text-align: center;
+  }
+
+  .navbar-tab-icon {
+    color: #fff;
+    display: block;
+    font-size: 26px;
+    width: 100%;
+  }
+
+  .navbar-tab span {
+    color: #fff;
+    font-size: 12px;
+  }
+
+  .oppia-editor-warnings-box {
+    cursor: default;
+    max-width: none;
+  }
+
+  .navbar-tab-active {
+    background-color: #e6e6e6;
+    box-shadow: 0 3px 2px 0 #e6e6e6;
+  }
+
+  .navbar-tab-active-icon {
+    color: #00609c;
+  }
+
+  .exploration-editor-warning-box {
+    display: block;
+  }
+
+  .oppia-exploration-open-threads-indicator {
+    border-radius: 50%;
+    bottom: 5px;
+    height: 15px;
+    position: absolute;
+    right: 3px;
+    text-align: center;
+  }
+
+  .oppia-exploration-open-threads-color {
+    background-color: #4078c0;
+  }
+
+  .oppia-exploration-open-threads-count {
+    background-color: #4078c0;
+    border: 1px solid;
+    border-radius: 10px;
+    bottom: 8px;
+    color: white;
+    font-size: 12px;
+    height: 16px;
+    line-height: 16px;
+    padding: 0 5px;
+    position: relative;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+  }
+
+  .nav-bar-preview-icon {
+    font-size: 20px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .navbar-helper {
+      display: none;
+    }
+  }
+
+  .navbar-text {
+    align-items: center;
+    color: #fff;
+    display: flex;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 20px;
+    margin-left: 3%;
+  }
+
+  .navbar-icons {
+    display: flex;
+    margin-right: 5%;
+  }
+
+  .nav-list-item {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    width: 90px;
+  }
+
+  .navbar-icons .nav-list-item:hover {
+    background-color: #4eb0c0;
+  }
+
+  .oppia-alert-warning {
+    padding: 2px;
+    width: 90%;
+  }
+
+  .oppia-stop {
+    stop-color: #8fbc8f;
+    stop-opacity: 1;
+  }
+
+  .oppia-disabled-tab {
+    opacity: 0.5;
+  }
+
+  @media screen and (max-width: 1000px) {
+    .navbar-text {
+      display: none;
+    }
+    .navbar-icons {
+      margin: 0 auto;
+    }
+  }
+  @media screen and (max-width: 800px) {
+    .navbar-helper {
+      position: inherit;
+    }
+    .navbar-tabs {
+      justify-content: center;
+    }
+    .exploration-editor-content {
+      margin-top: 0;
+    }
+  }
+</style>

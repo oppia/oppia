@@ -16,6 +16,6 @@
  * @fileoverview Requires for object templates required for players.
  */
 
-require('objects/templates/MathLatexStringEditorDirective.ts');
-require('objects/templates/SanitizedUrlEditorDirective.ts');
-require('objects/templates/ListOfTabsEditorDirective.ts');
+require('objects/templates/math-expression-content-editor.component.ts');
+require('objects/templates/sanitized-url-editor.component.ts');
+require('objects/templates/list-of-tabs-editor.component.ts');

@@ -1,0 +1,44 @@
+<div class="oppia-learner-hint-and-solution-modal-title">
+  <span [innerHTML]="'I18N_SOLUTION_TITLE' | translate"></span>
+</div>
+
+<div class="modal-body">
+  <label>{{ shortAnswerHtml.prefix }} solution is: &nbsp; </label>
+  <span>
+    <oppia-interaction-display classStr="oppia-learner-hint-and-solution-modal-body"
+                               [htmlData]="shortAnswerHtml.answer">
+    </oppia-interaction-display>
+  </span>
+  <br>
+  <br>
+  <label> <span [innerHTML]="'I18N_SOLUTION_EXPLANATION_TITLE' | translate"></span> </label>
+  <span>
+    <oppia-rte-output-display class="oppia-learner-hint-and-solution-modal-body"
+                              [rteString]="solutionExplanationHtml">
+    </oppia-rte-output-display>
+  </span>
+</div>
+
+<button class="oppia-learner-got-it-button e2e-test-learner-got-it-button md-button md-default-theme ml-auto"
+        (click)="closeModal()">
+  <span [innerHTML]="'I18N_GOT_IT' | translate"></span>
+</button>
+<span class="clearfix"></span>
+
+<style>
+  .oppia-learner-hint-and-solution-modal-title {
+    color: #00786d;
+    font-family: 'Capriola', Roboto, arial, sans-serif;
+    font-size: 1.75em;
+    font-weight: bold;
+    padding-top: 20px;
+    text-align: center;
+  }
+
+  .oppia-learner-hint-and-solution-modal-body {
+    word-wrap: break-word;
+  }
+  .oppia-learner-got-it-button {
+    float: right;
+  }
+</style>

@@ -1,0 +1,92 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "downlevelIteration": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "lib": [
+      "es2017",
+      "dom",
+      "webworker"
+    ],
+    "module": "es2020",
+    "moduleResolution": "node",
+    "outDir": "local_compiled_js_for_test",
+    "paths": {
+      "analytics-constants": [
+        "assets/analytics-constants.json"
+      ],
+      "app-events/*": [
+        "core/templates/app-events/*"
+      ],
+      "app.constants": [
+        "core/templates/app.constants"
+      ],
+      "classifiers/*": [
+        "extensions/classifiers/*"
+      ],
+      "components/*": [
+        "core/templates/components/*"
+      ],
+      "directives/*": [
+        "core/templates/directives/*"
+      ],
+      "domain/*": [
+        "core/templates/domain/*"
+      ],
+      "expressions/*": [
+        "core/templates/expressions/*"
+      ],
+      "filters/*": [
+        "core/templates/filters/*"
+      ],
+      "google-analytics.initializer": [
+        "core/templates/google-analytics.initializer"
+      ],
+      "hybrid-router-module-provider": [
+        "core/templates/hybrid-router-module-provider"
+      ],
+      "i18n/*": [
+        "core/templates/i18n/*"
+      ],
+      "interactions/*": [
+        "extensions/interactions/*"
+      ],
+      "modules/*": [
+        "core/templates/modules/*"
+      ],
+      "pages/*": [
+        "core/templates/pages/*"
+      ],
+      "services/*": [
+        "core/templates/services/*"
+      ],
+      "static/*": [
+        "third_party/static/*"
+      ],
+      "tests/*": [
+        "core/templates/tests/*"
+      ],
+      "utility/*": [
+        "core/templates/utility/*"
+      ]
+    },
+    "resolveJsonModule": true,
+    "rootDir": ".",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "es6",
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
+  },
+  "include": [
+    "core",
+    "extensions",
+    "typings"
+  ]
+}

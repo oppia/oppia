@@ -1,0 +1,45 @@
+<div class="modal-header">
+  <h3>Select topic(s) to which the skill is to be assigned</h3>
+</div>
+
+<div class="modal-body">
+  <oppia-select-topics [topicSummaries]="topicSummaries"
+                       [(selectedTopicIds)]="selectedTopicIds">
+  </oppia-select-topics>
+  <em *ngIf="!topicSummaries.length">The skill is already assigned to all available topics.</em>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success e2e-test-confirm-move-button" (click)="confirm(selectedTopicIds)">Save</button>
+</div>
+
+<style>
+  @media screen and (max-width: 768px) {
+    .assign-skill-to-topic-modal .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0 auto;
+      padding: 0;
+    }
+    .assign-skill-to-topic-modal .modal-header {
+      background-color: #00609c;
+      padding: 12px 10px;
+    }
+    .assign-skill-to-topic-modal .modal-header h3 {
+      color: #fff;
+    }
+    .assign-skill-to-topic-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+    }
+    .assign-skill-to-topic-modal .modal-body {
+      padding: 0;
+    }
+    .assign-skill-to-topic-modal .modal-close-button {
+      color: #fff;
+      display: block;
+      font-size: 20px;
+    }
+  }
+</style>

@@ -5,434 +5,709 @@
 # are allowed. For information about supported glob patterns please refer
 # https://docs.python.org/2/library/glob.html.
 
-# Note: The e2e test files are owned by both the dev workflow and QA teams.
-# - The QA team will do an initial review to verify the PR's test coverage. They
-#   will then ask the dev workflow team for a final review.
-# - The dev workflow team will review the code quality to see if the e2e tests
-#   can be optimized further.
+# IMPORTANT NOTES FOR DEVELOPERS:
+#
+# - When assigning codeowners for new files, please do so by picking an
+#   appropriate team lead from this page:
+#
+#       https://github.com/oppia/oppia/projects
+#
+#   You do not need to assign yourself as a codeowner (unless you are a project
+#   lead listed on the page above).
+
+# IMPORTANT NOTES FOR CODEOWNERS:
+#
+# - If you will be unavailable for more than 24 hours, please replace your
+#   ownership with a delegate, file an issue, and add a todo above the owner
+#   line like so:
+#
+#     TODO(#ISSUE_NUMBER): Revert ownership to @USERNAME after YYYY-MM-DD.
+#
+#   (See #10252 for an example.) Please make sure to restore ownership after
+#   the above date passes.
+
+# Blanket codeowners
+# This is for the case when new files are created in any directories that aren't
+# covered as a whole, since in these cases, codeowners are not recognized for
+# those files when reviewing, even if the PR does add it. Unless new
+# files/folders are created in the following directories, these codeowners would
+# be superseded by the relevant codeowners mentioned elsewhere in this file.
+# (Reference: https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners)
+/core/controllers/ @oppia/lace-backend-reviewers
+/core/domain/ @oppia/data-and-stability-reviewers
+/core/templates/components/ @oppia/lace-frontend-reviewers
+/core/templates/domain/ @oppia/lace-frontend-reviewers
+/core/templates/pages/ @oppia/lace-frontend-reviewers
+/core/templates/services/ @oppia/lace-frontend-reviewers
+/core/templates/utility/ @oppia/lace-frontend-reviewers
+/extensions/ @oppia/data-and-stability-reviewers
+/scripts/ @oppia/dev-workflow-reviewers
+
 
 # Angular Migration team
-/typings/ @ankita240796
-/tsconfig.json @ankita240796
+/core/controllers/oppia_root*.py @oppia/angular-migration-reviewers
+/core/templates/components/shared-component.module.ts @oppia/angular-migration-reviewers
+/core/templates/services/loader.service*.ts @oppia/angular-migration-reviewers
+/core/templates/components/code-mirror/ @oppia/angular-migration-reviewers
+/core/templates/components/filter-fields/ @oppia/angular-migration-reviewers
+/core/templates/components/oppia-angular-root.component.* @oppia/angular-migration-reviewers
+/core/templates/modules/ @oppia/angular-migration-reviewers
+/core/templates/pages/common-imports.ts @oppia/angular-migration-reviewers
+/core/templates/pages/mock-ajs.ts @oppia/angular-migration-reviewers
+/core/templates/pages/oppia-root/ @oppia/angular-migration-reviewers
+/core/templates/pages/lightweight-oppia-root/ @oppia/angular-migration-reviewers
+/core/templates/i18n/ @oppia/angular-migration-reviewers
+/core/templates/base-components/oppia-root.directive.ts @oppia/angular-migration-reviewers
+/core/templates/base-components/oppia-root.directive.html @oppia/angular-migration-reviewers
+/core/templates/services/angular-services.index.ts @oppia/angular-migration-reviewers
+/core/templates/services/contextual/logger.service.ts @oppia/angular-migration-reviewers
+/core/templates/services/contextual/logger.service.spec.ts @oppia/angular-migration-reviewers
+/core/templates/services/page-head.service*.ts @oppia/angular-migration-reviewers
+/core/templates/services/i18n-language-code.service.ts @oppia/angular-migration-reviewers
+/core/templates/services/question-validation.service*.ts @oppia/angular-migration-reviewers
+/core/templates/services/request-interceptor.service*.ts @oppia/angular-migration-reviewers
+/core/templates/services/UpgradedServices.ts @oppia/angular-migration-reviewers
+/core/templates/hybrid-router-module-provider*.ts @oppia/angular-migration-reviewers
+/core/templates/utility/string-utility*.ts @oppia/angular-migration-reviewers
+
+# TS typing
+/typings/ @oppia/data-and-stability-reviewers
+/tsconfig.json @oppia/data-and-stability-reviewers
+/tsconfig-strict.json @oppia/data-and-stability-reviewers
+/scripts/typescript_checks*.py @oppia/data-and-stability-reviewers
 
 
 # Answer classification team.
-/core/controllers/classifier*.py @prasanna08
-/core/domain/classifier*.py @prasanna08
-/core/storage/classifier/ @prasanna08
-/core/templates/dev/head/domain/classifier/ @prasanna08
-/extensions/classifiers/ @prasanna08
+/core/controllers/classifier*.py @oppia/ml
+/core/domain/classifier*.py @oppia/ml
+/proto_files/ @oppia/ml
+/core/templates/domain/classifier/ @oppia/ml
+/core/templates/services/classifier-data-backend-api.service*.ts @oppia/ml
+/extensions/classifiers/ @oppia/ml
+/buf.yaml @oppia/ml
+/buf.gen.yaml @oppia/ml
+
+
+# App Feedback Reporting project
+/core/domain/app_feedback_report_*.py @oppia/web-android-compatibility-reviewers
+/core/controllers/incoming_app_feedback_report*.py @oppia/web-android-compatibility-reviewers
 
 
 # Audio and Translation team.
-/core/controllers/voice_artist*.py @DubeySandeep
-/core/templates/dev/head/pages/exploration-editor-page/translation-tab/ @DubeySandeep
-/core/templates/dev/head/services/AudioPlayerService.ts @DubeySandeep
-/core/templates/dev/head/services/AutogeneratedAudioPlayerService.ts @DubeySandeep
-/core/templates/dev/head/services/GenerateContentIdService*.ts @DubeySandeep
-/core/templates/dev/head/services/SpeechSynthesisChunkerService*.ts @DubeySandeep
-/core/templates/dev/head/services/AssetsBackendApiService*.ts @DubeySandeep
+/core/controllers/voice_artist*.py @oppia/lace-backend-reviewers
+/core/templates/pages/exploration-editor-page/translation-tab/ @oppia/lace-frontend-reviewers
+/core/templates/services/audio-bar-status.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/audio-player.service.ts @oppia/lace-frontend-reviewers
+/core/templates/services/autogenerated-audio-player.service.ts @oppia/lace-frontend-reviewers
+/core/templates/services/generate-content-id.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/speech-synthesis-chunker.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/assets-backend-api.service*.ts @oppia/lace-frontend-reviewers
 
+
+# Blog project
+/core/domain/blog*.py @oppia/lace-backend-reviewers
+/core/controllers/blog_dashboard*.py @oppia/lace-backend-reviewers
+/core/controllers/blog_homepage*.py @oppia/lace-backend-reviewers
+/core/templates/domain/blog/ @oppia/lace-frontend-reviewers
+/core/templates/pages/blog-dashboard-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/blog-home-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/blog-post-page/ @oppia/lace-frontend-reviewers
 
 # Collection project.
-/core/controllers/collection*.py @kevinlee12
-/core/domain/collection*.py @kevinlee12
-/core/storage/collection/ @kevinlee12
-/core/templates/dev/head/components/entity-creation-services/collection-creation.service*.ts @kevinlee12
-/core/templates/dev/head/domain/collection/ @kevinlee12
-/core/templates/dev/head/pages/collection-editor-page/ @kevinlee12
-/core/templates/dev/head/pages/collection-player-page/ @kevinlee12
+/core/controllers/collection*.py @oppia/lace-backend-reviewers
+/core/domain/collection*.py @oppia/lace-backend-reviewers
+/core/templates/components/entity-creation-services/collection-creation.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/entity-creation-services/collection-creation-backend-api.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/domain/collection/ @oppia/lace-frontend-reviewers
+/core/templates/pages/collection-editor-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/collection-player-page/ @oppia/lace-frontend-reviewers
+
+
+# Contributor Dashboard project.
+/core/controllers/contributor_dashboard*.py @oppia/contributor-experience-team
+/core/domain/opportunity*.py @oppia/contributor-experience-team
+/core/domain/translation*.py @oppia/contributor-experience-team
+/core/storage/translation/ @oppia/data-and-stability-reviewers
+/core/templates/domain/opportunity/ @oppia/contributor-experience-team
+/core/templates/pages/contributor-dashboard-page/ @oppia/contributor-experience-team
+/core/templates/pages/contributor-dashboard-admin-page/ @oppia/contributor-experience-team
+/scripts/contributor_dashboard_debug.py @oppia/contributor-experience-team
 
 
 # Core documentation
-/AUTHORS @seanlip
-/CHANGELOG @seanlip
-/CONTRIBUTORS @seanlip
-/LICENSE @seanlip
-/NOTICE @seanlip
-/core/templates/dev/head/pages/about-page/ @DubeySandeep
-/core/templates/dev/head/pages/privacy-page/ @seanlip
-/core/templates/dev/head/pages/terms-page/ @seanlip
+/CHANGELOG @oppia/release-workflow-reviewers
+/core/templates/pages/android-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/about-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/about-page/about-page.constants.ts @oppia/angular-migration-reviewers
+/core/templates/pages/license-page/ @oppia/angular-migration-reviewers
+/core/templates/pages/privacy-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/privacy-page/privacy-page.component.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/terms-page/ @oppia/lace-frontend-reviewers
 
 
 # Dashboard pages.
-/core/controllers/creator_dashboard*.py @nithusha21
-/core/controllers/email_dashboard*.py @nithusha21
-/core/controllers/learner_dashboard*.py @nithusha21
-/core/controllers/learner_playlist*.py @nithusha21
-/core/controllers/subscriptions*.py @nithusha21
-/core/domain/activity*.py @nithusha21
-/core/domain/learner_playlist_services*.py @nithusha21
-/core/domain/learner_progress*.py @nithusha21
-/core/domain/subscription_services*.py @nithusha21
-/core/templates/dev/head/domain/creator_dashboard/ @nithusha21
-/core/templates/dev/head/domain/learner_dashboard/ @nithusha21
-/core/templates/dev/head/pages/creator-dashboard-page/ @nithusha21
-/core/templates/dev/head/pages/email-dashboard-pages/ @nithusha21
-/core/templates/dev/head/pages/learner-dashboard-page/ @nithusha21
-/core/templates/dev/head/pages/notifications-dashboard-page/ @nithusha21
+/core/controllers/creator_dashboard*.py @oppia/lace-backend-reviewers
+/core/controllers/email_dashboard*.py @oppia/lace-backend-reviewers
+/core/controllers/learner_dashboard*.py @oppia/lace-backend-reviewers
+/core/controllers/learner_goals*.py @oppia/lace-backend-reviewers
+/core/controllers/learner_playlist*.py @oppia/lace-backend-reviewers
+/core/controllers/subscriptions*.py @oppia/lace-backend-reviewers
+/core/domain/activity*.py @oppia/lace-backend-reviewers
+/core/domain/learner_goals_services*.py @oppia/lace-backend-reviewers
+/core/domain/learner_playlist_services*.py @oppia/lace-backend-reviewers
+/core/domain/learner_progress*.py @oppia/lace-backend-reviewers
+/core/domain/subscription_services*.py @oppia/lace-backend-reviewers
+/core/templates/domain/creator_dashboard/ @oppia/lace-frontend-reviewers
+/core/templates/domain/email-dashboard/ @oppia/lace-frontend-reviewers
+/core/templates/domain/learner_dashboard/ @oppia/lace-frontend-reviewers
+/core/templates/pages/creator-dashboard-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/email-dashboard-pages/ @oppia/lace-frontend-reviewers
+/core/templates/pages/learner-dashboard-page/ @oppia/lace-frontend-reviewers
 
 
 # Dev workflow team.
-/.circleci/ @apb7
-/.eslintignore @apb7
-/.eslintrc @apb7
-/.htmllintrc @apb7
-/.coveragerc @apb7
-/.gitattributes @apb7
-/.gitignore @apb7
-/.isort.cfg @apb7
-/.pylintrc @apb7
-/.stylelintrc @apb7
-/.travis.yml @apb7
-/core/templates/dev/head/css/.stylelintrc @apb7
-/tox.ini @apb7
-/scripts/ @apb7
-/Vagrantfile @apb7
+/.eslintignore @oppia/dev-workflow-reviewers
+/.eslintrc @oppia/dev-workflow-reviewers
+/.htmllintrc @oppia/dev-workflow-reviewers
+/.coveragerc @oppia/dev-workflow-reviewers
+/.gitattributes @oppia/dev-workflow-reviewers
+/.gitignore @oppia/dev-workflow-reviewers
+/.isort.cfg @oppia/dev-workflow-reviewers
+/.pylintrc @oppia/dev-workflow-reviewers
+/.stylelintrc @oppia/dev-workflow-reviewers
+/.yarnrc @oppia/dev-workflow-reviewers
+/tox.ini @oppia/dev-workflow-reviewers
+/scripts/*.py @oppia/dev-workflow-reviewers
+/scripts/check_e2e_tests_are_captured_in_ci*.py @oppia/automated-qa-reviewers
+/scripts/check_frontend_test_coverage*.py @oppia/automated-qa-reviewers
+/scripts/create_topological_sort_of_all_services*.py @oppia/dev-workflow-reviewers
+/scripts/install_prerequisites.sh @oppia/dev-workflow-reviewers
+/scripts/linters/ @oppia/dev-workflow-reviewers
+/scripts/linters/codeowner_linter*.py @oppia/dev-workflow-reviewers
+/scripts/linters/pylint_extensions*.py @oppia/dev-workflow-reviewers
+/scripts/linters/python_linter*.py @oppia/dev-workflow-reviewers
+/ubuntu_dockerfile @oppia/dev-workflow-reviewers
 
 
 # Exploration project.
-/core/controllers/editor*.py @DubeySandeep
-/core/controllers/reader*.py @aks681
-/core/controllers/resources*.py @vojtechjelinek @seanlip
-/core/domain/exp*.py @DubeySandeep
-/core/domain/fs*.py @aks681
-/core/domain/param_domain*.py @aks681
-/core/domain/rating_services*.py @DubeySandeep
-/core/domain/state_domain*.py @aks681
-/core/domain/summary_services*.py @aks681
-/core/domain/value_generators_domain*.py @vojtechjelinek @seanlip
-/core/storage/exploration/ @aks681
-/core/templates/dev/head/components/entity-creation-services/exploration-creation.service*.ts @DubeySandeep
-/core/templates/dev/head/components/button-directives/hint-and-solution-buttons.directive*.ts @aks681
-/core/templates/dev/head/components/button-directives/hint-and-solution-buttons.directive.html @aks681
-/core/templates/dev/head/components/state-directives/ @aks681
-/core/templates/dev/head/components/graph-services/ @DubeySandeep
-/core/templates/dev/head/components/version-diff-visualization/version-diff-visualization.directive.html @DubeySandeep
-/core/templates/dev/head/components/version-diff-visualization/version-diff-visualization.directive.ts @DubeySandeep
-/core/templates/dev/head/domain/editor/ @DubeySandeep
-/core/templates/dev/head/domain/exploration/ @DubeySandeep
-/core/templates/dev/head/domain/state/ @aks681
-/core/templates/dev/head/domain/summary/ @aks681
-/core/templates/dev/head/domain/state_card/ @aks681
-/core/templates/dev/head/pages/exploration-editor-page/ @DubeySandeep
-/core/templates/dev/head/pages/exploration-player-page/ @aks681
-/core/templates/dev/head/components/state-editor/ @aks681
-/core/templates/dev/head/services/ComputeGraphService.ts @DubeySandeep
-/core/templates/dev/head/services/ContextService*.ts @aks681
-/core/templates/dev/head/services/EditabilityService*.ts @DubeySandeep
-/core/templates/dev/head/services/ExplorationFeatures*.ts @aks681
-/core/templates/dev/head/services/ExplorationHtmlFormatterService*.ts @aks681
-/core/templates/dev/head/services/ValidatorsService*.ts @DubeySandeep
+/core/controllers/editor*.py @oppia/lace-backend-reviewers
+/core/controllers/reader*.py @oppia/lace-backend-reviewers
+/core/controllers/resources*.py @oppia/data-and-stability-reviewers
+/core/domain/exp*.py @oppia/lace-backend-reviewers
+/core/domain/fs*.py @oppia/lace-backend-reviewers
+/core/domain/param_domain*.py @oppia/lace-backend-reviewers
+/core/domain/rating_services*.py @oppia/lace-backend-reviewers
+/core/domain/state_domain*.py @oppia/lace-backend-reviewers
+/core/domain/summary_services*.py @oppia/lace-backend-reviewers
+/core/domain/value_generators_domain*.py @oppia/data-and-stability-reviewers
+/core/templates/components/entity-creation-services/exploration-creation.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/button-directives/hint-and-solution-buttons.component*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/button-directives/hint-and-solution-buttons.component.html @oppia/lace-frontend-reviewers
+/core/templates/components/checkpoint-celebration-modal/ @oppia/lace-frontend-reviewers
+/core/templates/components/state-directives/ @oppia/lace-frontend-reviewers
+/core/templates/components/graph-services/ @oppia/lace-frontend-reviewers
+/core/templates/components/on-screen-keyboard/ @oppia/interaction-and-rte-reviewers
+/core/templates/components/recommendations/ @oppia/lace-frontend-reviewers
+/core/templates/components/save-pending-changes/ @oppia/lace-frontend-reviewers
+/core/templates/components/stale-tab-info/ @oppia/lace-frontend-reviewers
+/core/templates/components/unsaved-changes-status-info/ @oppia/lace-frontend-reviewers
+/core/templates/components/version-diff-visualization/ @oppia/lace-frontend-reviewers
+/core/templates/domain/editor/ @oppia/lace-frontend-reviewers
+/core/templates/domain/entity_editor_browser_tabs_info/ @oppia/lace-frontend-reviewers
+/core/templates/domain/exploration/ @oppia/lace-frontend-reviewers
+/core/templates/domain/recommendations/ @oppia/lace-frontend-reviewers
+/core/templates/domain/state/ @oppia/lace-frontend-reviewers
+/core/templates/domain/summary/ @oppia/lace-frontend-reviewers
+/core/templates/domain/state_card/ @oppia/lace-frontend-reviewers
+/core/templates/pages/exploration-editor-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/exploration-editor-page/history-tab/ @oppia/lace-frontend-reviewers
+/core/templates/pages/exploration-editor-page/settings-tab/ @oppia/lace-frontend-reviewers
+/core/templates/pages/exploration-player-page/ @oppia/lace-frontend-reviewers
+/core/templates/components/state-editor/ @oppia/lace-frontend-reviewers
+/core/templates/services/blog-search.service.ts @oppia/lace-frontend-reviewers
+/core/templates/services/compute-graph.service.ts @oppia/lace-frontend-reviewers
+/core/templates/services/context.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/editability.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/exploration-features*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/exploration-html-formatter.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/favicon.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/image-upload-helper.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/staleness-detection.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/validators.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/yaml.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/copy-url/ @oppia/lace-frontend-reviewers
 
 
 # Forms pages.
-/core/templates/dev/head/components/forms/ @DubeySandeep
-/core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @DubeySandeep
-/core/templates/dev/head/components/ck-editor-helpers/customize-rte-component-modal.template.html @DubeySandeep
-/core/templates/dev/head/services/SchemaDefaultValueService.ts @DubeySandeep
-/core/templates/dev/head/services/SchemaUndefinedLastElementService.ts @DubeySandeep
+/core/templates/components/forms/ @oppia/lace-frontend-reviewers
+/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @oppia/lace-frontend-reviewers
+/core/templates/components/ck-editor-helpers/customize-rte-component-modal.template.html @oppia/lace-frontend-reviewers
+/core/templates/services/schema-default-value.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/schema-form-submitted.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/schema-undefined-last-element.service*.ts @oppia/lace-frontend-reviewers
 
 
 # Google-app-engine configurations
-/appengine_config.py @seanlip @nithusha21
-/cron.yaml @seanlip @nithusha21
-/dispatch.yaml @seanlip
-/index.yaml @seanlip @DubeySandeep
-/queue.yaml @seanlip
-/main_taskqueue.py @seanlip
+/app_dev.yaml @oppia/release-workflow-reviewers
+/cron.yaml @oppia/release-workflow-reviewers
+/index.yaml @oppia/release-workflow-reviewers
+/queue.yaml @oppia/release-workflow-reviewers
 
 
 # Global components and filters.
-/core/templates/dev/head/components/common-layout-directives/common-elements/alert-message.directive.ts @ankita240796
-/core/templates/dev/head/components/common-layout-directives/common-elements/attribution-guide.directive.html @ankita240796
-/core/templates/dev/head/components/common-layout-directives/common-elements/attribution-guide.directive.ts @ankita240796
-/core/templates/dev/head/components/common-layout-directives/common-elements/background-banner.directive.ts @ankita240796
-/core/templates/dev/head/components/common-layout-directives/common-elements/background-banner.directive.html @ankita240796
-/core/templates/dev/head/components/button-directives/exploration-embed-button.service.ts @ankita240796
-/core/templates/dev/head/components/button-directives/exploration-embed-button.directive.html @ankita240796
-/core/templates/dev/head/components/common-layout-directives/common-elements/loading-dots.directive.ts @ankita240796
-/core/templates/dev/head/components/common-layout-directives/common-elements/loading-dots.directive.html @ankita240796
-/core/templates/dev/head/components/common-layout-directives/common-elements/promo-bar.directive.ts @ankita240796
-/core/templates/dev/head/components/common-layout-directives/common-elements/promo-bar.directive.html @ankita240796
-/core/templates/dev/head/components/common-layout-directives/common-elements/sharing-links.directive.html @ankita240796
-/core/templates/dev/head/components/common-layout-directives/common-elements/sharing-links.directive.ts @ankita240796
-/core/templates/dev/head/components/button-directives/social-buttons.directive.ts @ankita240796
-/core/templates/dev/head/components/button-directives/social-buttons.directive.html @ankita240796
-/core/templates/dev/head/components/profile-link-directives/ @ankita240796
-/core/templates/dev/head/components/summary-tile/ @ankita240796
-/core/templates/dev/head/directives/FocusOnDirective*.ts @ankita240796
-/core/templates/dev/head/directives/AngularHtmlBindDirective*.ts @ankita240796
-/core/templates/dev/head/filters/ @ankita240796
+/core/templates/components/interaction-display/ @oppia/angular-migration-reviewers
+/core/templates/components/button-directives/* @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/alert-message.component*.ts @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/attribution-guide.component.html @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/attribution-guide.component*.ts @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/attribution-guide.component*.css @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/background-banner.*.ts @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/background-banner.component.html @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.component*.ts @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/lazy-loading.component.html @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/lazy-loading.component.ts @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/loading-dots.component.ts @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/loading-dots.component.html @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/promo-bar.component*.ts @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/promo-bar.component.html @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/sharing-links.component.html @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/sharing-links.component*.ts @oppia/angular-migration-reviewers
+/core/templates/components/common-layout-directives/common-elements/common-elements.module.ts @oppia/angular-migration-reviewers
+/core/templates/components/profile-link-directives/ @oppia/angular-migration-reviewers
+/core/templates/components/summary-tile/ @oppia/angular-migration-reviewers
+/core/templates/directives/angular-html-bind.directive*.ts @oppia/angular-migration-reviewers
+/core/templates/directives/directives.module.ts @oppia/angular-migration-reviewers
+/core/templates/directives/focus-on.directive*.ts @oppia/angular-migration-reviewers
+/core/templates/directives/headroom.directive.ts @oppia/angular-migration-reviewers
+/core/templates/directives/ng-init.directive.ts @oppia/angular-migration-reviewers
+/core/templates/domain/promo_bar/ @oppia/angular-migration-reviewers
+/core/templates/filters/ @oppia/angular-migration-reviewers
+/core/templates/services/attribution.service*.ts @oppia/angular-migration-reviewers
+/core/templates/services/ngb-modal.service.ts @oppia/angular-migration-reviewers
 
 
 # Global frontend services
-/core/templates/dev/head/services/PromoBarService*.ts @ankita240796
-/core/templates/dev/head/services/HtmlEscaperService*.ts @ankita240796
-/core/templates/dev/head/services/DebouncerService*.ts @ankita240796
-/core/templates/dev/head/services/SiteAnalyticsService*.ts @ankita240796
-/core/templates/dev/head/services/DateTimeFormatService*.ts @ankita240796
-/core/templates/dev/head/services/UtilsService*.ts @ankita240796
-/core/templates/dev/head/services/LocalStorageService*.ts @ankita240796
-/core/templates/dev/head/services/IdGenerationService*.ts @ankita240796
-/core/templates/dev/head/services/AlertsService*.ts @ankita240796
-/core/templates/dev/head/services/PageTitleService*.ts @ankita240796
-/core/templates/dev/head/services/ExtensionTagAssemblerService.ts @ankita240796
-/core/templates/dev/head/services/NestedDirectives*.ts @ankita240796
-/core/templates/dev/head/services/stateful/BackgroundMaskService*.ts @ankita240796
-/core/templates/dev/head/services/stateful/FocusManagerService*.ts @ankita240796
-/core/templates/dev/head/services/contextual/UrlService*.ts @ankita240796
-/core/templates/dev/head/services/contextual/DeviceInfoService*.ts @ankita240796
-/core/templates/dev/head/services/contextual/WindowDimensionsService*.ts @ankita240796
+/core/templates/services/alerts.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/date-time-format.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/debouncer.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/extension-tag-assembler.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/html-escaper.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/id-generation.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/keyboard-shortcut.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/local-storage.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/nested-directives*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/page-title.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/prevent-page-unload-event.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/promo-bar-backend-api.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/site-analytics.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/utils.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/stateful/background-mask.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/stateful/focus-manager.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/contextual/device-info.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/contextual/url.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/contextual/window-dimensions.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/contextual/window-ref.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/internet-connectivity.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/server-connection-backend-api.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/number-conversion.service*.ts @oppia/frontend-infrastructure-reviewers
 
 
 # Global stylesheet.
-/core/templates/dev/head/css/oppia.css @ankita240796
+/core/templates/css/oppia.css @oppia/frontend-infrastructure-reviewers
+/core/templates/css/oppia-material.css @oppia/frontend-infrastructure-reviewers
 
 
 # Interaction project.
-/core/domain/customization_args_util*.py @DubeySandeep
-/core/domain/interaction_registry*.py @aks681
-/core/domain/obj_services*.py @aks681
-/core/templates/dev/head/components/version-diff-visualization/codemirror-mergeview.directive.ts @kevinlee12
-/core/templates/dev/head/domain/objects/ @kevinlee12
-/core/templates/dev/head/expressions/ @seanlip
-/core/templates/dev/head/services/CodeNormalizerService*.ts @kevinlee12
-/extensions/dependencies/ @seanlip @vojtechjelinek
-/extensions/domain*.py @seanlip @DubeySandeep
-/extensions/interactions/ @kevinlee12 @vojtechjelinek
-/extensions/objects/ @aks681
-/extensions/value_generators/ @seanlip @vojtechjelinek
-/extensions/__init__.py @kevinlee12
+/core/domain/customization_args_util*.py @oppia/interaction-and-rte-reviewers
+/core/domain/expression_parser*.py @oppia/interaction-and-rte-reviewers
+/core/domain/interaction_registry*.py @oppia/interaction-and-rte-reviewers
+/core/domain/object_registry*.py @oppia/interaction-and-rte-reviewers
+/core/domain/rules_registry*.py @oppia/lace-backend-reviewers
+/core/domain/translatable_object_registry*.py @oppia/interaction-and-rte-reviewers
+/core/templates/components/keyboard-shortcut-help/ @oppia/interaction-and-rte-reviewers
+/core/templates/domain/objects/ @oppia/interaction-and-rte-reviewers
+/core/templates/expressions/ @oppia/interaction-and-rte-reviewers
+/core/templates/services/code-normalizer.service*.ts @oppia/interaction-and-rte-reviewers
+/core/templates/services/guppy-configuration.service.ts @oppia/interaction-and-rte-reviewers
+/core/templates/services/guppy-initialization.service.ts @oppia/interaction-and-rte-reviewers
+/core/templates/services/math-interactions.service.ts @oppia/interaction-and-rte-reviewers
+/extensions/domain*.py @oppia/interaction-and-rte-reviewers
+/extensions/interactions/ @oppia/interaction-and-rte-reviewers
+/extensions/objects/ @oppia/interaction-and-rte-reviewers
+/extensions/objects/templates/filepath-editor.component*.ts @oppia/interaction-and-rte-reviewers
+/extensions/objects/templates/filepath-editor.component.html @oppia/interaction-and-rte-reviewers
+/extensions/value_generators/ @oppia/interaction-and-rte-reviewers
+/extensions/__init__.py @oppia/interaction-and-rte-reviewers
 
 
 # Lesson Analytics team.
-/core/controllers/features*.py @brianrodri
-/core/domain/action_registry*.py @brianrodri
-/core/domain/calculation_registry*.py @brianrodri
-/core/domain/event_services*.py @brianrodri
-/core/domain/playthrough_issue_registry*.py @brianrodri
-/core/domain/stats*.py @brianrodri
-/core/domain/visualization_registry*.py @brianrodri
-/core/storage/statistics/ @brianrodri
-/core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
-/core/templates/dev/head/domain/statistics/ @brianrodri
-/core/templates/dev/head/pages/exploration-editor-page/improvements-tab/ @brianrodri
-/core/templates/dev/head/pages/exploration-editor-page/statistics-tab/ @brianrodri
-/core/templates/dev/head/services/ImprovementCardService*.ts @brianrodri
-/core/templates/dev/head/services/ImprovementsService*.ts @brianrodri
-/core/templates/dev/head/services/MessengerService.ts @brianrodri
-/core/templates/dev/head/services/Playthrough*.ts @brianrodri
-/core/templates/dev/head/services/StateRulesStatsService*.ts @brianrodri
-/core/templates/dev/head/services/StateTopAnswersStats*.ts @brianrodri
-/extensions/actions/ @brianrodri
-/extensions/answer_summarizers/ @brianrodri
-/extensions/issues/ @brianrodri
-/extensions/visualizations/ @brianrodri
+/core/controllers/features*.py @oppia/learner-analytics-reviewers
+/core/controllers/improvements*.py @oppia/learner-analytics-reviewers
+/core/domain/action_registry*.py @oppia/learner-analytics-reviewers
+/core/domain/calculation_registry*.py @oppia/learner-analytics-reviewers
+/core/domain/event_services*.py @oppia/learner-analytics-reviewers
+/core/domain/improvements_domain*.py @oppia/learner-analytics-reviewers
+/core/domain/improvements_services*.py @oppia/learner-analytics-reviewers
+/core/domain/playthrough_issue_registry*.py @oppia/learner-analytics-reviewers
+/core/domain/stats*.py @oppia/learner-analytics-reviewers
+/core/domain/visualization_registry*.py @oppia/learner-analytics-reviewers
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.component*.ts @oppia/learner-analytics-reviewers
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.component.html @oppia/learner-analytics-reviewers
+/core/templates/components/statistics-directives/ @oppia/learner-analytics-reviewers
+/core/templates/domain/statistics/ @oppia/learner-analytics-reviewers
+/core/templates/domain/improvements/ @oppia/learner-analytics-reviewers
+/core/templates/pages/exploration-editor-page/improvements-tab/ @oppia/learner-analytics-reviewers
+/core/templates/pages/exploration-editor-page/statistics-tab/ @oppia/learner-analytics-reviewers
+/core/templates/services/exploration-improvements.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/exploration-improvements-backend-api.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/exploration-improvements-task-registry.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/exploration-stats.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/exploration-stats-backend-api.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/improvements.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/messenger.service.ts @oppia/learner-analytics-reviewers
+/core/templates/services/playthrough*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/state-interaction-stats.service*.ts @oppia/learner-analytics-reviewers
+/core/templates/services/state-top-answers-stats*.ts @oppia/learner-analytics-reviewers
+/extensions/actions/ @oppia/learner-analytics-reviewers
+/extensions/answer_summarizers/ @oppia/learner-analytics-reviewers
+/extensions/issues/ @oppia/learner-analytics-reviewers
+/extensions/visualizations/ @oppia/learner-analytics-reviewers
 
 
 # Library page.
-/core/controllers/library*.py @kevinlee12
-/core/domain/recommendations*.py @seanlip
-/core/domain/search_services*.py @kevinlee12
-/core/templates/dev/head/pages/library-page/ @kevinlee12
-/core/templates/dev/head/services/ConstructTranslationIdsService.ts @kevinlee12
-/core/templates/dev/head/services/SearchService*.ts @kevinlee12
+/core/controllers/library*.py @oppia/lace-backend-reviewers
+/core/domain/recommendations*.py @oppia/lace-backend-reviewers
+/core/domain/search_services*.py @oppia/lace-backend-reviewers
+/core/templates/pages/library-page/ @oppia/lace-frontend-reviewers
+/core/templates/services/construct-translation-ids.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/search-backend-api.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/search.service*.ts @oppia/lace-frontend-reviewers
 
 
 # Navigation bar project.
-/core/templates/dev/head/domain/sidebar/ @nithusha21
-/core/templates/dev/head/components/button-directives/create-activity-button.directive.ts @nithusha21
-/core/templates/dev/head/components/button-directives/create-activity-button.directive.html @nithusha21
-/core/templates/dev/head/components/common-layout-directives/navigation-bars/ @nithusha21
-/core/templates/dev/head/services/NavigationService*.ts @nithusha21
+/core/templates/components/button-directives/create-activity-button.component.ts @oppia/lace-frontend-reviewers
+/core/templates/components/button-directives/create-activity-button.component.html @oppia/lace-frontend-reviewers
+/core/templates/components/common-layout-directives/navigation-bars/ @oppia/lace-frontend-reviewers
+/core/templates/services/bottom-navbar-status.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/navigation.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/sidebar-status.service*.ts @oppia/lace-frontend-reviewers
 
 
 # New structures team.
 # Question project.
-/core/controllers/practice_sessions*.py @vinitamurthi
-/core/controllers/question*.py @aks681
-/core/controllers/review_tests*.py @sophiewu6
-/core/domain/question*.py @aks681
-/core/storage/question/ @aks681
-/core/templates/dev/head/components/entity-creation-services/question-creation.service.ts @aks681
-/core/templates/dev/head/components/score-ring/ @vinitamurthi
-/core/templates/dev/head/domain/question/ @aks681
-/core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
-/core/templates/dev/head/pages/review-test-page/ @sophiewu6
-/core/templates/dev/head/services/QuestionsListService.ts @sophiewu6
-/core/templates/dev/head/components/question-directives/question-editor/ @aks681
-/core/templates/dev/head/components/question-directives/questions-list/ @aks681
-/core/templates/dev/head/components/question-directives/modal-templates/ @aks681
-/core/templates/dev/head/components/question-directives/question-player/ @vinitamurthi
+/core/controllers/practice_sessions*.py @oppia/lace-backend-reviewers
+/core/controllers/question*.py @oppia/lace-backend-reviewers
+/core/controllers/review_tests*.py @oppia/lace-backend-reviewers
+/core/domain/classroom*.py @oppia/lace-backend-reviewers
+/core/controllers/diagnostic_test_player*.py @oppia/lace-backend-reviewers
+/core/domain/classroom_services*.py @oppia/lace-backend-reviewers
+/core/domain/question*.py @oppia/lace-backend-reviewers
+/core/domain/rights_domain*.py @oppia/lace-backend-reviewers
+/core/templates/components/concept-card/ @oppia/lace-frontend-reviewers
+/core/templates/components/score-ring/ @oppia/lace-frontend-reviewers
+/core/templates/components/skill-mastery/ @oppia/lace-frontend-reviewers
+/core/templates/components/skills-mastery-list/ @oppia/lace-frontend-reviewers
+/core/templates/domain/question/ @oppia/lace-frontend-reviewers
+/core/templates/domain/review_test/ @oppia/lace-frontend-reviewers
+/core/templates/pages/practice-session-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/review-test-page/ @oppia/lace-frontend-reviewers
+/core/templates/services/questions-list.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/question-directives/ @oppia/lace-frontend-reviewers
+
+
+# Readme
+/core/README.md @oppia/data-and-stability-reviewers
+/core/templates/css/README.md @oppia/frontend-infrastructure-reviewers
+/extensions/README.md @oppia/data-and-stability-reviewers
+/scripts/README.md @oppia/data-and-stability-reviewers
 
 # Skill project.
-/core/controllers/concept_card_viewer*.py @aks681
-/core/controllers/skill*.py @aks681
-/core/domain/skill*.py @aks681
-/core/storage/skill/ @aks681
-/core/templates/dev/head/components/entity-creation-services/skill-creation.service.ts @aks681
-/core/templates/dev/head/domain/skill/ @aks681
-/core/templates/dev/head/pages/skill-editor-page/ @aks681
+/core/controllers/concept_card_viewer*.py @oppia/lace-backend-reviewers
+/core/controllers/skill*.py @oppia/lace-backend-reviewers
+/core/domain/skill*.py @oppia/lace-backend-reviewers
+/core/templates/components/entity-creation-services/skill-creation.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/question-difficulty-selector/ @oppia/lace-frontend-reviewers
+/core/templates/components/review-material-editor/ @oppia/lace-frontend-reviewers
+/core/templates/components/rubrics-editor/ @oppia/lace-frontend-reviewers
+/core/templates/components/skill-selector/ @oppia/lace-frontend-reviewers
+/core/templates/domain/skill/ @oppia/lace-frontend-reviewers
+/core/templates/pages/skill-editor-page/ @oppia/lace-frontend-reviewers
 
 # Story project.
-/core/controllers/story*.py @aks681
-/core/domain/story*.py @aks681
-/core/storage/story/ @aks681
-/core/templates/dev/head/components/entity-creation-services/story-creation.service.ts @aks681
-/core/templates/dev/head/domain/story/ @aks681
-/core/templates/dev/head/domain/story_viewer/ @aks681
-/core/templates/dev/head/pages/story-editor-page/ @aks681
-/core/templates/dev/head/pages/story-viewer-page/ @aks681
+/core/controllers/story*.py @oppia/lace-backend-reviewers
+/core/domain/story*.py @oppia/lace-backend-reviewers
+/core/templates/components/entity-creation-services/story-creation.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/domain/story/ @oppia/lace-frontend-reviewers
+/core/templates/domain/story_viewer/ @oppia/lace-frontend-reviewers
+/core/templates/pages/story-editor-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/story-viewer-page/ @oppia/lace-frontend-reviewers
 
 # Topic project.
 # Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
-/core/controllers/topic_*.py @aks681
-/core/domain/subtopic_page_domain*.py @aks681
-/core/domain/subtopic_page_services*.py @aks681
-/core/domain/topic*.py @aks681
-/core/storage/topic/ @aks681
-/core/templates/dev/head/components/entity-creation-services/topic-creation.service.ts.ts @aks681
-/core/templates/dev/head/domain/topic/ @aks681
-/core/templates/dev/head/domain/topic_viewer @aks681
-/core/templates/dev/head/pages/topic-editor-page/ @aks681
-/core/templates/dev/head/pages/topic-viewer-page/ @aks681
+/core/controllers/classroom*.py @oppia/lace-backend-reviewers
+/core/controllers/topic_*.py @oppia/lace-backend-reviewers
+/core/domain/subtopic_page_domain*.py @oppia/lace-backend-reviewers
+/core/domain/subtopic_page_services*.py @oppia/lace-backend-reviewers
+/core/domain/topic*.py @oppia/lace-backend-reviewers
+/core/templates/components/entity-creation-services/topic-creation.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/domain/classroom/ @oppia/lace-frontend-reviewers
+/core/templates/domain/subtopic_viewer/ @oppia/lace-frontend-reviewers
+/core/templates/domain/topic/ @oppia/lace-frontend-reviewers
+/core/templates/domain/topic_viewer @oppia/lace-frontend-reviewers
+/core/templates/pages/classroom-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/diagnostic-test-player-page @oppia/lace-frontend-reviewers
+/core/templates/pages/subtopic-viewer-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/topic-editor-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/topic-viewer-page/ @oppia/lace-frontend-reviewers
 
 # Topics and skills dashboard project.
-/core/controllers/subtopic_viewer*.py @aks681
-/core/controllers/topics_and_skills_dashboard*.py @aks681
-/core/templates/dev/head/domain/topics_and_skills_dashboard/ @aks681
-/core/templates/dev/head/pages/topics-and-skills-dashboard-page/ @aks681
+/core/controllers/subtopic_viewer*.py @oppia/lace-backend-reviewers
+/core/controllers/topics_and_skills_dashboard*.py @oppia/lace-backend-reviewers
+/core/templates/domain/topics_and_skills_dashboard/ @oppia/lace-frontend-reviewers
+/core/templates/pages/topics-and-skills-dashboard-page/ @oppia/lace-frontend-reviewers
 
+# Learner group project.
+/core/controllers/learner_group*.py @oppia/lace-backend-reviewers
+/core/domain/learner_group*.py @oppia/lace-backend-reviewers
+/core/templates/domain/learner_group/ @oppia/lace-frontend-reviewers
+/core/templates/pages/facilitator-dashboard-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/learner-group-pages/ @oppia/lace-frontend-reviewers
+
+# Beam jobs
+/setup*.py @oppia/data-and-stability-reviewers
+/MANIFEST.in @oppia/data-and-stability-reviewers
+/core/jobs/ @oppia/data-and-stability-reviewers
+/core/jobs/transforms @oppia/data-and-stability-reviewers
+/core/jobs/types @oppia/data-and-stability-reviewers
+/core/templates/domain/jobs/ @oppia/data-and-stability-reviewers
+/core/controllers/beam_jobs*.py @oppia/data-and-stability-reviewers
+/core/domain/beam_job*.py @oppia/data-and-stability-reviewers
 
 # Infrastructure.
-/core/controllers/cron*.py @nithusha21
-/core/domain/cron_services*.py @nithusha21
-/main_cron.py @nithusha21
-/main_mail.py @aks681
-/main.py @nithusha21 @DubeySandeep
-/feconf.py @seanlip @nithusha21
-/constants*.py @seanlip @nithusha21
-/assets/constants.js @seanlip @nithusha21
-/core/controllers/incoming_emails*.py @aks681
-/core/controllers/tasks*.py @aks681
-/core/domain/email*.py @aks681
-/core/domain/prod_validation_jobs_one_off*.py @ankita240796
-/core/domain/storage_model_audit_jobs_test.py @ankita240796
-/core/jobs*.py @seanlip
-/core/platform/ @seanlip @DubeySandeep
-/core/templates/dev/head/App*.ts @ankita240796
-/core/templates/dev/head/app.constants.ts @ankita240796
-/core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek @Jamesjay4199
-/core/templates/dev/head/I18nFooter.ts @DubeySandeep
-/core/templates/dev/head/services/TranslationFileHashLoaderService.ts @DubeySandeep
+/core/controllers/cron*.py @oppia/data-and-stability-reviewers
+/core/domain/cron_services*.py @oppia/data-and-stability-reviewers
+/main*.py @oppia/data-and-stability-reviewers
+/core/feconf*.py @oppia/data-and-stability-reviewers
+/core/constants*.py @oppia/data-and-stability-reviewers
+/assets/constants.ts @oppia/data-and-stability-reviewers
+/core/controllers/tasks*.py @oppia/lace-backend-reviewers
+/core/domain/email*.py @oppia/lace-backend-reviewers
+/core/domain/image_service*.py @oppia/lace-backend-reviewers
+/core/platform/ @oppia/data-and-stability-reviewers
+/core/templates/App*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/app.constants.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/app.constants.ajs.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/combined-tests.spec.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/pages/interaction-specs.constants.ajs.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/pages/interaction-specs.constants.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/pages/login-page/ @oppia/frontend-infrastructure-reviewers
+/core/templates/pages/logout-page/ @oppia/frontend-infrastructure-reviewers
+/core/templates/app-events/ @oppia/frontend-infrastructure-reviewers
+/core/templates/services/app.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/contextual/document-attribute-customization.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/contextual/meta-tag-customization.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/interaction-rules-registry.service*.ts @oppia/interaction-and-rte-reviewers
+/core/templates/services/interaction-specs.service*.ts @oppia/interaction-and-rte-reviewers
+/core/templates/services/translation-file-hash-loader-backend-api.service.ts @oppia/angular-migration-reviewers
+/redis.conf @oppia/data-and-stability-reviewers
+/.firebase.json @oppia/data-and-stability-reviewers
 
 
 # Miscellaneous.
-/__init__.py @DubeySandeep
-/core/__init__.py @DubeySandeep
-/core/controllers/__init__.py @DubeySandeep
-/core/domain/__init__.py @DubeySandeep
-/core/domain/config*.py @DubeySandeep
-/core/domain/change_domain.py @DubeySandeep
-/core/templates/dev/head/tests/ @DubeySandeep
-/core/templates/dev/head/domain/utilities/ @DubeySandeep
-/schema_utils*.py @seanlip @DubeySandeep
-/utils*.py @aks681
+/__init__.py @oppia/data-and-stability-reviewers
+/core/__init__.py @oppia/data-and-stability-reviewers
+/core/controllers/__init__.py @oppia/data-and-stability-reviewers
+/core/domain/__init__.py @oppia/data-and-stability-reviewers
+/core/domain/config*.py @oppia/lace-backend-reviewers
+/core/domain/change_domain*.py @oppia/lace-backend-reviewers
+/core/templates/tests/ @oppia/angular-migration-reviewers
+/core/templates/domain/utilities/ @oppia/frontend-infrastructure-reviewers
+/core/templates/Polyfills.ts @oppia/frontend-infrastructure-reviewers
+/extensions/extensions.module.ts @oppia/frontend-infrastructure-reviewers
+/core/schema_utils*.py @oppia/data-and-stability-reviewers
+/core/utils*.py @oppia/lace-backend-reviewers
+/.rtlcssrc @oppia/lace-frontend-reviewers
+
+
+# Python typing
+/mypy.ini @oppia/mypy-reviewers
+/mypy_imports*.py @oppia/mypy-reviewers
+/mypy_requirements.txt @oppia/mypy-reviewers
+/stubs/ @oppia/mypy-reviewers
+/scripts/run_mypy_checks*.py @oppia/mypy-reviewers
 
 
 # Restricted pages.
-/core/controllers/admin*.py @DubeySandeep @nithusha21
-/core/controllers/moderator*.py @seanlip
-/core/controllers/recent_commits*.py @seanlip
-/core/domain/moderator_services*.py @seanlip
-/core/templates/dev/head/pages/admin-page/ @DubeySandeep @nithusha21
-/core/templates/dev/head/pages/moderator-page/ @seanlip
+/core/controllers/admin*.py @oppia/data-and-stability-reviewers
+/core/controllers/blog_admin*.py @oppia/lace-backend-reviewers
+/core/controllers/moderator*.py @oppia/data-and-stability-reviewers
+/core/controllers/recent_commits*.py @oppia/data-and-stability-reviewers
+/core/domain/moderator_services*.py @oppia/data-and-stability-reviewers
+/core/templates/domain/admin/ @oppia/lace-frontend-reviewers
+/core/templates/domain/blog-admin/ @oppia/lace-frontend-reviewers
+/core/templates/pages/admin-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/moderator-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/blog-admin-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/classroom-admin-page/ @oppia/lace-frontend-reviewers
 
 
-# QA team.
-/core/tests/ @apb7 @nithusha21
-/assets/ @nithusha21
-/data/ @nithusha21
+# Release team.
+/.gcloudignore @oppia/release-workflow-reviewers
+/core/controllers/release_coordinator*.py @oppia/release-workflow-reviewers
+/core/templates/pages/release-coordinator-page/ @oppia/release-workflow-reviewers
+/scripts/release_scripts/ @oppia/release-workflow-reviewers
+/assets/release_constants.json @oppia/release-workflow-reviewers
 
 
 # Rich text editor team.
-/core/templates/dev/head/components/ck-editor-helpers/ck-editor-rte.directive.ts @aks681
-/core/templates/dev/head/directives/MathjaxBindDirective.ts @aks681
-/core/templates/dev/head/mathjaxConfig.ts @aks681
-/core/templates/dev/head/components/ck-editor-helpers/ck-editor-widgets.initializer.ts @aks681
-/core/templates/dev/head/services/AutoplayedVideosService*.ts @aks681
-/core/templates/dev/head/services/RteHelperService*.ts @aks681
-/core/domain/rte_component_registry*.py @vojtechjelinek
-/extensions/ckeditor_plugins/ @vojtechjelinek
-/extensions/rich_text_components/ @vojtechjelinek
-/assets/rich_text_components_definitions.js @vojtechjelinek
+/core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.html @oppia/interaction-and-rte-reviewers
+/core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts @oppia/interaction-and-rte-reviewers
+/core/templates/components/ck-editor-helpers/ckeditor4.module.ts @oppia/interaction-and-rte-reviewers
+/core/templates/directives/mathjax-bind.directive.ts @oppia/interaction-and-rte-reviewers
+/core/templates/directives/mathjax.directive.ts @oppia/interaction-and-rte-reviewers
+/core/templates/mathjaxConfig.ts @oppia/interaction-and-rte-reviewers
+/core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @oppia/interaction-and-rte-reviewers
+/core/templates/components/ck-editor-helpers/ck-editor-copy-content.service*.ts @oppia/interaction-and-rte-reviewers
+/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @oppia/interaction-and-rte-reviewers
+/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component*.ts @oppia/interaction-and-rte-reviewers
+/core/templates/services/autoplayed-videos.service*.ts @oppia/interaction-and-rte-reviewers
+/core/templates/services/external-save.service*.ts @oppia/angular-migration-reviewers
+/core/templates/services/external-rte-save.service*.ts @oppia/angular-migration-reviewers
+/core/templates/services/oppia-rte-parser.service*.ts @oppia/interaction-and-rte-reviewers
+/core/templates/services/image-local-storage*.ts @oppia/interaction-and-rte-reviewers
+/core/templates/services/rte-helper.service*.ts @oppia/interaction-and-rte-reviewers
+/core/templates/services/rte-helper-modal.controller*.ts @oppia/interaction-and-rte-reviewers
+/core/domain/image_validation_services*.py @oppia/lace-backend-reviewers
+/core/domain/rte_component_registry*.py @oppia/interaction-and-rte-reviewers
+/extensions/ckeditor_plugins/ @oppia/interaction-and-rte-reviewers
+/extensions/rich_text_components/rte-output-display.component* @oppia/interaction-and-rte-reviewers
+/extensions/rich_text_components/ @oppia/interaction-and-rte-reviewers
+/assets/rich_text_components_definitions.ts @oppia/interaction-and-rte-reviewers
 
 
 # Suggestion and feedback team.
 # Suggestion project.
-/core/controllers/suggestion*.py @nithusha21
-/core/domain/suggestion*.py @nithusha21
-/core/storage/suggestion/ @nithusha21
-/core/templates/dev/head/domain/suggestion/ @nithusha21
-/core/templates/dev/head/services/SuggestionModalService.ts @nithusha21
+/core/controllers/suggestion*.py @oppia/contributor-experience-team
+/core/domain/suggestion*.py @oppia/contributor-experience-team
+/core/templates/domain/suggestion/ @oppia/contributor-experience-team
+/core/templates/services/suggestion-modal.service*.ts @oppia/contributor-experience-team
+/core/templates/services/suggestions.service*.ts @oppia/contributor-experience-team
+
 
 # Feedback project.
-/core/controllers/feedback*.py @nithusha21
-/core/domain/feedback*.py @nithusha21
-/core/storage/feedback/ @nithusha21
-/core/templates/dev/head/components/ratings/rating-display/rating-display.directive.html @nithusha21
-/core/templates/dev/head/components/ratings/  @nithusha21
-/core/templates/dev/head/domain/feedback_message/ @nithusha21
-/core/templates/dev/head/domain/feedback_thread/ @nithusha21
-/core/templates/dev/head/pages/exploration-editor-page/feedback-tab/ @nithusha21
+/core/controllers/feedback*.py @oppia/contributor-experience-team
+/core/domain/feedback*.py @oppia/contributor-experience-team
+/core/templates/components/ratings/rating-display/rating-display.component.html @oppia/lace-frontend-reviewers
+/core/templates/components/ratings/ @oppia/lace-frontend-reviewers
+/core/templates/domain/feedback_message/ @oppia/contributor-experience-team
+/core/templates/domain/feedback_thread/ @oppia/contributor-experience-team
+/core/templates/pages/exploration-editor-page/feedback-tab/ @oppia/lace-frontend-reviewers
 
 
 # Simple pages.
-/core/controllers/pages*.py @vojtechjelinek
-/core/controllers/custom_landing_pages*.py @vojtechjelinek
-/core/templates/dev/head/pages/contact-page/ @vojtechjelinek
-/core/templates/dev/head/pages/donate-page/ @vojtechjelinek
-/core/templates/dev/head/pages/error-pages/ @vojtechjelinek
-/core/templates/dev/head/pages/get-started-page/ @vojtechjelinek
-/core/templates/dev/head/pages/landing-pages/ @vojtechjelinek
-/core/templates/dev/head/pages/maintenance-page/ @vojtechjelinek
-/core/templates/dev/head/pages/preferences-page/ @vojtechjelinek
-/core/templates/dev/head/pages/signup-page/ @vojtechjelinek
-/core/templates/dev/head/pages/splash-page/ @vojtechjelinek
-/core/templates/dev/head/pages/teach-page/ @vojtechjelinek
-/core/templates/dev/head/pages/thanks-page/ @vojtechjelinek
+/core/controllers/pages*.py @oppia/data-and-stability-reviewers
+/core/controllers/custom_landing_pages*.py @oppia/data-and-stability-reviewers
+/core/templates/pages/contact-page/ @oppia/angular-migration-reviewers
+/core/templates/pages/delete-account-page/ @oppia/angular-migration-reviewers
+/core/templates/pages/donate-page/ @oppia/angular-migration-reviewers
+/core/templates/pages/error-pages/ @oppia/angular-migration-reviewers
+/core/templates/pages/get-started-page/ @oppia/angular-migration-reviewers
+/core/templates/pages/landing-pages/ @oppia/angular-migration-reviewers
+/core/templates/pages/maintenance-page/ @oppia/angular-migration-reviewers
+/core/templates/pages/partnerships-page/ @oppia/angular-migration-reviewers
+/core/templates/pages/pending-account-deletion-page/ @oppia/angular-migration-reviewers
+/core/templates/pages/preferences-page/ @oppia/angular-migration-reviewers
+/core/templates/pages/signup-page/ @oppia/angular-migration-reviewers
+/core/templates/pages/splash-page/ @oppia/angular-migration-reviewers
+/core/templates/pages/teach-page/ @oppia/angular-migration-reviewers
+/core/templates/pages/thanks-page/ @oppia/angular-migration-reviewers
+/core/templates/pages/participation-playbook/ @oppia/angular-migration-reviewers
+/core/templates/pages/about-foundation-page/ @oppia/angular-migration-reviewers
+/core/templates/pages/volunteer-page/ @oppia/angular-migration-reviewers
 
 
 # Speed Improvement team.
-/app_dev.yaml @vojtechjelinek
-/core/templates/dev/head/base_components/ @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/Base.ts @vojtechjelinek
-/core/templates/dev/head/pages/base.html @vojtechjelinek
-/core/templates/dev/head/pages/oppia_footer_directive.html @vojtechjelinek
-/core/templates/dev/head/pages/OppiaFooterDirective.ts @vojtechjelinek
-/core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
-/core/templates/dev/head/pages/header_css_libs.html @vojtechjelinek
-/core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek
-/core/templates/dev/head/services/CsrfTokenService*.ts @jamesjay4199 @vojtechjelinek
-/gulpfile.js @vojtechjelinek
-/jinja_utils*.py @vojtechjelinek
-/webpack.config.ts @vojtechjelinek
-/webpack.dev.config.ts @vojtechjelinek
-/webpack.prod.config.ts @vojtechjelinek
-
-
-# Typings.
-/typings @ankita240796
+/core/templates/google-analytics.initializer.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/base-components/ @oppia/frontend-infrastructure-reviewers
+/core/templates/pages/Base.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/pages/footer_js_libs.html @oppia/frontend-infrastructure-reviewers
+/core/templates/pages/header_css_libs.html @oppia/frontend-infrastructure-reviewers
+/core/templates/pages/header_js_libs.html @oppia/frontend-infrastructure-reviewers
+/core/templates/services/csrf-token.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/third-party-imports/ @oppia/frontend-infrastructure-reviewers
+/.lighthouserc*.js @oppia/automated-qa-reviewers
+/puppeteer-login-script.js @oppia/automated-qa-reviewers
+/scripts/run_lighthouse_tests.py @oppia/automated-qa-reviewers
+/webpack.*.ts @oppia/data-and-stability-reviewers
 
 
 # User’s profile page.
-/core/controllers/profile*.py @kevinlee12
-/core/templates/dev/head/domain/user/ @kevinlee12
-/core/templates/dev/head/pages/profile-page/ @kevinlee12
-/core/templates/dev/head/services/UserService*.ts @kevinlee12
+/core/controllers/profile*.py @oppia/data-and-stability-reviewers
+/core/templates/domain/user/ @oppia/frontend-infrastructure-reviewers
+/core/templates/pages/profile-page/ @oppia/frontend-infrastructure-reviewers
+/core/templates/services/user.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/user-backend-api.service*.ts @oppia/frontend-infrastructure-reviewers
 
-/core/templates/dev/head/services/services.constants.ts @kevinlee12
+
+# Service constants
+/core/templates/services/services.constants.ajs.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/services.constants.ts @oppia/frontend-infrastructure-reviewers
+
+
+# Dynamic Feature Gating project
+/core/controllers/platform_feature*.py @oppia/web-android-compatibility-reviewers
+/core/domain/platform_feature_services*.py @oppia/web-android-compatibility-reviewers
+/core/domain/platform_parameter*.py @oppia/web-android-compatibility-reviewers
+/core/platform_feature*.py @oppia/web-android-compatibility-reviewers
+/core/templates/domain/platform_feature/ @oppia/web-android-compatibility-reviewers
+/core/templates/pages/admin-page/features-tab/ @oppia/web-android-compatibility-reviewers
+/core/templates/services/platform-feature*.ts @oppia/web-android-compatibility-reviewers
+
+
+# Frontend unit tests
+/core/templates/**/*.spec.ts @oppia/frontend-test-reviewers
+/core/templates/**/*Spec.ts @oppia/frontend-test-reviewers
+/extensions/**/*.spec.ts @oppia/frontend-test-reviewers
+/extensions/**/*Spec.ts @oppia/frontend-test-reviewers
+
+# Draft version upgrade.
+/core/domain/draft_upgrade_services*.py @oppia/lace-backend-reviewers
+
+
+# Data stability.
+/core/controllers/domain_objects_validator*.py @oppia/data-and-stability-reviewers
+/core/controllers/payload_validator*.py @oppia/data-and-stability-reviewers
+/core/handler_schema_constants*.py @oppia/data-and-stability-reviewers
+
+
+# QA team.
+/core/tests/ @oppia/automated-qa-reviewers
+/assets/ @oppia/data-and-stability-reviewers
+/data/ @oppia/data-and-stability-reviewers
+/core/templates/karma.module.ts @oppia/lace-frontend-reviewers
+/core/tests/webdriverio_utils/ @oppia/automated-qa-reviewers
+/core/tests/webdriverio_desktop/ @oppia/automated-qa-reviewers
+/core/tests/webdriverio/ @oppia/automated-qa-reviewers
+/core/tests/wdio.conf.js @oppia/automated-qa-reviewers
+/extensions/interactions/*/webdriverio.js @oppia/automated-qa-reviewers
+/extensions/interactions/webdriverio.js @oppia/automated-qa-reviewers
+/extensions/rich_text_components/*/webdriverio.js @oppia/automated-qa-reviewers
+/extensions/rich_text_components/webdriverio.js @oppia/automated-qa-reviewers
+/extensions/objects/webdriverio.js @oppia/automated-qa-reviewers
+/scripts/backend_test_shards.json @oppia/automated-qa-reviewers
+/scripts/backend_tests_incomplete_coverage.txt @oppia/automated-qa-reviewers
+/.github/actions @oppia/automated-qa-reviewers
+
+
+# Python 3 Migration project.
+/core/domain/auth*.py @oppia/data-and-stability-reviewers
+/core/domain/caching*.py @oppia/data-and-stability-reviewers
+/core/domain/taskqueue*.py @oppia/data-and-stability-reviewers
+/core/templates/services/auth.service*.ts @oppia/data-and-stability-reviewers
+/core/templates/services/auth-backend-api.service*.ts @oppia/data-and-stability-reviewers
+
 
 # Critical files.
 #
@@ -443,17 +718,40 @@
 #     https://help.github.com/en/articles/about-code-owners
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
-# in scripts/pre_commit_linter.py in sync with the modifications.
-/core/controllers/acl_decorators*.py @seanlip
-/core/controllers/base*.py @seanlip
-/core/domain/dependency_registry*.py @seanlip
-/core/domain/html*.py @seanlip
-/core/domain/rights_manager*.py @seanlip
-/core/domain/role_services*.py @seanlip
-/core/storage/ @seanlip
-/core/domain/user*.py @seanlip
-/export/ @seanlip
-/manifest.json @seanlip @vojtechjelinek
-/package*.json @seanlip @vojtechjelinek
-/scripts/install_third_party.sh @seanlip @vojtechjelinek
-/.github/ @DubeySandeep
+# in scripts/linters/codeowner_linter.py in sync with the modifications.
+/requirements.txt @oppia/data-and-stability-reviewers
+/requirements.in @oppia/data-and-stability-reviewers
+/requirements_dev.txt @oppia/data-and-stability-reviewers
+/requirements_dev.in @oppia/data-and-stability-reviewers
+/dependencies.json @oppia/data-and-stability-reviewers
+/package.json @oppia/data-and-stability-reviewers
+/yarn.lock @oppia/data-and-stability-reviewers
+/scripts/install_third_party_libs.py @oppia/dev-workflow-reviewers
+/.github/ @oppia/dev-workflow-reviewers
+/.github/CODEOWNERS @oppia/dev-workflow-reviewers
+/.github/stale.yml @oppia/data-and-stability-reviewers
+/.github/workflows/ @oppia/dev-workflow-reviewers @oppia/automated-qa-reviewers
+# Files needed by the Android team.
+/core/controllers/android_e2e_config*.py @oppia/web-android-compatibility-reviewers
+/core/android_validation_constants*.py @oppia/web-android-compatibility-reviewers
+/extensions/interactions/rule_templates.json @oppia/web-android-compatibility-reviewers
+# Files owned by core reviewers.
+/core/templates/services/svg-sanitizer.service.ts @oppia/core-reviewers
+/scripts/linters/warranted_angular_security_bypasses.py @oppia/core-reviewers
+/core/controllers/access_validators*.py @oppia/core-reviewers
+/core/controllers/acl_decorators*.py @oppia/core-reviewers
+/core/controllers/base*.py @oppia/core-reviewers
+/core/domain/html*.py @oppia/core-reviewers
+/core/domain/rights_manager*.py @oppia/core-reviewers
+/core/domain/role_services*.py @oppia/core-reviewers
+/core/storage/ @oppia/core-reviewers
+/core/domain/user*.py @oppia/core-reviewers
+/AUTHORS @oppia/core-reviewers
+/CONTRIBUTORS @oppia/core-reviewers
+/LICENSE @oppia/core-reviewers
+/NOTICE @oppia/core-reviewers
+/core/templates/pages/terms-page/terms-page.component.html @oppia/core-reviewers
+/core/templates/pages/privacy-page/privacy-page.component.html @oppia/core-reviewers
+/core/templates/pages/license-page/license-page.component.html @oppia/core-reviewers
+/core/domain/takeout_*.py @oppia/core-reviewers
+/core/domain/wipeout_*.py @oppia/core-reviewers

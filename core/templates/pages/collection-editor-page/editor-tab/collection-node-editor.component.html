@@ -1,0 +1,73 @@
+<mat-card class="collection-editor-node">
+  <div class="collection-editor-node-title">
+    <a [href]="hrefUrl"
+       target="_blank"
+       rel="noopener">
+      {{ collectionNode.getExplorationTitle() }}
+    </a>
+  </div>
+  <span class="collection-editor-delete-node e2e-test-editor-delete-node">
+    <span (click)="deleteNode()"
+          aria-hidden="true">
+      <i class="fas fa-times"></i>
+    </span>
+  </span>
+  <span (click)="shiftNodeLeft()"
+        *ngIf="linearIndex > 0"
+        class="collection-editor-shift-left-arrow e2e-test-editor-shift-left"
+        aria-hidden="true">
+    <i class="fas fa-chevron-left"></i>
+  </span>
+  <span (click)="shiftNodeRight()"
+        *ngIf="linearIndex < collection?.getCollectionNodeCount() - 1"
+        class="collection-editor-shift-right-arrow e2e-test-editor-shift-right"
+        aria-hidden="true">
+    <i class="fas fa-chevron-right"></i>
+  </span>
+</mat-card>
+
+<style>
+  .collection-editor-node {
+    background-color: #f5f5f5;
+    color: #424242;
+    display: inline-block;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 0.8em;
+    margin: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    position: relative;
+    text-align: center;
+  }
+
+  .collection-editor-delete-node {
+    color: #ef5350;
+    position: absolute;
+    right: 4.5px;
+    top: 0;
+  }
+
+  .collection-editor-shift-left-arrow {
+    bottom: 0;
+    color: #000;
+    left: 7px;
+    opacity: 0.7;
+    position: absolute;
+  }
+  .collection-editor-shift-right-arrow {
+    bottom: 0;
+    color: #000;
+    opacity: 0.7;
+    position: absolute;
+    right: 7px;
+  }
+  .collection-editor-shift-left-arrow:hover {
+    cursor: pointer;
+  }
+  .collection-editor-shift-right-arrow:hover {
+    cursor: pointer;
+  }
+  .collection-editor-node-title {
+    padding: 16px 16px 20px 16px;
+  }
+</style>

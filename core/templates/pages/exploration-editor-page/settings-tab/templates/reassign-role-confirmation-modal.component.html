@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <h3 class="oppia-reassign-role-confirmation-modal-header">Are you sure?</h3>
+</div>
+
+<div class="modal-body oppia-reassign-role-confirmation-modal-body">
+  <p>Are you sure you want to reassign <strong>{{username}}</strong> from <strong>{{oldRole}}</strong> to the role <strong>{{newRole}}</strong>?</p>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-danger e2e-test-really-delete-exploration-button" (click)="confirm()">Reassign user</button>
+</div>
+
+<style>
+  .oppia-reassign-role-confirmation-modal-header {
+    margin: 2% auto;
+  }
+  .oppia-reassign-role-confirmation-modal-body {
+    margin: 30px 0;
+  }
+</style>

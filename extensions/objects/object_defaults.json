@@ -1,7 +1,9 @@
 {
+    "AlgebraicExpression": "",
+    "AlgebraicIdentifier": "x",
     "CodeString": "",
     "CoordTwoDim": [0.0, 0.0],
-    "DragAndDropHtmlString": "",
+    "AllowedVariables": [],
     "DragAndDropPositiveInt": 1,
     "Graph": {
         "edges": [],
@@ -15,15 +17,24 @@
     "ListOfCodeEvaluation": [],
     "ListOfCoordTwoDim": [],
     "ListOfGraph": [],
-    "ListOfSetsOfHtmlStrings": [],
-    "LogicErrorCategory": "mistake",
+    "ListOfSetsOfTranslatableHtmlContentIds": [],
     "MusicPhrase": [],
     "NonnegativeInt": 0,
     "NormalizedString": "",
+    "PositiveInt": 1,
     "Real": 0.0,
-    "SetOfHtmlString": [],
-    "SetOfNormalizedString": [],
+    "SetOfAlgebraicIdentifier": [],
+    "SetOfTranslatableHtmlContentIds": [],
     "SetOfUnicodeString": [],
+    "TranslatableHtmlContentId": "",
+    "TranslatableSetOfNormalizedString": {
+      "contentId": null,
+      "normalizedStrSet": []
+    },
+    "TranslatableSetOfUnicodeString": {
+      "contentId": null,
+      "unicodeStrSet": []
+    },
     "UnicodeString": "",
     "Fraction": {
       "isNegative": false,
@@ -31,6 +42,7 @@
       "numerator": 0,
       "denominator": 1
     },
+    "MathEquation": "",
     "NumberWithUnits": {
       "type": "real",
       "real": 0.0,
@@ -41,5 +53,8 @@
         "denominator": 1
       },
       "units": []
-    }
+    },
+    "NumericExpression": "",
+    "PositionOfTerms": "both",
+    "RatioExpression": [1, 1]
 }

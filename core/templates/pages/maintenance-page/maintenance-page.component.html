@@ -1,0 +1,50 @@
+<div class="oppia-base-container e2e-test-base-container">
+  <div class="oppia-content-container e2e-test-content-container">
+    <div id="wrapper">
+      <div class="oppia-main-body">
+        <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
+          <div class="navbar-container">
+            <div class="navbar-header e2e-test-navbar-header float-left">
+              <a class="oppia-navbar-brand-name oppia-transition-200" href="/">
+                <picture>
+                  <source type="image/webp" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.webp')">
+                  <source type="image/png" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.png')">
+                  <img [src]="getStaticImageUrl('/logo/288x128_logo_white.png')"
+                       class="oppia-logo oppia-logo-wide" alt="Oppia Home">
+                </picture>
+              </a>
+            </div>
+            <div class="navbar-header float-right">
+            </div>
+          </div>
+        </nav>
+
+        <div class="oppia-top-of-page-padding"></div>
+        <div class="oppia-page-cards-container">
+          <mat-card class="oppia-page-card oppia-long-text">
+            <div class="first-child">
+              <h2>The Oppia site is temporarily unavailable.</h2>
+            </div>
+            <div class="last-child">
+              <p>
+                Oppia is currently being upgraded, and the site should be up
+                and running again in a few hours. Thanks for your patience!
+              </p>
+            </div>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .oppia-long-text {
+    display: flex;
+    flex-direction: column;
+    padding: 30px 55px 30px 45px;
+  }
+
+  .oppia-navbar {
+    background-color: #00645c;
+  }
+</style>

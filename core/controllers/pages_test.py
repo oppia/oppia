@@ -14,36 +14,30 @@
 
 """Tests for various static pages (like the About page)."""
 
-from core.controllers import pages
-from core.platform import models
-from core.tests import test_utils
-import feconf
-import main
+from __future__ import annotations
 
-import webapp2
-import webtest
+from core import feconf
+from core.tests import test_utils
 
 
 class NoninteractivePagesTests(test_utils.GenericTestBase):
 
-    def test_about_page(self):
-        """Test the About page."""
-        response = self.get_html_response('/about')
-        self.assertEqual(response.content_type, 'text/html')
-        response.mustcontain(
-            '<about-page></about-page>')
+    def test_redirect_forum(self):
+        response = self.get_html_response(
+            '/forum', expected_status_int=302)
+        self.assertIn(feconf.GOOGLE_GROUP_URL, response.headers['location'])
 
-    def test_maintenance_page(self):
-        fake_urls = []
-        fake_urls.append(
-            main.get_redirect_route(r'/maintenance', pages.MaintenancePage))
-        with self.swap(main, 'URLS', fake_urls):
-            transaction_services = models.Registry.import_transaction_services()
-            app = transaction_services.toplevel_wrapper(
-                webapp2.WSGIApplication(main.URLS, debug=feconf.DEBUG))
-            self.testapp = webtest.TestApp(app)
+    def test_redirect_about(self):
+        response = self.get_html_response(
+            '/credits', expected_status_int=302)
+        self.assertIn('about', response.headers['location'])
 
-            response = self.get_html_response('/maintenance')
-            self.assertIn(
-                'Oppia is currently being upgraded, and the site should be up',
-                response.body)
+    def test_redirect_foundation(self):
+        response = self.get_html_response(
+            '/foundation', expected_status_int=302)
+        self.assertIn('about-foundation', response.headers['location'])
+
+    def test_redirect_teach(self):
+        response = self.get_html_response(
+            '/participate', expected_status_int=302)
+        self.assertIn('teach', response.headers['location'])

@@ -1,0 +1,41 @@
+<div class="conversation-skin-supplemental-card">
+  <div *ngIf="helpCardHtml"
+       class="conversation-skin-help-card help-card-standard e2e-test-conversation-skin-help-card"
+       [ngStyle]="!isHelpCardTall() ? {'top': helpCardBottomPosition + 'px'} : {}"
+       #helpCard>
+    <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
+       [href]="OPPIA_AVATAR_LINK_URL"
+       target="_blank"
+       rel="noopener">
+      <img class="conversation-skin-oppia-avatar"
+           [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
+    </a>
+    <button type="button" class="conversation-skin-close-help-card-button e2e-test-close-help-card-button"
+            (click)="clearHelpCard()" *ngIf="!helpCardHasContinueButton">
+      <i class="fas fa-times"></i>
+    </button>
+    <div>
+      <oppia-rte-output-display class="oppia-rte-viewer conversation-skin-help-card-content e2e-test-conversation-feedback-latest"
+                                [rteString]="helpCardHtml"
+                                [ngClass]="getFeedbackAudioHighlightClass()">
+      </oppia-rte-output-display>
+    </div>
+    <br>
+    <oppia-continue-button *ngIf="helpCardHasContinueButton"
+                           [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL"
+                           [isLearnAgainButton]="isLearnAgainButton"
+                           (clickContinueButton)="clickContinueButton.emit()"
+                           class="d-inline-block">
+    </oppia-continue-button>
+  </div>
+
+  <!--This CSS class is essential for auto-scrolling in Drag and drop interaction to work
+  correctly. More details about the class can be found in extensions/interactions/
+  DragAndDropSortInput/directives/drag-and-drop-sort-input-interaction.component.html-->
+  <div class="conversation-skin-interaction-container" #interactionContainer>
+    <oppia-interaction-display classStr="e2e-test-conversation-input"
+                               [parentScope]="this"
+                               [htmlData]="currentDisplayedCard.getInteractionHtml()">
+    </oppia-interaction-display>
+  </div>
+</div>

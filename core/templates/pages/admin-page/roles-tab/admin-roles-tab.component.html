@@ -1,0 +1,185 @@
+<style>
+  .roles-tab .form-horizontal .col-form-label {
+    padding-left: 0;
+    text-align: left;
+  }
+  .roles-editor .row {
+    margin-top: 20px;
+  }
+  .oppia-flex {
+    align-items: center;
+    display: flex;
+    justify-content: flex-start;
+  }
+  .oppia-roles-editor-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin-top: 50px;
+  }
+  .oppia-roles-editor-form-container {
+    width: 100%;
+  }
+  .oppia-username-form {
+    align-items: center;
+    display: flex;
+    justify-content: flex-start;
+  }
+  .oppia-roles-edit-container {
+    min-height: 100px;
+    width: 100%;
+  }
+  .oppia-roles-editor-card {
+    min-height: 250px;
+    padding: 70px 70px 40px 70px;
+  }
+  .oppia-user-role {
+    display: flex;
+    justify-content: space-between;
+    width: 75%;
+  }
+  .oppia-user-role:hover {
+    background-color: #ccc;
+  }
+  .oppia-user-role-description:before {
+    bottom: 3px;
+    color: black;
+    content: "\2B24";
+    font-size: 10px;
+    padding-right: 6px;
+    position: relative;
+  }
+  .oppia-progress-spinner {
+    align-items: center;
+    display: flex;
+    height: 40px;
+    width: 32px;
+  }
+  .oppia-add-role-button {
+    margin-top: 20px;
+  }
+  .oppia-red-button {
+    background-color: #b03900;
+    color: #fff;
+  }
+  .oppia-red-link {
+    color: #b03900;
+  }
+</style>
+
+<div class="container-fluid roles-editor e2e-test-roles-tab-container">
+  <div class="row">
+    <div class="col-md-8 oppia-roles-editor-container">
+      <h2>Role editor</h2>
+      <div class="oppia-username-form">
+        <mat-form-field class="example-form-field">
+          <input matInput
+                 class="e2e-test-username-for-role-editor"
+                 type="text"
+                 placeholder="Username"
+                 [(ngModel)]="username"
+                 [disabled]="rolesFetched">
+          <button mat-button *ngIf="username" matSuffix mat-icon-button aria-label="Clear" (click)="clearEditor()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+        <button mat-icon-button
+                color="primary"
+                class="e2e-test-role-edit-button"
+                *ngIf="username && !rolesFetched"
+                (click)="startEditing()">
+          <mat-icon aria-label="Example icon-button with a heart icon">edit</mat-icon>
+        </button>
+      </div>
+      <div *ngIf="!username">Please fill in the username above to edit the user role.</div>
+
+      <div class="oppia-roles-editor-form-container">
+        <mat-card *ngIf="roleIsCurrentlyBeingEdited && !rolesFetched" class="oppia-roles-editor-card">
+          <mat-spinner class="mx-auto" [diameter]="30"></mat-spinner>
+        </mat-card>
+        <div *ngIf="roleIsCurrentlyBeingEdited && rolesFetched" class="e2e-test-roles-editor-card-container">
+          <mat-card *ngIf="userIsBanned" class="oppia-roles-editor-card">
+            <div class="d-flex flex-column align-items-center">
+              <h3>User "{{ username }}" is banned from the application.</h3>
+              <button mat-raised-button
+                      class="oppia-red-button"
+                      (click)="unmarkUserBanned()">
+                <div class="d-flex align-items-center">
+                  <span class="mr-3">Unban this user</span>
+                  <mat-spinner *ngIf="bannedStatusChangeInProgress" [diameter]="20"></mat-spinner>
+                </div>
+              </button>
+            </div>
+          </mat-card>
+          <mat-card *ngIf="!userIsBanned" class="oppia-roles-editor-card">
+            <div class="d-flex justify-content-between">
+              <h3>Existing roles of "{{ username }}":</h3>
+              <a mat-button
+                 class="oppia-red-link"
+                 (click)="markUserBanned()">
+                <div class="d-flex align-items-center">
+                  <span class="mr-3">Ban this user</span>
+                  <mat-spinner *ngIf="bannedStatusChangeInProgress" [diameter]="20"></mat-spinner>
+                </div>
+              </a>
+            </div>
+            <mat-list>
+              <mat-list-item  class="oppia-flex"  *ngFor="let role of userRoles">
+                <div class="d-flex align-items-center oppia-user-role">
+                  <span class="oppia-user-role-description e2e-test-user-role-description">
+                    <strong>{{ HUMAN_READABLE_ROLES[role] | titlecase }}</strong>
+                  </span>
+                  <div class="oppia-progress-spinner e2e-test-progress-spinner" *ngIf="roleCurrentlyBeingUpdatedInBackend === role">
+                    <mat-spinner [diameter]="24"></mat-spinner>
+                  </div>
+                  <div class="d-flex" *ngIf="roleCurrentlyBeingUpdatedInBackend !== role">
+                    <button *ngIf="role === 'TOPIC_MANAGER'" mat-button matSuffix mat-icon-button aria-label="Clear" (click)="openTopicManagerRoleEditor()">
+                      <mat-icon matListIcon>edit</mat-icon>
+                    </button>
+                    <div class="e2e-test-{{HUMAN_READABLE_ROLES[role].split(' ').join('-')}}-remove-button-container">
+                      <button *ngIf="VIEWABLE_ROLES.includes(role)"
+                              mat-button matSuffix mat-icon-button
+                              aria-label="Clear"
+                              (click)="removeRole(role)">
+                        <mat-icon matListIcon>close</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </mat-list-item>
+              <mat-list-item *ngIf="roleSelectorIsShown">
+                <span class="oppia-user-role-description">
+                  <mat-form-field>
+                    <mat-select (selectionChange)="addNewRole($event.value)" class="e2e-test-new-role-selector">
+                      <mat-option [value]="role" *ngFor="let role of possibleRolesToAdd">
+                        {{HUMAN_READABLE_ROLES[role]}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </span>
+              </mat-list-item>
+            </mat-list>
+            <button mat-button
+                    class="oppia-add-role-button e2e-test-add-new-role-button"
+                    color="primary"
+                    (click)="showNewRoleSelector()"
+                    *ngIf="!roleSelectorIsShown">
+              <div class="oppia-flex">
+                <mat-icon color="primary" aria-label="Example icon-button with a heart icon">add_circle</mat-icon>
+                <h4>Add role</h4>
+              </div>
+            </button>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="oppia-page-card oppia-long-text" *ngIf="roleToActions !== undefined">
+        <legend class="text-center">Roles</legend>
+        <oppia-roles-and-actions-visualizer [roleToActions]="roleToActions" [viewableRoles]="VIEWABLE_ROLES" [humanReadableRoles]="HUMAN_READABLE_ROLES"></oppia-roles-and-actions-visualizer>
+      </div>
+    </div>
+  </div>
+</div>

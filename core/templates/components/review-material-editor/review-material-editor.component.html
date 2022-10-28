@@ -1,0 +1,51 @@
+<div *ngIf="!conceptCardExplanationEditorIsShown" class="review-material">
+  <div [ngClass]="oppia-editable-section"
+       (click)="openConceptCardExplanationEditor()">
+    <i class="material-icons oppia-editor-edit-icon float-right e2e-test-edit-concept-card"
+       title="Edit Concept Card Explanation">&#xE254;
+    </i>
+    <div class="oppia-state-content-display oppia-transition-200 e2e-test-concept-card-explanation"
+         [ngClass]="oppia-prevent-selection"
+         title="Concept Card Explanation">
+      <span class="oppia-placeholder" [hidden]="!(editableExplanation === '')">
+          Give a review or explanation of the skill.
+      </span>
+      <oppia-rte-output-display [rteString]="editableExplanation">
+      </oppia-rte-output-display>
+    </div>
+    <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
+    <div class="oppia-editable-section-mask">
+    </div>
+  </div>
+</div>
+
+<div *ngIf="conceptCardExplanationEditorIsShown">
+  <schema-based-editor class="e2e-test-concept-card-text"
+                       [schema]="getSchema()"
+                       [localValue]="editableExplanation"
+                       (localValueChange)="updateLocalExp($event)">
+  </schema-based-editor>
+  <div class="editor-buttons">
+    <button type="button"
+            class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-concept-card"
+            (click)="saveConceptCardExplanation()">
+      Save
+    </button>
+    <button type="button" class="btn btn-secondary float-right" (click)="closeConceptCardExplanationEditor()">Cancel</button>
+    <div class="oppia-clear"></div>
+  </div>
+</div>
+<style>
+  .review-material {
+    padding-bottom: 36px;
+    padding-top: 0.5em;
+  }
+
+  .editor-buttons {
+    margin-top: 2px;
+  }
+
+  .oppia-editor-edit-icon {
+    position: inherit;
+  }
+</style>

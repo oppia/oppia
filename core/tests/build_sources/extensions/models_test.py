@@ -16,6 +16,8 @@
 
 """Test calculations to get interaction answer views."""
 
+from __future__ import annotations
+
 from core.domain import calculation_registry
 from core.domain import exp_domain
 from core.tests import test_utils
@@ -26,7 +28,11 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
     """Test cases for BaseCalculation."""
 
     def test_requires_override_for_calculation(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            r'Subclasses of BaseCalculation should implement the '
+            r'calculate_from_state_answers_dict\(state_answers_dict\) '
+            r'method.'):
             answer_models.BaseCalculation().calculate_from_state_answers_dict(
                 state_answers_dict={})
 

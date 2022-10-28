@@ -1,0 +1,51 @@
+<div class="modal-header">
+  <h4 class="modal-title">Topic Manager role editor</h4>
+  <button type="button" class="close" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <p *ngIf="managedTopicIds.length">User has rights in the following topics:</p>
+  <p *ngIf="!managedTopicIds.length">Please assign users to required topics:</p>
+  <ul>
+    <li *ngFor="let topicId of managedTopicIds">
+      <div class="d-flex justify-content-between">
+        <span>{{ topicIdToName[topicId] }}</span>
+        <div class="mat-icon-button oppia-progress-spinner" *ngIf="topicIdInUpdate === topicId">
+          <mat-spinner [diameter]="24"></mat-spinner>
+        </div>
+        <button mat-button matSuffix mat-icon-button
+                *ngIf="topicIdInUpdate !== topicId && managedTopicIds.length > 1"
+                aria-label="Clear"
+                (click)="removeTopicId(topicId)">
+          <mat-icon matListIcon>close</mat-icon>
+        </button>
+      </div>
+    </li>
+    <li *ngIf="topicIdsForSelection.length">
+      <div class="d-inline-flex mt-3 w-100">
+        <select class="w-50" placeholder="Select new topic to add" label="Topic selector" ngbAutofocus [(ngModel)]="newTopicId">
+          <option *ngFor="let topicId of topicIdsForSelection" [value]="topicId">{{ topicIdToName[topicId] }}</option>
+        </select>
+        <button mat-icon-button color="primary" (click)="addTopic()">
+          <mat-icon aria-label="Example icon-button with a heart icon">add</mat-icon>
+        </button>
+      </div>
+    </li>
+    <li *ngIf="!topicIdsForSelection.length">
+      <i *ngIf="managedTopicIds.length">There are no topics remaining, looks like user is assigned to all the topics.</i>
+      <i *ngIf="!managedTopicIds.length">There are no topics for which you can assign a manager.</i>
+    </li>
+  </ul>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-dark" (click)="close()">Close</button>
+</div>
+
+<style>
+  .oppia-progress-spinner {
+    align-items: center;
+    display: flex;
+    width: 32px;
+  }
+</style>

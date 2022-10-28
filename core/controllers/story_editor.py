@@ -14,34 +14,45 @@
 
 """Controllers for the story editor."""
 
+from __future__ import annotations
+
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import classroom_services
+from core.domain import skill_services
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
-from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
-import feconf
-import utils
 
 
 class StoryEditorPage(base.BaseHandler):
     """The editor page for a single story."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'story_id': {
+            'schema': {
+                'type': 'basestring'
+            },
+            'validators': [{
+                'id': 'has_length',
+                'value': constants.STORY_ID_LENGTH
+            }]
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.can_edit_story
-    def get(self, topic_id, story_id):
+    def get(self, _):
         """Handles GET requests."""
-        story_domain.Story.require_valid_story_id(story_id)
-        topic_domain.Topic.require_valid_topic_id(topic_id)
 
-        story = story_services.get_story_by_id(story_id, strict=False)
-        if story is None:
-            raise self.PageNotFoundException
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None or story_id not in topic.canonical_story_ids:
-            raise self.PageNotFoundException
-
-        self.render_template('dist/story-editor-page.mainpage.html')
+        self.render_template('story-editor-page.mainpage.html')
 
 
 class EditableStoryDataHandler(base.BaseHandler):
@@ -64,55 +75,67 @@ class EditableStoryDataHandler(base.BaseHandler):
                 % (story_version, version_from_payload))
 
     @acl_decorators.can_edit_story
-    def get(self, topic_id, story_id):
+    def get(self, story_id):
         """Populates the data on the individual story page."""
-        story_domain.Story.require_valid_story_id(story_id)
-        topic_domain.Topic.require_valid_topic_id(topic_id)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        topic_id = story.corresponding_topic_id
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+        skill_ids = topic.get_all_skill_ids()
 
-        story = story_services.get_story_by_id(story_id, strict=False)
-        if story is None:
-            raise self.PageNotFoundException
+        skill_summaries = skill_services.get_multi_skill_summaries(skill_ids)
+        skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
+        classroom_url_fragment = (
+            classroom_services.get_classroom_url_fragment_for_topic_id(
+                topic.id))
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None or story_id not in topic.canonical_story_ids:
-            raise self.PageNotFoundException
+        for story_reference in topic.canonical_story_references:
+            if story_reference.story_id == story_id:
+                story_is_published = story_reference.story_is_published
 
         self.values.update({
             'story': story.to_dict(),
-            'topic_name': topic.name
+            'topic_name': topic.name,
+            'story_is_published': story_is_published,
+            'skill_summaries': skill_summary_dicts,
+            'topic_url_fragment': topic.url_fragment,
+            'classroom_url_fragment': classroom_url_fragment
         })
 
         self.render_json(self.values)
 
     @acl_decorators.can_edit_story
-    def put(self, topic_id, story_id):
+    def put(self, story_id):
         """Updates properties of the given story."""
-        story_domain.Story.require_valid_story_id(story_id)
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-        story = story_services.get_story_by_id(story_id, strict=False)
-        if story is None:
-            raise self.PageNotFoundException
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None or story_id not in topic.canonical_story_ids:
-            raise self.PageNotFoundException
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
 
         version = self.payload.get('version')
         self._require_valid_version(version, story.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if commit_message is None:
+            raise self.InvalidInputException(
+                'Expected a commit message but received none.')
+
+        if len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH:
+            raise self.InvalidInputException(
+                'Commit messages must be at most %s characters long.'
+                % constants.MAX_COMMIT_MESSAGE_LENGTH)
+
         change_dicts = self.payload.get('change_dicts')
         change_list = [
             story_domain.StoryChange(change_dict)
             for change_dict in change_dicts
         ]
         try:
-            story_services.update_story(
-                self.user_id, story_id, change_list, commit_message)
+            # Update the Story and its corresponding TopicSummary.
+            topic_services.update_story_and_topic_summary(
+                self.user_id, story_id, change_list, commit_message,
+                story.corresponding_topic_id)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        story_dict = story_services.get_story_by_id(story_id).to_dict()
+        story_dict = story_fetchers.get_story_by_id(story_id).to_dict()
 
         self.values.update({
             'story': story_dict
@@ -121,15 +144,98 @@ class EditableStoryDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_delete_story
-    def delete(self, topic_id, story_id):
+    def delete(self, story_id):
         """Handles Delete requests."""
-        story_domain.Story.require_valid_story_id(story_id)
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
-        story = story_services.get_story_by_id(story_id, strict=False)
-        if story is None:
-            raise self.PageNotFoundException
-
         story_services.delete_story(self.user_id, story_id)
+        self.render_json(self.values)
 
+
+class StoryPublishHandler(base.BaseHandler):
+    """A data handler for publishing and unpublishing stories."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'story_id': {
+            'schema': {
+                'type': 'basestring'
+            },
+            'validators': [{
+                'id': 'has_length',
+                'value': constants.STORY_ID_LENGTH
+            }]
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'new_story_status_is_public': {
+                'schema': {
+                    'type': 'bool'
+                },
+            }
+        }
+    }
+
+    @acl_decorators.can_edit_story
+    def put(self, story_id):
+        """Published/unpublished given story."""
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        topic_id = story.corresponding_topic_id
+
+        new_story_status_is_public = self.normalized_payload.get(
+            'new_story_status_is_public')
+
+        if new_story_status_is_public:
+            topic_services.publish_story(topic_id, story_id, self.user_id)
+        else:
+            topic_services.unpublish_story(topic_id, story_id, self.user_id)
+
+        self.render_json(self.values)
+
+
+class ValidateExplorationsHandler(base.BaseHandler):
+    """A data handler for validating the explorations in a story."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_edit_story
+    def get(self, _):
+        """Handler that receives a list of exploration IDs, checks whether the
+        corresponding explorations are supported on mobile and returns the
+        validation error messages (if any).
+        """
+        comma_separated_exp_ids = self.request.get('comma_separated_exp_ids')
+        if not comma_separated_exp_ids:
+            raise self.InvalidInputException(
+                'Expected comma_separated_exp_ids parameter to be present.')
+        exp_ids = comma_separated_exp_ids.split(',')
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(exp_ids, False))
+        self.values.update({
+            'validation_error_messages': validation_error_messages
+        })
+        self.render_json(self.values)
+
+
+class StoryUrlFragmentHandler(base.BaseHandler):
+    """A data handler for checking if a story with given url fragment exists.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self, story_url_fragment):
+        """Handler that receives a story url fragment and checks whether
+        a story with the same url fragment exists or not.
+        """
+        self.values.update({
+            'story_url_fragment_exists': (
+                story_services.does_story_exist_with_url_fragment(
+                    story_url_fragment))
+        })
         self.render_json(self.values)

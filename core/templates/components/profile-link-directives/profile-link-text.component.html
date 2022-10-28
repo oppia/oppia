@@ -1,0 +1,6 @@
+<a *ngIf="isUsernameLinkable(username)" [href]="profileUrl" [smartRouterLink]="profileUrl">
+  {{ username }}
+</a>
+<span *ngIf="!isUsernameLinkable(username)">
+  {{ username }}
+</span>

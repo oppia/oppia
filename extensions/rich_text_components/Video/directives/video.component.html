@@ -1,0 +1,29 @@
+<div class="oppia-noninteractive-video-iframe-container">
+  <div class="oppia-noninteractive-video-iframe">
+    <youtube-player *ngIf="videoId"
+                    class="e2e-test-youtube-player"
+                    [videoId]="videoId"
+                    [startSeconds]="start"
+                    [endSeconds]="end"
+                    [playerVars]="playerVars">
+    </youtube-player>
+  </div>
+</div>
+<style>
+  /* The value of 60.9% is derived from the ratio of the height to the width
+   * (280/480). See http://alistapart.com/article/creating-intrinsic-ratios-for-video
+   * for more details.
+   */
+  .oppia-noninteractive-video-iframe-container {
+    padding-bottom: 60.9%;
+    position: relative;
+  }
+
+  .oppia-noninteractive-video-iframe /deep/ iframe {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+</style>

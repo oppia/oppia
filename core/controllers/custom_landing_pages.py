@@ -16,42 +16,45 @@
 
 """Controllers for custom landing pages."""
 
+from __future__ import annotations
+
 from core.controllers import acl_decorators
 from core.controllers import base
-import feconf
 
 
 class FractionLandingRedirectPage(base.BaseHandler):
     """The handler redirecting to the Fractions landing page."""
 
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.redirect('/learn/maths/fractions')
-
-
-class TopicLandingPage(base.BaseHandler):
-    """Page showing the topic landing page."""
-
-    @acl_decorators.open_access
-    def get(self, subject, topic):
-        """Handles GET requests."""
-        if subject in feconf.AVAILABLE_LANDING_PAGES:
-            if topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
-                self.render_template('dist/topic-landing-page.mainpage.html')
-            else:
-                raise self.PageNotFoundException
-        else:
-            raise self.PageNotFoundException
-
-
-class StewardsLandingPage(base.BaseHandler):
-    """Page showing the landing page for stewards (parents, teachers,
-    volunteers, or NGOs).
-    """
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template(
-            'dist/stewards-landing-page.mainpage.html')
+        self.redirect('/math/fractions')
+
+
+class TopicLandingRedirectPage(base.BaseHandler):
+    """The handler redirecting the old landing page URL to the new one."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self, topic):
+        """Handles GET requests.
+
+        Args:
+            topic: str. Topic of page to be redirected to.
+        """
+        self.redirect('/math/%s' % topic)

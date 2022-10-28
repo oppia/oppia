@@ -1,0 +1,97 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+subtopics-list .oppia-page-card.oppia-long-text {
+  padding: 30px 30px 30px 40px;
+  width: 50vw;
+}
+
+subtopics-list .oppia-page-card {
+  margin-top: 10em;
+}
+
+subtopics-list .tab-title {
+  color: #00645c;
+  margin: .83em 0;
+}
+
+subtopics-list .subtopic-subheading {
+  color: #6c757d;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 1.2em;
+  margin-bottom: 2.5vh;
+}
+
+subtopics-list .subtopics-container {
+  display: grid;
+  grid-gap: 20px;
+  grid-row-gap: 2vh;
+  grid-template-columns: 1fr 1fr 1fr;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+.subtopic-summary-tile {
+  margin-right: 2vw;
+}
+
+@media(max-width: 1280px) {
+  subtopics-list .oppia-page-card.oppia-long-text {
+    width: 60vw;
+  }
+
+  subtopics-list .subtopics-container {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media(max-width: 1024px) {
+  subtopics-list .oppia-page-card.oppia-long-text {
+    width: 65vw;
+  }
+
+  subtopics-list .subtopics-container {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media(max-width: 940px) {
+  subtopics-list .oppia-page-card.oppia-long-text {
+    width: 70vw;
+  }
+}
+
+@media(max-width: 880px) {
+  subtopics-list .oppia-page-card.oppia-long-text {
+    width: 75vw;
+  }
+}
+
+@media(max-width: 820px) {
+  subtopics-list .oppia-page-card.oppia-long-text {
+    width: 80vw;
+  }
+}
+
+@media(max-width: 680px) {
+  subtopics-list .oppia-page-card.oppia-long-text {
+    width: 90vw;
+  }
+}
+
+@media(max-width: 500px) {
+  subtopics-list .oppia-page-card.oppia-long-text {
+    padding: 50px 25px;
+    width: 100vw;
+  }
+
+  subtopics-list .subtopics-container {
+    display: grid;
+    grid-column-gap: 30px;
+    grid-row-gap: 10px;
+    grid-template-columns: 1fr 1fr;
+    justify-content: space-between;
+  }
+}

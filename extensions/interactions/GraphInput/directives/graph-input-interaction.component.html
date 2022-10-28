@@ -1,0 +1,27 @@
+<style>
+  .graph-input-container {
+    background: #fff;
+    padding: 8px;
+  }
+  .oppia-error-message-text {
+    margin-left: 30px;
+  }
+</style>
+
+<div class="graph-input-container">
+  <graph-viz [graph]="graph"
+             [canAddVertex]="canAddVertex"
+             [canDeleteVertex]="canDeleteVertex"
+             [canEditVertexLabel]="canEditVertexLabel"
+             [canMoveVertex]="canMoveVertex"
+             [canAddEdge]="canAddEdge"
+             [canDeleteEdge]="canDeleteEdge"
+             [canEditEdgeWeight]="canEditEdgeWeight"
+             [interactionIsActive]="interactionIsActive">
+  </graph-viz>
+  <!-- The '9999px' is just to push the button as right as possible. Due to the limits of the parent container, it does not overflow out of the div.-->
+  <button [ngStyle]="isLanguageRTL() ? {'margin' : '0 30px 0 9999px'} : {'margin' : '0 9999px 0 30px'}" mat-raised-button (click)="resetGraph()" [disabled]="!interactionIsActive" [innerHTML]="'I18N_INTERACTIONS_GRAPH_RESET_BUTTON' | translate"></button>
+  <span [hidden]="errorMessage" class="text-danger oppia-error-message-text" aria-live="assertive">
+    {{errorMessage | translate}}
+  </span>
+</div>

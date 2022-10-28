@@ -16,34 +16,45 @@
 
 """Provides app identity services."""
 
-from constants import constants
+from __future__ import annotations
 
-from google.appengine.api import app_identity
+import os
 
 _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
 
 
-def get_application_id():
+def get_application_id() -> str:
     """Returns the application's App Engine ID.
 
-    For more information, see
-    https://cloud.google.com/appengine/docs/python/appidentity/
+    Locally we set the GOOGLE_CLOUD_PROJECT environment variable in
+    scripts/servers.py when starting the dev server. In production
+    the GOOGLE_CLOUD_PROJECT is set by the server.
 
     Returns:
         str. The application ID.
+
+    Raises:
+        ValueError. Value can't be None for application id.
     """
-    return app_identity.get_application_id()
+    app_id = os.getenv('GOOGLE_CLOUD_PROJECT')
+    if app_id is None:
+        raise ValueError('Value None for application id is invalid.')
+    return app_id
 
 
-def get_gcs_resource_bucket_name():
+def get_gcs_resource_bucket_name() -> str:
     """Returns the application's bucket name for GCS resources, which depends
-    on the application ID.
+    on the application ID in production mode, or default bucket name in
+    development mode.
+
+    This needs to be in sync with deploy.py which adds the bucket name to
+    constants.ts
+
+    Also, note that app_identity.get_default_gcs_bucket_name() returns None
+    if we try to use it in production mode but the default bucket hasn't been
+    enabled through the project console.
 
     Returns:
-        str or None. The bucket name for the application's GCS resources, in
-        production mode.
+        str. The bucket name for the application's GCS resources.
     """
-    if constants.DEV_MODE:
-        return None
-    else:
-        return get_application_id() + _GCS_RESOURCE_BUCKET_NAME_SUFFIX
+    return get_application_id() + _GCS_RESOURCE_BUCKET_NAME_SUFFIX

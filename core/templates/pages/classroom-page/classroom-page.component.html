@@ -1,0 +1,47 @@
+<background-banner></background-banner>
+<div class="oppia-classroom-viewer-container position-relative">
+  <div class="oppia-classroom-header">
+    <div class="classroom-header">{{ 'I18N_CLASSROOM_PAGE_HEADING' | translate }}</div>
+    <div class="classroom-name">
+      <span *ngIf="!isHackyClassroomTranslationDisplayed()">
+        {{ classroomDisplayName }}
+      </span>
+      <span *ngIf="isHackyClassroomTranslationDisplayed()">
+        {{ classroomNameTranslationKey | translate }}
+      </span>
+    </div>
+  </div>
+  <div class="oppia-classroom-banner">
+    <img class="oppia-classroom-banner-img" [src]="bannerImageFileUrl" width="480" height="247" alt="">
+  </div>
+  <div class="oppia-classroom-details" *ngIf="classroomData">
+    <h2>{{ 'I18N_CLASSROOM_PAGE_COURSE_DETAILS' | translate }}</h2>
+    <!-- The course details and topic list intro texts are hardcoded so that they can be translated.
+    This method should be changed when more classrooms are added in the future. -->
+    <p class="course-details"> {{ 'I18N_MATH_COURSE_DETAILS' | translate }} </p>
+    <h2>{{ 'I18N_CLASSROOM_PAGE_TOPICS_COVERED' | translate }}</h2>
+    <p>{{ 'I18N_MATH_TOPICS_COVERED' | translate }}</p>
+  </div>
+  <div class="oppia-topic-summary-tiles" *ngIf="classroomData">
+    <div *ngFor="let topicSummary of classroomData.getTopicSummaries()"
+         class="oppia-topic-summary-tile e2e-test-topic-summary-tile">
+      <oppia-topic-summary-tile [topicSummary]="topicSummary"
+                                [classroomUrlFragment]="classroomUrlFragment"
+                                [isPublished]="topicSummary.isTopicPublished()">
+      </oppia-topic-summary-tile>
+    </div>
+  </div>
+  <div class="oppia-classroom-search-container">
+    <div class="oppia-classroom-search-section">
+      <div class="classroom-page-help-text initial-help-text">
+        {{ 'I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING' | translate }}
+      </div>
+      <div class="classroom-page-help-text oppia-classroom-page-subheading-text">
+        {{ 'I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING' | translate }}
+      </div>
+      <div class="oppia-classroom-search-bar-container">
+        <oppia-search-bar [enableDropup]="true"></oppia-search-bar>
+      </div>
+    </div>
+  </div>
+</div>

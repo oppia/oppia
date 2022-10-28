@@ -1,0 +1,23 @@
+<mat-form-field class="language-field">
+  <mat-select placeholder="{{ entity | titlecase }}"
+              class="e2e-test-{{ entity.replace(' ', '-') | lowercase }}-selector"
+              [value]="preferredLanguageCode"
+              (valueChange)="updateLanguage($event)">
+    <mat-option>
+      <ngx-mat-select-search ngModel
+                             (ngModelChange)="filterChoices($event)"
+                             placeholderLabel="{{ 'I18N_PREFERENCES_SEARCH_LABEL' | translate }}"
+                             noEntriesFoundLabel="No language found">
+      </ngx-mat-select-search>
+    </mat-option>
+    <mat-option *ngFor="let language of filteredChoices" [value]="language.id">
+      {{ language.text }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+
+<style>
+  .language-field {
+    width: 100%;
+  }
+</style>

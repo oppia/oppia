@@ -14,34 +14,41 @@
 
 """Tests for the collection editor page."""
 
+from __future__ import annotations
+
+import base64
+
+from core import feconf
+from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_fetchers
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
-import feconf
 
 
 class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
-        super(BaseCollectionEditorControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.moderator = user_services.get_user_actions_info(self.moderator_id)
 
         self.json_dict = {
             'version': 1,
@@ -58,7 +65,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
     COLLECTION_ID = '0'
 
     def setUp(self):
-        super(CollectionEditorTests, self).setUp()
+        super().setUp()
         system_user = user_services.get_system_user()
 
         collection_services.load_demo(self.COLLECTION_ID)
@@ -70,10 +77,9 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         whitelisted_usernames = [self.EDITOR_USERNAME]
         self.set_collection_editors(whitelisted_usernames)
 
-        # Check that it is possible to access a page with specific version
-        # number.
+        # Check that it is possible to access a page.
         self.get_json(
-            '%s/%s?v=1' % (
+            '%s/%s' % (
                 feconf.COLLECTION_DATA_URL_PREFIX,
                 self.COLLECTION_ID))
 
@@ -125,8 +131,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         rights_manager.create_new_collection_rights(
             self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
-            self.admin, self.COLLECTION_ID, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            self.moderator, self.COLLECTION_ID, self.editor_id,
+            rights_domain.ROLE_EDITOR)
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         self.login(self.EDITOR_EMAIL)
@@ -135,11 +141,17 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         # Raises error as version is None.
+        sample_change_list = [{
+            'cmd': 'edit_collection_property',
+            'property_name': 'title',
+            'new_value': 'A new title'
+        }]
         json_response = self.put_json(
             '%s/%s' % (
                 feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
                 self.COLLECTION_ID),
-            {'version': None}, csrf_token=csrf_token, expected_status_int=400)
+            {'version': None, 'change_list': sample_change_list},
+            csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             json_response['error'],
@@ -151,7 +163,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             '%s/%s' % (
                 feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
                 self.COLLECTION_ID),
-            {'version': 2}, csrf_token=csrf_token, expected_status_int=400)
+            {'version': 2, 'change_list': sample_change_list},
+            csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             json_response['error'],
@@ -169,8 +182,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         rights_manager.create_new_collection_rights(
             self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
-            self.admin, self.COLLECTION_ID, self.viewer_id,
-            rights_manager.ROLE_VIEWER)
+            self.moderator, self.COLLECTION_ID, self.viewer_id,
+            rights_domain.ROLE_VIEWER)
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         self.login(self.VIEWER_EMAIL)
@@ -196,8 +209,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         rights_manager.create_new_collection_rights(
             self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
-            self.admin, self.COLLECTION_ID, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            self.moderator, self.COLLECTION_ID, self.editor_id,
+            rights_domain.ROLE_EDITOR)
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         self.login(self.EDITOR_EMAIL)
@@ -215,6 +228,34 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         self.logout()
 
+    def test_cannot_put_long_commit_message(self):
+        """Check that putting a long commit message is denied."""
+        rights_manager.create_new_collection_rights(
+            self.COLLECTION_ID, self.owner_id)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
+
+        self.login(self.OWNER_EMAIL)
+        long_message = 'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
+        long_message_dict = self.json_dict.copy()
+        long_message_dict['commit_message'] = long_message
+
+        # Call get handler to return the csrf token.
+        csrf_token = self.get_new_csrf_token()
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
+                self.COLLECTION_ID),
+            long_message_dict, csrf_token=csrf_token, expected_status_int=400)
+
+        error_msg = (
+            'Schema validation for \'commit_message\' failed: Validation '
+            'failed: has_length_at_most ({\'max_value\': 375}) for object %s'
+            % long_message)
+        self.assertEqual(
+            json_response['error'], error_msg)
+
+        self.logout()
+
     def test_collection_rights_handler(self):
         collection_id = 'collection_id'
         collection = collection_domain.Collection.create_default_collection(
@@ -225,24 +266,24 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         # Check that collection is published correctly.
         rights_manager.assign_role_for_collection(
             self.owner, collection_id, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         rights_manager.publish_collection(self.owner, collection_id)
 
-        # Check that collection cannot be unpublished by non admin.
-        with self.assertRaisesRegexp(
+        # Check that collection cannot be unpublished by non moderator.
+        with self.assertRaisesRegex(
             Exception, 'This collection cannot be unpublished.'):
             rights_manager.unpublish_collection(self.owner, collection_id)
         collection_rights = rights_manager.get_collection_rights(collection_id)
         self.assertEqual(
             collection_rights.status,
-            rights_manager.ACTIVITY_STATUS_PUBLIC)
+            rights_domain.ACTIVITY_STATUS_PUBLIC)
 
-        # Check that collection can be unpublished by admin.
-        rights_manager.unpublish_collection(self.admin, collection_id)
+        # Check that collection can be unpublished by moderator.
+        rights_manager.unpublish_collection(self.moderator, collection_id)
         collection_rights = rights_manager.get_collection_rights(collection_id)
         self.assertEqual(
             collection_rights.status,
-            rights_manager.ACTIVITY_STATUS_PRIVATE)
+            rights_domain.ACTIVITY_STATUS_PRIVATE)
 
     def test_get_collection_rights(self):
         whitelisted_usernames = [self.OWNER_USERNAME]
@@ -324,8 +365,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.assertFalse(response_dict['is_private'])
         self.logout()
 
-        # Login as admin and try to unpublish the collection.
-        self.login(self.ADMIN_EMAIL)
+        # Login as moderator and try to unpublish the collection.
+        self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         # Raises error as version is None.
@@ -352,7 +393,6 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
     def test_publish_unpublish_collection(self):
         self.set_collection_editors([self.OWNER_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
 
         # Login as owner and publish a collection with a public exploration.
         self.login(self.OWNER_EMAIL)
@@ -371,12 +411,28 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.assertFalse(response_dict['is_private'])
         self.logout()
 
-        # Login as admin and unpublish the collection.
-        self.login(self.ADMIN_EMAIL)
+        # Login as moderator and unpublish the collection.
+        self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         response_dict = self.put_json(
             '/collection_editor_handler/unpublish/%s' % collection_id,
             {'version': collection.version},
             csrf_token=csrf_token)
         self.assertTrue(response_dict['is_private'])
+        self.logout()
+
+    def test_can_search_exploration_with_exploration_id(self):
+        self.set_collection_editors([self.OWNER_USERNAME])
+        self.login(self.OWNER_EMAIL)
+        exploration_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exploration_id, self.owner_id)
+        rights_manager.publish_exploration(self.owner, exploration_id)
+        # The b64encode accepts and returns bytes, so we first need to encode
+        # the exploration_id to bytes, then decode the returned bytes back
+        # to string.
+        exploration_id = (
+            base64.b64encode(exploration_id.encode('utf-8')).decode('utf-8'))
+
+        self.get_json(
+            '/exploration/metadata_search?q=%s' % exploration_id)
         self.logout()

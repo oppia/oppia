@@ -1,0 +1,147 @@
+<div class="modal-header create-new-topic-modal-header">
+  <h3>
+    New Topic
+  </h3>
+  <i class="fa fa-times modal-close-button" (click)="cancel()"></i>
+</div>
+<form (submit)="save()">
+  <div class="modal-body create-new-topic-form">
+    <div class="create-new-topic-input-field">
+      <div><span class="create-new-topic-input-label">Name*</span></div>
+      <input class="e2e-test-new-topic-name-field required"
+             [(ngModel)]="newlyCreatedTopic.name"
+             [ngModelOptions]="{standalone: true}"
+             [maxlength]="MAX_CHARS_IN_TOPIC_NAME"
+             (change)="onTopicNameChange()" autofocus>
+      <div class="oppia-input-box-subtitle">
+        <em>
+          Topic name should be at most {{ MAX_CHARS_IN_TOPIC_NAME }} characters.
+        </em>
+      </div>
+      <div *ngIf="topicNameExists" class="oppia-input-box-subtitle text-danger">
+        <em>
+          A topic with this name already exists.
+        </em>
+      </div>
+    </div>
+    <div class="create-new-topic-input-field">
+      <div><span class="create-new-topic-input-label">Topic URL Fragment*</span></div>
+      <input class="e2e-test-new-topic-url-fragment-field required"
+             [(ngModel)]="newlyCreatedTopic.urlFragment"
+             [ngModelOptions]="{standalone: true}"
+             [maxlength]="MAX_CHARS_IN_TOPIC_URL_FRAGMENT"
+             [ngClass]="{'invalid-field': topicUrlFragmentExists || !validUrlFragmentRegex.test(newlyCreatedTopic.urlFragment)}"
+             (change)="onTopicUrlFragmentChange()">
+      <div>
+        <span class="oppia-input-box-subtitle">
+          <em>
+            The topic URL fragment is used to uniquely access the topic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{ MAX_CHARS_IN_TOPIC_URL_FRAGMENT }} characters in total. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+            This topic can be accessed at the following URL:<br>
+            {{ hostname }}/learn/staging/{{ newlyCreatedTopic.urlFragment }}
+          </em>
+        </span>
+        <div *ngIf="topicUrlFragmentExists" class="oppia-input-box-subtitle text-danger">
+          <em>
+            This topic URL fragment already exists.
+          </em>
+        </div>
+      </div>
+    </div>
+    <div class="create-new-topic-input-field">
+      <div><span class="create-new-topic-input-label">Web Title Fragment for Web*</span></div>
+      <div>
+        <input class="e2e-test-new-page-title-fragm-field required"
+               [(ngModel)]="newlyCreatedTopic.pageTitleFragment"
+               [ngModelOptions]="{standalone: true}">
+      </div>
+      <span class="oppia-input-box-subtitle">
+        <em>
+          Enter the middle component of the page title. For example, if you enter "Add, Subtract, Multiply and Divide" it will show up in the browser tab as "Learn {{ newlyCreatedTopic.name }} | Add, Subtract, Multiply and Divide | Oppia".
+          It should be at least {{ minWebTitleFrag }} and at most {{ maxWebTitleFrag }} characters.
+        </em>
+      </span>
+    </div>
+    <div class="create-new-topic-input-field">
+      <div><span class="create-new-topic-input-label">Description*</span></div>
+      <textarea class="e2e-test-new-topic-description-field required"
+                rows="4" cols="50" placeholder="Enter description"
+                [maxlength]="MAX_CHARS_IN_TOPIC_DESCRIPTION"
+                [(ngModel)]="newlyCreatedTopic.description"
+                [ngModelOptions]="{standalone: true}">
+      </textarea>
+      <div class="oppia-input-box-subtitle">
+        <em>
+          Topic description should be at most {{ MAX_CHARS_IN_TOPIC_DESCRIPTION }} characters.
+        </em>
+      </div>
+    </div>
+    <div class="create-new-topic-input-field">
+      <label class="create-new-topic-input-label">Topic Thumbnail*</label>
+      <oppia-thumbnail-uploader [previewTitle]="newlyCreatedTopic.name"
+                                [aspectRatio]="'4:3'"
+                                [disabled]="false"
+                                [useLocalStorage]="true"
+                                [allowedBgColors]="allowedBgColors"
+                                previewDescriptionBgColor="#2F6687">
+      </oppia-thumbnail-uploader>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
+    <button class="btn btn-success e2e-test-confirm-topic-creation-button" type="submit" [disabled]="!isValid()">
+      <span>Create Topic</span>
+    </button>
+  </div>
+</form>
+<style>
+  .create-new-topic-form .ng-touched.invalid-field,
+  .create-new-topic-form .ng-touched.ng-empty.required {
+     outline: 1px solid #f00;
+  }
+  .create-new-topic-form .create-new-topic-input-field {
+     margin: 10px 0;
+  }
+  .create-new-topic-form .create-new-topic-input-field input, .create-new-topic-input-field textarea,.create-new-topic-input-field select {
+    border: 1px solid #b9b5b5;
+    border-radius: 5px;
+  }
+  .create-new-topic-form .create-new-topic-input-label {
+    font-weight: bold;
+  }
+  .create-new-topic-modal-header .modal-close-button {
+    display: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    .create-new-topic .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+    }
+    .create-new-topic .modal-content {
+      border: 0;
+      border-radius: 0;
+      display: block;
+      min-height: 100vh;
+    }
+    .create-new-topic .modal-header {
+      align-items: center;
+      background-color: #00609c;
+      display: flex;
+    }
+    .create-new-topic .modal-header h3 {
+      color: #fff;
+    }
+    .create-new-topic .create-new-topic-input-field {
+      margin: 25px 0;
+    }
+    .create-new-topic .modal-close-button {
+      color: #fff;
+      display: block;
+      font-size: 20px;
+    }
+  }
+</style>

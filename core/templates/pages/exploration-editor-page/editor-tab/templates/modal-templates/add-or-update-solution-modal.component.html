@@ -1,0 +1,52 @@
+<div class="modal-header e2e-test-add-or-update-solution-modal">
+  <h3>{{ solutionType !== null ? 'Update Solution' : 'Add Solution' }}</h3>
+</div>
+
+<div class="modal-body">
+  <div class="form-inline">
+    <div class="oppia-rule-details-header">
+      <select class="e2e-test-answer-is-exclusive-select"
+              [(ngModel)]="tempAnsOption"
+              (ngModelChange)="onAnswerChange()">
+        <option *ngFor="let item of ansOptions">
+          {{ item }}
+        </option>
+      </select> <strong> solution is...</strong>
+      <br>
+      <br>
+      <div>
+        <oppia-interaction-display classStr="e2e-test-interaction-html"
+                                   [htmlData]="correctAnswerEditorHtml">
+        </oppia-interaction-display>
+      </div>
+      <br>
+      <button class="md-button oppia-learner-confirm-button oppia-learner-submit-answer-button e2e-test-submit-answer-button"
+              (click)="onSubmitFromSubmitButton()"
+              *ngIf="data.correctAnswer === undefined && shouldAdditionalSubmitButtonBeShown()"
+              [disabled]="isSubmitButtonDisabled()">
+          Submit
+      </button>
+      <br>
+      <div [hidden]="data.correctAnswer === undefined">
+        <strong>Explanation:</strong>
+        <schema-based-editor class="e2e-test-explanation-textarea"
+                             [schema]="EXPLANATION_FORM_SCHEMA"
+                             [(localValue)]="data.explanationHtml">
+        </schema-based-editor>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="isSolutionExplanationLengthExceeded(data.explanationHtml)" class="oppia-length-validation-error">
+    The solution explanation is too long. Please use at most 3000 characters.
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success e2e-test-submit-solution-button"
+          (click)="saveSolution()"
+          [disabled]="data.correctAnswer === undefined || isSubmitButtonDisabled() || !data.explanationHtml || isSolutionExplanationLengthExceeded(data.explanationHtml)"
+          title="Check if the solution corresponds to a correct answer and save it.">
+    Check and Save Solution
+  </button>
+</div>

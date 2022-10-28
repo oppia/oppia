@@ -1,0 +1,80 @@
+<div class="modal-header">
+  <h3>
+    Card name: {{ newStateName }}
+    <span [hidden]="!oldStateName">(was: {{ oldStateName }})</span>
+  </h3>
+</div>
+
+<table class="table oppia-state-diff-table">
+  <!--
+    Spacing on the left of table and in the middle of the table is to
+    ensure text above each pane is aligned to codemirror gutter.
+   -->
+  <td class="colgroup-1">
+    <div>
+      {{ headers.leftPane }}
+    </div>
+  </td>
+  <td class="colgroup-2"></td>
+  <td class="colgroup-3">
+    <div>
+      {{ headers.rightPane }}
+    </div>
+  </td>
+</table>
+
+<div class="modal-body">
+  <oppia-codemirror-mergeview [options]="CODEMIRROR_MERGEVIEW_OPTIONS"
+                              [leftValue]="yamlStrs.leftPane"
+                              [rightValue]="yamlStrs.rightPane">
+  </oppia-codemirror-mergeview>
+  <div align="center" class="oppia-click-arrows-text">
+    <strong>Click arrows to desynchronize scrolling</strong>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary e2e-test-close-history-state-modal"
+          (click)="cancel()">
+    Done
+  </button>
+</div>
+
+<style>
+  .CodeMirror-merge-copy {
+    display: none;
+  }
+  .CodeMirror-merge-r-deleted {
+    text-decoration: underline #90ee90 2px;
+    text-decoration-skip-ink: none;
+  }
+  .CodeMirror-merge-r-inserted {
+    text-decoration: underline red 2px;
+    text-decoration-skip-ink: none;
+  }
+  .CodeMirror-merge, .CodeMirror-merge .CodeMirror {
+    height: 55vh;
+  }
+  .state-diff-modal .modal-dialog {
+    max-width: 1200px;
+    width: 90%;
+  }
+  .state-diff-modal .modal-body {
+    height: 60vh;
+    margin-top: -30px;
+  }
+  .state-diff-modal .colgroup-1 {
+    width: 47%;
+    word-wrap: break-word;
+  }
+  .state-diff-modal .colgroup-2 {
+    width: 6%;
+  }
+  .state-diff-modal .colgroup-3 {
+    width: 47%;
+    word-wrap: break-word;
+  }
+  .state-diff-modal .oppia-click-arrows-text {
+    margin-bottom: 20px;
+  }
+</style>

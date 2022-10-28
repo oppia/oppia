@@ -1,0 +1,153 @@
+<div class="e2e-test-story-summary-title"
+  [ngClass]="checkTabletView() ? 'story-summary-tile-mobile': 'story-summary-tile-desktop'">
+  <div class="story-progress-bar" *ngIf="!checkTabletView()">
+    <svg class="story-progress-svg" width="50" height="50" *ngIf="nodeCount">
+      <circle class="story-progress-circle total-circle"
+              cx="25"
+              cy="25"
+              r="20"
+              [attr.stroke-dasharray]="strokeDashArrayValues"
+              stroke-dashoffset="-2.5"
+              stroke-linecap="round"/>
+      <circle class="story-progress-circle completed-circle"
+              cx="25"
+              cy="25"
+              r="20"
+              [attr.stroke-dasharray]="completedStrokeDashArrayValues"
+              stroke-dashoffset="-2.5"
+              [attr.stroke-linecap]="completedStoriesCount ? 'round' : 'butt'"/>
+      <text x="25"
+            y="-20"
+            text-anchor="middle"
+            stroke="#000"
+            stroke-width="0.5"
+            font-size="0.9em"
+            transform="rotate(90)">
+        {{ storyProgress }}%
+      </text>
+    </svg>
+  </div>
+  <div class="oppia-story-title" dir="auto" *ngIf="!checkTabletView()">
+    <strong class="title-text">
+      <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">
+        <span *ngIf="!isHackyStoryTitleTranslationDisplayed()">
+          {{ storyTitle }}
+        </span>
+        <span *ngIf="isHackyStoryTitleTranslationDisplayed()">
+          {{ storyTitleTranslationKey | translate }}
+        </span>
+      </a>
+    </strong>
+    <span dir="auto" class="oppia-chapters-count">
+      <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:nodeCount, messageFormat: true}"></span>
+    </span>
+  </div>
+  <div class="story-details">
+    <div class="story-thumbnail e2e-test-story-thumbnail"
+         [ngStyle]="{background: thumbnailBgColor}">
+      <a [href]="storyLink">
+        <img *ngIf="thumbnailUrl !== null"
+             [src]="thumbnailUrl"
+             alt=""
+             class="img-thumbnail"
+             [ngStyle]="{background: thumbnailBgColor}">
+      </a>
+    </div>
+    <div class="story-details-box bottom-edge-shadow" *ngIf="checkTabletView()">
+      <div class="story-progress-bar">
+        <svg class="story-progress-svg" width="50" height="50" *ngIf="nodeCount">
+          <circle class="story-progress-circle total-circle"
+                  cx="25"
+                  cy="25"
+                  r="20"
+                  [attr.stroke-dasharray]="strokeDashArrayValues"
+                  stroke-dashoffset="-2.5"
+                  stroke-linecap="round"/>
+          <circle class="story-progress-circle completed-circle"
+                  cx="25"
+                  cy="25"
+                  r="20"
+                  [attr.stroke-dasharray]="completedStrokeDashArrayValues"
+                  stroke-dashoffset="-2.5"
+                  [attr.stroke-linecap]="completedStoriesCount ? 'round' : 'butt'"/>
+          <text x="25"
+                y="-20"
+                text-anchor="middle"
+                stroke="#4e4d4d9e"
+                stroke-width="0.3"
+                font-size="0.9em"
+                transform="rotate(90)">
+            {{ storyProgress }}%
+          </text>
+        </svg>
+        <p class="story-status-element">{{storyStatus}}</p>
+      </div>
+      <div class="oppia-story-title" dir="ltr" *ngIf="checkTabletView()">
+        <strong class="title-text">
+          <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">{{ storyTitle }} </a>
+        </strong>
+        <span dir="auto" class="oppia-chapters-count">
+          <p class="oppia-chapters-count-text" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:nodeCount, messageFormat: true}"></p>
+        </span>
+      </div>
+      <div (click)="showAllChapters()"
+           *ngIf="showButton && (chaptersDisplayed < nodeCount)"
+           class="view-button">
+        <span class="fas fa-caret-down down-caret-position"></span>
+      </div>
+      <div (click)="hideExtraChapters()"
+           *ngIf="showButton && (chaptersDisplayed === nodeCount)"
+           class="view-button">
+        <span class="fas fa-caret-up up-caret-position"></span>
+      </div>
+    </div>
+    <div class="chapters-container-box chapter-container" *ngIf="checkTabletView()">
+      <div *ngFor="let title of nodeTitles;let idx = index">
+        <div class="story-details-box chapter-specific-box" *ngIf="idx < chaptersDisplayed">
+          <div class="chapter-icon">
+            <span class="chapter-icon-number">{{ idx + 1 }}</span>
+          </div>
+          <div class="chapter-text">
+            <a [href]="getChapterUrl(title)" rel="noopener" target="_blank">
+              <span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">
+                {{ title }}
+              </span>
+              <span dir="auto" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
+                {{ nodeTitlesTranslationKeys[idx] | translate }}
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chapter-details" *ngIf="!checkTabletView()">
+      <div class="chapter-title"
+           *ngFor="let title of nodeTitles;let idx = index">
+        <div *ngIf="storySummary.isNodeCompleted(title)" class="fas fa-check completed-icon">
+        </div>
+        <div [ngClass]="{'border-bottom': idx < chaptersDisplayed, 'pending-chapter': !storySummary.isNodeCompleted(title) && isPreviousChapterCompleted(idx), 'incomplete-chapter': !storySummary.isNodeCompleted(title), 'complete-chapter': storySummary.isNodeCompleted(title)}"
+             *ngIf="idx < chaptersDisplayed">
+          <a [href]="getChapterUrl(title)" rel="noopener">
+            <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
+            </span>&nbsp;<span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;<span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">{{ title }}</span>
+            <span dir="auto" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
+              {{ nodeTitlesTranslationKeys[idx] | translate }}
+            </span>
+          </a>
+        </div>
+      </div>
+      <div (click)="showAllChapters()"
+           *ngIf="showButton && (chaptersDisplayed < nodeCount)"
+           class="view-button">
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_VIEW_ALL' | translate"></span>
+        <span class="fas fa-caret-down down-caret-position"></span>
+      </div>
+      <div (click)="hideExtraChapters()"
+           *ngIf="showButton && (chaptersDisplayed === nodeCount)"
+           class="view-button">
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_VIEW_LESS' | translate"></span>
+        <span class="fas fa-caret-up up-caret-position"></span>
+      </div>
+    </div>
+  </div>
+</div>

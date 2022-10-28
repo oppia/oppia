@@ -1,0 +1,217 @@
+<div class="oppia-osk-container" *ngIf="showOSK()" (click)="activateGuppy()">
+  <div class="oppia-osk-container" (click)="activateGuppy()">
+    <div class="oppia-osk-navbar">
+      <button [ngClass]="(currentTab === mainTab) ? 'oppia-osk-btn-tab-active' : 'oppia-osk-btn-tab-inactive'" (click)="changeTab(mainTab)">
+        123
+      </button>
+      <button [ngClass]="(currentTab === functionsTab) ? 'oppia-osk-btn-tab-active' : 'oppia-osk-btn-tab-inactive'" (click)="changeTab(functionsTab)">
+        f(x)
+      </button>
+      <button class="oppia-osk-btn-hide" (click)="hideOSK()">
+        HIDE <i class="fa fa-angle-down"></i>
+      </button>
+    </div>
+    <div class="oppia-osk-custom-letters-div" *ngIf="interactionType !== 'NumericExpressionInput' && currentTab === mainTab">
+      <button class="oppia-osk-btn-letter" (click)="insertString(letter)" *ngFor="let letter of customLetters">{{letter}}</button>
+    </div>
+    <div class="oppia-osk-main-tab" *ngIf="currentTab===mainTab">
+      <button class="oppia-osk-btn-number number-7" (click)="insertString('7')">7</button>
+      <button class="oppia-osk-btn-number number-8" (click)="insertString('8')">8</button>
+      <button class="oppia-osk-btn-number number-9" (click)="insertString('9')">9</button>
+      <button class="oppia-osk-btn-operator" (click)="insertString('+')">+</button>
+      <button class="oppia-osk-btn-operator" (click)="insertString('*')">×</button>
+      <button class="oppia-osk-btn-number number-4" (click)="insertString('4')">4</button>
+      <button class="oppia-osk-btn-number number-5" (click)="insertString('5')">5</button>
+      <button class="oppia-osk-btn-number number-6" (click)="insertString('6')">6</button>
+      <button class="oppia-osk-btn-operator" (click)="insertString('-')">-</button>
+      <img [src]="getStaticImageUrl('/icons/osk-fraction.svg')" class="oppia-osk-btn-operator" alt="÷" (click)="insertSymbol('frac')">
+      <button class="oppia-osk-btn-number number-1" (click)="insertString('1')">1</button>
+      <button class="oppia-osk-btn-number number-2" (click)="insertString('2')">2</button>
+      <button class="oppia-osk-btn-number number-3" (click)="insertString('3')">3</button>
+      <img [src]="getStaticImageUrl('/icons/osk-radical-2.svg')" class="oppia-osk-btn-shortcut" alt="sqrt" (click)="insertString('sqrt')">
+      <img [src]="getStaticImageUrl('/icons/osk-exponent.svg')" class="oppia-osk-btn-shortcut" alt="^" (click)="insertSymbol('exp')">
+      <button class="oppia-osk-btn-number" (click)="insertString('.')">.</button>
+      <button class="oppia-osk-btn-number number-0" (click)="insertString('0')">0</button>
+      <img [src]="getStaticImageUrl('/icons/osk-delete.svg')" class="oppia-osk-btn-delete" alt="delete" (click)="backspace()">
+      <button class="oppia-osk-btn-number" (click)="left()">
+        <i class="fa fa-angle-left"></i>
+      </button>
+      <button class="oppia-osk-btn-number" (click)="right()">
+        <i class="fa fa-angle-right"></i>
+      </button>
+    </div>
+    <div class="oppia-osk-functions-tab" *ngIf="currentTab===functionsTab">
+      <button class="oppia-osk-btn-operator" (click)="insertSymbol('paren')">()</button>
+      <button class="oppia-osk-btn-operator" (click)="insertString('abs')">||</button>
+      <button *ngIf="interactionType === 'MathEquationInput'" class="oppia-osk-btn-operator" (click)="insertString('=')">=</button>
+      <img [src]="getStaticImageUrl('/icons/osk-exponent-2.svg')" class="oppia-osk-btn-shortcut" alt="^2" (click)="exponent('2')">
+      <img [src]="getStaticImageUrl('/icons/osk-exponent-3.svg')" class="oppia-osk-btn-shortcut" alt="^3" (click)="exponent('3')">
+      <button class="oppia-osk-btn-function" (click)="insertString(function)" *ngFor="let function of functions">{{function}}</button>
+      <img [src]="getStaticImageUrl('/icons/osk-delete.svg')" class="oppia-osk-btn-delete" alt="delete" (click)="backspace()">
+    </div>
+  </div>
+</div>
+
+<style>
+  .oppia-osk-container {
+    background: #fff;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    position: sticky;
+    right: 0;
+    z-index: 10000;
+  }
+
+  .oppia-osk-container button {
+    outline: none;
+    padding: 11.2px 0;
+  }
+
+  .oppia-osk-container i {
+    opacity: 60%;
+  }
+
+  .oppia-osk-navbar {
+    background-color: #fff;
+    border-bottom: #d3d3d3 4px solid;
+    border-top: #808080 3px solid;
+    min-height: 56px;
+  }
+
+  .oppia-osk-main-tab {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(4, 5em);
+  }
+
+  .oppia-osk-custom-letters-div {
+    align-items: center;
+    background-color: #ebffe4;
+    border-bottom: #d3d3d3 4px solid;
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .oppia-osk-custom-letters-div button {
+    flex: 0 0 auto;
+  }
+
+  .oppia-osk-letters-tab {
+    padding: 10px 0;
+    text-align: center;
+  }
+
+  .oppia-osk-functions-tab {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(4, 5em);
+  }
+
+  .oppia-osk-main-tab img,
+  .oppia-osk-functions-tab img {
+    min-height: 64px;
+    width: -webkit-fill-available;
+  }
+
+  .oppia-osk-custom-letters-div button:active,
+  .oppia-osk-main-tab button:active,
+  .oppia-osk-functions-tab button:active,
+  .oppia-osk-container img:active {
+    background-color: #019b8b;
+    border: none;
+  }
+
+  .oppia-osk-btn-tab-active {
+    background-color: transparent;
+    border: none;
+    border-bottom: 3px #015c53 solid;
+    color: #015c53;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 19px;
+    margin: 0 10px;
+  }
+
+  .oppia-osk-btn-tab-inactive {
+    background-color: transparent;
+    border: none;
+    color: #000;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 19px;
+    margin: 0 10px;
+  }
+
+  .oppia-osk-btn-hide {
+    background-color: transparent;
+    border: none;
+    color: #015c53;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 19px;
+    position: absolute;
+    right: 16px;
+    vertical-align: middle;
+  }
+
+  .oppia-osk-btn-hide i {
+    margin: 3.2px;
+  }
+
+  .oppia-osk-btn-number {
+    background-color: #fff;
+    border: 1px #d3d3d3 solid;
+    color: #000;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 25px;
+  }
+
+  .oppia-osk-btn-operator {
+    align-items: center;
+    background-color: #ffffcb;
+    border: 1px #d3d3d3 solid;
+    color: #000;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 25px;
+  }
+
+  .oppia-osk-btn-function {
+    background-color: #fff;
+    border: 1px #d3d3d3 solid;
+    color: #000;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 15px;
+  }
+
+  .oppia-osk-btn-shortcut {
+    background-color: #e4ffcb;
+    border: 1px #d3d3d3 solid;
+    color: #000;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 25px;
+  }
+
+  .oppia-osk-btn-letter {
+    background-color: inherit;
+    border: none;
+    color: #000;
+    font-family: 'Noto Serif', serif;
+    font-size: 25px;
+    width: 10%;
+  }
+
+  .number-9,
+  .number-6,
+  .number-3 {
+    border-right: 3px #808080 solid;
+  }
+
+  .number-3,
+  .number-1 {
+    border-bottom: 3px #808080 solid;
+  }
+
+  .number-0 {
+    border-bottom: 3px #808080 solid;
+    border-left: 3px #808080 solid;
+    border-right: 3px #808080 solid;
+  }
+</style>

@@ -1,0 +1,25 @@
+<div *ngIf="responses.length === 0">
+  <em>No choices selected.</em>
+</div>
+
+<div *ngIf="responses.length === 1" class="item-selection-input-response-content">
+  <oppia-rte-output-display [rteString]="responses[0]">
+  </oppia-rte-output-display>
+</div>
+
+<ul *ngIf="responses.length > 1" class="item-selection-input-response-content">
+  <li *ngFor="let response of responses; index as idx">
+    <div>
+      <oppia-rte-output-display [rteString]="response">
+      </oppia-rte-output-display>
+    </div>
+  </li>
+</ul>
+
+
+<style>
+  .item-selection-input-response-content img {
+    max-height: 100px;
+    object-fit: contain;
+  }
+</style>

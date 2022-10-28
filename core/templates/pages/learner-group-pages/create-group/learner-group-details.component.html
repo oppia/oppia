@@ -1,0 +1,26 @@
+<div class="oppia-learner-group-details">
+  <div class="form-group">
+    <b>{{ 'I18N_LEARNER_GROUP_DETAILS_GROUP_TITLE' | translate }}<span class="required-field">*</span></b>
+    <input class="form-control"
+           type="text"
+           [(ngModel)]="learnerGroupTitle"
+           (ngModelChange)="updateGroupTitle($event)"
+           tabindex="0"
+           [attr.aria-invalid]="false"
+           required="true"
+           [readonly]="isReadOnlyModeActive()">
+  </div>
+  <div class="form-group oppia-long-text">
+    <b>{{ 'I18N_LEARNER_GROUP_DETAILS_GROUP_DESCRIPTION' | translate }}<span class="required-field">*</span></b>
+    <textarea rows="3"
+              cols="50"
+              [maxlength]="250"
+              [(ngModel)]="learnerGroupDescription"
+              (ngModelChange)="updateGroupDescription($event)"
+              class="form-control"
+              autofocus
+              required="true"
+              [readonly]="isReadOnlyModeActive()">
+    </textarea>
+  </div>
+</div>

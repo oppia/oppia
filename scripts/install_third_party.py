@@ -14,28 +14,28 @@
 
 """Installation script for Oppia third-party libraries."""
 
-import StringIO
+from __future__ import annotations
+
+import argparse
 import contextlib
+import io
 import json
 import os
+import subprocess
 import sys
 import tarfile
 import urllib
-import urllib2
 import zipfile
 
-import common  # pylint: disable=relative-import
+from core import utils
 
-# These two lines prevent a "IOError: [Errno socket error]
-# [Errno -2] Name or service not known" error
-# in urllib.urlretrieve, if the user is behind a proxy.
-if 'VAGRANT' in os.environ:
-    os.environ['http_proxy'] = ''
+from . import common
+from . import install_python_prod_dependencies
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 THIRD_PARTY_STATIC_DIR = os.path.join(THIRD_PARTY_DIR, 'static')
-MANIFEST_FILE_PATH = os.path.join(os.getcwd(), 'manifest.json')
+DEPENDENCIES_FILE_PATH = os.path.join(os.getcwd(), 'dependencies.json')
 
 # Place to download zip files for temporary storage.
 TMP_UNZIP_PATH = os.path.join('.', 'tmp_unzip.zip')
@@ -45,8 +45,8 @@ TMP_UNZIP_PATH = os.path.join('.', 'tmp_unzip.zip')
 common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
 TARGET_DOWNLOAD_DIRS = {
+    'proto': THIRD_PARTY_DIR,
     'frontend': THIRD_PARTY_STATIC_DIR,
-    'backend': THIRD_PARTY_DIR,
     'oppiaTools': TOOLS_DIR
 }
 
@@ -54,7 +54,7 @@ _DOWNLOAD_FORMAT_ZIP = 'zip'
 _DOWNLOAD_FORMAT_TAR = 'tar'
 _DOWNLOAD_FORMAT_FILES = 'files'
 
-DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
+DOWNLOAD_FORMATS_TO_DEPENDENCIES_KEYS = {
     'zip': {
         'mandatory_keys': ['version', 'url', 'downloadFormat'],
         'optional_key_pairs': [
@@ -74,6 +74,11 @@ DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
     }
 }
 
+_PARSER = argparse.ArgumentParser(
+    description="""
+Installation script for Oppia third-party libraries.
+""")
+
 
 def download_files(source_url_root, target_dir, source_filenames):
     """Downloads a group of files and saves them to a given directory.
@@ -81,23 +86,24 @@ def download_files(source_url_root, target_dir, source_filenames):
     Each file is downloaded only if it does not already exist.
 
     Args:
-      source_url_root: the URL to prepend to all the filenames.
-      target_dir: the directory to save the files to.
-      source_filenames: a list of filenames. Each filename is appended to the
-        end of the source_url_root in order to give the URL from which to
-        download the file. The downloaded file is then placed in target_dir,
-        and retains the same filename.
+        source_url_root: str. The URL to prepend to all the filenames.
+        target_dir: str. The directory to save the files to.
+        source_filenames: list(str). Each filename is appended to the
+            end of the source_url_root in order to give the URL from which to
+            download the file. The downloaded file is then placed in target_dir,
+            and retains the same filename.
     """
-    assert isinstance(source_filenames, list)
+    assert isinstance(source_filenames, list), (
+        'Expected list of filenames, got \'%s\'' % source_filenames)
     common.ensure_directory_exists(target_dir)
     for filename in source_filenames:
         if not os.path.exists(os.path.join(target_dir, filename)):
-            print 'Downloading file %s to %s ...' % (filename, target_dir)
-            urllib.urlretrieve(
+            print('Downloading file %s to %s ...' % (filename, target_dir))
+            common.url_retrieve(
                 '%s/%s' % (source_url_root, filename),
-                filename=os.path.join(target_dir, filename))
+                os.path.join(target_dir, filename))
 
-            print 'Download of %s succeeded.' % filename
+            print('Download of %s succeeded.' % filename)
 
 
 def download_and_unzip_files(
@@ -111,18 +117,20 @@ def download_and_unzip_files(
     one folder.
 
     Args:
-      source_url: the URL from which to download the zip file.
-      target_parent_dir: the directory to save the contents of the zip file to.
-      zip_root_name: the name of the top-level folder in the zip directory.
-      target_root_name: the name that the top-level folder should be renamed to
-        in the local directory.
+        source_url: str. The URL from which to download the zip file.
+        target_parent_dir: str. The directory to save the contents of the zip
+            file to.
+        zip_root_name: str. The name of the top-level folder in the zip
+            directory.
+        target_root_name: str. The name that the top-level folder should be
+            renamed to in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
-        print 'Downloading and unzipping file %s to %s ...' % (
-            zip_root_name, target_parent_dir)
+        print('Downloading and unzipping file %s to %s ...' % (
+            zip_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        urllib.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        common.url_retrieve(source_url, TMP_UNZIP_PATH)
 
         try:
             with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as zfile:
@@ -133,11 +141,11 @@ def download_and_unzip_files(
                 os.remove(TMP_UNZIP_PATH)
 
             # Some downloads (like jqueryui-themes) may require a user-agent.
-            req = urllib2.Request(source_url)
+            req = urllib.request.Request(source_url, None, {})
             req.add_header('User-agent', 'python')
             # This is needed to get a seekable filestream that can be used
             # by zipfile.ZipFile.
-            file_stream = StringIO.StringIO(urllib2.urlopen(req).read())
+            file_stream = io.StringIO(utils.url_open(req).read())
             with zipfile.ZipFile(file_stream, 'r') as zfile:
                 zfile.extractall(path=target_parent_dir)
 
@@ -146,7 +154,7 @@ def download_and_unzip_files(
             os.path.join(target_parent_dir, zip_root_name),
             os.path.join(target_parent_dir, target_root_name))
 
-        print 'Download of %s succeeded.' % zip_root_name
+        print('Download of %s succeeded.' % zip_root_name)
 
 
 def download_and_untar_files(
@@ -160,18 +168,20 @@ def download_and_untar_files(
     one folder.
 
     Args:
-      source_url: the URL from which to download the tar file.
-      target_parent_dir: the directory to save the contents of the tar file to.
-      tar_root_name: the name of the top-level folder in the tar directory.
-      target_root_name: the name that the top-level folder should be renamed to
-        in the local directory.
+        source_url: str. The URL from which to download the tar file.
+        target_parent_dir: str. The directory to save the contents of the tar
+            file to.
+        tar_root_name: str. The name of the top-level folder in the tar
+            directory.
+        target_root_name: str. The name that the top-level folder should be
+            renamed to in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
-        print 'Downloading and untarring file %s to %s ...' % (
-            tar_root_name, target_parent_dir)
+        print('Downloading and untarring file %s to %s ...' % (
+            tar_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        urllib.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        common.url_retrieve(source_url, TMP_UNZIP_PATH)
         with contextlib.closing(tarfile.open(
             name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
             tfile.extractall(target_parent_dir)
@@ -182,61 +192,65 @@ def download_and_untar_files(
             os.path.join(target_parent_dir, tar_root_name),
             os.path.join(target_parent_dir, target_root_name))
 
-        print 'Download of %s succeeded.' % tar_root_name
+        print('Download of %s succeeded.' % tar_root_name)
 
 
 def get_file_contents(filepath, mode='r'):
     """Gets the contents of a file, given a relative filepath from oppia/."""
-    with open(filepath, mode) as f:
-        return f.read().decode('utf-8')
+    with utils.open_file(filepath, mode) as f:
+        return f.read()
 
 
 def return_json(filepath):
     """Return json object when provided url
+
     Args:
-        filepath: the path to the json file.
-    Return:
-        a parsed json objects.
+        filepath: str. The path to the json file.
+
+    Returns:
+        *. A parsed json object. Actual conversion is different based on input
+        to json.loads. More details can be found here:
+            https://docs.python.org/3/library/json.html#encoders-and-decoders.
     """
     response = get_file_contents(filepath)
     return json.loads(response)
 
 
-def test_manifest_syntax(dependency_type, dependency_dict):
-    """This checks syntax of the manifest.json dependencies.
-
+def test_dependencies_syntax(dependency_type, dependency_dict):
+    """This checks syntax of the dependencies.json dependencies.
     Display warning message when there is an error and terminate the program.
+
     Args:
-      dependency_type: str. Dependency download format.
-      dependency_dict: dict. manifest.json dependency dict.
+        dependency_type: str. Dependency download format.
+        dependency_dict: dict. A dependencies.json dependency dict.
     """
-    keys = dependency_dict.keys()
-    mandatory_keys = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
+    keys = list(dependency_dict.keys())
+    mandatory_keys = DOWNLOAD_FORMATS_TO_DEPENDENCIES_KEYS[
         dependency_type]['mandatory_keys']
     # Optional keys requires exactly one member of the pair
     # to be available as a key in the dependency_dict.
-    optional_key_pairs = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
+    optional_key_pairs = DOWNLOAD_FORMATS_TO_DEPENDENCIES_KEYS[
         dependency_type]['optional_key_pairs']
     for key in mandatory_keys:
         if key not in keys:
-            print '------------------------------------------'
-            print 'There is syntax error in this dependency'
-            print dependency_dict
-            print 'This key is missing or misspelled: "%s".' % key
-            print 'Exiting'
+            print('------------------------------------------')
+            print('There is syntax error in this dependency')
+            print(dependency_dict)
+            print('This key is missing or misspelled: "%s".' % key)
+            print('Exiting')
             sys.exit(1)
     if optional_key_pairs:
         for optional_keys in optional_key_pairs:
             optional_keys_in_dict = [
                 key for key in optional_keys if key in keys]
             if len(optional_keys_in_dict) != 1:
-                print '------------------------------------------'
-                print 'There is syntax error in this dependency'
-                print dependency_dict
-                print (
+                print('------------------------------------------')
+                print('There is syntax error in this dependency')
+                print(dependency_dict)
+                print(
                     'Only one of these keys pair must be used: "%s".'
-                    % str(optional_keys))
-                print 'Exiting'
+                    % ', '.join(optional_keys))
+                print('Exiting')
                 sys.exit(1)
 
     # Checks the validity of the URL corresponding to the file format.
@@ -249,22 +263,26 @@ def test_manifest_syntax(dependency_type, dependency_dict):
             is_zip_file_format and not dependency_url.endswith('.zip') or
             dependency_url.endswith('.tar.gz') and not is_tar_file_format or
             is_tar_file_format and not dependency_url.endswith('.tar.gz')):
-        print '------------------------------------------'
-        print 'There is syntax error in this dependency'
-        print dependency_dict
-        print 'This url  %s is invalid for %s file format.' % (
-            dependency_url, dependency_type)
-        print 'Exiting.'
+        print('------------------------------------------')
+        print('There is syntax error in this dependency')
+        print(dependency_dict)
+        print('This url %s is invalid for %s file format.' % (
+            dependency_url, dependency_type))
+        print('Exiting.')
         sys.exit(1)
 
 
-def validate_manifest(filepath):
-    """This validates syntax of the manifest.json
+def validate_dependencies(filepath):
+    """This validates syntax of the dependencies.json
+
     Args:
-      filepath: the path to the json file.
+        filepath: str. The path to the json file.
+
+    Raises:
+        Exception. The 'downloadFormat' not specified.
     """
-    manifest_data = return_json(filepath)
-    dependencies = manifest_data['dependencies']
+    dependencies_data = return_json(filepath)
+    dependencies = dependencies_data['dependencies']
     for _, dependency in dependencies.items():
         for _, dependency_contents in dependency.items():
             if 'downloadFormat' not in dependency_contents:
@@ -272,17 +290,18 @@ def validate_manifest(filepath):
                     'downloadFormat not specified in %s' %
                     dependency_contents)
             download_format = dependency_contents['downloadFormat']
-            test_manifest_syntax(download_format, dependency_contents)
+            test_dependencies_syntax(download_format, dependency_contents)
 
 
-def download_manifest_files(filepath):
-    """This download all files to the required folders
+def download_all_dependencies(filepath):
+    """This download all files to the required folders.
+
     Args:
-      filepath: the path to the json file.
+        filepath: str. The path to the json file.
     """
-    validate_manifest(filepath)
-    manifest_data = return_json(filepath)
-    dependencies = manifest_data['dependencies']
+    validate_dependencies(filepath)
+    dependencies_data = return_json(filepath)
+    dependencies = dependencies_data['dependencies']
     for data, dependency in dependencies.items():
         for _, dependency_contents in dependency.items():
             dependency_rev = dependency_contents['version']
@@ -316,6 +335,7 @@ def download_manifest_files(filepath):
             elif download_format == _DOWNLOAD_FORMAT_TAR:
                 dependency_tar_root_name = (
                     dependency_contents['tarRootDirPrefix'] + dependency_rev)
+
                 dependency_target_root_name = (
                     dependency_contents['targetDirPrefix'] + dependency_rev)
                 download_and_untar_files(
@@ -323,10 +343,128 @@ def download_manifest_files(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 
-def _install_third_party_libs():
+def install_elasticsearch_dev_server():
+    """This installs a local ElasticSearch server to the oppia_tools
+    directory to be used by development servers and backend tests.
+    """
+    try:
+        subprocess.call(
+            ['%s/bin/elasticsearch' % common.ES_PATH, '--version'],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            # Set the minimum heap size to 100 MB and maximum to 500 MB.
+            env={'ES_JAVA_OPTS': '-Xms100m -Xmx500m'}
+        )
+        print('ElasticSearch is already installed.')
+        return
+    except OSError:
+        print('Installing ElasticSearch...')
+
+    if common.is_mac_os() or common.is_linux_os():
+        file_ext = 'tar.gz'
+        def download_and_extract(*args):
+            """This downloads and extracts the elasticsearch files."""
+            download_and_untar_files(*args)
+    elif common.is_windows_os():
+        file_ext = 'zip'
+        def download_and_extract(*args):
+            """This downloads and extracts the elasticsearch files."""
+            download_and_unzip_files(*args)
+    else:
+        raise Exception('Unrecognized or unsupported operating system.')
+
+    download_and_extract(
+        'https://artifacts.elastic.co/downloads/elasticsearch/' +
+        'elasticsearch-%s-%s-x86_64.%s' % (
+            common.ELASTICSEARCH_VERSION,
+            common.OS_NAME.lower(),
+            file_ext
+        ),
+        TARGET_DOWNLOAD_DIRS['oppiaTools'],
+        'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
+        'elasticsearch-%s' % common.ELASTICSEARCH_VERSION
+    )
+    print('ElasticSearch installed successfully.')
+
+
+def install_redis_cli():
+    """This installs the redis-cli to the local oppia third_party directory so
+    that development servers and backend tests can make use of a local redis
+    cache. Redis-cli installed here (redis-cli-6.0.6) is different from the
+    redis package installed in dependencies.json (redis-3.5.3). The redis-3.5.3
+    package detailed in dependencies.json is the Python library that allows
+    users to communicate with any Redis cache using Python. The redis-cli-6.0.6
+    package installed in this function contains C++ scripts for the redis-cli
+    and redis-server programs detailed below.
+
+    The redis-cli program is the command line interface that serves up an
+    interpreter that allows users to connect to a redis database cache and
+    query the cache using the Redis CLI API. It also contains functionality to
+    shutdown the redis server. We need to install redis-cli separately from the
+    default installation of backend libraries since it is a system program and
+    we need to build the program files after the library is untarred.
+
+    The redis-server starts a Redis database on the local machine that can be
+    queried using either the Python redis library or the redis-cli interpreter.
+    """
+    try:
+        subprocess.call(
+            [common.REDIS_SERVER_PATH, '--version'],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        print('Redis-cli is already installed.')
+    except OSError:
+        # The redis-cli is not installed, run the script to install it.
+        # NOTE: We do the installation here since we need to use make.
+        print('Installing redis-cli...')
+
+        download_and_untar_files(
+            ('https://download.redis.io/releases/redis-%s.tar.gz') %
+            common.REDIS_CLI_VERSION,
+            TARGET_DOWNLOAD_DIRS['oppiaTools'],
+            'redis-%s' % common.REDIS_CLI_VERSION,
+            'redis-cli-%s' % common.REDIS_CLI_VERSION)
+
+        # Temporarily change the working directory to redis-cli-6.0.6 so we can
+        # build the source code.
+        with common.CD(
+            os.path.join(
+                TARGET_DOWNLOAD_DIRS['oppiaTools'],
+                'redis-cli-%s' % common.REDIS_CLI_VERSION)):
+            # Build the scripts necessary to start the redis server.
+            # The make command only builds the C++ files in the src/ folder
+            # without modifying anything outside of the oppia root directory.
+            # It will build the redis-cli and redis-server files so that we can
+            # run the server from inside the oppia folder by executing the
+            # script src/redis-cli and src/redis-server.
+            subprocess.call(['make'])
+
+        # Make the scripts executable.
+        subprocess.call([
+            'chmod', '+x', common.REDIS_SERVER_PATH])
+        subprocess.call([
+            'chmod', '+x', common.REDIS_CLI_PATH])
+
+        print('Redis-cli installed successfully.')
+
+
+def main(args=None):
     """Installs all the third party libraries."""
-    download_manifest_files(MANIFEST_FILE_PATH)
+    if common.is_windows_os():
+        # The redis cli is not compatible with Windows machines.
+        raise Exception(
+            'The redis command line interface will not be installed because '
+            'your machine is on the Windows operating system.')
+    unused_parsed_args = _PARSER.parse_args(args=args)
+    install_python_prod_dependencies.main()
+    download_all_dependencies(DEPENDENCIES_FILE_PATH)
+    install_redis_cli()
+    install_elasticsearch_dev_server()
 
 
-if __name__ == '__main__':
-    _install_third_party_libs()
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when install_third_party.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
+    main()

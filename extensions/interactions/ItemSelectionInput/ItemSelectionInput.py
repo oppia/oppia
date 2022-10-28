@@ -16,26 +16,34 @@
 
 """Python configuration for ItemSelectionInput interaction."""
 
+from __future__ import annotations
+
 from extensions.interactions import base
+
+from typing import List
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
 
 
 class ItemSelectionInput(base.BaseInteraction):
     """Interaction for item selection input."""
 
-    name = 'Item Selection'
-    description = (
+    name: str = 'Item Selection'
+    description: str = (
         'Allows learners to select various options.')
-    display_mode = base.DISPLAY_MODE_INLINE
-    _dependency_ids = []
-    answer_type = 'SetOfHtmlString'
+    display_mode: str = base.DISPLAY_MODE_INLINE
+    _dependency_ids: List[str] = []
+    answer_type: str = 'SetOfTranslatableHtmlContentIds'
     # Radio buttons get unselected when specifying a solution. This needs to be
     # fixed before solution feature can support this interaction.
-    can_have_solution = False
+    can_have_solution: bool = False
     # ItemSelectionInput's submit button is dynamic and is handled
     # separately.
-    show_generic_submit_button = False
+    show_generic_submit_button: bool = False
 
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'minAllowableSelectionCount',
         'description': 'Minimum number of selections permitted.',
         'schema': {
@@ -62,21 +70,33 @@ class ItemSelectionInput(base.BaseInteraction):
         'description': 'Items for selection',
         'schema': {
             'type': 'list',
+            'validators': [{
+                'id': 'has_unique_subtitled_contents'
+            }],
             'items': {
-                'type': 'html',
-                'ui_config': {
-                    'hide_complex_extensions': True,
-                    'placeholder': 'Sample item answer',
-                },
+                'type': 'custom',
+                'obj_type': 'SubtitledHtml',
+                'validators': [{
+                    'id': 'has_subtitled_html_non_empty'
+                }],
+                'replacement_ui_config': {
+                    'html': {
+                        'hide_complex_extensions': True,
+                        'placeholder': 'Sample item answer',
+                    }
+                }
             },
             'ui_config': {
                 'add_element_text': 'Add item for selection',
             }
         },
-        'default_value': [''],
+        'default_value': [{
+            'content_id': None,
+            'html': ''
+        }],
     }]
 
-    _answer_visualization_specs = [{
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
         # Table with keyed answer counts for top N answers.
         'id': 'EnumeratedFrequencyTable',
         'options': {

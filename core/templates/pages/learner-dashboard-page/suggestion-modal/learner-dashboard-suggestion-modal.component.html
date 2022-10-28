@@ -1,0 +1,46 @@
+<div class="modal-header">
+  <h3 [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT' | translate"></h3>
+</div>
+
+<div class="modal-body oppia-learner-dashboard-suggestion-body">
+  <section class="oppia-suggestion-review-container">
+    <div class="oppia-suggestion-review-panel-container float-left">
+      <strong [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTION_CURRENT_STATE_CONTENT_HEADER' | translate"></strong>
+      <div class="oppia-suggestion-review-panel">
+        <div>
+          <oppia-rte-output-display *ngIf="oldContent" [rteString]="oldContent">
+          </oppia-rte-output-display>
+        </div>
+        <div *ngIf="!oldContent" class="oppia-no-current-state" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTION_NO_CURRENT_STATE' | translate"></div>
+      </div>
+    </div>
+    <div class="oppia-suggestion-review-panel-container float-right">
+      <strong [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTION_SUGGESTED_STATE_CONTENT_HEADER' | translate"></strong>
+      <div class="oppia-suggestion-review-panel">
+        <oppia-rte-output-display [rteString]="newContent">
+        </oppia-rte-output-display>
+      </div>
+    </div>
+  </section>
+  <div class="oppia-dashboard-suggestin-description-text">
+    <span [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTION_DESCRIPTION' | translate"></span>
+    <div class="oppia-suggestion-review-panel">
+      <oppia-rte-output-display [rteString]="description">
+      </oppia-rte-output-display>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()" [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"></button>
+</div>
+<style>
+  .oppia-learner-dashboard-suggestion-body .oppia-no-current-state {
+    color: red;
+  }
+  .oppia-learner-dashboard-suggestion-body .oppia-dashboard-suggestin-description-text {
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 20px;
+  }
+</style>

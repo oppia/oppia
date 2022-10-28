@@ -16,41 +16,65 @@
 
 """Custom value generator classes."""
 
+from __future__ import annotations
+
 import copy
 
+from core import utils
 from core.domain import value_generators_domain
-import jinja_utils
-import utils
+
+from typing import Dict, List, Optional
 
 
 class Copier(value_generators_domain.BaseValueGenerator):
     """Returns a copy of the input value."""
 
-    default_value = ''
+    default_value: str = ''
 
-    def generate_value(self, context_params, value, parse_with_jinja=False):
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with super class's generate_value method, because in the super
+    # class's method we are allowing arbitrary numbers of arguments with
+    # *args and **kwargs but here we are specifying only limited arguments.
+    # So, due to this conflict in arguments definitions, a conflict in
+    # signatures occurred which causes MyPy to throw an error. Thus, to
+    # avoid the error, we used ignore here.
+    def generate_value(  # type: ignore[override]
+        self,
+        unused_context_params: Optional[Dict[str, str]],
+        value: str,
+        parse_with_jinja: bool = False  # pylint: disable=unused-argument
+    ) -> str:
         """Returns a copy of the input value.
 
-        If parse_with_jinja is True, strings within the input value are treated
-        as templates and parsed against context_params. The output will be a
-        unicode string.
+        Args:
+            unused_context_params: dict. Context params parsed with input
+                value which is treated as a template. Not used.
+            value: str. Value whose copy should be returned.
+            parse_with_jinja: bool. It is a part of ParamChange object.
+                The parsing of input value against context_params
+                based on parse_with_jinja is done in the FE. Not used.
 
-        If parse_with_jinja is False, the input value is copied and returned
-        without changing its type.
+        Returns:
+            str. Copy of the input value.
         """
-        if context_params is None:
-            context_params = {}
-
-        if parse_with_jinja:
-            return jinja_utils.evaluate_object(value, context_params)
-        else:
-            return copy.deepcopy(value)
+        return copy.deepcopy(value)
 
 
 class RandomSelector(value_generators_domain.BaseValueGenerator):
     """Returns a random value from the input list."""
 
-    default_value = ''
+    default_value: str = ''
 
-    def generate_value(self, unused_context_params, list_of_values):
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with super class's generate_value method, because in the super
+    # class's method we are allowing arbitrary numbers of arguments with
+    # *args and **kwargs but here we are specifying only limited arguments.
+    # So, due to this conflict in arguments definitions, a conflict in
+    # signatures occurred which causes MyPy to throw an error. Thus, to
+    # avoid the error, we used ignore here.
+    def generate_value(  # type: ignore[override]
+        self,
+        unused_context_params: Dict[str, str],
+        list_of_values: List[str]
+    ) -> str:
         return copy.deepcopy(utils.get_random_choice(list_of_values))

@@ -1,0 +1,120 @@
+<style>
+  .oppia-param-editor-row {
+    margin-bottom: 15px;
+    position: relative;
+  }
+  .oppia-param-display-row {
+    margin-bottom: 4px;
+  }
+  .oppia-param-change-sort-handle {
+    cursor: move;
+    left: -20px;
+    opacity: 0.3;
+    position: absolute;
+    top: 4px;
+  }
+  .oppia-delete-param-change-button {
+    background: none;
+    border: 0;
+    color: #000;
+    cursor: pointer;
+    height: 30px;
+    opacity: 0.5;
+    position: absolute;
+    right: -30px;
+    top: 0;
+    width: 30px;
+  }
+  .oppia-delete-param-change-button:hover {
+    opacity: 1;
+  }
+  .oppia-form-control {
+    display: inline;
+    width: 110px;
+  }
+  .oppia-serious-warning-text-container {
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+  .oppia-card-parameter {
+    opacity: 0.7;
+  }
+</style>
+
+<!--
+  We do not track by index here, because if we do, then the select2 dropdown
+  will not update when elements are swapped or deleted.
+-->
+<div *ngIf="isParamChangesEditorOpen && editabilityService.isEditableOutsideTutorialMode()">
+  <div cdkDropList
+       (cdkDropListDropped)="drop($event)"
+       class="oppia-param-change-draggable-area">
+    <div *ngFor="let paramChange of paramChangesService.displayed; let index = index"
+         cdkDrag
+         class="oppia-param-editor-row e2e-test-param-changes-list">
+      <span class="oppia-param-change-sort-handle" *ngIf="paramChangesService.displayed.length > 1">
+        <picture>
+          <source type="image/webp" [src]="getStaticImageUrl('/general/drag_dots.webp')">
+          <source type="image/png" [src]="getStaticImageUrl('/general/drag_dots.png')">
+          <img *ngIf="editabilityService.isEditable()" [src]="getStaticImageUrl('/general/drag_dots.png')" width="10">
+        </picture>
+      </span>
+      <span>
+        Change
+        <select class="form-control e2e-test-history-version-dropdown-first"
+                [(ngModel)]="paramChange.generatorId"
+                (change)="onChangeGeneratorType(paramChange)">
+          <option *ngFor="let choice of PREAMBLE_TEXT | keyvalue; index as index" [value]="choice.key">{{ choice.value }}</option>
+        </select>
+        <br>
+        <oppia-value-generator-editor [generatorId]="paramChange.generatorId"
+                                      [customizationArgs]="paramChange.customizationArgs"
+                                      [objType]="'UnicodeString'">
+        </oppia-value-generator-editor>
+      </span>
+      <button type="button" class="oppia-delete-param-change-button oppia-transition-200"
+              (click)="deleteParamChange(index)" title="Delete parameter change">
+        <i class="material-icons md-18" *ngIf="editabilityService.isEditable()">&#xE5CD;</i>
+      </button>
+    </div>
+  </div>
+
+  <div>
+    <button type="button" class="btn btn-secondary btn-sm e2e-test-add-param-button"
+            (click)="addParamChange()">
+      Add parameter change
+    </button>
+  </div>
+
+  <div *ngIf="warningText" class="oppia-serious-warning-text oppia-serious-warning-text-container">
+    <i class="material-icons">&#xE002;</i>
+    {{ warningText }}
+  </div>
+
+  <button type="button"
+          class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-param-changes-button"
+          (click)="saveParamChanges()"
+          [disabled]="!areDisplayedParamChangesValid()">
+    Save Changes
+  </button>
+  <button type="button" class="btn btn-secondary float-right" (click)="cancelEdit()">Cancel</button>
+  <div class="oppia-clear"></div>
+</div>
+
+<div *ngIf="!isParamChangesEditorOpen" (click)="openParamChangesEditor()"
+     [ngClass]="{'oppia-editable-section': editabilityService.isEditable()}">
+  <i *ngIf="editabilityService.isEditable()" class="material-icons oppia-editor-edit-icon"
+     title="Edit Card Parameter Changes">&#xE254;
+  </i>
+  <div class="oppia-param-changes-display oppia-card-parameter oppia-transition-200"
+       [ngClass]="{'oppia-prevent-selection': editabilityService.isEditable()}"
+       title="Card Parameter Changes">
+    <span *ngIf="paramChangesService.savedMemento && paramChangesService.savedMemento.length === 0">
+      <em>No parameter changes.</em>
+    </span>
+    <div class="oppia-param-display-row" *ngFor="let paramChange of paramChangesService.savedMemento; index as index">
+      {{ index + 1 }}. Change <span class="badge badge-info">{{ paramChange.name }}</span>
+      {{ HUMAN_READABLE_ARGS_RENDERERS[paramChange.generatorId](paramChange.customizationArgs) }}
+    </div>
+  </div>
+</div>

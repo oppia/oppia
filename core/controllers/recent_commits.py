@@ -14,10 +14,13 @@
 
 """Controllers for queries relating to recent commits."""
 
+from __future__ import annotations
+
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_services
-import feconf
+from core.domain import user_services
 
 
 class RecentCommitsHandler(base.BaseHandler):
@@ -42,11 +45,19 @@ class RecentCommitsHandler(base.BaseHandler):
         else:
             raise self.PageNotFoundException
 
-        exp_ids = set([commit.exploration_id for commit in all_commits])
+        exp_ids = set(commit.exploration_id for commit in all_commits)
         exp_ids_to_exp_data = (
             exp_services.get_exploration_titles_and_categories(exp_ids))
 
-        all_commit_dicts = [commit.to_dict() for commit in all_commits]
+        unique_user_ids = list(set(commit.user_id for commit in all_commits))
+        unique_usernames = user_services.get_usernames(unique_user_ids)
+        user_id_to_username = dict(zip(unique_user_ids, unique_usernames))
+        all_commit_dicts = []
+        for commit in all_commits:
+            commit_dict = commit.to_dict()
+            commit_dict['username'] = user_id_to_username[commit.user_id]
+            all_commit_dicts.append(commit_dict)
+
         self.render_json({
             'results': all_commit_dicts,
             'cursor': new_urlsafe_start_cursor,

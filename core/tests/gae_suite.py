@@ -17,80 +17,109 @@
 In general, this script should not be run directly. Instead, invoke
 it from the command line by running
 
-    bash scripts/run_backend_tests.sh
+    python -m scripts.run_backend_tests
 
 from the oppia/ root folder.
 """
+
+from __future__ import annotations
 
 import argparse
 import os
 import sys
 import unittest
 
-CURR_DIR = os.path.abspath(os.getcwd())
-OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
-THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
+from typing import Final, List, Optional
 
-DIRS_TO_ADD_TO_SYS_PATH = [
-    os.path.join(
-        OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine'),
-    os.path.join(OPPIA_TOOLS_DIR, 'webtest-2.0.33'),
-    os.path.join(
-        OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine',
-        'lib', 'webob_0_9'),
-    os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.8.0'),
-    os.path.join(OPPIA_TOOLS_DIR, 'selenium-3.13.0'),
-    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-6.0.0'),
-    CURR_DIR,
-    os.path.join(THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
-    os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
-    os.path.join(THIRD_PARTY_DIR, 'bleach-3.1.0'),
-    os.path.join(THIRD_PARTY_DIR, 'callbacks-0.3.0'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
-    os.path.join(THIRD_PARTY_DIR, 'graphy-1.0.0'),
-    os.path.join(THIRD_PARTY_DIR, 'html5lib-python-1.0.1'),
-    os.path.join(THIRD_PARTY_DIR, 'mutagen-1.42.0'),
-    os.path.join(THIRD_PARTY_DIR, 'requests-2.10.0'),
-    os.path.join(THIRD_PARTY_DIR, 'simplejson-3.16.0'),
-    os.path.join(THIRD_PARTY_DIR, 'six-1.12.0'),
-    os.path.join(THIRD_PARTY_DIR, 'soupsieve-1.9.1'),
-    os.path.join(THIRD_PARTY_DIR, 'webencodings-0.5.1'),
-]
+sys.path.insert(1, os.getcwd())
 
-_PARSER = argparse.ArgumentParser()
+from scripts import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+CURR_DIR: Final = os.path.abspath(os.getcwd())
+OPPIA_TOOLS_DIR: Final = os.path.join(CURR_DIR, '..', 'oppia_tools')
+THIRD_PARTY_DIR: Final = os.path.join(CURR_DIR, 'third_party')
+THIRD_PARTY_PYTHON_LIBS_DIR: Final = os.path.join(
+    THIRD_PARTY_DIR, 'python_libs'
+)
+
+GOOGLE_APP_ENGINE_SDK_HOME: Final = os.path.join(
+    OPPIA_TOOLS_DIR, 'google-cloud-sdk-335.0.0', 'google-cloud-sdk', 'platform',
+    'google_appengine')
+
+_PARSER: Final = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--test_target',
     help='optional dotted module name of the test(s) to run',
     type=str)
 
 
-def create_test_suites(test_target=None):
+def create_test_suites(
+    test_target: Optional[str] = None
+) -> List[unittest.TestSuite]:
     """Creates test suites. If test_dir is None, runs all tests."""
     if test_target and '/' in test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
     loader = unittest.TestLoader()
-    return (
-        [loader.loadTestsFromName(test_target)]
-        if test_target else [loader.discover(
-            CURR_DIR, pattern='[^core/tests/data]*_test.py',
-            top_level_dir=CURR_DIR)])
+    master_test_suite = (
+        loader.loadTestsFromName(test_target)
+        if test_target else
+        loader.discover(
+            CURR_DIR,
+            pattern='[^core/tests/data]*_test.py',
+            top_level_dir=CURR_DIR
+        )
+    )
+
+    return [master_test_suite]
 
 
-def main():
+def main(args: Optional[List[str]] = None) -> None:
     """Runs the tests."""
-    for directory in DIRS_TO_ADD_TO_SYS_PATH:
+    parsed_args = _PARSER.parse_args(args=args)
+
+    for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
         sys.path.insert(0, directory)
 
+    # Remove coverage from path since it causes conflicts with the Python html
+    # library. The problem is that coverage library has a file named html.py,
+    # then when bs4 library attempts to do 'from html.entities import ...',
+    # it will fail with error "No module named 'html.entities';
+    # 'html' is not a package". This happens because Python resolves to
+    # the html.py file in coverage instead of the native html library.
+    sys.path = [path for path in sys.path if 'coverage' not in path]
+
+    # The devappserver function fixes the system path by adding certain google
+    # appengine libraries that we need in oppia to the system path. The Google
+    # Cloud SDK comes with certain packages preinstalled including webapp2,
+    # jinja2, and pyyaml so this function makes sure that those libraries are
+    # installed.
     import dev_appserver
     dev_appserver.fix_sys_path()
 
-    parsed_args = _PARSER.parse_args()
-    suites = create_test_suites(test_target=parsed_args.test_target)
+    # In the process of migrating Oppia from Python 2 to Python 3, we are using
+    # both google app engine apis that are contained in the Google Cloud SDK
+    # folder, and also google cloud apis that are installed in our
+    # 'third_party/python_libs' directory. Therefore, there is a confusion of
+    # where the google module is located and which google module to import from.
+    # The following code ensures that the google module that python looks at
+    # imports from the 'third_party/python_libs' folder so that the imports are
+    # correct.
+    if 'google' in sys.modules:
+        google_path = os.path.join(THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+        google_module = sys.modules['google']
+        # TODO(#15913): Here we use MyPy ignore because MyPy considering
+        # '__path__' attribute is not defined on Module type and this is
+        # because internally Module type was pointed wrongly, but this can
+        # be fixed once we upgraded our library.
+        google_module.__path__ = [google_path, THIRD_PARTY_PYTHON_LIBS_DIR]  # type: ignore[attr-defined]
+        google_module.__file__ = os.path.join(google_path, '__init__.py')
+
+    suites = create_test_suites(
+        test_target=parsed_args.test_target,
+    )
 
     results = [unittest.TextTestRunner(verbosity=2).run(suite)
                for suite in suites]

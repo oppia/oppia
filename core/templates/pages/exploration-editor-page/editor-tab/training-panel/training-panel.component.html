@@ -1,0 +1,72 @@
+<div class="form-inline oppia-training-panel-container">
+  <div class="oppia-training-panel-header">
+    <span><strong>If Oppia encounters the answer:</strong></span>
+  </div>
+
+  <div>
+    <oppia-interaction-display [htmlData]="answerTemplate">
+    </oppia-interaction-display>
+  </div>
+
+  <br>
+
+  <div>
+    <span><strong>Select correct feedback or type a new response:</strong></span>
+
+    <div class="trained-feedback-selection-form-container">
+      <form>
+        <div class="trained-feedback-selection-container" *ngFor="let outcome of allOutcomes; let index = index">
+          <button class="trained-feedback-selection"
+                  (click)="selectAnswerGroupIndex(index)"
+                  [ngClass]="{'trained-feedback-selected': index == selectedAnswerGroupIndex}">
+            <span *ngIf="!outcome.feedback.isEmpty()">
+              <oppia-interaction-display [htmlData]="outcome.feedback.html">
+              </oppia-interaction-display>
+            </span>
+            <span *ngIf="outcome.feedback.isEmpty()">
+              <em>(No feedback)</em>
+            </span>
+
+            <br>
+
+            <span class="oppia-float-right" *ngIf="outcome.dest != getCurrentStateName()">
+              → {{outcome.dest}}
+            </span>
+            <span class="oppia-float-right" *ngIf="outcome.dest == getCurrentStateName()">
+              <em>→ (try again)</em>
+            </span>
+          </button>
+        </div>
+      </form>
+      <button class="btn btn-secondary"
+              *ngIf="!addingNewResponse"
+              (click)="beginAddingNewResponse()">Add New Response
+      </button>
+      <oppia-outcome-feedback-editor *ngIf="addingNewResponse"
+                                     [outcome]="classification.newOutcome">
+      </oppia-outcome-feedback-editor>
+      <button class="btn btn-secondary btn-success"
+              *ngIf="addingNewResponse"
+              (click)="confirmNewFeedback()">Save New Response
+      </button>
+      <button class="btn btn-secondary"
+              *ngIf="addingNewResponse"
+              (click)="cancelAddingNewResponse()">Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .oppia-training-panel-container {
+    margin-bottom: 10px;
+  }
+
+  .oppia-training-panel-header {
+    margin-top: 10px;
+  }
+
+  .oppia-float-right {
+    float: right;
+  }
+</style>

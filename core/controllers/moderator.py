@@ -14,28 +14,50 @@
 
 """Controllers for the moderator page."""
 
+from __future__ import annotations
+
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import activity_domain
 from core.domain import activity_services
 from core.domain import email_manager
 from core.domain import summary_services
-import feconf
 
 
 class ModeratorPage(base.BaseHandler):
     """The moderator page."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.can_access_moderator_page
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/moderator-page.mainpage.html')
+        self.render_template('moderator-page.mainpage.html')
 
 
 class FeaturedActivitiesHandler(base.BaseHandler):
     """The moderator page handler for featured activities."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'featured_activity_reference_dicts': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': activity_domain.ActivityReference
+                    }
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_access_moderator_page
     def get(self):
@@ -50,12 +72,8 @@ class FeaturedActivitiesHandler(base.BaseHandler):
     @acl_decorators.can_access_moderator_page
     def post(self):
         """Handles POST requests."""
-        featured_activity_reference_dicts = self.payload.get(
+        featured_activity_references = self.normalized_payload.get(
             'featured_activity_reference_dicts')
-        featured_activity_references = [
-            activity_domain.ActivityReference(
-                reference_dict['type'], reference_dict['id'])
-            for reference_dict in featured_activity_reference_dicts]
 
         try:
             summary_services.require_activities_to_be_public(
@@ -73,6 +91,10 @@ class EmailDraftHandler(base.BaseHandler):
     """Provide default email templates for moderator emails."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_send_moderator_emails
     def get(self):

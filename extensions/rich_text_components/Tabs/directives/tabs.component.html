@@ -1,0 +1,17 @@
+<nav ngbNav #nav="ngbNav" class="nav-tabs">
+  <ng-container ngbNavItem *ngFor="let tabContent of tabContents; let idx = index">
+    <div class="e2e-test-non-interactive-tabs-headers">
+      <a ngbNavLink>{{ tabContent.title }}</a>
+    </div>
+    <ng-template ngbNavContent>
+      <span>
+        <br>
+        <oppia-rte-output-display [class]="'e2e-test-tab-content-' + idx"
+                                  [rteString]="tabContent.content">
+        </oppia-rte-output-display>
+      </span>
+    </ng-template>
+  </ng-container>
+</nav>
+<div [ngbNavOutlet]="nav" class="mt-2"></div>
+<hr>

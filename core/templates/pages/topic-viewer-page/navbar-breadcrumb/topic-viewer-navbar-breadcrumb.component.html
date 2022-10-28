@@ -1,0 +1,26 @@
+<div *ngIf="!isLanguageRTL()" dir="auto" class="nav navbar-nav oppia-navbar-breadcrumb">
+  <span class="oppia-navbar-breadcrumb-separator"></span>
+  <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
+    {{ topicName }}
+  </span>
+  <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+    {{ topicNameTranslationKey | translate }}
+  </span>
+</div>
+<div *ngIf="isLanguageRTL()" dir="auto" class="nav navbar-nav oppia-navbar-breadcrumb">
+  <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
+    {{ topicName }}
+  </span>
+  <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+    {{ topicNameTranslationKey | translate }}
+  </span>
+  <span class="oppia-navbar-breadcrumb-rtl-separator"></span>
+</div>
+
+<style>
+  @media(max-width:768px) {
+    .oppia-navbar-breadcrumb-separator {
+      display: none
+    }
+  }
+</style>

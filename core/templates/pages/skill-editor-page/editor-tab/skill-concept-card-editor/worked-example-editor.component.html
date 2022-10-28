@@ -1,0 +1,110 @@
+<div class="h-100">
+  <!-- Question Editor -->
+  <div *ngIf="!questionEditorIsOpen"
+       class="h-100"
+       title="Edit worked example question">
+    <div class="oppia-readonly-rule-tile"
+         [ngClass]="{'oppia-editable-section': isEditable}">
+      <div class="oppia-rule-preview">
+        <div class="oppia-click-to-start-editing" (click)="openQuestionEditor()">
+          <i *ngIf="isEditable"
+             class="fas fa-pencil-alt oppia-editor-edit-icon float-right"
+             title="Edit Worked Example">
+          </i>
+        </div>
+
+        <strong>Example Question</strong>
+        <oppia-rte-output-display class="e2e-test-worked-example-question-field"
+                                  [rteString]="container.workedExampleQuestionHtml">
+        </oppia-rte-output-display>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isEditable && questionEditorIsOpen">
+    <form class="form-inline"
+          (submit)="saveWorkedExample()">
+      <div class="oppia-rule-details-header">
+        <strong>Example Question</strong>
+        <schema-based-editor  [schema]="getSchema()"
+                              [localValue]="container.workedExampleQuestionHtml"
+                              (localValueChange)="this.updateLocalQues($event)">
+        </schema-based-editor>
+      </div>
+    </form>
+
+    <div class="oppia-rule-save-cancel-buttons">
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                (click)="cancelEditQuestion()">
+          Cancel
+        </button>
+        <button type="button"
+                class="btn btn-success"
+                [disabled]="!container.workedExampleQuestionHtml"
+                (click)="saveWorkedExample(true)">
+          Save
+        </button>
+      </div>
+      <div class="oppia-clear"></div>
+    </div>
+  </div>
+
+  <!-- Explanation Editor -->
+  <div *ngIf="!explanationEditorIsOpen"
+       class="h-100 worked-example-explanation-section"
+       title="Edit worked example explanation">
+    <div class="oppia-readonly-rule-tile"
+         [ngClass]="{'oppia-editable-section': isEditable}">
+      <div class="oppia-rule-preview">
+        <div class="oppia-click-to-start-editing" (click)="openExplanationEditor()">
+          <i *ngIf="isEditable"
+             class="fas fa-pencil-alt oppia-editor-edit-icon float-right"
+             title="Edit Worked Example">
+          </i>
+        </div>
+
+        <strong>Example Explanation</strong>
+        <oppia-rte-output-display class="e2e-test-worked-example-explanation-field"
+                                  [rteString]="container.workedExampleExplanationHtml">
+        </oppia-rte-output-display>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isEditable && explanationEditorIsOpen" class="worked-example-explanation-section">
+    <form class="form-inline"
+          (submit)="saveWorkedExample()">
+      <div class="oppia-rule-details-header">
+        <strong>Example Explanation</strong>
+        <schema-based-editor [schema]="getSchema.bind(this)"
+                             [localValue]="container.workedExampleExplanationHtml"
+                             (localValueChange)="this.updateLocalExp($event)">
+        </schema-based-editor>
+      </div>
+    </form>
+
+    <div class="oppia-rule-save-cancel-buttons">
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                (click)="cancelEditExplanation()">
+          Cancel
+        </button>
+        <button type="button"
+                class="btn btn-success"
+                [disabled]="!container.workedExampleExplanationHtml"
+                (click)="saveWorkedExample(false)">
+          Save
+        </button>
+      </div>
+      <div class="oppia-clear"></div>
+    </div>
+  </div>
+</div>
+<style>
+  .worked-example-explanation-section {
+    margin-top: 2.5vh;
+  }
+</style>

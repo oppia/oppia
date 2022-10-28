@@ -1,0 +1,45 @@
+<style>
+  .col-sm-1 {
+    margin-right: 10px;
+  }
+
+  .col-sm-10 {
+    border: 1px solid #000;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    margin-left: 10px;
+  }
+
+  p {
+    margin-bottom: 10px;
+  }
+  .oppia-drag-and-drop-error {
+    position: absolute;
+  }
+</style>
+
+<div>
+  <p>NOTE: Two or more items may occupy the same slot.</p>
+  <div *ngFor="let choice of choices; let idx = index">
+    <div class="row">
+      <div class="col-sm-1">
+        <select [(ngModel)]="choice.selectedRank"
+                (change)="selectItem(idx);"
+                aria-label="choice" id="{{idx}}"
+                (oppiaNgInit)="choice.selectedRank = initValues[idx]">
+          <option *ngFor="let option of allowedChoices()"
+                  [attr.selected]="option === choice.selectedRank">
+            {{ option }}
+          </option>
+        </select>
+      </div>
+      <div class="col-sm-10">
+        <oppia-rte-output-display [rteString]="choice.id"></oppia-rte-output-display>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="oppia-form-error oppia-drag-and-drop-error">
+  {{ errorMessage }}
+</div>

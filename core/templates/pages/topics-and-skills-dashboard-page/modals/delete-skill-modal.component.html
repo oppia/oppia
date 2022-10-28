@@ -1,0 +1,74 @@
+<div class="modal-header">
+  <h3>
+    Are you sure you want to delete this skill?
+  </h3>
+</div>
+<div class="modal-header loading-spinner" *ngIf="!topicsAssignmentsAreFetched">
+  <mat-spinner [diameter]="30"></mat-spinner>
+</div>
+<div class="modal-body" *ngIf="showTopicsAssignments()">
+  <div *ngIf="skillCanBeDeleted">
+    <span>
+      This skill is assigned to these following topics, If you delete the
+      skill, it will automatically be removed from these topics.
+    </span>
+    <ul>
+      <li *ngFor="let topic of topicsAssignments">
+        <span class="topic-name">{{ topic.topicName }}</span>
+      </li>
+    </ul>
+  </div>
+  <div *ngIf="!skillCanBeDeleted">
+    <p>
+      This skill is used as the only diagnostic test skill in the following
+      <span *ngIf="ineligibleTopicsCount === 1">topic</span>
+      <span *ngIf="ineligibleTopicsCount > 1">topics</span>
+    </p>
+    <ul>
+      <li *ngFor="let ineligibleTopicNameToTopicAssignment of ineligibleTopicNameToTopicAssignments | keyvalue">
+        <a [href]="getTopicEditorUrl(ineligibleTopicNameToTopicAssignment.value)" target="_blank" rel="noopener">
+          {{ ineligibleTopicNameToTopicAssignment.key }}
+        </a>
+      </li>
+    </ul>
+    <p>
+      Please remove this skill from the diagnostic tests of those topics first
+      before deleting it.
+    </p>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-danger e2e-test-confirm-skill-deletion-button"
+          (click)="confirm()"
+          *ngIf="skillCanBeDeleted"
+          [disabled]="!topicsAssignmentsAreFetched">
+    <span>Delete Skill</span>
+  </button>
+</div>
+
+<style>
+  .delete-skill-modal .topic-name {
+    font-weight: bold;
+  }
+  .loading-spinner {
+    margin-left: 45%;
+  }
+  @media screen and (max-width: 768px) {
+    .delete-skill-modal .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0 auto;
+      padding: 0;
+      width: 95vw;
+    }
+    .delete-skill-modal .modal-header {
+      padding: 10px 15px;
+    }
+    .delete-skill-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+      top: 20vh;
+    }
+  }
+</style>

@@ -1,0 +1,9 @@
+<ng-form name="schemaForm">
+  <schema-based-editor ng-model="localValue" ng-model-change="$applyAsync()" [schema]="definition" [disabled]="isDisabled()">
+  </schema-based-editor>
+</ng-form>
+
+<div ng-if="!isDisabled()">
+  <button ng-click="submitValue(localValue)" class="btn btn-success" ng-disabled="schemaForm.$invalid">Submit</button>
+  <button ng-click="cancelEdit()" class="btn btn-secondary">Cancel</button>
+</div>

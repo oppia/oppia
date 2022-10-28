@@ -1,0 +1,78 @@
+<div class="login-page">
+  <mat-card class="login-card" *ngIf="emulatorModeIsEnabled">
+    <mat-card-header>
+      <mat-card-title>Emulator Mode Sign in</mat-card-title>
+    </mat-card-header>
+
+    <form [formGroup]="formGroup" (ngSubmit)="onClickSignInButtonAsync(email.value)">
+      <mat-card-content>
+        <mat-form-field appearance="fill">
+          <mat-label>Enter an email</mat-label>
+
+          <input class="e2e-test-sign-in-email-input"
+                 matInput [formControl]="email" [matAutocomplete]="auto">
+
+          <mat-autocomplete #auto="matAutocomplete">
+            <mat-option value="testadmin@example.com"
+                        *ngIf="'testadmin@example.com'.startsWith(email.value)">
+              testadmin@example.com
+            </mat-option>
+          </mat-autocomplete>
+
+          <mat-error *ngIf="email.invalid">
+            Invalid email address
+          </mat-error>
+
+          <mat-hint *ngIf="email.value !== 'testadmin@example.com'">
+            To grant super-admin privileges to an account, please refer to the <a href="https://github.com/oppia/oppia/wiki/Firebase-authentication#2-add-custom-claims-to-a-firebase-account" rel="noopener" target="_blank">Oppia Wiki</a>.
+          </mat-hint>
+
+          <mat-hint *ngIf="email.value === 'testadmin@example.com'">
+            This email address has implicit super-admin privileges!
+          </mat-hint>
+        </mat-form-field>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button color="primary" type="submit" class="e2e-test-sign-in-button"
+                mat-raised-button [disabled]="email.invalid || email.value === ''">
+          Sign In
+        </button>
+      </mat-card-actions>
+    </form>
+  </mat-card>
+</div>
+
+<style>
+  .login-page {
+    align-items: center;
+    display: flex;
+    height: 400px;
+    justify-content: center;
+  }
+  .login-page .login-card {
+    max-width: 500px;
+    min-width: 150px;
+    width: 100%;
+  }
+  .login-page .mat-card-actions {
+    margin: 0;
+  }
+  .login-page .mat-card-header {
+    margin: 0 -16px; /* Explanation: https://stackoverflow.com/a/64183157/4859885. */
+  }
+  .login-page .mat-form-field {
+    width: 100%;
+  }
+  .login-page /deep/ .mat-form-field-invalid .mat-input-element {
+    caret-color: #f44336;
+  }
+  .login-page /deep/ .mat-error,
+  .login-page /deep/ .mat-form-field.mat-form-field-invalid .mat-form-field-label {
+    color: #f44336;
+  }
+  .login-page /deep/ .mat-form-field.mat-form-field-invalid .mat-form-field-ripple,
+  .login-page /deep/ .mat-form-field.mat-form-field-invalid .mat-form-field-ripple.mat-accent {
+    background-color: #f44336;
+  }
+</style>

@@ -1,0 +1,145 @@
+<mat-card class="oppia-page-card oppia-long-text oppia-long-text-card oppia-beam-jobs-tab-page">
+  <div class="job-name-form-container">
+    <mat-form-field class="job-name-form" appearance="outline">
+      <mat-label>Job name</mat-label>
+      <input matInput
+             [disabled]="!dataIsReady || dataFailedToLoad"
+             [formControl]="jobNameControl"
+             [matAutocomplete]="auto">
+      <mat-autocomplete autoActiveFirstOption
+                        #auto="matAutocomplete"
+                        (optionSelected)="onJobNameSelect($event.option.value)">
+        <mat-option *ngFor="let jobName of filteredJobNames | async" [value]="jobName">
+          {{ jobName }}
+        </mat-option>
+      </mat-autocomplete>
+      <button mat-icon-button
+              matSuffix
+              color="primary"
+              [disabled]="!jobNameControl.value"
+              (click)="jobNameControl.setValue('')">
+        <mat-icon>clear</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <button mat-fab
+            matSuffix
+            class="job-start-button"
+            color="primary"
+            [disabled]="selectedJob === undefined"
+            (click)="onStartNewClick($event)">
+      <mat-icon>play_arrow</mat-icon>
+    </button>
+  </div>
+
+  <div class="job-runs-table-container mat-elevation-z8">
+    <table class="job-runs-table" mat-table recycleRows [dataSource]="filteredBeamJobRuns">
+
+      <!-- Status Column -->
+      <ng-container matColumnDef="run_status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let jobRun">
+          <mat-icon class="job-status-mat-icon"
+                    [matTooltip]="jobRun.getJobStatusTooltipString()"
+                    [color]="jobRun.getJobStatusMaterialThemeColor()">
+            {{ jobRun.getJobStatusMaterialIconCode() }}
+          </mat-icon>
+        </td>
+      </ng-container>
+
+      <!-- Job Name Column -->
+      <ng-container matColumnDef="job_name">
+        <th mat-header-cell *matHeaderCellDef>Job name</th>
+        <td mat-cell *matCellDef="let jobRun" class="job-name-cell"> {{ jobRun.jobName }} </td>
+      </ng-container>
+
+      <!-- Started On Column -->
+      <ng-container matColumnDef="started_on">
+        <th mat-header-cell *matHeaderCellDef>Started on</th>
+        <td mat-cell *matCellDef="let jobRun"> {{ jobRun.jobStartedOnMsecs | date:'short' }} </td>
+      </ng-container>
+
+      <!-- Last Updated Column -->
+      <ng-container matColumnDef="updated_on">
+        <th mat-header-cell *matHeaderCellDef>Last updated</th>
+        <td mat-cell *matCellDef="let jobRun"> {{ jobRun.jobUpdatedOnMsecs | date:'short' }} </td>
+      </ng-container>
+
+      <!-- Take Action Column -->
+      <ng-container matColumnDef="action">
+        <th class="job-run-action-column" mat-header-cell *matHeaderCellDef>Take action</th>
+        <td mat-cell *matCellDef="let jobRun">
+          <button mat-raised-button
+                  *ngIf="jobRun.isRunning()"
+                  [disabled]="!jobRun.canBeCancelled()"
+                  (click)="onCancelClick(jobRun)"
+                  color="warn">
+            Cancel
+          </button>
+          <button mat-raised-button
+                  *ngIf="jobRun.inTerminalState()"
+                  color="accent"
+                  [disabled]="!jobRun.hasOutput()"
+                  (click)="onViewOutputClick(jobRun)">
+            View Output
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="jobRunTableColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let jobRun; columns: jobRunTableColumns;"></tr>
+    </table>
+
+    <mat-progress-bar *ngIf="!dataIsReady" color="accent" mode="indeterminate"></mat-progress-bar>
+  </div>
+</mat-card>
+
+<style>
+  .oppia-beam-jobs-tab-page {
+    height: 100%;
+    max-width: 900px;
+  }
+  .oppia-beam-jobs-tab-page .job-name-form-container {
+    display: flex;
+    width: 100%;
+  }
+  .oppia-beam-jobs-tab-page .job-name-form {
+    flex-grow: 1;
+  }
+  .oppia-beam-jobs-tab-page .job-start-button {
+    flex-grow: 0;
+    margin-left: 26px;
+    margin-top: 6px;
+  }
+  .oppia-beam-jobs-tab-page .job-runs-table-container {
+    max-height: 800px;
+    min-height: 300px;
+    overflow: auto;
+    width: 100%;
+  }
+  .oppia-beam-jobs-tab-page .job-runs-table {
+    font-size: 30px;
+    width: 100%;
+  }
+  .oppia-beam-jobs-tab-page .job-name-cell {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  }
+  .oppia-beam-jobs-tab-page .mat-icon.mat-warn {
+    color: #f44336;
+  }
+  .oppia-beam-jobs-tab-page .mat-raised-button {
+    width: 100%;
+  }
+  .oppia-beam-jobs-tab-page .mat-raised-button.mat-warn:not(.mat-button-disabled) {
+    background-color: #f44336;
+    color: #fff;
+  }
+  .oppia-beam-jobs-tab-page .job-run-action-column {
+    width: 150px;
+  }
+  .oppia-beam-jobs-tab-page .job-status-mat-icon {
+    font-size: 30px;
+    height: 30px;
+    width: 30px;
+  }
+</style>

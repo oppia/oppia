@@ -16,56 +16,69 @@
 
 """Models for Oppia statistics."""
 
+from __future__ import annotations
+
 import datetime
 import json
-import logging
 import sys
 
+from core import feconf
+from core import utils
 from core.platform import models
-import feconf
-import utils
 
-from google.appengine.ext import ndb
+from typing import Dict, Final, List, Optional, Sequence, Tuple
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+MYPY = False
+if MYPY: # pragma: no cover
+    # TODO(#13594): After the domain layer is refactored to be independent of
+    # the storage layer, the disable=invalid-import will
+    # be removed.
+    # The following import is dangerous and should not be generally
+    # used. We had to use this ignore as we need to import the domain layer
+    # for type-annotation and we have not imported them globally but inside
+    # this if block to prevent circular imports.
+    from core.domain import exp_domain # isort:skip # pylint: disable=invalid-import,unused-import,ungrouped-imports
+    from core.domain import stats_domain # isort:skip # pylint: disable=invalid-import,unused-import,ungrouped-imports
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+    from mypy_imports import transaction_services
+
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
+
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
-CURRENT_ACTION_SCHEMA_VERSION = 1
-CURRENT_ISSUE_SCHEMA_VERSION = 1
+CURRENT_ACTION_SCHEMA_VERSION: Final = 1
+CURRENT_ISSUE_SCHEMA_VERSION: Final = 1
 
-ACTION_TYPE_EXPLORATION_START = 'ExplorationStart'
-ACTION_TYPE_ANSWER_SUBMIT = 'AnswerSubmit'
-ACTION_TYPE_EXPLORATION_QUIT = 'ExplorationQuit'
+ACTION_TYPE_EXPLORATION_START: Final = 'ExplorationStart'
+ACTION_TYPE_ANSWER_SUBMIT: Final = 'AnswerSubmit'
+ACTION_TYPE_EXPLORATION_QUIT: Final = 'ExplorationQuit'
 
-ISSUE_TYPE_EARLY_QUIT = 'EarlyQuit'
-ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS = 'MultipleIncorrectSubmissions'
-ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS = 'CyclicStateTransitions'
+ISSUE_TYPE_EARLY_QUIT: Final = 'EarlyQuit'
+ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS: Final = (
+    'MultipleIncorrectSubmissions'
+)
+ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS: Final = 'CyclicStateTransitions'
 
 # Types of allowed issues.
-ALLOWED_ISSUE_TYPES = [
+ALLOWED_ISSUE_TYPES: Final = [
     ISSUE_TYPE_EARLY_QUIT,
     ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
     ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS
 ]
 # Types of allowed learner actions.
-ALLOWED_ACTION_TYPES = [
+ALLOWED_ACTION_TYPES: Final = [
     ACTION_TYPE_EXPLORATION_START,
     ACTION_TYPE_ANSWER_SUBMIT,
     ACTION_TYPE_EXPLORATION_QUIT
 ]
-# Mapping from issue type to issue keyname in the issue customization dict. This
-# mapping is useful to uniquely identify issues by the combination of their
-# issue type and other type-specific information (such as the list of states
-# involved).
-ISSUE_TYPE_KEYNAME_MAPPING = {
-    'EarlyQuit': 'state_name',
-    'MultipleIncorrectSubmissions': 'state_name',
-    'CyclicStateTransitions': 'state_names'
-}
+
 # The entity types for which the LearnerAnswerDetailsModel instance
 # can be created.
-ALLOWED_ENTITY_TYPES = [
-    feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_QUESTION]
+ALLOWED_ENTITY_TYPES: Final = [
+    feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_QUESTION
+]
 
 
 class StateCounterModel(base_models.BaseModel):
@@ -74,21 +87,33 @@ class StateCounterModel(base_models.BaseModel):
     The ID/key of instances of this class has the form
         [EXPLORATION_ID].[STATE_NAME].
     """
+
     # Number of times the state was entered for the first time in a reader
     # session.
-    first_entry_count = ndb.IntegerProperty(default=0, indexed=False)
+    first_entry_count = (
+        datastore_services.IntegerProperty(default=0, indexed=False))
     # Number of times the state was entered for the second time or later in a
     # reader session.
-    subsequent_entries_count = ndb.IntegerProperty(default=0, indexed=False)
+    subsequent_entries_count = (
+        datastore_services.IntegerProperty(default=0, indexed=False))
     # Number of times an answer submitted for this state was subsequently
     # resolved by an exploration admin and removed from the answer logs.
-    resolved_answer_count = ndb.IntegerProperty(default=0, indexed=False)
+    resolved_answer_count = (
+        datastore_services.IntegerProperty(default=0, indexed=False))
     # Number of times an answer was entered for this state and was not
     # subsequently resolved by an exploration admin.
-    active_answer_count = ndb.IntegerProperty(default=0, indexed=False)
+    active_answer_count = (
+        datastore_services.IntegerProperty(default=0, indexed=False))
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_or_create(cls, exploration_id, state_name):
+    def get_or_create(
+        cls, exploration_id: str, state_name: str
+    ) -> StateCounterModel:
         """Gets or creates an entity by exploration_id and state_name.
 
         Args:
@@ -104,28 +129,51 @@ class StateCounterModel(base_models.BaseModel):
             counter = cls(id=instance_id)
         return counter
 
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user.."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'first_entry_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subsequent_entries_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'resolved_answer_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'active_answer_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
 
 class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student submitting an answer."""
+
     # Id of exploration currently being played.
-    exp_id = ndb.StringProperty(indexed=True)
+    exp_id = datastore_services.StringProperty(indexed=True)
     # Current version of exploration.
-    exp_version = ndb.IntegerProperty(indexed=True)
+    exp_version = datastore_services.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = datastore_services.StringProperty(indexed=True)
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = datastore_services.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
-    time_spent_in_state_secs = ndb.FloatProperty()
+    time_spent_in_state_secs = datastore_services.FloatProperty()
     # Whether the submitted answer received useful feedback.
-    is_feedback_useful = ndb.BooleanProperty(indexed=True)
+    is_feedback_useful = datastore_services.BooleanProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(indexed=True)
+    event_schema_version = datastore_services.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -135,8 +183,14 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, session_id,
-            time_spent_in_state_secs, is_feedback_useful):
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str,
+            session_id: str,
+            time_spent_in_state_secs: float,
+            is_feedback_useful: bool
+    ) -> str:
         """Creates a new answer submitted event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -149,8 +203,29 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
             time_spent_in_state_secs=time_spent_in_state_secs,
             is_feedback_useful=is_feedback_useful,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        answer_submitted_event_entity.update_timestamps()
         answer_submitted_event_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_spent_in_state_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'is_feedback_useful': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
@@ -158,21 +233,27 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     'actually' entering an exploration means the student has completed the
     initial state of the exploration and traversed to the second state.
     """
+
     # Id of exploration currently being played.
-    exp_id = ndb.StringProperty(indexed=True)
+    exp_id = datastore_services.StringProperty(indexed=True)
     # Current version of exploration.
-    exp_version = ndb.IntegerProperty(indexed=True)
+    exp_version = datastore_services.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = datastore_services.StringProperty(indexed=True)
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = datastore_services.StringProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(indexed=True)
+    event_schema_version = datastore_services.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -181,7 +262,13 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id):
+    def create(
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str,
+            session_id: str
+    ) -> str:
         """Creates a new actual exploration start event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -192,29 +279,53 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
             state_name=state_name,
             session_id=session_id,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        actual_start_event_entity.update_timestamps()
         actual_start_event_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class SolutionHitEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student triggering the solution."""
+
     # Id of exploration currently being played.
-    exp_id = ndb.StringProperty(indexed=True)
+    exp_id = datastore_services.StringProperty(indexed=True)
     # Current version of exploration.
-    exp_version = ndb.IntegerProperty(indexed=True)
+    exp_version = datastore_services.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = datastore_services.StringProperty(indexed=True)
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = datastore_services.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
-    time_spent_in_state_secs = ndb.FloatProperty()
+    time_spent_in_state_secs = datastore_services.FloatProperty()
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(indexed=True)
+    event_schema_version = datastore_services.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -224,8 +335,13 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, session_id,
-            time_spent_in_state_secs):
+            cls,
+            exp_id: str,
+            exp_version: int,
+            state_name: str,
+            session_id: str,
+            time_spent_in_state_secs: float
+    ) -> str:
         """Creates a new solution hit event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -237,8 +353,28 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
             session_id=session_id,
             time_spent_in_state_secs=time_spent_in_state_secs,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        solution_hit_event_entity.update_timestamps()
         solution_hit_event_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_spent_in_state_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class StartExplorationEventLogEntryModel(base_models.BaseModel):
@@ -258,31 +394,37 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         params: Current parameter values, in the form of a map of parameter
             name to value.
     """
+
     # Which specific type of event this is.
-    event_type = ndb.StringProperty(indexed=True)
+    event_type = datastore_services.StringProperty(indexed=True)
     # Id of exploration currently being played.
-    exploration_id = ndb.StringProperty(indexed=True)
+    exploration_id = datastore_services.StringProperty(indexed=True)
     # Current version of exploration.
-    exploration_version = ndb.IntegerProperty(indexed=True)
+    exploration_version = datastore_services.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = datastore_services.StringProperty(indexed=True)
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = datastore_services.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
-    client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
+    client_time_spent_in_secs = datastore_services.FloatProperty(indexed=True)
     # Current parameter values, map of parameter name to value.
-    params = ndb.JsonProperty(indexed=False)
+    params = datastore_services.JsonProperty(indexed=False)
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = datastore_services.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(indexed=True)
+    event_schema_version = datastore_services.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates entity ID for a new event based on its
         exploration and session ID.
 
@@ -299,10 +441,22 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
+    # In the type annotation below, Dict[str, str] is used for 'params'.
+    # This is due to lack of information about the possible values for 'params'.
+    # If you're working with this part of the code in the future and find that
+    # the type for 'params' is incorrect, please go ahead and change it, and
+    # feel free to remove this comment once you've done so.
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, session_id,
-            params, play_type, unused_version=1):
+        cls,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        session_id: str,
+        params: Dict[str, str],
+        play_type: str,
+        unused_version: int = 1
+    ) -> str:
         """Creates a new start exploration event and then writes it to
         the datastore.
 
@@ -335,8 +489,31 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        start_event_entity.update_timestamps()
         start_event_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'client_time_spent_in_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
@@ -369,34 +546,40 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         client_time_spent_in_secs: Time spent in this state before the event
             was triggered.
     """
+
     # Which specific type of event this is.
-    event_type = ndb.StringProperty(indexed=True)
+    event_type = datastore_services.StringProperty(indexed=True)
     # Id of exploration currently being played.
-    exploration_id = ndb.StringProperty(indexed=True)
+    exploration_id = datastore_services.StringProperty(indexed=True)
     # Current version of exploration.
-    exploration_version = ndb.IntegerProperty(indexed=True)
+    exploration_version = datastore_services.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = datastore_services.StringProperty(indexed=True)
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = datastore_services.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     # Note: Some of these events were migrated from StateHit event instances
     # which did not record timestamp data. For this, we use a placeholder
     # value of 0.0 for client_time_spent_in_secs.
-    client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
+    client_time_spent_in_secs = datastore_services.FloatProperty(indexed=True)
     # Current parameter values, map of parameter name to value.
-    params = ndb.JsonProperty(indexed=False)
+    params = datastore_services.JsonProperty(indexed=False)
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = datastore_services.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(indexed=True)
+    event_schema_version = datastore_services.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates entity ID for a new event based on its
         exploration and session ID.
 
@@ -413,10 +596,22 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
+    # In the type annotation below, Dict[str, str] is used for 'params'.
+    # This is due to lack of information about the possible values for 'params'.
+    # If you're working with this part of the code in the future and find that
+    # the type for 'params' is incorrect, please go ahead and change it, and
+    # feel free to remove this comment once you've done so.
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, session_id,
-            client_time_spent_in_secs, params, play_type):
+        cls,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        session_id: str,
+        client_time_spent_in_secs: float,
+        params: Dict[str, str],
+        play_type: str
+    ) -> str:
         """Creates a new leave exploration event and then writes it
         to the datastore.
 
@@ -430,6 +625,9 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             params: dict. Current parameter values, map of parameter name
                 to value.
             play_type: str. Type of play-through.
+
+        Returns:
+            str. New unique ID for this entity instance.
         """
         # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due to an error.
@@ -447,7 +645,31 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        leave_event_entity.update_timestamps()
         leave_event_entity.put()
+        return entity_id
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'client_time_spent_in_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
@@ -474,34 +696,40 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     have the wrong 'last updated' timestamp. However, the 'created_on'
     timestamp is the same as that of the original model.
     """
+
     # Which specific type of event this is.
-    event_type = ndb.StringProperty(indexed=True)
+    event_type = datastore_services.StringProperty(indexed=True)
     # Id of exploration currently being played.
-    exploration_id = ndb.StringProperty(indexed=True)
+    exploration_id = datastore_services.StringProperty(indexed=True)
     # Current version of exploration.
-    exploration_version = ndb.IntegerProperty(indexed=True)
+    exploration_version = datastore_services.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = datastore_services.StringProperty(indexed=True)
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = datastore_services.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     # Note: Some of these events were migrated from StateHit event instances
     # which did not record timestamp data. For this, we use a placeholder
     # value of 0.0 for client_time_spent_in_secs.
-    client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
+    client_time_spent_in_secs = datastore_services.FloatProperty(indexed=True)
     # Current parameter values, map of parameter name to value.
-    params = ndb.JsonProperty(indexed=False)
+    params = datastore_services.JsonProperty(indexed=False)
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = datastore_services.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(indexed=True)
+    event_schema_version = datastore_services.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates entity ID for a new event based on its
         exploration and session ID.
 
@@ -518,10 +746,22 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
+    # In the type annotation below, Dict[str, str] is used for 'params'.
+    # This is due to lack of information about the possible values for 'params'.
+    # If you're working with this part of the code in the future and find that
+    # the type for 'params' is incorrect, please go ahead and change it, and
+    # feel free to remove this comment once you've done so.
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, session_id,
-            client_time_spent_in_secs, params, play_type):
+        cls,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        session_id: str,
+        client_time_spent_in_secs: float,
+        params: Dict[str, str],
+        play_type: str
+    ) -> str:
         """Creates a new exploration completion event and then writes it
         to the datastore.
 
@@ -551,8 +791,31 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        complete_event_entity.update_timestamps()
         complete_event_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'client_time_spent_in_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class RateExplorationEventLogEntryModel(base_models.BaseModel):
@@ -565,20 +828,26 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         exploration_id: ID of exploration which is being rated.
         rating: Value of rating assigned to exploration.
     """
+
     # Which specific type of event this is.
-    event_type = ndb.StringProperty(indexed=True)
+    event_type = datastore_services.StringProperty(indexed=True)
     # Id of exploration which has been rated.
-    exploration_id = ndb.StringProperty(indexed=True)
+    exploration_id = datastore_services.StringProperty(indexed=True)
     # Value of rating assigned.
-    rating = ndb.IntegerProperty(indexed=True)
+    rating = datastore_services.IntegerProperty(indexed=True)
     # Value of rating previously assigned by the same user. Will be None when a
     # user rates an exploration for the first time.
-    old_rating = ndb.IntegerProperty(indexed=True)
+    old_rating = datastore_services.IntegerProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(indexed=True)
+    event_schema_version = datastore_services.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, user_id):
+    def get_new_event_entity_id(cls, exp_id: str, user_id: str) -> str:
         """Generates entity ID for a new rate exploration event based on its
         exploration_id and user_id of the learner.
 
@@ -587,7 +856,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             user_id: str. ID of the user.
 
         Returns:
-            str. New unique ID for this entity class.
+            str. New unique ID for this entity instance.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -596,7 +865,13 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             user_id))
 
     @classmethod
-    def create(cls, exp_id, user_id, rating, old_rating):
+    def create(
+        cls,
+        exp_id: str,
+        user_id: str,
+        rating: int,
+        old_rating: Optional[int]
+    ) -> str:
         """Creates a new rate exploration event and then writes it to the
         datastore.
 
@@ -606,6 +881,9 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             rating: int. Value of rating assigned to exploration.
             old_rating: int or None. Will be None if the user rates an
                 exploration for the first time.
+
+        Returns:
+            str. New unique ID for this entity instance.
         """
         entity_id = cls.get_new_event_entity_id(
             exp_id, user_id)
@@ -617,6 +895,24 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             old_rating=old_rating,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
         ).put()
+        return entity_id
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rating': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'old_rating': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class StateHitEventLogEntryModel(base_models.BaseModel):
@@ -637,29 +933,35 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     amount of time between this event (i.e., the learner entering the
     state) and the other event.
     """
+
     # Which specific type of event this is.
-    event_type = ndb.StringProperty(indexed=True)
+    event_type = datastore_services.StringProperty(indexed=True)
     # Id of exploration currently being played.
-    exploration_id = ndb.StringProperty(indexed=True)
+    exploration_id = datastore_services.StringProperty(indexed=True)
     # Current version of exploration.
-    exploration_version = ndb.IntegerProperty(indexed=True)
+    exploration_version = datastore_services.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = datastore_services.StringProperty(indexed=True)
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = datastore_services.StringProperty(indexed=True)
     # Current parameter values, map of parameter name to value.
-    params = ndb.JsonProperty(indexed=False)
+    params = datastore_services.JsonProperty(indexed=False)
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = datastore_services.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(indexed=True)
+    event_schema_version = datastore_services.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates entity ID for a new event based on its
         exploration and session ID.
 
@@ -676,10 +978,21 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
+    # In the type annotation below, Dict[str, str] is used for 'params'.
+    # This is due to lack of information about the possible values for 'params'.
+    # If you're working with this part of the code in the future and find that
+    # the type for 'params' is incorrect, please go ahead and change it, and
+    # feel free to remove this comment once you've done so.
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, session_id, params,
-            play_type):
+        cls,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        session_id: str,
+        params: Dict[str, str],
+        play_type: str
+    ) -> str:
         """Creates a new state hit event entity and then writes
         it to the datastore.
 
@@ -709,29 +1022,56 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        state_event_entity.update_timestamps()
         state_event_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class StateCompleteEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student completing a state."""
+
     # Id of exploration currently being played.
-    exp_id = ndb.StringProperty(indexed=True)
+    exp_id = datastore_services.StringProperty(indexed=True)
     # Current version of exploration.
-    exp_version = ndb.IntegerProperty(indexed=True)
+    exp_version = datastore_services.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = datastore_services.StringProperty(indexed=True)
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = datastore_services.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
-    time_spent_in_state_secs = ndb.FloatProperty()
+    time_spent_in_state_secs = datastore_services.FloatProperty()
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(indexed=True)
+    event_schema_version = datastore_services.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -741,8 +1081,13 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, session_id,
-            time_spent_in_state_secs):
+        cls,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        session_id: str,
+        time_spent_in_state_secs: float
+    ) -> str:
         """Creates a new state complete event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -754,31 +1099,57 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
             session_id=session_id,
             time_spent_in_state_secs=time_spent_in_state_secs,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        state_finish_event_entity.update_timestamps()
         state_finish_event_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_spent_in_state_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student leaving for a refresher exploration."""
+
     # ID of exploration currently being played.
-    exp_id = ndb.StringProperty(indexed=True)
+    exp_id = datastore_services.StringProperty(indexed=True)
     # ID of the refresher exploration.
-    refresher_exp_id = ndb.StringProperty(indexed=True)
+    refresher_exp_id = datastore_services.StringProperty(indexed=True)
     # Current version of exploration.
-    exp_version = ndb.IntegerProperty(indexed=True)
+    exp_version = datastore_services.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty(indexed=True)
+    state_name = datastore_services.StringProperty(indexed=True)
     # ID of current student's session.
-    session_id = ndb.StringProperty(indexed=True)
+    session_id = datastore_services.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
-    time_spent_in_state_secs = ndb.FloatProperty()
+    time_spent_in_state_secs = datastore_services.FloatProperty()
     # The version of the event schema used to describe an event of this type.
-    event_schema_version = ndb.IntegerProperty(indexed=True)
+    event_schema_version = datastore_services.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -788,8 +1159,14 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, refresher_exp_id, exp_version, state_name,
-            session_id, time_spent_in_state_secs):
+        cls,
+        exp_id: str,
+        refresher_exp_id: str,
+        exp_version: int,
+        state_name: str,
+        session_id: str,
+        time_spent_in_state_secs: float
+    ) -> str:
         """Creates a new leave for refresher exploration event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -802,33 +1179,59 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
             session_id=session_id,
             time_spent_in_state_secs=time_spent_in_state_secs,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        leave_for_refresher_exp_entity.update_timestamps()
         leave_for_refresher_exp_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'refresher_exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_spent_in_state_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        })
 
 
 class ExplorationStatsModel(base_models.BaseModel):
     """Model for storing analytics data for an exploration. This model contains
     statistics data aggregated from version 1 to the version given in the key.
 
-    The ID of instances of this class has the form {{exp_id}}.{{exp_version}}.
+    The ID of instances of this class has the form [exp_id].[exp_version].
     """
+
+    # NOTE TO DEVELOPERS: The method save_multi() was removed in #13021 as part
+    # of the migration to Apache Beam. Please refer to that PR if you need to
+    # reinstate it.
+
     # ID of exploration.
-    exp_id = ndb.StringProperty(indexed=True)
+    exp_id = datastore_services.StringProperty(indexed=True)
     # Version of exploration.
-    exp_version = ndb.IntegerProperty(indexed=True)
+    exp_version = datastore_services.IntegerProperty(indexed=True)
     # Number of learners starting the exploration (v1 - data collected before
     # Dec 2017).
-    num_starts_v1 = ndb.IntegerProperty(indexed=True)
-    num_starts_v2 = ndb.IntegerProperty(indexed=True)
+    num_starts_v1 = datastore_services.IntegerProperty(indexed=True)
+    num_starts_v2 = datastore_services.IntegerProperty(indexed=True)
     # Number of students who actually attempted the exploration. Only learners
     # who spent a minimum time on the exploration are considered to have
     # actually started the exploration (v1 - data collected before Dec 2017).
-    num_actual_starts_v1 = ndb.IntegerProperty(indexed=True)
-    num_actual_starts_v2 = ndb.IntegerProperty(indexed=True)
+    num_actual_starts_v1 = datastore_services.IntegerProperty(indexed=True)
+    num_actual_starts_v2 = datastore_services.IntegerProperty(indexed=True)
     # Number of students who completed the exploration (v1 - data collected
     # before Dec 2017).
-    num_completions_v1 = ndb.IntegerProperty(indexed=True)
-    num_completions_v2 = ndb.IntegerProperty(indexed=True)
+    num_completions_v1 = datastore_services.IntegerProperty(indexed=True)
+    num_completions_v2 = datastore_services.IntegerProperty(indexed=True)
     # Keyed by state name that describes the analytics for that state.
     # {state_name: {
     #   'total_answers_count_v1': ...,
@@ -842,12 +1245,17 @@ class ExplorationStatsModel(base_models.BaseModel):
     #   'num_times_solution_viewed_v2': ...,
     #   'num_completions_v1': ...,
     #   'num_completions_v2': ...}}
-    state_stats_mapping = ndb.JsonProperty(indexed=False)
+    state_stats_mapping = datastore_services.JsonProperty(indexed=False)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_entity_id(cls, exp_id, exp_version):
+    def get_entity_id(cls, exp_id: str, exp_version: int) -> str:
         """Generates an ID for the instance of the form
-        {{exp_id}}.{{exp_version}}.
+        '[exp_id].[exp_version]'.
 
         Args:
             exp_id: str. ID of the exploration.
@@ -859,7 +1267,9 @@ class ExplorationStatsModel(base_models.BaseModel):
         return '%s.%s' % (exp_id, exp_version)
 
     @classmethod
-    def get_model(cls, exp_id, exp_version):
+    def get_model(
+        cls, exp_id: str, exp_version: int
+    ) -> Optional[ExplorationStatsModel]:
         """Retrieves ExplorationStatsModel given exploration ID and version.
 
         Args:
@@ -867,8 +1277,8 @@ class ExplorationStatsModel(base_models.BaseModel):
             exp_version: int. Version of the exploration.
 
         Returns:
-            ExplorationStatsModel. Exploration analytics model instance in
-                datastore.
+            ExplorationStatsModel|None. Exploration analytics model instance in
+            datastore, or None if no such model instance exists.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
         exploration_stats_model = cls.get(instance_id, strict=False)
@@ -876,9 +1286,17 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, num_starts_v1, num_starts_v2,
-            num_actual_starts_v1, num_actual_starts_v2, num_completions_v1,
-            num_completions_v2, state_stats_mapping):
+        cls,
+        exp_id: str,
+        exp_version: int,
+        num_starts_v1: int,
+        num_starts_v2: int,
+        num_actual_starts_v1: int,
+        num_actual_starts_v2: int,
+        num_completions_v1: int,
+        num_completions_v2: int,
+        state_stats_mapping: Dict[str, Dict[str, int]]
+    ) -> str:
         """Creates an ExplorationStatsModel instance and writes it to the
         datastore.
 
@@ -909,11 +1327,14 @@ class ExplorationStatsModel(base_models.BaseModel):
             num_completions_v1=num_completions_v1,
             num_completions_v2=num_completions_v2,
             state_stats_mapping=state_stats_mapping)
+        stats_instance.update_timestamps()
         stats_instance.put()
         return instance_id
 
     @classmethod
-    def get_multi_versions(cls, exp_id, version_numbers):
+    def get_multi_versions(
+        cls, exp_id: str, version_numbers: List[int]
+    ) -> List[Optional[ExplorationStatsModel]]:
         """Gets stats model instances for each version specified in
         version_numbers.
 
@@ -923,7 +1344,7 @@ class ExplorationStatsModel(base_models.BaseModel):
 
         Returns:
             list(ExplorationStatsModel|None). Model instances representing the
-                given versions.
+            given versions.
         """
         entity_ids = [cls.get_entity_id(
             exp_id, version) for version in version_numbers]
@@ -931,7 +1352,9 @@ class ExplorationStatsModel(base_models.BaseModel):
         return exploration_stats_models
 
     @classmethod
-    def get_multi_stats_models(cls, exp_version_references):
+    def get_multi_stats_models(
+        cls, exp_version_references: List[exp_domain.ExpVersionReference]
+    ) -> List[Optional[ExplorationStatsModel]]:
         """Gets stats model instances for each exploration and the corresponding
         version number.
 
@@ -941,7 +1364,7 @@ class ExplorationStatsModel(base_models.BaseModel):
 
         Returns:
             list(ExplorationStatsModel|None). Model instances representing the
-                given versions or None if it does not exist.
+            given versions or None if it does not exist.
         """
         entity_ids = [
             cls.get_entity_id(
@@ -951,54 +1374,52 @@ class ExplorationStatsModel(base_models.BaseModel):
         exploration_stats_models = cls.get_multi(entity_ids)
         return exploration_stats_models
 
-    @classmethod
-    def save_multi(cls, exploration_stats_dicts):
-        """Creates/Updates multiple ExplorationStatsModel entries.
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
-        Args:
-            exploration_stats_dicts: list(dict). The list of dicts where each
-                dict represents the attributes of one ExplorationStatsModel
-                instance.
-        """
-        exploration_stats_models = []
-        for exploration_stats_dict in exploration_stats_dicts:
-            instance_id = cls.get_entity_id(
-                exploration_stats_dict['exp_id'],
-                exploration_stats_dict['exp_version'])
-            stats_instance = cls(
-                id=instance_id, exp_id=exploration_stats_dict['exp_id'],
-                exp_version=exploration_stats_dict['exp_version'],
-                num_starts_v1=exploration_stats_dict['num_starts_v1'],
-                num_starts_v2=exploration_stats_dict['num_starts_v2'],
-                num_actual_starts_v1=exploration_stats_dict[
-                    'num_actual_starts_v1'],
-                num_actual_starts_v2=exploration_stats_dict[
-                    'num_actual_starts_v2'],
-                num_completions_v1=exploration_stats_dict['num_completions_v1'],
-                num_completions_v2=exploration_stats_dict['num_completions_v2'],
-                state_stats_mapping=exploration_stats_dict[
-                    'state_stats_mapping'])
-            exploration_stats_models.append(stats_instance)
-        cls.put_multi(exploration_stats_models)
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_starts_v1': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_starts_v2': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_actual_starts_v1': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_actual_starts_v2': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_completions_v1': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_completions_v2': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_stats_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class ExplorationIssuesModel(base_models.BaseModel):
     """Model for storing the list of playthroughs for an exploration grouped by
     issues.
     """
+
     # ID of exploration.
-    exp_id = ndb.StringProperty(indexed=True, required=True)
+    exp_id = datastore_services.StringProperty(indexed=True, required=True)
     # Version of exploration.
-    exp_version = ndb.IntegerProperty(indexed=True, required=True)
+    exp_version = (
+        datastore_services.IntegerProperty(indexed=True, required=True))
     # The unresolved issues for this exploration. This will be a list of dicts
     # where each dict represents an issue along with the associated
     # playthroughs.
-    unresolved_issues = ndb.JsonProperty(repeated=True)
+    unresolved_issues = datastore_services.JsonProperty(repeated=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_entity_id(cls, exp_id, exp_version):
+    def get_entity_id(cls, exp_id: str, exp_version: int) -> str:
         """Generates an ID for the instance of the form
-        {{exp_id}}.{{exp_version}}.
+        [exp_id].[exp_version].
 
         Args:
             exp_id: str. ID of the exploration.
@@ -1010,7 +1431,9 @@ class ExplorationIssuesModel(base_models.BaseModel):
         return '%s.%s' % (exp_id, exp_version)
 
     @classmethod
-    def get_model(cls, exp_id, exp_version):
+    def get_model(
+            cls, exp_id: str, exp_version: int
+    ) -> Optional[ExplorationIssuesModel]:
         """Retrieves ExplorationIssuesModel given exploration ID and version.
 
         Args:
@@ -1018,15 +1441,19 @@ class ExplorationIssuesModel(base_models.BaseModel):
             exp_version: int. Version of the exploration.
 
         Returns:
-            ExplorationISsuesModel. Exploration issues model instance in
-                datastore.
+            ExplorationIssuesModel|None. Exploration issues model instance in
+            datastore, or None if no such model instance exists.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
-        exp_issues_model = cls.get(instance_id, strict=False)
-        return exp_issues_model
+        return cls.get(instance_id, strict=False)
 
     @classmethod
-    def create(cls, exp_id, exp_version, unresolved_issues):
+    def create(
+        cls,
+        exp_id: str,
+        exp_version: int,
+        unresolved_issues: List[stats_domain.ExplorationIssueDict]
+    ) -> str:
         """Creates an ExplorationIssuesModel instance and writes it to the
         datastore.
 
@@ -1044,47 +1471,84 @@ class ExplorationIssuesModel(base_models.BaseModel):
         exp_issues_instance = cls(
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
             unresolved_issues=unresolved_issues)
+        exp_issues_instance.update_timestamps()
         exp_issues_instance.put()
         return instance_id
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """All playthrough issue data is anonymized and contains no data
+        directly corresponding to users. For specifics on the data included in
+        this model, see:
+        https://github.com/oppia/oppia/tree/develop/extensions/issues.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'unresolved_issues': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        })
 
 
 class PlaythroughModel(base_models.BaseModel):
     """Model for storing recorded useful playthrough data in the datastore.
 
     The ID of instances of this class are of the form
-    {{exp_id}}.{{random_hash_of_16_chars}}
+    '[exp_id].[random hash of 16 chars]'.
     """
+
     # ID of the exploration.
-    exp_id = ndb.StringProperty(indexed=True, required=True)
+    exp_id = datastore_services.StringProperty(indexed=True, required=True)
     # Version of the exploration.
-    exp_version = ndb.IntegerProperty(indexed=True, required=True)
+    exp_version = (
+        datastore_services.IntegerProperty(indexed=True, required=True))
     # Type of the issue.
-    issue_type = ndb.StringProperty(
+    issue_type = datastore_services.StringProperty(
         indexed=True, required=True, choices=ALLOWED_ISSUE_TYPES)
     # The customization args dict for the given issue_type.
-    issue_customization_args = ndb.JsonProperty(required=True)
+    issue_customization_args = datastore_services.JsonProperty(required=True)
     # The playthrough actions for this playthrough. This will be a list of dicts
     # where each dict represents a single playthrough action. The list is
     # ordered by the time of occurence of the action.
-    actions = ndb.JsonProperty(repeated=True)
+    actions = datastore_services.JsonProperty(repeated=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """All playthrough data is anonymized and contains no data directly
+        corresponding to users. For specifics on the data included in this
+        model, see:
+        https://github.com/oppia/oppia/tree/develop/extensions/actions.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def _generate_id(cls, exp_id):
+    def _generate_id(cls, exp_id: str) -> str:
         """Generates a unique id for the playthrough of the form
-        {{exp_id}}.{{random_hash_of_16_chars}}
+        '[exp_id].[random hash of 16 chars]'.
 
         Args:
             exp_id: str. ID of the exploration.
 
         Returns:
-            ID of the new PlaythroughModel instance.
+            str. ID of the new PlaythroughModel instance.
 
         Raises:
-            Exception: The id generator for PlaythroughModel is producing too
+            Exception. The id generator for PlaythroughModel is producing too
                 many collisions.
         """
 
-        for _ in xrange(base_models.MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
@@ -1099,8 +1563,15 @@ class PlaythroughModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, issue_type, issue_customization_args,
-            actions):
+        cls,
+        exp_id: str,
+        exp_version: int,
+        issue_type: str,
+        issue_customization_args: (
+            stats_domain.IssuesCustomizationArgsDictType
+        ),
+        actions: List[stats_domain.LearnerActionDict]
+    ) -> str:
         """Creates a PlaythroughModel instance and writes it to the
         datastore.
 
@@ -1119,23 +1590,24 @@ class PlaythroughModel(base_models.BaseModel):
             str. ID of the new PlaythroughModel instance.
         """
         instance_id = cls._generate_id(exp_id)
-        playthrough_instance = cls(
+        cls(
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
             issue_type=issue_type,
             issue_customization_args=issue_customization_args,
-            actions=actions)
-        playthrough_instance.put()
+            actions=actions).put()
         return instance_id
 
     @classmethod
-    def delete_playthroughs_multi(cls, playthrough_ids):
-        """Deltes multiple playthrough instances.
-
-        Args:
-            playthrough_ids: list(str). List of playthrough IDs to be deleted.
-        """
-        instances = cls.get_multi(playthrough_ids)
-        cls.delete_multi(instances)
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(PlaythroughModel, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'issue_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'issue_customization_args': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'actions': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class LearnerAnswerDetailsModel(base_models.BaseModel):
@@ -1151,29 +1623,40 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     # For exploration state the state reference is of the form
     # 'exp_id':'state_name', while for question state reference is of the form
     # 'question_id' as currently the one question holds only one state.
-    state_reference = ndb.StringProperty(required=True, indexed=True)
+    state_reference = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The type of entity e.g "exploration" or "question".
-    entity_type = ndb.StringProperty(
+    entity_type = datastore_services.StringProperty(
         required=True, indexed=True, choices=ALLOWED_ENTITY_TYPES)
     # The id of the interaction for which the answer details were received.
-    interaction_id = ndb.StringProperty(required=True, indexed=True)
+    interaction_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # List of LearnerAnswerInfo dicts, which is defined in
     # stats_domain.py, each dict corresponds to a single answer info of
     # learner.
-    learner_answer_info_list = ndb.JsonProperty(repeated=True, indexed=False)
+    learner_answer_info_list = (
+        datastore_services.JsonProperty(repeated=True, indexed=False))
     # The schema version of the LearnerAnswerInfo dict. If the
     # LearnerAnswerInfo schema changes in future this needs to be incremented.
-    learner_answer_info_schema_version = ndb.IntegerProperty(
+    learner_answer_info_schema_version = datastore_services.IntegerProperty(
         indexed=True, default=(
             feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION))
     # The total number of bytes needed to store all of the answers in the
     # learner_answer_info_list. This value is found by summing the JSON
     # sizes of all answer info dicts stored inside learner_answer_info_list.
-    accumulated_answer_info_json_size_bytes = ndb.IntegerProperty(
-        indexed=True, required=False, default=0)
+    accumulated_answer_info_json_size_bytes = (
+        datastore_services.IntegerProperty(
+            indexed=True, required=False, default=0))
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_state_reference_for_exploration(cls, exp_id, state_name):
+    def get_state_reference_for_exploration(
+            cls, exp_id: str, state_name: str
+    ) -> str:
         """Generate the state_reference for the state in an exploration.
 
         Args:
@@ -1186,7 +1669,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         return '%s:%s' % (exp_id, state_name)
 
     @classmethod
-    def get_state_reference_for_question(cls, question_id):
+    def get_state_reference_for_question(cls, question_id: str) -> str:
         """Generate the state_reference for the state in the question.
 
         Args:
@@ -1198,7 +1681,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         return question_id
 
     @classmethod
-    def get_instance_id(cls, entity_type, state_reference):
+    def get_instance_id(cls, entity_type: str, state_reference: str) -> str:
         """Generates the id for the newly created model instance.
 
         Args:
@@ -1216,11 +1699,18 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             '%s:%s' % (entity_type, state_reference))
         return instance_id
 
+    # TODO(#13523): Change 'learner_answer_info_list' to TypedDict/Domain Object
+    # to remove Any used below.
     @classmethod
     def create_model_instance(
-            cls, entity_type, state_reference, interaction_id,
-            learner_answer_info_list, learner_answer_info_schema_version,
-            accumulated_answer_info_json_size_bytes):
+        cls,
+        entity_type: str,
+        state_reference: str,
+        interaction_id: str,
+        learner_answer_info_list: List[stats_domain.LearnerAnswerInfo],
+        learner_answer_info_schema_version: int,
+        accumulated_answer_info_json_size_bytes: int
+    ) -> None:
         """Creates a new LearnerAnswerDetailsModel for the given entity type
         then writes it to the datastore.
 
@@ -1231,10 +1721,11 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 instance is being created. For exploration state it will be of
                 the form 'exp_id:state_name', and for question it will be of
                 the form 'question_id'.
-            interaction_id: str.  The ID of the interaction for which the
+            interaction_id: str. The ID of the interaction for which the
                 answer details are received.
-            learner_answer_info_list: list. The list of LearnerAnswerInfo
-                objects in dict format, which is defined in the stats_domain.
+            learner_answer_info_list: list(LearnerAnswerInfo). The list of
+                LearnerAnswerInfo objects in dict format, which is defined in
+                the stats_domain.
             learner_answer_info_schema_version: int. The version of
                 LearnerAnswerInfo dict, which is currently supported by
                 the Oppia.
@@ -1247,16 +1738,21 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             entity_type=entity_type,
             state_reference=state_reference,
             interaction_id=interaction_id,
-            learner_answer_info_list=learner_answer_info_list,
+            learner_answer_info_list=[
+                learner_answer_info.to_dict()
+                for learner_answer_info in learner_answer_info_list
+            ],
             learner_answer_info_schema_version=(
                 learner_answer_info_schema_version),
             accumulated_answer_info_json_size_bytes=(
                 accumulated_answer_info_json_size_bytes))
+        answer_details_instance.update_timestamps()
         answer_details_instance.put()
 
     @classmethod
     def get_model_instance(
-            cls, entity_type, state_reference):
+        cls, entity_type: str, state_reference: str
+    ) -> Optional[LearnerAnswerDetailsModel]:
         """Returns the model instance related to the entity type and
         state reference.
 
@@ -1270,15 +1766,33 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
 
         Returns:
             LearnerAnswerDetailsModel or None. The answer details model
-                associated with the given entity type and state reference or
-                None if the instance is not found. Doesn't include deleted
-                entries.
+            associated with the given entity type and state reference or
+            None if the instance is not found. Doesn't include deleted
+            entries.
         """
         instance_id = cls.get_instance_id(entity_type, state_reference)
-        model_instance = cls.get(instance_id, strict=False)
-        if model_instance:
-            return model_instance
-        return None
+        return cls.get(instance_id, strict=False)
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'state_reference': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'learner_answer_info_list':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'learner_answer_info_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'accumulated_answer_info_json_size_bytes':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -1287,22 +1801,33 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     This model is keyed using a custom ID of the format
     {[EXPLORATION_ID]:[EXPLORATION_VERSION]}.
     """
+
     # ID of exploration.
-    exploration_id = ndb.StringProperty(indexed=True)
+    exploration_id = datastore_services.StringProperty(indexed=True)
+    # TODO(#13614): Determine whether ExplorationAnnotationsModel can be
+    # updated to use an int type for the 'version' instead,
+    # and update existing datastore models if needed.
     # Version of exploration.
-    version = ndb.StringProperty(indexed=False)
+    version = datastore_services.StringProperty(indexed=True)
     # Number of students who started the exploration.
-    num_starts = ndb.IntegerProperty(indexed=False)
+    num_starts = datastore_services.IntegerProperty(indexed=False)
     # Number of students who have completed the exploration.
-    num_completions = ndb.IntegerProperty(indexed=False)
+    num_completions = datastore_services.IntegerProperty(indexed=False)
     # Keyed by state name that describes the numbers of hits for each state
     # {state_name: {'first_entry_count': ...,
     #               'total_entry_count': ...,
     #               'no_answer_count': ...}}
-    state_hit_counts = ndb.JsonProperty(indexed=False)
+    state_hit_counts = datastore_services.JsonProperty(indexed=False)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_entity_id(cls, exploration_id, exploration_version):
+    def get_entity_id(
+            cls, exploration_id: str, exploration_version: int
+    ) -> str:
         """Gets entity_id for a batch model based on given exploration state.
 
         Args:
@@ -1317,21 +1842,26 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def create(
-            cls, exp_id, version, num_starts, num_completions,
-            state_hit_counts):
+        cls,
+        exp_id: str,
+        version: str,
+        num_starts: int,
+        num_completions: int,
+        state_hit_counts: Dict[str, int]
+    ) -> None:
         """Creates a new ExplorationAnnotationsModel and
         then writes it to the datastore.
 
         Args:
             exp_id: str. ID of the exploration currently being played.
-            version: int. Version of exploration.
+            version: str. Version of exploration.
             num_starts: int. Number of students who started the exploration.
             num_completions: int. Number of students who have completed
                 the exploration.
             state_hit_counts: dict. Describes the number of hits
                 for each state.
         """
-        entity_id = cls.get_entity_id(exp_id, version)
+        entity_id = cls.get_entity_id(exp_id, int(version))
         cls(
             id=entity_id,
             exploration_id=exp_id,
@@ -1341,7 +1871,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
             state_hit_counts=state_hit_counts).put()
 
     @classmethod
-    def get_versions(cls, exploration_id):
+    def get_versions(cls, exploration_id: str) -> List[str]:
         """This function returns a list containing versions of
         ExplorationAnnotationsModel for a specific exploration_id.
 
@@ -1349,13 +1879,32 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
             exploration_id: str. ID of the exploration currently being played.
 
         Returns:
-            list(int). List of versions corresponding to annotation models
-                with given exp_id.
+            list(str). List of versions corresponding to annotation models
+            with given exp_id.
         """
-        return [
-            annotations.version for annotations in cls.get_all().filter(
+        annotations_result: Sequence[ExplorationAnnotationsModel] = (
+            cls.get_all().filter(
                 cls.exploration_id == exploration_id
-            ).fetch(feconf.DEFAULT_QUERY_LIMIT)]
+            ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
+        return [annotations.version for annotations in annotations_result]
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_starts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_completions': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_hit_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class StateAnswersModel(base_models.BaseModel):
@@ -1369,6 +1918,7 @@ class StateAnswersModel(base_models.BaseModel):
     This model is keyed using a custom ID of the format
         {[EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[SHARD_ID]}.
     """
+
     # This provides about 124k of padding for the other properties and entity
     # storage overhead (since the max entity size is 1MB). The meta data can
     # get close to 50k or exceed it, so plenty of padding is left to avoid
@@ -1377,28 +1927,30 @@ class StateAnswersModel(base_models.BaseModel):
 
     # Explicitly store exploration ID, exploration version and state name
     # so we can easily do queries on them.
-    exploration_id = ndb.StringProperty(indexed=True, required=True)
-    exploration_version = ndb.IntegerProperty(indexed=True, required=True)
-    state_name = ndb.StringProperty(indexed=True, required=True)
+    exploration_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
+    exploration_version = (
+        datastore_services.IntegerProperty(indexed=True, required=True))
+    state_name = datastore_services.StringProperty(indexed=True, required=True)
     # Which shard this corresponds to in the list of shards. If this is 0 it
     # represents the master shard which includes the shard_count. All other
     # shards look similar to the master shard except they do not populate
     # shard_count.
-    shard_id = ndb.IntegerProperty(indexed=True, required=True)
+    shard_id = datastore_services.IntegerProperty(indexed=True, required=True)
     # Store interaction type to know which calculations should be performed.
-    interaction_id = ndb.StringProperty(indexed=True, required=True)
+    interaction_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
     # Store how many extra shards are associated with this state. This is only
     # present when shard_id is 0. This starts at 0 (the main shard is not
     # counted).
-    shard_count = ndb.IntegerProperty(indexed=True, required=False)
+    shard_count = (
+        datastore_services.IntegerProperty(indexed=True, required=False))
     # The total number of bytes needed to store all of the answers in the
     # submitted_answer_list, minus any overhead of the property itself. This
     # value is found by summing the JSON sizes of all answer dicts stored inside
     # submitted_answer_list.
-    # pylint: disable=invalid-name
-    accumulated_answer_json_size_bytes = ndb.IntegerProperty(
+    accumulated_answer_json_size_bytes = datastore_services.IntegerProperty(
         indexed=False, required=False, default=0)
-    # pylint: enable=invalid-name
 
     # List of answer dicts, each of which is stored as JSON blob. The content
     # of answer dicts is specified in core.domain.stats_domain.StateAnswers.
@@ -1406,16 +1958,27 @@ class StateAnswersModel(base_models.BaseModel):
     # according to the chronological order of their submission otherwise
     # TopNUnresolvedAnswersByFrequency calculation in
     # InteractionAnswerSummariesAggregator will output invalid results.
-    submitted_answer_list = ndb.JsonProperty(repeated=True, indexed=False)
+    submitted_answer_list = (
+        datastore_services.JsonProperty(repeated=True, indexed=False))
     # The version of the submitted_answer_list currently supported by Oppia. If
     # the internal JSON structure of submitted_answer_list changes,
     # CURRENT_SCHEMA_VERSION in this class needs to be incremented.
-    schema_version = ndb.IntegerProperty(
+    schema_version = datastore_services.IntegerProperty(
         indexed=True, default=feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _get_model(
-            cls, exploration_id, exploration_version, state_name, shard_id):
+        cls,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str,
+        shard_id: int
+    ) -> Optional[StateAnswersModel]:
         """Gets model instance based on given exploration state and shard_id.
 
         Args:
@@ -1426,16 +1989,21 @@ class StateAnswersModel(base_models.BaseModel):
             shard_id: int. The ID of the shard to fetch answers for.
 
         Returns:
-            StateAnswersModel. The model associated with the specified
-                exploration state and shard ID, or None if no answers
-                have been submitted corresponding to this state.
+            StateAnswersModel|None. The model associated with the specified
+            exploration state and shard ID, or None if no answers
+            have been submitted corresponding to this state.
         """
         entity_id = cls._get_entity_id(
             exploration_id, exploration_version, state_name, shard_id)
         return cls.get(entity_id, strict=False)
 
     @classmethod
-    def get_master_model(cls, exploration_id, exploration_version, state_name):
+    def get_master_model(
+        cls,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str
+    ) -> Optional[StateAnswersModel]:
         """Retrieves the master model associated with the specific exploration
         state. Returns None if no answers have yet been submitted to the
         specified exploration state.
@@ -1448,15 +2016,17 @@ class StateAnswersModel(base_models.BaseModel):
 
         Returns:
             StateAnswersModel|None. The master model associated with the
-                specified exploration state, or None if no answers have been
-                submitted to this state.
+            specified exploration state, or None if no answers have been
+            submitted to this state.
         """
         main_shard = cls._get_model(
             exploration_id, exploration_version, state_name, 0)
         return main_shard if main_shard else None
 
     @classmethod
-    def get_all_models(cls, exploration_id, exploration_version, state_name):
+    def get_all_models(
+        cls, exploration_id: str, exploration_version: int, state_name: str
+    ) -> Optional[List[StateAnswersModel]]:
         """Retrieves all models and shards associated with the specific
         exploration state.
 
@@ -1468,7 +2038,7 @@ class StateAnswersModel(base_models.BaseModel):
 
         Returns:
             list(StateAnswersModel)|None. Returns None if no answers have yet
-                been submitted to the specified exploration state.
+            been submitted to the specified exploration state.
         """
         # It's okay if this isn't run in a transaction. When adding new shards,
         # it's guaranteed the master shard will be updated at the same time the
@@ -1486,16 +2056,32 @@ class StateAnswersModel(base_models.BaseModel):
                     cls._get_entity_id(
                         exploration_id, exploration_version, state_name,
                         shard_id)
-                    for shard_id in xrange(1, main_shard.shard_count + 1)]
-                all_models += cls.get_multi(shard_ids)
+                    for shard_id in range(
+                        1, main_shard.shard_count + 1)]
+                state_answer_models = cls.get_multi(shard_ids)
+                for state_answer_model in state_answer_models:
+                    # Filtering out the None cases for MyPy type checking,
+                    # because shard deletion is not supported and we expect
+                    # main_shard.shard_count to be present, since the master
+                    # model keeps track of the number of shards explicitly.
+                    assert state_answer_model is not None
+                    all_models.append(state_answer_model)
             return all_models
         else:
             return None
 
     @classmethod
-    def _insert_submitted_answers_unsafe(
-            cls, exploration_id, exploration_version, state_name,
-            interaction_id, new_submitted_answer_dict_list):
+    @transaction_services.run_in_transaction_wrapper
+    def _insert_submitted_answers_unsafe_transactional(
+        cls,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str,
+        interaction_id: str,
+        new_submitted_answer_dict_list: List[
+            stats_domain.SubmittedAnswerDict
+        ]
+    ) -> None:
         """See the insert_submitted_answers for general documentation of what
         this method does. It's only safe to call this method from within a
         transaction.
@@ -1533,6 +2119,8 @@ class StateAnswersModel(base_models.BaseModel):
                 exploration_id, exploration_version, state_name,
                 main_shard.shard_count)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert last_shard is not None
         sharded_answer_lists, sharded_answer_list_sizes = cls._shard_answers(
             last_shard.submitted_answer_list,
             last_shard.accumulated_answer_json_size_bytes,
@@ -1556,7 +2144,7 @@ class StateAnswersModel(base_models.BaseModel):
             last_shard_updated = False
 
         # Insert any new shards.
-        for i in xrange(1, len(sharded_answer_lists)):
+        for i in range(1, len(sharded_answer_lists)):
             shard_id = main_shard.shard_count + i
             entity_id = cls._get_entity_id(
                 exploration_id, exploration_version, state_name, shard_id)
@@ -1586,12 +2174,20 @@ class StateAnswersModel(base_models.BaseModel):
             if last_shard_updated:
                 entities_to_put.append(last_shard)
 
+        cls.update_timestamps_multi(entities_to_put)
         cls.put_multi(entities_to_put)
 
     @classmethod
     def insert_submitted_answers(
-            cls, exploration_id, exploration_version, state_name,
-            interaction_id, new_submitted_answer_dict_list):
+        cls,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str,
+        interaction_id: str,
+        new_submitted_answer_dict_list: List[
+            stats_domain.SubmittedAnswerDict
+        ]
+    ) -> None:
         """Given an exploration ID, version, state name, and interaction ID,
         attempt to insert a list of specified SubmittedAnswers into this model,
         performing sharding operations as necessary. This method automatically
@@ -1611,14 +2207,18 @@ class StateAnswersModel(base_models.BaseModel):
             new_submitted_answer_dict_list: list(dict). List of new submitted
                 answers each of which is stored as a JSON blob.
         """
-        transaction_services.run_in_transaction(
-            cls._insert_submitted_answers_unsafe, exploration_id,
-            exploration_version, state_name, interaction_id,
-            new_submitted_answer_dict_list)
+        cls._insert_submitted_answers_unsafe_transactional(
+            exploration_id, exploration_version, state_name,
+            interaction_id, new_submitted_answer_dict_list)
 
     @classmethod
     def _get_entity_id(
-            cls, exploration_id, exploration_version, state_name, shard_id):
+        cls,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str,
+        shard_id: int
+    ) -> str:
         """Returns the entity_id of a StateAnswersModel based on it's
         exp_id, state_name, exploration_version and shard_id.
 
@@ -1632,13 +2232,19 @@ class StateAnswersModel(base_models.BaseModel):
             str. Entity_id for a StateAnswersModel instance.
         """
         return ':'.join([
-            exploration_id, str(exploration_version), state_name,
-            str(shard_id)])
+            exploration_id,
+            str(exploration_version),
+            state_name,
+            str(shard_id)
+        ])
 
     @classmethod
     def _shard_answers(
-            cls, current_answer_list, current_answer_list_size,
-            new_answer_list):
+        cls,
+        current_answer_list: List[stats_domain.SubmittedAnswerDict],
+        current_answer_list_size: int,
+        new_answer_list: List[stats_domain.SubmittedAnswerDict]
+    ) -> Tuple[List[List[stats_domain.SubmittedAnswerDict]], List[int]]:
         """Given a current answer list which can fit within one NDB entity and
         a list of new answers which need to try and fit in the current answer
         list, shard the answers such that a list of answer lists are returned.
@@ -1686,7 +2292,9 @@ class StateAnswersModel(base_models.BaseModel):
         return sharded_answer_lists, sharded_answer_list_sizes
 
     @classmethod
-    def _get_answer_dict_size(cls, answer_dict):
+    def _get_answer_dict_size(
+        cls, answer_dict: stats_domain.SubmittedAnswerDict
+    ) -> int:
         """Returns a size overestimate (in bytes) of the given answer dict.
 
         Args:
@@ -1697,6 +2305,28 @@ class StateAnswersModel(base_models.BaseModel):
         """
         return sys.getsizeof(json.dumps(answer_dict))
 
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'shard_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'shard_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'accumulated_answer_json_size_bytes':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'submitted_answer_list': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
 
 class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     """Store output of calculation performed on StateAnswers.
@@ -1704,103 +2334,46 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     {[EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[CALCULATION_ID]}.
     """
 
-    exploration_id = ndb.StringProperty(indexed=True, required=True)
+    # NOTE TO DEVELOPERS: The methods create_or_update() and get_model() were
+    # removed in #13021 as part of the migration to Apache Beam. Please refer to
+    # that PR if you need to reinstate them.
+
+    exploration_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
     # May be an integral exploration_version or 'all' if this entity represents
     # an aggregation of multiple sets of answers.
-    exploration_version = ndb.StringProperty(indexed=True, required=True)
-    state_name = ndb.StringProperty(indexed=True, required=True)
-    interaction_id = ndb.StringProperty(indexed=True)
-    calculation_id = ndb.StringProperty(indexed=True, required=True)
+    exploration_version = (
+        datastore_services.StringProperty(indexed=True, required=True))
+    state_name = datastore_services.StringProperty(indexed=True, required=True)
+    interaction_id = datastore_services.StringProperty(indexed=True)
+    calculation_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
     # Calculation output type (for deserialization). See
     # stats_domain.StateAnswersCalcOutput for an enumeration of valid types.
-    calculation_output_type = ndb.StringProperty(indexed=True)
+    calculation_output_type = datastore_services.StringProperty(indexed=True)
     # Calculation output dict stored as JSON blob.
-    calculation_output = ndb.JsonProperty(indexed=False)
+    calculation_output = datastore_services.JsonProperty(indexed=False)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def create_or_update(
-            cls, exploration_id, exploration_version, state_name,
-            interaction_id, calculation_id, calculation_output_type,
-            calculation_output):
-        """Creates or updates StateAnswersCalcOutputModel and then writes
-        it to the datastore.
-
-        Args:
-            exploration_id: str. ID of the exploration currently being played.
-            exploration_version: int. Version of exploration.
-            state_name: str. Name of current state.
-            interaction_id: str. ID of the interaction corresponding to the
-                calculated output.
-            calculation_id: str. ID of the calculation performed.
-            calculation_output_type: str. Type of the calculation output.
-            calculation_output: dict. Output of the calculation which is to be
-                stored as a JSON blob.
-
-        Raises:
-            Exception: The calculation_output is too large.
-        """
-        instance_id = cls._get_entity_id(
-            exploration_id, exploration_version, state_name, calculation_id)
-        instance = cls.get(instance_id, strict=False)
-        if not instance:
-            # Create new instance.
-            instance = cls(
-                id=instance_id, exploration_id=exploration_id,
-                exploration_version=exploration_version,
-                state_name=state_name, interaction_id=interaction_id,
-                calculation_id=calculation_id,
-                calculation_output_type=calculation_output_type,
-                calculation_output=calculation_output)
-        else:
-            instance.calculation_output = calculation_output
-
-        try:
-            # This may fail if calculation_output is too large.
-            instance.put()
-        except Exception:
-            logging.exception(
-                'Failed to add calculation output for exploration ID %s, '
-                'version %s, state name %s, and calculation ID %s' % (
-                    exploration_id, exploration_version,
-                    state_name.encode('utf-8'), calculation_id))
-
-    @classmethod
-    def get_model(
-            cls, exploration_id, exploration_version, state_name,
-            calculation_id):
-        """Gets entity instance corresponding to the given exploration state.
-
-        Args:
-            exploration_id: str. ID of the exploration currently being played.
-            exploration_version: int. Version of exploration.
-            state_name: str. Name of current state.
-            calculation_id: str. ID of the calculation performed.
-
-        Returns:
-            StateAnswersCalcOutputModel. Entity instance associated with the
-                given exploration state.
-        """
-        entity_id = cls._get_entity_id(
-            exploration_id, str(exploration_version), state_name,
-            calculation_id)
-        instance = cls.get(entity_id, strict=False)
-        return instance
-
-    @classmethod
-    def _get_entity_id(
-            cls, exploration_id, exploration_version, state_name,
-            calculation_id):
-        """Returns entity_id corresponding to the given exploration state.
-
-        Args:
-            exploration_id: str. ID of the exploration currently being played.
-            exploration_version: int. Version of exploration.
-            state_name: str. Name of current state.
-            calculation_id: str. ID of the calculation performed.
-
-        Returns:
-            str. The entity ID corresponding to the given exploration state.
-        """
-        return ':'.join([
-            exploration_id, str(exploration_version), state_name,
-            calculation_id])
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'calculation_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'calculation_output_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'calculation_output': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })

@@ -1,4 +1,15 @@
 {
+  "AlgebraicExpressionInput": {
+    "MatchesExactlyWith": {
+      "description": "matches exactly with {{x|AlgebraicExpression}}"
+    },
+    "MatchesUpToTrivialManipulations": {
+      "description": "matches {{x|AlgebraicExpression}}, taking into account commutativity and associativity"
+    },
+    "IsEquivalentTo": {
+      "description": "is equivalent to {{x|AlgebraicExpression}}"
+    }
+  },
   "CodeRepl": {
     "CodeEquals": {
       "description": "has code equal to {{x|CodeString}}"
@@ -25,16 +36,16 @@
   "Continue": {},
   "DragAndDropSortInput": {
     "IsEqualToOrdering": {
-      "description": "is equal to ordering {{x|ListOfSetsOfHtmlStrings}}"
+      "description": "is equal to ordering {{x|ListOfSetsOfTranslatableHtmlContentIds}}"
     },
     "IsEqualToOrderingWithOneItemAtIncorrectPosition": {
-      "description": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfHtmlStrings}}"
+      "description": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfTranslatableHtmlContentIds}}"
     },
     "HasElementXAtPositionY": {
-      "description": "has element {{x|DragAndDropHtmlString}} at position {{y|DragAndDropPositiveInt}}"
+      "description": "has element {{x|TranslatableHtmlContentId}} at position {{y|DragAndDropPositiveInt}}"
     },
     "HasElementXBeforeElementY": {
-      "description": "has element {{x|DragAndDropHtmlString}} before element {{y|DragAndDropHtmlString}}"
+      "description": "has element {{x|TranslatableHtmlContentId}} before element {{y|TranslatableHtmlContentId}}"
     }
   },
   "EndExploration": {},
@@ -58,7 +69,7 @@
       "description": "has numerator equal to {{x|Int}}"
     },
     "HasDenominatorEqualTo": {
-      "description": "has denominator equal to {{x|NonnegativeInt}}"
+      "description": "has denominator equal to {{x|PositiveInt}}"
     },
     "HasIntegerPartEqualTo": {
       "description": "has integer part equal to {{x|Int}}"
@@ -90,32 +101,27 @@
   },
   "ItemSelectionInput": {
     "Equals": {
-      "description": "is equal to {{x|SetOfHtmlString}}"
+      "description": "is equal to {{x|SetOfTranslatableHtmlContentIds}}"
     },
     "ContainsAtLeastOneOf": {
-      "description": "contains at least one of {{x|SetOfHtmlString}}"
+      "description": "contains at least one of {{x|SetOfTranslatableHtmlContentIds}}"
     },
     "DoesNotContainAtLeastOneOf": {
-      "description": "omits at least one of {{x|SetOfHtmlString}}"
+      "description": "omits at least one of {{x|SetOfTranslatableHtmlContentIds}}"
     },
     "IsProperSubsetOf": {
-      "description": "is a proper subset of {{x|SetOfHtmlString}}"
+      "description": "is a proper subset of {{x|SetOfTranslatableHtmlContentIds}}"
     }
   },
-  "LogicProof": {
-    "Correct": {
-      "description": "is correct"
+  "MathEquationInput": {
+    "MatchesExactlyWith": {
+      "description": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}"
     },
-    "NotCorrect": {
-      "description": "is not correct"
+    "MatchesUpToTrivialManipulations": {
+      "description": "matches {{x|MathEquation}} {{y|PositionOfTerms}}, taking into account commutativity and associativity"
     },
-    "NotCorrectByCategory": {
-      "description": "is not correct due to {{c|LogicErrorCategory}}"
-    }
-  },
-  "MathExpressionInput": {
-    "IsMathematicallyEquivalentTo": {
-      "description": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}"
+    "IsEquivalentTo": {
+      "description": "is equivalent to {{x|MathEquation}}"
     }
   },
   "MultipleChoiceInput": {
@@ -149,6 +155,17 @@
     },
     "IsEquivalentTo": {
         "description": "is equivalent to {{f|NumberWithUnits}}"
+    }
+  },
+  "NumericExpressionInput": {
+    "MatchesExactlyWith": {
+      "description": "matches exactly with {{x|NumericExpression}}"
+    },
+    "MatchesUpToTrivialManipulations": {
+      "description": "matches {{x|NumericExpression}}, taking into account commutativity and associativity"
+    },
+    "IsEquivalentTo": {
+      "description": "is equivalent to {{x|NumericExpression}}"
     }
   },
   "NumericInput": {
@@ -199,42 +216,53 @@
   },
   "SetInput": {
     "Equals": {
-      "description": "is equal to {{x|SetOfUnicodeString}}"
+      "description": "is equal to {{x|TranslatableSetOfUnicodeString}}"
     },
     "IsSubsetOf": {
-      "description": "is a proper subset of {{x|SetOfUnicodeString}}"
+      "description": "is a proper subset of {{x|TranslatableSetOfUnicodeString}}"
     },
     "IsSupersetOf": {
-      "description": "is a proper superset of {{x|SetOfUnicodeString}}"
+      "description": "is a proper superset of {{x|TranslatableSetOfUnicodeString}}"
     },
     "HasElementsIn": {
-      "description": "has elements in common with {{x|SetOfUnicodeString}}"
+      "description": "has elements in common with {{x|TranslatableSetOfUnicodeString}}"
     },
     "HasElementsNotIn": {
-      "description": "has elements not in {{x|SetOfUnicodeString}}"
+      "description": "has elements not in {{x|TranslatableSetOfUnicodeString}}"
     },
     "OmitsElementsIn": {
-      "description": "omits some elements of {{x|SetOfUnicodeString}}"
+      "description": "omits some elements of {{x|TranslatableSetOfUnicodeString}}"
     },
     "IsDisjointFrom": {
-      "description": "has no elements in common with {{x|SetOfUnicodeString}}"
+      "description": "has no elements in common with {{x|TranslatableSetOfUnicodeString}}"
     }
   },
   "TextInput": {
     "Equals": {
-      "description": "is equal to {{x|NormalizedString}}"
-    },
-    "CaseSensitiveEquals": {
-      "description": "is equal to {{x|NormalizedString}}, taking case into account"
+      "description": "is equal to at least one of {{x|TranslatableSetOfNormalizedString}}, without taking case into account"
     },
     "StartsWith": {
-      "description": "starts with {{x|NormalizedString}}"
+      "description": "starts with at least one of {{x|TranslatableSetOfNormalizedString}}"
     },
     "Contains": {
-      "description": "contains {{x|NormalizedString}}"
+      "description": "contains at least one of {{x|TranslatableSetOfNormalizedString}}"
     },
     "FuzzyEquals": {
-      "description": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
+      "description": "is equal to at least one of {{x|TranslatableSetOfNormalizedString}}, misspelled by at most one character"
+    }
+  },
+  "RatioExpressionInput": {
+    "Equals": {
+      "description": "is equal to {{x|RatioExpression}}"
+    },
+    "IsEquivalent": {
+      "description": "is equivalent to {{x|RatioExpression}}"
+    },
+    "HasNumberOfTermsEqualTo": {
+      "description": "has number of terms equal to {{y|PositiveInt}}"
+    },
+    "HasSpecificTermEqualTo": {
+      "description": "has term {{x|PositiveInt}} equal to {{y|PositiveInt}}"
     }
   }
 }

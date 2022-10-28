@@ -1,0 +1,26 @@
+<!-- Checking history. -->
+<div *ngIf="!details">
+  <div class="modal-header">
+    <h3>Checking History<loading-dots></loading-dots></h3>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="close()">Cancel</button>
+  </div>
+</div>
+
+<!-- Finished checking history and exploration version is invalid. -->
+<div *ngIf="details">
+  <div class="modal-header"><h3>Unable to Revert</h3></div>
+
+  <div class="modal-body oppia-long-text">
+    <p>You are trying to revert to version {{ version }}.
+      However, this version is <strong>invalid</strong>. Here is the error:
+    </p>
+    <pre class="oppia-pre-wrapped-text">{{ details }}</pre>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="close()">Close</button>
+  </div>
+</div>

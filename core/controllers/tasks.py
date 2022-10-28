@@ -14,24 +14,27 @@
 
 """Controllers for task queue handlers."""
 
+from __future__ import annotations
+
 import json
 
+from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import rights_manager
-from core.domain import suggestion_services
-from core.platform import models
-
-(job_models, email_models) = models.Registry.import_models(
-    [models.NAMES.job, models.NAMES.email])
-transaction_services = models.Registry.import_transaction_services()
+from core.domain import question_services
+from core.domain import stats_services
+from core.domain import suggestion_registry
+from core.domain import taskqueue_services
+from core.domain import wipeout_service
 
 
 class UnsentFeedbackEmailHandler(base.BaseHandler):
     """Handler task of sending emails of feedback messages."""
 
+    @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
@@ -40,8 +43,7 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
             # Model may not exist if user has already attended to the feedback.
             return
 
-        transaction_services.run_in_transaction(
-            feedback_services.update_feedback_email_retries, user_id)
+        feedback_services.update_feedback_email_retries_transactional(user_id)
 
         messages = {}
         for reference in references:
@@ -64,32 +66,72 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
                 }
 
         email_manager.send_feedback_message_email(user_id, messages)
-        transaction_services.run_in_transaction(
-            feedback_services.pop_feedback_message_references, user_id,
-            len(references))
+        feedback_services.pop_feedback_message_references_transactional(
+            user_id, len(references))
+        self.render_json({})
 
 
-class SuggestionEmailHandler(base.BaseHandler):
-    """Handler task of sending email of suggestion."""
+class ContributorDashboardAchievementEmailHandler(base.BaseHandler):
+    """Handler task of sending email of contributor dashboard achievements."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'contributor_user_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'contribution_type': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'contribution_sub_type': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'rank_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
+
+    @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
-        exploration_id = payload['exploration_id']
-        thread_id = payload['thread_id']
+        contributor_user_id = payload['contributor_user_id']
+        contribution_type = payload['contribution_type']
+        contribution_sub_type = payload['contribution_sub_type']
+        language_code = payload['language_code']
+        rank_name = payload['rank_name']
 
-        exploration_rights = (
-            rights_manager.get_exploration_rights(exploration_id))
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        suggestion = suggestion_services.get_suggestion_by_id(thread_id)
+        email_info = suggestion_registry.ContributorMilestoneEmailInfo(
+            contributor_user_id, contribution_type, contribution_sub_type,
+            language_code, rank_name)
 
-        email_manager.send_suggestion_email(
-            exploration.title, exploration.id, suggestion.author_id,
-            exploration_rights.owner_ids)
+        email_manager.send_mail_to_notify_contributor_ranking_achievement(
+            email_info)
+        self.render_json({})
 
 
 class InstantFeedbackMessageEmailHandler(base.BaseHandler):
     """Handles task of sending feedback message emails instantly."""
 
+    @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
@@ -100,15 +142,12 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
         exploration = exp_fetchers.get_exploration_by_id(
             reference_dict['entity_id'])
         thread = feedback_services.get_thread(reference_dict['thread_id'])
-        model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-            user_id, reference_dict['thread_id'])
-        reply_to_id = model.reply_to_id
 
         subject = 'New Oppia message in "%s"' % thread.subject
         email_manager.send_instant_feedback_message_email(
             user_id, message.author_id, message.text, subject,
-            exploration.title, reference_dict['entity_id'],
-            thread.subject, reply_to_id=reply_to_id)
+            exploration.title, reference_dict['entity_id'], thread.subject)
+        self.render_json({})
 
 
 class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
@@ -116,6 +155,7 @@ class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
     changed.
     """
 
+    @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
@@ -134,6 +174,7 @@ class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
         email_manager.send_instant_feedback_message_email(
             user_id, message.author_id, text, subject, exploration.title,
             reference_dict['entity_id'], thread.subject)
+        self.render_json({})
 
 
 class FlagExplorationEmailHandler(base.BaseHandler):
@@ -141,6 +182,7 @@ class FlagExplorationEmailHandler(base.BaseHandler):
     to moderators.
     """
 
+    @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
         exploration_id = payload['exploration_id']
@@ -151,3 +193,54 @@ class FlagExplorationEmailHandler(base.BaseHandler):
 
         email_manager.send_flag_exploration_email(
             exploration.title, exploration_id, reporter_id, report_text)
+        self.render_json({})
+
+
+class DeferredTasksHandler(base.BaseHandler):
+    """This task handler handles special tasks that make single asynchronous
+    function calls. For more complex tasks that require a large number of
+    function calls, the correct approach is to create a special url handler that
+    handles that specific task. However, it doesn't make sense to create a url
+    handler for single function calls. This handler handles those cases.
+
+    The convention of function ids and an explanation of the different queue
+    names exists in 'core/domain/taskqueue_services.py' file.
+    """
+
+    DEFERRED_TASK_FUNCTIONS = {
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS: (
+            exp_services.delete_explorations_from_user_models),
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES: (
+            exp_services.delete_explorations_from_activities),
+        taskqueue_services.FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED: (
+            wipeout_service.delete_users_pending_to_be_deleted),
+        taskqueue_services.FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION: (
+            wipeout_service.check_completion_of_user_deletion),
+        taskqueue_services.FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY: (
+            exp_services.regenerate_exploration_summary_with_new_contributor),
+        taskqueue_services.FUNCTION_ID_UPDATE_STATS: (
+            stats_services.update_stats),
+        taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: (
+            question_services.untag_deleted_misconceptions),
+        taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: (
+            wipeout_service
+            .remove_user_from_activities_with_associated_rights_models)
+    }
+
+    @acl_decorators.can_perform_tasks_in_taskqueue
+    def post(self):
+        # The request body has bytes type, thus we need to decode it first.
+        payload = json.loads(self.request.body.decode('utf-8'))
+        if 'fn_identifier' not in payload:
+            raise Exception(
+                'This request cannot defer tasks because it does not contain a '
+                'function identifier attribute (fn_identifier). Deferred tasks '
+                'must contain a function_identifier in the payload.')
+        if payload['fn_identifier'] not in self.DEFERRED_TASK_FUNCTIONS:
+            raise Exception(
+                'The function id, %s, is not valid.' % payload['fn_identifier'])
+
+        deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
+            payload['fn_identifier']]
+        deferred_task_function(*payload['args'], **payload['kwargs'])
+        self.render_json({})

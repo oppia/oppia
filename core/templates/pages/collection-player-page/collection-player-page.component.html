@@ -1,0 +1,259 @@
+<div>
+  <background-banner></background-banner>
+  <div *ngIf="!collection?.getCollectionNodeCount()" class="no-exploration-created">
+    <div class="oppia-collection-path-section">
+      {{ 'I18N_COLLECTION_PLAYER_PAGE_NO_EXPLORATION' | translate }}
+    </div>
+  </div>
+  <div *ngIf="collection && collection?.getCollectionNodeCount()"
+       class="oppia-collection-player-tiles-container">
+    <h2 *ngIf="!collectionPlaythrough?.hasFinishedCollection()"
+        class="oppia-page-heading" align="center">
+      <span *ngIf="!collectionPlaythrough?.hasStartedCollection()"
+            class="oppia-collection-player-title-font">
+            {{ 'I18N_COLLECTION_PLAYER_PAGE_BEGIN' | translate }} {{ collection.getTitle() }}:
+      </span>
+      <span *ngIf="collectionPlaythrough?.hasStartedCollection()"
+            class="oppia-collection-player-title-font">
+            {{ 'I18N_COLLECTION_PLAYER_PAGE_CONTINUE' | translate }} {{ collection.getTitle() }}:
+      </span>
+    </h2>
+    <h2 *ngIf="collectionPlaythrough?.hasFinishedCollection()"
+        class="oppia-page-heading">
+      <span>
+        {{ 'I18N_COLLECTION_PLAYER_PAGE_FINISHED' | translate }}
+      </span>
+    </h2>
+    <div *ngIf="collection"
+         class="oppia-collection-path-section">
+      <svg width="540px"
+           [ngStyle]="{'margin-left': '10px'}"
+           [attr.height]="svgHeight + 'px'"
+           xmlns="http://www.w3.org/2000/svg">
+        <path fill="none"
+              stroke="#296E5F"
+              stroke-dasharray="15,28"
+              stroke-linecap="round"
+              stroke-width="12"
+              d="M80 80 L220 80"/>
+        <path fill="none"
+              stroke="#296E5F"
+              stroke-dasharray="15,28"
+              stroke-linecap="round"
+              stroke-width="12"
+              [attr.d]="pathSvgParameters"/>
+        <image *ngIf="!collectionPlaythrough?.hasStartedCollection()"
+               x="175"
+               y="100"
+               height="100"
+               width="100"
+               [attr.xlink:href]="getStaticImageUrl('/general/collection_start_here_arrow.svg')"
+               xlink:href="">
+        </image>
+        <text *ngIf="!collectionPlaythrough?.hasStartedCollection()"
+              x="210"
+              y="170"
+              alignment-baseline="middle"
+              font-family="Capriola, Roboto, Arial, sans-serif"
+              font-size="15"
+              fill="#E14738"
+              text-anchor="middle"
+              [innerHTML]="'I18N_START_HERE' | translate">
+        </text>
+      </svg>
+
+      <img [src]="getStaticImageUrl('/general/collection_mascot.svg')"
+           class="collection-mascot">
+      <a *ngFor="let node of collection.getCollectionNodes();let index = index"
+         [href]="getExplorationUrl(node?.getExplorationId())"
+         [ngStyle]="{position: 'absolute', left: pathIconParameters[index].left, top: pathIconParameters[index].top}">
+        <div [ngStyle]="{width: '125px',position: 'absolute',left: getExplorationTitlePosition(index),color: '#006553','font-family': 'Capriola, Roboto, Arial,sans-serif','font-size': '15px','text-align': 'center',bottom: '70%'}">
+            {{ node.getExplorationTitle() }}
+        </div>
+
+        <svg class="oppia-collection-exploration e2e-test-collection-exploration"
+             width="100"
+             height="125"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink"
+             version="1.1">
+          <defs>
+            <pattern id="image{{index}}"
+                     patternUnits="userSpaceOnUse"
+                     height="150"
+                     width="100">
+              <circle cx="50"
+                      cy="70"
+                      r="50"
+                      [attr.fill]="pathIconParameters[index]?.thumbnailBgColor"/>
+              <image *ngIf="isCompletedExploration(node?.getExplorationId())"
+                     x="0"
+                     y="20"
+                     height="100"
+                     width="100"
+                     [attr.xlink:href]="getStaticImageUrl('/general/collection_paw.svg')"
+                     xlink:href="">
+              </image>
+              <image *ngIf="!isCompletedExploration(node?.getExplorationId())"
+                     x="10"
+                     y="30"
+                     height="80"
+                     width="80"
+                     [attr.xlink:href]="getStaticImageUrl(pathIconParameters[index]?.thumbnailIconUrl)"
+                     xlink:href="">
+              </image>
+            </pattern>
+          </defs>
+          <a class="button glow-button"
+             target="_blank"
+             (mouseenter)="updateExplorationPreview(node.getExplorationId())"
+             (mouseleave)="togglePreviewCard();">
+            <circle cx="50"
+                    cy="70"
+                    r="42"
+                    attr.fill="url(#image{{index}})"
+                    stroke="#006553"
+                    stroke-width="2"/>
+          </a>
+        </svg>
+      </a>
+    </div>
+
+    <div *ngIf="collection && collection.getCollectionNodes().length !== 0"
+         class="oppia-collection-table">
+      <img [src]="getStaticImageUrl('/general/collection_mascot.svg')"
+           class="mobile-lesson-icon">
+      <div class="mobile-path-segment"
+           *ngFor="let node of collection.getCollectionNodes();let index = index"
+           id="mobile-path-anchor-{{index}}">
+        <a href="#"
+           [attr.title-data]="index + 1 + '. ' + node?.getExplorationTitle()"
+           class="oppia-collection-node-small-screen">
+          <svg class="e2e-mobile-test-collection-exploration"
+               width="100"
+               height="150"
+               xmlns="http://www.w3.org/2000/svg"
+               xmlns:xlink="http://www.w3.org/1999/xlink"
+               version="1.1"
+               (click)="scrollToLocation('mobile-path-anchor-' + index); updateExplorationPreview(node.getExplorationId());">
+            <image *ngIf="!collectionPlaythrough?.hasStartedCollection() && index===0"
+                   x="0"
+                   y="83"
+                   height="80"
+                   width="100"
+                   [attr.xlink:href]="getStaticImageUrl('/general/collection_start_here_arrow.svg')"
+                   xlink:href="">
+            </image>
+            <text *ngIf="!collectionPlaythrough?.hasStartedCollection() && index===0"
+                  x="50"
+                  y="140"
+                  alignment-baseline="middle"
+                  font-family="Capriola, Roboto, Arial, sans-serif"
+                  font-size="11"
+                  fill="#E14738"
+                  text-anchor="middle"
+                  [innerHTML]="'I18N_START_HERE' | translate">
+            </text>
+            <defs>
+              <pattern id="image0{{index}}"
+                       patternUnits="userSpaceOnUse"
+                       height="150"
+                       width="100">
+                <circle cx="50"
+                        cy="70"
+                        r="50"
+                        [attr.fill]="pathIconParameters[index]?.thumbnailBgColor"/>
+                <image *ngIf="isCompletedExploration(node?.getExplorationId())"
+                       x="0"
+                       y="20"
+                       height="100"
+                       width="100"
+                       [attr.xlink:href]="getStaticImageUrl('/general/collection_paw.svg')"
+                       xlink:href="">
+                </image>
+                <image *ngIf="!isCompletedExploration(node?.getExplorationId())"
+                       x="10"
+                       y="30"
+                       height="80"
+                       width="80"
+                       [attr.xlink:href]="getStaticImageUrl(pathIconParameters[index]?.thumbnailIconUrl)"
+                       xlink:href="">
+                </image>
+              </pattern>
+              <filter id="circle-shadow">
+                <feDropShadow dx="5" dy="5" stdDeviation="0.5" flood-opacity="0.5"/>
+              </filter>
+            </defs>
+            <circle [hidden]="!((node.getExplorationId() === nextExplorationId) && (index !== activeHighlightedIconIndex))"
+                    cx="50"
+                    cy="70"
+                    r="50"
+                    attr.id="{{'highlight' + index}}"
+                    fill="#FF8C00"
+                    fill-opacity="0.5"/>
+            <circle cx="50"
+                    cy="70"
+                    r="42"
+                    attr.fill="url(#image0{{index}})"
+                    stroke="#006553"
+                    stroke-width="2"
+                    filter="url(#circle-shadow)"/>
+          </svg>
+        </a>
+        <img [src]="getStaticImageUrl('/general/mobile_path_segment.svg')">
+        <div class="oppia-exploration-summary-tile-container">
+          <div [ngClass]="{'oppia-activity-summary-tile-mobile-background-mask': explorationCardIsShown}"
+               (click)="closeOnClickingOutside()">
+            <oppia-exploration-summary-tile *ngIf="explorationCardIsShown"
+                                            (click)="onClickStopPropagation($event)"
+                                            [collectionId]="collectionId"
+                                            [explorationId]="currentExplorationId"
+                                            [explorationTitle]="summaryToPreview.title"
+                                            [lastUpdatedMsec]="summaryToPreview.last_updated_msec"
+                                            [objective]="summaryToPreview.objective"
+                                            [category]="summaryToPreview.category"
+                                            [ratings]="summaryToPreview.ratings"
+                                            [numViews]="summaryToPreview.num_views"
+                                            [thumbnailIconUrl]="summaryToPreview.thumbnail_icon_url"
+                                            [thumbnailBgColor]="summaryToPreview.thumbnail_bg_color"
+                                            [isCommunityOwned]="summaryToPreview.community_owned"
+                                            [isCollectionPreviewTile]="true"
+                                            class="oppia-exploration-summary-tile">
+            </oppia-exploration-summary-tile>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="collection && collectionSummary"
+         class="oppia-card-preview-panel">
+      <mat-card class="oppia-activity-summary-tile md-default-theme">
+        <div class="title-section"
+             [ngStyle]="{'background-color': collectionSummary.thumbnail_bg_color}">
+          <img [src]="getStaticImageUrl(collectionSummary.thumbnail_icon_url)"
+               class="thumbnail-image">
+        </div>
+        <div class="title-section-mask objective oppia-activity-summary-tile-pre-hover-preview">
+          <span>
+            {{ 'I18N_COLLECTION_PLAYER_PAGE_HOVER_MESSAGE' | translate }}
+          </span>
+        </div>
+      </mat-card>
+      <oppia-exploration-summary-tile *ngIf="explorationCardIsShown"
+                                      [collectionId]="collectionId"
+                                      [explorationId]="currentExplorationId"
+                                      [explorationTitle]="summaryToPreview.title"
+                                      [lastUpdatedMsec]="summaryToPreview.last_updated_msec"
+                                      [objective]="summaryToPreview.objective"
+                                      [category]="summaryToPreview.category"
+                                      [ratings]="summaryToPreview.ratings"
+                                      [numViews]="summaryToPreview.num_views"
+                                      [thumbnailIconUrl]="summaryToPreview.thumbnail_icon_url"
+                                      [thumbnailBgColor]="summaryToPreview.thumbnail_bg_color"
+                                      [isCommunityOwned]="summaryToPreview.community_owned"
+                                      class="oppia-exploration-preview-summary-tile">
+      </oppia-exploration-summary-tile>
+    </div>
+  </div>
+</div>
+<attribution-guide></attribution-guide>

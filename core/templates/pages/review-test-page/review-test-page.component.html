@@ -1,0 +1,32 @@
+<background-banner></background-banner>
+<div class="oppia-review-test-container position-relative">
+  <div class="oppia-review-test">
+    Review Test
+  </div>
+  <oppia-question-player *ngIf="questionPlayerConfig && questionPlayerConfig.skillList.length > 0"
+                         [questionPlayerConfig]="questionPlayerConfig">
+  </oppia-question-player>
+</div>
+<style>
+  .oppia-review-test-container .oppia-review-test {
+    color: #01645c;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 3em;
+    margin-bottom: 25px;
+    margin-top: 0;
+    padding-top: 66.5px;
+    text-align: center;
+  }
+  .oppia-review-test-container {
+    color: black;
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0 auto;
+    text-decoration: none;
+  }
+
+  @media(max-width: 925px) {
+    .oppia-review-test-container {
+      max-width: 95%;
+    }
+  }
+</style>

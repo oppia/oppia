@@ -1,0 +1,25 @@
+# This is the official list of people who can contribute (and typically
+# have contributed) code to the Oppia repository.
+# The AUTHORS file lists the copyright holders; this file
+# lists people. For example, Google employees are listed here
+# but not in AUTHORS, because Google holds the copyright.
+#
+# Names should be added to this file only after verifying that
+# the individual or the individual's organization has agreed to
+# the appropriate Contributor License Agreement, found here:
+#
+#     https://developers.google.com/open-source/cla/individual
+#     https://developers.google.com/open-source/cla/corporate
+#
+# When adding Joe Contributor's name to this file, either Joe's name
+# or Joe's organization's name should be added to the AUTHORS file,
+# depending on whether the individual or corporate CLA was used.
+#
+# Names should be added to this file as:
+#     Name <email address>
+#
+# Please keep the list sorted alphabetically.
+
+Alison <alison@gmail.com>
+Jessica <jess@gmail.com>
+Paul <paul@gmail.com>

@@ -14,8 +14,10 @@
 
 """Tests for custom landing pages."""
 
+from __future__ import annotations
+
+from core import feconf
 from core.tests import test_utils
-import feconf
 
 
 class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
@@ -28,7 +30,7 @@ class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
         response = self.get_html_response(
             feconf.FRACTIONS_LANDING_PAGE_URL, expected_status_int=302)
         self.assertEqual(
-            'http://localhost/learn/maths/fractions',
+            'http://localhost/math/fractions',
             response.headers['location'])
 
     def test_old_fraction_landing_url_with_viewer_type(self):
@@ -39,48 +41,15 @@ class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
             '%s?viewerType=student' % feconf.FRACTIONS_LANDING_PAGE_URL,
             expected_status_int=302)
         self.assertEqual(
-            'http://localhost/learn/maths/fractions',
+            'http://localhost/math/fractions',
             response.headers['location'])
 
 
-class TopicLandingPageTest(test_utils.GenericTestBase):
-    """Test for showing landing pages."""
+class TopicLandingRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting the old landing page URL to the new one."""
 
-    def test_invalid_subject_landing_page_leads_to_404(self):
-        self.get_html_response(
-            '/learn/invalid_subject/fractions', expected_status_int=404)
-
-    def test_invalid_topic_landing_page_leads_to_404(self):
-        self.get_html_response(
-            '/learn/maths/invalid_topic', expected_status_int=404)
-
-    def test_valid_subject_and_topic_loads_correctly(self):
-        response = self.get_html_response('/learn/maths/fractions')
-        response.mustcontain('<topic-landing-page></topic-landing-page>')
-
-
-class StewardsLandingPageTest(test_utils.GenericTestBase):
-    """Test for showing the landing page for stewards (parents, teachers,
-    volunteers, or NGOs).
-    """
-    def test_nonprofits_landing_page(self):
+    def test_old_topic_url_redirect(self):
         response = self.get_html_response(
-            feconf.CUSTOM_NONPROFITS_LANDING_PAGE_URL)
-        response.mustcontain(
-            '<stewards-landing-page></stewards-landing-page>')
-
-    def test_parents_landing_page(self):
-        response = self.get_html_response(
-            feconf.CUSTOM_PARENTS_LANDING_PAGE_URL)
-        response.mustcontain(
-            '<stewards-landing-page></stewards-landing-page>')
-
-    def test_teachers_landing_page(self):
-        response = self.get_html_response(
-            feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL)
-        response.mustcontain('<stewards-landing-page></stewards-landing-page>')
-
-    def test_volunteers_landing_page(self):
-        response = self.get_html_response(
-            feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL)
-        response.mustcontain('<stewards-landing-page></stewards-landing-page>')
+            '/learn/maths/fractions', expected_status_int=302)
+        self.assertEqual(
+            'http://localhost/math/fractions', response.headers['location'])

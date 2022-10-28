@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @load('base-components/header.template.html', {"title": "Oppia"})
+
+    <!-- Updated previous version to current version of google charts
+    https://developers.google.com/chart/interactive/docs/basic_load_libs#update-library-loader-code -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        if (window.google && window.google.charts) {
+        google.charts.load('current', { packages: ['corechart'] });
+      } else {
+        throw new Error(
+          'Could not load google visualization library. Are you offline?');
+      }
+    </script>
+    <style>
+      html, body {
+        background-color: #eee;
+      }
+    </style>
+  </head>
+  <body>
+    <oppia-root>
+      <div ng-controller="Base">
+        <oppia-base-content>
+          <navbar-breadcrumb>
+            <oppia-editor-navbar-breadcrumb></oppia-editor-navbar-breadcrumb>
+          </navbar-breadcrumb>
+
+          <nav-options>
+            <exploration-save-and-publish-buttons class="ml-auto"></exploration-save-and-publish-buttons>
+          </nav-options>
+
+          <content>
+            <exploration-editor-page></exploration-editor-page>
+          </content>
+
+          <page-footer>
+            <oppia-editor-navigation></oppia-editor-navigation>
+          </page-footer>
+        </oppia-base-content>
+      </div>
+    </oppia-root>
+    @load('pages/footer_js_libs.html')
+    @load('pages/exploration-editor-page/ckeditor_dependency.html')
+    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=default"></script>
+    @loadExtensions('interactions/dependency_html.html')
+  </body>
+</html>

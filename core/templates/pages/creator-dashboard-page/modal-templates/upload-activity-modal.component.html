@@ -1,0 +1,28 @@
+<div class="modal-header">
+  <h3>Upload an Exploration</h3>
+</div>
+
+<div class="modal-body">
+  <p>
+    This form allows you to upload the YAML file corresponding to an exploration. However, you will need to manually upload any additional image files separately.
+  </p>
+  <form role="form" class="form-horizontal">
+    <fieldset>
+      <div class="form-group">
+        <label for="newFileInput">
+          Upload YAML file
+        </label>
+        <div class="col-lg-10 col-md-10 col-sm-10">
+          <input id="newFileInput" type="file">
+        </div>
+      </div>
+    </fieldset>
+  </form>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary e2e-test-cancel-create" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success e2e-test-submit-new-exploration" type="submit"
+          (click)="save()">
+    Upload Exploration
+  </button>
+</div>

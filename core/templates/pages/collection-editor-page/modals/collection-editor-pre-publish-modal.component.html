@@ -1,0 +1,41 @@
+<div class="modal-header">
+  <h3>Add Some Details</h3>
+</div>
+
+<div class="modal-body oppia-long-text">
+  <p>
+    Just a few more things before you publish:
+  </p>
+  <p *ngIf="requireTitleToBeSpecified">
+    Add a title: what should your collection be called?
+    <input type="text"
+           class="form-control e2e-collection-editor-title-input e2e-test-collection-editor-title-input"
+           [(ngModel)]="newTitle"
+           placeholder="Music in the 19th Century">
+  </p>
+  <p *ngIf="requireObjectiveToBeSpecified">
+    Add a goal: what does the collection help people to do?
+    <input type="text"
+           class="form-control e2e-collection-editor-objective-input e2e-test-collection-editor-objective-input"
+           [(ngModel)]="newObjective"
+           placeholder="Learn how to ...">
+  </p>
+  <p *ngIf="requireCategoryToBeSpecified">
+    Add a category: how would you categorize your collection?
+    <oppia-filtered-choices-field class="e2e-test-collection-editor-category-dropdown"
+                                  [(selection)]="newCategory"
+                                  [choices]="CATEGORY_LIST"
+                                  placeholder="Choose or type new"
+                                  noEntriesFoundLabel="Invalid category name">
+    </oppia-filtered-choices-field>
+  </p>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success e2e-test-collection-save-changes-button"
+          (click)="save()"
+          [disabled]="!isSavingAllowed()">
+    Save Changes
+  </button>
+</div>

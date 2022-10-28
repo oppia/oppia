@@ -1,0 +1,57 @@
+<ng-template #popContent>
+  <div class="oppia-answer-popup-container">
+    <div class="oppia-answer-popup">
+      <oppia-rte-output-display [rteString]="getAnswerHtml()">
+      </oppia-rte-output-display>
+    </div>
+  </div>
+</ng-template>
+
+<div class="conversation-skin-learner-answer-container">
+  <img class="conversation-skin-user-avatar rounded-circle"
+       [src]="decodedProfilePicture ? decodedProfilePicture : ''" alt="">
+  <div *ngIf="!data.isHint">
+    <div dir="auto" *ngIf="getShortAnswerHtml()"
+         [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()"
+         class="oppia-popover" #popover="ngbPopover" [autoClose]="false">
+      <oppia-interaction-display classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
+                                 [htmlData]="getShortAnswerHtml()">
+      </oppia-interaction-display>
+    </div>
+    <div dir="auto" *ngIf="!getShortAnswerHtml()">
+      <oppia-interaction-display classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
+                                 [htmlData]="getAnswerHtml()">
+      </oppia-interaction-display>
+    </div>
+  </div>
+  <div *ngIf="data.isHint">
+    <div class="oppia-rte-viewer conversation-skin-learner-answer-content">
+      {{ data.learnerInput | translate }}
+    </div>
+  </div>
+</div>
+
+<div class="conversation-skin-oppia-feedback-container" *ngIf="data.oppiaResponse !== ''">
+  <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
+     [href]="OPPIA_AVATAR_LINK_URL"
+     target="_blank"
+     rel="noopener">
+    <img class="conversation-skin-oppia-avatar rounded-circle"
+         [src]="oppiaAvatarImageUrl" alt="">
+  </a>
+  <div *ngIf="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()"
+       class="e2e-test-input-response-loading-dots">
+    <div class="conversation-skin-feedback-dot-one"></div>
+    <div class="conversation-skin-feedback-dot-two"></div>
+    <div class="conversation-skin-feedback-dot-three"></div>
+  </div>
+  <span id="getInputResponsePairId()"></span>
+  <div dir="auto">
+    <oppia-rte-output-display *ngIf="data.oppiaResponse !== null"
+                              [rteString]="data.oppiaResponse"
+                              [class]="'oppia-rte-viewer conversation-skin-oppia-feedback-content ' + (bottomSection ? 'e2e-test-conversation-feedback-latest' : '')"
+                              [ngStyle]="{'min-width': (isVideoRteElementPresentInResponse() ? '75%': 'inherit')}"
+                              [ngClass]="getFeedbackAudioHighlightClass()">
+    </oppia-rte-output-display>
+  </div>
+</div>

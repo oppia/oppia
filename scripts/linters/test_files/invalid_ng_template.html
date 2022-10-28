@@ -1,0 +1,14 @@
+<!-- This file is using ng-template which is not allowed. -->
+<!DOCTYPE html>
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../base-components/header.template.html', {"title": "Oppia"})
+  </head>
+  <body>
+    <div ng-controller="exampleController">
+      <script type="text/ng-template" id="test1.html"> <!-- ng-template is not allowed to use -->
+        This list denotes the first list element.
+      </script>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,37 @@
+<div class="h-100">
+  <div *ngIf="!solutionEditorIsOpen"
+       class="h-100"
+       title="Edit solution">
+    <div class="oppia-readonly-rule-tile"
+         [ngClass]="{'oppia-editable-section': isEditable}">
+      <div class="oppia-rule-preview oppia-transition-200">
+        <div *ngIf="isEditable"
+             class="oppia-click-to-start-editing"
+             (click)="openEditorModal()">
+          <i class="material-icons oppia-editor-edit-icon float-right"
+             title="Edit Solution">&#xE254;
+          </i>
+        </div>
+        <strong>
+          {{stateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One'}} solution is...
+        </strong>
+        <span>
+          <oppia-interaction-display [htmlData]="getAnswerHtml()">
+          </oppia-interaction-display>
+        </span>
+      </div>
+    </div>
+  </div>
+  <br>
+  <oppia-solution-explanation-editor (saveSolution)="updateNewSolution($event)"
+                                     (showMarkAllAudioAsNeedingUpdateModalIfRequired)="openMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+  </oppia-solution-explanation-editor>
+</div>
+
+<style>
+  @media screen and (max-width: 500px) {
+    .oppia-editor-edit-icon {
+      right: 3px;
+    }
+  }
+</style>

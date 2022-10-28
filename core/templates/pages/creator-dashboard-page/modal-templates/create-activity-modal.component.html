@@ -1,0 +1,77 @@
+<div class="oppia-create-activity-modal">
+  <div class="modal-body oppia-long-text e2e-test-creation-modal">
+    <div class="row">
+      <div class="col-sm-12">
+        <h1 [innerHTML]="'I18N_CREATE_ACTIVITY_TITLE' | translate"></h1>
+        <p [innerHTML]="'I18N_CREATE_ACTIVITY_QUESTION' | translate"></p>
+      </div>
+
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
+        <img [src]="getStaticImageUrl('/activity/exploration.svg')" (click)="chooseExploration()">
+        <button type="button" (click)="chooseExploration()"
+                class="btn oppia-transition-200 e2e-test-create-exploration">
+          <span [innerHTML]="'I18N_CREATE_EXPLORATION' | translate"></span>
+        </button>
+      </div>
+
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center" ng-if="canCreateCollections">
+        <img [src]="getStaticImageUrl('/activity/collection.svg')" (click)="chooseCollection()">
+        <button type="button" (click)="chooseCollection()"
+                class="btn oppia-transition-200 e2e-test-create-collection">
+          <span [innerHTML]="'I18N_CREATE_COLLECTION' | translate"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .oppia-create-activity-modal .modal-body {
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    height: 100%;
+    margin: 0 auto;
+    top: 7%;
+    width: 95%;
+  }
+
+  .oppia-create-activity-modal h1 {
+    color: #015c53;
+  }
+
+  .oppia-create-activity-modal p {
+    font-size: 0.9em;
+    margin-bottom: 6px;
+    margin-top: 0;
+  }
+
+  .oppia-create-activity-modal button {
+    background-color: #015c53;
+    border-radius: 4px;
+    color: #fff;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+    text-transform: uppercase;
+    width: 100%;
+  }
+
+  .oppia-create-activity-modal button:hover,
+  .oppia-create-activity-modal button:focus,
+  .oppia-create-activity-modal button:active {
+    background-color: rgba(5, 190, 178, 1);
+    color: #fff;
+  }
+
+  .oppia-create-activity-modal img {
+    max-height: 300px;
+    padding-top: 10px;
+    width: 100%;
+  }
+
+  @media (max-width: 770px) {
+    .oppia-create-activity-modal .modal-body {
+      top: 5%;
+    }
+  }
+</style>

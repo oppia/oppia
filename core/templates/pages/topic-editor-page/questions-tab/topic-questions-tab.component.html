@@ -1,0 +1,55 @@
+<div class="select-skill-dropdown-container">
+  <mat-form-field class="form-field e2e-test-select-skill-dropdown"
+                  appearance="fill"
+                  *ngIf="allSkillSummaries.length > 0">
+    <mat-label>Select a skill to view question list or create a new question</mat-label>
+    <mat-select [(value)]="selectedSkillId"
+                (selectionChange)="reinitializeQuestionsList(selectedSkillId)"
+                [oppiaFocusOn]="selectSkillField">
+      <mat-option *ngFor="let summary of allSkillSummaries"
+                  [value]="summary.getId()">
+        {{ summary.getDescription() }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div class="question-list-container">
+  <oppia-questions-list [skillDescriptionsAreShown]="true"
+                        [selectSkillModalIsShown]="true"
+                        [selectedSkillId]="selectedSkillId"
+                        [allSkillSummaries]="allSkillSummaries"
+                        [canEditQuestion]="canEditQuestion"
+                        [skillIdToRubricsObject]="skillIdToRubricsObject"
+                        [groupedSkillSummaries]="groupedSkillSummaries"
+                        [skillsCategorizedByTopics]="getSkillsCategorizedByTopics"
+                        [untriagedSkillSummaries]="getUntriagedSkillSummaries">
+  </oppia-questions-list>
+</div>
+
+<style>
+  .form-field {
+    width: 50%;
+  }
+  .oppia-page-card {
+    margin: 0;
+    padding: 30px 20px;
+    width: 100%;
+  }
+  .questions {
+    padding-bottom: 10px;
+  }
+  .select-skill-card {
+    margin: 0 auto;
+    width: 70%;
+  }
+  .select-skill-dropdown-container {
+    margin: 0 auto;
+    width: 70%;
+  }
+  .select-skill-dropdown-container select {
+    width: 60%;
+  }
+  .question-list-container {
+    margin-top: -30px;
+  }
+</style>

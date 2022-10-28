@@ -1,0 +1,24 @@
+<style>
+  .set-of-translatable-html-content-ids-editor .mat-checkbox /deep/  .mat-checkbox-label {
+    vertical-align: top;
+  }
+  .set-of-translatable-html-content-ids-editor /deep/ .mat-checkbox-layout {
+    margin-bottom: 20px;
+    white-space: normal;
+    word-break: break-word;
+  }
+</style>
+<div class="set-of-translatable-html-content-ids-editor">
+  <div class="container-fluid">
+    <div *ngFor="let choice of choices; let idx = index">
+      <mat-checkbox (click)="toggleSelection(idx)"
+                    [(ngModel)]="selections[idx]"
+                    class="oppia-check-box fx-row" aria-label="choice">
+        <span>
+          <oppia-rte-output-display class="e2e-test-html-item-select-option" [rteString]="choice.id">
+          </oppia-rte-output-display>
+        </span>
+      </mat-checkbox>
+    </div>
+  </div>
+</div>

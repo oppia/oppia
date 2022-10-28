@@ -1,0 +1,30 @@
+<div class="footer navbar-fixed-bottom oppia-collection-footer">
+  <div class="row">
+    <div class="col-sm-5">
+      <ul>
+        <li>
+          <img [src]="getStaticImageUrl('/general/apple.svg')" class="collection-footer-img" alt="">
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm-7">
+      <div class="float-right">
+        <ul>
+          <li>
+            <h4 [innerHTML]="'I18N_PLAYER_SHARE_THIS_COLLECTION' | translate" class="oppia-share-collection-footer e2e-test-share-collection-footer"></h4>
+          </li>
+          <li>
+            <sharing-links (click)="$event.stopPropagation()"
+                           [collectionId]="collectionId"
+                           layoutType="row collection-footer-sharing-links"
+                           layoutAlignType="center center"
+                           shareType="collection"
+                           class="oppia-collection-footer-sharing-links"
+                           aria-label="Social media links">
+            </sharing-links>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

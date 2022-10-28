@@ -1,0 +1,168 @@
+<!-- NOTE: This page should not contain any direct anchors to internal links. If the user visits an internal
+link before completing the signup process, they will be logged out.
+-->
+
+<div class="oppia-page-cards-container oppia-signup-page-container">
+  <mat-card class="oppia-page-card">
+    <h2 class="oppia-signup-page-title"
+        translate="I18N_SIGNUP_COMPLETE_REGISTRATION">
+    </h2>
+
+    <form>
+      <div *ngIf="!hasUsername" role="form" class="form-horizontal">
+        <div class="form-group row">
+          <label for="username"
+                 class="col-lg-3 col-md-3 col-sm-3"
+                 translate="I18N_SIGNUP_USERNAME">
+          </label>
+
+          <div class="col-lg-9 col-md-9 col-sm-9">
+            <input type="text"
+                   [(ngModel)]="username"
+                   [ngModelOptions]="{ standalone: true }"
+                   id="username"
+                   class="form-control oppia-username-input e2e-test-username-input"
+                   (blur)="onUsernameInputFormBlur(username)"
+                   (change)="updateWarningText(username)"
+                   oppiaFocusOn="usernameInputField"
+                   autofocus="true">
+            <span class="form-text oppia-username-explanation-text"
+                  translate="I18N_SIGNUP_USERNAME_EXPLANATION">
+            </span>
+            <div class="oppia-warning-text-container">
+              <p class="oppia-warning-text"
+                 aria-live="assertive"
+                 *ngIf="warningI18nCode"
+                 [translate]="warningI18nCode"
+                 [translateParams]="{maxUsernameLength: MAX_USERNAME_LENGTH}">
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="showEmailPreferencesForm" class="form-group row">
+          <label for="canReceiveEmailUpdates"
+                 class="col-lg-3 col-md-3 col-sm-3"
+                 translate="I18N_SIGNUP_EMAIL_PREFERENCES">
+          </label>
+          <div class="col-lg-9 col-md-9 col-sm-9">
+            <div class="radio">
+              <label>
+                <input type="radio"
+                       [(ngModel)]="canReceiveEmailUpdates"
+                       [ngModelOptions]="{standalone: true}"
+                       value="yes"
+                       name="canReceiveEmailUpdates"
+                       (change)="onSelectEmailPreference()">
+                <span translate="I18N_SIGNUP_SEND_ME_NEWS"></span>
+              </label>
+              <label>
+                <input type="radio"
+                       [(ngModel)]="canReceiveEmailUpdates"
+                       [ngModelOptions]="{standalone: true}"
+                       value="no"
+                       name="canReceiveEmailUpdates"
+                       (change)="onSelectEmailPreference()">
+                <span translate="I18N_SIGNUP_DO_NOT_SEND_EMAILS"></span>
+              </label>
+              <span class="form-text oppia-form-text-size"
+                    translate="I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN">
+              </span>
+              <div class="alert alert-warning" *ngIf="showEmailSignupLink">
+                <span class="help-block oppia-form-text"
+                      translate="I18N_PREFERENCES_EMAIL_SIGNUP_TEXT">
+                </span>
+                <a class="help-block oppia-form-text"
+                   [href]="emailSignupLink"
+                   target="_blank"
+                   rel="noopener">
+                  {{ emailSignupLink }}
+                </a>
+              </div>
+            </div>
+            <div class="oppia-warning-text-container">
+              <span class="oppia-warning-text"
+                    aria-live="assertive"
+                    *ngIf="blurredAtLeastOnce"
+                    [translate]="emailPreferencesWarningText">
+              </span>
+            </div>
+          </div>
+        </div>
+        <hr>
+      </div>
+
+      <div class="oppia-long-text" *ngIf="hasEverRegistered">
+        <p>
+          <em translate="I18N_SIGNUP_UPDATE_WARNING"></em>
+        </p>
+      </div>
+      <div class="oppia-long-text" *ngIf="!hasEverRegistered">
+        <p class="oppia-signup-site-description-text"
+           translate="I18N_SIGNUP_SITE_DESCRIPTION"
+           [translateParams]="{sitename: siteName}">
+        </p>
+      </div>
+
+      <div>
+        <strong translate="I18N_SIGNUP_CC_TITLE"></strong>
+        <br>
+        <span innerHTML="{{ 'I18N_SIGNUP_LICENSE_NOTE' | translate }}"
+              (click)="showLicenseExplanationModal($event)">
+        </span>
+      </div>
+
+      <hr>
+
+      <div class="checkbox oppia-long-text">
+        <label>
+          <input type="checkbox"
+                 [(ngModel)]="hasAgreedToLatestTerms"
+                 [ngModelOptions]="{standalone: true}"
+                 class="oppia-checkbox-margin e2e-test-agree-to-terms-checkbox"
+                 id="terms-checkbox">
+          <span innerHTML="{{ 'I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION' | translate: { sitename: siteName } }}">
+          </span>
+        </label>
+      </div>
+
+      <br>
+
+      <button type="submit"
+              class="btn btn-success e2e-test-register-user"
+              [disabled]="warningI18nCode || !hasAgreedToLatestTerms || submissionInProcess || usernameCheckIsInProgress"
+              (click)="submitPrerequisitesForm(hasAgreedToLatestTerms, username, canReceiveEmailUpdates)"
+              translate="I18N_SIGNUP_BUTTON_SUBMIT"
+              id="signup-submit">
+      </button>
+    </form>
+  </mat-card>
+</div>
+<style>
+  .oppia-signup-page-container .oppia-long-text > label {
+    font-weight: normal;
+  }
+  .oppia-username-input {
+    width: 260px;
+  }
+  .oppia-username-explanation-text {
+    font-size: 0.8em;
+  }
+  .oppia-warning-text-container {
+    height: 18px;
+    width: 550px;
+  }
+  .oppia-warning-text {
+    color: #f00;
+    font-size: 0.8em;
+  }
+  .oppia-form-text-size {
+    font-size: smaller
+  }
+  .oppia-signup-site-description-text {
+    font-size: 1em;
+  }
+  .oppia-checkbox-margin {
+    margin-right: 6px;
+  }
+</style>

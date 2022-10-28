@@ -16,13 +16,22 @@
 
 """Models for Oppia recommendations."""
 
+from __future__ import annotations
+
 from core.platform import models
 
-from google.appengine.ext import ndb
+from typing import Dict, Final
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
-TOPIC_SIMILARITIES_ID = 'topics'
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
+
+datastore_services = models.Registry.import_datastore_services()
+
+TOPIC_SIMILARITIES_ID: Final = 'topics'
 
 
 class ExplorationRecommendationsModel(
@@ -31,9 +40,29 @@ class ExplorationRecommendationsModel(
 
     Instances of this class are keyed by exploration id.
     """
+
     # Ids of recommended explorations.
-    recommended_exploration_ids = ndb.StringProperty(
-        repeated=True, indexed=False)
+    recommended_exploration_ids = datastore_services.StringProperty(
+        repeated=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'recommended_exploration_ids':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class TopicSimilaritiesModel(base_models.BaseModel):
@@ -48,4 +77,23 @@ class TopicSimilaritiesModel(base_models.BaseModel):
     Currently, topics are the same as the default categories. However, this may
     change in the future.
     """
-    content = ndb.JsonProperty(required=True)
+
+    content = datastore_services.JsonProperty(required=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'content': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })

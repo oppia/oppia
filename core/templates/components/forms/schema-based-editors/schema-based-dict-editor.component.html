@@ -1,0 +1,15 @@
+<div role="form">
+  <div class="e2e-test-schema-based-dict-editor" *ngFor="let property of propertySchemas; let idx = index">
+    <div class="form-group">
+      <label for="{{ fieldIds[property.name] }}">{{ getHumanReadablePropertyDescription(property) }}</label>
+      <div id="{{ fieldIds[property.name] }}" *ngIf="localValue">
+        <schema-based-editor [schema]="getSchema(idx)" [disabled]="disabled"
+                             [ngModel]="localValue[property.name]"
+                             (ngModelChange)="updateValue($event, property.name)"
+                             name="editor"
+                             [labelForFocusTarget]="idx === 0 ? getLabelForFocusTarget() : ''">
+        </schema-based-editor>
+      </div>
+    </div>
+  </div>
+</div>

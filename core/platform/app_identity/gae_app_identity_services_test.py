@@ -16,31 +16,30 @@
 
 """Tests for core.platform.app_identity.gae_app_identity_services."""
 
-from constants import constants
+from __future__ import annotations
+
+import os
+
 from core.platform.app_identity import gae_app_identity_services
 from core.tests import test_utils
 
 
 class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
 
-    def setUp(self):
-        super(GaeAppIdentityServicesTests, self).setUp()
-        self.expected_application_id = test_utils.TestBase.EXPECTED_TEST_APP_ID
-        self.expected_bucket_name = (
-            '%s-resources' % self.expected_application_id)
+    def test_get_application_id(self) -> None:
+        with self.swap(os, 'getenv', lambda _: 'some_id'):
+            self.assertEqual(
+                gae_app_identity_services.get_application_id(), 'some_id')
 
-    def test_get_application_id(self):
-        self.assertEqual(
-            gae_app_identity_services.get_application_id(),
-            self.expected_application_id)
+    def test_get_application_id_throws_error(self) -> None:
+        with self.swap(os, 'getenv', lambda _: None):
+            with self.assertRaisesRegex(
+                ValueError, 'Value None for application id is invalid.'
+            ):
+                gae_app_identity_services.get_application_id()
 
-    def test_get_gcs_resource_bucket_name_prod(self):
-        # Turn off DEV_MODE.
-        with self.swap(constants, 'DEV_MODE', False):
+    def test_get_default_gcs_bucket_name(self) -> None:
+        with self.swap(os, 'getenv', lambda _: 'some_id'):
             self.assertEqual(
                 gae_app_identity_services.get_gcs_resource_bucket_name(),
-                self.expected_bucket_name)
-
-    def test_get_gcs_resource_bucket_name_dev(self):
-        self.assertIsNone(
-            gae_app_identity_services.get_gcs_resource_bucket_name())
+                'some_id-resources')

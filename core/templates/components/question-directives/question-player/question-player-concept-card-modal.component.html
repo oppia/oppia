@@ -1,0 +1,28 @@
+<div class="modal-header">
+  <h3>
+    {{ modalHeader }}
+  </h3>
+</div>
+
+<div class="modal-body">
+  <oppia-concept-card [skillIds]="skillIds"
+                      [index]="index">
+  </oppia-concept-card>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          (click)="cancel()">
+    Close
+  </button>
+  <button class="btn btn-success"
+          *ngIf="!isLastConceptCard()"
+          (click)="goToNextConceptCard()">
+    Next
+  </button>
+  <button class="btn btn-success"
+          *ngIf="isLastConceptCard()"
+          (click)="retryTest()">
+    Retry Test
+  </button>
+</div>

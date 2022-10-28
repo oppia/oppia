@@ -1,0 +1,44 @@
+<h2>Add Exploration</h2>
+<form class="form-inline oppia-new-exploration-form" (submit)="createNewExploration()">
+  <input class="form-control"
+         aria-label="New Exploration"
+         [(ngModel)]="newExplorationTitle"
+         [ngModelOptions]="{ standalone: true }"
+         type="text"
+         placeholder="New exploration title">
+  <button class="btn btn-success"
+          type="submit"
+          [disabled]="!newExplorationTitle">
+    Create New Exploration
+  </button>
+</form>
+or
+<form class="form-inline oppia-add-existing-exploration-form oppia-typeahead-form"
+      [ngClass]="{'has-error': searchQueryHasError}"
+      (submit)="addExploration()">
+  <input class="form-control e2e-test-add-exploration-input"
+         aria-label="Existing Exploration"
+         [(ngModel)]="newExplorationId"
+         [ngModelOptions]="{ standalone: true }"
+         type="text"
+         placeholder="Enter exploration id to be added">
+  <button class="btn btn-success e2e-test-add-exploration-button" type="submit" [disabled]="!newExplorationId">Add Existing Exploration</button>
+  <span class="form-text oppia-form-text" *ngIf="isIdMalformed(newExplorationId)">
+    <em>The trailing '#' is not part of the ID.</em>
+  </span>
+</form>
+<style>
+  .oppia-add-existing-exploration-form > input {
+    margin-right: 5px;
+    min-width: 430px;
+  }
+
+  .oppia-new-exploration-form > input {
+    margin-right: 10px;
+    min-width: 160px;
+  }
+
+  .oppia-form-text {
+    font-size: smaller;
+  }
+</style>

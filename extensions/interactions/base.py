@@ -34,28 +34,69 @@ dicts, each representing a customization arg -- viz.:
     }]
 """
 
+from __future__ import annotations
+
 import copy
 import json
-import os
 
-from core.domain import obj_services
+from core import constants
+from core import feconf
+from core.domain import object_registry
 from core.domain import visualization_registry
 from extensions import domain
 from extensions.objects.models import objects
-import feconf
-import utils
+from extensions.visualizations import models
+
+from typing import Dict, Final, List, Optional, Tuple, Type, TypedDict
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from core.domain import state_domain
 
 # Indicates that the learner view of the interaction should be displayed in the
 # context of the conversation.
-DISPLAY_MODE_INLINE = 'inline'
+DISPLAY_MODE_INLINE: Final = 'inline'
 # Indicates that the learner view of the interaction should be displayed as a
 # separate object from the conversation.
-DISPLAY_MODE_SUPPLEMENTAL = 'supplemental'
+DISPLAY_MODE_SUPPLEMENTAL: Final = 'supplemental'
 
-ALLOWED_DISPLAY_MODES = [DISPLAY_MODE_SUPPLEMENTAL, DISPLAY_MODE_INLINE]
+ALLOWED_DISPLAY_MODES: Final = [
+    DISPLAY_MODE_SUPPLEMENTAL,
+    DISPLAY_MODE_INLINE
+]
 
 
-class BaseInteraction(object):
+class AnswerVisualizationSpecsDict(TypedDict):
+    """Type for the _answer_visualization_specs variable."""
+
+    id: str
+    options: models.OptionsDictType
+    calculation_id: str
+    addressed_info_is_supported: bool
+
+
+class BaseInteractionDict(TypedDict):
+    """Dictionary representing the BaseInteraction object."""
+
+    id: str
+    name: str
+    description: str
+    answer_type: Optional[str]
+    display_mode: str
+    is_terminal: bool
+    is_trainable: bool
+    is_linear: bool
+    needs_summary: bool
+    customization_arg_specs: List[domain.CustomizationArgSpecsDict]
+    instructions: Optional[str]
+    narrow_instructions: Optional[str]
+    default_outcome_heading: Optional[str]
+    rule_descriptions: Dict[str, str]
+    can_have_solution: bool
+    show_generic_submit_button: bool
+
+
+class BaseInteraction:
     """Base interaction definition class.
 
     This class is not meant to be user-editable. The only methods on it should
@@ -65,81 +106,85 @@ class BaseInteraction(object):
     178 x 146 pixels. This image will be shown in the interaction selector.
     """
 
+    # NOTE TO DEVELOPERS: The property answer_calculation_ids() was removed in
+    # #13021 as part of the migration to Apache Beam. Please refer to that PR if
+    # you need to reinstate it.
+
     # The human-readable name of the interaction. Overridden in subclasses.
-    name = ''
+    name: str = ''
     # A description of the interaction. Overridden in subclasses.
-    description = ''
+    description: str = ''
     # Describes how the interaction should be displayed -- either within the
     # conversation ('inline'), or as a separate object ('supplemental'). In the
     # latter case, the interaction instance is reused if two adjacent states
     # have the same interaction id.
-    display_mode = ''
+    display_mode: str = ''
     # Whether this interaction should be considered terminal, i.e. it ends
     # the exploration. Defaults to False.
-    is_terminal = False
+    is_terminal: bool = False
     # Whether the interaction has only one possible answer.
-    is_linear = False
+    is_linear: bool = False
     # Whether this interaction supports machine learning classification.
-    # TODO(chiangs): remove once classifier_services is generalized.
-    is_trainable = False
+    # TODO(chiangs): Remove once classifier_services is generalized.
+    is_trainable: bool = False
     # Additional JS library dependencies that should be loaded in pages
     # containing this interaction. These should correspond to names of files in
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
-    _dependency_ids = []
+    _dependency_ids: List[str] = []
     # The type of answer (as a string) accepted by this interaction, e.g.
     # 'CodeEvaluation'. This should be None for linear and terminal
     # interactions.
-    answer_type = None
+    answer_type: Optional[str] = None
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
-    _customization_arg_specs = []
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = []
     # Specs for desired visualizations of recorded state answers. Overridden
     # in subclasses.
-    _answer_visualization_specs = []
+    _answer_visualization_specs: List[AnswerVisualizationSpecsDict] = []
     # Instructions for using this interaction, to be shown to the learner. Only
     # relevant for supplemental interactions.
-    instructions = None
+    instructions: Optional[str] = None
     # Instructions for using this interaction, to be shown to the learner. Only
     # shows up when view port is narrow. Only relevent for supplemental
     # interactions.
-    narrow_instructions = None
+    narrow_instructions: Optional[str] = None
     # Whether the answer is long, and would benefit from being summarized.
-    needs_summary = False
+    needs_summary: bool = False
     # The heading for the 'default outcome' section in the editor. This should
     # be None unless the interaction is linear and non-terminal.
-    default_outcome_heading = None
+    default_outcome_heading: Optional[str] = None
     # Whether the solution feature supports this interaction.
-    can_have_solution = None
+    can_have_solution: bool = False
     # Whether to show a Submit button in the progress navigation area. This is
     # a generic submit button so do not use this if special interaction-specific
     # behavior is required. The interaction directive must also register
     # callbacks with CurrentInteractionService which handle answer submission
     # when the button is clicked and control the enabling/disabling of the
     # submit button.
-    show_generic_submit_button = False
+    show_generic_submit_button: bool = False
 
     # Temporary cache for the rule definitions.
-    _cached_rules_dict = None
+    _cached_rules_dict: Optional[Dict[str, Dict[str, str]]] = None
 
     @property
-    def id(self):
+    def id(self) -> str:
         """The name of the class."""
         return self.__class__.__name__
 
     @property
-    def customization_arg_specs(self):
+    def customization_arg_specs(self) -> List[domain.CustomizationArgSpec]:
         """The customization arg specs for the interaction."""
         return [
             domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
 
     @property
-    def answer_visualization_specs(self):
+    def answer_visualization_specs(self) -> List[AnswerVisualizationSpecsDict]:
         """The answer visualization specs for the interaction."""
         return self._answer_visualization_specs
 
     @property
-    def answer_visualizations(self):
+    def answer_visualizations(self) -> List[models.BaseVisualization]:
         """A list of answer visualization specs of the interaction."""
         result = []
         for spec in self._answer_visualization_specs:
@@ -153,39 +198,38 @@ class BaseInteraction(object):
         return result
 
     @property
-    def answer_calculation_ids(self):
-        """A set of answer calculation ids."""
-        visualizations = self.answer_visualizations
-        return set(
-            [visualization.calculation_id for visualization in visualizations])
-
-    @property
-    def dependency_ids(self):
+    def dependency_ids(self) -> List[str]:
         """A copy of dependency ids of the interaction."""
         return copy.deepcopy(self._dependency_ids)
 
-    def normalize_answer(self, answer):
+    def normalize_answer(
+        self, answer: state_domain.AcceptableCorrectAnswerTypes
+    ) -> state_domain.AcceptableCorrectAnswerTypes:
         """Normalizes a learner's input to this interaction."""
         if self.answer_type is None:
             return None
         else:
-            return obj_services.Registry.get_object_class_by_type(
-                self.answer_type).normalize(answer)
+            answers: state_domain.AcceptableCorrectAnswerTypes = (
+                    object_registry.Registry.get_object_class_by_type(
+                        self.answer_type).normalize(answer)
+                )
+            return answers
 
     @property
-    def rules_dict(self):
+    def rules_dict(self) -> Dict[str, Dict[str, str]]:
         """A dict of rule names to rule properties."""
         if self._cached_rules_dict is not None:
             return self._cached_rules_dict
 
         rules_index_dict = json.loads(
-            utils.get_file_contents(feconf.RULES_DESCRIPTIONS_FILE_PATH))
+            constants.get_package_file_contents(
+                'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
         self._cached_rules_dict = rules_index_dict[self.id]
 
         return self._cached_rules_dict
 
     @property
-    def _rule_description_strings(self):
+    def _rule_description_strings(self) -> Dict[str, str]:
         """Returns a dict, where the keys are rule names, and the values are the
         corresponding rule descriptions.
 
@@ -197,21 +241,7 @@ class BaseInteraction(object):
             for rule_name in self.rules_dict
         }
 
-    @property
-    def html_body(self):
-        """The HTML code containing directives and templates for the
-        interaction. This contains everything needed to display the interaction
-        once the necessary attributes are supplied.
-
-        Each interaction has two directive/template pairs, one for the
-        interaction itself and the other for displaying the learner's response
-        in a read-only view after it has been submitted.
-        """
-        html_templates = utils.get_file_contents(os.path.join(
-            feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id))
-        return html_templates
-
-    def to_dict(self):
+    def to_dict(self) -> BaseInteractionDict:
         """Gets a dict representing this interaction. Only default values are
         provided.
         """
@@ -239,14 +269,16 @@ class BaseInteraction(object):
             'show_generic_submit_button': self.show_generic_submit_button,
         }
 
-    def get_rule_description(self, rule_name):
+    def get_rule_description(self, rule_name: str) -> str:
         """Gets a rule description, given its name."""
         if rule_name not in self.rules_dict:
             raise Exception('Could not find rule with name %s' % rule_name)
-        else:
-            return self.rules_dict[rule_name]['description']
 
-    def get_rule_param_list(self, rule_name):
+        return self.rules_dict[rule_name]['description']
+
+    def get_rule_param_list(
+        self, rule_name: str
+    ) -> List[Tuple[str, Type[objects.BaseObject]]]:
         """Gets the parameter list for a given rule."""
         description = self.get_rule_description(rule_name)
 
@@ -269,7 +301,9 @@ class BaseInteraction(object):
 
         return param_list
 
-    def get_rule_param_type(self, rule_name, rule_param_name):
+    def get_rule_param_type(
+        self, rule_name: str, rule_param_name: str
+    ) -> Type[objects.BaseObject]:
         """Gets the parameter type for a given rule parameter name."""
         rule_param_list = self.get_rule_param_list(rule_name)
 

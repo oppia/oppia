@@ -14,12 +14,14 @@
 
 """Tests for user subscriptions."""
 
+from __future__ import annotations
+
+from core import feconf
 from core.domain import subscription_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class SubscriptionTests(test_utils.GenericTestBase):
@@ -30,7 +32,7 @@ class SubscriptionTests(test_utils.GenericTestBase):
     USER2_USERNAME = 'user2'
 
     def setUp(self):
-        super(SubscriptionTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 

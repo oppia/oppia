@@ -1,0 +1,28 @@
+<form autocomplete="off" [attr.disabled]="!isValid" role="form" class="form-horizontal" (submit)="submitAnswer()">
+  <!-- This ng-form is needed for submitting answer on hitting enter. -->
+  <input type="text"
+         name="answer"
+         [(ngModel)]="answer"
+         (ngModelChange)="answerValueChanged()"
+         class="form-control"
+         [oppiaFocusOn]="labelForFocusTarget">
+
+  <div class="oppia-form-error oppia-units-input-error">
+    {{ errorMessageI18nKey | translate }}
+  </div>
+</form>
+<button class="btn btn-secondary"
+        (click)="showHelp()"
+        [innerHTML]="'I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS' | translate">
+</button>
+
+<style>
+  .oppia-units-input-error {
+    margin-top: 10px;
+  }
+
+  .ng-invalid {
+    border-color: red;
+    outline-color: red;
+  }
+</style>

@@ -16,23 +16,31 @@
 
 """Python configuration for TextInput interaction."""
 
+from __future__ import annotations
+
 from extensions.interactions import base
+
+from typing import List, Optional
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
 
 
 class TextInput(base.BaseInteraction):
     """Interaction for entering text strings."""
 
-    name = 'Text Input'
-    description = 'Allows learners to enter arbitrary text strings.'
-    display_mode = base.DISPLAY_MODE_INLINE
-    is_trainable = True
-    _dependency_ids = []
-    answer_type = 'NormalizedString'
-    instructions = None
-    narrow_instructions = None
-    needs_summary = False
-    can_have_solution = True
-    show_generic_submit_button = True
+    name: str = 'Text Input'
+    description: str = 'Allows learners to enter arbitrary text strings.'
+    display_mode: str = base.DISPLAY_MODE_INLINE
+    is_trainable: bool = True
+    _dependency_ids: List[str] = []
+    answer_type: str = 'NormalizedString'
+    instructions: Optional[str] = None
+    narrow_instructions: Optional[str] = None
+    needs_summary: bool = False
+    can_have_solution: bool = True
+    show_generic_submit_button: bool = True
 
     # NB: There used to be an integer-typed parameter here called 'columns'
     # that was removed in revision 628942010573. Some text interactions in
@@ -41,13 +49,17 @@ class TextInput(base.BaseInteraction):
     # of collisions, do not add a new parameter with this name to this list.
     # TODO(sll): Migrate old definitions which still contain the 'columns'
     # parameter.
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'placeholder',
         'description': 'Placeholder text (optional)',
         'schema': {
-            'type': 'unicode',
+            'type': 'custom',
+            'obj_type': 'SubtitledUnicode'
         },
-        'default_value': ''
+        'default_value': {
+            'content_id': None,
+            'unicode_str': ''
+        }
     }, {
         'name': 'rows',
         'description': 'Height (in rows)',
@@ -58,13 +70,13 @@ class TextInput(base.BaseInteraction):
                 'min_value': 1,
             }, {
                 'id': 'is_at_most',
-                'max_value': 200,
+                'max_value': 10,
             }]
         },
         'default_value': 1,
     }]
 
-    _answer_visualization_specs = [{
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
         # Table with answer counts for top N answers.
         'id': 'FrequencyTable',
         'options': {

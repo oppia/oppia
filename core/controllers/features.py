@@ -14,16 +14,33 @@
 
 """Controllers for fetching the features Oppia provides to its users."""
 
+from __future__ import annotations
+
+from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
-import feconf
 
 
 class ExplorationFeaturesHandler(base.BaseHandler):
     """Returns features the given exploration is configured to support."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
@@ -35,8 +52,8 @@ class ExplorationFeaturesHandler(base.BaseHandler):
         whitelisted_exploration_ids_for_playthroughs = (
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
         self.render_json({
-            'is_improvements_tab_enabled':
-                config_domain.IS_IMPROVEMENTS_TAB_ENABLED.value,
             'is_exploration_whitelisted':
-                exploration_id in whitelisted_exploration_ids_for_playthroughs
+                exploration_id in whitelisted_exploration_ids_for_playthroughs,
+            'always_ask_learners_for_answer_details':
+                config_domain.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS.value
         })

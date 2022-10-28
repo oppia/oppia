@@ -1,0 +1,214 @@
+<div>
+  <div class="skill-editor-preview">
+    <div class="content-box">
+      <div class="question-filter-box">
+        <div><span class="headings">Selection</span></div>
+        <div class="question-box">
+          <div><span class="heading-secondary">Questions</span></div>
+          <div *ngIf="questionsFetched">
+            <div class="question-filters">
+              <input type="text"
+                     [(ngModel)]="questionTextFilter"
+                     (change)="applyFilters()">
+              <select [(ngModel)]="interactionFilter"
+                      class="form-control"
+                      (change)="applyFilters()">
+                <option *ngFor="let interaction of ALLOWED_QUESTION_INTERACTIONS" [value]="interaction">
+                  {{ interaction }}
+                </option>
+              </select>
+            </div>
+            <div *ngFor="let question of displayedQuestions; index as idx" class="question-list-item">
+              <div (click)="selectQuestionToPreview(idx)">
+                <div class="question-data">
+                  <oppia-rte-output-display class="question-text"
+                                            [rteString]="question.question_state_data.content.html">
+                  </oppia-rte-output-display>
+                  <span *ngIf="question.question_state_data.interaction.id==='TextInput'">
+                    {{"Text Input"}}
+                  </span>
+                  <span *ngIf="question.question_state_data.interaction.id==='ItemSelectionInput'">
+                    {{"Item Selection"}}
+                  </span>
+                  <span *ngIf="question.question_state_data.interaction.id==='MultipleChoiceInput'">
+                    {{"Multiple Choice"}}
+                  </span>
+                  <span *ngIf="question.question_state_data.interaction.id==='NumericInput'">
+                    {{"Numeric Input"}}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="skill-description-box">
+          <div class="skill-description">
+            <div class="content-text-box">
+              <span class="heading-secondary">
+                Content
+              </span>
+            </div>
+            <div *ngIf="htmlData">
+              <oppia-rte-output-display [rteString]="htmlData">
+              </oppia-rte-output-display>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="seperator-block">
+        <div class="seperator"></div>
+      </div>
+      <div class="skill-question-container">
+        <div><span class="headings">Preview</span></div>
+        <div class="preview-box" *ngIf="displayCardIsInitialized">
+          <oppia-tutor-card [displayedCard]="displayedCard"
+                            [avatarImageIsShown]="false"
+                            [startCardChangeAnimation]="false">
+          </oppia-tutor-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+  .content-box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 50px;
+  }
+
+  .question-filter-box {
+    width: 25%;
+  }
+
+  .seperator-block {
+    text-align: center;
+    width: 10%;
+  }
+
+  .seperator {
+    background-color: #707070;
+    display: inline-block;
+    height: 60vh;
+    width: 2px;
+  }
+
+  .content-heading {
+    border-bottom: 1px solid #707070;
+    width: 100%;
+  }
+
+  .question-box {
+    background-color: #fff;
+    border-radius: 7px;
+    height: 250px;
+    margin-top: 20px;
+    overflow-y: scroll;
+    padding: 30px;
+  }
+
+  .skill-description-box {
+    margin-top: 30px;
+  }
+
+  .skill-description {
+    background-color: #fff;
+    border-radius: 7px;
+    padding: 30px;
+  }
+
+  .skill-question-container {
+    width: 40%;
+  }
+
+  .question-text {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 60%;
+  }
+
+  .question-data {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .question-filters {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .question-filters input {
+    width: 60%;
+  }
+
+  .question-filters select {
+    width: 38%;
+  }
+
+  .preview-box {
+    margin-top: -40px;
+    padding: 30px 0;
+  }
+
+  .content-text-box {
+    border-bottom: 2px solid #707070;
+    margin-bottom: 15px;
+  }
+
+  .question-list-item {
+    border-bottom: 1px solid #e6e6e6;
+    margin: 12px 0;
+  }
+
+  .headings {
+    font-size: 30px;
+    font-weight: bold;
+  }
+
+  .heading-secondary {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  @media screen and (max-width: 1250px) {
+    .question-filter-box {
+      width: 35%;
+    }
+
+    .skill-question-container {
+      width: 45%;
+    }
+  }
+
+  @media screen and (max-width: 1000px) {
+    .seperator-block {
+      width: 5%;
+    }
+  }
+
+  @media screen and (max-width: 700px) {
+    .question-filter-box {
+      width: 90%;
+    }
+
+    .seperator-block,
+    .skill-description-box {
+      display: none;
+    }
+
+    .skill-question-container {
+      margin: 0;
+      width: 90%;
+    }
+  }
+</style>

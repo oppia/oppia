@@ -14,63 +14,161 @@
 
 """Models for storing the question data models."""
 
+from __future__ import annotations
+
 import math
+import random
 
-from constants import constants
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.platform import models
-import core.storage.user.gae_models as user_models
-import utils
 
-from google.appengine.datastore import datastore_query
-from google.appengine.ext import ndb
+from typing import Dict, List, Mapping, Sequence
+
+MYPY = False
+if MYPY: # pragma: no cover
+    # Here, we are importing 'state_domain' only for type-checking purpose.
+    from core.domain import state_domain  # pylint: disable=invalid-import # isort:skip
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
 (base_models, skill_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.skill
+    models.Names.BASE_MODEL, models.Names.SKILL
 ])
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a question snapshot."""
+
     pass
 
 
 class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a question snapshot."""
-    pass
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+
+class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to questions.
+
+    A new instance of this model is created and saved every time a commit to
+    QuestionModel occurs.
+
+    The id for this model is of the form 'question-[question_id]-[version]'.
+    """
+
+    # The id of the question being edited.
+    question_id = datastore_services.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """The history of commits is not relevant for the purposes of Takeout
+        since commits don't contain relevant data corresponding to users.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits isn't deemed as useful for users since
+        commit logs don't contain relevant data corresponding to those users.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def get_instance_id(cls, question_id: str, question_version: int) -> str:
+        """Returns ID of the question commit log entry model.
+
+        Args:
+            question_id: str. The question id whose states are mapped.
+            question_version: int. The version of the question.
+
+        Returns:
+            str. A string containing question ID and
+            question version.
+        """
+        return 'question-%s-%s' % (question_id, question_version)
 
 
 class QuestionModel(base_models.VersionedModel):
     """Model for storing Questions.
 
-    The ID of instances of this class has the form
-    {{random_hash_of_12_chars}}
+    The ID of instances of this class are in form of random hash of 12 chars.
     """
+
     SNAPSHOT_METADATA_CLASS = QuestionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = QuestionSnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = QuestionCommitLogEntryModel
     ALLOW_REVERT = True
 
     # An object representing the question state data.
-    question_state_data = ndb.JsonProperty(indexed=False, required=True)
+    question_state_data = (
+        datastore_services.JsonProperty(indexed=False, required=True))
     # The schema version for the question state data.
-    question_state_data_schema_version = ndb.IntegerProperty(
+    question_state_data_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # The ISO 639-1 code for the language this question is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The skill ids linked to this question.
-    linked_skill_ids = ndb.StringProperty(
+    linked_skill_ids = datastore_services.StringProperty(
+        indexed=True, repeated=True)
+    # The optional skill misconception ids marked as not relevant to the
+    # question.
+    # Note: Misconception ids are represented in two ways. In the Misconception
+    # domain object the id is a number. But in the context of a question
+    # (used here), the skill id needs to be included along with the
+    # misconception id, this is because questions can have multiple skills
+    # attached to it. Hence, the format for this field will be
+    # <skill-id>-<misconceptionid>.
+    inapplicable_skill_misconception_ids = datastore_services.StringProperty(
         indexed=True, repeated=True)
 
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
-    def _get_new_id(cls):
-        """Generates a unique ID for the question of the form
-        {{random_hash_of_12_chars}}
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'question_state_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_state_data_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'linked_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'inapplicable_skill_misconception_ids':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def _get_new_id(cls) -> str:
+        """Generates a unique ID for the question in the form of random hash
+        of 12 chars.
 
         Returns:
-           new_id: int. ID of the new QuestionModel instance.
+            new_id: str. ID of the new QuestionModel instance.
 
         Raises:
-            Exception: The ID generator for QuestionModel is
-            producing too many collisions.
+            Exception. The ID generator for QuestionModel is
+                producing too many collisions.
         """
 
         for _ in range(base_models.MAX_RETRIES):
@@ -84,8 +182,21 @@ class QuestionModel(base_models.VersionedModel):
             'The id generator for QuestionModel is producing too many '
             'collisions.')
 
-    def _trusted_commit(
-            self, committer_id, commit_type, commit_message, commit_cmds):
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with VersionedModel.compute_models_to_commit(). Because argument
+    # `commit_message` of super class can accept Optional[str] but this method
+    # can only accept str.
+    def compute_models_to_commit(  # type: ignore[override]
+        self,
+        committer_id: str,
+        commit_type: str,
+        commit_message: str,
+        commit_cmds: base_models.AllowedCommitCmdsListType,
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
+        additional_models: Mapping[str, base_models.BaseModel]
+    ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -101,27 +212,42 @@ class QuestionModel(base_models.VersionedModel):
                 reconstruct the commit. Each dict always contains:
                     cmd: str. Unique command.
                 and then additional arguments for that command.
-        """
-        super(QuestionModel, self)._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds)
+            additional_models: dict(str, BaseModel). Additional models that are
+                needed for the commit process.
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
+        Returns:
+            ModelsToPutDict. A dict of models that should be put into
+            the datastore.
+        """
+        models_to_put = super().compute_models_to_commit(
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            additional_models
+        )
 
         question_commit_log = QuestionCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC, False
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         question_commit_log.question_id = self.id
-        question_commit_log.put()
+        return {
+            'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
+            'snapshot_content_model': models_to_put['snapshot_content_model'],
+            'commit_log_model': question_commit_log,
+            'versioned_model': models_to_put['versioned_model'],
+        }
 
     @classmethod
     def create(
-            cls, question_state_data, language_code, version, linked_skill_ids):
+        cls,
+        question_state_data: state_domain.StateDict,
+        language_code: str,
+        version: int,
+        linked_skill_ids: List[str],
+        inapplicable_skill_misconception_ids: List[str]
+    ) -> QuestionModel:
         """Creates a new QuestionModel entry.
 
         Args:
@@ -129,14 +255,17 @@ class QuestionModel(base_models.VersionedModel):
                 state data.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
-            version: str. The version of the question.
+            version: int. The version of the question.
             linked_skill_ids: list(str). The skill ids linked to the question.
+            inapplicable_skill_misconception_ids: list(str). The optional
+                skill misconception ids marked as not applicable to the
+                question.
 
         Returns:
             QuestionModel. Instance of the new QuestionModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists.
+            Exception. A model with the same ID already exists.
         """
         instance_id = cls._get_new_id()
         question_model_instance = cls(
@@ -144,37 +273,61 @@ class QuestionModel(base_models.VersionedModel):
             question_state_data=question_state_data,
             language_code=language_code,
             version=version,
-            linked_skill_ids=linked_skill_ids)
+            linked_skill_ids=linked_skill_ids,
+            inapplicable_skill_misconception_ids=(
+                inapplicable_skill_misconception_ids))
 
         return question_model_instance
 
     @classmethod
-    def put_multi_questions(cls, questions):
+    def put_multi_questions(cls, questions: List[QuestionModel]) -> None:
         """Puts multiple question models into the datastore.
 
         Args:
             questions: list(Question). The list of question objects
-            to put into the datastore.
+                to put into the datastore.
         """
+        cls.update_timestamps_multi(questions)
         cls.put_multi(questions)
 
 
 class QuestionSkillLinkModel(base_models.BaseModel):
     """Model for storing Question-Skill Links.
 
-    The ID of instances of this class has the form
-    {{random_hash_of_12_chars}}
+    The ID of instances of this class has the form '[question_id]:[skill_id]'.
     """
 
     # The ID of the question.
-    question_id = ndb.StringProperty(required=True, indexed=True)
+    question_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The ID of the skill to which the question is linked.
-    skill_id = ndb.StringProperty(required=True, indexed=True)
+    skill_id = datastore_services.StringProperty(required=True, indexed=True)
     # The difficulty of the skill.
-    skill_difficulty = ndb.FloatProperty(required=True, indexed=True)
+    skill_difficulty = (
+        datastore_services.FloatProperty(required=True, indexed=True))
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_model_id(cls, question_id, skill_id):
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_difficulty': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def get_model_id(cls, question_id: str, skill_id: str) -> str:
         """Returns the model id by combining the questions and skill id.
 
         Args:
@@ -187,7 +340,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return '%s:%s' % (question_id, skill_id)
 
     @classmethod
-    def create(cls, question_id, skill_id, skill_difficulty):
+    def create(
+        cls,
+        question_id: str,
+        skill_id: str,
+        skill_difficulty: float
+    ) -> QuestionSkillLinkModel:
         """Creates a new QuestionSkillLinkModel entry.
 
         Args:
@@ -200,12 +358,13 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Returns:
             QuestionSkillLinkModel. Instance of the new QuestionSkillLinkModel
-                entry.
+            entry.
         """
         question_skill_link_id = cls.get_model_id(question_id, skill_id)
         if cls.get(question_skill_link_id, strict=False) is not None:
             raise Exception(
-                'The given question is already linked to given skill')
+                'The question with ID %s is already linked to skill %s' %
+                (question_id, skill_id))
 
         question_skill_link_model_instance = cls(
             id=question_skill_link_id,
@@ -216,8 +375,27 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_model_instance
 
     @classmethod
+    def get_total_question_count_for_skill_ids(
+        cls, skill_ids: List[str]
+    ) -> int:
+        """Returns the number of questions assigned to the given skill_ids.
+
+        Args:
+            skill_ids: list(str). Skill IDs for which the question count is
+                requested.
+
+        Returns:
+            int. The number of questions assigned to the given skill_ids.
+        """
+        total_question_count = cls.query().filter(
+            cls.skill_id.IN(skill_ids)).count()
+
+        return total_question_count
+
+    @classmethod
     def get_question_skill_links_by_skill_ids(
-            cls, question_count, skill_ids, start_cursor):
+        cls, question_count: int, skill_ids: List[str], offset: int
+    ) -> Sequence[QuestionSkillLinkModel]:
         """Fetches the list of QuestionSkillLinkModels linked to the skill in
         batches.
 
@@ -225,46 +403,176 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             question_count: int. The number of questions to be returned.
             skill_ids: list(str). The ids of skills for which the linked
                 question ids are to be retrieved.
-            start_cursor: str. The starting point from which the batch of
-                questions are to be returned. This value should be urlsafe.
+            offset: int. Number of query results to skip.
 
         Returns:
-            list(QuestionSkillLinkModel), str|None. The QuestionSkillLinkModels
-                corresponding to given skill_ids, the next cursor value to be
-                used for the next page (or None if no more pages are left). The
-                returned next cursor value is urlsafe.
+            list(QuestionSkillLinkModel). The QuestionSkillLinkModels
+            corresponding to given skill_ids.
         """
         question_skill_count = min(
             len(skill_ids), constants.MAX_SKILLS_PER_QUESTION
         ) * question_count
 
-        if not start_cursor == '':
-            cursor = datastore_query.Cursor(urlsafe=start_cursor)
-            question_skill_link_models, next_cursor, more = cls.query(
-                cls.skill_id.IN(skill_ids)
-                # Order by cls.key is needed alongside cls.last_updated so as to
-                # resolve conflicts, if any.
-                # Reference SO link: https://stackoverflow.com/q/12449197
-            ).order(-cls.last_updated, cls.key).fetch_page(
-                question_skill_count,
-                start_cursor=cursor
+        return cls.query(
+            cls.skill_id.IN(skill_ids)
+        ).order(-cls.last_updated).fetch(question_skill_count, offset=offset)
+
+    @classmethod
+    def get_question_skill_links_based_on_difficulty_equidistributed_by_skill(
+        cls,
+        total_question_count: int,
+        skill_ids: List[str],
+        difficulty_requested: float
+    ) -> List[QuestionSkillLinkModel]:
+        """Fetches the list of constant number of random QuestionSkillLinkModels
+        linked to the skills, sorted by the absolute value of the difference
+        between skill difficulty and the requested difficulty.
+
+        Args:
+            total_question_count: int. The number of questions expected.
+            skill_ids: list(str). The ids of skills for which the linked
+                question ids are to be retrieved.
+            difficulty_requested: float. The skill difficulty of the questions
+                requested to be fetched.
+
+        Returns:
+            list(QuestionSkillLinkModel). A list of random
+            QuestionSkillLinkModels corresponding to given skill_ids, with
+            total_question_count/len(skill_ids) number of questions for
+            each skill. If not evenly divisible, it will be rounded up.
+            If not enough questions for a skill, just return all questions
+            it links to.
+
+        Raises:
+            Exception. The number of skill IDs exceeds 20.
+        """
+        if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
+            raise Exception('Please keep the number of skill IDs below 20.')
+
+        if (not skill_ids) or (total_question_count == 0):
+            return []
+
+        question_count_per_skill = int(
+            math.ceil(float(total_question_count) / float(len(skill_ids))))
+
+        question_skill_link_mapping = {}
+
+        # For fetching the questions randomly we have used a random offset.
+        # But this is a temporary solution since this method scales linearly.
+        # Other alternative methods were:
+        # 1) Using a random id in question id filter
+        # 2) Adding an additional column that can be filtered upon.
+        # But these methods are not viable because google datastore limits
+        # each query to have at most one inequality filter. So we can't filter
+        # on both question_id and difficulty. Please see
+        # https://github.com/oppia/oppia/pull/9061#issuecomment-629765809
+        # for more details.
+
+        def get_offset(query: datastore_services.Query) -> int:
+            """Helper function to get the offset."""
+            question_count = query.count()
+            if question_count > 2 * question_count_per_skill:
+                return utils.get_random_int(
+                    question_count - (question_count_per_skill * 2))
+            return 0
+
+        for skill_id in skill_ids:
+            query = cls.query(cls.skill_id == skill_id)
+
+            equal_questions_query = query.filter(
+                cls.skill_difficulty == difficulty_requested)
+
+            # We fetch more questions here in order to try and ensure that the
+            # eventual number of returned questions is sufficient to meet the
+            # number requested, even after deduplication.
+            new_question_skill_link_models: List[QuestionSkillLinkModel] = list(
+                equal_questions_query.fetch(
+                    limit=question_count_per_skill * 2,
+                    offset=get_offset(equal_questions_query)
+                )
             )
-        else:
-            question_skill_link_models, next_cursor, more = cls.query(
-                cls.skill_id.IN(skill_ids)
-            ).order(-cls.last_updated, cls.key).fetch_page(
-                question_skill_count
-            )
-        next_cursor_str = (
-            next_cursor.urlsafe() if (next_cursor and more) else None
-        )
-        return question_skill_link_models, next_cursor_str
+            for model in new_question_skill_link_models:
+                if model.question_id in question_skill_link_mapping:
+                    new_question_skill_link_models.remove(model)
+
+            if len(new_question_skill_link_models) >= question_count_per_skill:
+                new_question_skill_link_models = random.sample(
+                    new_question_skill_link_models, question_count_per_skill)
+            else:
+                # Fetch QuestionSkillLinkModels with difficulty smaller than
+                # requested difficulty.
+                easier_questions_query = query.filter(
+                    cls.skill_difficulty < difficulty_requested)
+                easier_question_skill_link_models: List[
+                    QuestionSkillLinkModel
+                ] = list(
+                    easier_questions_query.fetch(
+                        limit=question_count_per_skill * 2,
+                        offset=get_offset(easier_questions_query)
+                    )
+                )
+                for model in easier_question_skill_link_models:
+                    if model.question_id in question_skill_link_mapping:
+                        easier_question_skill_link_models.remove(model)
+                question_extra_count = (
+                    len(new_question_skill_link_models) +
+                    len(easier_question_skill_link_models) -
+                    question_count_per_skill)
+                if question_extra_count >= 0:
+                    easier_question_skill_link_models = random.sample(
+                        easier_question_skill_link_models,
+                        question_count_per_skill -
+                        len(new_question_skill_link_models)
+                    )
+                    new_question_skill_link_models.extend(
+                        easier_question_skill_link_models)
+                else:
+                    # Fetch QuestionSkillLinkModels with difficulty larger than
+                    # requested difficulty.
+                    new_question_skill_link_models.extend(
+                        easier_question_skill_link_models)
+                    harder_questions_query = query.filter(
+                        cls.skill_difficulty > difficulty_requested)
+                    harder_question_skill_link_models: List[
+                        QuestionSkillLinkModel
+                    ] = list(
+                        harder_questions_query.fetch(
+                            limit=question_count_per_skill * 2,
+                            offset=get_offset(harder_questions_query)
+                        )
+                    )
+                    for model in harder_question_skill_link_models:
+                        if model.question_id in question_skill_link_mapping:
+                            harder_question_skill_link_models.remove(model)
+                    question_extra_count = (
+                        len(new_question_skill_link_models) +
+                        len(harder_question_skill_link_models) -
+                        question_count_per_skill)
+                    if question_extra_count >= 0:
+                        harder_question_skill_link_models = (
+                            random.sample(
+                                harder_question_skill_link_models,
+                                question_count_per_skill -
+                                len(new_question_skill_link_models)
+                            ))
+                    new_question_skill_link_models.extend(
+                        harder_question_skill_link_models)
+
+            new_question_skill_link_models = (
+                new_question_skill_link_models[:question_count_per_skill])
+
+            for model in new_question_skill_link_models:
+                if model.question_id not in question_skill_link_mapping:
+                    question_skill_link_mapping[model.question_id] = model
+
+        return list(question_skill_link_mapping.values())
 
     @classmethod
     def get_question_skill_links_equidistributed_by_skill(
-            cls, total_question_count, skill_ids):
-        """Fetches the list of constant number of QuestionSkillLinkModels
-        linked to the skills.
+        cls, total_question_count: int, skill_ids: List[str]
+    ) -> List[QuestionSkillLinkModel]:
+        """Fetches the list of constant number of random
+        QuestionSkillLinkModels linked to the skills.
 
         Args:
             total_question_count: int. The number of questions expected.
@@ -272,28 +580,74 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 question ids are to be retrieved.
 
         Returns:
-            list(QuestionSkillLinkModel). A list of QuestionSkillLinkModels
-                corresponding to given skill_ids, with
-                total_question_count/len(skill_ids) number of questions for
-                each skill. If not evenly divisible, it will be rounded up.
-                If not enough questions for a skill, just return all questions
-                it links to. The order of questions will follow the order of
-                given skill ids, but the order of questions for the same skill
-                is random.
+            list(QuestionSkillLinkModel). A list of random
+            QuestionSkillLinkModels corresponding to given skill_ids, with
+            total_question_count/len(skill_ids) number of questions for
+            each skill. If not evenly divisible, it will be rounded up.
+            If not enough questions for a skill, just return all questions
+            it links to.
+
+        Raises:
+            Exception. The number of skill IDs exceeds 20.
         """
+        if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
+            raise Exception('Please keep the number of skill IDs below 20.')
+
+        if not skill_ids:
+            return []
+
         question_count_per_skill = int(
-            math.ceil(float(total_question_count) / float(len(skill_ids))))
+            math.ceil(
+                float(total_question_count) / float(len(skill_ids))))
         question_skill_link_models = []
+        existing_question_ids = []
+
+        def get_offset(query: datastore_services.Query) -> int:
+            """Helper function to get the offset."""
+            question_count = query.count()
+            if question_count > 2 * question_count_per_skill:
+                return utils.get_random_int(
+                    question_count - (question_count_per_skill * 2))
+            return 0
+
         for skill_id in skill_ids:
-            question_skill_link_models.extend(
-                cls.query(cls.skill_id == skill_id).fetch(
-                    question_count_per_skill
+            query = cls.query(cls.skill_id == skill_id)
+
+            # We fetch more questions here in order to try and ensure that the
+            # eventual number of returned questions is sufficient to meet the
+            # number requested, even after deduplication.
+            new_question_skill_link_models: List[QuestionSkillLinkModel] = list(
+                query.fetch(
+                    limit=question_count_per_skill * 2,
+                    offset=get_offset(query)
                 )
             )
+            # Deduplicate if the same question is linked to multiple skills.
+            for model in new_question_skill_link_models:
+                if model.question_id in existing_question_ids:
+                    new_question_skill_link_models.remove(model)
+            if len(new_question_skill_link_models) > question_count_per_skill:
+                sampled_question_skill_link_models = random.sample(
+                    new_question_skill_link_models,
+                    question_count_per_skill
+                )
+            else:
+                sampled_question_skill_link_models = (
+                    new_question_skill_link_models)
+
+            question_skill_link_models.extend(
+                sampled_question_skill_link_models)
+            existing_question_ids.extend([
+                model.question_id for model in (
+                    sampled_question_skill_link_models)
+            ])
+
         return question_skill_link_models
 
     @classmethod
-    def get_all_question_ids_linked_to_skill_id(cls, skill_id):
+    def get_all_question_ids_linked_to_skill_id(
+        cls, skill_id: str
+    ) -> List[str]:
         """Returns a list of all question ids corresponding to the given skill
         id.
 
@@ -302,16 +656,20 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Returns:
             list(str). The list of all question ids corresponding to the given
-                skill id.
+            skill id.
         """
-        question_skill_link_models = cls.query(cls.skill_id == skill_id)
+        question_skill_link_models = cls.query().filter(
+            cls.skill_id == skill_id,
+            cls.deleted == False) # pylint: disable=singleton-comparison
         question_ids = [
             model.question_id for model in question_skill_link_models
         ]
         return question_ids
 
     @classmethod
-    def get_models_by_skill_id(cls, skill_id):
+    def get_models_by_skill_id(
+        cls, skill_id: str
+    ) -> Sequence[QuestionSkillLinkModel]:
         """Returns a list of QuestionSkillLink domains of a particular skill ID.
 
         Args:
@@ -322,11 +680,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             domains that are linked to the skill ID. None if the skill
             ID doesn't exist.
         """
-        return QuestionSkillLinkModel.query().filter(
-            cls.skill_id == skill_id).fetch()
+        return cls.get_all().filter(cls.skill_id == skill_id).fetch()
 
     @classmethod
-    def get_models_by_question_id(cls, question_id):
+    def get_models_by_question_id(
+        cls, question_id: str
+    ) -> Sequence[QuestionSkillLinkModel]:
         """Returns a list of QuestionSkillLinkModels of a particular
         question ID.
 
@@ -338,57 +697,32 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             models that are linked to the question ID, or None if there are no
             question skill link models associated with the question ID.
         """
-        return QuestionSkillLinkModel.query().filter(
-            cls.question_id == question_id,
-            cls.deleted == False).fetch() #pylint: disable=singleton-comparison
+        return cls.get_all().filter(cls.question_id == question_id).fetch()
 
     @classmethod
-    def put_multi_question_skill_links(cls, question_skill_links):
+    def put_multi_question_skill_links(
+        cls, question_skill_links: List[QuestionSkillLinkModel]
+    ) -> None:
         """Puts multiple question skill link models into the datastore.
 
         Args:
             question_skill_links: list(QuestionSkillLink). The list of
-            question skill link domain objects to put into the datastore.
+                question skill link domain objects to put into the datastore.
         """
+        cls.update_timestamps_multi(question_skill_links)
         cls.put_multi(question_skill_links)
 
-
     @classmethod
-    def delete_multi_question_skill_links(cls, question_skill_links):
+    def delete_multi_question_skill_links(
+        cls, question_skill_links: List[QuestionSkillLinkModel]
+    ) -> None:
         """Deletes multiple question skill links from the datastore.
 
         Args:
             question_skill_links: list(QuestionSkillLinkModel). The list of
-            question skill link domain objects to delete from the datastore.
+                question skill link domain objects to delete from the datastore.
         """
         cls.delete_multi(question_skill_links)
-
-
-class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Log of commits to questions.
-
-    A new instance of this model is created and saved every time a commit to
-    QuestionModel occurs.
-
-    The id for this model is of the form
-    'question-{{QUESTION_ID}}-{{QUESTION_VERSION}}'.
-    """
-    # The id of the question being edited.
-    question_id = ndb.StringProperty(indexed=True, required=True)
-
-    @classmethod
-    def _get_instance_id(cls, question_id, question_version):
-        """Returns ID of the question commit log entry model.
-
-        Args:
-            question_id: str. The question id whose states are mapped.
-            question_version: int. The version of the question.
-
-        Returns:
-            str. A string containing question ID and
-                question version.
-        """
-        return 'question-%s-%s' % (question_id, question_version)
 
 
 class QuestionSummaryModel(base_models.BaseModel):
@@ -399,60 +733,61 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     A QuestionSummaryModel instance stores the following information:
 
-    creator_id, question_model_last_updated, question_model_created_on,
+    question_model_last_updated, question_model_created_on,
     question_state_data.
 
     The key of each instance is the question id.
     """
-    # The user ID of the creator of the question.
-    creator_id = ndb.StringProperty(required=True)
+
     # Time when the question model was last updated (not to be
     # confused with last_updated, which is the time when the
     # question *summary* model was last updated).
-    question_model_last_updated = ndb.DateTimeProperty(
+    question_model_last_updated = datastore_services.DateTimeProperty(
         indexed=True, required=True)
     # Time when the question model was created (not to be confused
     # with created_on, which is the time when the question *summary*
     # model was created).
-    question_model_created_on = ndb.DateTimeProperty(
+    question_model_created_on = datastore_services.DateTimeProperty(
         indexed=True, required=True)
     # The html content for the question.
-    question_content = ndb.TextProperty(indexed=False, required=True)
+    question_content = (
+        datastore_services.TextProperty(indexed=False, required=True))
+    # The ID of the interaction.
+    interaction_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
+    # The misconception ids addressed in the question. This includes
+    # tagged misconceptions ids as well as inapplicable misconception
+    # ids in the question.
+    misconception_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model data has already been exported as a part of the QuestionModel
+        export_data function, and thus a new export_data function does not
+        need to be defined here.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def get_by_creator_id(cls, creator_id):
-        """Gets QuestionSummaryModel by creator_id.
-
-        Args:
-            creator_id: str. The user ID of the creator of the question.
-
-        Returns:
-            QuestionSummaryModel. The summary model of the question.
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data corresponding to a user, but this isn't exported
+        because because noteworthy details that belong to this model have
+        already been exported as a part of the QuestionModel export_data
+        function.
         """
-        return QuestionSummaryModel.query().filter(
-            cls.creator_id == creator_id).fetch()
-
-
-class QuestionRightsSnapshotMetadataModel(
-        base_models.BaseSnapshotMetadataModel):
-    """Storage model for the metadata for a question rights snapshot."""
-    pass
-
-
-class QuestionRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
-    """Storage model for the content of a question rights snapshot."""
-    pass
-
-
-class QuestionRightsModel(base_models.VersionedModel):
-    """Storage model for rights related to a question.
-
-    The id of each instance is the id of the corresponding question.
-    """
-
-    SNAPSHOT_METADATA_CLASS = QuestionRightsSnapshotMetadataModel
-    SNAPSHOT_CONTENT_CLASS = QuestionRightsSnapshotContentModel
-    ALLOW_REVERT = False
-
-    # The user ID of the creator of the question.
-    creator_id = ndb.StringProperty(indexed=True, required=True)
+        return dict(super(cls, cls).get_export_policy(), **{
+            'question_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_model_created_on':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'misconception_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })

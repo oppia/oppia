@@ -1,0 +1,118 @@
+<div class="modal-header create-new-skill-modal-header">
+  <h3>New Skill</h3>
+  <i class="fa fa-times modal-close-button" (click)="cancel()"></i>
+</div>
+
+<form (submit)="createNewSkill()">
+  <div class="modal-body create-new-skill-modal">
+    <div class="skill-description-box">
+      <div class="skill-description-header">
+        <strong>Skill Description</strong>
+      </div>
+      <input type="text" class="form-control e2e-test-new-skill-description-field"
+             placeholder="eg: Adding Fractions" (change)="updateSkillDescriptionAndCheckIfExists()"
+             [(ngModel)]="this.newSkillDescription" [ngModelOptions]="{standalone: true}"
+             autofocus [attr.maxlength]="MAX_CHARS_IN_SKILL_DESCRIPTION"
+             attr.label="Skill Description">
+      <span class="oppia-input-box-subtitle">
+        <i>
+          Skill description should be at most {{ MAX_CHARS_IN_SKILL_DESCRIPTION }} characters.
+        </i>
+      </span>
+      <span *ngIf="errorMsg" class="skill-description-error-message">
+        <i>
+          {{errorMsg}}
+        </i>
+      </span>
+    </div>
+    <div class="skill-review-material-box">
+      <div class="oppia-rule-details-header e2e-test-open-concept-card" (click)="openConceptCardExplanationEditor()">
+        <strong>Review Material</strong>
+        <div class="oppia-input-box-subtitle">
+          <i>
+            This gives the learner a brief overview of how to perform the skill.
+          </i>
+          <i class="fa fa-pen"></i>
+        </div>
+      </div>
+
+      <div *ngIf="conceptCardExplanationEditorIsShown">
+        <schema-based-editor [schema]="getHtmlSchema()" class="e2e-test-concept-card-text"
+                             [localValue]="bindableDict.displayedConceptCardExplanation"
+                             (localValueChange)="updateExplanation($event)">
+        </schema-based-editor>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
+    <button class="btn btn-success e2e-test-confirm-skill-creation-button"
+            type="submit"
+            [disabled]="bindableDict.displayedConceptCardExplanation.length === 0 || newSkillDescription.length === 0 || errorMsg !== ''">
+            Save
+    </button>
+  </div>
+</form>
+<style>
+  .create-new-skill-modal-header i {
+    display: none;
+  }
+  .create-new-skill-modal .skill-description-header {
+    margin-bottom: 6px;
+    margin-top: 1em;
+    width: 100%;
+  }
+
+  .create-new-skill-modal .oppia-rule-details-header {
+    margin-bottom: 0.5em;
+    margin-top: 1em;
+    width: 100%;
+  }
+
+  .create-new-skill-modal .skill-description-error-message {
+    color: red;
+    display: block;
+    font-size: 0.8em;
+  }
+
+  @media screen and (max-width: 768px) {
+    .create-new-skill-modal .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+    }
+    .create-new-skill-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+      height: 100vh;
+    }
+    .create-new-skill-modal .modal-body {
+      height: 80vh;
+    }
+    .create-new-skill-modal .modal-header {
+      align-items: center;
+      background-color: #00609c;
+      display: flex;
+    }
+    .create-new-skill-modal .modal-header h3 {
+      color: #fff;
+    }
+    .create-new-skill-modal .modal-close-button {
+      color: #fff;
+      display: block;
+      font-size: 20px;
+    }
+    .create-new-skill-modal .skill-description-box {
+      margin: 40px 0;
+    }
+    .create-new-skill-modal .skill-review-material-box {
+      margin: 40px 0;
+    }
+    .create-new-skill-modal .oppia-input-box-subtitle {
+      margin-bottom: 15px;
+    }
+  }
+</style>

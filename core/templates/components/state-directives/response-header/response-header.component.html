@@ -1,0 +1,125 @@
+<div class="oppia-response-header-block">
+  <div class="oppia-response-header">
+    <span *ngIf="showWarning">⚠</span>
+    <div class="oppia-response-container-desktop">
+      <i class="fas fa-times oppia-response-tick-cross oppia-response-cross" *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()"></i>
+      <i class="fas fa-check oppia-response-tick-cross  oppia-response-tick e2e-test-correct-tick-mark" *ngIf="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()"></i>
+    </div>
+    <div class="oppia-responses-mobile">
+      <div class="oppia-response-mobile-item oppia-response-mobile-item-incorrect" *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
+        Incorrect
+      </div>
+      <div class="oppia-response-mobile-item oppia-response-mobile-item-correct" *ngIf="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
+        Correct
+      </div>
+    </div>
+    <span class="oppia-response-summary" [attr.title]="summary">
+      <span class="oppia-response-short-summary">{{shortSummary}}</span>
+      <span *ngIf="numRules > 1" class="badge badge-primary position-relative oppia-num-rules">
+        +{{numRules - 1}}
+      </span>
+    </span>
+  </div>
+
+  <br class="break-in-mobile">
+  <span *ngIf="outcome"> →</span>
+  <span *ngIf="isCorrect() && isInQuestionMode()">
+    Correct
+  </span>
+  <span *ngIf="outcome && !isOutcomeLooping() && !isCreatingNewState() && !isInQuestionMode()"
+        (click)="returnToState()" class="oppia-nested-link">
+    {{outcome.dest}}
+  </span>
+  <span class="oppia-nested-link" *ngIf="outcome && !isOutcomeLooping() && isCreatingNewState()">
+    <em *ngIf="outcome.newStateName">{{outcome.newStateName}}</em>
+    <em *ngIf="!outcome.newStateName">Nowhere yet...</em>
+  </span>
+  <span *ngIf="outcome && !isInQuestionMode() && isOutcomeLooping()">
+    <em>(try again)</em>
+  </span>
+  <span *ngIf="outcome && isInQuestionMode() && !isCorrect()">
+    <em>Wrong<br> (try again)</em>
+  </span>
+</div>
+
+<style>
+  .oppia-response-header-block {
+    margin-left: 39px;
+  }
+
+  .oppia-nested-link {
+    color: #0844aa;
+    cursor: pointer;
+    display: inline-block;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    word-wrap: break-word;
+  }
+  .oppia-nested-link:hover {
+    color: #3f2c76;
+    text-decoration: underline;
+  }
+  .oppia-response-header {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 78%;
+  }
+  .oppia-response-tick-cross {
+    margin-bottom: 7px;
+  }
+  .oppia-response-cross {
+    color: #c55f45;
+  }
+  .oppia-response-tick {
+    color: #00645c;
+    font-size: 14px;
+  }
+  .oppia-response-summary {
+    display: flex;
+    flex-flow: row;
+  }
+  .oppia-response-short-summary {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .badge {
+    vertical-align: bottom;
+  }
+  /* This is to break the line only when screen is too narrow to have both divs
+     in same line.*/
+  @media screen and (min-width: 370px) {
+    .break-in-mobile {
+      display: none;
+    }
+  }
+  .oppia-responses-mobile {
+    display: none;
+  }
+  @media screen and (max-width: 768px) {
+    .oppia-responses-mobile {
+      display: block;
+    }
+    .oppia-response-mobile-item {
+      border-radius: 10px 0 0 0;
+      bottom: 0;
+      color: #fff;
+      padding-left: 10px;
+      padding-right: 6px;
+      padding-top: 1px;
+      position: absolute;
+      right: 0;
+    }
+    .oppia-response-mobile-item-incorrect {
+      background-color: #ffa500;
+    }
+    .oppia-response-mobile-item-correct {
+      background-color: #449d44;
+    }
+    .oppia-response-container-desktop {
+      display: none;
+    }
+  }
+</style>

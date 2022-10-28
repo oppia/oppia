@@ -1,0 +1,13 @@
+<oppia-exploration-summary-tile *ngFor="let collectionNode of collectionNodes"
+                                [collectionId]="collectionId"
+                                [explorationId]="collectionNode.getExplorationId()"
+                                [explorationTitle]="collectionNode.getExplorationSummaryObject().title"
+                                [lastUpdatedMsec]="collectionNode.getExplorationSummaryObject().last_updated_msec"
+                                [objective]="collectionNode.getExplorationSummaryObject().objective"
+                                [category]="collectionNode.getExplorationSummaryObject().category"
+                                [ratings]="collectionNode.getExplorationSummaryObject().ratings"
+                                [numViews]="collectionNode.getExplorationSummaryObject().num_views"
+                                [thumbnailIconUrl]="collectionNode.getExplorationSummaryObject().thumbnail_icon_url"
+                                [thumbnailBgColor]="collectionNode.getExplorationSummaryObject().thumbnail_bg_color"
+                                [isCommunityOwned]="collectionNode.getExplorationSummaryObject().community_owned">
+</oppia-exploration-summary-tile>

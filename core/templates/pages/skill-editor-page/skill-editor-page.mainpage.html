@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @load('base-components/header.template.html', {"title": "Skill Editor"})
+  </head>
+  <body>
+    <oppia-root>
+      <div ng-controller="Base">
+        <oppia-base-content>
+          <navbar-breadcrumb>
+            <oppia-skill-editor-navbar-breadcrumb>
+            </oppia-skill-editor-navbar-breadcrumb>
+          </navbar-breadcrumb>
+
+          <nav-options>
+            <oppia-skill-editor-navbar>
+            </oppia-skill-editor-navbar>
+          </nav-options>
+
+          <mobile-nav-options>
+            <oppia-skill-editor-navbar>
+            </oppia-skill-editor-navbar>
+          </mobile-nav-options>
+
+          <content>
+            <oppia-skill-editor-page></oppia-skill-editor-page>
+          </content>
+
+          <page-footer></page-footer>
+        </oppia-base-content>
+      </div>
+
+    </oppia-root>
+    @load('pages/footer_js_libs.html')
+    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=default"></script>
+  </body>
+</html>

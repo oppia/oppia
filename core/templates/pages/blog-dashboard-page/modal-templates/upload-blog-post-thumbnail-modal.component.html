@@ -1,0 +1,36 @@
+<div class="oppia-thumbnail-picture-container">
+  <div class="mt-5 mb-1 mx-3">
+    <h3>{{ 'I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD' | translate }}</h3>
+    <h4 class="image-upload-rules" [innerHTML]="'I18N_BLOG_POST_THUMBNAIL_ALLOWED_MAX_FILE_SIZE' | translate: { imageSize: ALLOWED_IMAGE_SIZE_IN_KB}">
+    </h4>
+    <h4 class="image-upload-rules">
+      {{ 'I18N_BLOG_POST_THUMBNAIL_ALLOWED_EXTENSIONS_PREFIX' | translate }} {{ ALLOWED_IMAGE_EXTENSIONS }}
+    </h4>
+  </div>
+
+  <div class="oppia-blog-post-thumbnail-uploader-container">
+    <oppia-upload-blog-post-thumbnail (imageLocallySaved)="save($event)"
+                                      (cancelThumbnailUpload)="cancel()">
+    </oppia-upload-blog-post-thumbnail>
+  </div>
+</div>
+<style>
+  .oppia-blog-post-thumbnail-uploader-container {
+    min-height: 300px;
+  }
+
+  .image-upload-rules {
+    color: #555;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 18px;
+    text-align: left;
+  }
+
+  @media(max-width: 768px) {
+    .oppia-blog-post-thumbnail-uploader-container {
+      height: 80px;
+      width: 164px;
+    }
+  }
+</style>

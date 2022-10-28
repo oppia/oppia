@@ -1,0 +1,17 @@
+<div>
+  <ul class="nav navbar-nav oppia-navbar-nav float-right oppia-navbar-pencil-icon">
+    <li *ngIf="canEdit" class="nav-item">
+      <a [href]="'/collection_editor/create/' + collectionId" ngbTooltip="Edit" placement="bottom" target="_blank" rel="noopener" class="nav-link">
+        <i class="fas fa-pen fa-lg"></i>
+        <span class="oppia-icon-accessibility-label">Edit</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<style>
+  .oppia-navbar-pencil-icon {
+    margin-right: 8px;
+    margin-top: 3px;
+
+  }
+</style>

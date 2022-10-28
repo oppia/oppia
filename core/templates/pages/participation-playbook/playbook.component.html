@@ -1,0 +1,86 @@
+<div class="playbook">
+  <div class="oppia-static-header">
+    <h1 [innerHTML]="'I18N_PLAYBOOK_HEADING' | translate"></h1>
+  </div>
+  <background-banner></background-banner>
+  <div>
+    <div class="oppia-static-content-below-banner">
+      <div class="oppia-page-card oppia-static-content">
+        <div class="about-tab-container">
+          <div class="participation oppia-about-tab-content" [ngClass]="{'oppia-about-visible-content': true}">
+            <div class="oppia-static-card-content oppia-static-card-content-narrow">
+              <h2 [innerHTML]="'I18N_PLAYBOOK_COMMUNITY_GUIDELINES_HEADING' | translate"></h2>
+              <ol>
+                <li>
+                  <p [innerHTML]="'I18N_PLAYBOOK_COMMUNITY_GUIDELINES_GUIDELINE_1' | translate">
+                  </p>
+                </li>
+                <li>
+                  <p [innerHTML]="'I18N_PLAYBOOK_COMMUNITY_GUIDELINES_GUIDELINE_2' | translate">
+                  </p>
+                </li>
+                <li>
+                  <p [innerHTML]="'I18N_PLAYBOOK_COMMUNITY_GUIDELINES_GUIDELINE_3' | translate">
+                  </p>
+                </li>
+              </ol>
+              <p [innerHTML]="'I18N_PLAYBOOK_COMMUNITY_GUIDELINES_TEXT' | translate">
+              </p>
+
+              <h2 [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_INSTRUCTIONS_HEADING' | translate"></h2>
+
+              <p [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_INSTRUCTIONS_PARAGRAPH_1' | translate">
+              </p>
+
+              <ul class="oppia-publication-instructions-container">
+                <li [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_INSTRUCTIONS_INSTRUCTION_1' | translate">
+                </li>
+                <li [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_INSTRUCTIONS_INSTRUCTION_2' | translate ">
+                </li>
+                <li [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_INSTRUCTIONS_INSTRUCTION_3' | translate">
+                </li>
+                <li [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_INSTRUCTIONS_INSTRUCTION_4' | translate">
+                </li>
+                <li [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_INSTRUCTIONS_INSTRUCTION_5' | translate">
+                </li>
+                <li [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_INSTRUCTIONS_INSTRUCTION_6' | translate">
+                </li>
+              </ul>
+
+              <p [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_INSTRUCTIONS_PARAGRAPH_2' | translate">
+              </p>
+
+              <h2 [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_POLICY_HEADING' | translate"></h2>
+
+              <p [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_POLICY_PARAGRAPH_1' | translate">
+              </p>
+              <p [innerHTML]="'I18N_PLAYBOOK_PUBLICATION_POLICY_PARAGRAPH_2' | translate">
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="oppia-about-extra-container about-tab-container">
+        <div class="oppia-about-tab-content oppia-about-visible-content">
+          <div class="oppia-about-extra-info">
+            <div class="oppia-static-content oppia-static-extra-content oppia-about-extra-content">
+              <div class="oppia-static-card-content oppia-static-card-content-wide oppia-about-buttons-container">
+                <a href="/creator-dashboard?mode=create" class="btn oppia-about-button"
+                  [innerHTML]="'I18N_ACTION_CREATE_EXPLORATION' | translate">
+                </a>
+                <a href="/community-library"
+                   [smartRouterLink]="communityLibraryUrl"
+                   class="btn oppia-about-button"
+                   [innerHTML]="'I18N_ACTION_BROWSE_EXPLORATIONS' | translate">
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-footer-padding-below-banner">
+  </div>
+</div>

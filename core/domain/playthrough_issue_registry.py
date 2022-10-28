@@ -16,23 +16,32 @@
 
 """Registry for issues."""
 
+from __future__ import annotations
+
+import importlib
 import os
-import pkgutil
 
+from core import feconf
 from core.platform import models
-import feconf
+from extensions.issues import base
 
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+from typing import Dict, List
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import stats_models
+
+(stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
 
 
-class Registry(object):
+class Registry:
     """Registry of all issues."""
 
     # Dict mapping issue types to instances of the issues.
-    _issues = {}
+    _issues: Dict[str, base.BaseExplorationIssueSpec] = {}
 
     @classmethod
-    def get_all_issue_types(cls):
+    def get_all_issue_types(cls) -> List[str]:
         """Get a list of all issue types.
 
         Returns:
@@ -41,43 +50,40 @@ class Registry(object):
         return stats_models.ALLOWED_ISSUE_TYPES
 
     @classmethod
-    def _refresh(cls):
+    def _refresh(cls) -> None:
         """Initializes the mapping between issue types to instances of the issue
         classes.
         """
         cls._issues.clear()
 
-        all_issue_types = cls.get_all_issue_types()
-
-        # Assemble all paths to the issues.
-        extension_paths = [
-            os.path.join(feconf.ISSUES_DIR, issue_type)
-            for issue_type in all_issue_types]
-
-        # Crawl the directories and add new issue instances to the
-        # registry.
-        for loader, name, _ in pkgutil.iter_modules(path=extension_paths):
-            module = loader.find_module(name).load_module(name)
-            clazz = getattr(module, name)
+        for issue_type in cls.get_all_issue_types():
+            module_path_parts = feconf.ISSUES_DIR.split(os.sep)
+            module_path_parts.extend([issue_type, issue_type])
+            module = importlib.import_module('.'.join(module_path_parts))
+            clazz = getattr(module, issue_type)
 
             ancestor_names = [
-                base_class.__name__ for base_class in clazz.__bases__]
+                base_class.__name__ for base_class in clazz.__bases__
+            ]
             if 'BaseExplorationIssueSpec' in ancestor_names:
                 cls._issues[clazz.__name__] = clazz()
 
     @classmethod
-    def get_all_issues(cls):
+    def get_all_issues(cls) -> List[base.BaseExplorationIssueSpec]:
         """Get a list of instances of all issues.
 
         Returns:
-            list. A list of all issue class instances.
+            list(*). A list of all issue class instances. Classes all have
+            "BaseExplorationIssueSpec" as an ancestor class.
         """
         if len(cls._issues) == 0:
             cls._refresh()
-        return cls._issues.values()
+        return list(cls._issues.values())
 
     @classmethod
-    def get_issue_by_type(cls, issue_type):
+    def get_issue_by_type(
+        cls, issue_type: str
+    ) -> base.BaseExplorationIssueSpec:
         """Gets an issue by its type.
 
         Refreshes once if the issue is not found; subsequently, throws a
@@ -87,7 +93,8 @@ class Registry(object):
             issue_type: str. Type of the issue.
 
         Returns:
-            An instance of the corresponding issue class.
+            *. An instance of the corresponding issue class. This class has
+            "BaseExplorationIssueSpec" as an ancestor class.
         """
         if issue_type not in cls._issues:
             cls._refresh()

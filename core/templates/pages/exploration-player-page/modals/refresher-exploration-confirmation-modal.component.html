@@ -1,0 +1,35 @@
+<div class="oppia-learner-refresher-exploration-confirmation-title">
+  {{ 'I18N_REFRESHER_EXPLORATION_MODAL_TITLE' | translate }}
+</div>
+
+<div class="modal-body">
+  <span class="oppia-learner-refresher-exploration-confirmation-body">
+    {{ 'I18N_REFRESHER_EXPLORATION_MODAL_BODY' | translate }}
+  </span>
+</div>
+<div class="modal-footer">
+  <button class="oppia-learner-got-it-button e2e-test-learner-got-it-button e2e-test-cancel-redirection-button md-button md-default-theme "
+          (click)="cancel()">
+    {{ 'I18N_NO' | translate }}
+  </button>
+  <button class="oppia-learner-got-it-button e2e-test-learner-got-it-button e2e-test-confirm-redirection-button md-button md-default-theme "
+          (click)="confirmRedirect()">
+    {{ 'I18N_YES' | translate }}
+  </button>
+</div>
+<span class="clearfix"></span>
+
+<style>
+  .oppia-learner-refresher-exploration-confirmation-body {
+    word-wrap: break-word;
+  }
+
+  .oppia-learner-refresher-exploration-confirmation-title {
+    color: #00786d;
+    font-family: 'Capriola', Roboto, arial, sans-serif;
+    font-size: 1.25em;
+    font-weight: bold;
+    padding-top: 20px;
+    text-align: center;
+  }
+</style>

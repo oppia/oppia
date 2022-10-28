@@ -16,35 +16,45 @@
 
 """Tests for recent commit controllers."""
 
+from __future__ import annotations
+
+from core import feconf
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
     """Test the RecentCommitsHandler class."""
 
     def setUp(self):
-        super(RecentCommitsHandlerUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
 
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.committer_1_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.committer_2_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
-            'entity_1', 0, 'committer_0', 'Janet',
-            'create', 'created first commit', [], 'public', True)
+            'entity_1', 0, self.committer_1_id, 'create',
+            'created first commit', [], 'public', True)
         commit2 = exp_models.ExplorationCommitLogEntryModel.create(
-            'entity_1', 1, 'committer_1', 'Joe',
-            'edit', 'edited commit', [], 'public', True)
+            'entity_1', 1, self.committer_2_id, 'edit', 'edited commit', [],
+            'public', True)
         commit3 = exp_models.ExplorationCommitLogEntryModel.create(
-            'entity_2', 0, 'committer_0', 'Janet',
-            'create', 'created second commit', [], 'private', False)
+            'entity_2', 0, self.committer_1_id, 'create',
+            'created second commit', [], 'private', False)
         commit1.exploration_id = 'exp_1'
         commit2.exploration_id = 'exp_1'
         commit3.exploration_id = 'exp_2'
+        commit1.update_timestamps()
         commit1.put()
+        commit2.update_timestamps()
         commit2.put()
+        commit3.update_timestamps()
         commit3.put()
 
     def test_get_recent_commits(self):
@@ -55,13 +65,13 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
             params={'query_type': 'all_non_private_commits'})
         self.assertEqual(len(response_dict['results']), 2)
         self.assertDictContainsSubset(
-            {'username': 'Janet', 'exploration_id': 'exp_1',
+            {'username': self.VIEWER_USERNAME, 'exploration_id': 'exp_1',
              'post_commit_status': 'public', 'version': 0,
              'commit_message': 'created first commit',
              'commit_type': 'create'},
             response_dict['results'][1])
         self.assertDictContainsSubset(
-            {'username': 'Joe', 'exploration_id': 'exp_1',
+            {'username': self.NEW_USER_USERNAME, 'exploration_id': 'exp_1',
              'post_commit_status': 'public', 'version': 1,
              'commit_message': 'edited commit',
              'commit_type': 'edit'},
@@ -93,17 +103,17 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
             exp_id = 'exp_%s' % i
 
             commit_i = exp_models.ExplorationCommitLogEntryModel.create(
-                entity_id, 0, 'committer_0', 'Joe',
-                'create', 'created commit', [], 'public', True)
+                entity_id, 0, self.committer_2_id, 'create', 'created commit',
+                [], 'public', True)
             commit_i.exploration_id = exp_id
+            commit_i.update_timestamps()
             commit_i.put()
         response_dict = self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
             params={'query_type': 'all_non_private_commits'})
 
         self.assertEqual(
-            len(response_dict['results']),
-            feconf.COMMIT_LIST_PAGE_SIZE)
+            len(response_dict['results']), feconf.COMMIT_LIST_PAGE_SIZE)
         self.assertTrue(response_dict['more'])
 
         cursor = response_dict['cursor']

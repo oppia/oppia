@@ -1,0 +1,73 @@
+<mat-card class="oppia-topic-dashboard-card">
+  <a [href]="getTopicLink()"
+     target="{{ openInNewWindow ? '_blank' : '_self' }}"
+     class="oppia-topic-link">
+    <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
+      <img class="oppia-thumbnail-image" [src]="thumbnailUrl">
+    </div>
+    <div class="oppia-summary-section">
+      <span class="oppia-topic-title e2e-test-learner-topic-summary-tile-title">
+        {{topicTitle}}
+      </span>
+      <div class="oppia-topic-lessons">
+        {{totalPublishedNodeCount}}
+        <div *ngIf="totalPublishedNodeCount === 1" class="lesson-title">
+          <span translate="I18N_TOPIC_VIEWER_LESSON"></span>
+        </div>
+        <div *ngIf="totalPublishedNodeCount !== 1" class="lesson-title">
+          <span translate="I18N_TOPIC_VIEWER_LESSONS"></span>
+        </div>
+      </div>
+    </div>
+  </a>
+</mat-card>
+<style>
+  .oppia-topic-dashboard-card .oppia-topic-link {
+    text-decoration: none;
+  }
+  .oppia-topic-dashboard-card .oppia-topic-lessons {
+    font-size: 14px;
+    font-style: italic;
+    left: -1px;
+    position: relative;
+    top: 53px;
+  }
+  .oppia-topic-dashboard-card .oppia-summary-section {
+    color: #fff;
+    padding: 8px;
+    position: absolute;
+  }
+  .oppia-topic-dashboard-card .lesson-title {
+    display: inline-block;
+  }
+  .oppia-topic-dashboard-card .oppia-topic-title {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    height: 16px;
+    letter-spacing: 0.25px;
+    text-align: left;
+    text-transform: capitalize;
+  }
+  .oppia-topic-dashboard-card {
+    background-color: #205d86;
+    border-radius: 4px;
+    display: inline-block;
+    height: 210px;
+    margin: 0 2px 30px 0;
+    padding: 0;
+    position: relative;
+    width: 148px;
+    z-index: 5;
+  }
+  .oppia-topic-dashboard-card .oppia-title-section {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    height: 108px;
+    width: 148px;
+  }
+  .oppia-topic-dashboard-card .oppia-thumbnail-image {
+    height: 108px;
+    width: 160px;
+  }
+</style>

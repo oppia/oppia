@@ -1,0 +1,28 @@
+<div class="oppia-toast-container toast-top-center">
+  <div *ngFor="let warning of (getWarnings() | limitTo:5)"
+       class="toast oppia-toast-warning oppia-toast">
+    <button type="button"
+            class="toast-close-button e2e-test-close-toast-warning"
+            (click)="deleteWarning(warning)"
+            role="button">&times;
+    </button>
+    <div class="toast-message e2e-test-toast-warning-message">
+      {{ warning.content }}
+    </div>
+  </div>
+</div>
+
+<div>
+  <div *ngFor="let message of getMessages(); index as idx">
+    <oppia-alert-message [messageObject]="message" [messageIndex]="idx"></oppia-alert-message>
+  </div>
+</div>
+<style>
+  .oppia-toast-warning {
+    background-color: #f89406;
+    background-image: none;
+  }
+  .oppia-toast-warning:before {
+    content: "\e002";
+  }
+</style>

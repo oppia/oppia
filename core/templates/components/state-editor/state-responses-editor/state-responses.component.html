@@ -1,0 +1,369 @@
+<div>
+  <div class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
+    <div class="oppia-editor-card-body">
+      <div class="state-responses-header-container oppia-mobile-collapsible-card-header">
+        <div class="state-responses-header" (click)="toggleResponseCard()">
+          <h3 class="oppia-exp-answer-card-header">Learner's Answers and Oppia's Responses</h3>
+          <i class="fa fa-caret-down"
+             *ngIf="!responseCardIsShown"
+             aria-hidden="true">
+          </i>
+          <i class="fa fa-caret-up"
+             *ngIf="responseCardIsShown"
+             aria-hidden="true">
+          </i>
+        </div>
+      </div>
+      <div class="state-response-container oppia-mobile-collapsible-card-content" *ngIf="responseCardIsShown">
+        <div *ngIf="answerGroups && answerGroups.length > 0">
+          <div cdkDropList
+               (cdkDropListDropped)="drop($event)"
+               class="nav oppia-option-list nav-stacked nav-pills"
+               role="tablist">
+            <div [cdkDragDisabled]="activeAnswerGroupIndex === index ? true : false"
+                 cdkDrag
+                 *ngFor="let answerGroup of answerGroups; let index = index"
+                 [ngClass]="{'active': activeAnswerGroupIndex === index}"
+                 class="oppia-sortable-rule-block oppia-prevent-selection">
+
+              <span class="oppia-rule-sort-handle" *ngIf="answerGroups?.length > 1" (mousedown)="changeActiveAnswerGroupIndex(-1)">
+                <span *ngIf="editabilityService.isEditable()" class="fas fa-grip-vertical draggable-icon-indicator"></span>
+              </span>
+
+              <div class="oppia-rule-header-warning-placement" *ngIf="isSelfLoopThatIsMarkedCorrect(answerGroup.outcome) || isSelfLoopWithNoFeedback(answerGroup.outcome)" (click)="changeActiveAnswerGroupIndex(index)"
+                   ngbTooltip="{{getOutcomeTooltip(answerGroup.outcome)}}"
+                   placement="bottom">
+                <div class="oppia-rule-header-warning-style" >
+                  ⚠
+                </div>
+              </div>
+              <a (click)="changeActiveAnswerGroupIndex(index)" class="oppia-rule-tab e2e-test-response-tab" [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex === index}">
+                <oppia-response-header [index]="index"
+                                       [summary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), false)"
+                                       [shortSummary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), true)"
+                                       [isActive]="index === activeAnswerGroupIndex"
+                                       [outcome]="answerGroup.outcome"
+                                       [defaultOutcome]="false"
+                                       [numRules]="answerGroup.rules.length"
+                                       [isResponse]="true"
+                                       (navigateToState)="navigateToState.emit($event)">
+                </oppia-response-header>
+              </a>
+
+              <div *ngIf="activeAnswerGroupIndex === index">
+                <div class="oppia-editor-card-section">
+                  <div class="oppia-rule-body-container e2e-test-response-body-{{index}}">
+                    <oppia-answer-group-editor class="e2e-test-response-body"
+                                               [rules]="answerGroup.rules"
+                                               [outcome]="answerGroup.outcome"
+                                               [taggedSkillMisconceptionId]="answerGroup.taggedSkillMisconceptionId"
+                                               (onSaveAnswerGroupFeedback)="saveActiveAnswerGroupFeedback($event)"
+                                               (onSaveAnswerGroupDest)="saveActiveAnswerGroupDest($event)"
+                                               (onSaveAnswerGroupDestIfStuck)="saveActiveAnswerGroupDestIfStuck($event)"
+                                               (onSaveAnswerGroupCorrectnessLabel)="saveActiveAnswerGroupCorrectnessLabel($event)"
+                                               (onSaveAnswerGroupRules)="saveActiveAnswerGroupRules($event)"
+                                               (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
+                                               (onSaveTaggedMisconception)="saveTaggedMisconception($event)"
+                                               [isEditable]="editabilityService.isEditable()"
+                                               [displayFeedback]="!isLinearWithNoFeedback(answerGroup.outcome)"
+                                               [addState]="addState"
+                                               (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendshowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+                    </oppia-answer-group-editor>
+                  </div>
+                  <div class="btn btn-danger oppia-delete-response e2e-test-delete-response"
+                       *ngIf="editabilityService.isEditable()"
+                       (click)="deleteAnswerGroup($event, index)">
+                    Delete Response
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- CkDrop End -->
+        </div>
+        <div *ngIf="!suppressDefaultAnswerGroup()">
+          <div class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
+            <div class="option-list-default" [ngClass]="{'active': activeAnswerGroupIndex === answerGroups.length}">
+              <div class="oppia-rule-header-warning-placement"
+                   *ngIf="isSelfLoopThatIsMarkedCorrect(defaultOutcome) || (isSelfLoopWithNoFeedback(defaultOutcome))"
+                   (click)="changeActiveAnswerGroupIndex(answerGroups.length)"
+                   ngbTooltip="{{getOutcomeTooltip(defaultOutcome)}}"
+                   placement="bottom">
+                <div class="oppia-rule-header-warning-style" >
+                  ⚠
+                </div>
+              </div>
+              <a (click)="changeActiveAnswerGroupIndex(answerGroups.length)"
+                 class="oppia-sortable-rule-block oppia-rule-tab oppia-default-rule-tab e2e-test-default-response-tab"
+                 [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups.length}">
+                <oppia-response-header [index]="index"
+                                       [isActive]="index === activeAnswerGroupIndex"
+                                       [summary]="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, false)"
+                                       [shortSummary]="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, true)"
+                                       [outcome]="defaultOutcome"
+                                       [defaultOutcome]="true"
+                                       (navigateToState)="navigateToState.emit($event)"
+                                       [isResponse]="true">
+                </oppia-response-header>
+              </a>
+
+              <div *ngIf="activeAnswerGroupIndex === (answerGroups && answerGroups.length)">
+                <div class="oppia-editor-card-section">
+                  <div class="oppia-rule-body-container e2e-test-response-body-default">
+                    <oppia-answer-group-editor class="e2e-test-response-body"
+                                               [rules]="null"
+                                               [outcome]="defaultOutcome"
+                                               [taggedSkillMisconceptionId]="null"
+                                               [isEditable]="editabilityService.isEditable()"
+                                               [suppressWarnings]="suppressDefaultAnswerGroup()"
+                                               [displayFeedback]="!isLinearWithNoFeedback(defaultOutcome)"
+                                               [addState]="addState"
+                                               (onSaveAnswerGroupFeedback)="saveDefaultOutcomeFeedback($event)"
+                                               (onSaveAnswerGroupDest)="saveDefaultOutcomeDest($event)"
+                                               (onSaveAnswerGroupDestIfStuck)="saveDefaultOutcomeDestIfStuck($event)"
+                                               (onSaveAnswerGroupCorrectnessLabel)="saveDefaultOutcomeCorrectnessLabel($event)"
+                                               (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
+                                               (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendshowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+                    </oppia-answer-group-editor>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="oppia-add-response-button-container">
+          <div *ngIf="editabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear() && editabilityService.isEditable()">
+            <button type="button" class="btn btn-secondary oppia-add-response-button e2e-test-open-add-response-modal" (click)="openAddAnswerGroupModal()">
+              + ADD RESPONSE
+            </button>
+          </div>
+        </div>
+        <div *ngIf="!isInQuestionMode()" class="solicit-answer-checkbox">
+          <span *ngIf="!isCurrentInteractionTrivial()" [hidden]="!enableSolicitAnswerDetailsFeature" class="solicit-answer-details-span">
+            <input id="label-target-solicit-answer-details-checkbox" type="checkbox" class="e2e-test-solicit-answer-details-checkbox" (change)="onChangeSolicitAnswerDetails()" [(ngModel)]="stateSolicitAnswerDetailsService.displayed" [disabled]="!editabilityService.isEditable()">
+            <label for="label-target-solicit-answer-details-checkbox">Solicit Answer Details</label>
+          </span>
+        </div>
+        <div *ngIf="isInQuestionMode() && answerGroups && answerGroups.length > 0 && (containsOptionalMisconceptions || getUnaddressedMisconceptionNames(misconceptionsBySkill).length)" class="misconception-parent-card">
+          <h3>Misconceptions</h3>
+          <small class="text-muted">The following must be addressed by tagging to an incorrect answer. If a misconception is not relevant to this question, mark it as "Not Applicable".</small>
+          <div class="pt-4" *ngIf="getUnaddressedMisconceptionNames(misconceptionsBySkill).length">
+            <h4 class="pl-3">Compulsory</h4>
+            <p *ngFor="let misconceptionName of getUnaddressedMisconceptionNames(misconceptionsBySkill); let index = index" class="misconception-list-item">
+              {{misconceptionName}}
+            </p>
+          </div>
+          <div class="pt-4">
+            <h4 class="pl-3" *ngIf="containsOptionalMisconceptions">Optional</h4>
+            <div *ngFor="let skillWithMisconceptions of misconceptionsBySkill | keyvalue; let index = index">
+              <div *ngFor="let misconception of skillWithMisconceptions.value">
+                <div *ngIf="!misconception.isMandatory()"
+                     class="misconception-list-item optional-misconception-list-item"
+                     [ngClass]="{'optional-misconception-list-no-action': isNoActionExpected(skillWithMisconceptions.key + '-' + misconception.getId())}">
+                  <div>
+                    <div>
+                      {{misconception.getName()}}
+                      <span class="pl-3" *ngIf="!isNoActionExpected(skillWithMisconceptions.key + '-' + misconception.getId())">⚠️</span>
+                    </div>
+                    <div class="small text-muted" ng-bind="getOptionalSkillMisconceptionStatus(skillId + '-' + misconception.getId())"></div>
+                  </div>
+                  <div *ngIf="skillWithMisconceptions.key + '-' + misconception.getId() === activeEditOption" class="optional-misconception-edit-options">
+                    <div *ngIf="inapplicableSkillMisconceptionIds.includes(skillWithMisconceptions.key + '-' + misconception.getId())"
+                         (click)="updateOptionalMisconceptionIdStatus(skillWithMisconceptions.key + '-' + misconception.getId(), true)"
+                         (mouseleave)="setActiveEditOption(null)">
+                        Mark as "Applicable"
+                    </div>
+                    <div *ngIf="!inapplicableSkillMisconceptionIds.includes(skillWithMisconceptions.key + '-' + misconception.getId())"
+                         (click)="updateOptionalMisconceptionIdStatus(skillWithMisconceptions.key + '-' + misconception.getId(), false)"
+                         (mouseleave)="setActiveEditOption(null)">
+                        Mark as "Not Applicable"
+                    </div>
+                  </div>
+                  <div *ngIf="editabilityService.isEditable()"
+                       (click)="setActiveEditOption(skillWithMisconceptions.key + '-' + misconception.getId())"
+                       class="fas fa-ellipsis-v optional-misconception-options-button"
+                       [ngClass]="{'d-none': getOptionalSkillMisconceptionStatus(skillWithMisconceptions.key + '-' + misconception.getId()) === 'Assigned'}">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .oppia-delete-response {
+    margin: 20px 10px 0;
+  }
+
+  .option-list-default {
+    border: solid 1px #ccc;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cdk-drag-placeholder {
+    opacity: 0;
+  }
+
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .oppia-sortable-rule-block {
+    border: solid 1px #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    color: rgba(0, 0, 0, 0.87);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    width: 100%;
+  }
+
+  .oppia-rule-sort-handle {
+    padding-right: 2px;
+    position: absolute;
+    top: 9px;
+  }
+
+  .oppia-option-list {
+    display: block;
+    max-width: 100%;
+    min-height: 60px;
+    overflow: hidden;
+    width: 500px;
+  }
+
+  .oppia-option-list.cdk-drop-list-dragging .oppia-sortable-rule-block:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  state-responses .state-responses-header-container {
+    padding: 15px 20px 15px 30px
+  }
+
+  .state-responses-header {
+    align-content: center;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 20px 15px;
+  }
+
+  .oppia-exp-answer-card-header {
+    font-size: 18px;
+  }
+
+  .solicit-answer-checkbox label {
+    margin-bottom: 0;
+  }
+
+  .nav-pills > div {
+    box-shadow: 1px 2px 5px #939393;
+    margin: 8px 0;
+  }
+
+  .nav-pills > div > a.oppia-rule-tab {
+    background: #e0f2f1 !important;
+  }
+
+  .state-response-container {
+    padding: 15px 30px;
+  }
+
+  .oppia-add-response-button-container {
+    margin: 22px 0;
+  }
+
+  .solicit-answer-checkbox {
+    padding-bottom: 20px;
+  }
+
+  .misconception-parent-card {
+    border-top: 1px solid #707070;
+    padding: 20px;
+  }
+
+  .misconception-parent-card h3 {
+    font-size: 1.75rem;
+  }
+
+  .misconception-list-item {
+    background-color: #fff5c8;
+    border: 2px solid #827127;
+    border-radius: 4px;
+    margin: 10px;
+    padding: 15px;
+  }
+
+  .optional-misconception-list-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    position: relative;
+    word-break: break-word;
+  }
+
+  .optional-misconception-options-button {
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+  }
+
+  .optional-misconception-edit-options {
+    background-color: #fff;
+    border: 2px solid #000;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0.3rem;
+    position: absolute;
+    right: -15%;
+    text-align: center;
+    top: calc(100% - 0.75em);
+    width: 15em;
+    z-index: 1;
+  }
+
+  .optional-misconception-list-no-action {
+    background-color: #fff;
+    border: 2px solid #999;
+  }
+
+  @media screen and (max-width: 768px) {
+    state-responses .state-response-container {
+      padding: 15px 10px;
+    }
+
+    .oppia-editor-card-section {
+      padding: 10px;
+    }
+
+    state-responses .solicit-answer-checkbox {
+      width: 100%;
+    }
+
+    .state-responses-header-container {
+      padding: 0;
+    }
+
+    .state-responses-header i {
+      display: block;
+    }
+
+    .state-responses-header {
+      padding: 16px;
+    }
+
+    .oppia-editor-card-with-avatar {
+      margin-top: 20px;
+    }
+  }
+</style>

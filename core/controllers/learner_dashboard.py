@@ -14,40 +14,204 @@
 
 """Controllers for the learner dashboard."""
 
+from __future__ import annotations
+
+from core import feconf
+from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import learner_progress_services
+from core.domain import story_fetchers
 from core.domain import subscription_services
 from core.domain import suggestion_services
 from core.domain import summary_services
 from core.domain import user_services
-import feconf
-import utils
+
+
+class OldLearnerDashboardRedirectPage(base.BaseHandler):
+    """Redirects the old learner dashboard URL to the new one."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.LEARNER_DASHBOARD_URL, permanent=True)
 
 
 class LearnerDashboardPage(base.BaseHandler):
     """Page showing the user's learner dashboard."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/learner-dashboard-page.mainpage.html')
+        self.render_template('learner-dashboard-page.mainpage.html')
 
 
-class LearnerDashboardHandler(base.BaseHandler):
-    """Provides data for the user's learner dashboard page."""
+class LearnerDashboardTopicsAndStoriesProgressHandler(base.BaseHandler):
+    """Provides data of the user's topics and stories for the learner
+    dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
         (
-            learner_progress, number_of_nonexistent_activities,
-            completed_to_incomplete_collections) = (
-                learner_progress_services.get_activity_progress(self.user_id))
+            learner_progress_in_topics_and_stories,
+            number_of_nonexistent_topics_and_stories) = (
+                learner_progress_services.get_topics_and_stories_progress(
+                    self.user_id))
+
+        completed_story_sumamries = (
+            learner_progress_in_topics_and_stories.completed_story_summaries)
+        completed_story_summary_dicts = (
+            learner_progress_services.get_displayable_story_summary_dicts(
+                self.user_id, completed_story_sumamries))
+
+        learnt_topic_summary_dicts = (
+            learner_progress_services.get_displayable_topic_summary_dicts(
+                self.user_id,
+                learner_progress_in_topics_and_stories.learnt_topic_summaries))
+        partially_learnt_topic_summaries = (
+            learner_progress_in_topics_and_stories.partially_learnt_topic_summaries # pylint: disable=line-too-long
+        )
+        partially_learnt_topic_summary_dicts = (
+            learner_progress_services.get_displayable_topic_summary_dicts(
+                self.user_id, partially_learnt_topic_summaries))
+
+        topics_to_learn_summaries = (
+            learner_progress_in_topics_and_stories.topics_to_learn_summaries)
+        topics_to_learn_summary_dicts = (
+            learner_progress_services.get_displayable_topic_summary_dicts(
+                self.user_id, topics_to_learn_summaries))
+        all_topic_summary_dicts = (
+            learner_progress_services.get_displayable_topic_summary_dicts(
+                self.user_id,
+                learner_progress_in_topics_and_stories.all_topic_summaries))
+        untracked_topic_sumamries = (
+            learner_progress_in_topics_and_stories.untracked_topic_summaries
+        )
+        untracked_topic_summary_dicts = (
+            learner_progress_services
+            .get_displayable_untracked_topic_summary_dicts(
+                self.user_id, untracked_topic_sumamries))
+
+        completed_to_incomplete_stories = (
+            learner_progress_in_topics_and_stories.completed_to_incomplete_stories # pylint: disable=line-too-long
+        )
+        learnt_to_partially_learnt_topics = (
+            learner_progress_in_topics_and_stories.learnt_to_partially_learnt_topics # pylint: disable=line-too-long
+        )
+        self.values.update({
+            'completed_stories_list': completed_story_summary_dicts,
+            'learnt_topics_list': learnt_topic_summary_dicts,
+            'partially_learnt_topics_list': (
+                partially_learnt_topic_summary_dicts),
+            'topics_to_learn_list': topics_to_learn_summary_dicts,
+            'all_topics_list': all_topic_summary_dicts,
+            'untracked_topics': untracked_topic_summary_dicts,
+            'number_of_nonexistent_topics_and_stories': (
+                number_of_nonexistent_topics_and_stories),
+            'completed_to_incomplete_stories': completed_to_incomplete_stories,
+            'learnt_to_partially_learnt_topics': (
+                learnt_to_partially_learnt_topics),
+        })
+        self.render_json(self.values)
+
+
+class LearnerCompletedChaptersCountHandler(base.BaseHandler):
+    """Provides the number of chapters completed by the user."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_access_learner_dashboard
+    def get(self):
+        """Handles GET requests."""
+        learner_progress_in_topics_and_stories = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id)[0])
+
+        all_topic_summary_dicts = (
+            learner_progress_services.get_displayable_topic_summary_dicts(
+                self.user_id,
+                learner_progress_in_topics_and_stories.all_topic_summaries))
+
+        completed_chapters_count = 0
+        for topic in all_topic_summary_dicts:
+            for story in topic['canonical_story_summary_dict']:
+                completed_chapters_count += (
+                    len(story_fetchers.get_completed_nodes_in_story(
+                        self.user_id, story['id'])))
+
+        self.render_json({
+            'completed_chapters_count': completed_chapters_count,
+        })
+
+
+class LearnerDashboardCollectionsProgressHandler(base.BaseHandler):
+    """Provides data of the user's collections for the learner
+    dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_access_learner_dashboard
+    def get(self):
+        """Handles GET requests."""
+        (
+            learner_progress, number_of_nonexistent_collections) = (
+                learner_progress_services.get_collection_progress(self.user_id))
+
+        completed_collection_summary_dicts = (
+            learner_progress_services.get_collection_summary_dicts(
+                learner_progress.completed_collection_summaries))
+        incomplete_collection_summary_dicts = (
+            learner_progress_services.get_collection_summary_dicts(
+                learner_progress.incomplete_collection_summaries))
+
+        collection_playlist_summary_dicts = (
+            learner_progress_services.get_collection_summary_dicts(
+                learner_progress.collection_playlist_summaries))
+
+        self.values.update({
+            'completed_collections_list': completed_collection_summary_dicts,
+            'incomplete_collections_list': incomplete_collection_summary_dicts,
+            'collection_playlist': collection_playlist_summary_dicts,
+            'number_of_nonexistent_collections': (
+                number_of_nonexistent_collections),
+            'completed_to_incomplete_collections': (
+                learner_progress.completed_to_incomplete_collections),
+        })
+        self.render_json(self.values)
+
+
+class LearnerDashboardExplorationsProgressHandler(base.BaseHandler):
+    """Provides data for the user's learner dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_access_learner_dashboard
+    def get(self):
+        """Handles GET requests."""
+        (
+            learner_progress, number_of_nonexistent_explorations) = (
+                learner_progress_services.get_exploration_progress(
+                    self.user_id))
 
         completed_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
@@ -57,28 +221,9 @@ class LearnerDashboardHandler(base.BaseHandler):
             summary_services.get_displayable_exp_summary_dicts(
                 learner_progress.incomplete_exp_summaries))
 
-        completed_collection_summary_dicts = (
-            learner_progress_services.get_collection_summary_dicts(
-                learner_progress.completed_collection_summaries))
-        incomplete_collection_summary_dicts = (
-            learner_progress_services.get_collection_summary_dicts(
-                learner_progress.incomplete_collection_summaries))
-
         exploration_playlist_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
                 learner_progress.exploration_playlist_summaries))
-        collection_playlist_summary_dicts = (
-            learner_progress_services.get_collection_summary_dicts(
-                learner_progress.collection_playlist_summaries))
-
-        full_thread_ids = subscription_services.get_all_threads_subscribed_to(
-            self.user_id)
-        if len(full_thread_ids) > 0:
-            thread_summaries, number_of_unread_threads = (
-                feedback_services.get_thread_summaries(
-                    self.user_id, full_thread_ids))
-        else:
-            thread_summaries, number_of_unread_threads = [], 0
 
         creators_subscribed_to = (
             subscription_services.get_all_creators_subscribed_to(self.user_id))
@@ -100,18 +245,64 @@ class LearnerDashboardHandler(base.BaseHandler):
 
         self.values.update({
             'completed_explorations_list': completed_exp_summary_dicts,
-            'completed_collections_list': completed_collection_summary_dicts,
             'incomplete_explorations_list': incomplete_exp_summary_dicts,
-            'incomplete_collections_list': incomplete_collection_summary_dicts,
             'exploration_playlist': exploration_playlist_summary_dicts,
-            'collection_playlist': collection_playlist_summary_dicts,
-            'number_of_nonexistent_activities': (
-                number_of_nonexistent_activities),
-            'completed_to_incomplete_collections': (
-                completed_to_incomplete_collections),
-            'thread_summaries': thread_summaries,
-            'number_of_unread_threads': number_of_unread_threads,
+            'number_of_nonexistent_explorations': (
+                number_of_nonexistent_explorations),
             'subscription_list': subscription_list
+        })
+        self.render_json(self.values)
+
+
+class LearnerDashboardFeedbackUpdatesHandler(base.BaseHandler):
+    """Provides data for the user's learner dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'paginated_threads_list': {
+                    'schema': {
+                        'type': 'list',
+                        'items': {
+                            'type': 'list',
+                            'items': {
+                                'type': 'basestring'
+                            },
+                        },
+                    },
+                    'default_value': []
+                }
+            }
+        }
+
+    @acl_decorators.can_access_learner_dashboard
+    def post(self):
+        """Handles POST requests."""
+        if len(self.normalized_payload.get('paginated_threads_list')) == 0:
+            full_thread_ids = (
+                subscription_services.get_all_threads_subscribed_to(
+                    self.user_id))
+            paginated_threads_list = [
+                full_thread_ids[index: index + 100]
+                for index in range(0, len(full_thread_ids), 100)]
+        else:
+            paginated_threads_list = self.normalized_payload.get(
+                'paginated_threads_list')
+        if (
+            len(paginated_threads_list) > 0 and
+            len(paginated_threads_list[0]) > 0
+        ):
+            thread_summaries, number_of_unread_threads = (
+                feedback_services.get_exp_thread_summaries(
+                    self.user_id, paginated_threads_list[0]))
+        else:
+            thread_summaries, number_of_unread_threads = [], 0
+
+        self.values.update({
+            'thread_summaries': [s.to_dict() for s in thread_summaries],
+            'number_of_unread_threads': number_of_unread_threads,
+            'paginated_threads_list': paginated_threads_list[1:]
         })
         self.render_json(self.values)
 
@@ -119,17 +310,21 @@ class LearnerDashboardHandler(base.BaseHandler):
 class LearnerDashboardIdsHandler(base.BaseHandler):
     """Gets the progress of the learner.
 
-    Gets the ids of all explorations and collections completed by the user,
-    the activities currently being pursued, and the activities present in
-    the playlist.
+    Gets the ids of all explorations, collections, topics and stories
+    completed by the user, the activities currently being pursued,
+    and the activities present in the playlist.
     """
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
         learner_dashboard_activities = (
-            learner_progress_services.get_learner_dashboard_activities( # pylint: disable=line-too-long
+            learner_progress_services.get_learner_dashboard_activities(
                 self.user_id))
 
         self.values.update({
@@ -143,6 +338,18 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
     """Gets all the messages in a thread."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'thread_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.VALID_THREAD_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
     def get(self, thread_id):
@@ -156,7 +363,9 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             self.user_id, thread_id, message_ids)
 
         message_summary_list = []
-        suggestion = suggestion_services.get_suggestion_by_id(thread_id)
+        suggestion = suggestion_services.get_suggestion_by_id(
+            thread_id, strict=False
+        )
         suggestion_thread = feedback_services.get_thread(thread_id)
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
@@ -171,7 +380,9 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 'description': suggestion_thread.subject,
                 'author_username': authors_settings[0].username,
                 'author_picture_data_url': (
-                    authors_settings[0].profile_picture_data_url)
+                    authors_settings[0].profile_picture_data_url),
+                'created_on_msecs': utils.get_time_in_millisecs(
+                    messages[0].created_on)
             }
             message_summary_list.append(suggestion_summary)
             messages.pop(0)
@@ -193,7 +404,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 'updated_status': m.updated_status,
                 'author_username': author_username,
                 'author_picture_data_url': author_picture_data_url,
-                'created_on': utils.get_time_in_millisecs(m.created_on)
+                'created_on_msecs': utils.get_time_in_millisecs(m.created_on)
             }
             message_summary_list.append(message_summary)
 

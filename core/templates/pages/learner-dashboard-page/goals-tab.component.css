@@ -1,0 +1,380 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+.oppia-arrow-button {
+  color: #00645c;
+  float: left;
+  height: 44px;
+  position: relative;
+  right: 10px;
+  text-align: right;
+  width: 6px;
+}
+.oppia-current-goals-content {
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 16px;
+  margin-left: 80px;
+  min-height: 57px;
+  width: 615px;
+}
+.oppia-completed-goals {
+  border-bottom: 1px solid #ccc;
+  height: 125px;
+  margin-bottom: 14px;
+  width: 656px;
+}
+.oppia-goals-title {
+  color: #00645c;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0;
+  margin-bottom: 30px;
+  opacity: 1;
+  padding: 32px 0 0 33px;
+  position: relative;
+  text-align: left;
+}
+.oppia-completed-goals-content {
+  border-bottom: 1px solid #ccc;
+  margin: auto;
+  margin-bottom: 14px;
+  min-height: 57px;
+  padding-left: 7px;
+  width: 656px;
+}
+.oppia-goals-story-name {
+  color: #333333b3;
+  font-size: 16px;
+  font-style: italic;
+  letter-spacing: 0;
+  opacity: 1;
+  text-align: left;
+}
+.oppia-edit-goals-content {
+  border-bottom: 1px solid #ccc;
+  margin: auto;
+  margin-bottom: 14px;
+  min-height: 36px;
+  width: 656px;
+}
+.oppia-edit-goals-learn-title {
+  color: #333;
+  float: right;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0;
+  margin-bottom: 0;
+  opacity: 1;
+  position: relative;
+  right: 50px;
+  text-align: center;
+  top: -46px;
+  width: 150px;
+}
+.oppia-edit-goals-subheading {
+  border-bottom: 1px solid #ccc;
+  height: 68px;
+  margin: auto;
+  margin-bottom: 14px;
+  width: 656px;
+}
+.oppia-current-goals-topic-name {
+  color: #333;
+  display: inline-block;
+  font-size: 19px;
+  font-weight: 100;
+  letter-spacing: 0;
+  margin-bottom: 0;
+  opacity: 1;
+  position: relative;
+  text-align: left;
+  width: 500px;
+}
+.oppia-completed-goals-topic-name {
+  color: #333;
+  display: inline-block;
+  font-size: 19px;
+  letter-spacing: 0;
+  margin-bottom: 0;
+  opacity: 1;
+  position: relative;
+  text-align: left;
+  width: 450px;
+}
+.oppia-completed-goals-topic-name:hover {
+  font-weight: 450;
+  text-decoration: none;
+}
+.oppia-goals-topic-name {
+  color: #333;
+  display: inline-block;
+  font-size: 19px;
+  letter-spacing: 0;
+  margin-bottom: 0;
+  opacity: 1;
+  position: relative;
+  text-align: left;
+  width: 270px;
+}
+.oppia-new-story-content {
+  color: #00645c;
+  font-size: 16px;
+  letter-spacing: 0;
+  opacity: 1;
+  text-align: left;
+  text-transform: uppercase;
+  width: 300px;
+}
+.oppia-goals-topic-name:hover {
+  font-weight: 450;
+  text-decoration: none;
+}
+.oppia-edit-goals-topic-title {
+  color: #333;
+  font-size: 22px;
+  font-weight: 450;
+  letter-spacing: 0;
+  margin-bottom: 0;
+  opacity: 1;
+  padding: 32px 0 20px 0;
+  position: relative;
+  text-align: left;
+  width: 150px;
+}
+.oppia-empty-goals-content {
+  color: #333;
+  font-size: 18px;
+  height: 44px;
+  letter-spacing: 0;
+  margin: auto;
+  opacity: 1;
+  text-align: left;
+  width: 656px
+}
+
+/* Following change is required due to incorrect spacing of checkbox in RTL
+  mode. */
+
+/*rtl:raw:
+.oppia-checkbox {
+  right: 560px;
+  position: absolute;
+  text-align: center;
+  transform: translateY(0%);
+}
+*/
+
+/*rtl:begin:remove*/
+.oppia-checkbox {
+  left: 585px;
+  position: absolute;
+  text-align: center;
+  transform: translateY(0%);
+}
+/*rtl:end:remove*/
+
+.oppia-svg-paw-image {
+  bottom: 10px;
+  filter: invert(31%) sepia(3%) saturate(11%) hue-rotate(341deg) brightness(101%) contrast(90%);
+  float: right;
+  margin-right: 110px;
+  position: relative;
+  width: 32px;
+}
+.oppia-svg-book-image {
+  left: 580px;
+  position: absolute;
+  text-align: center;
+  transform: translateY(0%);
+  width: 25px;
+}
+.oppia-svg-star-image {
+  filter: invert(95%) sepia(49%) saturate(2374%) hue-rotate(320deg) brightness(91%) contrast(89%);
+  float: right;
+  margin-right: 24px;
+  width: 30px;
+}
+.oppia-goals-box {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px #0000001a;
+  margin-bottom: 25px;
+  opacity: 1;
+  padding: 0 0 30px 0;
+  width: 726px;
+}
+.oppia-edit-goals-title {
+  color: #00645c;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0;
+  margin-bottom: 0;
+  opacity: 1;
+  padding: 32px 0 0 33px;
+  position: relative;
+  text-align: left;
+}
+.oppia-input-box-subtitle {
+  padding: 0 33px;
+}
+.oppia-story-summary-card {
+  display: inline-block;
+}
+.oppia-three-dots-dropdown-container {
+  color: #555;
+  cursor: pointer;
+  float: right;
+  font-size: 13px;
+  height: 24px;
+  margin-right: 13px;
+  position: relative;
+  width: 24px;
+}
+.oppia-three-dots-dropdown {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px rgb(0 0 0 / 25%);
+  padding: 10px;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  width: 100px;
+}
+.oppia-three-dots-dropdown:hover {
+  background-color: #f5f5f5;
+}
+.oppia-three-dots-dropdown span {
+  font-size: 14px;
+  padding-left: 10px;
+}
+.oppia-trash-button {
+  text-align: center;
+}
+@media screen and (max-width: 1200px) {
+  .oppia-checkbox {
+    left: 585px;
+  }
+  .oppia-svg-book-image {
+    left: 580px;
+  }
+}
+@media screen and (max-width: 767px) {
+  .oppia-goals-box {
+    margin: auto;
+    margin-bottom: 20px;
+    width: 369px;
+  }
+  .oppia-current-goals-topic-name {
+    width: 260px;
+  }
+  .oppia-goals-story-name {
+    width: 250px;
+  }
+  .oppia-three-dots-dropdown-container {
+    margin-right: 3px;
+  }
+  .oppia-current-goals-content {
+    margin-left: 50px;
+    width: 293px;
+  }
+  .oppia-edit-goals-subheading {
+    width: 300px;
+  }
+  .oppia-edit-goals-learn-title {
+    right: 8px;
+    text-align: end;
+  }
+  .oppia-edit-goals-content {
+    width: 300px;
+  }
+  .oppia-checkbox {
+    left: 310px;
+    text-align: start;
+    width: 100px;
+  }
+  .oppia-new-story-content {
+    font-size: 13px;
+  }
+  .oppia-completed-goals-content {
+    width: 300px;
+  }
+  .oppia-completed-goals-topic-name {
+    width: 250px;
+  }
+  .oppia-goals-title {
+    margin-bottom: 20px;
+  }
+  .oppia-empty-goals-content {
+    margin-bottom: 20px;
+    width: 300px;
+  }
+  .oppia-goals-topic-name {
+    width: 270px;
+  }
+  .oppia-svg-book-image {
+    left: 305px;
+    text-align: start;
+  }
+  .oppia-svg-paw-image {
+    left: 90px;
+  }
+  .oppia-svg-star-image {
+    position: relative;
+    top: 25px;
+  }
+}
+@media screen and (min-width: 768px) and (max-width: 1000px) {
+  .oppia-goals-box {
+    width: 500px;
+  }
+  .oppia-empty-goals-content {
+    width: 380px;
+  }
+  .oppia-edit-goals-subheading {
+    width: 430px;
+  }
+  .oppia-edit-goals-content {
+    width: 430px;
+  }
+  .oppia-checkbox {
+    left: 207px;
+    text-align: end;
+    width: 144px;
+  }
+  .oppia-svg-book-image {
+    left: 328px;
+  }
+  .oppia-current-goals-content {
+    width: 410px;
+  }
+  .oppia-completed-goals-content {
+    width: 445px;
+  }
+  .oppia-svg-star-image {
+    position: relative;
+    top: 30px;
+  }
+  .oppia-current-goals-topic-name {
+    width: 365px;
+  }
+}
+
+@media(max-width: 400px) {
+  .oppia-goals-box {
+    width: 355px;
+  }
+
+  .oppia-goals-topic-name {
+    width: 200px
+  }
+
+  .oppia-svg-book-image,
+  .oppia-checkbox {
+    left: 260px;
+    margin-left: 0;
+  }
+}

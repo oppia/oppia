@@ -1,0 +1,95 @@
+<div class="oppia-thumbnail-picture-container">
+  <div class="modal-body" [ngClass]="{'narrow-image-uploader': windowIsNarrow}">
+    <div class="blog-post-thumbnail-image-uploader">
+      <div *ngIf="!uploadedImage" [ngClass]="{'d-flex': windowIsNarrow}">
+        <oppia-image-uploader (fileChanged)="onFileChanged($event)"
+                              [allowedImageFormats]="allowedImageFormats"
+                              [isBlogPostThumbnailUploader]="true">
+        </oppia-image-uploader>
+      </div>
+      <div class="oppia-form-error oppia-form-error-text"
+           *ngIf="invalidImageWarningIsShown">
+           {{ 'I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR' | translate }}
+      </div>
+      <div *ngIf="uploadedImage">
+        <div class="oppia-thumbnail-picture-crop-area e2e-test-photo-crop">
+          <button class="btn btn-secondary oppia-thumbnail-picture-reset-button" (click)="reset()">
+            <i class="fas fa-times oppia-vcenter"></i>
+          </button>
+          <img id="croppable-image" [src]="uploadedImage" #croppableImage alt="">
+        </div>
+      </div>
+      <div *ngIf="invalidTagsAndAttributes.tags.length || invalidTagsAndAttributes.attrs.length"
+           class="oppia-unsupported-svg-tag-attribute-error"
+           [innerHTML]="'I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT' | translate: { issueURL: svgSanitizerService.getIssueURL(invalidTagsAndAttributes) }"
+      ></div>
+    </div>
+  </div>
+
+  <div class="modal-footer" *ngIf="!windowIsNarrow || uploadedImage">
+    <button class="btn btn-secondary e2e-test-photo-upload-cancel"
+            (click)="cancel()">
+            {{ 'I18N_BLOG_POST_EDITOR_CANCEL_BUTTON_TEXT' | translate }}
+    </button>
+    <button class="btn btn-success e2e-test-photo-upload-submit"
+            (click)="save()"
+            [disabled]="!uploadedImage">
+            {{ 'I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT' | translate }}
+    </button>
+  </div>
+</div>
+<style>
+  .oppia-thumbnail-picture-crop-area {
+    background: #e4e4e4;
+    height: 350px;
+    margin-top: 20px;
+    max-width: 100%;
+    position: relative;
+    width: 500px;
+  }
+
+  .oppia-thumbnail-picture-reset-button {
+    font-size: 16px;
+    position: absolute;
+    right: -37px;
+    top: -1px;
+  }
+
+  .oppia-form-error-text {
+    margin-top: 15px;
+  }
+
+  .blog-post-thumbnail-image-uploader /deep/ .image-uploader-drop-area {
+    border: #666 dashed;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 0;
+    width: 300px;
+  }
+
+  .oppia-unsupported-svg-tag-attribute-error {
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    color: #8a6d3b;
+    margin-top: 15px;
+    padding: 10px;
+  }
+
+  @media(max-width: 768px) {
+    .blog-post-thumbnail-image-uploader /deep/ .image-uploader-drop-area {
+      height: auto;
+      width: 164px;
+    }
+
+    .oppia-thumbnail-picture-reset-button {
+      right: -40px;
+      width: 40px;
+    }
+
+    .narrow-image-uploader {
+      padding-left: 0;
+      padding-top: 10px
+    }
+  }
+
+</style>

@@ -1,0 +1,148 @@
+<ul class="nav navbar-nav oppia-navbar-nav float-right oppia-collection-editor-navbar">
+  <!-- Editor -->
+  <li [ngClass]="{'active': getActiveTabName() === 'edit', 'open': editButtonHovering && getWarningsCount()}"
+      ngbDropdown
+      (mouseenter)="onEditButtonHover()"
+      (mouseleave)="$event.stopPropagation(); onEditButtonHover()"
+      class="nav-item">
+    <a href="#" ngbTooltip="Editor" (click)="selectMainTab()" class="nav-link e2e-test-main-tab">
+      <i class="fas fa-pen"></i>
+    </a>
+    <div *ngIf="getWarningsCount()"
+         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+         (click)="selectMainTab()">
+      <span class="oppia-editor-warnings-count">
+        {{ getWarningsCount() }}
+      </span>
+    </div>
+    <ul ngbDropdownMenu class="dropdown-menu oppia-editor-warnings-box">
+      <span class="oppia-editor-warnings-header">Warnings</span>
+      <li class="oppia-editor-warnings-text"
+          *ngFor="let issue of validationIssues">
+        <hr class="oppia-editor-warnings-separator">
+        {{ issue }}
+      </li>
+    </ul>
+  </li>
+
+  <!-- Settings -->
+  <li [ngClass]="{'active': getActiveTabName() === 'settings'}" class="nav-item">
+    <a href="#" ngbTooltip="Settings" placement="bottom" (click)="selectSettingsTab()" class="nav-link e2e-test-settings-tab">
+      <i class="fas fa-cog"></i>
+    </a>
+  </li>
+
+  <!-- Player -->
+  <li [ngClass]="{'open': (getWarningsCount() || getChangeListCount() > 0) && playerButtonHovering}"
+      ngbDropdown
+      (mouseenter)="onPlayerButtonHover()"
+      (mouseleave)="$event.stopPropagation(); onPlayerButtonHover()"
+      class="nav-item">
+    <a [href]="'/collection/' + collectionId"
+       target="_blank"
+       rel="noopener"
+       ngbTooltip="Player (new tab)"
+       placement="bottom" class="nav-link">
+      <i class="fas fa-play"></i>
+      <div *ngIf="getWarningsCount()"
+           class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+           (click)="selectMainTab()">
+        <span class="oppia-editor-warnings-count">
+          {{ getWarningsCount() }}
+        </span>
+      </div>
+      <div *ngIf="getChangeListCount() > 0"
+           class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+           (click)="selectMainTab()">
+        <span class="oppia-editor-warnings-count">
+          1
+        </span>
+      </div>
+    </a>
+    <ul ngbDropdownMenu class="dropdown-menu oppia-editor-warnings-box">
+      <span class="oppia-editor-warnings-header">Warnings</span>
+      <ng-container *ngIf="getWarningsCount()">
+        <li class="oppia-editor-warnings-text"
+            *ngFor="let issue of validationIssues">
+          <hr class="oppia-editor-warnings-separator">
+          {{ issue }}
+        </li>
+      </ng-container>
+      <li *ngIf="getChangeListCount() && isCollectionSaveable()"
+          class="oppia-editor-warnings-text">
+        Save Draft to preview latest changes.
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<ul class="nav navbar-nav oppia-navbar-nav float-right" *ngIf="!isLoadingCollection()">
+  <li class="oppia-button-container">
+    <button class="btn btn-secondary oppia-save-draft-button e2e-test-save-draft-button"
+            [ngClass]="{'btn-success': isCollectionSaveable()}"
+            (click)="saveChanges()"
+            [disabled]="!isCollectionSaveable()">
+      <span *ngIf="!isSaveInProgress()">
+        <span *ngIf="collectionRights.isPrivate()">
+          <i class="fas fa-save oppia-save-publish-button-icon"
+             alt="Save Collection">
+          </i>
+          <span class="oppia-save-publish-button-label">Save Draft</span>
+          <span class="d-none d-md-block float-left oppia-change-count"
+                *ngIf="getChangeListCount() > 0">
+            ({{ getChangeListCount() }})
+          </span>
+        </span>
+        <span *ngIf="collectionRights.isPublic()" title="Publish Changes">
+          <i class="fas fa-cloud-upload-alt oppia-save-publish-button-icon"
+             alt="Publish Changes">
+          </i>
+          <span class="oppia-save-publish-button-label">Publish Changes</span>
+        </span>
+      </span>
+
+      <span *ngIf="isSaveInProgress()" class="e2e-test-save-in-progress-label">
+        <span *ngIf="collectionRights.isPrivate()" class="oppia-save-publish-button-label">Saving</span>
+        <span *ngIf="collectionRights.isPublic()" class="oppia-save-publish-button-label">Publishing</span>
+        <loading-dots></loading-dots>
+      </span>
+    </button>
+
+    <button type="button" *ngIf="collectionRights.isPrivate()"
+            class="btn btn-secondary oppia-editor-publish-button e2e-test-editor-publish-button"
+            [ngClass]="{'btn-success': isCollectionPublishable()}"
+            (click)="publishCollection()"
+            [disabled]="!isCollectionPublishable()">
+      <i class="fas fa-cloud-upload-alt oppia-save-publish-button-icon"
+         alt="Publish to Oppia Library">
+      </i>
+      <span class="oppia-save-publish-button-label">Publish</span>
+    </button>
+
+    <button type="button" (click)="unpublishCollection()"
+            *ngIf="collectionRights.isPublic() && collectionRights.canUnpublish()"
+            class="btn btn-secondary">
+      Unpublish (as moderator)
+    </button>
+  </li>
+</ul>
+<style>
+  .oppia-collection-editor-navbar {
+    margin-left: 20px;
+  }
+  .oppia-button-container {
+    margin-right: 10px;
+    margin-top: 8px;
+  }
+  .oppia-change-count {
+    margin-left: 2px;
+    opacity: 0.5;
+  }
+  .oppia-editor-warnings-box {
+    background: #fcf8e3;
+    overflow: hidden;
+  }
+  .btn.oppia-save-draft-button {
+    margin-right: 5px;
+  }
+</style>

@@ -1,0 +1,27 @@
+<div class="modal-header">
+  <h3 [innerHTML]="'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate"></h3>
+</div>
+
+<form>
+  <div class="modal-body">
+    <p [innerHTML]="'I18N_DELETE_ACCOUNT_PAGE_MODAL_TEXT' | translate"></p>
+    <input class="form-control e2e-test-confirm-username-field required"
+           [(ngModel)]="username"
+           aria-label="Username"
+           name="deleteAccountModel"
+           autofocus>
+  </div>
+
+  <div class="modal-footer">
+    <button [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"
+            class="btn btn-secondary"
+            (click)="cancel()">
+    </button>
+    <button [innerHTML]="'I18N_DELETE_ACCOUNT_PAGE_BUTTON' | translate"
+            class="btn btn-danger e2e-test-confirm-deletion-button"
+            type="submit"
+            [disabled]="!isValid()"
+            (click)="confirm()">
+    </button>
+  </div>
+</form>

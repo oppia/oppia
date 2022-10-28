@@ -1,0 +1,64 @@
+<div class="thanks-page">
+  <background-banner></background-banner>
+  <div class="oppia-static-header">
+    <h1>Thank You!</h1>
+  </div>
+  <div class="oppia-static-content-below-banner">
+    <div class="oppia-page-card oppia-static-content e2e-test-thanks-page">
+      <div class="oppia-static-card-content oppia-static-card-content-wide oppia-default-height">
+        <h2>Thank you for donating to The Oppia Foundation!</h2>
+        <br>
+        <div class="oppia-float-left">
+          <picture>
+            <source type="image/webp" [srcset]="getStaticImageUrl('/general/donate.webp')">
+            <source type="image/png" [srcset]="getStaticImageUrl('/general/donate.png')">
+            <img [src]="getStaticImageUrl('/general/donate.png')" alt="Otter holding a gift" class="oppia-otter-image">
+          </picture>
+        </div>
+        <div class="oppia-float-right">
+          <p>
+            Your contribution will be used towards:
+          </p>
+          <ul class="oppia-contribution-use-container">
+            <li>Maintaining our servers</li>
+            <li>Marketing</li>
+            <li>Distributing learning materials to students</li>
+          </ul>
+          <p>
+            Thank you for your support!
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-footer-padding-below-banner">
+  </div>
+</div>
+<style>
+  .thanks-page .oppia-default-height {
+    height: 450px;
+  }
+  .thanks-page .oppia-float-left {
+    float: left;
+  }
+  .thanks-page .oppia-float-right {
+    float: right;
+  }
+  .thanks-page .oppia-otter-image {
+    height: 250px;
+  }
+  .thanks-page .oppia-contribution-use-container {
+    margin-left: 30px;
+  }
+  @media only screen and (max-width: 500px) {
+    .thanks-page .oppia-default-height {
+      height: auto;
+    }
+    .thanks-page .oppia-float-left {
+      float: none;
+    }
+    .thanks-page .oppia-float-right {
+      float: none;
+    }
+  }
+</style>

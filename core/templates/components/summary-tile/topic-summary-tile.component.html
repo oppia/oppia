@@ -1,0 +1,159 @@
+<div class="topic-card"
+     [ngStyle]="{background: topicSummary.getThumbnailBgColor(), 'pointer-events': !isPublished ? 'none' : 'auto'}"
+     [ngClass]="{'faded-topic-card': !isPublished}">
+  <a [href]="getTopicPageUrl()" class="e2e-test-topic-link">
+    <div class="topic-thumbnail">
+      <span class="topic-coming-soon" *ngIf="!isPublished">
+        {{ 'I18N_CLASSROOM_PAGE_COMING_SOON' | translate }}
+      </span>
+      <picture class="fx-row fx-main-center" [ngClass]="{'grayscale-effect': !isPublished, 'margin-top-offset': !isPublished}">
+        <img [src]="thumbnailUrl" alt="" class="img-thumbnail" [ngStyle]="{background: topicSummary.getThumbnailBgColor()}">
+      </picture>
+    </div>
+    <div class="topic-details" [ngStyle]="{'background-color': getDarkerThumbnailBgColor()}" ng-class="{'mask-effect': !isPublished}">
+      <span class="topic-name e2e-test-topic-name" *ngIf="!isHackyTopicNameTranslationDisplayed()">
+        {{ topicSummary.getName() }}
+      </span>
+      <span class="topic-name e2e-test-topic-name" *ngIf="isHackyTopicNameTranslationDisplayed()">
+        {{ topicNameTranslationKey | translate }}
+      </span>
+      {{ topicSummary.getTotalPublishedNodeCount() }}
+      <span *ngIf="topicSummary.getTotalPublishedNodeCount() === 1">
+        <span>{{ 'I18N_TOPIC_VIEWER_LESSON' | translate }}</span>
+      </span>
+      <span *ngIf="topicSummary.getTotalPublishedNodeCount() !== 1">
+        <span>{{ 'I18N_TOPIC_VIEWER_LESSONS' | translate }}</span>
+      </span>
+    </div>
+  </a>
+</div>
+<style>
+  .topic-card .margin-top-offset {
+    margin-top: -1.5em;
+  }
+
+  .topic-card .grayscale-effect {
+    backdrop-filter: brightness(0.5);
+  }
+
+  .topic-card .mask-effect {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+  }
+
+  .topic-card {
+    border-radius: 0.4em;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .topic-card picture {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  .topic-card .topic-coming-soon {
+    background-image: linear-gradient(to right, #7659b6, #674172);
+    border-radius: 0 0.2em 0 0.6em;
+    color: #fff;
+    display: block;
+    font-size: 1em;
+    margin-left: 4em;
+    position: relative;
+    text-transform: uppercase;
+    z-index: 100;
+  }
+
+  .topic-card a:hover {
+    text-decoration: none;
+  }
+
+  .topic-card .topic-name {
+    display: block;
+    font-size: 1.25em;
+    font-weight: 600;
+  }
+
+  .topic-card .mask-effect .topic-name,
+  .topic-card .mask-effect .topic-story-count {
+    filter: brightness(0.6);
+  }
+
+  .topic-card .topic-card:focus {
+    outline: 0;
+  }
+
+  .topic-card .topic-thumbnail {
+    height: 120px;
+    text-align: center;
+    vertical-align: middle;
+    width: 100%;
+  }
+
+  .topic-card .img-thumbnail {
+    border: none;
+    border-radius: 0.2em 0.2em 0 0;
+    max-width: 100%;
+  }
+
+  .topic-card .grayscale-effect .img-thumbnail {
+    filter: brightness(0.5);
+  }
+
+  .topic-card .topic-details {
+    border-radius: 0 0 0.2em 0.2em;
+    color: #fff;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 0.8em;
+    height: 100px;
+    letter-spacing: 0.5px;
+    padding: 4px 12px;
+  }
+
+  @media(max-width: 1150px) {
+    .topic-card .topic-name {
+      font-size: 1em;
+    }
+
+    .topic-card .topic-story-count {
+      font-size: 0.8em;
+    }
+
+    .topic-card .topic-details {
+      height: 85px;
+      padding-left: 10px;
+    }
+
+    .topic-card .topic-coming-soon {
+      margin-left: 25px;
+    }
+  }
+
+  @media(max-width: 680px) {
+    .topic-card .topic-nname {
+      font-size: 0.8em;
+      height: 85px;
+    }
+
+    .topic-card .mask-effect .topic-name,
+    .topic-card .mask-effect .topic-story-count {
+      filter: brightness(100%);
+    }
+  }
+
+  @media(max-width: 500px) {
+    .topic-card .topic-title {
+      height: 75px;
+    }
+
+    .topic-card .topic-thumbnail {
+      height: 100px;
+    }
+
+    .topic-card .mask-effect .topic-name,
+    .topic-card .mask-effect .topic-story-count {
+      filter: brightness(100%);
+    }
+  }
+</style>

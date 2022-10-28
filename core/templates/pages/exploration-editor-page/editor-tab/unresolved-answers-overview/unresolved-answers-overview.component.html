@@ -1,0 +1,54 @@
+<div *ngIf="isUnresolvedAnswersOverviewShown()">
+  <span class="oppia-improvements-overview-header">
+    <strong>Improvements Overview</strong>
+  </span>
+  <mat-card class="oppia-unresolved-answers-card">
+    <strong>Unresolved Student Answers</strong>
+    <ul>
+      <li *ngFor="let data of getUnresolvedStateStats(); index as index" class="answer-container">
+        <strong>({{ data.frequency }} times)</strong>: <span [innerHtml]="data.answerHtml"></span>
+      </li>
+      <li *ngIf="getUnresolvedStateStats().length === 0">
+        <em>No outstanding answers require attention.</em>
+      </li>
+    </ul>
+  </mat-card>
+
+  <mat-card class="oppia-unresolved-answers" *ngIf="SHOW_TRAINABLE_UNRESOLVED_ANSWERS && isCurrentInteractionTrainable()">
+    <div *ngIf="isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()">
+      <button type="button" class="btn btn-secondary btn-lg oppia-add-response-button e2e-test-open-teach-modal" (click)="openTeachOppiaModal()">
+        Train Oppia
+      </button>
+    </div>
+  </mat-card>
+</div>
+
+<style>
+  .answer-container {
+    vertical-align: text-bottom;
+  }
+
+  .refresh-container {
+    font-size: 0.8em;
+    text-align: right;
+  }
+
+  .refresh-container a {
+    font-weight: bold;
+  }
+
+  .oppia-improvements-overview-header {
+    font-size: 16px;
+  }
+
+  .oppia-unresolved-answers-card {
+    background-color: #fff;
+    margin: 20px 0;
+    padding: 8px;
+  }
+
+  .oppia-unresolved-answers {
+    margin: 20px 0;
+    padding: 0;
+  }
+</style>

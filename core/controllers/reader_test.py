@@ -14,12 +14,15 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 
+from __future__ import annotations
+
 import logging
 
-from constants import constants
-from core.domain import classifier_services
+from core import feconf
+from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -32,16 +35,29 @@ from core.domain import skill_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import taskqueue_services
+from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
-import feconf
 
-(classifier_models, stats_models) = models.Registry.import_models(
-    [models.NAMES.classifier, models.NAMES.statistics])
+(classifier_models, exp_models, stats_models) = models.Registry.import_models([
+    models.Names.CLASSIFIER, models.Names.EXPLORATION, models.Names.STATISTICS
+])
+
+
+def _get_change_list(state_name, property_name, new_value):
+    """Generates a change list for a single state change."""
+    return [exp_domain.ExplorationChange({
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'state_name': state_name,
+        'property_name': property_name,
+        'new_value': new_value
+    })]
 
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
@@ -51,11 +67,11 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, create a dummy exploration."""
-        super(ReaderPermissionsTest, self).setUp()
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.editor_id, title=self.UNICODE_TEST_STRING,
@@ -95,10 +111,10 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.logout()
 
-    def test_unpublished_explorations_are_visible_to_admins(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.login(self.ADMIN_EMAIL)
+    def test_unpublished_explorations_are_visible_to_moderator(self):
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.login(self.MODERATOR_EMAIL)
         self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.logout()
@@ -178,90 +194,30 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
-    """Test the handler for initialising exploration with
-    state_classifier_mapping.
-    """
-
-    def test_creation_of_state_classifier_mapping(self):
-        super(ExplorationStateClassifierMappingTests, self).setUp()
-        exploration_id = '15'
-
-        self.login(self.VIEWER_EMAIL)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-
-        exp_services.delete_demo(exploration_id)
-        # We enable ENABLE_ML_CLASSIFIERS so that the subsequent call to
-        # save_exploration handles job creation for trainable states.
-        # Since only one demo exploration has a trainable state, we modify our
-        # values for MIN_ASSIGNED_LABELS and MIN_TOTAL_TRAINING_EXAMPLES to let
-        # the classifier_demo_exploration.yaml be trainable. This is
-        # completely for testing purposes.
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 5):
-                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                    exp_services.load_demo(exploration_id)
-
-        # Retrieve job_id of created job (because of save_exp).
-        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
-        self.assertEqual(all_jobs.count(), 1)
-        for job in all_jobs:
-            job_id = job.id
-
-        classifier_services.store_classifier_data(job_id, {})
-
-        expected_state_classifier_mapping = {
-            'text': {
-                'algorithm_id': 'TextClassifier',
-                'classifier_data': {},
-                'data_schema_version': 1
-            }
-        }
-        # Call the handler.
-        exploration_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exploration_id))
-        retrieved_state_classifier_mapping = exploration_dict[
-            'state_classifier_mapping']
-
-        self.assertEqual(
-            expected_state_classifier_mapping,
-            retrieved_state_classifier_mapping)
-
-    def test_exploration_handler_raises_error_with_invalid_version(self):
-        exploration_id = '15'
-
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.login(self.VIEWER_EMAIL)
-
-        exp_services.load_demo(exploration_id)
-        self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exploration_id),
-            params={'v': 10}, expected_status_int=404)
-
-
 class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
     """Test the handler for initialising exploration with
     state_classifier_mapping.
     """
+
     def setUp(self):
         """Before each individual test, initialize data."""
-        super(ExplorationPretestsUnitTest, self).setUp()
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.skill_id, 'user', 'Description')
+            self.skill_id, 'user', description='Description')
 
     def test_get_exploration_pretests(self):
-        super(ExplorationPretestsUnitTest, self).setUp()
         story_id = story_services.get_new_story_id()
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
-            topic_id, 'user', 'Topic', 'A new topic', [], [], [], [], 0)
-        self.save_new_story(
-            story_id, 'user', 'Title', 'Description', 'Notes', topic_id
-        )
+            topic_id, 'user', name='Topic',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
+        self.save_new_story(story_id, 'user', topic_id)
         topic_services.add_canonical_story('user', topic_id, story_id)
 
         changelist = [
@@ -273,10 +229,10 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         ]
         story_services.update_story('user', story_id, changelist, 'Added node.')
 
-        exp_id = '0'
+        exp_id = '15'
         exp_id_2 = '1'
         exp_services.delete_demo('0')
-        exp_services.load_demo('0')
+        exp_services.load_demo('15')
         exp_services.delete_demo('1')
         exp_services.load_demo('1')
         change_list = [story_domain.StoryChange({
@@ -311,42 +267,40 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         # Call the handler.
         with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
             json_response_1 = self.get_json(
-                '%s/%s?story_id=%s&cursor=' % (
-                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, story_id))
-            next_cursor = json_response_1['next_start_cursor']
-
-            self.assertEqual(len(json_response_1['pretest_question_dicts']), 1)
-            json_response_2 = self.get_json(
-                '%s/%s?story_id=%s&cursor=%s' % (
-                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, story_id,
-                    next_cursor))
-            self.assertEqual(len(json_response_2['pretest_question_dicts']), 1)
-            self.assertNotEqual(
-                json_response_1['pretest_question_dicts'][0]['id'],
-                json_response_2['pretest_question_dicts'][0]['id'])
+                '%s/%s?story_url_fragment=title' % (
+                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id))
+        self.assertTrue(
+            json_response_1['pretest_question_dicts'][0]['id'] in
+            [question_id, question_id_2])
 
         self.get_json(
-            '%s/%s?story_id=%s' % (
-                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, story_id),
+            '%s/%s?story_url_fragment=title' % (
+                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2),
             expected_status_int=400)
 
         self.get_json(
-            '%s/%s?story_id=%s' % (
-                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, 'story'),
+            '%s/%s?story_url_fragment=invalid-story' % (
+                feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2),
             expected_status_int=400)
 
 
 class QuestionsUnitTest(test_utils.GenericTestBase):
     """Test the handler for fetching questions."""
 
+    USER_EMAIL = 'user@example.com'
+    USER_USERNAME = 'user'
+
     def setUp(self):
         """Before each individual test, initialize data."""
-        super(QuestionsUnitTest, self).setUp()
+        super().setUp()
+        self.signup(self.USER_EMAIL, self.USER_USERNAME)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, 'user', 'Description')
+        self.save_new_skill(self.skill_id, 'user', description='Description')
 
         self.question_id = question_services.get_new_question_id()
         self.save_new_question(
@@ -364,21 +318,21 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
     def test_questions_are_returned_successfully(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id)
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id, 'false')
         json_response_1 = self.get_json(url)
         self.assertEqual(len(json_response_1['question_dicts']), 1)
 
     def test_question_count_more_than_available_returns_all_questions(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '5', self.skill_id)
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '5', self.skill_id, 'true')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 2)
 
     def test_multiple_skill_id_returns_questions(self):
         skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_2, 'user', 'Description')
+        self.save_new_skill(skill_id_2, 'user', description='Description')
 
         question_id_3 = question_services.get_new_question_id()
         self.save_new_question(
@@ -386,25 +340,70 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_3, skill_id_2, 0.5)
-        url = '%s?question_count=%s&skill_ids=%s,%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '3', self.skill_id, skill_id_2)
+        url = '%s?question_count=%s&skill_ids=%s,%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '3', self.skill_id, skill_id_2, 'true')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 3)
         question_ids = [data['id'] for data in json_response['question_dicts']]
         self.assertItemsEqual(
             [self.question_id, self.question_id_2, question_id_3], question_ids)
 
+    def test_filter_multiple_skill_id_return_questions(self):
+        self.login(self.USER_EMAIL)
+        skill_ids_for_url = ''
+
+        # Create multiple skills, questions and skill links.
+        for _ in range(feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
+            skill_id = skill_services.get_new_skill_id()
+            skill_ids_for_url = skill_ids_for_url + skill_id + ','
+            self.save_new_skill(skill_id, 'user', description='Description')
+            question_id = question_services.get_new_question_id()
+            self.save_new_question(
+                question_id, 'user',
+                self._create_valid_question_data('ABC'), [skill_id])
+            question_services.create_new_question_skill_link(
+                self.editor_id, question_id, skill_id, 0.5)
+
+        # Create additional skills with user skill mastery > 0.0,
+        # so that these are filtered out correctly.
+        for _ in range(5):
+            skill_id = skill_services.get_new_skill_id()
+            skill_ids_for_url = skill_ids_for_url + skill_id + ','
+            self.save_new_skill(skill_id, 'user', description='Description')
+            skill_services.create_user_skill_mastery(
+                self.user_id, skill_id, 0.5)
+
+        # Removing the last comma of the string.
+        skill_ids_for_url = skill_ids_for_url[:-1]
+
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX,
+            feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME,
+            skill_ids_for_url,
+            'true'
+        )
+        json_response = self.get_json(url)
+        self.assertEqual(
+            len(json_response['question_dicts']),
+            feconf.QUESTION_BATCH_SIZE)
+
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '1', 'invalid_skill_id')
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '1', 'invalid_skill_id', 'true')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 0)
 
     def test_question_count_zero_raises_invalid_input_exception(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '0', self.skill_id)
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '0', self.skill_id, 'true')
+        self.get_json(url, expected_status_int=400)
+
+    def test_invalid_fetch_by_difficulty_raises_invalid_input_exception(self):
+        # Call the handler.
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id, [])
         self.get_json(url, expected_status_int=400)
 
 
@@ -415,54 +414,12 @@ class ExplorationParametersUnitTests(test_utils.GenericTestBase):
         """Test the get_init_params() method."""
         independent_pc = param_domain.ParamChange(
             'a', 'Copier', {'value': 'firstValue', 'parse_with_jinja': False})
-        dependent_pc = param_domain.ParamChange(
-            'b', 'Copier', {'value': '{{a}}', 'parse_with_jinja': True})
-
         exp_param_specs = {
             'a': param_domain.ParamSpec('UnicodeString'),
-            'b': param_domain.ParamSpec('UnicodeString'),
         }
         new_params = self.get_updated_param_dict(
-            {}, [independent_pc, dependent_pc], exp_param_specs)
-        self.assertEqual(new_params, {'a': 'firstValue', 'b': 'firstValue'})
-
-        # Jinja string evaluation fails gracefully on dependencies that do not
-        # exist.
-        new_params = self.get_updated_param_dict(
-            {}, [dependent_pc, independent_pc], exp_param_specs)
-        self.assertEqual(new_params, {'a': 'firstValue', 'b': ''})
-
-    def test_update_learner_params(self):
-        """Test the update_learner_params() method."""
-        independent_pc = param_domain.ParamChange(
-            'a', 'Copier', {'value': 'firstValue', 'parse_with_jinja': False})
-        dependent_pc = param_domain.ParamChange(
-            'b', 'Copier', {'value': '{{a}}', 'parse_with_jinja': True})
-
-        exp_param_specs = {
-            'a': param_domain.ParamSpec('UnicodeString'),
-            'b': param_domain.ParamSpec('UnicodeString'),
-        }
-
-        old_params = {}
-        new_params = self.get_updated_param_dict(
-            old_params, [independent_pc, dependent_pc], exp_param_specs)
-        self.assertEqual(new_params, {'a': 'firstValue', 'b': 'firstValue'})
-        self.assertEqual(old_params, {})
-
-        old_params = {'a': 'secondValue'}
-        new_params = self.get_updated_param_dict(
-            old_params, [dependent_pc], exp_param_specs)
-        self.assertEqual(new_params, {'a': 'secondValue', 'b': 'secondValue'})
-        self.assertEqual(old_params, {'a': 'secondValue'})
-
-        # Jinja string evaluation fails gracefully on dependencies that do not
-        # exist.
-        old_params = {}
-        new_params = self.get_updated_param_dict(
-            old_params, [dependent_pc], exp_param_specs)
-        self.assertEqual(new_params, {'b': ''})
-        self.assertEqual(old_params, {})
+            {}, [independent_pc], exp_param_specs)
+        self.assertEqual(new_params, {'a': 'firstValue'})
 
 
 class RatingsIntegrationTests(test_utils.GenericTestBase):
@@ -471,7 +428,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
     EXP_ID = '0'
 
     def setUp(self):
-        super(RatingsIntegrationTests, self).setUp()
+        super().setUp()
         exp_services.load_demo(self.EXP_ID)
 
     def test_assign_and_read_ratings(self):
@@ -567,15 +524,16 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class RecommendationsHandlerTests(test_utils.GenericTestBase):
+class RecommendationsHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for recommended explorations for after an
     exploration is completed.
     """
+
     # Demo explorations.
     EXP_ID_0 = '0'
     EXP_ID_1 = '1'
     EXP_ID_7 = '7'
-    EXP_ID_8 = '8'
+    EXP_ID_9 = '9'
 
     # Explorations contained within the demo collection.
     EXP_ID_19 = '19'
@@ -586,11 +544,11 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
     COL_ID = '0'
 
     def setUp(self):
-        super(RecommendationsHandlerTests, self).setUp()
+        super().setUp()
 
         # Register users.
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
@@ -599,7 +557,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         exp_services.load_demo(self.EXP_ID_0)
         exp_services.load_demo(self.EXP_ID_1)
         exp_services.load_demo(self.EXP_ID_7)
-        exp_services.load_demo(self.EXP_ID_8)
+        exp_services.load_demo(self.EXP_ID_9)
         collection_services.load_demo(self.COL_ID)
         self.logout()
 
@@ -621,7 +579,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
             if include_system_recommendations is not None else '')
         recommendations_url = (
             '/explorehandler/recommendations/%s?'
-            'stringified_author_recommended_ids=%s%s%s' % (
+            'author_recommended_ids=%s%s%s' % (
                 exploration_id, author_recommended_ids_str, collection_id_param,
                 include_recommendations_param))
 
@@ -639,7 +597,8 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         """Sets the recommendations in the exploration corresponding to the
         given exploration id.
         """
-        recommendations_services.set_recommendations(exp_id, recommended_ids)
+        recommendations_services.set_exploration_recommendations(
+            exp_id, recommended_ids)
 
     def _complete_exploration_in_collection(self, exp_id):
         """Completes the exploration within the collection. Records that the
@@ -672,10 +631,10 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         finishes an exploration in-viewer, and there are system recommendations.
         """
         self.login(self.NEW_USER_EMAIL)
-        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_8])
+        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0, include_system_recommendations=True)
-        self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_8])
+        self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_9])
 
     def test_logged_in_with_no_sysexps_some_authexps_no_col_has_some_exps(self):
         """Check there are some recommended explorations when a user is logged
@@ -685,8 +644,8 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         self.login(self.NEW_USER_EMAIL)
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0, include_system_recommendations=True,
-            author_recommended_ids_str='["7","8"]')
-        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_8])
+            author_recommended_ids_str='["7","9"]')
+        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
 
     def test_logged_in_with_sysexps_and_authexps_no_col_has_some_exps(self):
         """Check there are recommended explorations when a user is logged in,
@@ -694,12 +653,12 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         exploration IDs and recommendations from the system.
         """
         self.login(self.NEW_USER_EMAIL)
-        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_8])
+        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0, include_system_recommendations=True,
-            author_recommended_ids_str='["7","8"]')
+            author_recommended_ids_str='["7","9"]')
         self.assertEqual(
-            recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_8])
+            recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_9])
 
     # Logged in in-editor tests.
     def test_logged_in_preview_no_authexps_no_col_has_no_exps(self):
@@ -718,8 +677,8 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         """
         self.login(self.NEW_USER_EMAIL)
         recommendation_ids = self._get_recommendation_ids(
-            self.EXP_ID_0, author_recommended_ids_str='["7","8"]')
-        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_8])
+            self.EXP_ID_0, author_recommended_ids_str='["7","9"]')
+        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
 
     # Logged in collection tests.
     def test_logged_in_no_sysexps_no_authexps_first_exp_in_col_has_exp(self):
@@ -766,7 +725,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         """
         self.login(self.NEW_USER_EMAIL)
         self._set_recommendations(
-            self.EXP_ID_19, [self.EXP_ID_1, self.EXP_ID_8])
+            self.EXP_ID_19, [self.EXP_ID_1, self.EXP_ID_9])
         self._complete_exploration_in_collection(self.EXP_ID_19)
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_19, collection_id=self.COL_ID,
@@ -783,7 +742,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         """
         self.login(self.NEW_USER_EMAIL)
         self._set_recommendations(
-            self.EXP_ID_20, [self.EXP_ID_1, self.EXP_ID_8])
+            self.EXP_ID_20, [self.EXP_ID_1, self.EXP_ID_9])
         self._complete_exploration_in_collection(self.EXP_ID_20)
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_20, collection_id=self.COL_ID,
@@ -801,7 +760,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         self.login(self.NEW_USER_EMAIL)
         self._complete_entire_collection_in_order()
         self._set_recommendations(
-            self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_8])
+            self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0, collection_id=self.COL_ID,
             include_system_recommendations=True)
@@ -817,11 +776,11 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         self._complete_exploration_in_collection(self.EXP_ID_19)
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_19, collection_id=self.COL_ID,
-            author_recommended_ids_str='["7","8"]')
+            author_recommended_ids_str='["7","9"]')
         # The next exploration in the collection should be recommended along
         # with author specified explorations.
         self.assertEqual(
-            recommendation_ids, [self.EXP_ID_20, self.EXP_ID_7, self.EXP_ID_8])
+            recommendation_ids, [self.EXP_ID_20, self.EXP_ID_7, self.EXP_ID_9])
 
     def test_logged_in_no_sysexps_with_authexps_mid_exp_in_col_has_exps(self):
         """Check there are recommended explorations when a user is logged in
@@ -847,10 +806,10 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         self._complete_entire_collection_in_order()
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0, collection_id=self.COL_ID,
-            author_recommended_ids_str='["7","8"]')
+            author_recommended_ids_str='["7","9"]')
         # Only author specified explorations should be recommended since all
         # others in the collection have been completed.
-        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_8])
+        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
 
     # Logged out standard viewer tests.
     def test_logged_out_with_no_sysexps_no_authexps_no_col_has_no_exps(self):
@@ -866,10 +825,10 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         """Check there are recommended explorations when a user is logged out,
         finishes an exploration in-viewer, and there are system recommendations.
         """
-        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_8])
+        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0, include_system_recommendations=True)
-        self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_8])
+        self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_9])
 
     def test_logged_out_no_sysexps_some_authexps_no_col_has_some_exps(self):
         """Check there are some recommended explorations when a user is logged
@@ -878,20 +837,20 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         """
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0, include_system_recommendations=True,
-            author_recommended_ids_str='["7","8"]')
-        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_8])
+            author_recommended_ids_str='["7","9"]')
+        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
 
     def test_logged_out_with_sysexps_and_authexps_no_col_has_some_exps(self):
         """Check there are recommended explorations when a user is logged in,
         finishes an exploration in-viewer, and there are both author-specified
         exploration IDs and recommendations from the system.
         """
-        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_8])
+        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0, include_system_recommendations=True,
-            author_recommended_ids_str='["7","8"]')
+            author_recommended_ids_str='["7","9"]')
         self.assertEqual(
-            recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_8])
+            recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_9])
 
     # Logged out collection tests.
     def test_logged_out_no_sysexps_no_authexps_first_exp_in_col_has_exp(self):
@@ -928,7 +887,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         ignored in favor of the collection's own recommendations.
         """
         self._set_recommendations(
-            self.EXP_ID_19, [self.EXP_ID_1, self.EXP_ID_8])
+            self.EXP_ID_19, [self.EXP_ID_1, self.EXP_ID_9])
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_19, collection_id=self.COL_ID,
             include_system_recommendations=True)
@@ -942,7 +901,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         ignored in favor of the collection's own recommendations.
         """
         self._set_recommendations(
-            self.EXP_ID_20, [self.EXP_ID_1, self.EXP_ID_8])
+            self.EXP_ID_20, [self.EXP_ID_1, self.EXP_ID_9])
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_20, collection_id=self.COL_ID,
             include_system_recommendations=True)
@@ -956,7 +915,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         even if there are system recommendations for the last exploration.
         """
         self._set_recommendations(
-            self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_8])
+            self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0, collection_id=self.COL_ID,
             include_system_recommendations=True)
@@ -971,11 +930,11 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         """
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_19, collection_id=self.COL_ID,
-            author_recommended_ids_str='["7","8"]')
+            author_recommended_ids_str='["7","9"]')
         # The next exploration in the collection should be recommended along
         # with author specified explorations.
         self.assertEqual(
-            recommendation_ids, [self.EXP_ID_20, self.EXP_ID_7, self.EXP_ID_8])
+            recommendation_ids, [self.EXP_ID_20, self.EXP_ID_7, self.EXP_ID_9])
 
     def test_logged_out_no_sysexps_with_authexps_mid_exp_in_col_has_exps(self):
         """Check there are recommended explorations when a user is logged out
@@ -1008,29 +967,29 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         """
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_0, collection_id=self.COL_ID,
-            author_recommended_ids_str='["7","8"]')
+            author_recommended_ids_str='["7","9"]')
         # Only author specified explorations should be recommended since all
         # others in the collection have been completed.
-        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_8])
+        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
 
     def test_get_recommendation_ids_with_invalid_author_recommended_ids(self):
         self.get_json(
             '/explorehandler/recommendations/%s' % self.EXP_ID_1, params={
-                'collection_id': 'collection_id',
+                'collection_id': self.COL_ID,
                 'include_system_recommendations': True,
-                'stringified_author_recommended_ids': 'invalid_type'
-            }, expected_status_int=404
+                'author_recommended_ids': 'invalid_type'
+            }, expected_status_int=400
         )
 
 
-class FlagExplorationHandlerTests(test_utils.GenericTestBase):
+class FlagExplorationHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for flagging an exploration."""
 
     EXP_ID = '0'
     REPORT_TEXT = 'AD'
 
     def setUp(self):
-        super(FlagExplorationHandlerTests, self).setUp()
+        super().setUp()
 
         # Register users.
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -1041,7 +1000,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration.
         self.login(self.EDITOR_EMAIL)
@@ -1088,7 +1047,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hello Moderator,\n'
@@ -1106,14 +1065,11 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         with self.can_send_emails_ctx:
             self.process_and_flush_pending_tasks()
 
-            messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(),
-                expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(),
-                expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_non_logged_in_users_cannot_report(self):
         """Check that non-logged in users cannot report."""
@@ -1139,19 +1095,25 @@ class LearnerProgressTest(test_utils.GenericTestBase):
     # belongs. The second number corresponds to the exploration id.
     EXP_ID_1_0 = 'exp_2'
     EXP_ID_1_1 = 'exp_3'
+    EXP_ID_2_0 = 'exp_4'
     COL_ID_0 = 'col_0'
     COL_ID_1 = 'col_1'
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
 
     def setUp(self):
-        super(LearnerProgressTest, self).setUp()
+        super().setUp()
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.STORY_ID = story_services.get_new_story_id()
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
 
         # Save and publish explorations.
         self.save_new_valid_exploration(
@@ -1171,10 +1133,16 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             title='Introduce Interactions in Oppia',
             category='Welcome', language_code='en')
 
+        self.save_new_valid_exploration(
+            self.EXP_ID_2_0, self.owner_id, title='Sillat Suomi',
+            category='Architecture', language_code='en',
+            correctness_feedback_enabled=True)
+
         rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
         rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
         rights_manager.publish_exploration(self.owner, self.EXP_ID_1_0)
         rights_manager.publish_exploration(self.owner, self.EXP_ID_1_1)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_2_0)
 
         # Save a new collection.
         self.save_new_default_collection(
@@ -1184,6 +1152,45 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.save_new_default_collection(
             self.COL_ID_1, self.owner_id, title='Bridges in England',
             category='Architecture')
+
+        # Save a new topic and story.
+        self.subtopic = topic_domain.Subtopic(
+            0, 'Title', ['skill_id_1'], 'image.svg',
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+            'dummy-subtopic-one')
+        self.save_new_topic(
+            self.TOPIC_ID, self.owner_id, name='Topic',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[self.subtopic], next_subtopic_id=1)
+        self.save_new_story(self.STORY_ID, self.owner_id, self.TOPIC_ID)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, self.STORY_ID)
+
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_1',
+                'title': 'Title 1'
+            })
+        ]
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, changelist, 'Added node.')
+
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'old_value': None,
+            'new_value': self.EXP_ID_2_0,
+            'node_id': 'node_1'
+        })]
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, change_list, 'Updated Node 1.')
+
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
         # Add two explorations to the previously saved collection and publish
         # it.
@@ -1298,7 +1305,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_1_0,
             payload, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
-            response['error'], 'NONE EXP VERSION: Exploration complete')
+            response['error'], 'Missing key in handler args: version.')
 
     def test_exp_incomplete_event_handler(self):
         """Test handler for leaving an exploration incomplete."""
@@ -1351,6 +1358,40 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_1])
 
+        # If the exploration is played in the context of a story, the
+        # story is also added to the incomplete list.
+        self.post_json(
+            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_2_0, # pylint: disable=line-too-long
+            payload, csrf_token=csrf_token)
+        self.assertEqual(learner_progress_services.get_all_incomplete_exp_ids(
+            self.user_id), [self.EXP_ID_0, self.EXP_ID_1_0, self.EXP_ID_2_0])
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id), [self.STORY_ID])
+        self.assertEqual(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id), [self.TOPIC_ID])
+
+        # If the exploration is played in context of an invalid story, raise
+        # an error.
+        def _mock_none_function(_):
+            """Mocks None."""
+            return None
+
+        story_fetchers_swap = self.swap(
+            story_fetchers, 'get_story_by_id', _mock_none_function)
+
+        with story_fetchers_swap:
+            with self.capture_logging(min_level=logging.ERROR) as captured_logs:
+                self.post_json(
+                    '/explorehandler/exploration_maybe_leave_event'
+                    '/%s' % self.EXP_ID_2_0,
+                    payload, csrf_token=csrf_token)
+                self.assertEqual(
+                    captured_logs,
+                    ['Could not find a story corresponding to '
+                     '%s id.' % self.STORY_ID])
+
     def test_exp_incomplete_event_handler_with_no_version_raises_error(self):
         self.login(self.USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -1365,7 +1406,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         response = self.post_json(
             '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
             payload, csrf_token=csrf_token, expected_status_int=400)
-        self.assertEqual(response['error'], 'NONE EXP VERSION: Maybe quit')
+        error_msg = 'Missing key in handler args: version.'
+        self.assertEqual(response['error'], error_msg)
 
     def test_remove_exp_from_incomplete_list_handler(self):
         """Test handler for removing explorations from the partially completed
@@ -1386,23 +1428,23 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Remove one exploration.
-        self.delete_json(str(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_EXPLORATION,
-                self.EXP_ID_0)))
+                self.EXP_ID_0))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_1])
 
         # Remove another exploration.
-        self.delete_json(str(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_EXPLORATION,
-                self.EXP_ID_1)))
+                self.EXP_ID_1))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [])
@@ -1422,25 +1464,47 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
         # Remove one collection.
-        self.delete_json(str(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_COLLECTION,
-                self.COL_ID_0)))
+                self.COL_ID_0))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_1])
 
         # Remove another collection.
-        self.delete_json(str(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_COLLECTION,
-                self.COL_ID_1)))
+                self.COL_ID_1))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id), [])
+
+        # Remove one story.
+        self.delete_json(
+            '%s/%s/%s' %
+            (
+                feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+                constants.ACTIVITY_TYPE_STORY,
+                self.STORY_ID))
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id), [])
+
+        # Remove one topic.
+        self.delete_json(
+            '%s/%s/%s' %
+            (
+                feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+                constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                self.TOPIC_ID))
+        self.assertEqual(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.user_id), [])
 
 
@@ -1448,7 +1512,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
     """Tests for the handler that records playthroughs."""
 
     def setUp(self):
-        super(StorePlaythroughHandlerTest, self).setUp()
+        super().setUp()
         self.exp_id = '15'
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -1459,59 +1523,49 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         playthrough_id = stats_models.PlaythroughModel.create(
             self.exp_id, self.exploration.version, 'EarlyQuit',
             {
-                'state_name': {
-                    'value': 'state_name1'
-                },
-                'time_spent_in_exp_in_msecs': {
-                    'value': 200
-                }
+                'state_name': {'value': 'state_name1'},
+                'time_spent_in_exp_in_msecs': {'value': 200}
             },
-            [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    }
-                },
-                'schema_version': 1
-            }])
-        stats_models.ExplorationIssuesModel.create(
-            self.exp_id, 1, [{
-                'issue_type': 'EarlyQuit',
-                'issue_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
+            [
+                {
+                    'action_type': 'ExplorationStart',
+                    'action_customization_args': {
+                        'state_name': {'value': 'state_name1'}
                     },
-                    'time_spent_in_exp_in_msecs': {
-                        'value': 200
-                    }
-                },
-                'playthrough_ids': [playthrough_id],
-                'schema_version': 1,
-                'is_valid': True
-            }])
+                    'schema_version': 1
+                }
+            ])
+        stats_models.ExplorationIssuesModel.create(
+            self.exp_id, 1, [
+                {
+                    'issue_type': 'EarlyQuit',
+                    'issue_customization_args': {
+                        'state_name': {'value': 'state_name1'},
+                        'time_spent_in_exp_in_msecs': {'value': 200}
+                        },
+                    'playthrough_ids': [playthrough_id],
+                    'schema_version': 1,
+                    'is_valid': True
+                }
+            ])
 
         self.playthrough_data = {
             'exp_id': self.exp_id,
             'exp_version': self.exploration.version,
             'issue_type': 'EarlyQuit',
             'issue_customization_args': {
-                'state_name': {
-                    'value': 'state_name1'
-                },
-                'time_spent_in_exp_in_msecs': {
-                    'value': 250
-                }
+                'state_name': {'value': 'state_name1'},
+                'time_spent_in_exp_in_msecs': {'value': 250}
             },
-            'actions': [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    }
-                },
-                'schema_version': 1
-            }]
+            'actions': [
+                {
+                    'action_type': 'ExplorationStart',
+                    'action_customization_args': {
+                        'state_name': {'value': 'state_name1'}
+                    },
+                    'schema_version': 1
+                }
+            ]
         }
 
         self.csrf_token = self.get_new_csrf_token()
@@ -1520,13 +1574,10 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         """Test that a new playthrough gets created and is added to an existing
         issue's list of playthrough IDs.
         """
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
+        self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
+            'playthrough_data': self.playthrough_data,
+            'issue_schema_version': 1,
+        }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1540,13 +1591,10 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.playthrough_data['issue_customization_args']['state_name'][
             'value'] = 'state_name2'
 
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
+        self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
+            'playthrough_data': self.playthrough_data,
+            'issue_schema_version': 1,
+        }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1565,15 +1613,17 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name2', 'state_name1']
                 },
             },
-            [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    }
-                },
-                'schema_version': 1
-            }])
+            [
+                {
+                    'action_type': 'ExplorationStart',
+                    'action_customization_args': {
+                        'state_name': {
+                            'value': 'state_name1'
+                        }
+                    },
+                    'schema_version': 1
+                }
+            ])
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         model.unresolved_issues.append({
@@ -1587,6 +1637,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
+        model.update_timestamps()
         model.put()
 
         self.playthrough_data = {
@@ -1598,24 +1649,21 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name2', 'state_name1']
                 },
             },
-            'actions': [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    }
-                },
-                'schema_version': 1
-            }],
+            'actions': [
+                {
+                    'action_type': 'ExplorationStart',
+                    'action_customization_args': {
+                        'state_name': {'value': 'state_name1'}
+                    },
+                    'schema_version': 1
+                }
+            ],
         }
 
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
+        self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
+            'playthrough_data': self.playthrough_data,
+            'issue_schema_version': 1,
+        }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1634,15 +1682,17 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name2', 'state_name1']
                 },
             },
-            [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    }
+            [
+                {
+                    'action_type': 'ExplorationStart',
+                    'action_customization_args': {
+                        'state_name': {
+                            'value': 'state_name1'
+                            }
+                        },
+                    'schema_version': 1
                 },
-                'schema_version': 1
-            }])
+            ])
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         model.unresolved_issues.append({
@@ -1656,6 +1706,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
+        model.update_timestamps()
         model.put()
 
         self.playthrough_data = {
@@ -1664,27 +1715,24 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'issue_type': 'CyclicStateTransitions',
             'issue_customization_args': {
                 'state_names': {
-                    'value': ['state_name1', 'state_name1', 'state_name2']
+                    'value': ['state_name2', 'state_name1', 'state_name2']
                 },
             },
-            'actions': [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    }
-                },
-                'schema_version': 1
-            }]
+            'actions': [
+                {
+                    'action_type': 'ExplorationStart',
+                    'action_customization_args': {
+                        'state_name': {'value': 'state_name1'}
+                    },
+                    'schema_version': 1
+                }
+            ]
         }
 
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
+        self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
+            'playthrough_data': self.playthrough_data,
+            'issue_schema_version': 1,
+        }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1699,16 +1747,15 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         """
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         model.unresolved_issues[0]['playthrough_ids'] = [
-            'id1', 'id2', 'id3', 'id4', 'id5']
+            'id1', 'id2', 'id3', 'id4', 'id5'
+        ]
+        model.update_timestamps()
         model.put()
 
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
+        self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
+            'playthrough_data': self.playthrough_data,
+            'issue_schema_version': 1,
+        }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1719,206 +1766,24 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         """Test that passing a payload without schema version raises an
         exception.
         """
-        payload_dict_without_schema_version = {
+        self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
             'playthrough_data': self.playthrough_data,
-            'playthrough_id': None
-        }
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            payload_dict_without_schema_version,
-            csrf_token=self.csrf_token,
-            expected_status_int=400)
+        }, csrf_token=self.csrf_token, expected_status_int=400)
 
     def test_error_on_invalid_playthrough_dict(self):
         """Test that passing an invalid playthrough dict raises an exception."""
         self.playthrough_data['issue_type'] = 'FakeIssueType'
-
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token,
-            expected_status_int=400)
-
-    def test_playthrough_id_is_returned(self):
-        """Test that playthrough ID is returned when it is stored for the first
-        time and the playthrough is updated from the next time.
-        """
-        response = self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
-        self.process_and_flush_pending_tasks()
-
-        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
-        self.assertEqual(len(model.unresolved_issues), 1)
-        self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
-        playthrough_id = model.unresolved_issues[0]['playthrough_ids'][1]
-        self.assertEqual(response['playthrough_id'], playthrough_id)
-        self.assertEqual(response['playthrough_stored'], True)
-
-    def test_playthrough_is_subsequently_updated(self):
-        """Test that a playthrough is updated if the controller is called for
-        the second time.
-        """
-        response = self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
-        self.process_and_flush_pending_tasks()
-
-        playthrough_id = response['playthrough_id']
-        self.playthrough_data['id'] = playthrough_id
-        self.playthrough_data['issue_customization_args'][
-            'time_spent_in_exp_in_msecs']['value'] = 150
-
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': playthrough_id
-            }, csrf_token=self.csrf_token)
-        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
-        self.assertEqual(len(model.unresolved_issues), 1)
-        self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
-        playthrough_id = model.unresolved_issues[0]['playthrough_ids'][1]
-        playthrough = stats_services.get_playthrough_by_id(playthrough_id)
-        self.assertEqual(
-            playthrough.issue_customization_args['time_spent_in_exp_in_msecs'][
-                'value'], 150)
-
-    def test_updating_playthrough_issue(self):
-        """Test that updating an existing playthrough's issue creates a new
-        issue if the issue doesn't exist.
-        """
-        response = self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
-        self.process_and_flush_pending_tasks()
-
-        playthrough_id = response['playthrough_id']
-        self.playthrough_data['id'] = playthrough_id
-        self.playthrough_data['issue_type'] = 'CyclicStateTransitions'
-        self.playthrough_data['issue_customization_args'] = {
-            'state_names': {
-                'value': ['state1', 'state2', 'state1']
-            }
-        }
-
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': playthrough_id
-            }, csrf_token=self.csrf_token)
-        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
-        self.assertEqual(len(model.unresolved_issues), 2)
-        self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
-        self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 1)
-        playthrough_id = model.unresolved_issues[1]['playthrough_ids'][0]
-        playthrough = stats_services.get_playthrough_by_id(playthrough_id)
-        self.assertEqual(playthrough.issue_type, 'CyclicStateTransitions')
-        self.assertEqual(
-            playthrough.issue_customization_args['state_names'][
-                'value'], ['state1', 'state2', 'state1'])
-
-    def test_cannot_update_playthrough_issue_with_no_playthrough_id(self):
-        response = self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1
-            }, csrf_token=self.csrf_token, expected_status_int=400)
-
-        self.assertEqual(response['error'], u'\'playthrough_id\'')
-
-    def test_move_playthrough_to_correct_issue(self):
-        playthrough_id = stats_models.PlaythroughModel.create(
-            self.exp_id, 1, 'MultipleIncorrectSubmissions',
-            {
-                'state_name': {
-                    'value': 'state_name1'
-                },
-                'num_times_answered_incorrectly': {
-                    'value': 7
-                }
-            },
-            [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    }
-                },
-                'schema_version': 1
-            }])
-
-        stats_models.ExplorationIssuesModel.create(
-            self.exp_id, 1, [{
-                'issue_type': 'MultipleIncorrectSubmissions',
-                'issue_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    },
-                    'num_times_answered_incorrectly': {
-                        'value': 7
-                    }
-                },
-                'playthrough_ids': [playthrough_id],
-                'schema_version': 1,
-                'is_valid': True
-            }])
-
-        response = self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
-
-        self.playthrough_data['id'] = playthrough_id
-        self.playthrough_data['issue_type'] = 'MultipleIncorrectSubmissions'
-        self.playthrough_data['issue_customization_args'] = {
-            'state_name': {
-                'value': 'state_name1'
-            }
-        }
-
-        response = self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': response['playthrough_id']
-            }, csrf_token=self.csrf_token)
-        playthrough = stats_services.get_playthrough_by_id(playthrough_id)
-
-        self.assertEqual(playthrough.issue_type, 'MultipleIncorrectSubmissions')
-        self.assertEqual(
-            playthrough.issue_customization_args['state_name'][
-                'value'], 'state_name1')
+        self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
+            'playthrough_data': self.playthrough_data,
+            'issue_schema_version': 1,
+        }, csrf_token=self.csrf_token, expected_status_int=400)
 
 
 class StatsEventHandlerTest(test_utils.GenericTestBase):
     """Tests for all the statistics event models recording handlers."""
 
     def setUp(self):
-        super(StatsEventHandlerTest, self).setUp()
+        super().setUp()
         self.exp_id = '15'
 
         self.login(self.VIEWER_EMAIL)
@@ -1998,51 +1863,83 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping[
                 self.state_name].num_times_solution_viewed_v2, 1)
 
-    def test_stats_events_handler_raises_error_with_invalid_exp_stats_property(
+    def test_stats_events_handler_raises_error_with_missing_exp_stats_property(
             self):
-
-        observed_log_messages = []
-
-        def _mock_logging_function(msg):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg)
-
         self.aggregated_stats.pop('num_starts')
 
-        with self.swap(logging, 'error', _mock_logging_function):
-            self.post_json('/explorehandler/stats_events/%s' % (
-                self.exp_id), {
-                    'aggregated_stats': self.aggregated_stats,
-                    'exp_version': self.exp_version})
+        response = self.post_json('/explorehandler/stats_events/%s' % (
+            self.exp_id), {
+                'aggregated_stats': self.aggregated_stats,
+                'exp_version': self.exp_version
+        }, expected_status_int=400)
 
-        self.assertEqual(len(observed_log_messages), 1)
-        self.assertIn(
-            'num_starts not in aggregated stats dict.',
-            observed_log_messages[0])
+        error_msg = (
+            'Schema validation for \'aggregated_stats\' '
+            'failed: num_starts not in aggregated stats dict.'
+        )
+        self.assertEqual(response['error'], error_msg)
 
-    def test_stats_events_handler_raise_error_with_invalid_state_stats_property(
+        self.logout()
+
+    def test_stats_events_handler_raises_error_with_invalid_exp_stats_property(
+        self
+    ):
+        self.aggregated_stats['num_starts'] = 'invalid'
+
+        response = self.post_json('/explorehandler/stats_events/%s' % (
+            self.exp_id), {
+                'aggregated_stats': self.aggregated_stats,
+                'exp_version': self.exp_version
+        }, expected_status_int=400)
+
+        error_msg = (
+            'Schema validation for \'aggregated_stats\' '
+            'failed: Expected num_starts to be an int, received invalid'
+        )
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
+
+    def test_stats_events_handler_raise_error_with_missing_state_stats_property(
             self):
-
-        observed_log_messages = []
-
-        def _mock_logging_function(msg):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg)
-
         self.aggregated_stats['state_stats_mapping']['Home'].pop(
             'total_hit_count')
 
-        with self.swap(logging, 'error', _mock_logging_function):
-            self.post_json('/explorehandler/stats_events/%s' % (
+        response = self.post_json('/explorehandler/stats_events/%s' % (
                 self.exp_id), {
                     'aggregated_stats': self.aggregated_stats,
-                    'exp_version': self.exp_version})
+                    'exp_version': self.exp_version}, expected_status_int=400)
 
-        self.assertEqual(len(observed_log_messages), 1)
-        self.assertIn(
-            'total_hit_count not in state stats mapping '
-            'of Home in aggregated stats dict.',
-            observed_log_messages[0])
+        error_msg = (
+            'Schema validation for \'aggregated_stats\' '
+            'failed: total_hit_count not in '
+            'state stats mapping of Home in aggregated stats dict.'
+        )
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
+
+    def test_stats_events_handler_raise_error_with_invalid_state_stats_property(
+            self):
+        self.aggregated_stats['state_stats_mapping']['Home'][
+            'total_hit_count'
+        ] = 'invalid'
+
+        response = self.post_json(
+            '/explorehandler/stats_events/%s' % self.exp_id,
+            {
+                'aggregated_stats': self.aggregated_stats,
+                'exp_version': self.exp_version
+            }, expected_status_int=400
+        )
+
+        error_msg = (
+            'Schema validation for \'aggregated_stats\' '
+            'failed: Expected total_hit_count to be an int, received invalid'
+        )
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
 
 
 class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
@@ -2112,13 +2009,51 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
                     exp_domain.EXPLICIT_CLASSIFICATION),
             }, expected_status_int=400
         )
-        self.assertEqual(response['error'], 'NONE EXP VERSION: Answer Submit')
+        self.assertEqual(
+            response['error'], 'Missing key in handler args: version.'
+        )
+
+    def test_submit_answer_for_exp_raises_error_with_no_answer_matching_type(
+        self
+    ):
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        version = 1
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        state_name_1 = exploration_dict['exploration']['init_state_name']
+
+        response = self.post_json(
+            '/explorehandler/answer_submitted_event/%s' % exp_id,
+            {
+                'old_state_name': state_name_1,
+                'answer': 1.1,
+                'version': version,
+                'client_time_spent_in_secs': 0,
+                'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+                'answer_group_index': 0,
+                'rule_spec_index': 0,
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION),
+            }, expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'Schema validation for \'answer\' failed: ' +
+            'Type of 1.1 is not present in options'
+        )
 
 
 class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(StateHitEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_hitting_new_state(self):
@@ -2203,7 +2138,7 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
             stats_models.StateHitEventLogEntryModel.get_all())
         self.assertEqual(all_models.count(), 0)
 
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.swap(logging, 'exception', _mock_logging_function):
             self.post_json(
                 '/explorehandler/state_hit_event/%s' % exp_id,
                 {
@@ -2225,7 +2160,7 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
 class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(StateCompleteEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_completing_a_state(self):
@@ -2283,7 +2218,9 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
                 'session_id': 'session_id'
             }, expected_status_int=400
         )
-        self.assertEqual(response['error'], 'NONE EXP VERSION: State Complete')
+
+        error_msg = 'Missing key in handler args: exp_version.'
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -2291,7 +2228,7 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LeaveForRefresherExpEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_leaving_an_exploration(self):
@@ -2338,8 +2275,100 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
 class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(ExplorationStartEventHandlerTests, self).setUp()
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+    def test_cannot_fetch_exploration_with_invalid_version(self):
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        self.login(self.VIEWER_EMAIL)
+
+        self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id),
+            {'v': 5},
+            expected_status_int=404)
+
+        self.logout()
+
+    def test_user_checkpoint_progress_is_none_on_fetching_older_exploration(
+        self
+    ):
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.login(self.VIEWER_EMAIL)
+
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name'])
+
+        # Update exploration.
+        # Now version of the exploration becomes 2.
+        change_list = _get_change_list(
+            'What language',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True
+        )
+        exp_services.update_exploration(
+            owner_id,
+            exp_id,
+            change_list,
+            'Made What language state a checkpoint'
+        )
+
+        # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/checkpoint_reached/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 2,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!'
+            },
+            csrf_token=csrf_token
+        )
+
+        # Fetching latest exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_exp_version'], 2)
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_state_name'],
+            'Welcome!')
+        self.assertEqual(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'],
+            2)
+        self.assertEqual(
+            exploration_dict['most_recently_reached_checkpoint_state_name'],
+            'Welcome!')
+
+        # Fetching older exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id),
+            {'v': 1})
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name'])
+
+        self.logout()
 
     def test_starting_a_state(self):
         self.login(self.VIEWER_EMAIL)
@@ -2358,7 +2387,9 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
             {
                 'state_name': 'state_name',
                 'version': version,
-                'params': {},
+                'params': {
+                    'test_param1': 1
+                },
                 'session_id': 'session_id'
             }
         )
@@ -2373,7 +2404,9 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(model.state_name, 'state_name')
         self.assertEqual(model.session_id, 'session_id')
         self.assertEqual(model.exploration_version, version)
-        self.assertEqual(model.params, {})
+        self.assertEqual(model.params, {
+            'test_param1': 1
+        })
         self.assertEqual(model.play_type, feconf.PLAY_TYPE_NORMAL)
 
         self.logout()
@@ -2398,8 +2431,8 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
 
-        self.assertEqual(
-            response['error'], 'NONE EXP VERSION: Exploration start')
+        error_msg = 'Missing key in handler args: version.'
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -2407,7 +2440,7 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(ExplorationActualStartEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_actually_starting_a_state(self):
@@ -2463,7 +2496,8 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
 
-        self.assertEqual(response['error'], 'NONE EXP VERSION: Actual Start')
+        error_msg = 'Missing key in handler args: exploration_version.'
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -2471,7 +2505,7 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(SolutionHitEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_viewing_solution(self):
@@ -2529,8 +2563,8 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
                 'time_spent_in_state_secs': 2.0
             }, expected_status_int=400
         )
-
-        self.assertEqual(response['error'], 'NONE EXP VERSION: Solution hit')
+        error_msg = 'Missing key in handler args: exploration_version.'
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -2541,7 +2575,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
     EXP_ID = 'exp_id'
 
     def setUp(self):
-        super(ExplorationEmbedPageTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -2559,9 +2593,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
                 'collection_id': self.COL_ID
             }
         )
-        self.assertIn(
-            '<exploration-player-page></exploration-player-page>',
-            response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
         self.logout()
 
@@ -2573,7 +2605,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
             '%s/invalid_exp_id' % (feconf.EXPLORATION_URL_EMBED_PREFIX),
             params={
                 'collection_id': self.COL_ID
-            }, expected_status_int=404
+            }, expected_status_int=400
         )
 
         self.logout()
@@ -2588,6 +2620,21 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
             params={
                 'v': exploration.version,
                 'collection_id': 'invalid_collection_id'
+            }, expected_status_int=400
+        )
+
+        self.logout()
+
+    def test_handler_raises_error_with_no_collection(self):
+        self.login(self.OWNER_EMAIL)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
+
+        self.get_html_response(
+            '%s/%s' % (feconf.EXPLORATION_URL_EMBED_PREFIX, self.EXP_ID),
+            params={
+                'v': exploration.version,
+                'collection_id': 'aZ9_______12'
             }, expected_status_int=404
         )
 
@@ -2607,3 +2654,776 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
         )
 
         self.logout()
+
+
+class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
+    """Tests for learner answer info handler tests."""
+
+    def test_submit_learner_answer_details_for_exploration_states(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        entity_type = feconf.ENTITY_TYPE_EXPLORATION
+
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    entity_type, exp_id),
+                {
+                    'state_name': 'abc',
+                    'interaction_id': 'TextInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token, expected_status_int=404)
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
+            exploration_dict = self.get_json(
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+            state_name = exploration_dict['exploration']['init_state_name']
+            interaction_id = exploration_dict['exploration'][
+                'states'][state_name]['interaction']['id']
+            state_reference = (
+                stats_services.get_state_reference_for_exploration(
+                    exp_id, state_name))
+
+            self.assertEqual(state_name, 'Sentence')
+            self.assertEqual(interaction_id, 'TextInput')
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    entity_type, exp_id),
+                {
+                    'state_name': state_name,
+                    'interaction_id': interaction_id,
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token)
+
+            learner_answer_details = stats_services.get_learner_answer_details(
+                entity_type, state_reference)
+            self.assertEqual(
+                learner_answer_details.state_reference, state_reference)
+            self.assertEqual(
+                learner_answer_details.interaction_id, interaction_id)
+            self.assertEqual(
+                len(learner_answer_details.learner_answer_info_list), 1)
+            self.assertEqual(
+                learner_answer_details.learner_answer_info_list[0].answer,
+                'This is an answer.')
+            self.assertEqual(
+                learner_answer_details.learner_answer_info_list[0]
+                .answer_details,
+                'This is an answer details.')
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    entity_type, exp_id),
+                {
+                    'state_name': state_name,
+                    'interaction_id': 'GraphInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token, expected_status_int=500)
+
+    def test_submit_learner_answer_details_for_question(self):
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        editor_id = self.get_user_id_from_email(
+            self.EDITOR_EMAIL)
+        question_id = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id, editor_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
+            state_reference = (
+                stats_services.get_state_reference_for_question(question_id))
+            self.assertEqual(state_reference, question_id)
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    feconf.ENTITY_TYPE_QUESTION, question_id),
+                {
+                    'interaction_id': 'TextInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token)
+            learner_answer_details = stats_services.get_learner_answer_details(
+                feconf.ENTITY_TYPE_QUESTION, state_reference)
+            self.assertEqual(
+                learner_answer_details.state_reference, state_reference)
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    feconf.ENTITY_TYPE_QUESTION, question_id),
+                {
+                    'interaction_id': 'TextInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token)
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    feconf.ENTITY_TYPE_QUESTION, question_id),
+                {
+                    'interaction_id': 'GraphInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token, expected_status_int=500)
+
+
+class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
+    """Tests for checkpoint reached event handler."""
+
+    def test_user_checkpoint_progress_is_updated_correctly(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        self.login(self.VIEWER_EMAIL)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        # Viewer opens exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name'])
+
+        # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/checkpoint_reached/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!'
+            },
+            csrf_token=csrf_token
+        )
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            viewer_id, exp_id)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'Welcome!')
+
+        # Update exploration.
+        # Now version of the exploration becomes 2.
+        change_list = _get_change_list(
+            'What language',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True
+        )
+        exp_services.update_exploration(
+            owner_id,
+            exp_id,
+            change_list,
+            'Made What language state a checkpoint'
+        )
+
+        # Viewer opens exploration again.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'Welcome!')
+
+        # Second checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/checkpoint_reached/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 2,
+                'most_recently_reached_checkpoint_state_name': 'What language'
+            },
+            csrf_token=csrf_token
+        )
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            viewer_id, exp_id)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 2)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            'What language')
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 2)
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'What language')
+
+        self.logout()
+
+
+class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
+    """Tests for exploration restart event handler."""
+
+    def test_user_checkpoint_progress_is_updated_correctly_on_restart(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        self.login(self.VIEWER_EMAIL)
+        viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        # Viewer opens exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name'])
+
+        # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/checkpoint_reached/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!'
+            },
+            csrf_token=csrf_token
+        )
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            viewer_id, exp_id)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'Welcome!')
+
+        # Exploration restarted.
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/restart/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_state_name': None
+            },
+            csrf_token=csrf_token
+        )
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_exp_version'], 1)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name'])
+
+        self.logout()
+
+
+class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
+    """Tests for save transient checkpoint progress handler."""
+
+    def test_logged_out_user_checkpoint_progress_is_saved_correctly(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Logged out user opens exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name'])
+
+        # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/explorehandler/checkpoint_reached_by_logged_out_user/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!'
+            },
+            csrf_token=csrf_token
+        )
+
+        unique_progress_url_id = response['unique_progress_url_id']
+
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'Welcome!')
+
+        # Update exploration.
+        # Now version of the exploration becomes 2.
+        change_list = _get_change_list(
+            'What language',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True
+        )
+        exp_services.update_exploration(
+            owner_id,
+            exp_id,
+            change_list,
+            'Made What language state a checkpoint'
+        )
+
+        # Second checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/checkpoint_reached_by_logged_out_user/%s' % exp_id,
+            {
+                'unique_progress_url_id': unique_progress_url_id,
+                'most_recently_reached_checkpoint_exp_version': 2,
+                'most_recently_reached_checkpoint_state_name': 'What language'
+            },
+            csrf_token=csrf_token
+        )
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 2)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            'What language')
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 2)
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'What language')
+
+
+class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
+    """Tests for transient checkpoint url handler."""
+
+    def test_exploration_page_raises_error_with_invalid_pid(self):
+        unique_progress_url_id = 'pid123'
+
+        self.get_html_response(
+            '/progress/%s' % (unique_progress_url_id),
+            expected_status_int=404
+        )
+
+    def test_logged_out_progress_is_displayed_correctly_when_exp_version_is_same(self): # pylint: disable=line-too-long
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Logged out user opens exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name'])
+
+        # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/explorehandler/checkpoint_reached_by_logged_out_user/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!'
+            },
+            csrf_token=csrf_token
+        )
+
+        unique_progress_url_id = response['unique_progress_url_id']
+
+        response = self.get_html_response(
+            '/progress/%s' % (unique_progress_url_id),
+            expected_status_int=302
+        )
+
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
+
+        self.assertTrue(
+            response.headers['Location'].endswith(
+                '%s/%s?pid=%s' % (
+            feconf.EXPLORATION_URL_PREFIX,
+            exp_user_data.exploration_id,
+            unique_progress_url_id)))
+
+        exploration_dict = self.get_json(
+            '%s/%s?pid=%s' % (
+                feconf.EXPLORATION_INIT_URL_PREFIX,
+                exp_user_data.exploration_id,
+                unique_progress_url_id
+                ))
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_exp_version'], 1)
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_state_name'],
+            'Welcome!')
+        self.assertEqual(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'], 1)
+        self.assertEqual(
+            exploration_dict['most_recently_reached_checkpoint_state_name'],
+            'Welcome!')
+
+    def test_logged_out_progress_is_displayed_correctly_when_exp_version_different(self): # pylint: disable=line-too-long
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Logged out user opens exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name'])
+
+        # Update exploration.
+        # Now version of the exploration becomes 2.
+        change_list = _get_change_list(
+            'What language',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True
+        )
+        exp_services.update_exploration(
+            owner_id,
+            exp_id,
+            change_list,
+            'Made What language state a checkpoint'
+        )
+
+        # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/explorehandler/checkpoint_reached_by_logged_out_user/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!'
+            },
+            csrf_token=csrf_token
+        )
+
+        unique_progress_url_id = response['unique_progress_url_id']
+
+        response = self.get_html_response(
+            '/progress/%s' % (unique_progress_url_id),
+            expected_status_int=302
+        )
+
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
+
+        self.assertTrue(
+            response.headers['Location'].endswith(
+                '%s/%s?pid=%s' % (
+            feconf.EXPLORATION_URL_PREFIX,
+            exp_user_data.exploration_id,
+            unique_progress_url_id)))
+
+        exploration_dict = self.get_json(
+            '%s/%s?pid=%s' % (
+                feconf.EXPLORATION_INIT_URL_PREFIX,
+                exp_user_data.exploration_id,
+                unique_progress_url_id
+                ))
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_exp_version'], 1)
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_state_name'],
+            'Welcome!')
+        self.assertEqual(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'], 1)
+        self.assertEqual(
+            exploration_dict['most_recently_reached_checkpoint_state_name'],
+            'Welcome!')
+
+
+class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
+    """Tests for sync logged out learner progress handler."""
+
+    def test_logged_in_checkpoint_progress_is_synced_correctly(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Use a dummy unique_progress_url_id.
+        pid = 'pidABC'
+
+        # Update progress for logged out user.
+        exp_services.update_logged_out_user_progress(
+            exp_id,
+            pid,
+            'Welcome!',
+            1
+        )
+
+        self.login(self.VIEWER_EMAIL)
+        viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        # Hit the handler for syncing logged out progress with
+        # logged in progress when the user signs-in.
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/sync_logged_out_and_logged_in_progress/%s' % exp_id, # pylint: disable=line-too-long
+            {
+                'unique_progress_url_id': pid,
+            },
+            csrf_token=csrf_token
+        )
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            viewer_id, exp_id)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'Welcome!')
+
+        self.logout()
+
+
+class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
+    """Tests for fetching the version history of a particular state of an
+    exploration.
+    """
+
+    EXP_ID = '0'
+
+    def setUp(self):
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'b'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'new_state_name': 'a'
+            })
+        ], 'A commit message.')
+
+    def test_raises_error_when_version_history_does_not_exist(self):
+        self.login(self.OWNER_EMAIL)
+        # Deleting the version history model produced by exp_services.
+        vh_model = exp_models.ExplorationVersionHistoryModel.get(
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                self.EXP_ID, 2
+            )
+        )
+        vh_model.delete()
+
+        self.get_json(
+            '%s/%s/%s/%s' % (
+                feconf.STATE_VERSION_HISTORY_URL_PREFIX,
+                self.EXP_ID, 'a', 2
+            ), expected_status_int=404
+        )
+
+        self.logout()
+
+    def test_version_history_for_a_state_is_fetched_correctly(self):
+        self.login(self.OWNER_EMAIL)
+        exploration_v1 = exp_fetchers.get_exploration_by_id(
+            self.EXP_ID, version=1
+        )
+        response_for_state_a = self.get_json(
+            '%s/%s/%s/%s' % (
+                feconf.STATE_VERSION_HISTORY_URL_PREFIX,
+                self.EXP_ID, 'a', 2
+            )
+        )
+        response_for_state_b = self.get_json(
+            '%s/%s/%s/%s' % (
+                feconf.STATE_VERSION_HISTORY_URL_PREFIX,
+                self.EXP_ID, 'b', 2
+            )
+        )
+
+        self.assertEqual(
+            response_for_state_a, {
+                'last_edited_version_number': 1,
+                'state_name_in_previous_version': (
+                    feconf.DEFAULT_INIT_STATE_NAME
+                ),
+                'state_dict_in_previous_version': exploration_v1.states[
+                    feconf.DEFAULT_INIT_STATE_NAME
+                ].to_dict(),
+                'last_edited_committer_username': self.OWNER_USERNAME
+            }
+        )
+        self.assertEqual(
+            response_for_state_b, {
+                'last_edited_version_number': None,
+                'state_name_in_previous_version': None,
+                'state_dict_in_previous_version': None,
+                'last_edited_committer_username': self.OWNER_USERNAME
+            }
+        )
+
+        self.logout()
+
+
+class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
+    """Tests for fetching the version history of the exploration metadata."""
+
+    EXP_ID = '0'
+
+    def setUp(self):
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title'
+            })
+        ], 'A commit message.')
+
+    def test_raises_error_when_version_history_does_not_exist(self):
+        self.login(self.OWNER_EMAIL)
+        # Deleting the version history model produced by exp_services.
+        vh_model = exp_models.ExplorationVersionHistoryModel.get(
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                self.EXP_ID, 2
+            )
+        )
+        vh_model.delete()
+
+        self.get_json(
+            '%s/%s/%s' % (
+                feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 2
+            ), expected_status_int=404)
+
+        self.logout()
+
+    def test_version_history_for_exploration_metadata_is_fetched_correctly(
+        self
+    ):
+        self.login(self.OWNER_EMAIL)
+        exploration_v1 = exp_fetchers.get_exploration_by_id(
+            self.EXP_ID, version=1
+        )
+        response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 2
+            )
+        )
+
+        self.assertEqual(
+            response, {
+                'last_edited_version_number': 1,
+                'last_edited_committer_username': self.OWNER_USERNAME,
+                'metadata_dict_in_previous_version': (
+                    exploration_v1.get_metadata().to_dict()
+                )
+            }
+        )
+
+        self.logout()
+
+
+class CheckpointsFeatureStatusHandlerTests(test_utils.GenericTestBase):
+    """Unit test for CheckpointsFeatureStatusHandler."""
+
+    def test_get_request_returns_correct_status(self):
+        self.set_config_property(
+            config_domain.CHECKPOINTS_FEATURE_IS_ENABLED, False)
+
+        response = self.get_json('/checkpoints_feature_status_handler')
+        self.assertEqual(
+            response, {
+                'checkpoints_feature_is_enabled': False
+            })
+
+        self.set_config_property(
+            config_domain.CHECKPOINTS_FEATURE_IS_ENABLED, True)
+        response = self.get_json('/checkpoints_feature_status_handler')
+        self.assertEqual(
+            response, {
+                'checkpoints_feature_is_enabled': True,
+            })

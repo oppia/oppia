@@ -1,0 +1,58 @@
+<div *ngIf="!misconceptionEditorIsOpen && misconceptionName && !outcome.labelledAsCorrect"
+     title="{{ isEditable ? 'Edit Misconception' : '' }}"
+     class="oppia-misconception-editor-container">
+  <div class="oppia-readonly-rule-tile e2e-test-edit-misconception-button"
+       [ngClass]="{'oppia-editable-section': isEditable}">
+    <div class="oppia-transition-200">
+      <div class="oppia-click-to-start-editing e2e-test-open-misconception-editor"
+           *ngIf="isEditable" (click)="editMisconception()">
+        <i *ngIf="isEditable" class="fas fa-pen oppia-editor-edit-icon float-right"
+           title="Edit Misconception">
+        </i>
+      </div>
+      <strong>Tagged Misconception:</strong>
+      <div class="oppia-tagged-misconception-title">
+        {{ misconceptionName }}
+      </div>
+    </div>
+    <div class="oppia-rule-preview-section-mask"></div>
+  </div>
+</div>
+<div class="clearfix" *ngIf="misconceptionEditorIsOpen">
+  <oppia-question-misconception-selector (updateMisconceptionValues)="updateValues($event)"
+                                         [misconceptionFeedbackIsUsed]="feedbackIsUsed"
+                                         [selectedMisconception]="selectedMisconception"
+                                         [selectedMisconceptionSkillId]="selectedMisconceptionSkillId"
+                                         [taggedSkillMisconceptionId]="taggedSkillMisconceptionId">
+  </oppia-question-misconception-selector>
+  <button class="btn btn-success float-right" [disabled]="selectedMisconception === null" (click)="updateMisconception()">Save Misconception</button>
+</div>
+<button type="button"
+        *ngIf="!misconceptionName && isEditable && rules && !outcome.labelledAsCorrect && containsMisconceptions()"
+        class="btn btn-primary btn-lg oppia-add-rule-button e2e-test-add-answer"
+        (click)="tagAnswerGroupWithMisconception()">
+  Tag with misconception
+</button>
+<style>
+  .oppia-add-rule-button {
+    background-color: #058ca6;
+    border: 0;
+    border-radius: 0;
+    margin-top: 10px;
+    padding-top: 5px;
+    width: 100%;
+  }
+  .oppia-add-rule-button:active,
+  .oppia-add-rule-button:focus,
+  .oppia-add-rule-button:hover {
+    background-color: rgba(5,140,166,1);
+  }
+  .oppia-tagged-misconception-title {
+    margin-top: 10px;
+  }
+
+  .oppia-misconception-editor-container {
+    height: 100%;
+    max-width: 95%;
+  }
+</style>

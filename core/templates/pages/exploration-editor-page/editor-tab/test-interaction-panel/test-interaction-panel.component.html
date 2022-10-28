@@ -1,0 +1,46 @@
+<div class="form-inline test-interaction-modal">
+  <div *ngIf="interactionIsInline">
+    <div class="preview-conversation-skin-inline-interaction">
+      <table class="preview-conversation-skin-card-row-container">
+        <tr class="preview-conversation-skin-card-row">
+          <td class="preview-conversation-skin-row-avatar" valign="top">
+            <img class="preview-conversation-skin-row-avatar-img rounded-circle" [src]="userBlueImgUrl" >
+          </td>
+          <td class="preview-conversation-skin-learner-input">
+            <oppia-interaction-display [htmlData]="inputTemplate"></oppia-interaction-display>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="preview-conversation-skin-supplemental-interaction" *ngIf="!interactionIsInline">
+    <div>
+      <mat-card class="preview-conversation-skin-supplemental-card">
+        <div>
+          <oppia-interaction-display [htmlData]="inputTemplate">
+          </oppia-interaction-display>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+  <br>
+  <div class="submit-answer-btn">
+    <button mat-button
+            class="oppia-learner-confirm-button oppia-learner-submit-answer-button e2e-test-submit-answer-button"
+            [disabled]="isSubmitButtonDisabled()"
+            (click)="onSubmitAnswerFromButton()"
+            translate="I18N_INTERACTIONS_SUBMIT">
+    </button>
+  </div>
+</div>
+
+<style>
+  .test-interaction-modal .submit-answer-btn {
+    margin-bottom: 20px;
+    text-align: right;
+  }
+
+  .test-interaction-modal table {
+    margin-bottom: 0;
+  }
+</style>

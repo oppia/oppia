@@ -1,0 +1,83 @@
+<div class="form-inline oppia-form-inline e2e-test-dest-bubble">
+  <div class="oppia-rule-details-header">
+    <strong *ngIf="outcomeHasFeedback">And afterwards, directs the learner to...</strong>
+    <strong *ngIf="!outcomeHasFeedback">Oppia directs the learner to...</strong>
+  </div>
+  <div class="form-group oppia-form-group">
+    <span>
+      <select class="form-control oppia-form-control e2e-test-destination-selector-dropdown"
+              [(ngModel)]="outcome.dest"
+              (ngModelChange)="onDestSelectorChange()">
+        <option class="e2e-test-afterward-dest-selector" *ngFor="let choice of destinationChoices" [value]="choice.id">{{ choice.text }}</option>
+      </select>
+    </span>
+  </div>
+  <form #newStateNameForm="ngForm" class="e2e-test-dest-form">
+    <span *ngIf="isCreatingNewState()">
+      <input class="form-control e2e-test-add-state-input"
+             type="text"
+             name="newStateNameInput"
+             [ngModel]="outcomeNewStateName"
+             (ngModelChange)="updateChanges($event)"
+             [oppiaFocusOn]="newStateNameInputField"
+             [attr.maxlength]="maxLen"
+             [pattern]="newStateNamePattern"
+             tabindex="0"
+             [attr.aria-invalid]="false" required>
+    </span>
+  </form>
+  <p [hidden]="newStateNameForm.form.valid ||  outcomeNewStateName === undefined" class="form-text oppia-form-error oppia-form-error-text">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
+
+  <div *ngIf="isSelfLoop() && canEditRefresherExplorationId && !!outcome.refresherExplorationId" class="oppia-id-text">
+    <b>Refresher exploration ID (optional):</b>
+    <input type="text"
+           class="form-control e2e-test-add-refresher-exploration-id"
+           [(ngModel)]="outcome.refresherExplorationId"
+           [pattern]="explorationAndSkillIdPattern"
+           tabindex="0"
+           [attr.aria-invalid]="false">
+    <div class="refresher-error-message">
+      Refresher exploration id should be removed.
+    </div>
+  </div>
+  <div class="oppia-id-text" *ngIf="canAddPrerequisiteSkill">
+    <b>Prerequisite skill ID (optional):&nbsp;</b>
+    <input class="form-control"
+           type="text"
+           [(ngModel)]="outcome.missingPrerequisiteSkillId"
+           tabindex="0"
+           [attr.aria-invalid]="false"
+           [ngModelOptions]="{allowInvalid: true}">
+    <p class="oppia-prerequisite-explanation-text">
+      <i> Mention the skill that this state requires so that a learner who is stuck in the state can quickly learn the
+          required material and continue with the exploration.
+      </i>
+    </p>
+  </div>
+</div>
+
+<style>
+  .oppia-form-inline {
+    margin-bottom: 10px;
+  }
+  .oppia-form-group {
+    font-size: 1.1em;
+  }
+  .form-control.oppia-form-control {
+    width: 200px;
+  }
+  .oppia-form-error-text {
+    font-size: 0.85em;
+  }
+  .oppia-id-text {
+    margin-top: 12px;
+  }
+  .oppia-prerequisite-explanation-text {
+    font-size: 0.8em;
+  }
+  .refresher-error-message {
+    color: #f00;
+    display: block;
+    font-size: 0.8em;
+  }
+</style>

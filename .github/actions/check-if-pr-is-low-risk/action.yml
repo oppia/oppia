@@ -1,0 +1,14 @@
+name: 'Check if PR is low-risk'
+description: 'This action checks whether a PR is low-risk, which means we can skip some CI checks.'
+outputs:
+  is-low-risk:
+    description: '0 if PR is low risk, 1 otherwise.'
+    value: ${{ steps.check-risk.outputs.is-low-risk }}
+runs:
+  using: 'composite'
+  steps:
+    - id: check-risk
+      run: |
+        python -m scripts.check_if_pr_is_low_risk ${{ github.event.pull_request.html_url }} && true
+        echo "::set-output name=is-low-risk::$?"
+      shell: bash

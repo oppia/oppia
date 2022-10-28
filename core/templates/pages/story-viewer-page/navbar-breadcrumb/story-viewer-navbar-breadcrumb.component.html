@@ -1,0 +1,64 @@
+<div dir="auto" *ngIf="storyTitle && !isLanguageRTL()" class="nav navbar-nav oppia-navbar-breadcrumb oppia-story-viewer-nav-breadcrumb">
+  <div class="oppia-story-viewer-nav-separator"></div>
+  <div class="oppia-story-viewer-nav-labels-container">
+    <p class="oppia-story-navbar-title">
+      <span *ngIf="!isHackyStoryTitleTranslationDisplayed()">{{ storyTitle }}</span>
+      <span *ngIf="isHackyStoryTitleTranslationDisplayed()">{{ storyTitleTranslationKey | translate }}</span>
+    </p>
+    <a class="oppia-story-navbar-topic" [href]="getTopicUrl()">
+      <span *ngIf="!isHackyTopicNameTranslationDisplayed()">{{ topicName }}</span>
+      <span *ngIf="isHackyTopicNameTranslationDisplayed()">{{ topicNameTranslationKey | translate }}</span>
+    </a>
+  </div>
+</div>
+
+<div dir="auto" *ngIf="storyTitle && isLanguageRTL()" class="nav navbar-nav oppia-navbar-breadcrumb oppia-story-viewer-nav-breadcrumb">
+  <div class="oppia-story-viewer-nav-labels-container">
+    <p class="oppia-story-navbar-title">
+      <span *ngIf="!isHackyStoryTitleTranslationDisplayed()">{{ storyTitle }}</span>
+      <span *ngIf="isHackyStoryTitleTranslationDisplayed()">{{ storyTitleTranslationKey | translate }}</span>
+    </p>
+    <a class="oppia-story-navbar-topic" [href]="getTopicUrl()">
+      <span *ngIf="!isHackyTopicNameTranslationDisplayed()">{{ topicName }}</span>
+      <span *ngIf="isHackyTopicNameTranslationDisplayed()">{{ topicNameTranslationKey | translate }}</span>
+    </a>
+  </div>
+  <div class="oppia-story-viewer-nav-separator"></div>
+</div>
+
+<style>
+  .oppia-story-viewer-nav-breadcrumb {
+    align-items: center;
+    height: 56px;
+    padding-top: 0;
+  }
+
+  .oppia-story-navbar-title {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    margin: 0;
+  }
+
+  .oppia-story-navbar-topic {
+    color: #fff;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 12px;
+  }
+
+  .oppia-story-navbar-topic:hover {
+    color: #fff;
+  }
+
+  .oppia-story-viewer-nav-separator {
+    background-color: white;
+    height: 80%;
+    margin-left: 12px;
+    margin-right: 12px;
+    width: 1px;
+  }
+
+  .oppia-story-viewer-nav-labels-container {
+    display: flex;
+    flex-direction: column;
+  }
+</style>

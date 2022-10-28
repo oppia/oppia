@@ -1,0 +1,71 @@
+<div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-10">
+        <mat-card class="oppia-page-card oppia-long-text">
+          <form class="form-horizontal" (submit)="submitQueryAsync()" name="form.schemaForm">
+            <legend>Email Dashboard</legend>
+            <div *ngFor="let customizationArgSpec of customizationArgSpecs">
+              <div class="d-xl-inline-flex form-group">
+                <label class="col-3 col-form-label" for="label-target-role-method">
+                  {{ customizationArgSpec.description }}:
+                </label>
+                <div class="col-2">
+                  <schema-based-editor [localValue]="data[customizationArgSpec.backend_attr]"
+                                       (localValueChange)="updateQueryData($event, customizationArgSpec.backend_attr)"
+                                       [schema]="customizationArgSpec.schema"
+                                       [notRequired]="isRequired"
+                                       class="e2e-test-email-dashboard-input-{{ idx }}">
+                  </schema-based-editor>
+                </div>
+              </div>
+            </div>
+            <input type="submit"
+                   value="submit query"
+                   [disabled]="areAllInputsEmpty()"
+                   class="e2e-test-submit-query-button">
+            <input type="reset" value="reset" (click)="resetForm()">
+          </form>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+  <p class="success" *ngIf="showSuccessMessage">
+    Query has been submitted successfully. Check recent queries below.
+  </p>
+  <div class="oppia-recent-queries">
+    <p>Recent queries:</p>
+    <table class="table" *ngIf="currentPageOfQueries?.length > 0">
+      <thead>
+        <tr>
+          <td>Query id</td>
+          <td>Submitted on</td>
+          <td>Submitted by</td>
+          <td>Status</td>
+          <td>No. of qualified users</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let q of currentPageOfQueries; index as idx">
+          <td>{{ q.id }}</td>
+          <td>{{ q.createdOn }}</td>
+          <td>{{ q.submitterUsername }}</td>
+          <td class="e2e-test-status-{{ idx }}">{{ q.status }}</td>
+          <td class="e2e-test-number-of-users-{{ idx }}">{{ q.numQualifiedUsers }}</td>
+          <td>
+            <button (click)="recheckStatus(idx)" class="e2e-test-check-status-button-{{ idx }}">
+              Re-check status
+            </button>
+          </td>
+          <td *ngIf="showLinkToResultPage(q.submitterUsername, q.status)">
+            <a [href]="'/emaildashboardresult/' + q.id">
+              <button class="btn btn-link">Result</button>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <button *ngIf="showPreviousButton()" (click)="getPreviousPageOfQueries()">Previous</button>
+    <button *ngIf="showNextButton()"(click)="getNextPageOfQueries()">Next</button>
+  </div>
+</div>

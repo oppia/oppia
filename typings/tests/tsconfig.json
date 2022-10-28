@@ -1,0 +1,38 @@
+// This additional tsconfig is required by dtslint. It is used to configure
+// tslint, which is used to compile the tests.
+// See: https://github.com/Microsoft/dtslint#typestsconfigjson
+{
+  "compilerOptions": {
+    "lib": ["es2017", "dom", "webworker"],
+    "target": "es6",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": false,
+    "strictFunctionTypes": true,
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "paths": {
+      "app.constants": ["../../core/templates/app.constants"],
+      "app-type.constants": ["../../core/templates/app-type.constants"],
+      "components/*": ["../../core/templates/components/*"],
+      "directives/*": ["../../core/templates/directives/*"],
+      "domain/*": ["../../core/templates/domain/*"],
+      "expressions/*": ["../../core/templates/expressions/*"],
+      "app-events/*": ["../../core/templates/app-events/*"],
+      "pages/*": ["../../core/templates/pages/*"],
+      "services/*": ["../../core/templates/services/*"],
+      "classifiers/*": ["../../extensions/classifiers/*"],
+      "interactions/*": ["../../extensions/interactions/*"],
+      "rich_text_components/*": ["../../extensions/rich_text_components/*"],
+      "objects/*": ["../../extensions/objects/*"],
+      "filters/*": ["../../core/templates/filters/*"],
+      "static/*": ["../../third_party/static/*"],
+      "tests/*": ["../../core/templates/tests/*"],
+      "utility/*": ["../../core/templates/utility/*"]
+    }
+  },
+  "include": ["../."]
+}

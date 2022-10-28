@@ -1,0 +1,109 @@
+<ng-template #EditorTabTourSaveDraft>
+  <h3 class="e2e-test-joyride-title">Save</h3>
+  <p>When you're done making changes, be sure to save your work.</p>
+</ng-template>
+
+<ul class="nav navbar-nav oppia-navbar-nav float-right">
+  <!-- Start of html for large screens. -->
+  <li class="nav-item d-none d-sm-block" *ngIf="explorationCanBePublished">
+    <div class="btn-group oppia-publish-button-container"
+         ngbTooltip="{{ getPublishExplorationButtonTooltip() }}"
+         placement="bottom"
+         [ngClass]="{'disable-publish-button': !connectedToInternet || isExplorationLockedForEditing() || countWarnings()}">
+      <button type="button" class="btn btn-light oppia-editor-publish-button e2e-test-publish-exploration"
+              [ngClass]="{'btn-success': connectedToInternet && !isExplorationLockedForEditing() && !countWarnings()}"
+              (click)="showPublishExplorationModal()"
+              [disabled]="!connectedToInternet || isExplorationLockedForEditing() || countWarnings()">
+        <span *ngIf="!publishIsInProcess">
+          <i class="fas fa-cloud-upload-alt oppia-save-publish-button-icon"
+             alt="Publish to Oppia Library">
+          </i>
+          <span class="oppia-save-publish-button-label">Publish</span>
+        </span>
+        <span *ngIf="publishIsInProcess">
+          <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
+             alt="Publish to Oppia Library">
+            <loading-dots [hidden]="!loadingDotsAreShown"></loading-dots>
+          </i>
+          <span class="oppia-save-publish-button-label">
+            Publishing
+            <loading-dots [hidden]="!loadingDotsAreShown"></loading-dots>
+          </span>
+        </span>
+      </button>
+    </div>
+  </li>
+
+  <li class="nav-item d-none d-sm-block" *ngIf="isEditableOutsideTutorialMode()">
+    <div class="btn-group oppia-publish-button-container"
+         title="{{ getSaveButtonTooltip() }}" [ngClass]="{'disable-save-button': !connectedToInternet || !isExplorationSaveable() || isLockedByAdmin()}">
+      <button id="tutorialSaveButton"
+              class="btn btn-light oppia-save-draft-button e2e-test-save-changes"
+              [ngClass]="{'btn-success': connectedToInternet && isExplorationSaveable() && !isLockedByAdmin()}"
+              (click)="saveChanges()" [disabled]="!connectedToInternet || !isExplorationSaveable() || isLockedByAdmin()">
+        <span *ngIf="!saveIsInProcess">
+          <span class="oppia-draft-label-container" *ngIf="isPrivate()">
+            <i class="fas fa-save oppia-save-publish-button-icon"
+               alt="Save Draft">
+            </i>
+            <span class="oppia-save-draft-button-label oppia-save-publish-button-label e2e-test-save-draft-message" joyrideStep="editorTabTourSaveDraft" [stepContent]="EditorTabTourSaveDraft">Save Draft</span>
+            <span class="d-none d-md-block oppia-num-changes-text" *ngIf="getChangeListLength()">({{ getChangeListLength() }})</span>
+          </span>
+          <span class="oppia-publish-label-container" *ngIf="!isPrivate()" title="Publish Changes">
+            <i class="fas fa-cloud-upload-alt md-18 oppia-save-publish-button-icon"
+               alt="Publish Changes">
+            </i>
+            <span class="oppia-save-publish-button-label e2e-test-publish-changes-message">Publish Changes</span>
+            <span class="d-none d-md-block oppia-num-changes-count-text" *ngIf="getChangeListLength()">({{ getChangeListLength() }})</span>
+          </span>
+        </span>
+        <span *ngIf="saveIsInProcess">
+          <span *ngIf="isPrivate()" class="oppia-save-publish-button-label">
+            Saving
+          </span>
+          <span *ngIf="!isPrivate()" class="oppia-save-publish-button-label">
+            Publishing
+          </span>
+          <loading-dots [hidden]="!loadingDotsAreShown"></loading-dots>
+        </span>
+      </button>
+
+      <button [matMenuTriggerFor]="discardButton" type="button" class="btn btn-light oppia-discard-button e2e-test-save-discard-toggle dropdown-toggle"
+              [disabled]="!connectedToInternet || !getChangeListLength()" aria-label="Discard Draft">
+      </button>
+
+      <mat-menu #discardButton="matMenu" [ngStyle]="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
+        <button mat-menu-item title="Discard all pending changes"><a (click)="discardChanges()" [ngClass]="{'oppia-disabled-link': !connectedToInternet || !getChangeListLength()}" class="dropdown-item nav-item e2e-test-discard-changes">Discard Draft</a></button>
+      </mat-menu>
+    </div>
+  </li>
+  <!-- End of html for large screens. -->
+</ul>
+
+<style>
+  .disable-publish-button {
+    cursor: default;
+  }
+  .disable-save-button {
+    cursor: default;
+  }
+  .oppia-draft-label-container,
+  .oppia-publish-label-container {
+    display: flex;
+    flex-direction: row;
+  }
+  .oppia-publish-button-container {
+    margin-right: 10px;
+    margin-top: 8px;
+  }
+  .oppia-num-changes-text {
+    margin-left: 2px;
+    opacity: 0.5;
+  }
+  .oppia-num-changes-count-text {
+    opacity: 0.5;
+  }
+  .oppia-discard-button {
+    height: 34px;
+  }
+</style>

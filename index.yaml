@@ -10,15 +10,40 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: AppFeedbackReportModel
+  properties:
+  - name: scrubbed_by
+  - name: created_on
+
+- kind: BlogPostRightsModel
+  properties:
+  - name: blog_post_is_published
+  - name: editor_ids
+  - name: last_updated
+    direction: desc
+
 - kind: ClassifierTrainingJobModel
   properties:
   - name: status
   - name: next_scheduled_check_time
 
-- kind: DeleteExpCopiesRealtimeModel
+- kind: CollectionRightsSnapshotMetadataModel
   properties:
-  - name: realtime_layer
-  - name: created_on
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: CollectionSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: ConfigPropertySnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
 
 - kind: ExpCopiesRealtimeModel
   properties:
@@ -78,6 +103,16 @@ indexes:
   - name: last_updated
     direction: desc
 
+- kind: ExplorationOpportunitySummaryModel
+  properties:
+  - name: incomplete_translation_language_codes
+  - name: topic_name
+
+- kind: ExplorationOpportunitySummaryModel
+  properties:
+  - name: language_codes_needing_voice_artists
+  - name: created_on
+
 - kind: ExplorationRecommendationsRealtimeModel
   properties:
   - name: realtime_layer
@@ -87,6 +122,18 @@ indexes:
   properties:
   - name: deleted
   - name: status
+
+- kind: ExplorationRightsSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: ExplorationSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
 
 - kind: FeedbackAnalyticsRealtimeModel
   properties:
@@ -136,6 +183,30 @@ indexes:
 
 - kind: GeneralSuggestionModel
   properties:
+  - name: author_id
+  - name: deleted
+  - name: suggestion_type
+  - name: created_on
+    direction: desc
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: suggestion_type
+  - name: author_id
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: suggestion_type
+  - name: last_updated
+
+- kind: GeneralSuggestionModel
+  properties:
   - name: deleted
   - name: score_category
   - name: status
@@ -147,6 +218,25 @@ indexes:
   - name: status
   - name: last_updated
 
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: status
+  - name: suggestion_type
+  - name: author_id
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: status
+  - name: suggestion_type
+  - name: last_updated
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: target_id
+  - name: author_id
+
 - kind: InteractionAnswerSummariesRealtimeModel
   properties:
   - name: realtime_layer
@@ -154,9 +244,20 @@ indexes:
 
 - kind: JobModel
   properties:
+  - name: status
+  - name: next_scheduled_check_time
+
+- kind: JobModel
+  properties:
   - name: status_code
   - name: time_queued_msec
     direction: desc
+
+- kind: PlatformParameterSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
 
 - kind: QuestionSkillLinkModel
   properties:
@@ -173,6 +274,28 @@ indexes:
   - name: skill_id
   - name: last_updated
     direction: desc
+
+- kind: QuestionSkillLinkModel
+  properties:
+  - name: skill_id
+  - name: question_id
+
+- kind: QuestionSkillLinkModel
+  properties:
+  - name: skill_id
+  - name: skill_difficulty
+
+- kind: QuestionSkillLinkModel
+  properties:
+  - name: skill_id
+  - name: skill_difficulty
+    direction: desc
+
+- kind: QuestionSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
 
 - kind: RecentUpdatesRealtimeModel
   properties:
@@ -189,18 +312,58 @@ indexes:
   - name: email_hash
   - name: sent_datetime
 
+- kind: SkillOpportunityModel
+  properties:
+  - name: deleted
+  - name: created_on
+
+- kind: SkillSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
 - kind: StatisticsRealtimeModel
   properties:
   - name: realtime_layer
   - name: created_on
 
-- kind: UserContributionScoringModel
+- kind: StorySnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: SubtopicPageSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: TaskEntryModel
+  properties:
+  - name: composite_entity_id
+  - name: status
+
+- kind: TopicRightsSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: TopicSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type
+
+- kind: UserContributionProficiencyModel
   properties:
   - name: deleted
   - name: user_id
   - name: score
 
-- kind: UserImpactRealtimeModel
+- kind: UserContributionProficiencyModel
   properties:
   - name: realtime_layer
   - name: created_on
@@ -214,4 +377,10 @@ indexes:
   properties:
   - name: is_root_pipeline
   - name: start_time
+    direction: desc
+
+- kind: BlogPostRightsModel
+  properties:
+  - name: blog_post_is_published
+  - name: last_updated
     direction: desc

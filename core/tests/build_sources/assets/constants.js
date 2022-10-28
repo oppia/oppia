@@ -8,9 +8,6 @@
  *    functions.
  */
 var constants = {
-  // Whether to allow custom event reporting to Google Analytics.
-  "CAN_SEND_ANALYTICS_EVENTS": false,
-
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
     "Combinatorics", "Computing", "Economics", "Education", "Engineering",
@@ -97,7 +94,7 @@ var constants = {
   // List of supported language codes. Each description has a
   // parenthetical part that may be stripped out to give a shorter
   // description.
-  "ALL_LANGUAGE_CODES": [{
+  "SUPPORTED_CONTENT_LANGUAGES": [{
     "code": "en",
     "description": "English"
   }, {
@@ -261,175 +258,175 @@ var constants = {
   "SUPPORTED_AUDIO_LANGUAGES": [{
     "id": "en",
     "description": "English",
-    "related_languages": ["en"]
+    "relatedLanguages": ["en"]
   }, {
     "id": "ar",
     "description": "Arabic",
-    "related_languages": ["ar"]
+    "relatedLanguages": ["ar"]
   }, {
     "id": "bg",
     "description": "Bulgarian",
-    "related_languages": ["bg"]
+    "relatedLanguages": ["bg"]
   }, {
     "id": "bn",
     "description": "Bangla",
-    "related_languages": ["bn"]
+    "relatedLanguages": ["bn"]
   }, {
     "id": "ca",
     "description": "Catalan",
-    "related_languages": ["ca"]
+    "relatedLanguages": ["ca"]
   }, {
     "id": "zh",
     "description": "Chinese",
-    "related_languages": ["zh"]
+    "relatedLanguages": ["zh"]
   }, {
     "id": "hr",
     "description": "Croatian",
-    "related_languages": ["hr"]
+    "relatedLanguages": ["hr"]
   }, {
     "id": "cs",
     "description": "Czech",
-    "related_languages": ["cs"]
+    "relatedLanguages": ["cs"]
   }, {
     "id": "da",
     "description": "Danish",
-    "related_languages": ["da"]
+    "relatedLanguages": ["da"]
   }, {
     "id": "nl",
     "description": "Dutch",
-    "related_languages": ["nl"]
+    "relatedLanguages": ["nl"]
   }, {
     "id": "tl",
     "description": "Filipino",
-    "related_languages": ["tl"]
+    "relatedLanguages": ["tl"]
   }, {
     "id": "fi",
     "description": "Finnish",
-    "related_languages": ["fi"]
+    "relatedLanguages": ["fi"]
   }, {
     "id": "fr",
     "description": "French",
-    "related_languages": ["fr"]
+    "relatedLanguages": ["fr"]
   }, {
     "id": "de",
     "description": "German",
-    "related_languages": ["de"]
+    "relatedLanguages": ["de"]
   }, {
     "id": "el",
     "description": "Greek",
-    "related_languages": ["el"]
+    "relatedLanguages": ["el"]
   }, {
     "id": "he",
     "description": "Hebrew",
-    "related_languages": ["he"]
+    "relatedLanguages": ["he"]
   }, {
     "id": "hi",
     "description": "Hindi",
-    "related_languages": ["hi"]
+    "relatedLanguages": ["hi"]
   }, {
     "id": "hi-en",
     "description": "Hinglish",
-    "related_languages": ["hi", "en"]
+    "relatedLanguages": ["hi", "en"]
   }, {
     "id": "hu",
     "description": "Hungarian",
-    "related_languages": ["hu"]
+    "relatedLanguages": ["hu"]
   }, {
     "id": "id",
     "description": "Indonesian",
-    "related_languages": ["id"]
+    "relatedLanguages": ["id"]
   }, {
     "id": "it",
     "description": "Italian",
-    "related_languages": ["it"]
+    "relatedLanguages": ["it"]
   }, {
     "id": "ja",
     "description": "Japanese",
-    "related_languages": ["ja"]
+    "relatedLanguages": ["ja"]
   }, {
     "id": "kab",
     "description": "Kabyle",
-    "related_languages": ["kab"]
+    "relatedLanguages": ["kab"]
   }, {
     "id": "ko",
     "description": "Korean",
-    "related_languages": ["ko"]
+    "relatedLanguages": ["ko"]
   }, {
     "id": "lv",
     "description": "Latvian",
-    "related_languages": ["lv"]
+    "relatedLanguages": ["lv"]
   }, {
     "id": "lt",
     "description": "Lithuanian",
-    "related_languages": ["lt"]
+    "relatedLanguages": ["lt"]
   }, {
     "id": "no",
     "description": "Norwegian",
-    "related_languages": ["no"]
+    "relatedLanguages": ["no"]
   }, {
     "id": "fa",
     "description": "Persian",
-    "related_languages": ["fa"]
+    "relatedLanguages": ["fa"]
   }, {
     "id": "pl",
     "description": "Polish",
-    "related_languages": ["pl"]
+    "relatedLanguages": ["pl"]
   }, {
     "id": "pt",
     "description": "Portuguese",
-    "related_languages": ["pt"]
+    "relatedLanguages": ["pt"]
   }, {
     "id": "ro",
     "description": "Romanian",
-    "related_languages": ["ro"]
+    "relatedLanguages": ["ro"]
   }, {
     "id": "ru",
     "description": "Russian",
-    "related_languages": ["ru"]
+    "relatedLanguages": ["ru"]
   }, {
     "id": "sr",
     "description": "Serbian",
-    "related_languages": ["sr"]
+    "relatedLanguages": ["sr"]
   }, {
     "id": "sk",
     "description": "Slovak",
-    "related_languages": ["sk"]
+    "relatedLanguages": ["sk"]
   }, {
     "id": "sl",
     "description": "Slovenian",
-    "related_languages": ["sl"]
+    "relatedLanguages": ["sl"]
   }, {
     "id": "es",
     "description": "Spanish",
-    "related_languages": ["es"]
+    "relatedLanguages": ["es"]
   }, {
     "id": "sv",
     "description": "Swedish",
-    "related_languages": ["sw"]
+    "relatedLanguages": ["sw"]
   }, {
     "id": "th",
     "description": "Thai",
-    "related_languages": ["th"]
+    "relatedLanguages": ["th"]
   }, {
     "id": "tr",
     "description": "Turkish",
-    "related_languages": ["tr"]
+    "relatedLanguages": ["tr"]
   }, {
     "id": "uk",
     "description": "Ukrainian",
-    "related_languages": ["uk"]
+    "relatedLanguages": ["uk"]
   }, {
     "id": "vi",
     "description": "Vietnamese",
-    "related_languages": ["vi"]
+    "relatedLanguages": ["vi"]
   }],
 
   "AUTOGENERATED_AUDIO_LANGUAGES": [{
     "id": "en-auto",
     "description": "English (auto)",
-    "exploration_language": "en",
-    "speech_synthesis_code": "en-GB",
-    "speech_synthesis_code_mobile": "en_US"
+    "explorationLanguage": "en",
+    "speechSynthesisCode": "en-GB",
+    "speechSynthesisCodeMobile": "en_US"
   }],
 
   // Types of view in creator dashboard page.
@@ -454,13 +451,14 @@ var constants = {
   // These categories and interactions are displayed in the order in which they
   // appear in the interaction selector.
   "ALLOWED_INTERACTION_CATEGORIES": [{
-    "name": "General",
+    "name": "Commonly Used",
     "interaction_ids": [
         "Continue",
         "EndExploration",
         "ImageClickInput",
         "ItemSelectionInput",
         "MultipleChoiceInput",
+        "NumericInput",
         "TextInput",
         "DragAndDropSortInput"
     ]
@@ -469,11 +467,13 @@ var constants = {
     "interaction_ids": [
         "FractionInput",
         "GraphInput",
-        "LogicProof",
         "NumericInput",
         "SetInput",
-        "MathExpressionInput",
-        "NumberWithUnits"
+        "NumericExpressionInput",
+        "AlgebraicExpressionInput",
+        "MathEquationInput",
+        "NumberWithUnits",
+        "RatioExpressionInput"
     ]
   }, {
     "name": "Programming",
@@ -520,8 +520,6 @@ var constants = {
 
   "ENABLE_PREREQUISITE_SKILLS": false,
 
-  "ENABLE_NEW_STRUCTURE_PLAYERS": false,
-
   "MAX_SKILLS_PER_QUESTION": 3,
 
   "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
@@ -563,6 +561,8 @@ var constants = {
             "content": {},
             "default_outcome": {}
           }
-      }
+      },
+      "linked_skill_id": null,
+      "next_content_id_index": 0
   }
 };

@@ -16,23 +16,33 @@
 
 """Unit tests for recommendations_services."""
 
+from __future__ import annotations
+
+from core import feconf
 from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
-(recommendations_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.recommendations, models.NAMES.exploration])
+from typing import Dict, Final
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import recommendations_models
+
+(recommendations_models,) = models.Registry.import_models(
+    [models.Names.RECOMMENDATIONS]
+)
 
 
 class TopicSimilarityUnitTests(test_utils.GenericTestBase):
     """Tests of the recommendation services module."""
 
-    # pylint: disable=line-too-long
-    TOPIC_SIMILARITIES_DEFAULT = ("""Architecture,Art,Biology,Business,Chemistry,Computing,Economics,Education,Engineering,Environment,Geography,Government,Hobbies,Languages,Law,Life Skills,Mathematics,Medicine,Music,Philosophy,Physics,Programming,Psychology,Puzzles,Reading,Religion,Sport,Statistics,Welcome
+    # pylint: disable=line-too-long, single-line-pragma
+    TOPIC_SIMILARITIES_DEFAULT: Final = (
+        """Architecture,Art,Biology,Business,Chemistry,Computing,Economics,Education,Engineering,Environment,Geography,Government,Hobbies,Languages,Law,Life Skills,Mathematics,Medicine,Music,Philosophy,Physics,Programming,Psychology,Puzzles,Reading,Religion,Sport,Statistics,Welcome
 1.0,0.9,0.2,0.4,0.1,0.2,0.3,0.3,0.6,0.6,0.4,0.2,0.5,0.5,0.5,0.3,0.5,0.3,0.3,0.5,0.4,0.1,0.6,0.1,0.1,0.1,0.1,0.1,0.3
 0.9,1.0,0.1,0.6,0.1,0.1,0.6,0.6,0.2,0.3,0.3,0.2,0.5,0.7,0.6,0.2,0.3,0.2,0.9,0.7,0.3,0.1,0.6,0.1,0.1,0.1,0.1,0.1,0.3
 0.2,0.1,1.0,0.2,0.8,0.3,0.2,0.3,0.3,0.7,0.4,0.2,0.2,0.1,0.1,0.9,0.4,0.8,0.1,0.1,0.4,0.1,0.6,0.1,0.1,0.1,0.1,0.6,0.3
@@ -63,7 +73,8 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
 0.1,0.1,0.6,0.5,0.3,0.6,0.7,0.2,0.5,0.3,0.2,0.4,0.2,0.1,0.2,0.4,0.8,0.1,0.1,0.3,0.4,0.6,0.4,0.5,0.1,0.1,0.3,1.0,0.3
 0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,1.0""")
 
-    TOPIC_SIMILARITIES_UPDATED = ("""Architecture,Art,Biology,Business,Chemistry,Computing,Economics,Education,Engineering,Environment,Geography,Government,Hobbies,Languages,Law,Life Skills,Mathematics,Medicine,Music,Philosophy,Physics,Programming,Psychology,Puzzles,Reading,Religion,Sport,Statistics,Welcome
+    TOPIC_SIMILARITIES_UPDATED: Final = (
+        """Architecture,Art,Biology,Business,Chemistry,Computing,Economics,Education,Engineering,Environment,Geography,Government,Hobbies,Languages,Law,Life Skills,Mathematics,Medicine,Music,Philosophy,Physics,Programming,Psychology,Puzzles,Reading,Religion,Sport,Statistics,Welcome
 1.0,0.9,0.2,0.4,0.1,0.2,0.3,0.3,0.6,0.6,0.4,0.2,0.5,0.5,0.5,0.3,0.5,0.3,0.3,0.5,0.4,0.1,0.6,0.1,0.1,0.1,0.1,0.1,0.3
 0.9,1.0,0.2,0.6,0.1,0.1,0.6,0.6,0.2,0.3,0.3,0.2,0.5,0.7,0.6,0.2,0.3,0.2,0.9,0.7,0.3,0.1,0.6,0.1,0.1,0.1,0.1,0.1,0.3
 0.2,0.2,1.0,0.2,0.8,0.3,0.2,0.3,0.3,0.7,0.4,0.2,0.2,0.1,0.1,0.9,0.4,0.8,0.1,0.1,0.4,0.1,0.6,0.1,0.1,0.1,0.1,0.6,0.3
@@ -93,20 +104,20 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
 0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.2,0.1,0.1,0.1,0.2,0.6,0.1,0.1,0.3,0.1,0.1,0.1,0.1,0.3,0.1,0.2,0.1,0.1,0.2,1.0,0.3,0.3
 0.1,0.1,0.6,0.5,0.3,0.6,0.7,0.2,0.5,0.3,0.2,0.4,0.2,0.1,0.2,0.4,0.8,0.1,0.1,0.3,0.4,0.6,0.4,0.5,0.1,0.1,0.3,1.0,0.3
 0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,1.0""")
-    # pylint: enable=line-too-long
+    # pylint: enable=line-too-long, single-line-pragma
 
-    def test_validate_default_similarities(self):
+    def test_validate_default_similarities(self) -> None:
         recommendations_services.validate_topic_similarities(
             recommendations_services.DEFAULT_TOPIC_SIMILARITIES_STRING)
 
-    def test_update_topic_similarities(self):
+    def test_update_topic_similarities(self) -> None:
         recommendations_services.update_topic_similarities(
             'Art,Biology,Chemistry\n'
             '1.0,0.2,0.1\n'
             '0.2,1.0,0.8\n'
             '0.1,0.8,1.0')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, (
                 'Length of topic similarities columns: 2 does not match '
                 'length of topic list: 3.')
@@ -116,7 +127,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '1.0,0.2,0.1\n'
                 '0.2,1.0,0.8')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, (
                 'Length of topic similarities rows: 2 does not match '
                 'length of topic list: 3.')
@@ -127,7 +138,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.2,1.0\n'
                 '0.1,0.8,1.0')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Expected similarity to be between 0.0 and 1.0, received 800'
             ):
@@ -137,7 +148,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.2,1.0,800\n'
                 '0.1,0.8,1.0')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'Expected similarity to be a float, received string'
             ):
@@ -147,7 +158,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.2,1.0,0.8\n'
                 '0.1,0.8,1.0')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Topic Fake Topic not in list of known topics.'
             ):
             recommendations_services.update_topic_similarities(
@@ -156,7 +167,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.2,1.0,0.8\n'
                 '0.1,0.8,1.0')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected topic similarities to be symmetric.'
             ):
             recommendations_services.update_topic_similarities(
@@ -165,7 +176,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.3,1.0,0.8\n'
                 '0.8,0.1,1.0')
 
-    def test_get_topic_similarity(self):
+    def test_get_topic_similarity(self) -> None:
         self.assertEqual(recommendations_services.get_topic_similarity(
             'Art', 'Biology'), 0.1)
         self.assertEqual(recommendations_services.get_topic_similarity(
@@ -183,14 +194,15 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
         self.assertEqual(recommendations_services.get_topic_similarity(
             'Art', 'Biology'), 0.2)
 
-    def test_get_topic_similarities_as_csv(self):
+    def test_get_topic_similarities_as_csv(self) -> None:
         # The splitlines() is needed because a carriage return is added in
         # the returned string.
         topic_similarities = (
             recommendations_services.get_topic_similarities_as_csv())
 
-        self.assertEqual(topic_similarities.splitlines(),
-                         self.TOPIC_SIMILARITIES_DEFAULT.splitlines())
+        self.assertEqual(
+            topic_similarities.splitlines(),
+            self.TOPIC_SIMILARITIES_DEFAULT.splitlines())
 
         recommendations_services.update_topic_similarities(
             'Art,Biology,Chemistry\n'
@@ -199,14 +211,15 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
             '0.1,0.8,1.0')
         topic_similarities = (
             recommendations_services.get_topic_similarities_as_csv())
-        self.assertEqual(topic_similarities.splitlines(),
-                         self.TOPIC_SIMILARITIES_UPDATED.splitlines())
+        self.assertEqual(
+            topic_similarities.splitlines(),
+            self.TOPIC_SIMILARITIES_UPDATED.splitlines())
 
 
 class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
     """Test recommendations services relating to exploration comparison."""
 
-    EXP_DATA = {
+    EXP_DATA: Dict[str, Dict[str, str]] = {
         'exp_id_1': {
             'category': 'Art',
         },
@@ -220,7 +233,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             'category': 'Art',
         }
     }
-    USER_DATA = {
+    USER_DATA: Dict[str, Dict[str, str]] = {
         'alice': {
             'email': 'alice@example.com'
         },
@@ -232,17 +245,14 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         },
     }
 
-    def setUp(self):
-        """Before each individual test, set up dummy explorations, users
-        and admin.
-        """
-        super(RecommendationsServicesUnitTests, self).setUp()
+    def setUp(self) -> None:
+        """Before each individual test, set up dummy explorations and users."""
+        super().setUp()
 
-        for name, user in self.USER_DATA.iteritems():
+        for name, user in self.USER_DATA.items():
+            self.signup(user['email'], name)
             user['id'] = self.get_user_id_from_email(
                 user['email'])
-            user_services.create_new_user(user['id'], user['email'])
-            self.signup(user['email'], name)
             self.USER_DATA[name]['id'] = user['id']
 
         self.EXP_DATA['exp_id_1']['owner_id'] = self.USER_DATA['alice']['id']
@@ -250,19 +260,13 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         self.EXP_DATA['exp_id_3']['owner_id'] = self.USER_DATA['bob']['id']
         self.EXP_DATA['exp_id_4']['owner_id'] = self.USER_DATA['charlie']['id']
 
-        for exp_id, exp in self.EXP_DATA.iteritems():
+        for exp_id, exp in self.EXP_DATA.items():
             self.save_new_valid_exploration(
                 exp_id, exp['owner_id'], category=exp['category'])
-            owner = user_services.UserActionsInfo(exp['owner_id'])
+            owner = user_services.get_user_actions_info(exp['owner_id'])
             rights_manager.publish_exploration(owner, exp_id)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        user_services.create_new_user(self.admin_id, self.ADMIN_EMAIL)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-
-    def test_recommendation_categories_and_matrix_headers_match(self):
+    def test_recommendation_categories_and_matrix_headers_match(self) -> None:
         topic_similarities_lines = (
             recommendations_services.DEFAULT_TOPIC_SIMILARITIES_STRING.split(
                 '\n'))
@@ -271,43 +275,32 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             matrix_categories,
             sorted(recommendations_services.RECOMMENDATION_CATEGORIES))
 
-    def test_get_item_similarity(self):
+    def test_get_item_similarity(self) -> None:
         exp_summaries = exp_services.get_all_exploration_summaries()
 
-        self.assertEqual(recommendations_services.get_item_similarity(
-            exp_summaries['exp_id_1'].category,
-            exp_summaries['exp_id_1'].language_code,
-            exp_summaries['exp_id_1'].owner_ids,
-            exp_summaries['exp_id_2'].category,
-            exp_summaries['exp_id_2'].language_code,
-            exp_summaries['exp_id_2'].exploration_model_last_updated,
-            exp_summaries['exp_id_2'].owner_ids,
-            exp_summaries['exp_id_2'].status), 4.5)
-        self.assertEqual(recommendations_services.get_item_similarity(
-            exp_summaries['exp_id_4'].category,
-            exp_summaries['exp_id_4'].language_code,
-            exp_summaries['exp_id_4'].owner_ids,
-            exp_summaries['exp_id_4'].category,
-            exp_summaries['exp_id_4'].language_code,
-            exp_summaries['exp_id_4'].exploration_model_last_updated,
-            exp_summaries['exp_id_4'].owner_ids,
-            exp_summaries['exp_id_4'].status), 9.0)
+        self.assertEqual(
+            recommendations_services.get_item_similarity(
+                exp_summaries['exp_id_1'], exp_summaries['exp_id_2']),
+            4.5
+        )
+        self.assertEqual(
+            recommendations_services.get_item_similarity(
+                exp_summaries['exp_id_4'], exp_summaries['exp_id_4']),
+            9.0
+        )
 
-        rights_manager.unpublish_exploration(self.admin, 'exp_id_2')
+        system_user = user_services.get_system_user()
+        rights_manager.unpublish_exploration(system_user, 'exp_id_2')
         exp_summaries = exp_services.get_all_exploration_summaries()
-        self.assertEqual(recommendations_services.get_item_similarity(
-            exp_summaries['exp_id_1'].category,
-            exp_summaries['exp_id_1'].language_code,
-            exp_summaries['exp_id_1'].owner_ids,
-            exp_summaries['exp_id_2'].category,
-            exp_summaries['exp_id_2'].language_code,
-            exp_summaries['exp_id_2'].exploration_model_last_updated,
-            exp_summaries['exp_id_2'].owner_ids,
-            exp_summaries['exp_id_2'].status), 0.0)
+        self.assertEqual(
+            recommendations_services.get_item_similarity(
+                exp_summaries['exp_id_1'], exp_summaries['exp_id_2']),
+            0.0
+        )
 
-    def test_get_and_set_exploration_recommendations(self):
+    def test_get_and_set_exploration_recommendations(self) -> None:
         recommended_exp_ids = ['exp_id_2', 'exp_id_3']
-        recommendations_services.set_recommendations(
+        recommendations_services.set_exploration_recommendations(
             'exp_id_1', recommended_exp_ids)
         saved_recommendation_ids = (
             recommendations_services.get_exploration_recommendations(
@@ -315,9 +308,43 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(recommended_exp_ids, saved_recommendation_ids)
 
         recommended_exp_ids = ['exp_id_3']
-        recommendations_services.set_recommendations(
+        recommendations_services.set_exploration_recommendations(
             'exp_id_1', recommended_exp_ids)
         saved_recommendation_ids = (
             recommendations_services.get_exploration_recommendations(
                 'exp_id_1'))
         self.assertEqual(recommended_exp_ids, saved_recommendation_ids)
+
+        saved_recommendation_ids = (
+            recommendations_services.get_exploration_recommendations(
+                'exp_id_0'))
+        self.assertEqual(saved_recommendation_ids, [])
+
+    def test_delete_recommendations_for_exploration(self) -> None:
+        recommendations_services.delete_explorations_from_recommendations([
+            'exp_id_1', 'exp_id_2'])
+        self.assertIsNone(
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                'exp_id_1'))
+        self.assertIsNone(
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                'exp_id_2'))
+
+    def test_delete_exploration_from_recommendations(self) -> None:
+        recommendations_services.set_exploration_recommendations(
+            'exp_id_1', ['exp_id_3', 'exp_id_4'])
+        recommendations_services.set_exploration_recommendations(
+            'exp_id_2', ['exp_id_1', 'exp_id_3', 'exp_id_4'])
+
+        recommendations_services.delete_explorations_from_recommendations([
+            'exp_id_3', 'exp_id_4'])
+        recommendations_1 = (
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                'exp_id_1'))
+        recommendations_2 = (
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                'exp_id_2'))
+        self.assertEqual(
+            [], recommendations_1.recommended_exploration_ids)
+        self.assertEqual(
+            ['exp_id_1'], recommendations_2.recommended_exploration_ids)

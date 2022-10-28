@@ -1,0 +1,48 @@
+<div class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card oppia-rubrics-editor-card">
+  <div class="oppia-editor-card-body">
+    <div class="oppia-editor-card-section edit-rubrics-header">
+      <div class="oppia-skill-rubrics-header oppia-mobile-collapsible-card-header" (click)="toggleRubricsList()">
+        <strong>Rubrics</strong>
+        <i class="fa fa-caret-down"
+           *ngIf="!rubricsListIsShown"
+           aria-hidden="true">
+        </i>
+        <i class="fa fa-caret-up"
+           *ngIf="rubricsListIsShown"
+           aria-hidden="true">
+        </i>
+      </div>
+      <div *ngIf="rubricsListIsShown" class="oppia-mobile-collapsible-card-content">
+        <oppia-rubrics-editor [rubrics]="skill.getRubrics()"
+                              (saveRubric)="onSaveRubric($event.difficulty, $event.data)"
+                              [newSkillBeingCreated]="false">
+        </oppia-rubrics-editor>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .edit-rubrics-header strong {
+    font-size: 16px;
+  }
+  .oppia-skill-rubrics-header {
+    display: flex;
+    justify-content: space-between;
+  }
+  .oppia-skill-rubrics-header i {
+    display: none;
+  }
+  .oppia-rubrics-editor-card {
+    margin-bottom: 5vh;
+  }
+
+  @media screen and (max-width: 768px) {
+    .oppia-skill-rubrics-header i {
+      display: block;
+    }
+    .edit-rubrics-header {
+      padding: 0;
+    }
+  }
+</style>

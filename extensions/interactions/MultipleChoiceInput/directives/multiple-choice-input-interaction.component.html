@@ -1,0 +1,20 @@
+<form>
+  <div *ngFor="let choice of choices"
+       dir="auto" class="multiple-choice-option-container e2e-test-multiple-choice-option-container">
+    <button class="multiple-choice-option"
+            (click)="selectAnswer($event, choice.originalIndex)">
+      <div class="multiple-choice-radio-button-container">
+        <span class="multiple-choice-outer-radio-button">
+          <span class="multiple-choice-inner-radio-button"></span>
+        </span>
+      </div>
+      <div class="multiple-choice-content-container">
+        <span>
+          <oppia-rte-output-display class="e2e-test-multiple-choice-option"
+                                    [rteString]="choice.value">
+          </oppia-rte-output-display>
+        </span>
+      </div>
+    </button>
+  </div>
+</form>

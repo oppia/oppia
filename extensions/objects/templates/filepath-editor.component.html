@@ -1,0 +1,61 @@
+<svg-editor *ngIf="svgEditorIsShown"
+            (validityChange)="validityHasChanged($event)"
+            (valueChanged)="valueHasChanged($event)"
+            (discardImage)="resetEditor()"
+            [value]="value">
+</svg-editor>
+<image-editor *ngIf="imageEditorIsShown"
+              (validityChange)="validityHasChanged($event)"
+              (valueChanged)="valueHasChanged($event)"
+              [value]="value"
+              [modalId]="modalId">
+</image-editor>
+<div *ngIf="!svgEditorIsShown && !imageEditorIsShown" class="create-or-upload-image-selector-container">
+  <div class="upload-image-container">
+    <div class="mb-4 font-weight-bold">Browse from Your Device</div>
+    <button class="btn btn-primary e2e-test-upload-image" (click)="onClickUploadImage()">
+      UPLOAD <i class="fa fa-upload" aria-hidden="true"></i>
+    </button>
+  </div>
+  <div class="create-image-container">
+    <div class="mb-4 font-weight-bold">Make from Scratch</div>
+    <button class="btn create-image-button e2e-test-create-image" (click)="onClickCreateImage()">CREATE</button>
+  </div>
+</div>
+<style>
+  .create-or-upload-image-selector-container {
+    background-color: #dcdcdc;
+    display: flex;
+    height: fit-content;
+    justify-content: center;
+    outline: 1px solid;
+  }
+
+  .upload-image-container, .create-image-container {
+    align-self: center;
+    font-family: "Roboto", Arial, sans-serif;
+    padding: 45px;
+    text-align: center;
+  }
+  .upload-image-container {
+    border-right: 1px solid #000;
+  }
+  .create-image-button {
+    background-color: #00645b;
+    color: #fff;
+  }
+  @media screen and (max-width: 370px) {
+    .create-or-upload-image-selector-container {
+      flex-direction: column;
+    }
+    .upload-image-container, .create-image-container {
+      align-self: center;
+      font-family: "Roboto", Arial, sans-serif;
+      padding: 45px;
+      text-align: center;
+    }
+    .upload-image-container {
+      border-bottom: 1px solid #000;
+    }
+  }
+</style>

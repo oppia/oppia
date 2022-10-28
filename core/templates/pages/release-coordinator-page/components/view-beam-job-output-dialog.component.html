@@ -1,0 +1,123 @@
+<div class="view-beam-job-output-dialog">
+  <mat-card class="beam-job-run-summary-card">
+    <mat-card-header>
+      <div mat-card-avatar>
+        <mat-icon class="beam-job-run-summary-icon"
+                  [color]="beamJobRun.getJobStatusMaterialThemeColor()"
+                  [matTooltip]="beamJobRun.getJobStatusTooltipString()">
+          {{ beamJobRun.getJobStatusMaterialIconCode() }}
+        </mat-icon>
+      </div>
+      <mat-card-title>{{ beamJobRun.jobName }}</mat-card-title>
+      <mat-card-subtitle>ID: {{ beamJobRun.jobId }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <table class="beam-job-run-summary-table">
+        <tr>
+          <th>Started on</th>
+          <td>{{ beamJobRun.jobStartedOnMsecs | date:'short' }}</td>
+        </tr>
+        <tr>
+          <th>Last updated</th>
+          <td>{{ beamJobRun.jobUpdatedOnMsecs | date:'short' }}</td>
+        </tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-dialog-content>
+
+    <div *ngIf="beamJobRun.isFailed()" class="beam-job-run-failure-message">
+      <em>
+        The job failed, for more details please check the Google Cloud Dataflow
+        dashboard or ask someone with access to the dashboard to check it.
+      </em>
+    </div>
+
+    <mat-tab-group *ngIf="output !== null && !output.isEmpty()">
+      <mat-tab *ngIf="output.stdout" label="Output" aria-label="Output">
+        <ng-template matTabContent>
+          <pre class="beam-job-run-output">{{ output.stdout }}</pre>
+        </ng-template>
+      </mat-tab>
+      <mat-tab *ngIf="output.stderr" label="Errors" color="warn" aria-label="Errors">
+        <ng-template matTabContent>
+          <pre class="beam-job-run-output">{{ output.stderr }}</pre>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+
+    <div *ngIf="output !== null && output.isEmpty()" class="beam-job-run-empty-output">
+      <em>No output</em>
+    </div>
+
+    <mat-progress-bar *ngIf="output === null"
+                      mode="indeterminate"
+                      class="oppia-align-center oppia-vcenter"
+                      color="accent">
+    </mat-progress-bar>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="beam-job-run-output-actions">
+    <button mat-button mat-dialog-close>Close</button>
+    <button mat-fab color="accent"
+            [disabled]="output === null || output.isEmpty()"
+            [cdkCopyToClipboard]="getOutput()">
+      <mat-icon>content_copy</mat-icon>
+    </button>
+  </mat-dialog-actions>
+</div>
+
+<style>
+  .view-beam-job-output-dialog .beam-job-run-summary-card {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    margin-bottom: 20px;
+  }
+  .view-beam-job-output-dialog .beam-job-run-summary-card mat-card-header {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  }
+  .view-beam-job-output-dialog .beam-job-run-summary-card mat-card-title {
+    font-weight: bold;
+  }
+  .view-beam-job-output-dialog .beam-job-run-summary-icon {
+    font-size: 40px;
+    margin-top: 8px;
+    width: 40px;
+  }
+  .view-beam-job-output-dialog .beam-job-run-summary-table td,
+  .view-beam-job-output-dialog .beam-job-run-summary-table th {
+    padding: 10px;
+  }
+  .view-beam-job-output-dialog .beam-job-run-failure-message {
+    padding: 1em 0;
+    text-align: center;
+  }
+  .view-beam-job-output-dialog .beam-job-run-output {
+    background-color: rgba(0, 0, 0, 0.06);
+    max-height: 300px;
+    overflow-x: auto;
+    overflow-y: auto;
+    padding: 1em;
+    white-space: pre;
+    word-wrap: normal;
+  }
+  .view-beam-job-output-dialog .beam-job-run-empty-output {
+    background-color: rgba(0, 0, 0, 0.06);
+    max-height: 300px;
+    overflow-x: auto;
+    overflow-y: auto;
+    padding: 1em;
+    text-align: center;
+    white-space: pre;
+    word-wrap: normal;
+  }
+  .view-beam-job-output-dialog .beam-job-run-output-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .view-beam-job-output-dialog .mat-icon.mat-warn {
+    color: #f44336;
+  }
+</style>

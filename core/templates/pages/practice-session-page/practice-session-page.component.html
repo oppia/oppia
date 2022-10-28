@@ -1,0 +1,31 @@
+<background-banner></background-banner>
+<div class="oppia-practice-session-container position-relative e2e-test-practice-session-container">
+  <oppia-question-player *ngIf="questionPlayerConfig && questionPlayerConfig.skillList.length > 0"
+                         [questionPlayerConfig]="questionPlayerConfig">
+  </oppia-question-player>
+</div>
+
+<style>
+  .oppia-practice-session-container .oppia-practice-session {
+    color: #01645c;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 3em;
+    margin-bottom: 25px;
+    margin-top: 0;
+    padding-top: 66.5px;
+    text-align: center;
+  }
+
+  .oppia-practice-session-container {
+    color: black;
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0 auto;
+    text-decoration: none;
+  }
+
+  @media(max-width: 925px) {
+    .oppia-practice-session-container {
+      max-width: 95%;
+    }
+  }
+</style>

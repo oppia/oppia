@@ -1,0 +1,468 @@
+<ng-template #TranslationTabCardOptions>
+  <h3 class="e2e-test-joyride-title">Choose a Part of the Card to Translate</h3>
+  <p>
+    Next, choose a part of the lesson card to translate. This menu at the top lists all the translatable parts of the card. Within each tab, multiple sections may be available for translating.
+  </p>
+</ng-template>
+
+<ng-template #TranslationTabTutorialComplete>
+  <h3 class="e2e-test-joyride-title">Tutorial Complete</h3>
+  <p>
+    Now, you are ready to begin adding translations
+    to your explorations!
+    This marks the end of this tour.
+    Remember to save your progress periodically using
+    the save button in the navigation bar at the top:
+    <button class="btn btn-success" disabled>
+      <i class="material-icons" >&#xE161;</i>
+    </button>.<br>
+    Thank you for making this lesson more accessible
+    for non-native speakers!'
+  </p>
+</ng-template>
+
+<ng-template #TranslationTabReRecordingOverview>
+  <h3 class="e2e-test-joyride-title">Re-record/Re-upload audio</h3>
+  <div>
+    <p>The audio recording also has options related to updating and deleting translations.</p>
+    <ul>
+      <li>
+        To revert and cancel any unsaved translation(s),
+        click the
+        <i class="material-icons oppia-state-translation-icons">&#xE5C9;</i> button.
+      </li>
+      <li>
+        To play the audio, click the
+        <i class="material-icons oppia-state-translation-icons" >&#xE039;</i> button.
+      </li>
+      <li>
+        To do retakes, click the
+        <i class="material-icons oppia-state-translation-icons">&#xE028;</i> button.
+      </li>
+      <li>
+        To delete a recording, click the
+        <i class="material-icons oppia-state-translation-icons">&#xE872;</i> button.
+      </li>
+    </ul>
+  </div>
+</ng-template>
+
+<ng-template #TranslationTabRecordingOverview>
+  <h3 class="e2e-test-joyride-title">Recording Audio</h3>
+  <div>
+    <p>To create audio translations in Oppia, we recommend using the <i class="material-icons oppia-state-translation-icons">&#xE2C6;</i>
+    button to <b>upload</b> audio files from your computer.</p>
+    <p>You can also record via your browser, but that may lead to degraded audio quality. If you would like to do so anyway,
+       simply follow these 3 steps:
+    </p>
+    <ol>
+      <li>
+        To start <b>recording</b>, click the
+        <i class="material-icons oppia-state-translation-icons">mic</i> button.
+        If the browser pops up a message asking if you’d
+        like to record audio, accept it.
+      </li>
+      <li>
+        When you are ready to end the recording, click
+        <i class="material-icons oppia-state-translation-icons">
+        &#xE047;</i> to <b>stop</b>.
+      </li>
+      <li>
+        Hit the <b>save</b>
+        <i class="material-icons oppia-state-translation-icons"> &#xE161;</i> button
+        to confirm the recording.
+      </li>
+    </ol>
+  </div>
+</ng-template>
+
+<div class="oppia-translation-page-statename">
+  <strong>{{ stateName }}</strong>
+</div>
+<div class="oppia-page-card oppia-state-translation-page">
+  <div class="translation-nav" joyrideStep="translationTabCardOptions" [stepContent]="TranslationTabCardOptions">
+    <ul id="tutorialTranslationState" class="oppia-translation-tabs">
+      <li [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_CONTENT)}" class="e2e-test-accessibility-translation-content" aria-label="Content of the card" role="button">
+        <div (click)="onTabClick(TAB_ID_CONTENT)" [ngStyle]="tabStatusColorStyle(TAB_ID_CONTENT)" class="oppia-translation-tabs-text e2e-test-translation-content-tab">
+          <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_CONTENT)" class="oppia-tab-needs-update"
+                [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
+          </span>Content
+        </div>
+      </li>
+      <li [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_CUSTOMIZATION_ARGS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_CUSTOMIZATION_ARGS)}" aria-label="Interaction content" role="button">
+        <div (click)="onTabClick(TAB_ID_CUSTOMIZATION_ARGS)" [ngStyle]="tabStatusColorStyle(TAB_ID_CUSTOMIZATION_ARGS)" class="oppia-translation-tabs-text">
+          <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_CUSTOMIZATION_ARGS)" class="oppia-tab-needs-update"
+                [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
+          </span>Interaction
+        </div>
+      </li>
+      <li *ngIf="!isVoiceoverModeActive()" [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_RULE_INPUTS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_RULE_INPUTS)}" aria-label="Rule Inputs" role="button">
+        <div (click)="onTabClick(TAB_ID_RULE_INPUTS)" [ngStyle]="tabStatusColorStyle(TAB_ID_RULE_INPUTS)" class="oppia-translation-tabs-text">
+          <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_RULE_INPUTS)" class="oppia-tab-needs-update"
+                [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
+          </span>Rules
+        </div>
+      </li>
+      <li [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_FEEDBACK), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_FEEDBACK)}" class="e2e-test-accessibility-translation-feedback" aria-label="Feedback responses for answer groups" role="button">
+        <div (click)="onTabClick(TAB_ID_FEEDBACK)" [ngStyle]="tabStatusColorStyle(TAB_ID_FEEDBACK)" class="oppia-translation-tabs-text e2e-test-translation-feedback-tab">
+          <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_FEEDBACK)" class="oppia-tab-needs-update"
+                [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
+          </span>Feedback
+        </div>
+      </li>
+      <li [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_HINTS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_HINTS)}" class="e2e-test-accessibility-translation-hint" aria-label="Hints for the state" role="button">
+        <div (click)="onTabClick(TAB_ID_HINTS)" [ngStyle]="tabStatusColorStyle(TAB_ID_HINTS)" class="oppia-translation-tabs-text e2e-test-translation-hints-tab">
+          <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_HINTS)" class="oppia-tab-needs-update"
+                [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
+          </span>Hints
+        </div>
+      </li>
+      <li [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_SOLUTION), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_SOLUTION)}" class="e2e-test-accessibility-translation-solution" aria-label="Solutions for the state" role="button">
+        <div (click)="onTabClick(TAB_ID_SOLUTION)" [ngStyle]="tabStatusColorStyle(TAB_ID_SOLUTION)" class="oppia-translation-tabs-text e2e-test-translation-solution-tab" >
+          <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_SOLUTION)" class="oppia-tab-needs-update"
+                [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
+          </span>Solution
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="!isVoiceoverModeActive()" class="oppia-state-content-header">Original content</div>
+  <div class="translation-state-contents">
+    <div *ngIf="isActive(TAB_ID_CONTENT)" class="translation-state-content e2e-test-content-text">
+      <span>
+        <span *ngIf="!getRequiredHtml(stateContent)" class="oppia-placeholder">
+          {{ getEmptyContentMessage() }}
+        </span>
+        <span>
+          <oppia-rte-output-display [rteString]="getRequiredHtml(stateContent)"
+                                    [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                    (click)="onContentClick($event)"
+                                    class="oppia-rte-editor">
+          </oppia-rte-output-display>
+        </span>
+      </span>
+    </div>
+    <div *ngIf="isActive(TAB_ID_CUSTOMIZATION_ARGS)" class="translation-state-content">
+      <h3>Preview - {{INTERACTION_SPECS[stateInteractionId].name}}</h3>
+      <oppia-rte-output-display class="oppia-translation-state-content-html-data" [rteString]="interactionPreviewHtml">
+      </oppia-rte-output-display>
+      <h3>Content</h3>
+      <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
+        <li class="oppia-rule-block mt-0"
+            *ngFor="let caContent of interactionCustomizationArgTranslatableContent; index as index"
+            [ngClass]="{'active': activeCustomizationArgContentIndex === index}">
+          <a (click)="changeActiveCustomizationArgContentIndex(index)"
+             class="oppia-rule-tab"
+             [ngClass]="{'oppia-rule-tab-active': activeHintIndex === index}"
+             [ngStyle]="contentIdStatusColorStyle(caContent.content.contentId)">
+            <oppia-response-header [index]="index"
+                                   [defaultOutcome]="true"
+                                   [summary]="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
+                                   [shortSummary]="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
+                                   [isActive]="index === activeCustomizationArgContentIndex"
+                                   [showWarning]="contentIdNeedUpdates(caContent.content.contentId)">
+            </oppia-response-header>
+          </a>
+          <div *ngIf="activeCustomizationArgContentIndex === index">
+            <div class="oppia-editor-card-section" *ngIf="caContent.content._html">
+              <span *ngIf="!getRequiredHtml(caContent.content)" class="oppia-placeholder">
+                {{ getEmptyContentMessage() }}
+              </span>
+              <span>
+                <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                          (click)="onContentClick($event)"
+                                          class="oppia-rte-editor"
+                                          [rteString]="getRequiredHtml(caContent.content)">
+                </oppia-rte-output-display>
+              </span>
+            </div>
+            <div class="oppia-editor-card-section" *ngIf="caContent.content._unicode">
+              <span *ngIf="!caContent.content.unicode" class="oppia-placeholder">
+                {{ getEmptyContentMessage() }}
+              </span>
+              <span>
+                <p>{{ caContent.content.unicode }}</p>
+              </span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="isActive(TAB_ID_RULE_INPUTS)" class="translation-state-content">
+      <div>
+        <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
+          <li class="oppia-rule-block e2e-test-translation-feedback mt-0"
+              *ngFor="let ruleContent of interactionRuleTranslatableContents; index as index"
+              [ngClass]="{'active': activeRuleContentIndex === index}">
+            <a class="oppia-rule-tab e2e-test-feedback-{{ index }}"
+               (click)="changeActiveRuleContentIndex(index)"
+               [ngClass]="{'oppia-rule-tab-active': activeRuleContentIndex === index}"
+               [ngStyle]="contentIdStatusColorStyle(ruleContent.contentId)">
+               {{ ruleContent.rule | parameterizeRuleDescriptionPipe: stateInteractionId: answerChoices }}
+            </a>
+            <div *ngIf="activeRuleContentIndex === index">
+              <div class="oppia-editor-card-section">
+                <div class="oppia-rule-body-container">
+                  <span>
+                    {{ getHumanReadableRuleInputValues(ruleContent.rule.inputs[ruleContent.inputName], ruleContent.rule.inputTypes[ruleContent.inputName]) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div *ngIf="isActive(TAB_ID_FEEDBACK)" class="translation-state-content">
+      <div>
+        <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
+          <li class="oppia-rule-block e2e-test-translation-feedback mt-0"
+              *ngFor="let answerGroup of stateAnswerGroups; index as index"
+              [ngClass]="{'active': activeAnswerGroupIndex === index}">
+            <a class="oppia-rule-tab e2e-test-feedback-{{ index }}"
+               (click)="changeActiveAnswerGroupIndex(index)"
+               [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex === index}"
+               [ngStyle]="contentIdStatusColorStyle(answerGroup.outcome.feedback.contentId)">
+              <oppia-response-header [index]="index"
+                                     [summary]="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, false)"
+                                     [shortSummary]="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, true)"
+                                     [isActive]="index === activeAnswerGroupIndex"
+                                     [outcome]="answerGroup.outcome"
+                                     [defaultOutcome]="true"
+                                     [numRules]="answerGroup.rules.length"
+                                     [isResponse]="true"
+                                     [showWarning]="contentIdNeedUpdates(answerGroup.outcome.feedback.contentId)"
+                                     (navigateToState)="navigateToState($event)"
+                                     [correctnessFeedbackEnabled]="explorationCorrectnessFeedbackService.isEnabled()">
+              </oppia-response-header>
+            </a>
+            <div *ngIf="activeAnswerGroupIndex === index">
+              <div class="oppia-editor-card-section e2e-test-feedback-{{ index }}-text">
+                <div class="oppia-rule-body-container">
+                  <span *ngIf="!getRequiredHtml(answerGroup.outcome.feedback)" class="oppia-placeholder">
+                    {{ getEmptyContentMessage() }}
+                  </span>
+                  <span>
+                    <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                              (click)="onContentClick($event)"
+                                              [rteString]="getRequiredHtml(answerGroup.outcome.feedback)"
+                                              class="oppia-rte-editor">
+                    </oppia-rte-output-display>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+
+      <div>
+        <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
+          <li [ngClass]="{'active': activeAnswerGroupIndex === stateAnswerGroups.length}"
+              class="oppia-rule-block e2e-test-translation-feedback">
+            <a class="oppia-rule-tab oppia-default-rule-tab e2e-test-feedback-{{ stateAnswerGroups.length }}"
+               (click)="changeActiveAnswerGroupIndex(stateAnswerGroups.length)"
+               [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex == stateAnswerGroups.length}"
+               [ngStyle]="contentIdStatusColorStyle(stateDefaultOutcome.feedback.contentId)">
+              <oppia-response-header [index]="index"
+                                     [isActive]="index === activeAnswerGroupIndex"
+                                     [summary]="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, false)"
+                                     [shortSummary]="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, true)"
+                                     [outcome]="stateDefaultOutcome"
+                                     [defaultOutcome]="true"
+                                     [isResponse]="true"
+                                     [showWarning]="contentIdNeedUpdates(stateDefaultOutcome.feedback.contentId)"
+                                     (navigateToState)="navigateToState($event)"
+                                     [correctnessFeedbackEnabled]="explorationCorrectnessFeedbackService.isEnabled()">
+              </oppia-response-header>
+            </a>
+            <div *ngIf="activeAnswerGroupIndex === stateAnswerGroups.length">
+              <div class="oppia-editor-card-section e2e-test-feedback-{{ stateAnswerGroups.length }}-text">
+                <div class="oppia-rule-body-container">
+                  <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                            (click)="onContentClick($event)"
+                                            [rteString]="getRequiredHtml(stateDefaultOutcome.feedback)"
+                                            class="oppia-rte-editor">
+                  </oppia-rte-output-display>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div *ngIf="isActive(TAB_ID_HINTS)" class="translation-state-content">
+      <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
+        <li class="oppia-rule-block e2e-test-translation-hint mt-0"
+            *ngFor="let hint of stateHints; index as index"
+            [ngClass]="{'active': activeHintIndex === index}">
+          <a (click)="changeActiveHintIndex(index)"
+             class="oppia-rule-tab e2e-test-hint-{{ index }}"
+             [ngClass]="{'oppia-rule-tab-active': activeHintIndex === index}"
+             [ngStyle]="contentIdStatusColorStyle(hint.hintContent.contentId)">
+            <oppia-response-header [index]="index"
+                                   [defaultOutcome]="true"
+                                   [summary]="getSubtitledContentSummary(hint.hintContent)"
+                                   [shortSummary]="getSubtitledContentSummary(hint.hintContent)"
+                                   [isActive]="index === activeHintIndex"
+                                   [showWarning]="contentIdNeedUpdates(hint.hintContent.contentId)">
+            </oppia-response-header>
+          </a>
+          <div *ngIf="activeHintIndex === index">
+            <div class="oppia-editor-card-section e2e-test-hint-{{ index }}-text">
+              <span *ngIf="!getRequiredHtml(hint.hintContent)" class="oppia-placeholder">
+                {{ getEmptyContentMessage() }}
+              </span>
+              <span>
+                <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                          (click)="onContentClick($event)"
+                                          [rteString]="getRequiredHtml(hint.hintContent)"
+                                          class="oppia-rte-editor">
+                </oppia-rte-output-display>
+              </span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div *ngIf="isActive(TAB_ID_SOLUTION)" class="translation-state-content e2e-test-solution-text">
+      <span *ngIf="!getRequiredHtml(stateSolution.explanation)" class="oppia-placeholder">
+        {{ getEmptyContentMessage() }}
+      </span>
+      <span>
+        <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                  (click)="onContentClick($event)"
+                                  [rteString]="getRequiredHtml(stateSolution.explanation)"
+                                  class="oppia-rte-editor">
+        </oppia-rte-output-display>
+      </span>
+    </div>
+  </div>
+  <div joyrideStep="translationTabRecordingOverview" [stepContent]="TranslationTabRecordingOverview"></div>
+  <div joyrideStep="translationTabReRecordingOverview" [stepContent]="TranslationTabReRecordingOverview"></div>
+  <div joyrideStep="translationTabTutorialComplete" [stepContent]="TranslationTabTutorialComplete"></div>
+  <div *ngIf="isVoiceoverModeActive()" id="tutorialTranslationAudioBar" class="oppia-audio-translation-bar">
+    <oppia-audio-translation-bar [isTranslationTabBusy]="isTranslationTabBusy"></oppia-audio-translation-bar>
+  </div>
+  <div *ngIf="!isVoiceoverModeActive()">
+    <oppia-state-translation-editor></oppia-state-translation-editor>
+  </div>
+</div>
+
+
+<style>
+  .oppia-tab-needs-update {
+    color: #f00;
+  }
+  .oppia-state-content-header {
+    background: #ccc;
+    font-size: 12px;
+    font-style: italic;
+    height: 16px;
+    text-align: center;
+  }
+  .oppia-translation-page-statename {
+    margin-left: 80px;
+    margin-top: 35px;
+    position: relative;
+  }
+  .oppia-state-translation-page {
+    display: flex;
+    flex-direction: column;
+    margin-left: 80px;
+    margin-top: 20px;
+    padding: 0;
+    width: 80%;
+  }
+  .oppia-translation-tabs {
+    display: flex;
+    height: 50px;
+    margin-bottom: 0;
+    padding-left: 0;
+    text-align: center;
+  }
+  .oppia-translation-tabs li {
+    display: flex;
+    margin-bottom: 5px;
+    width: -webkit-calc(100% / 4);
+    width: -moz-calc(100% / 4);
+    width: -o-calc(100% / 4);
+    width: calc(100% / 4);
+  }
+  .oppia-active-translation-tab a {
+    background-color: white;
+    border-bottom: 0;
+    color: #009688;
+    text-decoration: none;
+  }
+  .oppia-disabled-translation-tab a {
+    color: #ccc;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .oppia-translation-tabs-text {
+    background: rgba(243,243,243,.75);
+    border: 1px solid #eee;
+    border-bottom-width: 2px;
+    border-top-width: 3px;
+    color: #009688;
+    padding: 10px;
+    text-decoration: none;
+    width: 100%;
+  }
+  .oppia-translation-tabs-text:hover {
+    color: #009688;
+    text-decoration: none;
+  }
+  .translation-state-contents {
+    border-bottom: 2px solid #eee;
+    min-height: 400px;
+    word-wrap: break-word;
+  }
+  .translation-state-content {
+    margin: auto;
+    padding: 20px 30px 20px 30px;
+  }
+  .oppia-audio-translation-bar {
+    height: 50px;
+  }
+  .oppia-rte-editor-focused:focus > p {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > ol {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > ul {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > pre {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > blockquote {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-tabs > div {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-collapsible > uib-accordion > div {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-image > figure {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-video > center {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused *:hover {
+    background-color: rgba(233, 241, 242);
+  }
+  .oppia-state-translation-icons {
+    color: #009688
+  }
+  state-translation .oppia-translation-state-content-html-data {
+    pointer-events: none;
+  }
+</style>

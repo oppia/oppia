@@ -14,30 +14,46 @@
 
 """Controllers for the Oppia skill's concept card viewer."""
 
-from constants import constants
+from __future__ import annotations
+
+from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import skill_services
-import feconf
+from core.domain import skill_fetchers
 
 
 class ConceptCardDataHandler(base.BaseHandler):
     """A card that shows the explanation of a skill's concept."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'selected_skill_ids': {
+            'schema': {
+                'type': 'custom',
+                'obj_type': 'JsonEncodedInString'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
-    @acl_decorators.can_view_skill
-    def get(self, skill_id):
-        """Handles GET requests."""
+    @acl_decorators.can_view_skills
+    def get(self, selected_skill_ids):
+        """Handles GET requests.
 
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
+        Args:
+            selected_skill_ids: list(str). List of skill ids.
+        """
 
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        skills = skill_fetchers.get_multi_skills(selected_skill_ids)
 
-        skill_dict = skill.to_dict()
+        concept_card_dicts = []
+        for skill in skills:
+            concept_card_dicts.append(skill.skill_contents.to_dict())
+
         self.values.update({
-            'concept_card_dict': skill_dict['skill_contents']
+            'concept_card_dicts': concept_card_dicts
         })
 
         self.render_json(self.values)

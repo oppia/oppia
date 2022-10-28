@@ -1,0 +1,51 @@
+<div class="oppia-learner-answer-info-card">
+  <div class="oppia-enter-answer-details">
+    <textarea class="form-control e2e-test-answer-details-text-area"
+              [(ngModel)]="answerDetails" rows="4"
+              placeholder="Enter your explanation here">
+    </textarea>
+  </div>
+  <div class="oppia-submit-button">
+    <button mat-button
+            class="oppia-learner-confirm-button e2e-test-answer-details-submit-button"
+            [disabled]="!answerDetails"
+            (click)="submitLearnerAnswerInfo()">
+            SUBMIT
+    </button>
+  </div>
+</div>
+<style>
+  .oppia-learner-answer-info-card {
+    background: #fff;
+    border-radius: 2px;
+    margin-left: 87px;
+    padding-top: 20px;
+    text-align: left;
+  }
+
+  .oppia-learner-answer-info-card textarea {
+    resize: vertical;
+  }
+
+  .oppia-learner-answer-info-card .oppia-enter-answer-details {
+    padding: 20px;
+  }
+
+  .oppia-learner-answer-info-card .oppia-submit-button {
+    left: 80%;
+    position: relative;
+  }
+
+  @media screen and (max-width: 959px) {
+    .oppia-learner-answer-info-card {
+      margin-left: auto;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .oppia-learner-answer-info-card .oppia-submit-button {
+      left: 75%;
+    }
+  }
+
+</style>

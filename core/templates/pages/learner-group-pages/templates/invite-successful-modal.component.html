@@ -1,0 +1,23 @@
+<div class="modal-body">
+  <p>
+    <span>{{successMessage | translate}}</span>
+    <span class="primary-color" *ngFor="let username of invitedUsernames; let last = last; let first = first">
+      <span *ngIf="first && first !== last">{{username}}</span>
+      <span *ngIf="!first && !last">, {{username}}</span>
+      <span *ngIf="first === last">{{username}}</span>
+      <span *ngIf="first !== last"> and {{username}}</span>
+    </span>
+  </p>
+  <div class="close" (click)="cancel()">
+    <span aria-hidden="true">&times;</span>
+  </div>
+</div>
+
+<style>
+  .modal-body p {
+    margin: unset;
+  }
+  .primary-color {
+    color: #00645c;
+  }
+</style>

@@ -1,0 +1,606 @@
+<div class="embedded-body">
+  <section role="main" *ngIf="hasFullyLoaded">
+    <div class="conversation-skin-cards-container conversation-skin-animate-cards"
+         [ngClass]="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard, 'with-supplementary-card': isCurrentSupplementalCardNonempty()}">
+
+      <div class="conversation-skin-main-tutor-card-embed"
+           [ngClass]="{ 'conversation-skin-animate-tutor-card-on-narrow': !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty()}">
+        <oppia-tutor-card [displayedCard]="displayedCard"
+                          [avatarImageIsShown]="true"
+                          [startCardChangeAnimation]="startCardChangeAnimation">
+        </oppia-tutor-card>
+        <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
+          <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
+                                   [displayedCard]="displayedCard">
+          </oppia-supplemental-card>
+        </div>
+        <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
+                            [isLearnAgainButton]="isLearnAgainButton()"
+                            [displayedCard]="displayedCard"
+                            [submitButtonIsShown]="!answerIsBeingProcessed"
+                            (clickContinueButton)="showUpcomingCard()">
+        </oppia-progress-nav>
+      </div>
+
+      <div *ngIf="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
+           class="conversation-skin-supplemental-card-container">
+        <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
+                                 [displayedCard]="displayedCard">
+        </oppia-supplemental-card>
+      </div>
+    </div>
+  </section>
+
+  <footer class="grid-container">
+    <nav class="bottom-nav-row">
+      <div class="col-1-4 bottom-nav-left">
+        <div *ngIf="isOnTerminalCard()" class="nav-bar-bottom-replay-content">
+          <i (click)="reloadExploration()" class="material-icons replay-nav-icon">replay</i>
+          <span class="oppia-restart-exploration"> Restart exploration? </span>
+        </div>
+      </div>
+      <div class="col-1-2">
+      </div>
+      <div class="col-1-4">
+        <div>
+          <div class="nav-bar-bottom-visit-oppia">
+            <span *ngIf="isOnTerminalCard()" class="oppia-view-more-explorations">For more explorations, visit:</span>
+            <a class="oppia-link" (click)="onNavigateFromIframe()" href="https://www.oppia.org/" target="_blank" rel="noopener">
+              <picture>
+                <source type="image/webp" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.webp')">
+                <source type="image/png" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.png')">
+                <img class="logo-bottom-nav-bar" [src]="getStaticImageUrl('/logo/288x128_logo_white.png')">
+              </picture>
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </footer>
+</div>
+
+<!-- The styles here need to be embedded within the directive script tags,
+since otherwise they will interfere with the non-iframed conversation skin
+directive. -->
+<style>
+  html, body {
+    background: #afd2eb no-repeat center center fixed;
+    background-size: cover;
+    bottom: 0;
+    color: rgba(0, 0, 0, 0.87);
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 1.0em;
+    height: 100%;
+    overflow-y: auto;
+    position: fixed;
+    top: 0;
+    width: 100%;
+  }
+
+  .oppia-progress-dot {
+    height: 18px;
+    width: 18px;
+  }
+  .oppia-progress-arrow-active {
+    color: #fff;
+  }
+
+  .embedded-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    position: absolute;
+    width: 100%;
+  }
+  .bottom-nav-left {
+    align-items: center;
+    display: flex;
+    height: 50px;
+  }
+
+  .grid-container {
+    bottom: 0;
+    position: fixed;
+    width: 100%;
+  }
+
+  .bottom-nav-row:before,
+  .bottom-nav-row:after {
+    clear: both;
+    content: "";
+    display: table;
+  }
+
+  [class*='col-'] {
+    float: left;
+    min-height: 1px;
+    padding: 0;
+    padding-right: 20px;
+  }
+
+  [class*='col-']:last-of-type {
+    padding-right: 0;
+  }
+
+  .col-1-2 {
+    width: 50%;
+  }
+  .col-1-4 {
+    width: 25%;
+  }
+  .col-lg-12,
+  .col-md-12,
+  .col-sm-12 {
+    width: 100%;
+  }
+
+  .logo-bottom-nav-bar {
+    margin: auto;
+    max-height: 50px;
+    min-width: 70px;
+    position: relative;
+  }
+
+  .nav-bar-bottom-replay-content {
+    align-items: center;
+    color: white;
+    display: flex;
+  }
+  .nav-bar-bottom-visit-oppia {
+    align-items: center;
+    color: white;
+    display: flex;
+    justify-content: center;
+  }
+
+  .nav-bar-bottom-replay-content,
+  .nav-bar-bottom-visit-oppia {
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    line-height: 1;
+  }
+
+  .replay-nav-icon {
+    font-size: 50px;
+    font-weight: bold;
+  }
+  .row.numeric-input-container {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  section {
+    flex: 1 0 auto;
+  }
+
+  footer {
+    background-color: #015c53;
+    padding: 0.5em;
+    z-index: 20;
+  }
+
+  iframe {
+    overflow: scroll;
+  }
+
+  /*
+    Additional CSS for the conversation_v1 skin.
+    All classes below should start with .conversation-skin
+  */
+
+  .conversation-skin-responses-dropdown-icon {
+    font-size: 20px;
+    margin-bottom: -2px;
+    -webkit-transition: all 0.2s;
+    -moz-transition: all 0.2s;
+    -o-transition: all 0.2s;
+    transition: all 0.2s;
+  }
+
+  .conversation-skin-responses-dropdown-icon-rotated {
+    margin-bottom: -2px;
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .conversation-skin-responses-dropdown-container {
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+    line-height: 0.1em;
+    margin: 8px 20px 20px 20px;
+    text-align: center;
+  }
+
+  .conversation-skin-responses-dropdown-text {
+    background-color: #fff;
+    color: #888;
+    font-size: 0.8em;
+    padding: 0 10px;
+  }
+
+  .conversation-skin-cards-container {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    justify-content: center;
+    margin: 20px auto;
+    max-width: 1400px;
+    width: 100%;
+  }
+
+  .conversation-skin-main-tutor-card,
+  .conversation-skin-future-tutor-card {
+    background: #fff;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
+    flex-shrink: 10000;
+    margin-left: 30px;
+    max-width: 560px;
+    min-width: 360px;
+    text-align: left;
+    width: 100%;
+    z-index: 1;
+  }
+
+  .conversation-skin-main-tutor-card-embed,
+  .conversation-skin-future-tutor-card-embed {
+    background: #fff;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
+    flex-shrink: 10000;
+    margin-left: 30px;
+    margin-top: 20px;
+    min-width: 360px;
+    text-align: left;
+    width: 90%;
+    z-index: 1;
+  }
+
+  .conversation-skin-supplemental-card-container {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
+    flex-shrink: 1;
+    margin-bottom: 10%;
+    margin-left: 12px;
+    max-width: 1000px;
+    min-width: 560px;
+    position: relative;
+  }
+
+  .conversation-skin-help-card {
+    background: #fff;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
+    min-height: 50px;
+    opacity: 1;
+    padding: 12px;
+    right: 12px;
+    text-align: left;
+    transition: all 350ms;
+    z-index: 500;
+  }
+
+  .help-card-standard {
+    position: absolute;
+  }
+
+  .help-card-tall {
+    bottom: 50px;
+    position: fixed;
+  }
+
+  .conversation-skin-help-card.ng-enter,
+  .conversation-skin-help-card.ng-leave-active {
+    opacity: 0;
+    transform: translateX(200px);
+  }
+
+  .conversation-skin-help-card .conversation-skin-oppia-avatar {
+    top: 12px;
+  }
+
+  .conversation-skin-help-card-content {
+    padding: 12px;
+    width: 270px;
+  }
+
+  .conversation-skin-close-help-card-button {
+    background: none;
+    border: 0;
+    color: #000;
+    cursor: pointer;
+    height: 24px;
+    opacity: 0.5;
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    width: 24px;
+    z-index: 200;
+  }
+
+  .conversation-skin-main-tutor-card.animate-card-width {
+    -webkit-transition: width 500ms;
+    transition: width 500ms;
+  }
+
+  .conversation-skin-future-tutor-card {
+    left: -30000px;
+    position: absolute;
+    top: -30000px;
+  }
+
+  .conversation-skin-oppia-feedback-container,
+  .conversation-skin-learner-answer-container {
+    padding: 0 20px;
+    position: relative;
+  }
+
+  .conversation-skin-oppia-feedback-content,
+  .conversation-skin-learner-answer-content {
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    word-wrap: break-word;
+  }
+
+  .conversation-skin-oppia-feedback-content,
+  .conversation-skin-help-card-content {
+    background-color: rgba(224, 242, 241, 1);
+    border-top-left-radius: 0;
+  }
+
+  .conversation-skin-learner-answer-content {
+    background-color: rgba(236, 239, 241, 1);
+    border-bottom-right-radius: 0;
+  }
+
+  .conversation-skin-main-tutor-card-embed {
+    margin-bottom: 100px;
+  }
+
+  /*
+      This CSS block is for ensuring that only a response from a multi-line text input preserves newlines.
+      Leveraging the parent class ".conversation-skin-learner-answer-content" will render newlines in the
+      other interactions (ie; Multiple Choice, Item Selection) which is not necessary.
+  */
+  oppia-response-text-input {
+    white-space: pre-wrap;
+  }
+
+  .conversation-skin-learner-answer-container {
+    height: 36px;
+    position: absolute;
+    text-align: right;
+    top: 0;
+    width: 36px;
+    z-index: 1;
+  }
+
+  .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
+    background-color: rgba(236, 239, 241, 0.4);
+  }
+
+  .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content {
+    background-color: rgba(224, 242, 241, 0.4);
+  }
+
+  .oppia-learner-view-card-top-content::before,
+  .conversation-skin-oppia-feedback-content::before,
+  .conversation-skin-help-card-content::before {
+    border-left: 8px solid transparent;
+    border-top: 12px solid rgba(224, 242, 241, 1);
+    content: " ";
+    left: -8px;
+    position: absolute;
+    top: 0;
+  }
+
+  .conversation-skin-learner-answer-content::before {
+    border-right: 8px solid transparent;
+    border-top: 12px solid rgba(236, 239, 241, 1);
+    content: " ";
+    position: absolute;
+    right: -8px;
+    top: 0;
+  }
+
+  .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content::before,
+  .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content::before {
+    display: none;
+  }
+
+  .conversation-skin-inline-interaction {
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+    margin-top: 8px;
+    padding: 16px 20px;
+    position: relative;
+  }
+
+  .conversation-skin-feedback-dot-one,
+  .conversation-skin-feedback-dot-two,
+  .conversation-skin-feedback-dot-three {
+    background-color: #666;
+    display: inline-block;
+    height: 2px;
+    width: 2px;
+  }
+
+  .conversation-skin-feedback-dot-one {
+    -webkit-animation: dot 1.0s infinite;
+    -moz-animation: dot 1.0s infinite;
+    animation: dot 1.0s infinite;
+    -webkit-animation-delay: 0.0s;
+    -moz-animation-delay: 0.0s;
+    animation-delay: 0.0s;
+    opacity: 0;
+  }
+
+  .conversation-skin-feedback-dot-two {
+    -webkit-animation: dot 1.0s infinite;
+    -moz-animation: dot 1.0s infinite;
+    animation: dot 1.0s infinite;
+    -webkit-animation-delay: 0.2s;
+    -moz-animation-delay: 0.2s;
+    animation-delay: 0.2s;
+    opacity: 0;
+  }
+
+  .conversation-skin-feedback-dot-three {
+    -webkit-animation: dot 1.0s infinite;
+    -moz-animation: dot 1.0s infinite;
+    animation: dot 1.0s infinite;
+    -webkit-animation-delay: 0.4s;
+    -moz-animation-delay: 0.4s;
+    animation-delay: 0.4s;
+    opacity: 0;
+  }
+
+  .conversation-skin-final-ratings {
+    text-align: center;
+  }
+
+  .conversation-skin-final-recommendations {
+    margin-top: 50px;
+    text-align: center;
+  }
+
+  .conversation-skin-oppia-feedback.ng-enter {
+    opacity: 0;
+    -webkit-transition: all .5s;
+    transition: all .5s;
+  }
+
+  .conversation-skin-oppia-feedback.ng-enter.ng-enter-active {
+    opacity: 1;
+  }
+
+  .conversation-skin-main-tutor-card.ng-hide-add.ng-hide-add-active,
+  .conversation-skin-main-tutor-card.ng-hide-remove.ng-hide-remove-active,
+  .conversation-skin-supplemental-card.ng-hide-add.ng-hide-add-active,
+  .conversation-skin-supplemental-card.ng-hide-remove.ng-hide-remove-active {
+    -webkit-transition: all ease-out 0.4s;
+    transition: all ease-out 0.4s;
+  }
+
+  .conversation-skin-main-tutor-card.ng-hide {
+    opacity: 0;
+    transform: translateX(-1000px);
+  }
+
+  .conversation-skin-supplemental-card.ng-hide {
+    opacity: 0;
+    transform: translateX(1000px);
+  }
+
+  .conversation-skin-main-tutor-card .instructions-button {
+    background: inherit;
+    border: none;
+  }
+
+  @media screen and (max-width: 959px) {
+    .conversation-skin-main-tutor-card-embed,
+    .conversation-skin-future-tutor-card-embed {
+      margin-left: 0;
+    }
+
+    .conversation-skin-main-tutor-card-embed.conversation-skin-animate-tutor-card-on-narrow {
+      position: absolute;
+    }
+
+    .conversation-skin-cards-container {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-width: 1400px;
+      width: 100%;
+    }
+
+    .conversation-skin-cards-container.with-supplementary-card {
+      /* TODO(tjiang11): Find a way to handle arbitrarily long/short content.
+         in supplemental interactions.
+      */
+      margin-top: 308px;
+    }
+
+    .conversation-skin-main-tutor-card {
+      left: 0;
+      margin: 0 auto;
+      position: absolute;
+      right: 0;
+      top: 40px;
+      width: 100%;
+      z-index: 15;
+    }
+
+    .conversation-skin-supplemental-card-container {
+      margin: 40px auto;
+      max-width: 959px;
+      min-width: 360px;
+      position: relative;
+    }
+
+    .conversation-skin-supplemental-card-container .supplemental-mask {
+      background-color: #ccc;
+      height: 100%;
+      left: 0;
+      opacity: 0.7;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
+    .conversation-skin-main-tutor-card .instructions-button {
+      background-color: #0d48a1;
+      color: #fff;
+      padding: 6px 12px;
+    }
+    .conversation-skin-main-tutor-card button.mat-button.instructions-button:focus,
+    .conversation-skin-main-tutor-card button.mat-button.instructions-button:hover {
+      background-color: #115fd4;
+    }
+    .conversation-skin-oppia-avatar.show-tutor-card {
+      border-radius: 50%;
+      box-shadow: 0 3px 3px grey, 0 5px 3px grey;
+      display: block;
+      height: 40px;
+      left: 100%;
+      position: absolute;
+      transform: translate(-100%, -100%);
+      width: 40px;
+      z-index: 16;
+    }
+    .conversation-skin-oppia-avatar.show-tutor-card:hover {
+      opacity: 0.8;
+    }
+    .nav-bar-bottom-replay-content,
+    .nav-bar-bottom-visit-oppia {
+      font-size: 0.7em;
+    }
+    .oppia-view-more-explorations {
+      display: none;
+    }
+  }
+  @media screen and (max-width: 550px) {
+    .oppia-restart-exploration {
+      display: none;
+    }
+    [class*='col-'] {
+      padding: 0;
+    }
+
+    .col-1-2 {
+      width: 60%;
+    }
+    .col-1-4 {
+      width: 20%;
+    }
+    .replay-nav-icon {
+      font-size: 40px;
+    }
+    .help-card-standard {
+      bottom: -20px;
+    }
+  }
+</style>

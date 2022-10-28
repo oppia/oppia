@@ -14,34 +14,32 @@
 
 """Base constants and handlers."""
 
-import Cookie
+from __future__ import annotations
+
 import base64
 import datetime
+import functools
 import hmac
 import json
 import logging
 import os
-import sys
+import re
 import time
-import traceback
-import urlparse
+import urllib
 
-from constants import constants
+from core import feconf
+from core import handler_schema_constants
+from core import utils
+from core.controllers import payload_validator
+from core.domain import auth_domain
+from core.domain import auth_services
 from core.domain import config_domain
 from core.domain import config_services
-from core.domain import rights_manager
 from core.domain import user_services
-from core.platform import models
-import feconf
-import jinja_utils
-import utils
 
-from google.appengine.api import users
 import webapp2
 
-app_identity_services = models.Registry.import_app_identity_services()
-current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+from typing import Any, Dict, Optional # isort: skip
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
@@ -49,58 +47,76 @@ CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
+# NOTE: These handlers manage user sessions and serve auth pages. Thus, we
+# should never reject or replace them when running in maintenance mode;
+# otherwise admins will be unable to access the site.
+AUTH_HANDLER_PATHS = (
+    '/csrfhandler',
+    '/login',
+    '/session_begin',
+    '/session_end',
+)
 
 
-def _clear_login_cookies(response_headers):
-    """Clears login cookies from the given response headers."""
+@functools.lru_cache(maxsize=128)
+def load_template(filename):
+    """Return the HTML file contents at filepath.
 
-    # App Engine sets the ACSID cookie for http:// and the SACSID cookie
-    # for https:// . We just unset both below.
-    cookie = Cookie.SimpleCookie()
-    for cookie_name in ['ACSID', 'SACSID']:
-        cookie = Cookie.SimpleCookie()
-        cookie[cookie_name] = ''
-        cookie[cookie_name]['expires'] = (
-            datetime.datetime.utcnow() +
-            datetime.timedelta(seconds=ONE_DAY_AGO_IN_SECS)
-        ).strftime('%a, %d %b %Y %H:%M:%S GMT')
-        response_headers.add_header(*cookie.output().split(': ', 1))
+    Args:
+        filename: str. Name of the requested HTML file.
+
+    Returns:
+        str. The HTML file content.
+    """
+    filepath = os.path.join(feconf.FRONTEND_TEMPLATES_DIR, filename)
+    with utils.open_file(filepath, 'r') as f:
+        html_text = f.read()
+    return html_text
 
 
-class LogoutPage(webapp2.RequestHandler):
-    """Class which handles the logout URL."""
+class SessionBeginHandler(webapp2.RequestHandler):
+    """Handler for creating new authentication sessions."""
 
     def get(self):
-        """Logs the user out, and returns them to a specified follow-up
-        page (or the home page if no follow-up page is specified).
-        """
-
-        _clear_login_cookies(self.response.headers)
-        url_to_redirect_to = '/'
-
-        if constants.DEV_MODE:
-            self.redirect(users.create_logout_url(url_to_redirect_to))
-        else:
-            self.redirect(url_to_redirect_to)
+        """Establishes a new auth session."""
+        auth_services.establish_auth_session(self.request, self.response)
 
 
-class UserFacingExceptions(object):
+class SessionEndHandler(webapp2.RequestHandler):
+    """Handler for destroying existing authentication sessions."""
+
+    def get(self):
+        """Destroys an existing auth session."""
+        auth_services.destroy_auth_session(self.response)
+
+
+class UserFacingExceptions:
     """This class contains all the exception class definitions used."""
 
     class NotLoggedInException(Exception):
         """Error class for users that are not logged in (error code 401)."""
 
+        pass
+
     class InvalidInputException(Exception):
         """Error class for invalid input on the user side (error code 400)."""
+
+        pass
 
     class UnauthorizedUserException(Exception):
         """Error class for unauthorized access."""
 
+        pass
+
     class PageNotFoundException(Exception):
         """Error class for a page not found error (error code 404)."""
 
+        pass
+
     class InternalErrorException(Exception):
         """Error class for an internal server side error (error code 500)."""
+
+        pass
 
 
 class BaseHandler(webapp2.RequestHandler):
@@ -121,14 +137,14 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @webapp2.cached_property
-    def jinja2_env(self):
-        """Returns a Jinja2 environment cached for frontend templates.
-
-        Returns:
-            Environment. A Jinja2 environment object used to load templates.
-        """
-        return jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
+    # Using Dict[str, Any] here because the following schema can have a
+    # recursive structure and currently mypy doesn't support recursive type
+    # currently. See: https://github.com/python/mypy/issues/731
+    URL_PATH_ARGS_SCHEMAS: Optional[Dict[str, Any]] = None
+    # Using Dict[str, Any] here because the following schema can have a
+    # recursive structure and currently mypy doesn't support recursive type
+    # currently. See: https://github.com/python/mypy/issues/731
+    HANDLER_ARGS_SCHEMAS: Optional[Dict[str, Any]] = None
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
@@ -139,24 +155,84 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
-        self.user_id = current_user_services.get_current_user_id()
+        # This try-catch block is intended to log cases where getting the
+        # request payload errors with ValueError: Invalid boundary in multipart
+        # form: b''. This is done to gather sufficient data to help debug the
+        # error if it arises in the future.
+        try:
+            payload_json_string = self.request.get('payload')
+        except ValueError as e:
+            logging.error('%s: request %s', e, self.request)
+            raise e
+        # TODO(#13155): Remove the if-else part once all the handlers have had
+        # schema validation implemented.
+        if payload_json_string:
+            self.payload = json.loads(payload_json_string)
+        else:
+            self.payload = None
+        self.iframed = False
+
+        self.user_id = None
         self.username = None
+        self.email = None
         self.partially_logged_in = False
+        self.user_is_scheduled_for_deletion = False
+        self.current_user_is_super_admin = False
+        # Once the attribute `normalized_request` is type annotated here, make
+        # sure to fix all the subclasses using normalized_request.get() method
+        # by removing their type: ignore[union-attr] and using a type cast
+        # instead to eliminate the possibility on union types.
+        # e.g. ClassroomAccessValidationHandler.
+        self.normalized_request = None
+        self.normalized_payload = None
 
-        if self.user_id:
-            user_settings = user_services.get_user_settings(
-                self.user_id, strict=False)
+        try:
+            auth_claims = auth_services.get_auth_claims_from_request(request)
+        except auth_domain.StaleAuthSessionError:
+            auth_services.destroy_auth_session(self.response)
+            self.redirect(user_services.create_login_url(self.request.uri))
+            return
+        except auth_domain.UserDisabledError:
+            auth_services.destroy_auth_session(self.response)
+            self.redirect(
+                '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
+            return
+        except auth_domain.InvalidAuthSessionError:
+            logging.exception('User session is invalid!')
+            auth_services.destroy_auth_session(self.response)
+            self.redirect(user_services.create_login_url(self.request.uri))
+            return
+        else:
+            self.current_user_is_super_admin = (
+                auth_claims is not None and auth_claims.role_is_super_admin)
+
+        if auth_claims:
+            auth_id = auth_claims.auth_id
+            user_settings = user_services.get_user_settings_by_auth_id(auth_id)
             if user_settings is None:
-                email = current_user_services.get_current_user_email()
-                user_settings = user_services.create_new_user(
-                    self.user_id, email)
-            self.values['user_email'] = user_settings.email
+                # If the user settings are not yet created and the request leads
+                # to signup page create a new user settings. Otherwise logout
+                # the not-fully registered user.
+                email = auth_claims.email
+                if 'signup?' in self.request.uri:
+                    user_settings = (
+                        user_services.create_new_user(auth_id, email))
+                else:
+                    logging.exception(
+                        'Cannot find user %s with email %s on page %s' % (
+                            auth_id, email, self.request.uri))
+                    auth_services.destroy_auth_session(self.response)
+                    return
 
-            if (self.REDIRECT_UNFINISHED_SIGNUPS and not
-                    user_services.has_fully_registered(self.user_id)):
-                _clear_login_cookies(self.response.headers)
+            self.email = user_settings.email
+            self.values['user_email'] = user_settings.email
+            self.user_id = user_settings.user_id
+
+            if user_settings.deleted:
+                self.user_is_scheduled_for_deletion = user_settings.deleted
+            elif (self.REDIRECT_UNFINISHED_SIGNUPS and
+                  not user_services.has_fully_registered_account(self.user_id)):
                 self.partially_logged_in = True
-                self.user_id = None
             else:
                 self.username = user_settings.username
                 self.values['username'] = self.username
@@ -169,45 +245,47 @@ class BaseHandler(webapp2.RequestHandler):
                             user_settings.last_logged_in)):
                     user_services.record_user_logged_in(self.user_id)
 
-        self.role = (
-            feconf.ROLE_ID_GUEST
-            if self.user_id is None else user_settings.role)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.roles = (
+            [feconf.ROLE_ID_GUEST]
+            if self.user_id is None else user_settings.roles)
+        self.user = user_services.get_user_actions_info(self.user_id)
 
-        self.is_super_admin = (
-            current_user_services.is_current_user_super_admin())
+        if not self._is_requested_path_currently_accessible_to_user():
+            auth_services.destroy_auth_session(self.response)
+            return
 
-        self.values['additional_angular_modules'] = []
-        self.values['iframed'] = False
-        self.values['is_moderator'] = user_services.is_at_least_moderator(
-            self.user_id)
-        self.values['is_admin'] = user_services.is_admin(self.user_id)
-        self.values['is_topic_manager'] = (
-            user_services.is_topic_manager(self.user_id))
-        self.values['is_super_admin'] = self.is_super_admin
-
-        if self.request.get('payload'):
-            self.payload = json.loads(self.request.get('payload'))
-        else:
-            self.payload = None
+        self.values['is_super_admin'] = self.current_user_is_super_admin
 
     def dispatch(self):
         """Overrides dispatch method in webapp2 superclass.
 
         Raises:
-            Exception: The CSRF token is missing.
-            UnauthorizedUserException: The CSRF token is invalid.
+            Exception. The CSRF token is missing.
+            UnauthorizedUserException. The CSRF token is invalid.
         """
+        request_split = urllib.parse.urlsplit(self.request.uri)
         # If the request is to the old demo server, redirect it permanently to
-        # the new demo server.
-        if self.request.uri.startswith('https://oppiaserver.appspot.com'):
+        # the new demo server. (Unless it is a cron job or tasks request,
+        # because cron job and tasks destination URLs are generated by
+        # App Engine and we can't change their destination.)
+        if (
+                request_split.netloc == 'oppiaserver.appspot.com' and
+                not request_split.path.startswith(('/cron/', '/task/'))
+        ):
             self.redirect('https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        # In DEV_MODE, clearing cookies does not log out the user, so we
-        # force-clear them by redirecting to the logout URL.
-        if constants.DEV_MODE and self.partially_logged_in:
-            self.redirect(users.create_logout_url(self.request.uri))
+        if not self._is_requested_path_currently_accessible_to_user():
+            self.render_template('maintenance-page.mainpage.html')
+            return
+
+        if self.user_is_scheduled_for_deletion:
+            self.redirect(
+                '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
+            return
+
+        if self.partially_logged_in and request_split.path != '/logout':
+            self.redirect('/logout?redirect_url=%s' % request_split.path)
             return
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
@@ -235,30 +313,225 @@ class BaseHandler(webapp2.RequestHandler):
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
             except Exception as e:
-                logging.error('%s: payload %s', e, self.payload)
+                logging.exception('%s: payload %s', e, self.payload)
 
                 self.handle_exception(e, self.app.debug)
                 return
 
-        super(BaseHandler, self).dispatch()
+        schema_validation_succeeded = True
+        try:
+            self.validate_and_normalize_args()
+
+        # TODO(#13155): Remove NotImplementedError once all the handlers
+        # have had schema validation implemented.
+        except (
+            NotImplementedError,
+            self.InternalErrorException,
+            self.InvalidInputException
+        ) as e:
+            self.handle_exception(e, self.app.debug)
+            schema_validation_succeeded = False
+        if not schema_validation_succeeded:
+            return
+
+        super().dispatch()
+
+    def validate_and_normalize_args(self):
+        """Validates schema for controller layer handler class arguments.
+
+        Raises:
+            InvalidInputException. Schema validation failed.
+            NotImplementedError. Schema is not provided in handler class.
+        """
+        handler_class_name = self.__class__.__name__
+        request_method = self.request.environ['REQUEST_METHOD']
+
+        # For HEAD requests, we use the schema of GET handler,
+        # because HEAD returns just the handlers of the GET request.
+        if request_method == 'HEAD':
+            request_method = 'GET'
+
+        url_path_args = self.request.route_kwargs
+
+        if (
+            handler_class_name in
+            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
+        ):
+            # TODO(#13155): Remove this clause once all the handlers have had
+            # schema validation implemented.
+            if self.URL_PATH_ARGS_SCHEMAS or self.HANDLER_ARGS_SCHEMAS:
+                raise self.InternalErrorException(
+                    'Remove handler class name from '
+                    'HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS')
+            return
+
+        handler_args = {}
+        payload_arg_keys = []
+        request_arg_keys = []
+        for arg in self.request.arguments():
+            if arg == 'csrf_token':
+                # 'csrf_token' has been already validated in the
+                # dispatch method.
+                pass
+            elif arg == 'source':
+                source_url = self.request.get('source')
+                regex_pattern = (
+                    r'http[s]?://(?:[a-zA-Z]|[0-9]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' # pylint: disable=line-too-long
+                )
+                regex_verified_url = re.findall(regex_pattern, source_url)
+                if not regex_verified_url:
+                    raise self.InvalidInputException(
+                        'Not a valid source url.')
+            elif arg == 'payload':
+                payload_args = self.payload
+                if payload_args is not None:
+                    payload_arg_keys = list(payload_args.keys())
+                    handler_args.update(payload_args)
+            else:
+                request_arg_keys.append(arg)
+                handler_args[arg] = self.request.get(arg)
+
+        # For html handlers, extra args are allowed (to accommodate
+        # e.g. utm parameters which are not used by the backend but
+        # needed for analytics).
+        extra_args_are_allowed = (
+            self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_HTML and
+            request_method == 'GET')
+
+        if self.URL_PATH_ARGS_SCHEMAS is None:
+            raise NotImplementedError(
+                'Missing schema for url path args in %s handler class.' % (
+                    handler_class_name))
+
+        schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
+        self.request.route_kwargs, errors = (
+            payload_validator.validate_arguments_against_schema(
+                url_path_args, schema_for_url_path_args, extra_args_are_allowed)
+        )
+
+        if errors:
+            raise self.InvalidInputException(
+                'At \'%s\' these errors are happening:\n%s' % (
+                    self.request.uri, '\n'.join(errors)
+                )
+            )
+
+        # This check ensures that if a request method is not defined
+        # in the handler class then schema validation will not raise
+        # NotImplementedError for that corresponding request method.
+        if request_method in ['GET', 'POST', 'PUT', 'DELETE'] and (
+                getattr(self.__class__, request_method.lower()) ==
+                getattr(BaseHandler, request_method.lower())):
+            return
+
+        try:
+            schema_for_request_method = self.HANDLER_ARGS_SCHEMAS[
+                request_method]
+        except Exception as e:
+            raise NotImplementedError(
+                'Missing schema for %s method in %s handler class.' % (
+                    request_method, handler_class_name)) from e
+
+        allow_string_to_bool_conversion = request_method in ['GET', 'DELETE']
+        normalized_arg_values, errors = (
+            payload_validator.validate_arguments_against_schema(
+                handler_args, schema_for_request_method, extra_args_are_allowed,
+                allow_string_to_bool_conversion)
+        )
+
+        self.normalized_payload = {
+            arg: normalized_arg_values.get(arg) for arg in payload_arg_keys
+        }
+        self.normalized_request = {
+            arg: normalized_arg_values.get(arg) for arg in request_arg_keys
+        }
+
+        # The following keys are absent in request/payload but present in
+        # normalized_arg_values because these args are populated from their
+        # default_value provided in the schema.
+        keys_that_correspond_to_default_values = list(
+            set(normalized_arg_values.keys()) -
+            set(payload_arg_keys + request_arg_keys)
+        )
+        # Populate the payload/request with the default args before passing
+        # execution onwards to the handler.
+        for arg in keys_that_correspond_to_default_values:
+            if request_method in ['GET', 'DELETE']:
+                self.normalized_request[arg] = normalized_arg_values.get(arg)
+            else:
+                self.normalized_payload[arg] = normalized_arg_values.get(arg)
+
+        self.request.get = RaiseErrorOnGet(
+            'Use self.normalized_request instead of self.request.').get
+        self.payload = RaiseErrorOnGet(
+            'Use self.normalized_payload instead of self.payload.')
+
+        if errors:
+            raise self.InvalidInputException('\n'.join(errors))
+
+    @property
+    def current_user_is_site_maintainer(self):
+        """Returns whether the current user is a site maintainer.
+
+        A super admin or release coordinator is also a site maintainer.
+
+        Returns:
+            bool. Whether the current user is a site maintainer.
+        """
+        return (
+            self.current_user_is_super_admin or
+            feconf.ROLE_ID_RELEASE_COORDINATOR in self.roles)
+
+    def _is_requested_path_currently_accessible_to_user(self):
+        """Checks whether the requested path is currently accessible to user.
+
+        Returns:
+            bool. Whether the requested path is currently accessible to user.
+        """
+        return (
+            self.request.path in AUTH_HANDLER_PATHS or
+            not feconf.ENABLE_MAINTENANCE_MODE or
+            self.current_user_is_site_maintainer)
 
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
         """Base method to handle GET requests."""
-        raise self.PageNotFoundException
+        logging.warning('Invalid URL requested: %s', self.request.uri)
+        self.error(404)
+        self._render_exception(
+            404, {
+                'error': 'Could not find the page %s.' % self.request.uri})
 
     def post(self, *args):  # pylint: disable=unused-argument
-        """Base method to handle POST requests."""
+        """Base method to handle POST requests.
+
+        Raises:
+            PageNotFoundException. Page not found error (error code 404).
+        """
         raise self.PageNotFoundException
 
     def put(self, *args):  # pylint: disable=unused-argument
-        """Base method to handle PUT requests."""
+        """Base method to handle PUT requests.
+
+        Raises:
+            PageNotFoundException. Page not found error (error code 404).
+        """
         raise self.PageNotFoundException
 
     def delete(self, *args):  # pylint: disable=unused-argument
-        """Base method to handle DELETE requests."""
+        """Base method to handle DELETE requests.
+
+        Raises:
+            PageNotFoundException. Page not found error (error code 404).
+        """
         raise self.PageNotFoundException
 
-    def render_json(self, values):
+    def head(self, *args, **kwargs):
+        """Method to handle HEAD requests. The webapp library automatically
+        makes sure that HEAD only returns the headers of GET request.
+        """
+        return self.get(*args, **kwargs)
+
+    def render_json(self, values: Dict[Any, Any]) -> None:
         """Prepares JSON response to be sent to the client.
 
         Args:
@@ -273,14 +546,26 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.headers['X-Xss-Protection'] = '1; mode=block'
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
-        self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
+        # Write expects bytes, thus we need to encode the JSON output.
+        self.response.write(
+            b'%s%s' % (feconf.XSSI_PREFIX, json_output.encode('utf-8')))
 
-    def render_downloadable_file(self, values, filename, content_type):
-        """Prepares downloadable content to be sent to the client."""
+    def render_downloadable_file(self, file, filename, content_type):
+        """Prepares downloadable content to be sent to the client.
+
+        Args:
+            file: BytesIO. The data of the downloadable file.
+            filename: str. The name of the file to be rendered.
+            content_type: str. The type of file to be rendered.
+        """
         self.response.headers['Content-Type'] = content_type
-        self.response.headers['Content-Disposition'] = str(
+        self.response.headers['Content-Disposition'] = (
             'attachment; filename=%s' % filename)
-        self.response.write(values)
+        self.response.charset = 'utf-8'
+        # We use this super in order to bypass the write method
+        # in webapp2.Response, since webapp2.Response doesn't support writing
+        # bytes.
+        super(webapp2.Response, self.response).write(file.getvalue())  # pylint: disable=bad-super-call
 
     def render_template(self, filepath, iframe_restriction='DENY'):
         """Prepares an HTML response to be sent to the client.
@@ -293,40 +578,14 @@ class BaseHandler(webapp2.RequestHandler):
                 DENY: Strictly prevents the template to load in an iframe.
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
+
+        Raises:
+            Exception. Invalid X-Frame-Options.
         """
-        values = self.values
 
-        scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
-
-        values.update({
-            'DEV_MODE': constants.DEV_MODE,
-            'DOMAIN_URL': '%s://%s' % (scheme, netloc),
-            'ACTIVITY_STATUS_PRIVATE': (
-                rights_manager.ACTIVITY_STATUS_PRIVATE),
-            'ACTIVITY_STATUS_PUBLIC': (
-                rights_manager.ACTIVITY_STATUS_PUBLIC),
-            'GCS_RESOURCE_BUCKET_NAME': (
-                app_identity_services.get_gcs_resource_bucket_name()),
-            # The 'path' variable starts with a forward slash.
-            'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
-        })
-
-        if 'status_code' not in values:
-            values['status_code'] = 200
-
-        if 'meta_name' not in values:
-            values['meta_name'] = 'Personalized Online Learning from Oppia'
-
-        if 'meta_description' not in values:
-            values['meta_description'] = (
-                'Oppia is a free, open-source learning platform. Join the '
-                'community to create or try an exploration today!')
-
-        # Create a new csrf token for inclusion in HTML responses. This assumes
-        # that tokens generated in one handler will be sent back to a handler
-        # with the same page name.
-
-        self.response.cache_control.no_cache = True
+        # The 'no-store' must be used to properly invalidate the cache when we
+        # deploy a new version, using only 'no-cache' doesn't work properly.
+        self.response.cache_control.no_store = True
         self.response.cache_control.must_revalidate = True
         self.response.headers['Strict-Transport-Security'] = (
             'max-age=31536000; includeSubDomains')
@@ -335,8 +594,8 @@ class BaseHandler(webapp2.RequestHandler):
 
         if iframe_restriction is not None:
             if iframe_restriction in ['SAMEORIGIN', 'DENY']:
-                self.response.headers['X-Frame-Options'] = str(
-                    iframe_restriction)
+                self.response.headers['X-Frame-Options'] = (
+                    str(iframe_restriction))
             else:
                 raise Exception(
                     'Invalid X-Frame-Options: %s' % iframe_restriction)
@@ -344,8 +603,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
 
-        self.response.write(
-            self.jinja2_env.get_template(filepath).render(**values))
+        self.response.write(load_template(filepath))
 
     def _render_exception_json_or_html(self, return_type, values):
         """Renders an error page, or an error JSON response.
@@ -357,20 +615,24 @@ class BaseHandler(webapp2.RequestHandler):
 
         method = self.request.environ['REQUEST_METHOD']
 
-        if return_type == feconf.HANDLER_TYPE_HTML and (
-                method == 'GET'):
+        if return_type == feconf.HANDLER_TYPE_HTML and method == 'GET':
             self.values.update(values)
-            if 'iframed' in self.values and self.values['iframed']:
+            if self.iframed:
                 self.render_template(
-                    'pages/error-pages/error-iframed.mainpage.html',
-                    iframe_restriction=None)
+                    'error-iframed.mainpage.html', iframe_restriction=None)
+            elif values['status_code'] == 404:
+                # Only 404 routes can be handled with angular router as it only
+                # has access to the path, not to the status code.
+                # That's why 404 status code is treated differently.
+                self.render_template('oppia-root.mainpage.html')
             else:
-                self.render_template('dist/error-page.mainpage.html')
+                self.render_template(
+                    'error-page-%s.mainpage.html' % values['status_code'])
         else:
-            if return_type != feconf.HANDLER_TYPE_JSON and (
-                    return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
-                logging.warning('Not a recognized return type: '
-                                'defaulting to render JSON.')
+            if return_type not in (
+                    feconf.HANDLER_TYPE_JSON, feconf.HANDLER_TYPE_DOWNLOADABLE):
+                logging.warning(
+                    'Not a recognized return type: defaulting to render JSON.')
             self.render_json(values)
 
     def _render_exception(self, error_code, values):
@@ -381,6 +643,8 @@ class BaseHandler(webapp2.RequestHandler):
                 400, 401, 404 or 500).
             values: dict. The key-value pairs to include in the response.
         """
+        # The error codes here should be in sync with the error pages
+        # generated via webpack.common.config.ts.
         assert error_code in [400, 401, 404, 500]
         values['status_code'] = error_code
         method = self.request.environ['REQUEST_METHOD']
@@ -399,8 +663,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.DELETE_HANDLER_ERROR_RETURN_TYPE, values)
         else:
             logging.warning('Not a recognized request method.')
-            self._render_exception_json_or_html(
-                None, values)
+            self._render_exception_json_or_html(None, values)
 
     def handle_exception(self, exception, unused_debug_mode):
         """Overwrites the default exception handler.
@@ -415,20 +678,31 @@ class BaseHandler(webapp2.RequestHandler):
             # For GET requests, there is no payload, so we check against
             # GET_HANDLER_ERROR_RETURN_TYPE.
             # Otherwise, we check whether self.payload exists.
-            if (self.payload is not None or
+
+            # This check is to avoid throwing of 401 when payload doesn't
+            # exists and self.payload is replaced by RaiseErrorOnGet object.
+            # TODO(#13155): Change this to self.normalized_payload
+            #  once schema is implemented for all handlers.
+            payload_exists = (
+                self.payload is not None and
+                not isinstance(self.payload, RaiseErrorOnGet)
+            )
+            if (
+                    payload_exists or
                     self.GET_HANDLER_ERROR_RETURN_TYPE ==
-                    feconf.HANDLER_TYPE_JSON):
+                    feconf.HANDLER_TYPE_JSON
+            ):
                 self.error(401)
                 self._render_exception(
                     401, {
                         'error': (
                             'You must be logged in to access this resource.')})
             else:
-                self.redirect(
-                    current_user_services.create_login_url(self.request.uri))
+                self.redirect(user_services.create_login_url(self.request.uri))
             return
 
-        logging.info(''.join(traceback.format_exception(*sys.exc_info())))
+        logging.exception(
+            'Exception raised at %s: %s', self.request.uri, exception)
 
         if isinstance(exception, self.PageNotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)
@@ -438,25 +712,25 @@ class BaseHandler(webapp2.RequestHandler):
                     'error': 'Could not find the page %s.' % self.request.uri})
             return
 
-        logging.error('Exception raised: %s', exception)
+        logging.exception('Exception raised: %s', exception)
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
-            self._render_exception(401, {'error': unicode(exception)})
+            self._render_exception(401, {'error': str(exception)})
             return
 
         if isinstance(exception, self.InvalidInputException):
             self.error(400)
-            self._render_exception(400, {'error': unicode(exception)})
+            self._render_exception(400, {'error': str(exception)})
             return
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
-            self._render_exception(500, {'error': unicode(exception)})
+            self._render_exception(500, {'error': str(exception)})
             return
 
         self.error(500)
-        self._render_exception(500, {'error': unicode(exception)})
+        self._render_exception(500, {'error': str(exception)})
 
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
@@ -471,7 +745,18 @@ class Error404Handler(BaseHandler):
     pass
 
 
-class CsrfTokenManager(object):
+class RaiseErrorOnGet:
+    """Class that will throw a ValueError when the get function is invoked."""
+
+    def __init__(self, message: str):
+        self.error_message = message
+
+    def get(self, *args: Any, **kwargs: Any) -> None:
+        """Raises an error when invoked."""
+        raise ValueError(self.error_message)
+
+
+class CsrfTokenManager:
     """Manages page/user tokens in memcache to protect against CSRF."""
 
     # Max age of the token (48 hours).
@@ -501,7 +786,7 @@ class CsrfTokenManager(object):
             issued_on: float. The timestamp at which the token was issued.
 
         Returns:
-            str: The generated CSRF token.
+            str. The generated CSRF token.
         """
         cls.init_csrf_secret()
 
@@ -512,15 +797,21 @@ class CsrfTokenManager(object):
             user_id = cls._USER_ID_DEFAULT
 
         # Round time to seconds.
-        issued_on = long(issued_on)
+        issued_on = str(int(issued_on))
 
-        digester = hmac.new(str(CSRF_SECRET.value))
-        digester.update(str(user_id))
-        digester.update(':')
-        digester.update(str(issued_on))
+        digester = hmac.new(
+            key=CSRF_SECRET.value.encode('utf-8'),
+            digestmod='md5'
+        )
+        digester.update(user_id.encode('utf-8'))
+        digester.update(b':')
+        digester.update(issued_on.encode('utf-8'))
 
         digest = digester.digest()
-        token = '%s/%s' % (issued_on, base64.urlsafe_b64encode(digest))
+        # The b64encode returns bytes, so we first need to decode the returned
+        # bytes to string.
+        token = '%s/%s' % (
+            issued_on, base64.urlsafe_b64encode(digest).decode('utf-8'))
 
         return token
 
@@ -561,7 +852,7 @@ class CsrfTokenManager(object):
             if len(parts) != 2:
                 return False
 
-            issued_on = long(parts[0])
+            issued_on = int(parts[0])
             age = cls._get_current_time() - issued_on
             if age > cls._CSRF_TOKEN_AGE_SECS:
                 return False
@@ -587,3 +878,25 @@ class CsrfTokenHandler(BaseHandler):
         self.render_json({
             'token': csrf_token,
         })
+
+
+class OppiaMLVMHandler(BaseHandler):
+    """Base class for the handlers that communicate with Oppia-ML VM instances.
+    """
+
+    def extract_request_message_vm_id_and_signature(self):
+        """Returns the OppiaMLAuthInfo domain object containing
+        information from the incoming request that is necessary for
+        authentication.
+
+        Since incoming request can be either a protobuf serialized binary or
+        a JSON object, the derived classes must implement the necessary
+        logic to decode the incoming request and return a tuple of size 3
+        where message is at index 0, vm_id is at index 1 and signature is at
+        index 2.
+
+        Raises:
+            NotImplementedError. The derived child classes must implement the
+                necessary logic as described above.
+        """
+        raise NotImplementedError

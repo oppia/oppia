@@ -1,0 +1,38 @@
+<div class="modal-header">
+  <h3>Add Outcome</h3>
+  <i class="fa fa-times" (click)="cancel()"></i>
+</div>
+
+<div class="modal-body">
+  <form role="form"
+        class="form-inline e2e-test-edit-outcome-feedback"
+        name="editOutcomeForm.editFeedbackForm">
+    <oppia-outcome-feedback-editor [outcome]="outcome">
+    </oppia-outcome-feedback-editor>
+  </form>
+  <div *ngIf="isFeedbackLengthExceeded()"
+       class="oppia-length-validation-error">
+    The feedback length is too long. Please use at most 500 characters.
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary e2e-test-cancel-outcome"
+          (click)="cancel()">
+    Cancel
+  </button>
+  <button class="btn btn-success e2e-test-save-outcome-feedback"
+          (click)="save()"
+          [disabled]="!this.outcome || this.isFeedbackLengthExceeded()">
+    Save Response
+  </button>
+</div>
+
+<style>
+  .modal-header {
+    padding-bottom: 0;
+  }
+  .modal-body {
+    padding-top: 0;
+  }
+</style>

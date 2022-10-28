@@ -1,4 +1,4 @@
-# [Oppia](https://www.oppia.org) [![Build Status](https://api.travis-ci.org/oppia/oppia.svg?branch=develop)](https://travis-ci.org/oppia/oppia) [![Code Coverage](https://api.codeclimate.com/v1/badges/eaa9dfe89c760481079d/test_coverage)](https://codeclimate.com/github/oppia/oppia/test_coverage) [![Join the chat at https://gitter.im/oppia/oppia-chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/oppia/oppia-chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+# [Oppia](https://www.oppia.org) [![Actions](https://github.com/oppia/oppia/workflows/End-to-End%20tests/badge.svg?branch=develop)](https://github.com/oppia/oppia/actions?query=branch%3Adevelop+workflow%3A%22End-to-End+tests%22) [![Join the chat at https://gitter.im/oppia/oppia-chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/oppia/oppia-chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Oppia is an online learning tool that enables anyone to easily create and share interactive activities (called 'explorations'). These activities simulate a one-on-one conversation with a tutor, making it possible for students to learn by doing while getting feedback.
 
@@ -20,23 +20,7 @@ Oppia is written using Python and AngularJS, and is built on top of Google App E
 
 ## Installation
 
-Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for full installation instructions. This is just a short summary for developers who would like to contribute:
-
-1. Create a new, empty folder called `opensource/` within your home folder. Navigate to it (`cd opensource`), then [fork and clone](https://github.com/oppia/oppia/wiki/Fork-and-Clone-Oppia) the Oppia repo. This will create a new folder named `opensource/oppia`.
-
-2. Navigate to `opensource/oppia/` and run:
-
-  ```
-    git checkout develop
-    bash scripts/start.sh
-  ```
-
-3. To run tests:
-
-  ```
-    bash scripts/run_tests.sh
-  ```
-
+Please refer to the [Installing Oppia page](https://github.com/oppia/oppia/wiki/Installing-Oppia) for full instructions.
 
 ## Contributing
 
@@ -61,9 +45,17 @@ The Oppia code is released under the [Apache v2 license](https://github.com/oppi
 
 ## Keeping in touch
 
-  * [Blog](https://medium.com/oppia-org)
   * [Discussion forum](http://groups.google.com/group/oppia)
   * [Announcements mailing list](http://groups.google.com/group/oppia-announce)
-  * Social media: [YouTube](https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw), [FB](https://www.facebook.com/oppiaorg), [Twitter](https://twitter.com/oppiaorg)
 
-We also have public chat rooms on Gitter: [https://gitter.im/oppia/oppia-chat](https://gitter.im/oppia/oppia-chat) and the #oppia channel on Freenode IRC. Drop by and say hello!
+We also have public chat rooms on Gitter: [https://gitter.im/oppia/oppia-chat](https://gitter.im/oppia/oppia-chat). Drop by and say hello!
+
+## Social Media
+[<img height="30" src="https://img.shields.io/badge/twitter-1DA1F2.svg?&style=for-the-badge&logo=twitter&logoColor=white" />][twitter] [<img height="30" src="https://img.shields.io/badge/linkedin-0077B5.svg?&style=for-the-badge&logo=linkedin&logoColor=white" />][LinkedIn] [<img height="30" src = "https://img.shields.io/badge/facebook-1877F2.svg?&style=for-the-badge&logo=facebook&logoColor=white">][Facebook] [<img height="30" src = "https://img.shields.io/badge/medium-12100E.svg?&style=for-the-badge&logo=medium&logoColor=white">][medium] [<img height="30" src = "https://img.shields.io/badge/oppia.org%20youtube-FF0000.svg?&style=for-the-badge&logo=youtube&logoColor=white">][oppia-org-youtube] [<img height="30" src = "https://img.shields.io/badge/oppia%20dev%20youtube-FF0000.svg?&style=for-the-badge&logo=youtube&logoColor=white">][dev-youtube]
+
+[twitter]: https://twitter.com/oppiaorg
+[linkedIn]: https://www.linkedin.com/company/oppia-org/
+[medium]: https://medium.com/@oppia.org
+[facebook]: https://www.facebook.com/oppiaorg/
+[oppia-org-youtube]: https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw
+[dev-youtube]: https://www.youtube.com/channel/UCsrAX-oeqm0-NIQzQrdiUkQ
