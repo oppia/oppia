@@ -74,7 +74,7 @@ var ExplorationEditorMainTab = function() {
   var nodeLabelLocator = '.e2e-test-node-label';
   var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
   var openOutcomeFeedBackEditor = $('.e2e-test-open-outcome-feedback-editor');
-  var postTutorialPopover = $('.ng-joyride .popover-content');
+  var postTutorialPopover = $('.joyride .popover-content');
   var responseBody = function(responseNum) {
     return $(`.e2e-test-response-body-${responseNum}`);
   };

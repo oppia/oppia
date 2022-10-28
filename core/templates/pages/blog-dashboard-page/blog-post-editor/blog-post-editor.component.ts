@@ -68,6 +68,8 @@ export class BlogPostEditorComponent implements OnInit {
   invalidImageWarningIsShown: boolean = false;
   newChangesAreMade: boolean = false;
   lastChangesWerePublished: boolean = false;
+  saveInProgress: boolean = false;
+  publishingInProgress: boolean = false;
   HTML_SCHEMA: EditorSchema = {
     type: 'html',
     ui_config: {
@@ -95,15 +97,12 @@ export class BlogPostEditorComponent implements OnInit {
     this.loaderService.showLoadingScreen('Loading');
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
       .getStaticImageUrl('/general/no_profile_picture.png');
-    this.blogPostData = BlogPostData.createInterstitialBlogPost();
     this.blogPostId = this.blogDashboardPageService.blogPostId;
-    this.title = this.blogPostData.title;
+    this.initEditor();
     this.MAX_CHARS_IN_BLOG_POST_TITLE = (
       AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE);
     this.MIN_CHARS_IN_BLOG_POST_TITLE = (
       AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE);
-    this.loaderService.hideLoadingScreen();
-    this.initEditor();
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.windowDimensionService.getResizeEvent().subscribe(() => {
       this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
@@ -152,6 +151,7 @@ export class BlogPostEditorComponent implements OnInit {
             this.lastChangesWerePublished, this.title);
           this.newChangesAreMade = false;
           this.preventPageUnloadEventService.removeListener();
+          this.loaderService.hideLoadingScreen();
         }, (errorResponse) => {
           if (
             AppConstants.FATAL_ERROR_CODES.indexOf(
@@ -203,6 +203,7 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   saveDraft(): void {
+    this.saveInProgress = true;
     let issues = this.blogPostData.validate();
     if (issues.length === 0) {
       this.updateBlogPostData(false);
@@ -210,10 +211,12 @@ export class BlogPostEditorComponent implements OnInit {
       this.alertsService.addWarning(
         'Please fix the errors.'
       );
+      this.saveInProgress = false;
     }
   }
 
   publishBlogPost(): void {
+    this.publishingInProgress = true;
     let issues = this.blogPostData.prepublishValidate(this.maxAllowedTags);
     if (issues.length === 0) {
       this.blogDashboardPageService.blogPostAction = (
@@ -226,7 +229,7 @@ export class BlogPostEditorComponent implements OnInit {
       }, () => {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
+        this.publishingInProgress = false;
       });
     }
   }
@@ -243,10 +246,12 @@ export class BlogPostEditorComponent implements OnInit {
             'Blog Post Saved and Published Successfully.'
           );
           this.lastChangesWerePublished = true;
+          this.publishingInProgress = false;
         } else {
           this.alertsService.addSuccessMessage(
             'Blog Post Saved Successfully.');
           this.lastChangesWerePublished = false;
+          this.saveInProgress = false;
         }
         this.newChangesAreMade = false;
         this.blogDashboardPageService.setNavTitle(
@@ -255,6 +260,8 @@ export class BlogPostEditorComponent implements OnInit {
       }, (errorResponse) => {
         this.alertsService.addWarning(
           `Failed to save Blog Post. Internal Error: ${errorResponse}`);
+        this.saveInProgress = false;
+        this.publishingInProgress = false;
       }
     );
   }
