@@ -2909,7 +2909,7 @@ title: Title
     def delete_json(  # pylint: disable=dangerous-default-value
         self,
         url: str,
-        params: Dict[str, Any] = None,
+        params: Optional[Dict[str, Any]] = None,
         expected_status_int: int = 200
     ) -> Dict[str, Any]:
         """Delete object on the server using a JSON call."""
