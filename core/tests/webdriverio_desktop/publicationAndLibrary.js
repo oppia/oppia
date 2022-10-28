@@ -137,11 +137,11 @@ describe('Library index page', function() {
       expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
     }, {
       categories: [],
-      languages: [LANGUAGE_ENGLISH, LANGUAGE_FRANCAI],
+      languages: [LANGUAGE_FRANCAI],
       expectVisible: [EXPLORATION_VINGILOT]
     }, {
       categories: [],
-      languages: [LANGUAGE_ENGLISH, LANGUAGE_DEUTSC, LANGUAGE_FRANCAI],
+      languages: [LANGUAGE_DEUTSC, LANGUAGE_FRANCAI],
       expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
     }, {
       categories: [CATEGORY_ARCHITECTURE],
@@ -190,10 +190,13 @@ describe('Library index page', function() {
     // Private explorations are not shown in the library.
     await libraryPage.expectExplorationToBeHidden('Vilya');
 
+    await libraryPage.selectLanguages([LANGUAGE_FRANCAI]);
     await libraryPage.findExploration(EXPLORATION_VINGILOT);
     // The first letter of the objective is automatically capitalized.
     expect(await libraryPage.getExplorationObjective(EXPLORATION_VINGILOT))
       .toBe('Seek the aid of the Valar');
+
+    await libraryPage.selectLanguages([LANGUAGE_DEUTSC]);
     await libraryPage.findExploration(EXPLORATION_SILMARILS);
     await libraryPage.playExploration(EXPLORATION_SILMARILS);
     await explorationPlayerPage.expectExplorationNameToBe('silmarils');
