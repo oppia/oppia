@@ -7,6 +7,8 @@ FROM ubuntu:18.04
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV TZ "UTC"
+ENV LANG ru_RU.UTF-8
+ENV LC_ALL ru_RU.UTF-8
 ENV DOCKER_CONTAINER True
 SHELL ["/bin/bash", "-c"]
 
