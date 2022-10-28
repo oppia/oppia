@@ -235,19 +235,19 @@ class FindDuplicateBlogAuthorDetailsModelForAuthorJobTests(
         author_details_model_1 = self.create_model(
             blog_models.BlogAuthorDetailsModel,
             id='validblogid1',
-            author_name='user one',
+            displayed_author_name='user one',
             author_id='user',
             author_bio='')
         author_details_model_2 = self.create_model(
             blog_models.BlogAuthorDetailsModel,
             id='validblogid2',
-            author_name='user two',
+            displayed_author_name='user two',
             author_id='user',
             author_bio='author general bio')
         author_details_model_3 = self.create_model(
             blog_models.BlogAuthorDetailsModel,
             id='validblogid3',
-            author_name='user name',
+            displayed_author_name='user name',
             author_id='diffUserId',
             author_bio='some author bio')
 
@@ -261,10 +261,10 @@ class FindDuplicateBlogAuthorDetailsModelForAuthorJobTests(
 
         self.assert_job_output_is(
             [
-                blog_validation_errors.DuplicateblogAuthorModelError(
+                blog_validation_errors.DuplicateBlogAuthorModelError(
                     author_details_model_1
                 ),
-                blog_validation_errors.DuplicateblogAuthorModelError(
+                blog_validation_errors.DuplicateBlogAuthorModelError(
                     author_details_model_2
                 ),
             ])

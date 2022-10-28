@@ -5097,7 +5097,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
 
         blog_models.BlogAuthorDetailsModel.create(
             author_id=self.user_1_id,
-            author_name='blog author',
+            displayed_author_name='blog author',
             author_bio='general bio'
         )
         self.author_details_model = (

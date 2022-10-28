@@ -520,7 +520,7 @@ class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
         author_model_one = blog_models.BlogAuthorDetailsModel(
             id='author_model',
             author_id=self.USER_1_ID,
-            author_name=self.USER_1_NAME,
+            displayed_author_name=self.USER_1_NAME,
             author_bio=self.GENERIC_USER_BIO
         )
         author_model_one.update_timestamps()
@@ -545,7 +545,7 @@ class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
                     lambda x, y: True,
                     blog_author_details_model_cls)):
                 blog_author_details_model_cls.create(
-                    self.USER_1_ID, 'author_name', '')
+                    self.USER_1_ID, 'displayed_author_name', '')
 
         # Test generate_new_blog_post_id method.
         with self.assertRaisesRegex(
@@ -573,7 +573,7 @@ class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             blog_models.BlogAuthorDetailsModel.get_export_policy(), {
                 'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'author_name': base_models.EXPORT_POLICY.EXPORTED,
+                'displayed_author_name': base_models.EXPORT_POLICY.EXPORTED,
                 'author_bio': base_models.EXPORT_POLICY.EXPORTED,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -598,7 +598,7 @@ class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
         user_data = (
             blog_models.BlogAuthorDetailsModel.export_data(self.USER_1_ID))
         expected_data = {
-            'author_name': self.USER_1_NAME,
+            'displayed_author_name': self.USER_1_NAME,
             'author_bio': self.GENERIC_USER_BIO
         }
         self.assertEqual(expected_data, user_data)
@@ -624,5 +624,5 @@ class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert model_instance is not None
         self.assertEqual(model_instance.author_id, self.USER_2_ID)
-        self.assertEqual(model_instance.author_name, self.USER_2_NAME)
+        self.assertEqual(model_instance.displayed_author_name, self.USER_2_NAME)
         self.assertEqual(model_instance.author_bio, self.GENERIC_USER_BIO)

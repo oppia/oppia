@@ -160,7 +160,7 @@ describe('PlatformFeatureService', () => {
               [FeatureNames.EndChapterCelebration]: true,
               [FeatureNames.CheckpointCelebration]: true,
               [FeatureNames.AndroidBetaLandingPage]: true,
-              [FeatureNames.BlogProject]: true,
+              [FeatureNames.BlogPages]: true,
             }
           })
         });

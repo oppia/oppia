@@ -1,3 +1,4 @@
+
 # Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -1505,7 +1506,7 @@ def _pseudonymize_blog_post_models(
     blog_author_details_model_class = blog_models.BlogAuthorDetailsModel
     blog_author_details_model = blog_author_details_model_class.get_by_author(
         user_id)
-    if blog_author_details_model:
+    if blog_author_details_model is not None:
         blog_related_model_ids |= {blog_author_details_model.id}
 
     _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
@@ -1580,7 +1581,7 @@ def _pseudonymize_blog_post_models(
                 blog_post_models_list,
                 blog_post_summary_models,
                 [blog_author_details_model]
-                )
+            )
             if model is not None and model.id == blog_related_ids
         ]
         transaction_slices = utils.grouper(

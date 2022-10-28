@@ -46,7 +46,7 @@ class MockTranslateService {
 
 class MockPlatformFeatureService {
   status = {
-    BlogProject: {
+    BlogPages: {
       isEnabled: true
     }
   };
@@ -123,7 +123,7 @@ describe('Blog Post Page Root', () => {
     sampleBlogPost = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
     userService = TestBed.inject(UserService);
-    mockPlatformFeatureService.status.BlogProject.isEnabled = true;
+    mockPlatformFeatureService.status.BlogPages.isEnabled = true;
     spyOn(urlService, 'getBlogPostUrlFromUrl')
       .and.returnValue('sample-post');
   });
@@ -183,7 +183,7 @@ describe('Blog Post Page Root', () => {
 
   it('should initialize and show error page when blog project feature is' +
   ' disabled and user can not edit blog posts', fakeAsync(() => {
-    mockPlatformFeatureService.status.BlogProject.isEnabled = false;
+    mockPlatformFeatureService.status.BlogPages.isEnabled = false;
     spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
       Promise.resolve(false));
     spyOn(
@@ -207,7 +207,7 @@ describe('Blog Post Page Root', () => {
 
   it('should initialize and validate access when blog project feature is ' +
   'disabled and user can edit blog posts', fakeAsync(() => {
-    mockPlatformFeatureService.status.BlogProject.isEnabled = false;
+    mockPlatformFeatureService.status.BlogPages.isEnabled = false;
     spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
       Promise.resolve(true));
     spyOn(

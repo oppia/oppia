@@ -59,7 +59,7 @@ def _get_blog_card_summary_dicts_for_homepage(summaries):
             summary_dict['author_username'] = 'author account deleted'
         author_details = blog_services.get_blog_author_details(
             summary_dict['author_id'])
-        summary_dict['author_name'] = author_details.author_name
+        summary_dict['author_name'] = author_details.displayed_author_name
         del summary_dict['author_id']
         summary_dicts.append(summary_dict)
     return summary_dicts
@@ -197,7 +197,7 @@ class BlogPostDataHandler(base.BaseHandler):
             blog_post.author_id)
         blog_post_dict = (
             blog_services.get_blog_post_from_model(blog_post).to_dict())
-        blog_post_dict['author_name'] = author_details.author_name
+        blog_post_dict['author_name'] = author_details.displayed_author_name
         del blog_post_dict['author_id']
         # We fetch 1 more than the required blog post summaries as the result
         # might contain the blog post which is currently being viewed.

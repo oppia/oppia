@@ -49,7 +49,7 @@ class BlogPostModelDataDict(TypedDict):
 class BlogAuthorDetailsModelDict(TypedDict):
     """Dictionary representing the export data of  BlogAuthorDetailsModel."""
 
-    author_name: str
+    displayed_author_name: str
     author_bio: str
 
 
@@ -513,15 +513,16 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
     """Model for storing user's blog author details.
 
     The id/key of instances of this model is randomly generated string of
-    length 12."""
+    length 12.
+    """
 
     # We use the model id as a key in the Takeout dict.
     ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
-
+    # The user ID of the blog author.
     author_id = datastore_services.StringProperty(indexed=True, required=True)
     # The publicly viewable name of the user to display as author name in blog
     # posts.
-    author_name = datastore_services.StringProperty(indexed=True)
+    displayed_author_name = datastore_services.StringProperty(indexed=True, required=True)
     # User specified biography to be shown on their blog author page.
     author_bio = datastore_services.TextProperty(indexed=False)
 
@@ -561,13 +562,13 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            Dict. Dictionary of the data from BlogAuthorDetailModel.
+            dict. Dictionary of the data from BlogAuthorDetailModel.
         """
 
         author_model = cls.query(cls.author_id == user_id).get()
         if author_model:
             return {
-                'author_name': author_model.author_name,
+                'displayed_author_name': author_model.displayed_author_name,
                 'author_bio': author_model.author_bio
             }
         else:
@@ -580,7 +581,7 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
             # We do not export the author id of the model because we should not
             # export internal user ids.
             'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'author_name': base_models.EXPORT_POLICY.EXPORTED,
+            'displayed_author_name': base_models.EXPORT_POLICY.EXPORTED,
             'author_bio': base_models.EXPORT_POLICY.EXPORTED,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -611,13 +612,13 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
 
     @classmethod
     def create(
-        cls, author_id: str, author_name: str, author_bio: str
+        cls, author_id: str, displayed_author_name: str, author_bio: str
     ) -> None:
         """Creates a new BlogAuthorDetailsModel entry.
 
         Args:
             author_id: str. The user ID of the author.
-            author_name: str. The author name of the user.
+            displayed_author_name: str. The author name of the user.
             author_bio: str. The author bio of the user.
 
         Raises:
@@ -631,7 +632,7 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
         entity = cls(
             id=model_id,
             author_id=author_id,
-            author_name=author_name,
+            displayed_author_name=displayed_author_name,
             author_bio=author_bio)
         entity.update_timestamps()
         entity.put()

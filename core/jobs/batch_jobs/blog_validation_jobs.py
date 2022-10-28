@@ -120,7 +120,7 @@ class FindDuplicateBlogAuthorDetailsModelForAuthorJob(base_jobs.JobBase):
 
     def run(
         self
-    ) -> beam.PCollection[blog_validation_errors.DuplicateblogAuthorModelError]:
+    ) -> beam.PCollection[blog_validation_errors.DuplicateBlogAuthorModelError]:
         return (
             self.pipeline
             | 'Get every Blog Author Details Model' >> (
@@ -128,7 +128,7 @@ class FindDuplicateBlogAuthorDetailsModelForAuthorJob(base_jobs.JobBase):
             | GetModelsWithDuplicatePropertyValues('author_id')
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
-                    blog_validation_errors.DuplicateblogAuthorModelError(model)
+                    blog_validation_errors.DuplicateBlogAuthorModelError(model)
                     for model in models
                 ])
         )

@@ -46,7 +46,7 @@ class MockPlatformFeatureService {
     AndroidBetaLandingPage: {
       isEnabled: false
     },
-    BlogProject: {
+    BlogPages: {
       isEnabled: false
     }
   };
@@ -628,14 +628,14 @@ describe('TopNavigationBarComponent', () => {
 
   it('should return correct blog url if the blog homepage feature is enabled',
     () => {
-      mockPlatformFeatureService.status.BlogProject.isEnabled = true;
+      mockPlatformFeatureService.status.BlogPages.isEnabled = true;
 
       expect(component.getOppiaBlogUrl()).toEqual('/blog');
     });
 
   it('should return correct blog url if the blog homepage feature is disabled',
     () => {
-      mockPlatformFeatureService.status.BlogProject.isEnabled = false;
+      mockPlatformFeatureService.status.BlogPages.isEnabled = false;
 
       expect(component.getOppiaBlogUrl()).toEqual(
         'https://medium.com/oppia-org');

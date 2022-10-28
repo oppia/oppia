@@ -26,7 +26,7 @@ import { OppiaFooterComponent } from './oppia-footer.component';
 
 class MockPlatformFeatureService {
   status = {
-    BlogProject: {
+    BlogPages: {
       isEnabled: false
     }
   };
@@ -70,14 +70,14 @@ describe('OppiaFooterComponent', () => {
 
   it('should return correct blog url if the blog homepage feature is enabled',
     () => {
-      mockPlatformFeatureService.status.BlogProject.isEnabled = true;
+      mockPlatformFeatureService.status.BlogPages.isEnabled = true;
 
       expect(component.getOppiaBlogUrl()).toEqual('/blog');
     });
 
   it('should return correct blog url if the blog homepage feature is disabled',
     () => {
-      mockPlatformFeatureService.status.BlogProject.isEnabled = false;
+      mockPlatformFeatureService.status.BlogPages.isEnabled = false;
 
       expect(component.getOppiaBlogUrl()).toEqual(
         'https://medium.com/oppia-org');

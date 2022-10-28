@@ -61,7 +61,7 @@ export class BlogAuthorProfilePageRootComponent implements OnDestroy, OnInit {
     this.loaderService.showLoadingScreen('Loading');
     this.userService.canUserEditBlogPosts().then((userCanEditBlogPost) => {
       if (
-        this.platformFeatureService.status.BlogProject.isEnabled ||
+        this.platformFeatureService.status.BlogPages.isEnabled ||
         userCanEditBlogPost
       ) {
         this.accessValidationBackendApiService

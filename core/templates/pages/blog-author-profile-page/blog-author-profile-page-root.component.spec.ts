@@ -40,7 +40,7 @@ class MockTranslateService {
 
 class MockPlatformFeatureService {
   status = {
-    BlogProject: {
+    BlogPages: {
       isEnabled: true
     }
   };
@@ -165,7 +165,7 @@ describe('Blog Author Profile Page Root', () => {
 
   it('should initialize and show error page when blog project feature is ' +
   'disabled and user can not edit blog posts', fakeAsync(() => {
-    mockPlatformFeatureService.status.BlogProject.isEnabled = false;
+    mockPlatformFeatureService.status.BlogPages.isEnabled = false;
     spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
       Promise.resolve(false));
     spyOn(

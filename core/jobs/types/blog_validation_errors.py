@@ -128,7 +128,7 @@ class ModelMutatedDuringJobErrorForPublishedOn(
         super().__init__(message, model)
 
 
-class DuplicateblogAuthorModelError(base_validation_errors.BaseAuditError):
+class DuplicateBlogAuthorModelError(base_validation_errors.BaseAuditError):
     """Error class for blog author detail models with duplicate author ids."""
 
     def __init__(

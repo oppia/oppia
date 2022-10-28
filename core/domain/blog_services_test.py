@@ -762,7 +762,7 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
     def test_get_blog_author_details_model(self) -> None:
         author_details = blog_services.get_blog_author_details(self.user_id)
         assert author_details is not None
-        self.assertEqual(author_details.author_name, self.user_name)
+        self.assertEqual(author_details.displayed_author_name, self.user_name)
         self.assertEqual(author_details.author_bio, self.user_bio)
 
     def test_update_blog_author_details(self) -> None:
@@ -773,7 +773,7 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
             self.user_id)
         assert pre_update_author_details is not None
         self.assertNotEqual(
-            pre_update_author_details.author_name, new_author_name)
+            pre_update_author_details.displayed_author_name, new_author_name)
         self.assertNotEqual(
             pre_update_author_details.author_bio, new_author_bio)
 
@@ -783,7 +783,8 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         updated_author_details = blog_services.get_blog_author_details(
             self.user_id)
         assert updated_author_details is not None
-        self.assertEqual(updated_author_details.author_name, new_author_name)
+        self.assertEqual(
+            updated_author_details.displayed_author_name, new_author_name)
         self.assertEqual(updated_author_details.author_bio, new_author_bio)
 
     def test_update_blog_author_details_with_invalid_author_name(self) -> None:
@@ -794,7 +795,7 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
             self.user_id)
         assert pre_update_author_details is not None
         self.assertNotEqual(
-            pre_update_author_details.author_name, new_author_name)
+            pre_update_author_details.displayed_author_name, new_author_name)
         self.assertNotEqual(
             pre_update_author_details.author_bio, new_author_bio)
 

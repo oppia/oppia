@@ -88,7 +88,7 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
             )
         self.assertEqual(
             self.BLOG_EDITOR_USERNAME,
-            json_response['author_details']['author_name']
+            json_response['author_details']['displayed_author_name']
         )
         self.assertEqual(json_response['published_blog_post_summary_dicts'], [])
         self.assertEqual(json_response['draft_blog_post_summary_dicts'], [])
@@ -168,7 +168,7 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         pre_update_author_details = blog_services.get_blog_author_details(
             self.blog_editor_id).to_dict()
         self.assertEqual(
-            pre_update_author_details['author_name'],
+            pre_update_author_details['displayed_author_name'],
             self.BLOG_EDITOR_USERNAME
         )
         self.assertEqual(pre_update_author_details['author_bio'], '')
@@ -178,7 +178,9 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
             payload, csrf_token=csrf_token)
 
         self.assertEqual(
-            json_response['author_details']['author_name'], 'new user name')
+            json_response['author_details']['displayed_author_name'],
+            'new user name'
+        )
         self.assertEqual(
             json_response['author_details']['author_bio'],
             'general oppia user and blog post author'
@@ -196,7 +198,9 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         pre_update_author_details = blog_services.get_blog_author_details(
             self.blog_editor_id).to_dict()
         self.assertEqual(
-            pre_update_author_details['author_name'], self.BLOG_EDITOR_USERNAME)
+            pre_update_author_details['displayed_author_name'],
+            self.BLOG_EDITOR_USERNAME
+        )
 
         self.put_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),

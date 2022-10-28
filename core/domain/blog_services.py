@@ -1005,29 +1005,30 @@ def get_blog_author_details(user_id: str) -> Optional[
     return None if not author_model else blog_domain.BlogAuthorDetails(
         author_model.id,
         author_model.author_id,
-        author_model.author_name,
+        author_model.displayed_author_name,
         author_model.author_bio,
         author_model.last_updated
         )
 
 
 def update_blog_author_details(
-    user_id: str, author_name: str, author_bio: str
+    user_id: str, displayed_author_name: str, author_bio: str
 ) -> None:
     """Updates the author name and bio for the given user id.
 
     Args:
         user_id: str. The user id of the blog author.
-        author_name: str. The publicly viewable name of the author.
+        displayed_author_name: str. The publicly viewable name of the author.
         author_bio: str. The bio of the blog author.
     """
     blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
         user_id)
-    blog_domain.BlogAuthorDetails.require_valid_author_name(author_name)
+    blog_domain.BlogAuthorDetails.require_valid_displayed_author_name(
+        displayed_author_name)
 
     # Adding an if statement for mypy type checks to pass.
     if blog_author_model:
-        blog_author_model.author_name = author_name
+        blog_author_model.displayed_author_name = displayed_author_name
         blog_author_model.author_bio = author_bio
         blog_author_model.update_timestamps()
         blog_author_model.put()

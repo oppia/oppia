@@ -220,11 +220,11 @@ class BlogPostHandler(base.BaseHandler):
 
         blog_post_dict = blog_post.to_dict()
         del blog_post_dict['author_id']
-        blog_post_dict['author_name'] = author_details.author_name
+        blog_post_dict['author_name'] = author_details.displayed_author_name
 
         self.values.update({
             'blog_post_dict': blog_post_dict,
-            'author_name': author_details.author_name,
+            'author_name': author_details.displayed_author_name,
             'profile_picture_data_url': profile_picture_data_url,
             'max_no_of_tags': max_no_of_tags,
             'list_of_default_tags': list_of_default_tags
