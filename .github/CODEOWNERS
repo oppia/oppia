@@ -127,7 +127,6 @@
 /core/controllers/contributor_dashboard*.py @oppia/contributor-experience-team
 /core/domain/opportunity*.py @oppia/contributor-experience-team
 /core/domain/translation*.py @oppia/contributor-experience-team
-/core/domain/voiceover_services*.py @oppia/contributor-experience-team
 /core/storage/translation/ @oppia/data-and-stability-reviewers
 /core/templates/domain/opportunity/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-page/ @oppia/contributor-experience-team

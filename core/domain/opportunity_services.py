@@ -359,32 +359,6 @@ def update_exploration_opportunities_with_story_changes(
         exploration_opportunity_summary_list)
 
 
-def update_exploration_voiceover_opportunities(
-    exp_id: str, assigned_voice_artist_in_language_code: str
-) -> None:
-    """Updates the language_codes_with_assigned_voice_artists of exploration
-    opportunity model.
-
-    Args:
-        exp_id: str. The ID of the exploration.
-        assigned_voice_artist_in_language_code: str. The language code in which
-            a voice artist is assigned to the exploration.
-    """
-    model = opportunity_models.ExplorationOpportunitySummaryModel.get(exp_id)
-    exploration_opportunity_summary = (
-        get_exploration_opportunity_summary_from_model(model))
-
-    exploration_opportunity_summary.language_codes_needing_voice_artists.remove(
-        assigned_voice_artist_in_language_code)
-    (
-        exploration_opportunity_summary
-        .language_codes_with_assigned_voice_artists.append(
-            assigned_voice_artist_in_language_code))
-    exploration_opportunity_summary.validate()
-    _save_multi_exploration_opportunity_summary(
-        [exploration_opportunity_summary])
-
-
 def delete_exploration_opportunities(exp_ids: List[str]) -> None:
     """Deletes the ExplorationOpportunitySummaryModel models corresponding to
     the given exp_ids.
@@ -558,48 +532,6 @@ def _build_exp_id_to_translation_suggestion_in_review_count(
         if suggestion is not None:
             exp_id_to_in_review_count[suggestion.target_id] += 1
     return exp_id_to_in_review_count
-
-
-def get_voiceover_opportunities(
-    language_code: str, cursor: Optional[str]
-) -> Tuple[
-    List[opportunity_domain.ExplorationOpportunitySummary],
-    Optional[str],
-    bool
-]:
-    """Returns a list of opportunities available for voiceover in a specific
-    language.
-
-    Args:
-        cursor: str or None. If provided, the list of returned entities
-            starts from this datastore cursor. Otherwise, the returned
-            entities start from the beginning of the full list of entities.
-        language_code: str. The language for which voiceover opportunities
-            to be fetched.
-
-    Returns:
-        3-tuple(opportunities, cursor, more). where:
-            opportunities: list(ExplorationOpportunitySummary). A list of
-                ExplorationOpportunitySummary domain objects.
-            cursor: str or None. A query cursor pointing to the next
-                batch of results. If there are no more results, this might
-                be None.
-            more: bool. If True, there are (probably) more results after
-                this batch. If False, there are no further results after
-                this batch.
-    """
-    page_size = constants.OPPORTUNITIES_PAGE_SIZE
-    exp_opportunity_summary_models, new_cursor, more = (
-        opportunity_models.ExplorationOpportunitySummaryModel
-        .get_all_voiceover_opportunities(page_size, cursor, language_code))
-
-    opportunities = []
-    for exp_opportunity_summary_model in exp_opportunity_summary_models:
-        exp_opportunity_summary = (
-            get_exploration_opportunity_summary_from_model(
-                exp_opportunity_summary_model))
-        opportunities.append(exp_opportunity_summary)
-    return opportunities, new_cursor, more
 
 
 def get_exploration_opportunity_summaries_by_ids(

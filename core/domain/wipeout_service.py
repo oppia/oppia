@@ -402,7 +402,6 @@ def delete_user(
             pending_deletion_request.user_id)
         _pseudonymize_app_feedback_report_models(pending_deletion_request)
         _pseudonymize_feedback_models(pending_deletion_request)
-        _pseudonymize_suggestion_models(pending_deletion_request)
         _pseudonymize_activity_models_without_associated_rights_models(
             pending_deletion_request,
             models.Names.QUESTION,
@@ -1398,74 +1397,6 @@ def _pseudonymize_feedback_models(
                 feedback_related_models[
                     i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id)
-
-
-def _pseudonymize_suggestion_models(
-    pending_deletion_request: wipeout_domain.PendingDeletionRequest
-) -> None:
-    """Pseudonymize the suggestion models for the user with user_id.
-
-    Args:
-        pending_deletion_request: PendingDeletionRequest. The pending deletion
-            request object to be saved in the datastore.
-    """
-    user_id = pending_deletion_request.user_id
-
-    voiceover_application_class = (
-        suggestion_models.GeneralVoiceoverApplicationModel)
-
-    voiceover_application_models: Sequence[
-        suggestion_models.GeneralVoiceoverApplicationModel
-    ] = voiceover_application_class.query(
-        datastore_services.any_of(
-            voiceover_application_class.author_id == user_id,
-            voiceover_application_class.final_reviewer_id == user_id
-        )).fetch()
-    suggestion_ids = set(model.id for model in voiceover_application_models)
-
-    _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
-        pending_deletion_request, models.Names.SUGGESTION, list(suggestion_ids))
-
-    @transaction_services.run_in_transaction_wrapper
-    def _pseudonymize_models_transactional(
-        voiceover_application_models: List[
-            suggestion_models.GeneralVoiceoverApplicationModel
-        ]
-    ) -> None:
-        """Pseudonymize user ID fields in the models.
-
-        This function is run in a transaction, with the maximum number of
-        voiceover_application_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
-
-        Args:
-            voiceover_application_models:
-                list(GeneralVoiceoverApplicationModel). Models whose user IDs
-                should be pseudonymized.
-        """
-        for voiceover_application_model in voiceover_application_models:
-            if voiceover_application_model.author_id == user_id:
-                voiceover_application_model.author_id = (
-                    suggestion_ids_to_pids[voiceover_application_model.id]
-                )
-            if voiceover_application_model.final_reviewer_id == user_id:
-                voiceover_application_model.final_reviewer_id = (
-                    suggestion_ids_to_pids[voiceover_application_model.id]
-                )
-        voiceover_application_class.update_timestamps_multi(
-            voiceover_application_models)
-        voiceover_application_class.put_multi(voiceover_application_models)
-
-    suggestion_ids_to_pids = (
-        pending_deletion_request.pseudonymizable_entity_mappings[
-            models.Names.SUGGESTION.value])
-    for i in range(
-            0,
-            len(voiceover_application_models),
-            feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-        _pseudonymize_models_transactional(
-            voiceover_application_models[
-                i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
-        )
 
 
 def _pseudonymize_blog_post_models(

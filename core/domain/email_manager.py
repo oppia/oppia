@@ -501,8 +501,6 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ACCOUNT_DELETED: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_MARKETING: (
@@ -2022,108 +2020,6 @@ def send_mail_to_notify_contributor_ranking_achievement(
             feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS,
             email_template['email_subject'], email_body,
             feconf.NOREPLY_EMAIL_ADDRESS)
-
-
-def send_accepted_voiceover_application_email(
-    recipient_id: str,
-    lesson_title: str,
-    language_code: str
-) -> None:
-    """Sends an email to users to an give update on the accepted voiceover
-    application.
-
-    Args:
-        recipient_id: str. The id of the user whose voiceover application got
-            accepted.
-        lesson_title: str. The title of the lessons for which the voiceover
-            application got accepted.
-        language_code: str. The language code for which the voiceover
-            application got accepted.
-    """
-    email_subject = '[Accepted] Updates on submitted voiceover application'
-
-    email_body_template = (
-        'Hi %s,<br><br>'
-        'Congratulations! Your voiceover application for "%s" lesson got '
-        'accepted and you have been assigned with a voice artist role in the '
-        'lesson. Now you will be able to add voiceovers to the lesson in %s '
-        'language.'
-        '<br><br>You can check the wiki page to learn'
-        '<a href="https://github.com/oppia/oppia/wiki/'
-        'Instructions-for-voice-artists">how to voiceover a lesson</a><br><br>'
-        'Thank you for helping improve Oppia\'s lessons!'
-        '- The Oppia Team<br>'
-        '<br>%s')
-
-    if not feconf.CAN_SEND_EMAILS:
-        logging.error('This app cannot send emails to users.')
-        return
-
-    recipient_username = user_services.get_username(recipient_id)
-    can_user_receive_email = user_services.get_email_preferences(
-        recipient_id).can_receive_email_updates
-
-    # Send email only if recipient wants to receive.
-    if can_user_receive_email:
-        language = utils.get_supported_audio_language_description(language_code)
-        email_body = email_body_template % (
-            recipient_username, lesson_title, language, EMAIL_FOOTER.value)
-        _send_email(
-            recipient_id, feconf.SYSTEM_COMMITTER_ID,
-            feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
-            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
-
-
-def send_rejected_voiceover_application_email(
-    recipient_id: str,
-    lesson_title: str,
-    language_code: str,
-    rejection_message: str
-) -> None:
-    """Sends an email to users to give update on the rejected voiceover
-    application.
-
-    Args:
-        recipient_id: str. The id of the user whose voiceover application got
-            accepted.
-        lesson_title: str. The title of the lessons for which the voiceover
-            application got accepted.
-        language_code: str. The language code in which for which the voiceover
-            application got accepted.
-        rejection_message: str. The message left by the reviewer while rejecting
-            the voiceover application.
-    """
-    email_subject = 'Updates on submitted voiceover application'
-
-    email_body_template = (
-        'Hi %s,<br><br>'
-        'Your voiceover application for "%s" lesson in language %s got rejected'
-        ' and the reviewer has left a message.'
-        '<br><br>Review message: %s<br><br>'
-        'You can create a new voiceover application through the'
-        '<a href="https://oppia.org/contributor-dashboard">'
-        'contributor dashboard</a> page.<br><br>'
-        '- The Oppia Team<br>'
-        '<br>%s')
-
-    if not feconf.CAN_SEND_EMAILS:
-        logging.error('This app cannot send emails to users.')
-        return
-
-    recipient_username = user_services.get_username(recipient_id)
-    can_user_receive_email = user_services.get_email_preferences(
-        recipient_id).can_receive_email_updates
-
-    # Send email only if recipient wants to receive.
-    if can_user_receive_email:
-        language = utils.get_supported_audio_language_description(language_code)
-        email_body = email_body_template % (
-            recipient_username, lesson_title, language,
-            rejection_message, EMAIL_FOOTER.value)
-        _send_email(
-            recipient_id, feconf.SYSTEM_COMMITTER_ID,
-            feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
-            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
 def send_account_deleted_email(user_id: str, user_email: str) -> None:

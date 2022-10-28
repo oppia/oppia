@@ -95,7 +95,6 @@ describe('Contribution Opportunities backend API service', function() {
   let userInfo: UserInfo[];
   let sampleSkillOpportunitiesResponse: SkillOpportunity[];
   let sampleTranslationOpportunitiesResponse: ExplorationOpportunitySummary[];
-  let sampleVoiceoverOpportunitiesResponse: ExplorationOpportunitySummary[];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -115,11 +114,6 @@ describe('Contribution Opportunities backend API service', function() {
         skillOpportunityResponse.opportunities[0])
     ];
     sampleTranslationOpportunitiesResponse = [
-      ExplorationOpportunitySummary.createFromBackendDict(
-        translationOpportunityResponse.opportunities[0]
-      )
-    ];
-    sampleVoiceoverOpportunitiesResponse = [
       ExplorationOpportunitySummary.createFromBackendDict(
         translationOpportunityResponse.opportunities[0]
       )
@@ -246,65 +240,6 @@ describe('Contribution Opportunities backend API service', function() {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(
       new Error('Failed to fetch translation opportunities data.'));
-  }));
-
-  it('should successfully fetch the voiceover opportunities data',
-    fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-
-      contributionOpportunitiesBackendApiService
-        .fetchVoiceoverOpportunitiesAsync('hi', '',).then(
-          successHandler, failHandler
-        );
-      const req = httpTestingController.expectOne(
-        urlInterpolationService.interpolateUrl(
-          '/opportunitiessummaryhandler/<opportunityType>',
-          { opportunityType: 'voiceover' }
-        ) + '?language_code=hi&cursor='
-      );
-      expect(req.request.method).toEqual('GET');
-      req.flush(translationOpportunityResponse);
-
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalledWith({
-        opportunities: sampleVoiceoverOpportunitiesResponse,
-        nextCursor: translationOpportunityResponse.next_cursor,
-        more: translationOpportunityResponse.more
-      });
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
-  it('should fail to fetch the voiceover opportunities data ' +
-    'given invalid language code ' +
-    'when calling \'fetchVoiceoverOpportunitiesAsync\'', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
-
-    contributionOpportunitiesBackendApiService
-      .fetchVoiceoverOpportunitiesAsync('invalidCode', 'invalidCursor',).then(
-        successHandler, failHandler
-      );
-    const req = httpTestingController.expectOne(
-      urlInterpolationService.interpolateUrl(
-        '/opportunitiessummaryhandler/<opportunityType>',
-        { opportunityType: 'voiceover' }
-      ) + '?language_code=invalidCode&cursor=invalidCursor'
-    );
-
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: 'Failed to fetch voiceover opportunities data.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      new Error('Failed to fetch voiceover opportunities data.'));
   }));
 
   it('should successfully fetch reviewable translation opportunities',

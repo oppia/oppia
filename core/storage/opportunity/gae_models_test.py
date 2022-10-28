@@ -212,39 +212,6 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
         self.assertTrue(isinstance(cursor, str))
 
-    def test_get_all_voiceover_opportunities(self) -> None:
-        results, cursor, more = (
-            opportunity_models.ExplorationOpportunitySummaryModel
-                .get_all_voiceover_opportunities(5, None, 'en'))
-        # Ruling out the possibility of None for mypy type checking.
-        assert results is not None
-        self.assertEqual(len(results), 2)
-        self.assertEqual(results[0].id, 'opportunity_id1')
-        self.assertEqual(results[1].id, 'opportunity_id2')
-        self.assertFalse(more)
-        self.assertTrue(isinstance(cursor, str))
-
-    def test_get_all_voiceover_opportunities_pagination(self) -> None:
-        results, cursor, more = (
-            opportunity_models.ExplorationOpportunitySummaryModel
-                .get_all_voiceover_opportunities(1, None, 'en'))
-        # Ruling out the possibility of None for mypy type checking.
-        assert results is not None
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].id, 'opportunity_id1')
-        self.assertTrue(more)
-        self.assertTrue(isinstance(cursor, str))
-
-        results, new_cursor, more = (
-            opportunity_models.ExplorationOpportunitySummaryModel
-                .get_all_voiceover_opportunities(1, cursor, 'en'))
-        # Ruling out the possibility of None for mypy type checking.
-        assert results is not None
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].id, 'opportunity_id2')
-        self.assertFalse(more)
-        self.assertTrue(isinstance(new_cursor, str))
-
     def test_get_by_topic(self) -> None:
         model_list = (
             opportunity_models.ExplorationOpportunitySummaryModel

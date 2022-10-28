@@ -228,20 +228,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
-    def test_get_voiceover_opportunity_data(self):
-        response = self.get_json(
-            '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={'language_code': 'en'})
-
-        self.assertEqual(len(response['opportunities']), 3)
-        self.assertEqual(
-            response['opportunities'], [
-                self.expected_opportunity_dict_1,
-                self.expected_opportunity_dict_2,
-                self.expected_opportunity_dict_3])
-        self.assertFalse(response['more'])
-        self.assertIsInstance(response['next_cursor'], str)
-
     def test_get_skill_opportunity_data_pagination(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
@@ -362,41 +348,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertFalse(next_response['more'])
             self.assertIsInstance(next_response['next_cursor'], str)
 
-    def test_get_voiceover_opportunity_data_pagination(self):
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
-            response = self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'en'})
-            self.assertEqual(len(response['opportunities']), 1)
-            self.assertEqual(
-                response['opportunities'], [self.expected_opportunity_dict_1])
-            self.assertTrue(response['more'])
-            self.assertIsInstance(response['next_cursor'], str)
-
-            next_cursor = response['next_cursor']
-            next_response = self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'en', 'cursor': next_cursor})
-
-            self.assertEqual(len(next_response['opportunities']), 1)
-            self.assertEqual(
-                next_response['opportunities'],
-                [self.expected_opportunity_dict_2])
-            self.assertTrue(next_response['more'])
-            self.assertIsInstance(next_response['next_cursor'], str)
-
-            next_cursor = next_response['next_cursor']
-            next_response = self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'en', 'cursor': next_cursor})
-
-            self.assertEqual(len(next_response['opportunities']), 1)
-            self.assertEqual(
-                next_response['opportunities'],
-                [self.expected_opportunity_dict_3])
-            self.assertFalse(next_response['more'])
-            self.assertIsInstance(next_response['next_cursor'], str)
-
     def test_get_translation_opportunity_with_invalid_language_code(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
@@ -408,19 +359,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                expected_status_int=400)
-
-    def test_get_voiceover_opportunity_with_invalid_language_code(self):
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
-            self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'invalid_lang_code'},
-                expected_status_int=400)
-
-    def test_get_voiceover_opportunity_without_language_code(self):
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
-            self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
 
     def test_get_translation_opportunities_without_topic_name_returns_all_topics( # pylint: disable=line-too-long

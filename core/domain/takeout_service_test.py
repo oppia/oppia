@@ -707,30 +707,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             display_alias=self.GENERIC_DISPLAY_ALIAS_2
         ).put()
 
-        suggestion_models.GeneralVoiceoverApplicationModel(
-            id='application_1_id',
-            target_type='exploration',
-            target_id='exp_id',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            author_id=self.USER_ID_1,
-            final_reviewer_id='reviewer_id',
-            language_code=self.SUGGESTION_LANGUAGE_CODE,
-            filename='application_audio.mp3',
-            content='<p>Some content</p>',
-            rejection_message=None).put()
-
-        suggestion_models.GeneralVoiceoverApplicationModel(
-            id='application_2_id',
-            target_type='exploration',
-            target_id='exp_id',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            author_id=self.USER_ID_1,
-            final_reviewer_id=None,
-            language_code=self.SUGGESTION_LANGUAGE_CODE,
-            filename='application_audio.mp3',
-            content='<p>Some content</p>',
-            rejection_message=None).put()
-
         suggestion_models.TranslationContributionStatsModel.create(
             language_code=self.SUGGESTION_LANGUAGE_CODE,
             contributor_user_id=self.USER_ID_1,
@@ -1093,9 +1069,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'managed_topic_ids': []
         }
 
-        expected_voiceover_application_data: Dict[
-            str, Dict[str, Optional[str]]
-        ] = {}
         expected_contrib_proficiency_data: Dict[
             str, Dict[str, Union[int, bool]]
         ] = {}
@@ -1171,8 +1144,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'collection_rights': collection_rights_data,
             'general_suggestion': general_suggestion_data,
             'exploration_rights': exploration_rights_data,
-            'general_voiceover_application':
-                expected_voiceover_application_data,
             'user_contribution_proficiency': expected_contrib_proficiency_data,
             'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
@@ -1649,27 +1620,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'managed_topic_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
         }
 
-        expected_voiceover_application_data = {
-            'application_1_id': {
-                'target_type': 'exploration',
-                'target_id': 'exp_id',
-                'status': 'review',
-                'language_code': 'en',
-                'filename': 'application_audio.mp3',
-                'content': '<p>Some content</p>',
-                'rejection_message': None
-            },
-            'application_2_id': {
-                'target_type': 'exploration',
-                'target_id': 'exp_id',
-                'status': 'review',
-                'language_code': 'en',
-                'filename': 'application_audio.mp3',
-                'content': '<p>Some content</p>',
-                'rejection_message': None
-            }
-        }
-
         expected_contribution_rights_data = {
             'can_review_translation_for_language_codes': ['hi', 'en'],
             'can_review_voiceover_for_language_codes': ['hi'],
@@ -1923,8 +1873,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_collection_rights_data,
             'general_suggestion': expected_general_suggestion_data,
             'exploration_rights': expected_exploration_rights_data,
-            'general_voiceover_application':
-                expected_voiceover_application_data,
             'user_contribution_proficiency': expected_contrib_proficiency_data,
             'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
