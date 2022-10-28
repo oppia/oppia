@@ -20,7 +20,7 @@ import { ChangeDetectorRef, Component, ComponentFactoryResolver, Input,
   SimpleChange,
   ViewChild, ViewContainerRef }
   from '@angular/core';
-import camelCaseFromHyphen from 'utility/string-utility';
+import { camelCaseFromHyphen } from 'utility/string-utility';
 
 import { TAG_TO_INTERACTION_MAPPING } from 'interactions/tag-to-interaction-mapping';
 

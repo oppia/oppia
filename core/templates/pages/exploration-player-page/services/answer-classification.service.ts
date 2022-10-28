@@ -32,6 +32,7 @@ import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-pag
 import { State } from 'domain/state/StateObjectFactory';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { InteractionRuleInputs, TextInputRuleInputs } from 'interactions/rule-input-defs';
+import { hasEditDistanceEqualToTwo } from 'utility/string-utility';
 
 export interface InteractionRulesService {
   [ruleName: string]: (
@@ -191,33 +192,6 @@ export class AnswerClassificationService {
     const normalizedAnswer = answer.toLowerCase();
     const normalizedInput = inputs.x.normalizedStrSet.map(
       input => input.toLowerCase());
-
-    const hasEditDistanceEqualToTwo = (
-        inputString: string, matchString: string) => {
-      if (inputString === matchString) {
-        return true;
-      }
-      var editDistance = [];
-      for (var i = 0; i <= inputString.length; i++) {
-        editDistance.push([i]);
-      }
-      for (var j = 1; j <= matchString.length; j++) {
-        editDistance[0].push(j);
-      }
-      for (var i = 1; i <= inputString.length; i++) {
-        for (var j = 1; j <= matchString.length; j++) {
-          if (inputString.charAt(i - 1) === matchString.charAt(j - 1)) {
-            editDistance[i][j] = editDistance[i - 1][j - 1];
-          } else {
-            editDistance[i][j] = Math.min(
-              editDistance[i - 1][j - 1], editDistance[i][j - 1],
-              editDistance[i - 1][j]) + 1;
-          }
-        }
-      }
-      return editDistance[inputString.length][matchString.length] <= 2;
-    };
-
     return normalizedInput.some(
       input => hasEditDistanceEqualToTwo(input, normalizedAnswer));
   }

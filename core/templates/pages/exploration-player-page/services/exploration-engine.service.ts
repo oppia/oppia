@@ -45,6 +45,7 @@ import { ExplorationParams, LearnerParamsService } from './learner-params.servic
 import { PlayerTranscriptService } from './player-transcript.service';
 import { StatsReportingService } from './stats-reporting.service';
 
+const TEXTINPUT: string = 'TextInput'
  @Injectable({
    providedIn: 'root'
  })
@@ -552,7 +553,7 @@ export class ExplorationEngineService {
     // Work => let catchMisspellingsFeatOn =
     // oldStateCard.getInteraction().customizationArgs.
 
-    if (oldInteractionId === 'TextInput' && onSameCard) {
+    if (oldInteractionId === TEXTINPUT && onSameCard) {
       var answerIsOnlyMisspelled = this.answerClassificationService.
         isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
       if (answerIsOnlyMisspelled) {
