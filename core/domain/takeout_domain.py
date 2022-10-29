@@ -32,11 +32,11 @@ class TakeoutData:
         """Constructs a TakeoutData domain object.
 
         Args:
-            user_data: dict. The user's Takeout data stored as a dictionary. The
+            user_data: The user's Takeout data stored as a dictionary. The
                 dictionary is constructed via takeout_service.py, and the format
                 of the dictionary's contents can be found there.
-            user_images: list(TakeoutImage). A list of TakeoutImage objects
-                representing the user's images.
+            user_images: A list of TakeoutImage objects representing the user's
+                images.
         """
         self.user_data = user_data
         self.user_images = user_images
@@ -53,8 +53,8 @@ class TakeoutImage:
         """Constructs a TakeoutImage domain object.
 
         Args:
-            b64_image_data: str. A Base64-encoded string representing the image.
-            image_export_path: str. The path within the images/ folder to write
+            b64_image_data: A Base64-encoded string representing the image.
+            image_export_path: The path within the images/ folder to write
                 image to in the final Takeout zip.
         """
         self.b64_image_data = b64_image_data
@@ -75,10 +75,10 @@ class TakeoutImageReplacementInstruction:
         """Constructs a TakeoutImageReplacementInstruction object.
 
         Args:
-            dictionary_path: tuple(str). A sequence of keys indicating the
+            dictionary_path: A sequence of keys indicating the
                 position of the user image data within the user data dictionary.
-            export_filename: str. The filename of the new file created.
-            new_key: str. The new key name in the user data dictionary after the
+            export_filename: The filename of the new file created.
+            new_key: The new key name in the user data dictionary after the
                 image data is replaced with the filename within the final
                 Takeout zip.
         """

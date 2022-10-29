@@ -71,25 +71,24 @@ class BaseSuggestion:
     """Base class for a suggestion.
 
     Attributes:
-        suggestion_id: str. The ID of the suggestion.
-        suggestion_type: str. The type of the suggestion.
-        target_type: str. The type of target entity being edited.
-        target_id: str. The ID of the target entity being edited.
-        target_version_at_submission: int. The version number of the target
+        suggestion_id: The ID of the suggestion.
+        suggestion_type: The type of the suggestion.
+        target_type: The type of target entity being edited.
+        target_id: The ID of the target entity being edited.
+        target_version_at_submission: The version number of the target
             entity at the time of creation of the suggestion.
-        status: str. The status of the suggestion.
-        author_id: str. The ID of the user who submitted the suggestion.
-        final_reviewer_id: str. The ID of the reviewer who has accepted/rejected
+        status: The status of the suggestion.
+        author_id: The ID of the user who submitted the suggestion.
+        final_reviewer_id: The ID of the reviewer who has accepted/rejected
             the suggestion.
-        change: Change. The details of the suggestion. This should be an
+        change: The details of the suggestion. This should be an
             object of type ExplorationChange, TopicChange, etc.
-        score_category: str. The scoring category for the suggestion.
-        last_updated: datetime.datetime. Date and time when the suggestion
-            was last updated.
-        language_code: str|None. The ISO 639-1 code used to query suggestions
+        score_category: The scoring category for the suggestion.
+        last_updated: Date and time when the suggestion was last updated.
+        language_code: The ISO 639-1 code used to query suggestions
             by language, or None if the suggestion type is not queryable by
             language.
-        edited_by_reviewer: bool. Whether the suggestion is edited by the
+        edited_by_reviewer: Whether the suggestion is edited by the
             reviewer.
     """
 
@@ -123,7 +122,7 @@ class BaseSuggestion:
         """Returns a dict representation of a suggestion object.
 
         Returns:
-            dict. A dict representation of a suggestion object.
+            A dict representation of a suggestion object.
         """
         return {
             'suggestion_id': self.suggestion_id,
@@ -147,7 +146,7 @@ class BaseSuggestion:
         suggestion_models.SCORE_TYPE_CHOICES.
 
         Returns:
-            str. The first part of the score category.
+            The first part of the score category.
         """
         return self.score_category.split(
             suggestion_models.SCORE_CATEGORY_DELIMITER)[0]
@@ -156,7 +155,7 @@ class BaseSuggestion:
         """Returns the author's username.
 
         Returns:
-            str. The username of the author of the suggestion.
+            The username of the author of the suggestion.
         """
         return user_services.get_username(self.author_id)
 
@@ -167,7 +166,7 @@ class BaseSuggestion:
         skill linked to the question.
 
         Returns:
-            str. The second part of the score category.
+            The second part of the score category.
         """
         return self.score_category.split(
             suggestion_models.SCORE_CATEGORY_DELIMITER)[1]
@@ -188,7 +187,7 @@ class BaseSuggestion:
         """Sets the final reviewer id of the suggestion to be reviewer_id.
 
         Args:
-            reviewer_id: str. The ID of the user who completed the review.
+            reviewer_id: The ID of the user who completed the review.
         """
         self.final_reviewer_id = reviewer_id
 
@@ -334,7 +333,7 @@ class BaseSuggestion:
         """Returns the list of newly added image filenames in the suggestion.
 
         Returns:
-            list(str). A list of newly added image filenames in the suggestion.
+            A list of newly added image filenames in the suggestion.
         """
         html_list = self.get_all_html_content_strings()
         all_image_filenames = (
@@ -374,7 +373,7 @@ class BaseSuggestion:
         """Returns if the suggestion has either been accepted or rejected.
 
         Returns:
-            bool. Whether the suggestion has been handled or not.
+            Whether the suggestion has been handled or not.
         """
         return self.status != suggestion_models.STATUS_IN_REVIEW
 
@@ -494,8 +493,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         """Gets a complete change for the SuggestionEditStateContent.
 
         Returns:
-            list(ExplorationChange). The change_list corresponding to the
-            suggestion.
+            The change_list corresponding to the suggestion.
         """
         change = self.change
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
@@ -524,7 +522,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         """Accepts the suggestion.
 
         Args:
-            commit_message: str. The commit message.
+            commit_message: The commit message.
         """
         change_list = (
             self._get_change_list_for_accepting_edit_state_content_suggestion()
@@ -543,7 +541,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         before updating the suggestion.
 
         Args:
-            change: ExplorationChange. The new change.
+            change: The new ExplorationChange object.
 
         Raises:
             ValidationError. Invalid new change.
@@ -568,7 +566,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         """Gets all html content strings used in this suggestion.
 
         Returns:
-            list(str). The list of html content strings.
+            The list of html content strings.
         """
         html_string_list = [self.change.new_value['html']]
         if self.change.old_value is not None:
@@ -580,7 +578,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         suggestion.
 
         Returns:
-            list(str). The list of html content strings from target entity used
+            The list of html content strings from target entity used
             in the suggestion.
         """
         if self.change.old_value is not None:
@@ -595,8 +593,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         according to the conversion function.
 
         Args:
-            conversion_fn: function. The function to be used for converting the
-                HTML.
+            conversion_fn: The function to be used for converting the HTML.
         """
         if self.change.old_value is not None:
             self.change.old_value['html'] = (
@@ -708,7 +705,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         before updating the suggestion.
 
         Args:
-            change: ExplorationChange. The new change.
+            change: The new ExplorationChange object.
 
         Raises:
             ValidationError. Invalid new change.
@@ -744,7 +741,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         """Accepts the suggestion.
 
         Args:
-            commit_message: str. The commit message.
+            commit_message: The commit message.
         """
         # If the translation is for a set of strings, we don't want to process
         # the HTML strings for images.
@@ -770,7 +767,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         """Gets all html content strings used in this suggestion.
 
         Returns:
-            list(str). The list of html content strings.
+            The list of html content strings.
         """
         content_strings = []
         if isinstance(self.change.translation_html, list):
@@ -788,7 +785,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         suggestion.
 
         Returns:
-            list(str). The list of html content strings from target entity used
+            The list of html content strings from target entity used
             in the suggestion.
         """
         return [self.change.content_html]
@@ -800,8 +797,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         according to the conversion function.
 
         Args:
-            conversion_fn: function. The function to be used for converting the
-                HTML.
+            conversion_fn: The function to be used for converting the HTML.
         """
         self.change.content_html = (
             conversion_fn(self.change.content_html))
@@ -813,25 +809,23 @@ class SuggestionAddQuestion(BaseSuggestion):
     """Domain object for a suggestion of type SUGGESTION_TYPE_ADD_QUESTION.
 
     Attributes:
-        suggestion_id: str. The ID of the suggestion.
-        suggestion_type: str. The type of the suggestion.
-        target_type: str. The type of target entity being edited, for this
+        suggestion_id: The ID of the suggestion.
+        suggestion_type: The type of the suggestion.
+        target_type: The type of target entity being edited, for this
             subclass, target type is 'skill'.
-        target_id: str. The ID of the skill the question was submitted to.
-        target_version_at_submission: int. The version number of the target
+        target_id: The ID of the skill the question was submitted to.
+        target_version_at_submission: The version number of the target
             topic at the time of creation of the suggestion.
-        status: str. The status of the suggestion.
-        author_id: str. The ID of the user who submitted the suggestion.
-        final_reviewer_id: str. The ID of the reviewer who has accepted/rejected
+        status: The status of the suggestion.
+        author_id: The ID of the user who submitted the suggestion.
+        final_reviewer_id: The ID of the reviewer who has accepted/rejected
             the suggestion.
-        change_cmd: QuestionChange. The change associated with the suggestion.
-        score_category: str. The scoring category for the suggestion.
-        last_updated: datetime.datetime. Date and time when the suggestion
-            was last updated.
-        language_code: str. The ISO 639-1 code used to query suggestions
+        change_cmd: The change associated with the suggestion.
+        score_category: The scoring category for the suggestion.
+        last_updated: Date and time when the suggestion was last updated.
+        language_code: The ISO 639-1 code used to query suggestions
             by language. In this case it is the language code of the question.
-        edited_by_reviewer: bool. Whether the suggestion is edited by the
-            reviewer.
+        edited_by_reviewer: Whether the suggestion is edited by the reviewer.
     """
 
     def __init__(
@@ -1019,7 +1013,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         """Accepts the suggestion.
 
         Args:
-            unused_commit_message: str. This parameter is passed in for
+            unused_commit_message: This parameter is passed in for
                 consistency with the existing suggestions. As a default commit
                 message is used in the add_question function, the arg is unused.
         """
@@ -1082,7 +1076,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         before updating the suggestion.
 
         Args:
-            change: QuestionChange. The new change.
+            change: The new QuestionChange object.
 
         Raises:
             ValidationError. Invalid new change.
@@ -1110,7 +1104,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         """Gets all html content strings used in this suggestion.
 
         Returns:
-            list(str). The list of html content strings.
+            The list of html content strings.
         """
         question_dict: question_domain.QuestionDict = self.change.question_dict
         state_object = (
@@ -1132,8 +1126,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         according to the conversion function.
 
         Args:
-            conversion_fn: function. The function to be used for converting the
-                HTML.
+            conversion_fn: The function to be used for converting the HTML.
         """
         question_dict: question_domain.QuestionDict = self.change.question_dict
         question_dict['question_state_data'] = (
@@ -1170,19 +1163,19 @@ class CommunityContributionStats:
     """Domain object for the CommunityContributionStatsModel.
 
     Attributes:
-        translation_reviewer_counts_by_lang_code: dict. A dictionary where the
+        translation_reviewer_counts_by_lang_code: A dictionary where the
             keys represent the language codes that translation suggestions are
             offered in and the values correspond to the total number of
             reviewers who have permission to review translation suggestions in
             that language.
-        translation_suggestion_counts_by_lang_code: dict. A dictionary where
+        translation_suggestion_counts_by_lang_code: A dictionary where
             the keys represent the language codes that translation suggestions
             are offered in and the values correspond to the total number of
             translation suggestions that are currently in review in that
             language.
-        question_reviewer_count: int. The total number of reviewers who have
+        question_reviewer_count: The total number of reviewers who have
             permission to review question suggestions.
-        question_suggestion_count: int. The total number of question
+        question_suggestion_count: The total number of question
             suggestions that are currently in review.
     """
 
@@ -1280,9 +1273,9 @@ class CommunityContributionStats:
         language code.
 
         Args:
-            language_code: str. The translation suggestion language code that
+            language_code: The translation suggestion language code that
                 reviewers have the rights to review.
-            count: int. The number of reviewers that have the rights to review
+            count: The number of reviewers that have the rights to review
                 translation suggestions in language_code.
         """
         self.translation_reviewer_counts_by_lang_code[language_code] = count
@@ -1294,8 +1287,8 @@ class CommunityContributionStats:
         code given.
 
         Args:
-            language_code: str. The translation suggestion language code.
-            count: int. The number of translation suggestions in language_code
+            language_code: The translation suggestion language code.
+            count: The number of translation suggestions in language_code
                 that are currently in review.
         """
         self.translation_suggestion_counts_by_lang_code[language_code] = count
@@ -1311,11 +1304,10 @@ class CommunityContributionStats:
         config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
         Args:
-            lang_code: str. The language code of the translation
-                suggestions.
+            lang_code: The language code of the translation suggestions.
 
         Returns:
-            bool. Whether or not more reviewers are needed to review
+            Whether or not more reviewers are needed to review
             translation suggestions in the given language code.
        """
         if lang_code not in self.translation_suggestion_counts_by_lang_code:
@@ -1342,7 +1334,7 @@ class CommunityContributionStats:
         config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
         Returns:
-            set. A set of of the language codes where more translation reviewers
+            A set of of the language codes where more translation reviewers
             are needed.
         """
         language_codes_that_need_reviewers = set()
@@ -1359,7 +1351,7 @@ class CommunityContributionStats:
         greater than config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
         Returns:
-            bool. Whether or not more reviewers are needed to review
+            Whether or not more reviewers are needed to review
             question suggestions.
        """
         if self.question_suggestion_count == 0:
@@ -1431,16 +1423,14 @@ class TranslationContributionStats:
         """Create default translation contribution stats.
 
         Args:
-            language_code: str. The language code for which are these stats
+            language_code: The language code for which are these stats
                 generated.
-            contributor_user_id: str. User ID of the contributor to which
+            contributor_user_id: User ID of the contributor to which
                 these stats belong.
-            topic_id: str. ID of the topic for which were
-                the translations created.
+            topic_id: ID of the topic for which were the translations created.
 
         Returns:
-            TranslationContributionStats. Default translation contribution
-            stats.
+            The Default translation contribution stats.
         """
         return cls(
             language_code, contributor_user_id, topic_id,
@@ -1452,7 +1442,7 @@ class TranslationContributionStats:
         domain object.
 
         Returns:
-            dict. A dict representation of a TranslationContributionStats
+            A dict representation of a TranslationContributionStats
             domain object.
         """
         return {
@@ -1523,8 +1513,7 @@ class TranslationReviewStats:
         domain object.
 
         Returns:
-            dict. A dict representation of a TranslationReviewStats
-            domain object.
+            A dict representation of a TranslationReviewStats domain object.
         """
         return {
             'language_code': self.language_code,
@@ -1583,8 +1572,7 @@ class QuestionContributionStats:
         domain object.
 
         Returns:
-            dict. A dict representation of a QuestionContributionStats
-            domain object.
+            A dict representation of a QuestionContributionStats domain object.
         """
         return {
             'contributor_user_id': self.contributor_user_id,
@@ -1640,7 +1628,7 @@ class QuestionReviewStats:
         domain object.
 
         Returns:
-            dict. A dict representation of a QuestionContributionStats
+            A dict representation of a QuestionContributionStats
             domain object.
         """
         return {
@@ -1662,13 +1650,13 @@ class ContributorMilestoneEmailInfo:
     notifying contributors about milestones they achieved.
 
     Attributes:
-        contributor_user_id: str. The ID of the contributor.
-        language_code: str|None. The language code of the suggestion.
-        contribution_type: str. The type of the contribution i.e.
+        contributor_user_id: The ID of the contributor.
+        language_code: The language code of the suggestion.
+        contribution_type: The type of the contribution i.e.
             translation or question.
-        contribution_sub_type: str. The sub type of the contribution
+        contribution_sub_type: The sub type of the contribution
             i.e. submissions/acceptances/reviews/edits.
-        rank_name: str. The name of the rank that the contributor achieved.
+        rank_name: The name of the rank that the contributor achieved.
     """
 
     def __init__(
@@ -1701,15 +1689,15 @@ class ContributorStatsSummary:
     regarding contributor stats.
 
     Attributes:
-        contributor_user_id: str. The ID of the contributor.
-        translation_contribution_stats: list(TranslationContributionStats). A
-            list of TranslationContributionStats corresponding to the user.
-        question_contribution_stats: list(QuestionContributionStats). A list of
-            QuestionContributionStats corresponding to the user.
-        translation_review_stats: list(TranslationReviewStats). A list of
-            TranslationReviewStats corresponding to the user.
-        question_review_stats: list(QuestionReviewStats). A list of
-            QuestionReviewStats  corresponding to the user.
+        contributor_user_id: The ID of the contributor.
+        translation_contribution_stats: A list of TranslationContributionStats
+            corresponding to the user.
+        question_contribution_stats: A list of QuestionContributionStats
+            corresponding to the user.
+        translation_review_stats: A list of TranslationReviewStats corresponding
+            to the user.
+        question_review_stats: A list of QuestionReviewStats corresponding to
+            the user.
     """
 
     def __init__(
@@ -1731,7 +1719,7 @@ class ContributorStatsSummary:
         domain object.
 
         Returns:
-            dict. A dict representation of a ContributorStatsSummary
+            A dict representation of a ContributorStatsSummary
             domain object.
         """
         return {
@@ -1754,13 +1742,13 @@ class ReviewableSuggestionEmailInfo:
     reviewed.
 
     Attributes:
-        suggestion_type: str. The type of the suggestion.
-        language_code: str. The language code of the suggestion.
-        suggestion_content: str. The suggestion content that is emphasized for
+        suggestion_type: The type of the suggestion.
+        language_code: The language code of the suggestion.
+        suggestion_content: The suggestion content that is emphasized for
             a user when they are viewing a list of suggestions on the
             Contributor Dashboard.
-        submission_datetime: datetime.datetime. Date and time when the
-            suggestion was submitted for review.
+        submission_datetime: Date and time when the suggestion was submitted
+            for review.
     """
 
     def __init__(

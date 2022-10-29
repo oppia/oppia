@@ -36,8 +36,8 @@ def subscribe_to_thread(user_id: str, feedback_thread_id: str) -> None:
     feedback_thread_id are valid.
 
     Args:
-        user_id: str. The user ID of the new subscriber.
-        feedback_thread_id: str. The ID of the feedback thread.
+        user_id: The user ID of the new subscriber.
+        feedback_thread_id: The ID of the feedback thread.
     """
     subscribe_to_threads(user_id, [feedback_thread_id])
 
@@ -49,8 +49,8 @@ def subscribe_to_threads(user_id: str, feedback_thread_ids: List[str]) -> None:
     the feedback_thread_ids are valid.
 
     Args:
-        user_id: str. The user ID of the new subscriber.
-        feedback_thread_ids: list(str). The IDs of the feedback threads.
+        user_id: The user ID of the new subscriber.
+        feedback_thread_ids: The IDs of the feedback threads.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
@@ -80,8 +80,8 @@ def subscribe_to_exploration(user_id: str, exploration_id: str) -> None:
     exploration_id are valid.
 
     Args:
-        user_id: str. The user ID of the new subscriber.
-        exploration_id: str. The exploration ID.
+        user_id: The user ID of the new subscriber.
+        exploration_id: The exploration ID.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
@@ -101,8 +101,8 @@ def subscribe_to_creator(user_id: str, creator_id: str) -> None:
     creator_id are valid.
 
     Args:
-        user_id: str. The user ID of the new subscriber.
-        creator_id: str. The user ID of the creator.
+        user_id: The user ID of the new subscriber.
+        creator_id: The user ID of the creator.
 
     Raises:
         Exception. The user ID of the new subscriber is same as the
@@ -139,8 +139,8 @@ def unsubscribe_from_creator(user_id: str, creator_id: str) -> None:
     creator_id are valid.
 
     Args:
-        user_id: str. The user ID of the subscriber.
-        creator_id: str. The user ID of the creator.
+        user_id: The user ID of the subscriber.
+        creator_id: The user ID of the creator.
     """
     subscribers_model_creator = user_models.UserSubscribersModel.get(
         creator_id)
@@ -163,10 +163,10 @@ def get_all_threads_subscribed_to(user_id: str) -> List[str]:
     WARNING: Callers of this function should ensure that the user_id is valid.
 
     Args:
-        user_id: str. The user ID of the subscriber.
+        user_id: The user ID of the subscriber.
 
     Returns:
-        list(str). IDs of all the feedback and suggestion threads to
+        IDs of all the feedback and suggestion threads to
         which the user is subscribed.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
@@ -190,11 +190,10 @@ def get_all_creators_subscribed_to(user_id: str) -> List[str]:
     WARNING: Callers of this function should ensure that the user_id is valid.
 
     Args:
-        user_id: str. The user ID of the subscriber.
+        user_id: The user ID of the subscriber.
 
     Returns:
-        list(str). IDs of all the creators to which this learner has
-        subscribed.
+        IDs of all the creators to which this learner has subscribed.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
@@ -215,10 +214,10 @@ def get_all_subscribers_of_creator(user_id: str) -> List[str]:
     WARNING: Callers of this function should ensure that the user_id is valid.
 
     Args:
-        user_id: str. The user ID of the subscriber.
+        user_id: The user ID of the subscriber.
 
     Returns:
-        list(str). IDs of all users who have subscribed to this creator.
+        IDs of all users who have subscribed to this creator.
     """
     subscribers_model = user_models.UserSubscribersModel.get(
         user_id, strict=False)
@@ -239,11 +238,10 @@ def get_exploration_ids_subscribed_to(user_id: str) -> List[str]:
     WARNING: Callers of this function should ensure that the user_id is valid.
 
     Args:
-        user_id: str. The user ID of the subscriber.
+        user_id: The user ID of the subscriber.
 
     Returns:
-        list(str). IDs of all explorations that the given user
-        subscribes to.
+        IDs of all explorations that the given user subscribes to.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
@@ -264,8 +262,8 @@ def subscribe_to_collection(user_id: str, collection_id: str) -> None:
     collection_id are valid.
 
     Args:
-        user_id: str. The user ID of the new subscriber.
-        collection_id: str. The collection ID.
+        user_id: The user ID of the new subscriber.
+        collection_id: The collection ID.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
@@ -285,11 +283,10 @@ def get_collection_ids_subscribed_to(user_id: str) -> List[str]:
     WARNING: Callers of this function should ensure that the user_id is valid.
 
     Args:
-        user_id: str. The user ID of the subscriber.
+        user_id: The user ID of the subscriber.
 
     Returns:
-        list(str). IDs of all collections that the given user
-        subscribes to.
+        IDs of all collections that the given user subscribes to.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)

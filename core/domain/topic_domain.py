@@ -677,8 +677,8 @@ class StoryReference:
         """Constructs a StoryReference domain object.
 
         Args:
-            story_id: str. The ID of the story.
-            story_is_published: bool. Whether the story is published or not.
+            story_id: The ID of the story.
+            story_is_published: Whether the story is published or not.
         """
         self.story_id = story_id
         self.story_is_published = story_is_published
@@ -687,7 +687,7 @@ class StoryReference:
         """Returns a dict representing this StoryReference domain object.
 
         Returns:
-            dict. A dict, mapping all fields of StoryReference instance.
+            A dict, mapping all fields of StoryReference instance.
         """
         return {
             'story_id': self.story_id,
@@ -701,11 +701,11 @@ class StoryReference:
         """Returns a StoryReference domain object from a dict.
 
         Args:
-            story_reference_dict: dict. The dict representation of
-                StoryReference object.
+            story_reference_dict: The dict representation of StoryReference
+                object.
 
         Returns:
-            StoryReference. The corresponding StoryReference domain object.
+            The corresponding StoryReference domain object.
         """
         story_reference = cls(
             story_reference_dict['story_id'],
@@ -717,11 +717,11 @@ class StoryReference:
         """Creates a StoryReference object with default values.
 
         Args:
-            story_id: str. ID of the new story.
+            story_id: ID of the new story.
 
         Returns:
-            StoryReference. A story reference object with given story_id and
-            'not published' status.
+            A story reference object with given story_id and 'not published'
+            status.
         """
         return cls(story_id, False)
 
@@ -765,17 +765,13 @@ class Subtopic:
         """Constructs a Subtopic domain object.
 
         Args:
-            subtopic_id: int. The number of the subtopic.
-            title: str. The title of the subtopic.
-            skill_ids: list(str). The list of skill ids that are part of this
-                subtopic.
-            thumbnail_filename: str|None. The thumbnail filename for the
-                subtopic.
-            thumbnail_bg_color: str|None. The thumbnail background color for
-                the subtopic.
-            thumbnail_size_in_bytes: int|None. The thumbnail size of the topic
-                in bytes.
-            url_fragment: str. The url fragment for the subtopic.
+            subtopic_id: The number of the subtopic.
+            title: The title of the subtopic.
+            skill_ids: The list of skill ids that are part of this subtopic.
+            thumbnail_filename: The thumbnail filename for the subtopic.
+            thumbnail_bg_color: The thumbnail background color for the subtopic.
+            thumbnail_size_in_bytes: The thumbnail size of the topic in bytes.
+            url_fragment: The url fragment for the subtopic.
         """
         self.id = subtopic_id
         self.title = title
@@ -789,7 +785,7 @@ class Subtopic:
         """Returns a dict representing this Subtopic domain object.
 
         Returns:
-            dict. A dict, mapping all fields of Subtopic instance.
+            A dict, mapping all fields of Subtopic instance.
         """
         return {
             'id': self.id,
@@ -806,10 +802,10 @@ class Subtopic:
         """Returns a Subtopic domain object from a dict.
 
         Args:
-            subtopic_dict: dict. The dict representation of Subtopic object.
+            subtopic_dict: The dict representation of Subtopic object.
 
         Returns:
-            Subtopic. The corresponding Subtopic domain object.
+            The corresponding Subtopic domain object.
         """
         subtopic = cls(
             subtopic_dict['id'], subtopic_dict['title'],
@@ -829,13 +825,12 @@ class Subtopic:
         """Creates a Subtopic object with default values.
 
         Args:
-            subtopic_id: int. ID of the new subtopic.
-            title: str. The title for the new subtopic.
-            url_frag: str. The url fragment for the new subtopic.
+            subtopic_id: ID of the new subtopic.
+            title: The title for the new subtopic.
+            url_frag: The url fragment for the new subtopic.
 
         Returns:
-            Subtopic. A subtopic object with given id, title and empty skill ids
-            list.
+            A subtopic object with given id, title and empty skill ids list.
         """
         return cls(subtopic_id, title, [], None, None, None, url_frag)
 
@@ -845,7 +840,7 @@ class Subtopic:
             one.
 
         Args:
-            thumbnail_filename: str. The thumbnail filename to validate.
+            thumbnail_filename: The thumbnail filename to validate.
         """
         utils.require_valid_thumbnail_filename(thumbnail_filename)
 
@@ -855,11 +850,10 @@ class Subtopic:
             valid one.
 
         Args:
-            thumbnail_bg_color: str. The thumbnail background color to
-                validate.
+            thumbnail_bg_color: The thumbnail background color to validate.
 
         Returns:
-            bool. Whether the thumbnail background color is valid or not.
+            Whether the thumbnail background color is valid or not.
         """
         return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
             'subtopic']
@@ -992,45 +986,38 @@ class Topic:
         """Constructs a Topic domain object.
 
         Args:
-            topic_id: str. The unique ID of the topic.
-            name: str. The name of the topic.
-            abbreviated_name: str. The abbreviated topic name.
-            url_fragment: str. The url fragment of the topic.
-            thumbnail_filename: str|None. The thumbnail filename of the topic.
-            thumbnail_bg_color: str|None. The thumbnail background color of the
-                topic.
-            thumbnail_size_in_bytes: int|None. The thumbnail size of the topic
-                in bytes.
-            description: str. The description of the topic.
-            canonical_story_references: list(StoryReference). A set of story
-                reference objects representing the canonical stories that are
-                part of this topic.
-            additional_story_references: list(StoryReference). A set of story
-                reference object representing the additional stories that are
-                part of this topic.
-            uncategorized_skill_ids: list(str). This consists of the list of
+            topic_id: The unique ID of the topic.
+            name: The name of the topic.
+            abbreviated_name: The abbreviated topic name.
+            url_fragment: The url fragment of the topic.
+            thumbnail_filename: The thumbnail filename of the topic.
+            thumbnail_bg_color: The thumbnail background color of the topic.
+            thumbnail_size_in_bytes: The thumbnail size of the topic in bytes.
+            description: The description of the topic.
+            canonical_story_references: A set of story reference objects
+                representing the canonical stories that are part of this topic.
+            additional_story_references: A set of story reference object
+                representing the additional stories that are part of this topic.
+            uncategorized_skill_ids: This consists of the list of
                 uncategorized skill ids that are not part of any subtopic.
-            subtopics: list(Subtopic). The list of subtopics that are part of
-                the topic.
-            subtopic_schema_version: int. The current schema version of the
-                subtopic dict.
-            next_subtopic_id: int. The id for the next subtopic in the topic.
-            language_code: str. The ISO 639-1 code for the language this
+            subtopics: The list of subtopics that are part of the topic.
+            subtopic_schema_version: The current schema version of the subtopic
+                dict.
+            next_subtopic_id: The id for the next subtopic in the topic.
+            language_code: The ISO 639-1 code for the language this
                 topic is written in.
-            version: int. The version of the topic.
-            story_reference_schema_version: int. The schema version of the
+            version: The version of the topic.
+            story_reference_schema_version: The schema version of the
                 story reference object.
-            meta_tag_content: str. The meta tag content in the topic viewer
+            meta_tag_content: The meta tag content in the topic viewer
                 page.
-            practice_tab_is_displayed: bool. Whether the practice tab is shown.
-            page_title_fragment_for_web: str. The page title fragment in the
+            practice_tab_is_displayed: Whether the practice tab is shown.
+            page_title_fragment_for_web: The page title fragment in the
                 topic viewer page.
-            skill_ids_for_diagnostic_test: list(str). The list of skill_id that
+            skill_ids_for_diagnostic_test: The list of skill_id that
                 will be used from a topic in the diagnostic test.
-            created_on: datetime.datetime. Date and time when the topic is
-                created.
-            last_updated: datetime.datetime. Date and time when the
-                topic was last updated.
+            created_on: Date and time when the topic is created.
+            last_updated: Date and time when the topic was last updated.
         """
         self.id = topic_id
         self.name = name
@@ -1061,7 +1048,7 @@ class Topic:
         """Returns a dict representing this Topic domain object.
 
         Returns:
-            dict. A dict, mapping all fields of Topic instance.
+            A dict, mapping all fields of Topic instance.
         """
         return {
             'id': self.id,
@@ -1100,7 +1087,7 @@ class Topic:
         """Returns the object serialized as a JSON string.
 
         Returns:
-            str. JSON-encoded str encoding all of the information composing
+            JSON-encoded str encoding all of the information composing
             the object.
         """
         topic_dict = self.to_dict()
@@ -1135,16 +1122,13 @@ class Topic:
         """Returns a Topic domain object from a dictionary.
 
         Args:
-            topic_dict: dict. The dictionary representation of topic
-                object.
-            topic_version: int. The version of the topic.
-            topic_created_on: datetime.datetime. Date and time when the
-                topic is created.
-            topic_last_updated: datetime.datetime. Date and time when the
-                topic was last updated.
+            topic_dict: The dictionary representation of topic object.
+            topic_version: The version of the topic.
+            topic_created_on: Date and time when the topic is created.
+            topic_last_updated: Date and time when the topic was last updated.
 
         Returns:
-            Topic. The corresponding Topic domain object.
+            The corresponding Topic domain object.
         """
         topic = cls(
             topic_dict['id'], topic_dict['name'],
@@ -1184,12 +1168,12 @@ class Topic:
         """Returns a Topic domain object decoded from a JSON string.
 
         Args:
-            json_string: str. A JSON-encoded string that can be
+            json_string: A JSON-encoded string that can be
                 decoded into a dictionary representing a Topic.
                 Only call on strings that were created using serialize().
 
         Returns:
-            Topic. The corresponding Topic domain object.
+            The corresponding Topic domain object.
         """
         topic_dict = json.loads(json_string)
 
@@ -1213,7 +1197,7 @@ class Topic:
         """Checks whether the topic id is a valid one.
 
         Args:
-            topic_id: str. The topic id to validate.
+            topic_id: The topic id to validate.
         """
         if topic_id is not None and len(topic_id) != 12:
             raise utils.ValidationError('Topic id %s is invalid' % topic_id)
@@ -1223,7 +1207,7 @@ class Topic:
         """Checks whether the name of the topic is a valid one.
 
         Args:
-            name: str. The name to validate.
+            name: The name to validate.
         """
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
@@ -1239,7 +1223,7 @@ class Topic:
         """Checks whether the url fragment of the topic is a valid one.
 
         Args:
-            url_fragment: str. The url fragment to validate.
+            url_fragment: The url fragment to validate.
         """
         utils.require_valid_url_fragment(
             url_fragment, 'Topic URL Fragment',
@@ -1251,7 +1235,7 @@ class Topic:
             one.
 
         Args:
-            thumbnail_filename: str. The thumbnail filename to validate.
+            thumbnail_filename: The thumbnail filename to validate.
         """
         utils.require_valid_thumbnail_filename(thumbnail_filename)
 
@@ -1261,11 +1245,10 @@ class Topic:
             valid one.
 
         Args:
-            thumbnail_bg_color: str. The thumbnail background color to
-                validate.
+            thumbnail_bg_color: The thumbnail background color to validate.
 
         Returns:
-            bool. Whether the thumbnail background color is valid or not.
+            Whether the thumbnail background color is valid or not.
         """
         return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
             'topic']
@@ -1274,7 +1257,7 @@ class Topic:
         """Returns all the ids of all the skills present in the topic.
 
         Returns:
-            list(str). The list of all the skill ids present in the topic.
+            The list of all the skill ids present in the topic.
         """
         skill_ids = copy.deepcopy(self.uncategorized_skill_ids)
 
@@ -1323,11 +1306,11 @@ class Topic:
         """Returns a list of canonical story ids that are part of the topic.
 
         Args:
-            include_only_published: bool. Only return IDs of stories that are
+            include_only_published: Only return IDs of stories that are
                 published.
 
         Returns:
-            list(str). The list of canonical story ids.
+            The list of canonical story ids.
         """
         story_ids = [
             elem.story_id for elem in self.canonical_story_references
@@ -1340,7 +1323,7 @@ class Topic:
         additional.
 
         Returns:
-            list(StoryReference). The list of StoryReference objects in topic.
+            The list of StoryReference objects in topic.
         """
         return (
             self.canonical_story_references + self.additional_story_references)
@@ -1351,11 +1334,11 @@ class Topic:
         """Returns a list of additional story ids that are part of the topic.
 
         Args:
-            include_only_published: bool. Only return IDs of stories that are
+            include_only_published: Only return IDs of stories that are
                 published.
 
         Returns:
-            list(str). The list of additional story ids.
+            The list of additional story ids.
         """
         story_ids = [
             elem.story_id for elem in self.additional_story_references
@@ -1367,8 +1350,7 @@ class Topic:
         """Returns ids of all the uncategorized skills present in the topic.
 
         Returns:
-            list(str). The list of all the uncategorized skill ids present
-            in the topic.
+            The list of all the uncategorized skill ids present in the topic.
         """
         return self.uncategorized_skill_ids
 
@@ -1376,7 +1358,7 @@ class Topic:
         """Removes a story from the canonical_story_references list.
 
         Args:
-            story_id: str. The story id to remove from the list.
+            story_id: The story id to remove from the list.
 
         Raises:
             Exception. The story_id is not present in the canonical stories
@@ -1397,9 +1379,8 @@ class Topic:
         """Rearranges or moves a canonical story to another position.
 
         Args:
-            from_index: int. The index of canonical story to move.
-            to_index: int. The index at which to insert the moved canonical
-                story.
+            from_index: The index of canonical story to move.
+            to_index: The index at which to insert the moved canonical story.
 
         Raises:
             Exception. Invalid input.
@@ -1426,7 +1407,7 @@ class Topic:
         """Adds a story to the canonical_story_references list.
 
         Args:
-            story_id: str. The story id to add to the list.
+            story_id: The story id to add to the list.
 
         Raises:
             Exception. The story ID is already present in the canonical
@@ -1445,7 +1426,7 @@ class Topic:
         """Adds a story to the additional_story_references list.
 
         Args:
-            story_id: str. The story id to add to the list.
+            story_id: The story id to add to the list.
 
         Raises:
             Exception. The story ID is already present in the additional
@@ -1464,7 +1445,7 @@ class Topic:
         """Removes a story from the additional_story_references list.
 
         Args:
-            story_id: str. The story id to remove from the list.
+            story_id: The story id to remove from the list.
 
         Raises:
             Exception. The story ID is not present in the additional stories
@@ -1485,7 +1466,7 @@ class Topic:
         """Validates all properties of this topic and its constituents.
 
         Args:
-            strict: bool. Enable strict checks on the topic when the topic is
+            strict: Enable strict checks on the topic when the topic is
                 published or is going to be published.
 
         Raises:
@@ -1616,14 +1597,14 @@ class Topic:
         when the topic is created for the first time.
 
         Args:
-            topic_id: str. The unique id of the topic.
-            name: str. The initial name for the topic.
-            url_fragment: str. The url fragment for the topic.
-            description: str. The description for the topic.
-            page_title_frag: str. The page title fragment for web.
+            topic_id: The unique id of the topic.
+            name: The initial name for the topic.
+            url_fragment: The url fragment for the topic.
+            description: The description for the topic.
+            page_title_frag: The page title fragment for web.
 
         Returns:
-            Topic. The Topic domain object with the default values.
+            The Topic domain object with the default values.
         """
         return cls(
             topic_id, name, name, url_fragment, None, None, None,
@@ -1641,13 +1622,11 @@ class Topic:
         introduces the thumbnail_size_in_bytes field.
 
         Args:
-            topic_id: str. The id of the topic to which the subtopic is linked
-                to.
-            subtopic_dict: dict. A dict used to initialize a Subtopic domain
-                object.
+            topic_id: The id of the topic to which the subtopic is linked to.
+            subtopic_dict: A dict used to initialize a Subtopic domain object.
 
         Returns:
-            dict. The converted subtopic_dict.
+            The converted subtopic_dict.
         """
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)
         filepath = '%s/%s' % (
@@ -1665,11 +1644,10 @@ class Topic:
         introduces the url_fragment field.
 
         Args:
-            subtopic_dict: dict. A dict used to initialize a Subtopic domain
-                object.
+            subtopic_dict: A dict used to initialize a Subtopic domain object.
 
         Returns:
-            dict. The converted subtopic_dict.
+            The converted subtopic_dict.
         """
         subtopic_title = re.sub('[^a-z]+', '', subtopic_dict['title'])
         subtopic_dict['url_fragment'] = (
@@ -1684,11 +1662,10 @@ class Topic:
         introduces the thumbnail_filename and thumbnail_bg_color field.
 
         Args:
-            subtopic_dict: dict. A dict used to initialize a Subtopic domain
-                object.
+            subtopic_dict: A dict used to initialize a Subtopic domain object.
 
         Returns:
-            dict. The converted subtopic_dict.
+            The converted subtopic_dict.
         """
         subtopic_dict['thumbnail_filename'] = None
         subtopic_dict['thumbnail_bg_color'] = None
@@ -1707,13 +1684,13 @@ class Topic:
         passed in is modified in-place.
 
         Args:
-            versioned_subtopics: dict. A dict with two keys:
-                - schema_version: str. The schema version for the
+            versioned_subtopics: A dict with two keys:
+                - schema_version: The schema version for the
                     subtopics dict.
-                - subtopics: list(dict). The list of dicts comprising the
+                - subtopics: The list of dicts comprising the
                     subtopics of the topic.
-            current_version: int. The current schema version of subtopics.
-            topic_id: str. The topic_id of the topic to which the subtopics
+            current_version: The current schema version of subtopics.
+            topic_id: The topic_id of the topic to which the subtopics
                 are linked to.
         """
         versioned_subtopics['schema_version'] = current_version + 1
@@ -1743,12 +1720,12 @@ class Topic:
         passed in is modified in-place.
 
         Args:
-            versioned_story_references: dict. A dict with two keys:
-                - schema_version: str. The schema version for the
+            versioned_story_references: A dict with two keys:
+                - schema_version: The schema version for the
                     story_references dict.
-                - story_references: list(dict). The list of dicts comprising the
+                - story_references: The list of dicts comprising the
                     story_references of the topic.
-            current_version: int. The current schema version of
+            current_version: The current schema version of
                 story_references.
         """
         versioned_story_references['schema_version'] = current_version + 1
@@ -1768,7 +1745,7 @@ class Topic:
         """Updates the name of a topic object.
 
         Args:
-            new_name: str. The updated name for the topic.
+            new_name: The updated name for the topic.
 
         Raises:
             ValidationError. Name should be a string.
@@ -1782,7 +1759,7 @@ class Topic:
         """Updates the abbreviated_name of a topic object.
 
         Args:
-            new_abbreviated_name: str. The updated abbreviated_name
+            new_abbreviated_name: The updated abbreviated_name
                 for the topic.
         """
         self.abbreviated_name = new_abbreviated_name
@@ -1791,7 +1768,7 @@ class Topic:
         """Updates the url_fragment of a topic object.
 
         Args:
-            new_url_fragment: str. The updated url_fragment for the topic.
+            new_url_fragment: The updated url_fragment for the topic.
         """
         self.url_fragment = new_url_fragment
 
@@ -1801,9 +1778,9 @@ class Topic:
         """Updates the thumbnail filename and file size of a topic object.
 
         Args:
-            new_thumbnail_filename: str|None. The updated thumbnail filename
+            new_thumbnail_filename: The updated thumbnail filename
                 for the topic.
-            new_thumbnail_size: int. The updated thumbnail file size.
+            new_thumbnail_size: The updated thumbnail file size.
         """
         self.thumbnail_filename = new_thumbnail_filename
         self.thumbnail_size_in_bytes = new_thumbnail_size
@@ -1814,7 +1791,7 @@ class Topic:
         """Updates the thumbnail background color of a topic object.
 
         Args:
-            new_thumbnail_bg_color: str|None. The updated thumbnail background
+            new_thumbnail_bg_color: The updated thumbnail background
                 color for the topic.
         """
         self.thumbnail_bg_color = new_thumbnail_bg_color
@@ -1823,7 +1800,7 @@ class Topic:
         """Updates the description of a topic object.
 
         Args:
-            new_description: str. The updated description for the topic.
+            new_description: The updated description for the topic.
         """
         self.description = new_description
 
@@ -1831,7 +1808,7 @@ class Topic:
         """Updates the language code of a topic object.
 
         Args:
-            new_language_code: str. The updated language code for the topic.
+            new_language_code: The updated language code for the topic.
         """
         self.language_code = new_language_code
 
@@ -1839,8 +1816,7 @@ class Topic:
         """Updates the meta tag content of a topic object.
 
         Args:
-            new_meta_tag_content: str. The updated meta tag content for the
-                topic.
+            new_meta_tag_content: The updated meta tag content for the topic.
         """
         self.meta_tag_content = new_meta_tag_content
 
@@ -1850,7 +1826,7 @@ class Topic:
         """Updates the page title fragment of a topic object.
 
         Args:
-            new_page_title_fragment_for_web: str. The updated page title
+            new_page_title_fragment_for_web: The updated page title
                 fragment for the topic.
         """
         self.page_title_fragment_for_web = new_page_title_fragment_for_web
@@ -1861,7 +1837,7 @@ class Topic:
         """Updates the language code of a topic object.
 
         Args:
-            new_practice_tab_is_displayed: bool. The updated practice tab is
+            new_practice_tab_is_displayed: The updated practice tab is
                 displayed property for the topic.
         """
         self.practice_tab_is_displayed = new_practice_tab_is_displayed
@@ -1873,9 +1849,9 @@ class Topic:
         instance.
 
         Args:
-            skill_ids_for_diagnostic_test: list(str). A list of skill_ids that
-                will be used to update skill_ids_for_diagnostic_test field for
-                the topic.
+            skill_ids_for_diagnostic_test: A list of skill_ids that
+                will be used to update skill_ids_for_diagnostic_test
+                field for the topic.
         """
         self.skill_ids_for_diagnostic_test = skill_ids_for_diagnostic_test
 
@@ -1885,7 +1861,7 @@ class Topic:
         """Updates the skill id list of a topic object.
 
         Args:
-            new_uncategorized_skill_id: str. The new skill id to add to
+            new_uncategorized_skill_id: The new skill id to add to
                 uncategorized_skill_ids list.
 
         Raises:
@@ -1910,7 +1886,7 @@ class Topic:
         """Updates the skill id list of a topic object.
 
         Args:
-            uncategorized_skill_id: str. The skill id to be removed from the
+            uncategorized_skill_id: The skill id to be removed from the
                 uncategorized_skill_ids list.
 
         Raises:
@@ -1930,8 +1906,7 @@ class Topic:
         """Returns all subtopics in the topic.
 
         Returns:
-            list(dict). The list of all subtopics present
-            in topic.
+            The list of all subtopics present in topic.
         """
         subtopics = []
         for _, subtopic in enumerate(self.subtopics):
@@ -1943,12 +1918,11 @@ class Topic:
         list.
 
         Args:
-            subtopic_id: int. The id of the subtopic for which the index is to
+            subtopic_id: The id of the subtopic for which the index is to
                 be found.
 
         Returns:
-            int. Returns the index of the subtopic if it exists or else
-            None.
+            Returns the index of the subtopic if it exists or else None.
 
         Raises:
             Exception. The subtopic does not exist.
@@ -1968,9 +1942,9 @@ class Topic:
         """Adds a subtopic with the given id and title.
 
         Args:
-            new_subtopic_id: int. The id of the new subtopic.
-            title: str. The title for the new subtopic.
-            url_frag: str. The url fragment of the new subtopic.
+            new_subtopic_id: The id of the new subtopic.
+            title: The title for the new subtopic.
+            url_frag: The url fragment of the new subtopic.
 
         Raises:
             Exception. The new subtopic ID is not equal to the expected next
@@ -1990,7 +1964,7 @@ class Topic:
         uncategorized skill ids section.
 
         Args:
-            subtopic_id: int. The id of the subtopic to remove.
+            subtopic_id: The id of the subtopic to remove.
 
         Raises:
             Exception. A subtopic with the given id doesn't exist.
@@ -2004,8 +1978,8 @@ class Topic:
         """Updates the title of the new subtopic.
 
         Args:
-            subtopic_id: int. The id of the subtopic to edit.
-            new_title: str. The new title for the subtopic.
+            subtopic_id: The id of the subtopic to edit.
+            new_title: The new title for the subtopic.
 
         Raises:
             Exception. The subtopic with the given id doesn't exist.
@@ -2023,10 +1997,10 @@ class Topic:
          of the new subtopic.
 
         Args:
-            subtopic_id: int. The id of the subtopic to edit.
-            new_thumbnail_filename: str. The new thumbnail filename for the
+            subtopic_id: The id of the subtopic to edit.
+            new_thumbnail_filename: The new thumbnail filename for the
                 subtopic.
-            new_thumbnail_size: int. The updated thumbnail file size.
+            new_thumbnail_size: The updated thumbnail file size.
 
         Raises:
             Exception. The subtopic with the given id doesn't exist.
@@ -2043,8 +2017,8 @@ class Topic:
         """Updates the url fragment of the subtopic.
 
         Args:
-            subtopic_id: int. The id of the subtopic to edit.
-            new_url_fragment: str. The new url fragment of the subtopic.
+            subtopic_id: The id of the subtopic to edit.
+            new_url_fragment: The new url fragment of the subtopic.
 
         Raises:
             Exception. The subtopic with the given id doesn't exist.
@@ -2061,8 +2035,8 @@ class Topic:
         """Updates the thumbnail background color property of the new subtopic.
 
         Args:
-            subtopic_id: int. The id of the subtopic to edit.
-            new_thumbnail_bg_color: str. The new thumbnail background color for
+            subtopic_id: The id of the subtopic to edit.
+            new_thumbnail_bg_color: The new thumbnail background color for
                 the subtopic.
 
         Raises:
@@ -2078,9 +2052,9 @@ class Topic:
         """Rearranges the skills in the subtopic with the given id.
 
         Args:
-            subtopic_id: int. The id of subtopic.
-            from_index: int. The index of skill to move.
-            to_index: int. The index at which to insert the moved skill.
+            subtopic_id: The id of subtopic.
+            from_index: The index of skill to move.
+            to_index: The index at which to insert the moved skill.
 
         Raises:
             Exception. Invalid input.
@@ -2109,8 +2083,8 @@ class Topic:
         """Rearranges the subtopic in the topic.
 
         Args:
-            from_index: int. The index of subtopic to move.
-            to_index: int. The index at which to insert the moved subtopic.
+            from_index: The index of subtopic to move.
+            to_index: The index at which to insert the moved subtopic.
 
         Raises:
             Exception. Invalid input.
@@ -2139,12 +2113,12 @@ class Topic:
         """Moves the skill_id to a new subtopic or to uncategorized skill ids.
 
         Args:
-            old_subtopic_id: int or None. The id of the subtopic in which the
-                skill is present currently (before moving) or None if it is
-                uncategorized.
-            new_subtopic_id: int. The id of the new subtopic to which the skill
+            old_subtopic_id: The id of the subtopic in which the
+                skill is present currently (before moving) or None
+                if it is uncategorized.
+            new_subtopic_id: The id of the new subtopic to which the skill
                 is to be moved.
-            skill_id: str. The skill id which is to be moved.
+            skill_id: The skill id which is to be moved.
 
         Raises:
             Exception. The subtopic with the given id doesn't exist.
@@ -2183,9 +2157,9 @@ class Topic:
         uncategorized skill ids.
 
         Args:
-            subtopic_id: int. The subtopic from which the skill is
+            subtopic_id: The subtopic from which the skill is
                 to be removed.
-            skill_id: str. The skill id which is to be removed.
+            skill_id: The skill id which is to be removed.
 
         Raises:
             Exception. The subtopic with the given id doesn't exist.
@@ -2207,7 +2181,7 @@ class Topic:
         topic.
 
         Returns:
-            bool. Whether the subtopic url fragments are unique in the topic.
+            Whether the subtopic url fragments are unique in the topic.
         """
         url_fragments_list = [
             subtopic.url_fragment for subtopic in self.subtopics]
@@ -2262,33 +2236,33 @@ class TopicSummary:
         """Constructs a TopicSummary domain object.
 
         Args:
-            topic_id: str. The unique id of the topic.
-            name: str. The name of the topic.
-            canonical_name: str. The canonical name (lowercase) of the topic.
-            language_code: str. The language code of the topic.
-            description: str. The description of the topic.
-            version: int. The version of the topic.
-            canonical_story_count: int. The number of canonical stories present
+            topic_id: The unique id of the topic.
+            name: The name of the topic.
+            canonical_name: The canonical name (lowercase) of the topic.
+            language_code: The language code of the topic.
+            description: The description of the topic.
+            version: The version of the topic.
+            canonical_story_count: The number of canonical stories present
                 in the topic.
-            additional_story_count: int. The number of additional stories
+            additional_story_count: The number of additional stories
                 present in the topic.
-            uncategorized_skill_count: int. The number of uncategorized skills
+            uncategorized_skill_count: The number of uncategorized skills
                 in the topic.
-            subtopic_count: int. The number of subtopics in the topic.
-            total_skill_count: int. The total number of skills in the topic
+            subtopic_count: The number of subtopics in the topic.
+            total_skill_count: The total number of skills in the topic
                 (including those that are uncategorized).
-            total_published_node_count: int. The total number of chapters
+            total_published_node_count: The total number of chapters
                 that are published and associated with the stories of the topic.
-            thumbnail_filename: str|None. The filename for the topic thumbnail,
+            thumbnail_filename: The filename for the topic thumbnail,
                 or None if no filename is provided.
-            thumbnail_bg_color: str|None. The background color for the
-                thumbnail, or None if no background color provided for
-                the thumbnail.
-            url_fragment: str. The url fragment of the topic.
-            topic_model_created_on: datetime.datetime. Date and time when
-                the topic model is created.
-            topic_model_last_updated: datetime.datetime. Date and time
-                when the topic model was last updated.
+            thumbnail_bg_color: The background color for the
+                thumbnail, or None if no background color
+                provided for the thumbnail.
+            url_fragment: The url fragment of the topic.
+            topic_model_created_on: Date and time when the topic model is
+                created.
+            topic_model_last_updated: Date and time when the topic model
+                was last updated.
         """
         self.id = topic_id
         self.name = name
@@ -2313,7 +2287,7 @@ class TopicSummary:
         """Checks whether the url fragment of the topic is a valid one.
 
         Args:
-            url_fragment: str. The url fragment to validate.
+            url_fragment: The url fragment to validate.
         """
         utils.require_valid_url_fragment(
             url_fragment, 'Topic URL Fragment',
@@ -2394,7 +2368,7 @@ class TopicSummary:
         """Returns a dictionary representation of this domain object.
 
         Returns:
-            dict. A dict representing this TopicSummary object.
+            A dict representing this TopicSummary object.
         """
         return {
             'id': self.id,
@@ -2430,11 +2404,10 @@ class TopicRights:
         """Constructs a TopicRights domain object.
 
         Args:
-            topic_id: str. The id of the topic.
-            manager_ids: list(str). The id of the users who have been assigned
+            topic_id: The id of the topic.
+            manager_ids: The id of the users who have been assigned
                 as managers for the topic.
-            topic_is_published: bool. Whether the topic is viewable by a
-                learner.
+            topic_is_published: Whether the topic is viewable by a learner.
         """
         self.id = topic_id
         self.manager_ids = manager_ids
@@ -2444,9 +2417,9 @@ class TopicRights:
         """Checks whether given user is a manager of the topic.
 
         Args:
-            user_id: str. Id of the user.
+            user_id: Id of the user.
 
         Returns:
-            bool. Whether user is a topic manager of this topic.
+            Whether user is a topic manager of this topic.
         """
         return bool(user_id in self.manager_ids)

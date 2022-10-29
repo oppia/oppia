@@ -50,9 +50,9 @@ def _migrate_page_contents_to_latest_schema(
     function to account for that new version.
 
     Args:
-        versioned_page_contents: dict. A dict with two keys:
-          - schema_version: int. The schema version for the page_contents dict.
-          - page_contents: dict. The dict comprising the page contents.
+        versioned_page_contents: A dict with two keys:
+          - schema_version: The schema version for the page_contents dict.
+          - page_contents: The dict comprising the page contents.
 
     Raises:
         Exception. The schema version of the page_contents is outside of what
@@ -78,11 +78,11 @@ def get_subtopic_page_from_model(
     """Returns a domain object for an SubtopicPage given a subtopic page model.
 
     Args:
-        subtopic_page_model: SubtopicPageModel. The subtopic page model to get
-            the corresponding domain object.
+        subtopic_page_model: The subtopic page model to get the corresponding
+            domain object.
 
     Returns:
-        SubtopicPage. The domain object corresponding to the given model object.
+        The domain object corresponding to the given model object.
     """
     versioned_page_contents: (
         subtopic_page_domain.VersionedSubtopicPageContentsDict
@@ -145,14 +145,14 @@ def get_subtopic_page_by_id(
     """Returns a domain object representing a subtopic page.
 
     Args:
-        topic_id: str. ID of the topic that the subtopic is a part of.
-        subtopic_id: int. The id of the subtopic.
-        strict: bool. Whether to fail noisily if no subtopic page with the given
+        topic_id: ID of the topic that the subtopic is a part of.
+        subtopic_id: The id of the subtopic.
+        strict: Whether to fail noisily if no subtopic page with the given
             id exists in the datastore.
 
     Returns:
-        SubtopicPage or None. The domain object representing a subtopic page
-        with the given id, or None if it does not exist.
+        The domain object representing a subtopic page with the given id,
+        or None if it does not exist.
     """
     subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
         topic_id, subtopic_id)
@@ -172,12 +172,12 @@ def get_subtopic_pages_with_ids(
     """Returns a list of domain objects with given ids.
 
     Args:
-        topic_id: str. ID of the topic that the subtopics belong to.
-        subtopic_ids: list(int). The ids of the subtopics.
+        topic_id: ID of the topic that the subtopics belong to.
+        subtopic_ids: The ids of the subtopics.
 
     Returns:
-        list(SubtopicPage) or None. The list of domain objects representing the
-        subtopic pages corresponding to given ids list or None if none exist.
+        The list of domain objects representing the subtopic pages corresponding
+        to given ids list or None if none exist.
     """
     subtopic_page_ids = []
     for subtopic_id in subtopic_ids:
@@ -228,14 +228,14 @@ def get_subtopic_page_contents_by_id(
     """Returns the page contents of a subtopic
 
     Args:
-        topic_id: str. ID of the topic that the subtopic belong to.
-        subtopic_id: int. The id of the subtopic.
-        strict: bool. Whether to fail noisily if no subtopic page with the given
+        topic_id: ID of the topic that the subtopic belong to.
+        subtopic_id: The id of the subtopic.
+        strict: Whether to fail noisily if no subtopic page with the given
             id exists in the datastore.
 
     Returns:
-        SubtopicPageContents or None. The page contents for a subtopic page,
-        or None if subtopic page does not exist.
+        The page contents for a subtopic page, or None if subtopic
+        page does not exist.
     """
     subtopic_page = get_subtopic_page_by_id(
         topic_id, subtopic_id, strict=strict)
@@ -256,13 +256,11 @@ def save_subtopic_page(
     domain object by 1.
 
     Args:
-        committer_id: str. ID of the given committer.
-        subtopic_page: SubtopicPage. The subtopic page domain object to be
-            saved.
-        commit_message: str|None. The commit description message, for
-            unpublished topics, it may be equal to None.
-        change_list: list(SubtopicPageChange). List of changes applied to a
-            subtopic page.
+        committer_id: ID of the given committer.
+        subtopic_page: The subtopic page domain object to be saved.
+        commit_message: The commit description message, for unpublished topics,
+            it may be equal to None.
+        change_list: List of changes applied to a subtopic page.
 
     Raises:
         Exception. Received invalid change list.
@@ -312,10 +310,10 @@ def delete_subtopic_page(
     """Delete a topic summary model.
 
     Args:
-        committer_id: str. The user who is deleting the subtopic page.
-        topic_id: str. The ID of the topic that this subtopic belongs to.
-        subtopic_id: int. ID of the subtopic which was removed.
-        force_deletion: bool. If true, the subtopic page and its history are
+        committer_id: The user who is deleting the subtopic page.
+        topic_id: The ID of the topic that this subtopic belongs to.
+        subtopic_id: ID of the subtopic which was removed.
+        force_deletion: If true, the subtopic page and its history are
             fully deleted and are unrecoverable. Otherwise, the subtopic page
             and all its history are marked as deleted, but the corresponding
             models are still retained in the datastore. This last option is the
@@ -337,10 +335,10 @@ def get_topic_ids_from_subtopic_page_ids(
     ids.
 
     Args:
-        subtopic_page_ids: list(str). The ids of the subtopic pages.
+        subtopic_page_ids: The ids of the subtopic pages.
 
     Returns:
-        list(str). The topic ids corresponding to the given subtopic page ids.
+        The topic ids corresponding to the given subtopic page ids.
         The returned list of topic ids is deduplicated and ordered
         alphabetically.
     """
@@ -357,13 +355,13 @@ def get_multi_users_subtopic_pages_progress(
     """Returns the progress of the given user on the given subtopic pages.
 
     Args:
-        user_ids: list(str). The ids of the users.
-        subtopic_page_ids: list(str). The ids of the subtopic pages.
+        user_ids: The ids of the users.
+        subtopic_page_ids: The ids of the subtopic pages.
 
     Returns:
-        dict(str, list(SubtopicPageSummaryDict)). User IDs as keys and Subtopic
-        Page Summary domain object dictionaries containing details of the
-        subtopic page and users mastery in it as values.
+        User IDs as keys and Subtopic Page Summary domain object dictionaries
+        containing details of the subtopic page and users mastery in it as
+        values.
     """
 
     topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
@@ -436,11 +434,10 @@ def get_learner_group_syllabus_subtopic_page_summaries(
     """Returns summary dicts corresponding to the given subtopic page ids.
 
     Args:
-        subtopic_page_ids: list(str). The ids of the subtopic pages.
+        subtopic_page_ids: The ids of the subtopic pages.
 
     Returns:
-        list(SubtopicPageSummaryDict). The summary dicts corresponding to the
-        given subtopic page ids.
+        The summary dicts corresponding to the given subtopic page ids.
     """
     topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
     topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)

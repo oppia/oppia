@@ -56,7 +56,7 @@ def get_new_story_id() -> str:
     """Returns a new story id.
 
     Returns:
-        str. A new story id.
+        A new story id.
     """
     return story_models.StoryModel.get_new_id('')
 
@@ -70,11 +70,10 @@ def _create_story(
     """Creates a new story.
 
     Args:
-        committer_id: str. ID of the committer.
-        story: Story. The story domain object.
-        commit_message: str. A description of changes made to the story.
-        commit_cmds: list(StoryChange). A list of change commands made to the
-            given story.
+        committer_id: ID of the committer.
+        story: The story domain object.
+        commit_message: A description of changes made to the story.
+        commit_cmds: A list of change commands made to the given story.
     """
     story.validate()
     model = story_models.StoryModel(
@@ -102,8 +101,8 @@ def save_new_story(committer_id: str, story: story_domain.Story) -> None:
     """Saves a new story.
 
     Args:
-        committer_id: str. ID of the committer.
-        story: Story. Story to be saved.
+        committer_id: ID of the committer.
+        story: Story to be saved.
     """
     commit_message = (
         'New story created with title \'%s\'.' % story.title)
@@ -121,14 +120,12 @@ def apply_change_list(
     """Applies a changelist to a story and returns the result.
 
     Args:
-        story_id: str. ID of the given story.
-        change_list: list(StoryChange). A change list to be applied to the given
-            story.
+        story_id: ID of the given story.
+        change_list: A change list to be applied to the given story.
 
     Returns:
-        Story, list(str), list(str). The resulting story domain object, the
-        exploration IDs removed from story and the exploration IDs added to
-        the story.
+        The resulting story domain object, the exploration IDs removed from
+        story and the exploration IDs added to the story.
 
     Raises:
         Exception. The elements in change list are not of domain object type.
@@ -385,10 +382,10 @@ def does_story_exist_with_url_fragment(url_fragment: str) -> bool:
     """Checks if the url fragment for the story exists.
 
     Args:
-        url_fragment: str. The url_fragment of the story.
+        url_fragment: The url_fragment of the story.
 
     Returns:
-        bool. Whether the the url fragment for the story exists or not.
+        Whether the the url fragment for the story exists or not.
     """
     story = story_fetchers.get_story_by_url_fragment(url_fragment)
     return story is not None
@@ -401,9 +398,9 @@ def validate_prerequisite_skills_in_story_contents(
     """Validates the prerequisites skills in the story contents.
 
     Args:
-        skill_ids_in_corresponding_topic: list(str). List of skill IDs in
-            the corresponding topic of the story.
-        story_contents: StoryContents. The story contents.
+        skill_ids_in_corresponding_topic: List of skill IDs in the corresponding
+            topic of the story.
+        story_contents: The story contents.
 
     Raises:
         ValidationError. Expected prerequisite skills to have been acquired in
@@ -480,16 +477,15 @@ def validate_explorations_for_story(
     are compatible with the mobile app and ready for publishing.
 
     Args:
-        exp_ids: list(str). The exp IDs to validate.
-        strict: bool. Whether to raise an Exception when a validation error
+        exp_ids: The exp IDs to validate.
+        strict: Whether to raise an Exception when a validation error
             is encountered. If not, a list of the error messages are
             returned. strict should be True when this is called before
             saving the story and False when this function is called from the
             frontend.
 
     Returns:
-        list(str). The various validation error messages (if strict is
-        False).
+        The various validation error messages (if strict is False).
 
     Raises:
         ValidationError. Expected story to only reference valid explorations.
@@ -613,11 +609,11 @@ def _save_story(
     object by 1.
 
     Args:
-        committer_id: str. ID of the given committer.
-        story: Story. The story domain object to be saved.
-        commit_message: str. The commit message.
-        change_list: list(StoryChange). List of changes applied to a story.
-        story_is_published: bool. Whether the supplied story is published.
+        committer_id: ID of the given committer.
+        story: The story domain object to be saved.
+        commit_message: The commit message.
+        change_list: List of changes applied to a story.
+        story_is_published: Whether the supplied story is published.
 
     Raises:
         ValidationError. An invalid exploration was referenced in the
@@ -677,10 +673,10 @@ def is_story_published_and_present_in_topic(story: story_domain.Story) -> bool:
     is not present in the corresponding topic's story references.
 
     Args:
-        story: Story. The story domain object.
+        story: The story domain object.
 
     Returns:
-        bool. Whether the supplied story is published.
+        Whether the supplied story is published.
 
     Raises:
         ValidationError. The story does not belong to any valid topic.
@@ -721,13 +717,12 @@ def update_story(
     # through `topic_services.update_story_and_topic_summary`.
 
     Args:
-        committer_id: str. The id of the user who is performing the update
+        committer_id: The id of the user who is performing the update
             action.
-        story_id: str. The story id.
-        change_list: list(StoryChange). These changes are applied in sequence to
-            produce the resulting story.
-        commit_message: str. A description of changes made to the
-            story.
+        story_id: The story id.
+        change_list: These changes are applied in sequence to produce the
+            resulting story.
+        commit_message: A description of changes made to the story.
 
     Raises:
         ValueError. Expected a commit message but received None.
@@ -789,9 +784,9 @@ def delete_story(
     """Deletes the story with the given story_id.
 
     Args:
-        committer_id: str. ID of the committer.
-        story_id: str. ID of the story to be deleted.
-        force_deletion: bool. If true, the story and its history are fully
+        committer_id: ID of the committer.
+        story_id: ID of the story to be deleted.
+        force_deletion: If true, the story and its history are fully
             deleted and are unrecoverable. Otherwise, the story and all
             its history are marked as deleted, but the corresponding models are
             still retained in the datastore. This last option is the preferred
@@ -844,7 +839,7 @@ def delete_story_summary(story_id: str) -> None:
     """Delete a story summary model.
 
     Args:
-        story_id: str. ID of the story whose story summary is to
+        story_id: ID of the story whose story summary is to
             be deleted.
     """
 
@@ -858,10 +853,10 @@ def compute_summary_of_story(
     object and return it.
 
     Args:
-        story: Story. The story object, for which the summary is to be computed.
+        story: The story object, for which the summary is to be computed.
 
     Returns:
-        StorySummary. The computed summary for the given story.
+        The computed summary for the given story.
 
     Raises:
         Exception. No data available for when the story was last_updated on.
@@ -887,7 +882,7 @@ def create_story_summary(story_id: str) -> None:
     """Creates and stores a summary of the given story.
 
     Args:
-        story_id: str. ID of the story.
+        story_id: ID of the story.
     """
     story = story_fetchers.get_story_by_id(story_id)
     story_summary = compute_summary_of_story(story)
@@ -901,12 +896,12 @@ def populate_story_summary_model_fields(
     """Populate story summary model with the data from story summary object.
 
     Args:
-        story_summary_model: StorySummaryModel. The model to populate.
-        story_summary: StorySummary. The story summary domain object which
+        story_summary_model: The model to populate.
+        story_summary: The story summary domain object which
             should be used to populate the model.
 
     Returns:
-        StorySummaryModel. Populated model.
+        The Populated StorySummaryModel.
     """
     story_summary_dict = {
         'title': story_summary.title,
@@ -937,8 +932,7 @@ def save_story_summary(story_summary: story_domain.StorySummary) -> None:
     entity in the datastore.
 
     Args:
-        story_summary: StorySummary. The story summary object to be saved in the
-            datastore.
+        story_summary: The story summary object to be saved in the datastore.
     """
     existing_skill_summary_model = (
         story_models.StorySummaryModel.get_by_id(story_summary.id))
@@ -956,9 +950,9 @@ def record_completed_node_in_story_context(
     context as having been played.
 
     Args:
-        user_id: str. ID of the given user.
-        story_id: str. ID of the given story.
-        node_id: str. ID of the given node.
+        user_id: ID of the given user.
+        story_id: ID of the given story.
+        node_id: ID of the given node.
     """
     progress_model = user_models.StoryProgressModel.get_or_create(
         user_id, story_id)

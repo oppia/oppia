@@ -146,20 +146,20 @@ def create_suggestion(
     """Creates a new SuggestionModel and the corresponding FeedbackThread.
 
     Args:
-        suggestion_type: str. The type of the suggestion. This parameter should
+        suggestion_type: The type of the suggestion. This parameter should
             be one of the constants defined in storage/suggestion/gae_models.py.
-        target_type: str. The target entity being edited. This parameter should
+        target_type: The target entity being edited. This parameter should
             be one of the constants defined in storage/suggestion/gae_models.py.
-        target_id: str. The ID of the target entity being suggested to.
-        target_version_at_submission: int. The version number of the target
+        target_id: The ID of the target entity being suggested to.
+        target_version_at_submission: The version number of the target
             entity at the time of creation of the suggestion.
-        author_id: str. The ID of the user who submitted the suggestion.
-        change: dict. The details of the suggestion.
-        description: str|None. The description of the changes provided by the
+        author_id: The ID of the user who submitted the suggestion.
+        change: The details of the suggestion.
+        description: The description of the changes provided by the
             author or None, if no description is provided.
 
     Returns:
-        Suggestion. The newly created suggestion domain object.
+        The newly created suggestion domain object.
 
     Raises:
         Exception. Invalid suggestion type.
@@ -254,11 +254,11 @@ def get_suggestion_from_model(
     """Converts the given SuggestionModel to a Suggestion domain object
 
     Args:
-        suggestion_model: SuggestionModel. SuggestionModel object to be
-            converted to Suggestion domain object.
+        suggestion_model: SuggestionModel object to be converted to Suggestion
+            domain object.
 
     Returns:
-        Suggestion. The corresponding Suggestion domain object.
+        The corresponding Suggestion domain object.
     """
     suggestion_domain_class = (
         suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
@@ -296,13 +296,11 @@ def get_suggestion_by_id(
     """Finds a suggestion by the suggestion ID.
 
     Args:
-        suggestion_id: str. The ID of the suggestion.
-        strict: bool. Whether to fail noisily if no suggestion with a given id
-            exists.
+        suggestion_id: The ID of the suggestion.
+        strict: Whether to fail noisily if no suggestion with a given id exists.
 
     Returns:
-        Suggestion|None. The corresponding suggestion, or None if no suggestion
-        is found.
+        The corresponding suggestion, or None if no suggestion is found.
 
     Raises:
         Exception. The suggestion model does not exists for the given id.
@@ -342,12 +340,11 @@ def get_translation_contribution_stats_models(
     """Finds translation contribution stats by the IDs.
 
     Args:
-        stats_ids: list(str). The IDs of the stats.
-        strict: bool. Whether to fail noisily if no stat with given ids exists.
+        stats_ids: The IDs of the stats.
+        strict: Whether to fail noisily if no stat with given ids exists.
 
     Returns:
-        list(TranslationContributionStatsModel|None). The corresponding
-        translation contribution stats for the given IDs.
+        The corresponding translation contribution stats for the given IDs.
 
     Raises:
         Exception. The stats models do not exist for the given IDs.
@@ -393,12 +390,11 @@ def get_translation_review_stats_models(
     """Finds translation review stats by the IDs.
 
     Args:
-        stats_ids: list(str). The IDs of the stats.
-        strict: bool. Whether to fail noisily if no stat with given ids exists.
+        stats_ids: The IDs of the stats.
+        strict: Whether to fail noisily if no stat with given ids exists.
 
     Returns:
-        list(TranslationReviewStatsModel|None). The corresponding translation
-        review stats for the given IDs.
+        The corresponding translation review stats for the given IDs.
 
     Raises:
         Exception. The stats models do not exist for the given IDs.
@@ -444,12 +440,11 @@ def get_question_contribution_stats_models(
     """Finds question contribution stats by the IDs.
 
     Args:
-        stats_ids: list(str). The IDs of the stats.
-        strict: bool. Whether to fail noisily if no stat with given ids exists.
+        stats_ids: The IDs of the stats.
+        strict: Whether to fail noisily if no stat with given ids exists.
 
     Returns:
-        list(QuestionContributionStatsModel|None). The corresponding question
-        contribution stats for the given IDs.
+        The corresponding question contribution stats for the given IDs.
 
     Raises:
         Exception. The stats models do not exist for the given IDs.
@@ -495,12 +490,11 @@ def get_question_review_stats_models(
     """Finds question review stats by the IDs.
 
     Args:
-        stats_ids: list(str). The IDs of the stats.
-        strict: bool. Whether to fail noisily if no stat with given ids exists.
+        stats_ids: The IDs of the stats.
+        strict: Whether to fail noisily if no stat with given ids exists.
 
     Returns:
-        list(QuestionReviewStatsModel|None). The corresponding question review
-        stats for the given IDs.
+        The corresponding question review stats for the given IDs.
 
     Raises:
         Exception. The stats models do not exist for the given IDs.
@@ -528,12 +522,11 @@ def get_suggestions_by_ids(
     """Finds suggestions using the given suggestion IDs.
 
     Args:
-        suggestion_ids: list(str). The IDs of the suggestions.
+        suggestion_ids: The IDs of the suggestions.
 
     Returns:
-        list(Suggestion|None). A list of the corresponding suggestions. The
-        list will contain None elements if no suggestion is found with the
-        corresponding suggestion id.
+        A list of the corresponding suggestions. The list will contain None
+        elements if no suggestion is found with the corresponding suggestion id.
     """
     general_suggestion_models = (
         suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
@@ -551,13 +544,13 @@ def query_suggestions(
     """Queries for suggestions.
 
     Args:
-        query_fields_and_values: list(tuple(str, str)). A list of queries. The
-            first element in each tuple is the field to be queried, and the
-            second element is its value.
+        query_fields_and_values: A list of queries. The first element in each
+            tuple is the field to be queried, and the second element is its
+            value.
 
     Returns:
-        list(Suggestion). A list of suggestions that match the given query
-        values, up to a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
+        A list of suggestions that match the given query values, up to a maximum
+        of feconf.DEFAULT_QUERY_LIMIT suggestions.
     """
     return [
         get_suggestion_from_model(s) for s in
@@ -573,13 +566,12 @@ def get_translation_suggestion_ids_with_exp_ids(
     explorations with the given exploration ids.
 
     Args:
-        exp_ids: list(str). List of exploration ids to query for.
+        exp_ids: List of exploration ids to query for.
 
     Returns:
-        list(str). A list of the ids of translation suggestions that
-        correspond to the given exploration ids. Note: it is not
-        guaranteed that the suggestion ids returned are ordered by the
-        exploration ids in exp_ids.
+        A list of the ids of translation suggestions that correspond to the
+        given exploration ids. Note: it is not guaranteed that the suggestion
+        ids returned are ordered by the exploration ids in exp_ids.
     """
     if len(exp_ids) == 0:
         return []
@@ -595,8 +587,7 @@ def get_all_stale_suggestion_ids() -> List[str]:
     not had any activity on them for THRESHOLD_TIME_BEFORE_ACCEPT time.
 
     Returns:
-        list(str). A list of suggestion ids that correspond to stale
-        suggestions.
+        A list of suggestion ids that correspond to stale suggestions.
     """
 
     return (
@@ -610,7 +601,7 @@ def _update_suggestion(
     """Updates the given suggestion.
 
     Args:
-        suggestion: Suggestion. The suggestion to be updated.
+        suggestion: The suggestion to be updated.
     """
     _update_suggestions([suggestion])
 
@@ -622,8 +613,8 @@ def _update_suggestions(
     """Updates the given suggestions.
 
     Args:
-        suggestions: list(Suggestion). The suggestions to be updated.
-        update_last_updated_time: bool. Whether to update the last_updated
+        suggestions: The suggestions to be updated.
+        update_last_updated_time: Whether to update the last_updated
             field of the suggestions.
     """
     suggestion_ids = []
@@ -664,13 +655,12 @@ def get_commit_message_for_suggestion(
     """Returns a modified commit message for an accepted suggestion.
 
     Args:
-        author_username: str. Username of the suggestion author.
-        commit_message: str. The original commit message submitted by the
-            suggestion author.
+        author_username: Username of the suggestion author.
+        commit_message: The original commit message submitted by the suggestion
+            author.
 
     Returns:
-        str. The modified commit message to be used in the exploration commit
-        logs.
+        The modified commit message to be used in the exploration commit logs.
     """
     return '%s %s: %s' % (
         feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX,
@@ -686,10 +676,10 @@ def accept_suggestion(
     """Accepts the suggestion with the given suggestion_id after validating it.
 
     Args:
-        suggestion_id: str. The id of the suggestion to be accepted.
-        reviewer_id: str. The ID of the reviewer accepting the suggestion.
-        commit_message: str. The commit message.
-        review_message: str. The message provided by the reviewer while
+        suggestion_id: The id of the suggestion to be accepted.
+        reviewer_id: The ID of the reviewer accepting the suggestion.
+        commit_message: The commit message.
+        review_message: The message provided by the reviewer while
             accepting the suggestion.
 
     Raises:
@@ -783,9 +773,9 @@ def reject_suggestion(
     """Rejects the suggestion with the given suggestion_id.
 
     Args:
-        suggestion_id: str. The id of the suggestion to be rejected.
-        reviewer_id: str. The ID of the reviewer rejecting the suggestion.
-        review_message: str. The message provided by the reviewer while
+        suggestion_id: The id of the suggestion to be rejected.
+        reviewer_id: The ID of the reviewer rejecting the suggestion.
+        review_message: The message provided by the reviewer while
             rejecting the suggestion.
 
     Raises:
@@ -801,9 +791,9 @@ def reject_suggestions(
     """Rejects the suggestions with the given suggestion_ids.
 
     Args:
-        suggestion_ids: list(str). The ids of the suggestions to be rejected.
-        reviewer_id: str. The ID of the reviewer rejecting the suggestions.
-        review_message: str. The message provided by the reviewer while
+        suggestion_ids: The ids of the suggestions to be rejected.
+        reviewer_id: The ID of the reviewer rejecting the suggestions.
+        review_message: The message provided by the reviewer while
             rejecting the suggestions.
 
     Raises:
@@ -849,7 +839,7 @@ def auto_reject_question_suggestions_for_skill_id(skill_id: str) -> None:
     skill ID. Reviewer ID is set to SUGGESTION_BOT_USER_ID.
 
     Args:
-        skill_id: str. The skill ID corresponding to the target ID of the
+        skill_id: The skill ID corresponding to the target ID of the
             SuggestionAddQuestion.
     """
     suggestions = query_suggestions(
@@ -880,7 +870,7 @@ def auto_reject_translation_suggestions_for_exp_ids(exp_ids: List[str]) -> None:
     deleted. Reviewer ID is set to SUGGESTION_BOT_USER_ID.
 
     Args:
-        exp_ids: list(str). The exploration IDs corresponding to the target IDs
+        exp_ids: The exploration IDs corresponding to the target IDs
             of the translation suggestions.
     """
     suggestion_ids = get_translation_suggestion_ids_with_exp_ids(exp_ids)
@@ -902,11 +892,11 @@ def resubmit_rejected_suggestion(
     """Resubmit a rejected suggestion with the given suggestion_id.
 
     Args:
-        suggestion_id: str. The id of the rejected suggestion.
-        summary_message: str. The message provided by the author to
+        suggestion_id: The id of the rejected suggestion.
+        summary_message: The message provided by the author to
             summarize new suggestion.
-        author_id: str. The ID of the author creating the suggestion.
-        change: ExplorationChange. The new change to apply to the suggestion.
+        author_id: The ID of the author creating the suggestion.
+        change: The new change to apply to the suggestion.
 
     Raises:
         Exception. The summary message is empty.
@@ -948,11 +938,10 @@ def get_all_suggestions_that_can_be_reviewed_by_user(
     where the user has crossed the minimum score to review.
 
     Args:
-        user_id: str. The ID of the user.
+        user_id: The ID of the user.
 
     Returns:
-        list(Suggestion). A list of suggestions which the given user is allowed
-        to review.
+        A list of suggestions which the given user is allowed to review.
     """
     score_categories = (
         user_models.UserContributionProficiencyModel
@@ -979,24 +968,23 @@ def get_reviewable_translation_suggestions_by_offset(
      passed opportunity IDs which the user can review.
 
     Args:
-        user_id: str. The ID of the user.
-        opportunity_summary_exp_ids: list(str) or None.
-            The list of exploration IDs for which suggestions
-            are fetched. If the list is empty, no suggestions are
-            fetched. If the value is None, all reviewable
+        user_id: The ID of the user.
+        opportunity_summary_exp_ids:  The list of exploration IDs for
+            which suggestions are fetched. If the list is empty, no
+            suggestions are fetched. If the value is None, all reviewable
             suggestions are fetched. If the list consists of some
             valid number of ids, suggestions corresponding to the
             IDs are fetched.
-        limit: int|None. The maximum number of results to return. If None,
-            all available results are returned.
-        offset: int. The number of results to skip from the beginning of all
+        limit: The maximum number of results to return. If None, all available
+            results are returned.
+        offset: The number of results to skip from the beginning of all
             results matching the query.
 
     Returns:
-        Tuple of (results, next_offset). Where:
-            results: list(Suggestion). A list of translation suggestions
-            which the supplied user is permitted to review.
-            next_offset: int. The input offset + the number of results returned
+        A Tuple of (results, next_offset). Where:
+            - results: A list of translation suggestions which the supplied
+                user is permitted to review.
+            - next_offset: The input offset + the number of results returned
                 by the current query.
     """
     contribution_rights = user_services.get_user_contribution_rights(
@@ -1047,16 +1035,16 @@ def get_reviewable_question_suggestions_by_offset(
        can review.
 
     Args:
-        user_id: str. The ID of the user.
-        limit: int. The maximum number of results to return.
-        offset: int. The number of results to skip from the beginning of all
+        user_id: The ID of the user.
+        limit: The maximum number of results to return.
+        offset: The number of results to skip from the beginning of all
             results matching the query.
 
     Returns:
-        Tuple of (results, next_offset). Where:
-            results: list(Suggestion). A list of question suggestions which
-            the given user is allowed to review.
-            next_offset: int. The input offset + the number of results returned
+        A Tuple of (results, next_offset). Where:
+            - results: A list of question suggestions which
+                the given user is allowed to review.
+            - next_offset: The input offset + the number of results returned
                 by the current query.
     """
     suggestions, next_offset = (
@@ -1081,8 +1069,8 @@ def get_question_suggestions_waiting_longest_for_review() -> List[
     of question suggestions, sorted in descending order by review wait time.
 
     Returns:
-        list(Suggestion). A list of question suggestions, sorted in descending
-        order based on how long the suggestions have been waiting for review.
+        A list of question suggestions, sorted in descending order based on
+        how long the suggestions have been waiting for review.
     """
     question_suggestion_models = (
         suggestion_models.GeneralSuggestionModel
@@ -1107,13 +1095,12 @@ def get_translation_suggestions_waiting_longest_for_review(
     sorted in descending order by review wait time.
 
     Args:
-        language_code: str. The ISO 639-1 language code of the translation
+        language_code: The ISO 639-1 language code of the translation
             suggestions.
 
     Returns:
-        list(Suggestion). A list of translation suggestions, sorted in
-        descending order based on how long the suggestions have been waiting
-        for review.
+        A list of translation suggestions, sorted in descending order based
+        on how long the suggestions have been waiting for review.
     """
     translation_suggestion_models = (
         suggestion_models.GeneralSuggestionModel
@@ -1140,12 +1127,12 @@ def get_translation_suggestions_in_review_by_exploration(
     """Returns translation suggestions in review by exploration ID.
 
     Args:
-        exp_id: str. Exploration ID.
-        language_code: str. Language code.
+        exp_id: Exploration ID.
+        language_code: Language code.
 
     Returns:
-        list(Suggestion|None). A list of translation suggestions in review with
-        target_id == exp_id, or None if suggestion model does not exists.
+        A list of translation suggestions in review with target_id == exp_id,
+        or None if suggestion model does not exists.
     """
     suggestion_models_in_review = (
         suggestion_models.GeneralSuggestionModel
@@ -1165,15 +1152,15 @@ def get_translation_suggestions_in_review_by_exp_ids(
     code.
 
     Args:
-        exp_ids: list(str). Exploration IDs matching the target ID of the
-            translation suggestions.
-        language_code: str. The ISO 639-1 language code of the translation
+        exp_ids: Exploration IDs matching the target ID of the translation
+            suggestions.
+        language_code: The ISO 639-1 language code of the translation
             suggestions.
 
     Returns:
-        list(Suggestion). A list of translation suggestions in review with
-        target_id in exp_ids and language_code == language_code, or None if
-        suggestion model does not exists.
+        A list of translation suggestions in review with target_id in exp_ids
+        and language_code == language_code, or None if suggestion model does
+        not exists.
     """
     suggestion_models_in_review = (
         suggestion_models.GeneralSuggestionModel
@@ -1196,11 +1183,10 @@ def get_suggestions_with_translatable_explorations(
     - The suggestion's corresponding exploration allows edits.
 
     Args:
-        suggestions: list(Suggestion). List of translation suggestions to
-            filter.
+        suggestions: List of translation suggestions to filter.
 
     Returns:
-        list(Suggestion). List of filtered translation suggestions.
+        List of filtered translation suggestions.
     """
 
     def _has_translatable_exploration(
@@ -1211,14 +1197,13 @@ def get_suggestions_with_translatable_explorations(
         exploration content card.
 
         Args:
-            suggestion: Suggestion. Translation suggestion domain object to
-                check.
-            suggestion_exp_id_to_exp: dict(str, Exploration). Dictionary mapping
-                suggestion target exploration IDs to their corresponding
-                Exploration domain objects.
+            suggestion: Translation suggestion domain object to check.
+            suggestion_exp_id_to_exp: Dictionary mapping suggestion target
+                exploration IDs to their corresponding Exploration domain
+                objects.
 
         Returns:
-            bool. Whether the supplied suggestion corresponds to a translatable
+            Whether the supplied suggestion corresponds to a translatable
             exploration content card.
         """
         exploration = suggestion_exp_id_to_exp[suggestion.target_id]
@@ -1252,11 +1237,10 @@ def _get_plain_text_from_html_content_string(html_content_string: str) -> str:
     Note: similar logic exists in the frontend in format-rte-preview.filter.ts.
 
     Args:
-        html_content_string: str. The content html string to convert to plain
-            text.
+        html_content_string: The content html string to convert to plain text.
 
     Returns:
-        str. The plain text string from the given html content string.
+        The plain text string from the given html content string.
     """
 
     def _replace_rte_tag(rte_tag: Match[str]) -> str:
@@ -1264,11 +1248,11 @@ def _get_plain_text_from_html_content_string(html_content_string: str) -> str:
         corresponding rte component name in square brackets.
 
         Args:
-            rte_tag: MatchObject. A matched object that contins the
-                oppia-noninteractive rte tags.
+            rte_tag: A matched object that contins the oppia-noninteractive
+                rte tags.
 
         Returns:
-            str. The string to replace the rte tags with.
+            The string to replace the rte tags with.
         """
         # Retrieve the matched string from the MatchObject.
         rte_tag_string = rte_tag.group(0)
@@ -1317,13 +1301,12 @@ def create_reviewable_suggestion_email_info_from_suggestion(
     admins that the given suggestion needs review.
 
     Args:
-        suggestion: Suggestion. The suggestion used to create the
+        suggestion: The suggestion used to create the
             ReviewableSuggestionEmailInfo object. Note that the suggestion's
             status must be in review.
 
     Returns:
-        ReviewableSuggestionEmailInfo. The corresponding reviewable suggestion
-        email info.
+        The corresponding reviewable suggestion email info.
 
     Raises:
         Exception. The suggestion type must be offered on the Contributor
@@ -1362,16 +1345,15 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(
     permissions to review.
 
     Args:
-        reviewer_ids: list(str). A list of the reviewer user ids to notify.
+        reviewer_ids: A list of the reviewer user ids to notify.
 
     Returns:
-        list(list(ReviewableSuggestionEmailInfo)). A list of suggestion
-        email content info objects for each reviewer. Each suggestion email
-        content info object contains the type of the suggestion, the language
-        of the suggestion, the suggestion content (question/translation) and
-        the date that the suggestion was submitted for review. For each user
-        the suggestion email content info objects are sorted in descending order
-        based on review wait time.
+        A list of suggestion email content info objects for each reviewer.
+        Each suggestion email content info object contains the type of the
+        suggestion, the language of the suggestion, the suggestion content
+        (question/translation) and the date that the suggestion was submitted
+        for review. For each user the suggestion email content info objects
+        are sorted in descending order based on review wait time.
     """
     # Get each reviewer's review permissions.
     users_contribution_rights = user_services.get_users_contribution_rights(
@@ -1474,12 +1456,11 @@ def get_submitted_suggestions(
     has submitted.
 
     Args:
-        user_id: str. The ID of the user.
-        suggestion_type: str. The type of the suggestion.
+        user_id: The ID of the user.
+        suggestion_type: The type of the suggestion.
 
     Returns:
-        list(Suggestion). A list of suggestions which the given user has
-        submitted.
+        A list of suggestions which the given user has submitted.
     """
     return ([
         get_suggestion_from_model(s) for s in (
@@ -1496,17 +1477,17 @@ def get_submitted_suggestions_by_offset(
     has submitted.
 
     Args:
-        user_id: str. The ID of the user.
-        suggestion_type: str. The type of suggestion.
-        limit: int. The maximum number of results to return.
-        offset: int. The number of results to skip from the beginning
+        user_id: The ID of the user.
+        suggestion_type: The type of suggestion.
+        limit: The maximum number of results to return.
+        offset: The number of results to skip from the beginning
             of all results matching the query.
 
     Returns:
-        Tuple of (results, next_offset). Where:
-            results: list(Suggestion). A list of suggestions of the supplied
-                type which the supplied user has submitted.
-            next_offset: int. The input offset + the number of results returned
+        A Tuple of (results, next_offset). Where:
+            - results: A list of suggestions of the supplied type which the
+                supplied user has submitted.
+            - next_offset: The input offset + the number of results returned
                 by the current query.
     """
     submitted_suggestion_models, next_offset = (
@@ -1533,13 +1514,12 @@ def get_info_about_suggestions_waiting_too_long_for_review() -> List[
     the suggestion's review wait time.
 
     Returns:
-        list(ReviewableSuggestionEmailContentInfo). A list of reviewable
-        suggestion email content info objects that represent suggestions that
-        have been waiting too long for a review. Each object contains the type
-        of the suggestion, the language of the suggestion, the suggestion
-        content (question/translation), and the date that the suggestion was
-        submitted for review. The objects are sorted in descending order based
-        on review wait time.
+        A list of reviewable suggestion email content info objects that
+        represent suggestions that have been waiting too long for a review.
+        Each object contains the type of the suggestion, the language of the
+        suggestion, the suggestion content (question/translation), and the date
+        that the suggestion was submitted for review. The objects are sorted in
+        descending order based on review wait time.
     """
     suggestions_waiting_too_long_for_review = [
         get_suggestion_from_model(suggestion_model) for suggestion_model in (
@@ -1560,13 +1540,11 @@ def get_user_proficiency_from_model(
     UserContributionProficiency domain object.
 
     Args:
-        user_proficiency_model: UserContributionProficiencyModel.
-            UserContributionProficiencyModel to be converted to
-            a UserContributionProficiency domain object.
+        user_proficiency_model:  UserContributionProficiencyModel to be
+            converted to a UserContributionProficiency domain object.
 
     Returns:
-        UserContributionProficiency. The corresponding
-        UserContributionProficiency domain object.
+        The corresponding UserContributionProficiency domain object.
     """
     return user_domain.UserContributionProficiency(
         user_proficiency_model.user_id, user_proficiency_model.score_category,
@@ -1581,8 +1559,7 @@ def _update_user_proficiency(
     """Updates the user_proficiency.
 
     Args:
-        user_proficiency: UserContributionProficiency. The user proficiency to
-            be updated.
+        user_proficiency: The user proficiency to be updated.
     """
     user_proficiency_model = user_models.UserContributionProficiencyModel.get(
         user_proficiency.user_id, user_proficiency.score_category
@@ -1609,10 +1586,10 @@ def get_all_scores_of_user(user_id: str) -> Dict[str, int]:
     """Gets all scores for a given user.
 
     Args:
-        user_id: str. The id of the user.
+        user_id: The id of the user.
 
     Returns:
-        dict. A dict containing all the scores of the user. The keys of the dict
+        A dict containing all the scores of the user. The keys of the dict
         are the score categories and the values are the scores.
     """
     scores = {}
@@ -1632,11 +1609,11 @@ def can_user_review_category(
     allowed to review.
 
     Args:
-        user_id: str. The id of the user.
-        score_category: str. The category to check the user's score.
+        user_id: The id of the user.
+        score_category: The category to check the user's score.
 
     Returns:
-        bool. Whether the user can review suggestions under category
+        Whether the user can review suggestions under category
         score_category.
     """
     user_proficiency = _get_user_proficiency(user_id, score_category)
@@ -1650,11 +1627,10 @@ def get_all_user_ids_who_are_allowed_to_review(
     scores) suggestions to a particular category.
 
     Args:
-        score_category: str. The category of the suggestion.
+        score_category: The category of the suggestion.
 
     Returns:
-        list(str). All user_ids of users who are allowed to review in the given
-        category.
+        All user_ids of users who are allowed to review in the given category.
     """
     return [
         model.user_id for model in user_models.UserContributionProficiencyModel
@@ -1672,11 +1648,11 @@ def _get_user_proficiency(
     values.
 
     Args:
-        user_id: str. The id of the user.
-        score_category: str. The category of the suggestion.
+        user_id: The id of the user.
+        score_category: The category of the suggestion.
 
     Returns:
-        UserContributionProficiency. The user proficiency object.
+        The user proficiency(UserContributionProficiency) object.
     """
     user_proficiency_model = user_models.UserContributionProficiencyModel.get(
         user_id, score_category)
@@ -1692,11 +1668,11 @@ def check_can_resubmit_suggestion(suggestion_id: str, user_id: str) -> bool:
     """Checks whether the given user can resubmit the suggestion.
 
     Args:
-        suggestion_id: str. The ID of the suggestion.
-        user_id: str. The ID of the user.
+        suggestion_id: The ID of the suggestion.
+        user_id: The ID of the user.
 
     Returns:
-        bool. Whether the user can resubmit the suggestion.
+        Whether the user can resubmit the suggestion.
     """
 
     suggestion = get_suggestion_by_id(suggestion_id)
@@ -1715,12 +1691,11 @@ def create_community_contribution_stats_from_model(
     a single, shared source.
 
     Args:
-        community_contribution_stats_model: CommunityContributionStatsModel.
-            The model to convert to a domain object.
+        community_contribution_stats_model: The model to convert to a
+            domain object.
 
     Returns:
-        CommunityContributionStats. The corresponding
-        CommunityContributionStats domain object.
+        The corresponding CommunityContributionStats domain object.
     """
     return suggestion_registry.CommunityContributionStats(
         (
@@ -1744,8 +1719,7 @@ def get_community_contribution_stats(
     model doesn't exist yet, it will be created.
 
     Returns:
-        CommunityContributionStats. The corresponding
-        CommunityContributionStats domain object.
+        The corresponding CommunityContributionStats domain object.
     """
     community_contribution_stats_model = (
         suggestion_models.CommunityContributionStatsModel.get()
@@ -1764,12 +1738,11 @@ def create_translation_contribution_stats_from_model(
     TranslationContributionStatsModel.
 
     Args:
-        translation_contribution_stats_model: TranslationContributionStatsModel.
-            The model to convert to a domain object.
+        translation_contribution_stats_model: The model to convert to
+            a domain object.
 
     Returns:
-        TranslationContributionStats. The corresponding
-        TranslationContributionStats domain object.
+        The corresponding TranslationContributionStats domain object.
     """
     return suggestion_registry.TranslationContributionStats(
         translation_contribution_stats_model.language_code,
@@ -1796,11 +1769,11 @@ def get_all_translation_contribution_stats(
     user and converts them to their corresponding domain objects.
 
     Args:
-        user_id: str. User ID.
+        user_id: User ID.
 
     Returns:
-        list(TranslationContributionStats). TranslationContributionStats domain
-        objects corresponding to the supplied user.
+        TranslationContributionStats domain objects corresponding to the
+        supplied user.
     """
     translation_contribution_stats_models = (
         suggestion_models.TranslationContributionStatsModel.get_all_by_user_id(
@@ -1820,7 +1793,7 @@ def get_suggestion_types_that_need_reviewers() -> Dict[str, Set[str]]:
     greater than config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
     Returns:
-        dict. A dictionary that uses the presence of its keys to indicate which
+        A dictionary that uses the presence of its keys to indicate which
         suggestion types need more reviewers. The possible key values are the
         suggestion types listed in
         feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES. The dictionary
@@ -1858,11 +1831,11 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
     called in a transaction.
 
     Args:
-        suggestions: list(Suggestion). Suggestions that may update the counts
-            stored in the community contribution stats model. Only suggestion
-            types that are tracked in the community contribution stats model
-            trigger count updates.
-        amount: int. The amount to adjust the counts by.
+        suggestions: Suggestions that may update the counts stored in the
+            community contribution stats model. Only suggestion types that
+            are tracked in the community contribution stats model trigger
+            count updates.
+        amount: The amount to adjust the counts by.
     """
     stats_model = suggestion_models.CommunityContributionStatsModel.get()
     for suggestion in suggestions:
@@ -1904,11 +1877,11 @@ def _update_suggestion_counts_in_community_contribution_stats(
     transaction to avoid loss of updates that come in rapid succession.
 
     Args:
-        suggestions: list(Suggestion). Suggestions that may update the counts
-            stored in the community contribution stats model. Only suggestion
-            types that are tracked in the community contribution stats model
-            trigger count updates.
-        amount: int. The amount to adjust the counts by.
+        suggestions: Suggestions that may update the counts stored in the
+            community contribution stats model. Only suggestion types that
+            are tracked in the community contribution stats model trigger
+            count updates.
+        amount: The amount to adjust the counts by.
     """
     _update_suggestion_counts_in_community_contribution_stats_transactional(
         suggestions, amount)
@@ -1921,8 +1894,8 @@ def update_translation_suggestion(
     suggestion_id.
 
     Args:
-        suggestion_id: str. The id of the suggestion to be updated.
-        translation_html: str. The new translation_html string.
+        suggestion_id: The id of the suggestion to be updated.
+        translation_html: The new translation_html string.
 
     Raises:
         Exception. Expected SuggestionTranslateContent suggestion but found
@@ -1955,13 +1928,12 @@ def update_question_suggestion(
     the given suggestion_id.
 
     Args:
-        suggestion_id: str. The id of the suggestion to be updated.
-        skill_difficulty: double. The difficulty level of the question.
-        question_state_data: obj. Details of the question.
+        suggestion_id: The id of the suggestion to be updated.
+        skill_difficulty: The difficulty level of the question.
+        question_state_data: Details of the question.
 
     Returns:
-        Suggestion|None. The corresponding suggestion, or None if no suggestion
-        is found.
+        The corresponding suggestion, or None if no suggestion is found.
 
     Raises:
         Exception. Expected SuggestionAddQuestion suggestion but found
@@ -2014,12 +1986,10 @@ def _create_translation_review_stats_from_model(
     TranslationReviewStatsModel.
 
     Args:
-        translation_review_stats_model: TranslationReviewStatsModel.
-            The model to convert to a domain object.
+        translation_review_stats_model: The model to convert to a domain object.
 
     Returns:
-        TranslationReviewStats. The corresponding TranslationReviewStats domain
-        object.
+        The corresponding TranslationReviewStats domain object.
     """
     return suggestion_registry.TranslationReviewStats(
         translation_review_stats_model.language_code,
@@ -2046,12 +2016,11 @@ def _create_question_contribution_stats_from_model(
     QuestionContributionStatsModel.
 
     Args:
-        question_contribution_stats_model: QuestionContributionStatsModel.
-            The model to convert to a domain object.
+        question_contribution_stats_model: The model to convert to a
+            domain object.
 
     Returns:
-        QuestionContributionStats. The corresponding QuestionContributionStats
-        domain object.
+        The corresponding QuestionContributionStats domain object.
     """
     return suggestion_registry.QuestionContributionStats(
         question_contribution_stats_model.contributor_user_id,
@@ -2075,12 +2044,11 @@ def _create_question_review_stats_from_model(
     QuestionReviewStatsModel.
 
     Args:
-        question_review_stats_model: QuestionReviewStatsModel.
-            The model to convert to a domain object.
+        question_review_stats_model: The model to convert to a
+            domain object.
 
     Returns:
-        QuestionReviewStats. The corresponding QuestionReviewStats domain
-        object.
+        The corresponding QuestionReviewStats domain object.
     """
     return suggestion_registry.QuestionReviewStats(
         question_review_stats_model.reviewer_user_id,
@@ -2102,11 +2070,11 @@ def get_all_translation_review_stats(
     user and converts them to their corresponding domain objects.
 
     Args:
-        user_id: str. User ID.
+        user_id: User ID.
 
     Returns:
-        list(TranslationReviewStats). TranslationReviewStats domain objects
-        corresponding to the supplied user.
+        TranslationReviewStats domain objects corresponding to the supplied
+        user.
     """
     translation_review_stats_models = (
         suggestion_models.TranslationReviewStatsModel.get_all_by_user_id(
@@ -2126,11 +2094,11 @@ def get_all_question_contribution_stats(
     user and converts them to their corresponding domain objects.
 
     Args:
-        user_id: str. User ID.
+        user_id: User ID.
 
     Returns:
-        list(QuestionContributionStats). QuestionContributionStats domain
-        objects corresponding to the supplied user.
+        QuestionContributionStats domain objects corresponding to the
+        supplied user.
     """
     question_contribution_stats_models = (
         suggestion_models.QuestionContributionStatsModel.get_all_by_user_id(
@@ -2150,11 +2118,11 @@ def get_all_question_review_stats(
     user and converts them to their corresponding domain objects.
 
     Args:
-        user_id: str. User ID.
+        user_id: User ID.
 
     Returns:
-        list(QuestionReviewStats). QuestionReviewStats domain objects
-        corresponding to the supplied user.
+        QuestionReviewStats domain objects corresponding to the
+        supplied user.
     """
     question_review_stats_models = (
         suggestion_models.QuestionReviewStatsModel.get_all_by_user_id(
@@ -2174,11 +2142,11 @@ def get_all_contributor_stats(
     """Gets ContributorStatsSummary corresponding to the supplied user.
 
     Args:
-        user_id: str. User ID.
+        user_id: User ID.
 
     Returns:
-        ContributorStatsSummary. ContributorStatsSummary domain objects
-        corresponding to the supplied user.
+        ContributorStatsSummary domain objects corresponding to the
+        supplied user.
     """
     translation_contribution_stats = get_all_translation_contribution_stats(
         user_id)
@@ -2203,8 +2171,8 @@ def _update_translation_contribution_stats_models(
     contribution stats.
 
     Args:
-        translation_contribution_stats: list(TranslationContributionStats).
-            A list of TranslationContributionStats domain objects.
+        translation_contribution_stats: A list of TranslationContributionStats
+            domain objects.
 
     Raises:
         Exception. Language is None.
@@ -2267,8 +2235,8 @@ def _update_translation_review_stats_models(
     review stats.
 
     Args:
-        translation_review_stats: list(TranslationReviewStats). A list of
-            TranslationReviewStats domain objects.
+        translation_review_stats: A list of TranslationReviewStats domain
+            objects.
     """
     stats_dict = {}
     for stat in translation_review_stats:
@@ -2315,8 +2283,8 @@ def _update_question_contribution_stats_models(
     contribution stats.
 
     Args:
-        question_contribution_stats: list(QuestionContributionStats). A list of
-            QuestionContribution domain objects.
+        question_contribution_stats: A list of QuestionContribution domain
+            objects.
     """
     stats_dict = {}
     for stat in question_contribution_stats:
@@ -2357,8 +2325,8 @@ def _update_question_review_stats_models(
     review stats.
 
     Args:
-        question_review_stats: list(QuestionReviewStats). A list of
-            QuestionReviewStats domain objects.
+        question_review_stats: A list of QuestionReviewStats domain
+            objects.
     """
     stats_dict = {}
     for stat in question_review_stats:
@@ -2397,8 +2365,7 @@ def update_translation_contribution_stats_at_submission(
     given translation submitter when a translation is submitted.
 
     Args:
-        suggestion: Suggestion. The suggestion domain object that is being
-            submitted.
+        suggestion: The suggestion domain object that is being submitted.
     """
     exp_opportunity = (
         opportunity_services.get_exploration_opportunity_summary_by_id(
@@ -2454,8 +2421,7 @@ def update_translation_contribution_stats_at_review(
     given translation submitter when a translation is reviewed.
 
     Args:
-        suggestion: Suggestion. The suggestion domain object that is being
-            reviewed.
+        suggestion: The suggestion domain object that is being reviewed.
     """
     exp_opportunity = (
         opportunity_services.get_exploration_opportunity_summary_by_id(
@@ -2528,8 +2494,7 @@ def update_translation_review_stats(
     reviewer when a translation is reviewed.
 
     Args:
-        suggestion: Suggestion. The suggestion domain object that is being
-            reviewed.
+        suggestion: The suggestion domain object that is being reviewed.
 
     Raises:
         Exception. The final_reviewer_id of the suggestion should not be None.
@@ -2610,8 +2575,7 @@ def update_question_contribution_stats_at_submission(
     submitter when a question is submitted.
 
     Args:
-        suggestion: Suggestion. The suggestion domain object that is being
-            submitted.
+        suggestion: The suggestion domain object that is being submitted.
     """
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id):
@@ -2650,8 +2614,7 @@ def update_question_contribution_stats_at_review(
     submitter when a question is reviewed.
 
     Args:
-        suggestion: Suggestion. The suggestion domain object that is being
-            reviewed.
+        suggestion: The suggestion domain object that is being reviewed.
     """
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
@@ -2704,8 +2667,7 @@ def update_question_review_stats(
     reviewer when a question is reviewed.
 
     Args:
-        suggestion: Suggestion. The suggestion domain object that is being
-            reviewed.
+        suggestion: The suggestion domain object that is being reviewed.
 
     Raises:
         Exception. The final_reviewer_id of the suggestion should not be None.
@@ -2773,12 +2735,11 @@ def increment_translation_contribution_stats_at_review(
     """Updates TranslationContributionStats object.
 
     Args:
-        translation_contribution_stat: TranslationContributionStats. The stats
-            object to update.
-        content_word_count: int. The number of words in the translation.
-        suggestion_is_accepted: bool. A flag that indicates whether the
+        translation_contribution_stat: The stats object to update.
+        content_word_count: The number of words in the translation.
+        suggestion_is_accepted: A flag that indicates whether the
             suggestion is accepted.
-        edited_by_reviewer: bool. A flag that indicates whether the suggestion
+        edited_by_reviewer: A flag that indicates whether the suggestion
             is edited by the reviewer.
     """
     if suggestion_is_accepted:
@@ -2803,13 +2764,12 @@ def increment_translation_review_stats(
     """Updates TranslationReviewStats object.
 
     Args:
-        translation_review_stat: TranslationReviewStats. The stats
-            object to update.
-        content_word_count: int. The number of words in the translation.
-        last_contribution_date: datetime.datetime. The last updated date.
-        suggestion_is_accepted: bool. A flag that indicates whether the
+        translation_review_stat: The stats object to update.
+        content_word_count: The number of words in the translation.
+        last_contribution_date: The last updated date.
+        suggestion_is_accepted: A flag that indicates whether the
             suggestion is accepted.
-        edited_by_reviewer: bool. A flag that indicates whether the suggestion
+        edited_by_reviewer: A flag that indicates whether the suggestion
             is edited by the reviewer.
     """
     translation_review_stat.reviewed_translations_count += 1
@@ -2837,11 +2797,11 @@ def increment_question_review_stats(
     """Updates QuestionReviewStats object.
 
     Args:
-        question_review_stat: QuestionReviewStats. The stats object to update.
-        last_contribution_date: datetime.datetime. The last updated date.
-        suggestion_is_accepted: bool. A flag that indicates whether the
+        question_review_stat: The stats object to update.
+        last_contribution_date: The last updated date.
+        suggestion_is_accepted: A flag that indicates whether the
             suggestion is accepted.
-        edited_by_reviewer: bool. A flag that indicates whether the suggestion
+        edited_by_reviewer: A flag that indicates whether the suggestion
             is edited by the reviewer.
     """
     question_review_stat.reviewed_questions_count += 1
@@ -2859,13 +2819,13 @@ def enqueue_contributor_ranking_notification_email_task(
 ) -> None:
     """Adds a 'send feedback email' (instant) task into the task queue.
     Attributes:
-        contributor_user_id: str. The ID of the contributor.
-        contribution_type: str. The type of the contribution i.e.
+        contributor_user_id: The ID of the contributor.
+        contribution_type: The type of the contribution i.e.
             translation or question.
-        contribution_sub_type: str. The sub type of the contribution
+        contribution_sub_type: The sub type of the contribution
             i.e. submissions/acceptances/reviews/edits.
-        language_code: str. The language code of the suggestion.
-        rank_name: str. The name of the rank that the contributor achieved.
+        language_code: The language code of the suggestion.
+        rank_name: The name of the rank that the contributor achieved.
 
     Raises:
         Exception. The contribution type must be offered on the Contributor

@@ -171,13 +171,11 @@ class SubtopicPageContents:
         """Constructs a SubtopicPageContents domain object.
 
         Args:
-            subtitled_html: SubtitledHtml. The html data being displayed on
-                the page.
-            recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
-                the subtopic page content and their translations in different
-                languages.
-            written_translations: WrittenTranslations. The text translations of
-                the subtopic page content.
+            subtitled_html: The html data being displayed on the page.
+            recorded_voiceovers: The recorded voiceovers for the subtopic
+                page content and their translations in different languages.
+            written_translations: The text translations of the subtopic page
+                content.
         """
         self.subtitled_html = subtitled_html
         self.recorded_voiceovers = recorded_voiceovers
@@ -197,7 +195,7 @@ class SubtopicPageContents:
         """Creates a default subtopic page contents object.
 
         Returns:
-            SubtopicPageContents. A default object.
+            A default SubtopicPageContents object.
         """
         content_id = feconf.DEFAULT_SUBTOPIC_PAGE_CONTENT_ID
         return cls(
@@ -212,7 +210,7 @@ class SubtopicPageContents:
         """Returns a dict representing this SubtopicPageContents domain object.
 
         Returns:
-            dict. A dict, mapping all fields of SubtopicPageContents instance.
+            A dict, mapping all fields of SubtopicPageContents instance.
         """
         return {
             'subtitled_html': self.subtitled_html.to_dict(),
@@ -227,11 +225,11 @@ class SubtopicPageContents:
         """Creates a subtopic page contents object from a dictionary.
 
         Args:
-            page_contents_dict: dict. The dict representation of
+            page_contents_dict: The dict representation of
                 SubtopicPageContents object.
 
         Returns:
-            SubtopicPageContents. The corresponding object.
+            The corresponding SubtopicPageContents object.
         """
         page_contents = state_domain.SubtitledHtml.from_dict(
             page_contents_dict['subtitled_html'])
@@ -270,15 +268,15 @@ class SubtopicPage:
         """Constructs a SubtopicPage domain object.
 
         Args:
-            subtopic_page_id: str. The unique ID of the subtopic page.
-            topic_id: str. The ID of the topic that this subtopic is a part of.
-            page_contents: SubtopicPageContents. The html and audio
-                translations to be surfaced to the learner.
-            page_contents_schema_version: int. The schema version for the page
+            subtopic_page_id: The unique ID of the subtopic page.
+            topic_id: The ID of the topic that this subtopic is a part of.
+            page_contents: The html and audio translations to be surfaced
+                to the learner.
+            page_contents_schema_version: The schema version for the page
                 contents object.
-            language_code: str. The ISO 639-1 code for the language this
+            language_code: The ISO 639-1 code for the language this
                 subtopic page is written in.
-            version: int. The current version of the subtopic.
+            version: The current version of the subtopic.
         """
         self.id = subtopic_page_id
         self.topic_id = topic_id
@@ -291,7 +289,7 @@ class SubtopicPage:
         """Returns a dict representing this SubtopicPage domain object.
 
         Returns:
-            dict. A dict, mapping all fields of SubtopicPage instance.
+            A dict, mapping all fields of SubtopicPage instance.
         """
         return {
             'id': self.id,
@@ -307,11 +305,11 @@ class SubtopicPage:
         """Returns the subtopic page id from the topic_id and subtopic_id.
 
         Args:
-            topic_id: str. The id of the topic that the subtopic is a part of.
-            subtopic_id: int. The id of the subtopic.
+            topic_id: The id of the topic that the subtopic is a part of.
+            subtopic_id: The id of the subtopic.
 
         Returns:
-            str. The subtopic_page_id calculated from the given values.
+            The subtopic_page_id calculated from the given values.
         """
         return '%s-%s' % (topic_id, subtopic_id)
 
@@ -322,13 +320,12 @@ class SubtopicPage:
         """Creates a SubtopicPage object with default values.
 
         Args:
-            subtopic_id: int. ID of the subtopic.
-            topic_id: str. The Id of the topic to which this page is linked
-                with.
+            subtopic_id: ID of the subtopic.
+            topic_id: The Id of the topic to which this page is linked with.
 
         Returns:
-            SubtopicPage. A subtopic object with given id, topic_id and default
-            page contents field.
+            A subtopic object with given id, topic_id and default page contents
+            field.
         """
         subtopic_page_id = cls.get_subtopic_page_id(topic_id, subtopic_id)
         return cls(
@@ -347,13 +344,13 @@ class SubtopicPage:
         page contents to migrate them to a desired state.
 
         Args:
-            subtopic_page_contents_dict: dict. The dict representation of
-                subtopic page contents.
-            conversion_fn: function. The conversion function to be applied on
+            subtopic_page_contents_dict: The dict representation of subtopic
+                page contents.
+            conversion_fn: The conversion function to be applied on
                 the subtopic_page_contents_dict.
 
         Returns:
-            dict. The converted subtopic_page_contents_dict.
+            The converted subtopic_page_contents_dict.
         """
         subtopic_page_contents_dict['written_translations'] = (
             state_domain.WrittenTranslations.
@@ -373,11 +370,11 @@ class SubtopicPage:
         v2 schema introduces the new schema for Math components.
 
         Args:
-            page_contents_dict: dict. A dict used to initialize a SubtopicPage
+            page_contents_dict: A dict used to initialize a SubtopicPage
                 domain object.
 
         Returns:
-            dict. The converted page_contents_dict.
+            The converted page_contents_dict.
         """
         return cls.convert_html_fields_in_subtopic_page_contents(
             page_contents_dict,
@@ -392,11 +389,11 @@ class SubtopicPage:
         existing occurences of it to oppia-noninteractive-image tag.
 
         Args:
-            page_contents_dict: dict. A dict used to initialize a SubtopicPage
+            page_contents_dict: A dict used to initialize a SubtopicPage
                 domain object.
 
         Returns:
-            dict. The converted page_contents_dict.
+            The converted page_contents_dict.
         """
         return cls.convert_html_fields_in_subtopic_page_contents(
             page_contents_dict,
@@ -410,11 +407,11 @@ class SubtopicPage:
         v4 schema fixes HTML encoding issues.
 
         Args:
-            page_contents_dict: dict. A dict used to initialize a SubtopicPage
+            page_contents_dict: A dict used to initialize a SubtopicPage
                 domain object.
 
         Returns:
-            dict. The converted page_contents_dict.
+            The converted page_contents_dict.
         """
         return cls.convert_html_fields_in_subtopic_page_contents(
             page_contents_dict,
@@ -432,12 +429,11 @@ class SubtopicPage:
         passed in is modified in-place.
 
         Args:
-            versioned_page_contents: dict. A dict with two keys:
-                - schema_version: str. The schema version for the
+            versioned_page_contents: A dict with two keys:
+                - schema_version: The schema version for the
                     page_contents dict.
-                - page_contents: dict. The dict comprising the subtopic page
-                    contents.
-            current_version: int. The current schema version of page_contents.
+                - page_contents: The dict comprising the subtopic page contents.
+            current_version: The current schema version of page_contents.
         """
         versioned_page_contents['schema_version'] = current_version + 1
 
@@ -451,7 +447,7 @@ class SubtopicPage:
         """Returns the id from the subtopic page id of the object.
 
         Returns:
-            int. The subtopic_id of the object.
+            The subtopic_id of the object.
         """
         return int(self.id[len(self.topic_id) + 1:])
 
@@ -461,8 +457,7 @@ class SubtopicPage:
         """The new value for the html data field.
 
         Args:
-            new_page_contents_html: SubtitledHtml. The new html for the subtopic
-                page.
+            new_page_contents_html: The new html for the subtopic page.
         """
         self.page_contents.subtitled_html = new_page_contents_html
 
@@ -472,8 +467,7 @@ class SubtopicPage:
         """The new value for the recorded_voiceovers data field.
 
         Args:
-            new_page_contents_audio: RecordedVoiceovers. The new audio for
-                the subtopic page.
+            new_page_contents_audio: The new audio for the subtopic page.
         """
         self.page_contents.recorded_voiceovers = new_page_contents_audio
 
@@ -484,8 +478,8 @@ class SubtopicPage:
         """The new value for the written_translations data field.
 
         Args:
-            new_page_written_translations_dict: dict. The new translation for
-                the subtopic page.
+            new_page_written_translations_dict: The new translation for the
+                subtopic page.
         """
         self.page_contents.written_translations = (
             state_domain.WrittenTranslations.from_dict(
@@ -566,18 +560,16 @@ class SubtopicPageSummary:
         """Initialize a SubtopicPageSummary object.
 
         Args:
-            subtopic_id: str. The id of the subtopic.
-            subtopic_title: str. The title of the subtopic.
-            parent_topic_id: str. The id of the parent topic.
-            parent_topic_name: str. The name of the parent topic.
-            thumbnail_filename: str. The filename of the thumbnail image.
-            thumbnail_bg_color: str. The background color of the thumbnail
+            subtopic_id: The id of the subtopic.
+            subtopic_title: The title of the subtopic.
+            parent_topic_id: The id of the parent topic.
+            parent_topic_name: The name of the parent topic.
+            thumbnail_filename: The filename of the thumbnail image.
+            thumbnail_bg_color: The background color of the thumbnail
                 image.
-            subtopic_mastery: float. The mastery score of a user in the
-                subtopic.
-            parent_topic_url_fragment: str. The url fragment of the parent
-                topic.
-            classroom_url_fragment: str. The url fragment of the classroom
+            subtopic_mastery: The mastery score of a user in the subtopic.
+            parent_topic_url_fragment: The url fragment of the parent topic.
+            classroom_url_fragment: The url fragment of the classroom
                 to which the parent topic belongs.
         """
         self.subtopic_id = subtopic_id
@@ -594,7 +586,7 @@ class SubtopicPageSummary:
         """Returns a dict representing this SubtopicPageSummary domain object.
 
         Returns:
-            dict. A dict, mapping all fields of SubtopicPageSummary instance.
+            A dict, mapping all fields of SubtopicPageSummary instance.
         """
         return {
             'subtopic_id': self.subtopic_id,

@@ -40,8 +40,7 @@ def get_models_which_should_be_exported() -> List[Type[base_models.BaseModel]]:
     """Returns list of models to export.
 
     Returns:
-        list(datastore_services.Model). List of models whose data should be
-        exported.
+        List of models whose data should be exported.
     """
     exempt_base_classes = [
         'BaseCommitLogEntryModel',
@@ -63,10 +62,10 @@ def export_data_for_user(user_id: str) -> takeout_domain.TakeoutData:
     """Exports selected models according to model defined export_data functions.
 
     Args:
-        user_id: str. The user_id of the user whose data is being exported.
+        user_id: The user_id of the user whose data is being exported.
 
     Returns:
-        dict. Dictionary containing all user data in the following format:
+        Dictionary containing all user data in the following format:
         {
             <MODEL_NAME>_data: <dict of data in format as specified by
                                 model export policy>

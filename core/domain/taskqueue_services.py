@@ -83,13 +83,12 @@ def defer(
     execution.
 
     Args:
-        fn_identifier: str. The string identifier of the function being
-            deferred.
-        queue_name: str. The name of the queue to place the task into. Should be
+        fn_identifier: The string identifier of the function being deferred.
+        queue_name: The name of the queue to place the task into. Should be
             one of the QUEUE_NAME_* constants listed above.
-        *args: list(*). Positional arguments for fn. Positional arguments
-            should be json serializable.
-        **kwargs: dict(str : *). Keyword arguments for fn.
+        *args: Positional arguments for fn. Positional arguments should be json
+            serializable.
+        **kwargs: Keyword arguments for fn.
 
     Raises:
         ValueError. The arguments and keyword arguments that are passed in are
@@ -121,11 +120,10 @@ def enqueue_task(url: str, params: Dict[str, Any], countdown: int) -> None:
     """Adds a new task for sending email.
 
     Args:
-        url: str. Url of the handler function.
-        params: dict(str : *). Payload to pass to the request. Defaults
-            to None if no payload is required.
-        countdown: int. Amount of time, in seconds, to wait before executing
-            task.
+        url: Url of the handler function.
+        params: Payload to pass to the request. Defaults to None if no payload
+            is required.
+        countdown: Amount of time, in seconds, to wait before executing task.
 
     Raises:
         ValueError. The params that are passed in are not JSON serializable.

@@ -56,11 +56,10 @@ def _migrate_story_contents_to_latest_schema(
     to account for that new version.
 
     Args:
-        versioned_story_contents: dict. A dict with two keys:
-          - schema_version: str. The schema version for the story_contents dict.
-          - story_contents: dict. The dict comprising the story
-              contents.
-        story_id: str. The unique ID of the story.
+        versioned_story_contents: A dict with two keys:
+          - schema_version: The schema version for the story_contents dict.
+          - story_contents: The dict comprising the story contents.
+        story_id: The unique ID of the story.
 
     Raises:
         Exception. The schema version of the story_contents is outside of what
@@ -87,12 +86,10 @@ def get_story_from_model(
     from the datastore.
 
     Args:
-        story_model: StoryModel. The story model loaded from the
-            datastore.
+        story_model: The story model loaded from the datastore.
 
     Returns:
-        story. A Story domain object corresponding to the given
-        story model.
+        A Story domain object corresponding to the given story model.
     """
 
     # Ensure the original story model does not get altered.
@@ -127,12 +124,11 @@ def get_story_summary_from_model(
     story summary model.
 
     Args:
-        story_summary_model: StorySummaryModel. The story summary model object
-            to get the corresponding domain object.
+        story_summary_model: The story summary model object to get the
+            corresponding domain object.
 
     Returns:
-        StorySummary. The corresponding domain object to the given story
-        summary model object.
+        The corresponding domain object to the given story summary model object.
     """
     return story_domain.StorySummary(
         story_summary_model.id, story_summary_model.title,
@@ -188,15 +184,15 @@ def get_story_by_id(
     """Returns a domain object representing a story.
 
     Args:
-        story_id: str. ID of the story.
-        strict: bool. Whether to fail noisily if no story with the given
-            id exists in the datastore.
-        version: str or None. The version number of the story to be
-            retrieved. If it is None, the latest version will be retrieved.
+        story_id: ID of the story.
+        strict: Whether to fail noisily if no story with the given id exists
+            in the datastore.
+        version: The version number of the story to be retrieved. If it is None,
+            the latest version will be retrieved.
 
     Returns:
-        Story or None. The domain object representing a story with the
-        given id, or None if it does not exist.
+        The domain object representing a story with the given id, or None if it
+        does not exist.
     """
     sub_namespace = str(version) if version else None
     cached_story = caching_services.get_multi(
@@ -226,11 +222,11 @@ def get_story_by_url_fragment(
     """Returns a domain object representing a story.
 
     Args:
-        url_fragment: str. The url fragment of the story.
+        url_fragment: The url fragment of the story.
 
     Returns:
-        Story or None. The domain object representing a story with the
-        given url_fragment, or None if it does not exist.
+        The domain object representing a story with the given url_fragment,
+        or None if it does not exist.
     """
     story_model = story_models.StoryModel.get_by_url_fragment(url_fragment)
     if story_model is None:
@@ -264,13 +260,13 @@ def get_story_summary_by_id(
     """Returns a domain object representing a story summary.
 
     Args:
-        story_id: str. ID of the story summary.
-        strict: bool. Whether to fail noisily if no story summary with the given
+        story_id: ID of the story summary.
+        strict: Whether to fail noisily if no story summary with the given
             id exists in the datastore.
 
     Returns:
-        StorySummary. The story summary domain object corresponding to
-        a story with the given story_id.
+        The story summary domain object corresponding to a story with the
+        given story_id.
     """
     story_summary_model = story_models.StorySummaryModel.get(
         story_id, strict=strict)
@@ -306,13 +302,13 @@ def get_stories_by_ids(
     """Returns a list of stories matching the IDs provided.
 
     Args:
-        story_ids: list(str). List of IDs to get stories for.
-        strict: bool. Whether to fail noisily if no story model exists
+        story_ids: List of IDs to get stories for.
+        strict: Whether to fail noisily if no story model exists
             with a given ID exists in the datastore.
 
     Returns:
-        list(Story|None). The list of stories corresponding to given ids.  If a
-        Story does not exist, the corresponding returned list element is None.
+        The list of stories corresponding to given ids. If a Story does
+        not exist, the corresponding returned list element is None.
 
     Raises:
         Exception. No story model exists for the given story_id.
@@ -338,12 +334,11 @@ def get_story_summaries_by_ids(
     """Returns the StorySummary objects corresponding the given story ids.
 
     Args:
-        story_ids: list(str). The list of story ids for which the story
-            summaries are to be found.
+        story_ids: The list of story ids for which the story summaries are
+            to be found.
 
     Returns:
-        list(StorySummary). The story summaries corresponds to given story
-        ids.
+        The story summaries corresponds to given story ids.
     """
     story_summary_models = story_models.StorySummaryModel.get_multi(story_ids)
     story_summaries = [
@@ -361,12 +356,11 @@ def get_learner_group_syllabus_story_summaries(
     corresponding the given story ids.
 
     Args:
-        story_ids: list(str). The list of story ids for which the story
-            summaries are to be returned.
+        story_ids: The list of story ids for which the story summaries
+            are to be returned.
 
     Returns:
-        list(LearnerGroupSyllabusStorySummaryDict). The story summaries
-        corresponds to given story ids.
+        The story summaries corresponds to given story ids.
     """
     # Validating if story exists before adding it to all stories list is only
     # done for mypy type checks as all story ids are supposed to be valid as
@@ -429,13 +423,13 @@ def get_latest_completed_node_ids(user_id: str, story_id: str) -> List[str]:
     """Returns the ids of the completed nodes that come latest in the story.
 
     Args:
-        user_id: str. ID of the given user.
-        story_id: str. ID of the story.
+        user_id: ID of the given user.
+        story_id: ID of the story.
 
     Returns:
-        list(str). List of the completed node ids that come latest in the story.
-        If length is larger than 3, return the last three of them. If length is
-        smaller or equal to 3, return all of them.
+        List of the completed node ids that come latest in the story. If length
+        is larger than 3, return the last three of them. If length is smaller
+        or equal to 3, return all of them.
     """
     progress_model = user_models.StoryProgressModel.get(
         user_id, story_id, strict=False)
@@ -460,12 +454,11 @@ def get_completed_nodes_in_story(
     """Returns nodes that are completed in a story
 
     Args:
-        user_id: str. The user id of the user.
-        story_id: str. The id of the story.
+        user_id: The user id of the user.
+        story_id: The id of the story.
 
     Returns:
-        list(StoryNode). The list of the story nodes that the user has
-        completed.
+        The list of the story nodes that the user has completed.
     """
     story = get_story_by_id(story_id, strict=True)
     completed_nodes = []
@@ -484,12 +477,12 @@ def get_user_progress_in_story_chapters(
     """Returns the progress of multiple users in multiple chapters.
 
     Args:
-        user_id: str. The user id of the user.
-        story_ids: list(str). The ids of the stories.
+        user_id: The user id of the user.
+        story_ids: The ids of the stories.
 
     Returns:
-        list(StoryChapterProgressSummaryDict). The list of the progress
-        summaries of the user corresponding to all stories chapters.
+        The list of the progress summaries of the user corresponding
+        to all stories chapters.
     """
     all_valid_story_nodes: List[story_domain.StoryNode] = []
     for story in get_stories_by_ids(story_ids):
@@ -536,12 +529,12 @@ def get_multi_users_progress_in_stories(
     """Returns the progress of given users in all given stories.
 
     Args:
-        user_ids: list(str). The user ids of the users.
-        story_ids: list(str). The list of story ids.
+        user_ids: The user ids of the users.
+        story_ids: The list of story ids.
 
     Returns:
-        Dict(str, list(StoryProgressDict)). Dictionary of user id and their
-        corresponding list of story progress dicts.
+        Dictionary of user id and their corresponding list of story
+        progress dicts.
     """
     all_valid_stories = [
         story for story in get_stories_by_ids(story_ids) if story
@@ -620,12 +613,11 @@ def get_pending_and_all_nodes_in_story(
     """Returns the nodes that are pending in a story
 
     Args:
-        user_id: str. The user id of the user.
-        story_id: str. The id of the story.
+        user_id: The user id of the user.
+        story_id: The id of the story.
 
     Returns:
-        Dict[str, List[story_domain.StoryNode]]. The list of story nodes,
-        pending for the user.
+        The list of story nodes, pending for the user.
     """
     story = get_story_by_id(story_id, strict=True)
     pending_nodes = []
@@ -645,11 +637,11 @@ def get_completed_node_ids(user_id: str, story_id: str) -> List[str]:
     """Returns the ids of the nodes completed in the story.
 
     Args:
-        user_id: str. ID of the given user.
-        story_id: str. ID of the story.
+        user_id: ID of the given user.
+        story_id: ID of the story.
 
     Returns:
-        list(str). List of the node ids completed in story.
+        List of the node ids completed in story.
     """
     progress_model = user_models.StoryProgressModel.get(
         user_id, story_id, strict=False)
@@ -671,11 +663,11 @@ def get_node_index_by_story_id_and_node_id(
     and node id.
 
     Args:
-        story_id: str. ID of the story.
-        node_id: str. ID of the story node.
+        story_id: ID of the story.
+        node_id: ID of the story node.
 
     Returns:
-        int. The index of the corresponding node.
+        The index of the corresponding node.
 
     Raises:
         Exception. The given story does not exist.

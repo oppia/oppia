@@ -426,29 +426,28 @@ class StoryNode:
         """Initializes a StoryNode domain object.
 
         Args:
-            node_id: str. The unique id for each node.
-            title: str. The title of the story node.
-            description: str. The description for the story node.
-            thumbnail_filename: str|None. The thumbnail filename of the story
+            node_id: The unique id for each node.
+            title: The title of the story node.
+            description: The description for the story node.
+            thumbnail_filename: The thumbnail filename of the story node.
+            thumbnail_bg_color: The thumbnail background color of the story
                 node.
-            thumbnail_bg_color: str|None. The thumbnail background color of
-                the story node.
-            thumbnail_size_in_bytes: int|None. The size of thumbnail in bytes.
-            destination_node_ids: list(str). The list of destination node ids
-                that this node points to in the story graph.
-            acquired_skill_ids: list(str). The list of skill ids acquired by
-                the user on completion of the node.
-            prerequisite_skill_ids: list(str). The list of skill ids required
-                before starting a node.
-            outline: str. Free-form annotations that a lesson implementer
+            thumbnail_size_in_bytes: The size of thumbnail in bytes.
+            destination_node_ids: The list of destination node ids that this
+                node points to in the story graph.
+            acquired_skill_ids: The list of skill ids acquired by the user on
+                completion of the node.
+            prerequisite_skill_ids: The list of skill ids required before
+                starting a node.
+            outline: Free-form annotations that a lesson implementer
                 can use to construct the exploration. It describes the basic
                 theme or template of the story and is to be provided in html
                 form.
-            outline_is_finalized: bool. Whether the outline for the story
+            outline_is_finalized: Whether the outline for the story
                 node is finalized or not.
-            exploration_id: str or None. The valid exploration id that fits the
-                story node. It can be None initially, when the story creator
-                has just created a story with the basic storyline (by providing
+            exploration_id: The valid exploration id that fits the story node.
+                It can be None initially, when the story creator has just
+                created a story with the basic storyline (by providing
                 outlines) without linking an exploration to any node.
         """
         self.id = node_id
@@ -469,10 +468,10 @@ class StoryNode:
         """Decodes the node_id to get the number at the end of the id.
 
         Args:
-            node_id: str. The id of the node.
+            node_id: The id of the node.
 
         Returns:
-            int. The number at the end of the id.
+            The number at the end of the id.
         """
         return int(node_id.replace(NODE_ID_PREFIX, ''))
 
@@ -481,10 +480,10 @@ class StoryNode:
         """Increments the next node id of the story.
 
         Args:
-            node_id: str. The node id to be incremented.
+            node_id: The node id to be incremented.
 
         Returns:
-            str. The new next node id.
+            The new next node id.
         """
         current_number = StoryNode.get_number_from_node_id(node_id)
         incremented_node_id = NODE_ID_PREFIX + str(current_number + 1)
@@ -495,7 +494,7 @@ class StoryNode:
         """Validates the node id for a StoryNode object.
 
         Args:
-            node_id: str. The node id to be validated.
+            node_id: The node id to be validated.
         """
         if not isinstance(node_id, str):
             raise utils.ValidationError(
@@ -512,7 +511,7 @@ class StoryNode:
             one.
 
         Args:
-            thumbnail_filename: str. The thumbnail filename to validate.
+            thumbnail_filename: The thumbnail filename to validate.
         """
         utils.require_valid_thumbnail_filename(thumbnail_filename)
 
@@ -522,11 +521,10 @@ class StoryNode:
             valid one.
 
         Args:
-            thumbnail_bg_color: str. The thumbnail background color to
-                validate.
+            thumbnail_bg_color: The thumbnail background color to validate.
 
         Returns:
-            bool. Whether the thumbnail background color is valid or not.
+            Whether the thumbnail background color is valid or not.
         """
         return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
             'chapter']
@@ -535,7 +533,7 @@ class StoryNode:
         """Returns a dict representing this StoryNode domain object.
 
         Returns:
-            dict. A dict, mapping all fields of StoryNode instance.
+            A dict, mapping all fields of StoryNode instance.
         """
         return {
             'id': self.id,
@@ -557,10 +555,10 @@ class StoryNode:
         """Return a StoryNode domain object from a dict.
 
         Args:
-            node_dict: dict. The dict representation of StoryNode object.
+            node_dict: The dict representation of StoryNode object.
 
         Returns:
-            StoryNode. The corresponding StoryNode domain object.
+            The corresponding StoryNode domain object.
         """
         node = cls(
             node_dict['id'],
@@ -584,12 +582,11 @@ class StoryNode:
         """Returns a StoryNode domain object with default values.
 
         Args:
-            node_id: str. The id of the node.
-            title: str. The title of the node.
+            node_id: The id of the node.
+            title: The title of the node.
 
         Returns:
-            StoryNode. The StoryNode domain object with default
-            value.
+            The StoryNode domain object with default value.
         """
         return cls(
             node_id, title, '', None, None, None,
@@ -734,12 +731,10 @@ class StoryContents:
         """Constructs a StoryContents domain object.
 
         Args:
-            story_nodes: list(StoryNode). The list of story nodes that are part
-                of this story.
-            initial_node_id: Optional[str]. The id of the starting node of the
-                story and None if there is only one node(or the starting node).
-            next_node_id: str. The id for the next node to be added to the
-                story.
+            story_nodes: The list of story nodes that are part of this story.
+            initial_node_id: The id of the starting node of the story and None
+                if there is only one node(or the starting node).
+            next_node_id: The id for the next node to be added to the story.
         """
         self.initial_node_id = initial_node_id
         self.nodes = story_nodes
@@ -830,12 +825,12 @@ class StoryContents:
         id, or None if the node id is not in the story contents dict.
 
         Args:
-            node_id: str. The id of the node.
-            strict: bool. Whether to fail noisily if no node with the given
+            node_id: The id of the node.
+            strict: Whether to fail noisily if no node with the given
                 node_id exists. Default is True.
 
         Returns:
-            int or None. The index of the corresponding node, or None if there
+            The index of the corresponding node, or None if there
             is no such node and strict == False.
 
         Raises:
@@ -858,7 +853,7 @@ class StoryContents:
         nodes.
 
         Returns:
-            list(StoryNode). The ordered list of nodes.
+            The ordered list of story nodes.
         """
         if len(self.nodes) == 0:
             return []
@@ -879,7 +874,7 @@ class StoryContents:
         story content.
 
         Returns:
-            list(str). A list of exploration ids.
+            A list of exploration ids.
         """
         exp_ids = []
         for node in self.nodes:
@@ -891,8 +886,7 @@ class StoryContents:
         """Returns the node object which corresponds to a given exploration ids.
 
         Returns:
-            StoryNode. The StoryNode object of the corresponding exploration id
-            if exist.
+            The StoryNode object of the corresponding exploration id if exist.
 
         Raises:
             Exception. Unable to find the exploration in any node.
@@ -908,7 +902,7 @@ class StoryContents:
         """Returns a dict representing this StoryContents domain object.
 
         Returns:
-            dict. A dict, mapping all fields of StoryContents instance.
+            A dict, mapping all fields of StoryContents instance.
         """
         return {
             'nodes': [
@@ -925,11 +919,11 @@ class StoryContents:
         """Return a StoryContents domain object from a dict.
 
         Args:
-            story_contents_dict: dict. The dict representation of
+            story_contents_dict: The dict representation of
                 StoryContents object.
 
         Returns:
-            StoryContents. The corresponding StoryContents domain object.
+            The corresponding StoryContents domain object.
         """
         story_contents = cls(
             [
@@ -1001,32 +995,27 @@ class Story:
         """Constructs a Story domain object.
 
         Args:
-            story_id: str. The unique ID of the story.
-            title: str. The title of the story.
-            description: str. The high level description of the story.
-            notes: str. A set of notes, that describe the characters,
+            story_id: The unique ID of the story.
+            title: The title of the story.
+            description: The high level description of the story.
+            notes: A set of notes, that describe the characters,
                 main storyline, and setting. To be provided in html form.
-            story_contents: StoryContents. The StoryContents instance
-                representing the contents (like nodes) that are part of the
-                story.
-            story_contents_schema_version: int. The schema version for the
-                story contents object.
-            language_code: str. The ISO 639-1 code for the language this
+            story_contents: The StoryContents instance representing the
+                contents (like nodes) that are part of the story.
+            story_contents_schema_version: The schema version for the story
+                contents object.
+            language_code: The ISO 639-1 code for the language this
                 story is written in.
-            corresponding_topic_id: str. The id of the topic to which the story
+            corresponding_topic_id: The id of the topic to which the story
                 belongs.
-            version: int. The version of the story.
-            created_on: datetime.datetime. Date and time when the story is
-                created.
-            last_updated: datetime.datetime. Date and time when the
-                story was last updated.
-            thumbnail_filename: str|None. The thumbnail filename of the story.
-            thumbnail_bg_color: str|None. The thumbnail background color of
-                the story.
-            thumbnail_size_in_bytes: int|None. The size of thumbnail in bytes.
-            url_fragment: str. The url fragment for the story.
-            meta_tag_content: str. The meta tag content in the topic viewer
-                page.
+            version: The version of the story.
+            created_on: Date and time when the story is created.
+            last_updated: Date and time when the story was last updated.
+            thumbnail_filename: The thumbnail filename of the story.
+            thumbnail_bg_color: The thumbnail background color of the story.
+            thumbnail_size_in_bytes: The size of thumbnail in bytes.
+            url_fragment: The url fragment for the story.
+            meta_tag_content: The meta tag content in the topic viewer page.
         """
         self.id = story_id
         self.title = title
@@ -1050,7 +1039,7 @@ class Story:
         """Checks whether the description is a valid string.
 
         Args:
-            description: str. The description to be checked.
+            description: The description to be checked.
 
         Raises:
             ValidationError. The description is not a valid string.
@@ -1076,7 +1065,7 @@ class Story:
             one.
 
         Args:
-            thumbnail_filename: str. The thumbnail filename to validate.
+            thumbnail_filename: The thumbnail filename to validate.
         """
         utils.require_valid_thumbnail_filename(thumbnail_filename)
 
@@ -1086,11 +1075,10 @@ class Story:
             valid one.
 
         Args:
-            thumbnail_bg_color: str. The thumbnail background color to
-                validate.
+            thumbnail_bg_color: The thumbnail background color to validate.
 
         Returns:
-            bool. Whether the thumbnail background color is valid or not.
+            Whether the thumbnail background color is valid or not.
         """
         return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
             'story']
@@ -1160,7 +1148,7 @@ class Story:
         """Checks whether the story id is a valid one.
 
         Args:
-            story_id: str. The story id to validate.
+            story_id: The story id to validate.
         """
         if not isinstance(story_id, str):
             raise utils.ValidationError(
@@ -1174,7 +1162,7 @@ class Story:
         """Checks whether the story title is a valid one.
 
         Args:
-            title: str. The title to validate.
+            title: The title to validate.
         """
 
         if not isinstance(title, str):
@@ -1195,11 +1183,10 @@ class Story:
         node ids.
 
         Args:
-            node_ids: list(str). The list of IDs of the nodes inside
-                the story.
+            node_ids: The list of IDs of the nodes inside the story.
 
         Returns:
-            list(str). The union of the acquired skill IDs corresponding to
+            The union of the acquired skill IDs corresponding to
             each of the node IDs.
         """
         acquired_skill_ids = []
@@ -1217,11 +1204,11 @@ class Story:
         exploration id.
 
         Args:
-            exp_id: str. The ID of the exploration linked to the story.
+            exp_id: The ID of the exploration linked to the story.
 
         Returns:
-            list(str)|None. The list of prerequisite skill ids for the
-            exploration or None, if no node is linked to it.
+            The list of prerequisite skill ids for the exploration or None,
+            if no node is linked to it.
         """
         for node in self.story_contents.nodes:
             if node.exploration_id == exp_id:
@@ -1232,10 +1219,10 @@ class Story:
         """Checks whether an exploration is present in the story.
 
         Args:
-            exp_id: str. The ID of the exploration linked to the story.
+            exp_id: The ID of the exploration linked to the story.
 
         Returns:
-            bool. Whether the exploration is linked to the story.
+            Whether the exploration is linked to the story.
         """
         for node in self.story_contents.nodes:
             if node.exploration_id == exp_id:
@@ -1246,7 +1233,7 @@ class Story:
         """Returns a dict representing this Story domain object.
 
         Returns:
-            dict. A dict, mapping all fields of Story instance.
+            A dict, mapping all fields of Story instance.
         """
         return {
             'id': self.id,
@@ -1270,12 +1257,12 @@ class Story:
         """Returns a Story domain object decoded from a JSON string.
 
         Args:
-            json_string: str. A JSON-encoded string that can be
-                decoded into a dictionary representing a Story.
-                Only call on strings that were created using serialize().
+            json_string: A JSON-encoded string that can be decoded into
+                a dictionary representing a Story. Only call on strings
+                that were created using serialize().
 
         Returns:
-            Story. The corresponding Story domain object.
+            The corresponding Story domain object.
         """
         story_dict = json.loads(json_string)
         created_on = (
@@ -1299,7 +1286,7 @@ class Story:
         """Returns the object serialized as a JSON string.
 
         Returns:
-            str. JSON-encoded str encoding all of the information composing
+            JSON-encoded str encoding all of the information composing
             the object.
         """
         # Here we use MyPy ignore because to_dict() method returns a general
@@ -1341,16 +1328,14 @@ class Story:
         """Returns a Story domain object from a dictionary.
 
         Args:
-            story_dict: dict. The dictionary representation of story
-                object.
-            story_version: int. The version of the story.
-            story_created_on: datetime.datetime. Date and time when the
-                story is created.
-            story_last_updated: datetime.datetime. Date and time when the
-                story was last updated.
+            story_dict: The dictionary representation of story object.
+            story_version: The version of the story.
+            story_created_on: Date and time when the story is created.
+            story_last_updated: Date and time when the story was last
+                updated.
 
         Returns:
-            Story. The corresponding Story domain object.
+            The corresponding Story domain object.
         """
         story = cls(
             story_dict['id'],
@@ -1387,15 +1372,15 @@ class Story:
         when the story is created for the first time.
 
         Args:
-            story_id: str. The unique id of the story.
-            title: str. The title for the newly created story.
-            description: str. The high level description of the story.
-            corresponding_topic_id: str. The id of the topic to which the story
+            story_id: The unique id of the story.
+            title: The title for the newly created story.
+            description: The high level description of the story.
+            corresponding_topic_id: The id of the topic to which the story
                 belongs.
-            url_fragment: str. The url fragment of the story.
+            url_fragment: The url fragment of the story.
 
         Returns:
-            Story. The Story domain object with the default values.
+            The Story domain object with the default values.
         """
         # Initial node id for a new story.
         initial_node_id = '%s1' % NODE_ID_PREFIX
@@ -1416,11 +1401,11 @@ class Story:
         fields for Story Nodes.
 
         Args:
-            story_contents_dict: dict. A dict used to initialize a Story
+            story_contents_dict: A dict used to initialize a Story
                 Contents domain object.
 
         Returns:
-            dict. The converted story_contents_dict.
+            The converted story_contents_dict.
         """
         for index in range(len(story_contents_dict['nodes'])):
             story_contents_dict['nodes'][index]['thumbnail_filename'] = None
@@ -1435,11 +1420,11 @@ class Story:
         v3 schema introduces the description field for Story Nodes.
 
         Args:
-            story_contents_dict: dict. A dict used to initialize a Story
+            story_contents_dict: A dict used to initialize a Story
                 Contents domain object.
 
         Returns:
-            dict. The converted story_contents_dict.
+            The converted story_contents_dict.
         """
         for node in story_contents_dict['nodes']:
             node['description'] = ''
@@ -1453,11 +1438,11 @@ class Story:
         v4 schema introduces the new schema for Math components.
 
         Args:
-            story_contents_dict: dict. A dict used to initialize a Story
+            story_contents_dict: A dict used to initialize a Story
                 Contents domain object.
 
         Returns:
-            dict. The converted story_contents_dict.
+            The converted story_contents_dict.
         """
         for node in story_contents_dict['nodes']:
             node['outline'] = (
@@ -1477,12 +1462,12 @@ class Story:
         v5 schema introduces the thumbnail_size_in_bytes for Story Nodes.
 
         Args:
-            story_id: str. The unique ID of the story.
-            story_contents_dict: dict. A dict used to initialize a Story
+            story_id: The unique ID of the story.
+            story_contents_dict: A dict used to initialize a Story
                 Contents domain object.
 
         Returns:
-            dict. The converted story_contents_dict.
+            The converted story_contents_dict.
         """
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, story_id)
         for index in range(len(story_contents_dict['nodes'])):
@@ -1506,13 +1491,12 @@ class Story:
         passed in is modified in-place.
 
         Args:
-            versioned_story_contents: dict. A dict with two keys:
-                - schema_version: int. The schema version for the
+            versioned_story_contents: A dict with two keys:
+                - schema_version: The schema version for the
                     story_contents dict.
-                - story_contents: dict. The dict comprising the story
-                    contents.
-            current_version: int. The current schema version of story_contents.
-            story_id: str. The unique ID of the story.
+                - story_contents: The dict comprising the story contents.
+            current_version: The current schema version of story_contents.
+            story_id: The unique ID of the story.
         """
         versioned_story_contents['schema_version'] = current_version + 1
 
@@ -1530,7 +1514,7 @@ class Story:
         """Updates the title of the story.
 
         Args:
-            title: str. The new title of the story.
+            title: The new title of the story.
         """
         self.title = title
 
@@ -1540,8 +1524,7 @@ class Story:
         """Updates the thumbnail filename and file size of the story.
 
         Args:
-            new_thumbnail_filename: str|None. The new thumbnail filename of the
-                story.
+            new_thumbnail_filename: The new thumbnail filename of the story.
 
         Raises:
             Exception. The subtopic with the given id doesn't exist.
@@ -1564,8 +1547,7 @@ class Story:
         """Updates the thumbnail background color of the story.
 
         Args:
-            thumbnail_bg_color: str|None. The new thumbnail background color of
-                the story.
+            thumbnail_bg_color: The new thumbnail background color of the story.
         """
         self.thumbnail_bg_color = thumbnail_bg_color
 
@@ -1573,7 +1555,7 @@ class Story:
         """Updates the description of the story.
 
         Args:
-            description: str. The new description of the story.
+            description: The new description of the story.
         """
         self.description = description
 
@@ -1581,7 +1563,7 @@ class Story:
         """Updates the notes of the story.
 
         Args:
-            notes: str. The new notes of the story.
+            notes: The new notes of the story.
         """
         self.notes = notes
 
@@ -1589,7 +1571,7 @@ class Story:
         """Updates the language code of the story.
 
         Args:
-            language_code: str. The new language code of the story.
+            language_code: The new language code of the story.
         """
         self.language_code = language_code
 
@@ -1597,7 +1579,7 @@ class Story:
         """Updates the url fragment of the story.
 
         Args:
-            url_fragment: str. The new url fragment of the story.
+            url_fragment: The new url fragment of the story.
         """
         self.url_fragment = url_fragment
 
@@ -1605,8 +1587,7 @@ class Story:
         """Updates the meta tag content of the story.
 
         Args:
-            new_meta_tag_content: str. The updated meta tag content for the
-                story.
+            new_meta_tag_content: The updated meta tag content for the story.
         """
         self.meta_tag_content = new_meta_tag_content
 
@@ -1614,9 +1595,9 @@ class Story:
         """Adds a new default node with the id as story_contents.next_node_id.
 
         Args:
-            desired_node_id: str. The node id to be given to the new node in the
+            desired_node_id: The node id to be given to the new node in the
                 story.
-            node_title: str. The title for the new story node.
+            node_title: The title for the new story node.
 
         Raises:
             Exception. The desired_node_id differs from
@@ -1640,11 +1621,10 @@ class Story:
         present in story_contents.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: The id of the exploration.
 
         Returns:
-            bool. Whether a node with the given exploration ID is already
-            present.
+            Whether a node with the given exploration ID is already present.
         """
         for node in self.story_contents.nodes:
             if node.exploration_id == exploration_id:
@@ -1655,7 +1635,7 @@ class Story:
         """Deletes a node with the given node_id.
 
         Args:
-            node_id: str. The id of the node.
+            node_id: The id of the node.
 
         Raises:
             ValueError. The node is the starting node for story, change the
@@ -1678,8 +1658,8 @@ class Story:
         """Updates the outline field of a given node.
 
         Args:
-            node_id: str. The id of the node.
-            new_outline: str. The new outline of the given node.
+            node_id: The id of the node.
+            new_outline: The new outline of the given node.
         """
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].outline = new_outline
@@ -1688,8 +1668,8 @@ class Story:
         """Updates the title field of a given node.
 
         Args:
-            node_id: str. The id of the node.
-            new_title: str. The new title of the given node.
+            node_id: The id of the node.
+            new_title: The new title of the given node.
         """
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].title = new_title
@@ -1702,8 +1682,8 @@ class Story:
         """Updates the description field of a given node.
 
         Args:
-            node_id: str. The id of the node.
-            new_description: str. The new description of the given node.
+            node_id: The id of the node.
+            new_description: The new description of the given node.
         """
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].description = new_description
@@ -1716,8 +1696,8 @@ class Story:
         """Updates the thumbnail filename and file size field of a given node.
 
         Args:
-            node_id: str. The id of the node.
-            new_thumbnail_filename: str|None. The new thumbnail filename of the
+            node_id: The id of the node.
+            new_thumbnail_filename: The new thumbnail filename of the
                 given node.
 
         Raises:
@@ -1746,8 +1726,8 @@ class Story:
         """Updates the thumbnail background color field of a given node.
 
         Args:
-            node_id: str. The id of the node.
-            new_thumbnail_bg_color: str|None. The new thumbnail background
+            node_id: The id of the node.
+            new_thumbnail_bg_color: The new thumbnail background
                 color of the given node.
         """
         node_index = self.story_contents.get_node_index(node_id)
@@ -1759,7 +1739,7 @@ class Story:
         node_id as True.
 
         Args:
-            node_id: str. The id of the node.
+            node_id: The id of the node.
         """
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].outline_is_finalized = True
@@ -1769,7 +1749,7 @@ class Story:
         node_id as False.
 
         Args:
-            node_id: str. The id of the node.
+            node_id: The id of the node.
         """
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].outline_is_finalized = False
@@ -1782,9 +1762,8 @@ class Story:
         """Updates the acquired skill ids field of a given node.
 
         Args:
-            node_id: str. The id of the node.
-            new_acquired_skill_ids: list(str). The updated acquired skill id
-                list.
+            node_id: The id of the node.
+            new_acquired_skill_ids: The updated acquired skill id list.
         """
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].acquired_skill_ids = (
@@ -1798,9 +1777,8 @@ class Story:
         """Updates the prerequisite skill ids field of a given node.
 
         Args:
-            node_id: str. The id of the node.
-            new_prerequisite_skill_ids: list(str). The updated prerequisite
-                skill id list.
+            node_id: The id of the node.
+            new_prerequisite_skill_ids: The updated prerequisite skill id list.
         """
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].prerequisite_skill_ids = (
@@ -1814,9 +1792,8 @@ class Story:
         """Updates the destination_node_ids field of a given node.
 
         Args:
-            node_id: str. The id of the node.
-            new_destination_node_ids: list(str). The updated destination
-                node id list.
+            node_id: The id of the node.
+            new_destination_node_ids: The updated destination node id list.
         """
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].destination_node_ids = (
@@ -1826,8 +1803,8 @@ class Story:
         """Rearranges or moves a node in the story content.
 
         Args:
-            from_index: int. The index of the node to move.
-            to_index: int. The index at which to insert the moved node.
+            from_index: The index of the node to move.
+            to_index: The index at which to insert the moved node.
 
         Raises:
             Exception. Invalid input.
@@ -1863,8 +1840,8 @@ class Story:
         """Updates the exploration id field of a given node.
 
         Args:
-            node_id: str. The id of the node.
-            new_exploration_id: str. The updated exploration id for a node.
+            node_id: The id of the node.
+            new_exploration_id: The updated exploration id for a node.
 
         Raises:
             ValueError. A node with given exploration id is already exists.
@@ -1889,7 +1866,7 @@ class Story:
         """Updates the starting node of the story.
 
         Args:
-            new_initial_node_id: str. The new starting node id.
+            new_initial_node_id: The new starting node id.
         """
         self.story_contents.get_node_index(new_initial_node_id)
         self.story_contents.initial_node_id = new_initial_node_id
@@ -1936,20 +1913,19 @@ class StorySummary:
         """Constructs a StorySummary domain object.
 
         Args:
-            story_id: str. The unique id of the story.
-            title: str. The title of the story.
-            description: str. The description of the story.
-            language_code: str. The language code of the story.
-            version: int. The version of the story.
-            node_titles: list(str). The titles of nodes present in the story.
-            thumbnail_bg_color: str|None. The thumbnail background color of the
-                story.
-            thumbnail_filename: str|None. The thumbnail filename of the story.
-            url_fragment: str. The url fragment for the story.
-            story_model_created_on: datetime.datetime. Date and time when
-                the story model is created.
-            story_model_last_updated: datetime.datetime. Date and time
-                when the story model was last updated.
+            story_id: The unique id of the story.
+            title: The title of the story.
+            description: The description of the story.
+            language_code: The language code of the story.
+            version: The version of the story.
+            node_titles: The titles of nodes present in the story.
+            thumbnail_bg_color: The thumbnail background color of the story.
+            thumbnail_filename: The thumbnail filename of the story.
+            url_fragment: The url fragment for the story.
+            story_model_created_on: Date and time when the story model is
+                created.
+            story_model_last_updated: Date and time when the story model
+                was last updated.
         """
         self.id = story_id
         self.title = title
@@ -2027,7 +2003,7 @@ class StorySummary:
         """Returns a dictionary representation of this domain object.
 
         Returns:
-            dict. A dict representing this StorySummary object.
+            A dict representing this StorySummary object.
         """
         return {
             'id': self.id,
@@ -2049,7 +2025,7 @@ class StorySummary:
         """Returns a dictionary representation of this domain object.
 
         Returns:
-            dict. A dict representing this StorySummary object.
+            A dict representing this StorySummary object.
         """
         return {
             'id': self.id,
