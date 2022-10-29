@@ -87,7 +87,7 @@ class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):
         self.question_4 = self.save_new_question(
             self.question_id_4, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_id_2'])
-        self.question_dict_4 = self.question_1.to_dict()
+        self.question_dict_4 = self.question_4.to_dict()
 
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id_1, 'skill_id_1', 0.5)
@@ -101,8 +101,12 @@ class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):
     def test_get_skill_id_to_question_dict_for_valid_topic_id(self) -> None:
         url = '%s/%s' % (
             feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL, self.topic_id)
+
         json_response = self.get_json(url)
-        expected_json_response = {
+        received_skill_id_to_questions_dict = json_response[
+            'skill_id_to_questions_dict']
+
+        expected_skill_id_to_questions_dict = {
             'skill_id_1': {
                 'main_question': self.question_dict_1,
                 'backup_question': self.question_dict_2
@@ -113,9 +117,23 @@ class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):
             }
         }
 
+        # The equality of received dict and expected dict is not directly
+        # checked here because the main question and the backup question are
+        # of the same priority so the order in which they are fetched from
+        # the datastore is not fixed. Hence the items in the nested skill ID
+        # dict are validated individually.
         self.assertItemsEqual(
-            json_response['skill_id_to_questions_dict'],
-            expected_json_response)
+            list(received_skill_id_to_questions_dict.keys()),
+            list(expected_skill_id_to_questions_dict.keys())
+        )
+        self.assertItemsEqual(
+            list(received_skill_id_to_questions_dict['skill_id_1'].values()),
+            list(expected_skill_id_to_questions_dict['skill_id_1'].values())
+        )
+        self.assertItemsEqual(
+            list(received_skill_id_to_questions_dict['skill_id_2'].values()),
+            list(expected_skill_id_to_questions_dict['skill_id_2'].values())
+        )
 
     def test_raise_error_for_non_existent_topic_id(self) -> None:
         non_existent_topic_id = topic_fetchers.get_new_topic_id()
@@ -123,10 +141,5 @@ class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):
         url = '%s/%s' % (
             feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL,
             non_existent_topic_id)
-        json_response = self.get_json(url, expected_status_int=500)
 
-        self.assertEqual(
-            json_response['error'],
-            'No corresponding topic models exist for these topic IDs: '
-            '%s.' % non_existent_topic_id
-        )
+        self.get_json(url, expected_status_int=404)

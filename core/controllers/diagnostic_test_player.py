@@ -68,9 +68,12 @@ class DiagnosticTestQuestionsHandler(base.BaseHandler):
 
     @acl_decorators.open_access # type: ignore[misc]
     def get(self, topic_id: str) -> None:
-        diagnostic_test_skill_ids = (
-            topic_services.get_topic_id_to_diagnostic_test_skill_ids([topic_id])
-        )[topic_id]
+        try:
+            diagnostic_test_skill_ids = (
+                topic_services.get_topic_id_to_diagnostic_test_skill_ids(
+                    [topic_id]))[topic_id]
+        except Exception as e:
+            raise self.PageNotFoundException(e)
 
         # From each skill, two questions were fetched. The first question
         # (main question) will be presented to the learner initially and if the
@@ -107,7 +110,7 @@ class DiagnosticTestQuestionsHandler(base.BaseHandler):
             )
 
             for skill_id in diagnostic_test_linked_skill_ids:
-                if 'main_question' in skill_id_to_questions_dict[skill_id]:
+                if 'main_question' not in skill_id_to_questions_dict[skill_id]:
                     skill_id_to_questions_dict[skill_id]['main_question'] = (
                         question.to_dict())
                 else:
