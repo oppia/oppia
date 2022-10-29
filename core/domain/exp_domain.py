@@ -42,10 +42,8 @@ from extensions.objects.models import objects
 from proto_files import exploration_pb2
 
 from typing import (
-    Callable, Dict, List, Mapping, Optional, Sequence,
-    Set, Tuple, Union, cast, overload
-)
-from typing_extensions import Final, Literal, TypedDict
+    Callable, Dict, Final, List, Literal, Mapping, Optional, Sequence, Set,
+    Tuple, TypedDict, Union, cast, overload)
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip

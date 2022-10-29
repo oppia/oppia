@@ -27,8 +27,7 @@ import tarfile
 
 from core.tests import test_utils
 
-from typing import List
-from typing_extensions import Final
+from typing import Final, List
 
 from . import clean
 from . import common
@@ -117,9 +116,9 @@ class SetupTests(test_utils.GenericTestBase):
         self.get_swap = self.swap(os.environ, 'get', mock_get)
         self.cd_swap = self.swap(common, 'CD', MockCD)
         version_info = collections.namedtuple(
-            'version_info', ['major', 'minor'])
-        self.version_info_py37_swap = self.swap(
-            sys, 'version_info', version_info(major=3, minor=7)
+            'version_info', ['major', 'minor', 'micro'])
+        self.version_info_py38_swap = self.swap(
+            sys, 'version_info', version_info(major=3, minor=8, micro=12)
         )
         self.python2_print_swap = self.swap_with_checks(
             builtins,
@@ -162,7 +161,7 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertFalse(check_function_calls['makedirs_is_called'])
 
     def test_python_version_testing_with_correct_version(self) -> None:
-        with self.version_info_py37_swap:
+        with self.version_info_py38_swap:
             setup.test_python_version()
 
     def test_python_version_testing_with_incorrect_version_and_linux_os(
@@ -180,9 +179,9 @@ class SetupTests(test_utils.GenericTestBase):
             common, 'print_each_string_after_two_new_lines', mock_print)
         uname_swap = self.swap(os, 'uname', mock_uname)
         version_info = collections.namedtuple(
-            'version_info', ['major', 'minor'])
+            'version_info', ['major', 'minor', 'micro'])
         version_swap = self.swap(
-            sys, 'version_info', version_info(major=3, minor=4))
+            sys, 'version_info', version_info(major=3, minor=4, micro=12))
         with print_swap, uname_swap, version_swap, self.assertRaisesRegex(
             Exception, 'No suitable python version found.'):
             setup.test_python_version()
@@ -200,9 +199,9 @@ class SetupTests(test_utils.GenericTestBase):
             common, 'print_each_string_after_two_new_lines', mock_print)
         os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
         version_info = collections.namedtuple(
-            'version_info', ['major', 'minor'])
+            'version_info', ['major', 'minor', 'micro'])
         version_swap = self.swap(
-            sys, 'version_info', version_info(major=3, minor=4))
+            sys, 'version_info', version_info(major=3, minor=4, micro=12))
         with print_swap, os_name_swap, version_swap:
             with self.assertRaisesRegex(
                 Exception, 'No suitable python version found.'):
@@ -223,7 +222,7 @@ class SetupTests(test_utils.GenericTestBase):
     def test_python_version_testing_with_python2_wrong_code(self) -> None:
         check_call_swap = self.swap_to_always_return(subprocess, 'call', 1)
 
-        with self.python2_print_swap, self.version_info_py37_swap:
+        with self.python2_print_swap, self.version_info_py38_swap:
             with check_call_swap, self.assertRaisesRegex(SystemExit, '1'):
                 setup.test_python_version()
 
@@ -497,6 +496,24 @@ class SetupTests(test_utils.GenericTestBase):
                 'https://github.com/yarnpkg/yarn/releases/download/'
                 'v%s/yarn-v%s.tar.gz' % (
                     common.YARN_VERSION, common.YARN_VERSION)])
+
+    def test_package_install_with_incompatible_system_raises_error(
+            self) -> None:
+        def mock_exists(unused_path: str) -> bool:
+            return False
+        def mock_is_x64() -> bool:
+            return True
+        os_name_swap = self.swap(common, 'OS_NAME', 'Solaris')
+        architecture_swap = self.swap(
+            common, 'is_x64_architecture', mock_is_x64)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+
+        with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
+            with self.rename_swap, self.chown_swap, architecture_swap:
+                with self.assertRaisesRegex(
+                        Exception,
+                        'System\'s Operating System is not compatible.'):
+                    setup.main(args=[])
 
     def test_chrome_bin_setup_with_google_chrome(self) -> None:
         def mock_isfile(path: str) -> bool:

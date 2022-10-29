@@ -40,8 +40,7 @@ from core.tests import test_utils
 from scripts import install_python_dev_dependencies
 
 import github
-from typing import Generator, List, NoReturn
-from typing_extensions import Literal
+from typing import Generator, List, Literal, NoReturn
 
 from . import common
 
@@ -927,11 +926,6 @@ class CommonTests(test_utils.GenericTestBase):
         finally:
             if os.path.exists('readme_test_dir'):
                 shutil.rmtree('readme_test_dir')
-
-    def test_fix_third_party_imports_correctly_sets_up_imports(self) -> None:
-        common.fix_third_party_imports()
-        # Asserts that imports from problematic modules do not error.
-        from google.cloud import tasks_v2  # pylint: disable=unused-import
 
     def test_cd(self) -> None:
         def mock_chdir(unused_path: str) -> None:

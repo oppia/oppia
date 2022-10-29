@@ -28,8 +28,7 @@ from core.domain import rte_component_registry
 
 import bleach
 import bs4
-from typing import Any, Dict, List
-from typing_extensions import Final, TypedDict
+from typing import Any, Dict, Final, List, TypedDict
 
 
 empty_values = ['&quot;&quot;', '', '\'\'', '\"\"', '<p></p>']
@@ -80,6 +79,7 @@ ATTRS_WHITELIST: Final = {
     'code': [],
     'div': [],
     'em': [],
+    'h1': [],
     'hr': [],
     'i': [],
     'li': [],

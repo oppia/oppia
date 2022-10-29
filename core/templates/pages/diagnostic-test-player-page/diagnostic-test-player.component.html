@@ -1,0 +1,66 @@
+<div class="diagnostic-test-container">
+  <div class="oppia-diagnostic-test-session">Learner Diagnostic Test</div>
+  <mat-card class="introductory-card">
+    <div class="oppia-introductory-container">
+      <div class="oppia-image">
+        <img class="oppia-otter-image" [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
+      </div>
+      <div>
+        <p class="test-introduction-text">
+          <span translate="I18N_DIAGNOSTIC_TEST_INTRO_TEXT_1"></span>
+        </p>
+        <p class="test-introduction-text">
+          <span translate="I18N_DIAGNOSTIC_TEST_INTRO_TEXT_2"></span>
+        </p>
+      </div>
+    </div>
+    <div>
+      <button class="btn oppia-diagnostic-test-start-button"
+              disabled="true"
+              translate="I18N_DIAGNOSTIC_TEST_START_BUTTON">
+      </button>
+    </div>
+  </mat-card>
+</div>
+
+<style>
+  .oppia-image {
+    align-items: center;
+    display: flex;
+    margin-right: 60px;
+  }
+  .oppia-introductory-container {
+    display: flex;
+  }
+  .introductory-card {
+    margin: auto;
+    margin-top: 5vh;
+    overflow: auto;
+    padding: 60px;
+    width: 704px;
+  }
+  .test-introduction-text {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 1.5em;
+  }
+  .oppia-diagnostic-test-session {
+    color: #01645c;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 3em;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    text-align: center;
+  }
+  .oppia-diagnostic-test-start-button {
+    background-color: #00645c;
+    color: #fff;
+    float: right;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 1.2em;
+    margin-top: 5vh;
+    text-transform: uppercase;
+  }
+  .oppia-otter-image {
+    max-width: 7em;
+  }
+</style>

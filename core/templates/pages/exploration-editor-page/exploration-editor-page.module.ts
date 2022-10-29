@@ -36,7 +36,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
-import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { SaveVersionMismatchModalComponent } from './modal-templates/save-version-mismatch-modal.component';
@@ -99,6 +98,8 @@ import { StateTranslationComponent } from './translation-tab/state-translation/s
 import { TranslatorOverviewComponent } from './translation-tab/translator-overview/translator-overview.component';
 import { StateTranslationStatusGraphComponent } from './translation-tab/state-translation-status-graph/state-translation-status-graph.component';
 import { TranslationTabComponent } from './translation-tab/translation-tab.component';
+import { ValueGeneratorEditorComponent } from './param-changes-editor/value-generator-editor.component';
+import { ParamChangesEditorComponent } from './param-changes-editor/param-changes-editor.component';
 import { ExplorationEditorPageComponent } from './exploration-editor-page.component';
 
 @NgModule({
@@ -123,7 +124,6 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
   declarations: [
     CkEditorCopyToolbarComponent,
     DeleteStateSkillModalComponent,
-    ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     SaveVersionMismatchModalComponent,
@@ -178,6 +178,8 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     AddAudioTranslationModalComponent,
     AudioTranslationBarComponent,
     StateTranslationEditorComponent,
+    ValueGeneratorEditorComponent,
+    ParamChangesEditorComponent,
     StateTranslationComponent,
     TranslatorOverviewComponent,
     StateTranslationStatusGraphComponent,
@@ -241,6 +243,8 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     AddAudioTranslationModalComponent,
     AudioTranslationBarComponent,
     StateTranslationEditorComponent,
+    ValueGeneratorEditorComponent,
+    ParamChangesEditorComponent,
     StateTranslationComponent,
     TranslatorOverviewComponent,
     StateTranslationStatusGraphComponent,

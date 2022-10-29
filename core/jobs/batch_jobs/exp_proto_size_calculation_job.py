@@ -363,9 +363,9 @@ class AuditPopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
         """Counts the number of exploration models with
         proto_size_in_bytes as a non-zero attribute.
 
-         Args:
-             exp_id: str. The ID of the exploration.
-             exp_model: ExplorationModel. The exploration model.
+        Args:
+            exp_id: str. The ID of the exploration.
+            exp_model: ExplorationModel. The exploration model.
 
         Returns:
             Result((str, Exploration), (str, Exception)). Result containing
@@ -391,9 +391,9 @@ class AuditPopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
         """Counts the number of exploration models without
         proto_size_in_bytes attribute.
 
-         Args:
-             exp_id: str. The ID of the exploration.
-             exp_model: ExplorationModel. The exploration model.
+        Args:
+            exp_id: str. The ID of the exploration.
+            exp_model: ExplorationModel. The exploration model.
 
         Returns:
             Result((str, Exploration), (str, Exception)). Result containing
@@ -416,9 +416,9 @@ class AuditPopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
         """Counts the number of exploration models with
         proto_size_in_bytes attribute as none.
 
-         Args:
-             exp_id: str. The ID of the exploration.
-             exp_model: ExplorationModel. The exploration model.
+        Args:
+            exp_id: str. The ID of the exploration.
+            exp_model: ExplorationModel. The exploration model.
 
         Returns:
             Result((str, Exploration), (str, Exception)). Result containing

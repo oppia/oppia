@@ -24,8 +24,7 @@ import uuid
 from core import utils
 from core.platform import models
 
-from typing import Dict, Type
-from typing_extensions import Final
+from typing import Dict, Final, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
