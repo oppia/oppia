@@ -77,6 +77,8 @@ import { ConversationSkinComponent } from './conversation-skin.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 
 class MockWindowRef {
   nativeWindow = {
@@ -155,6 +157,7 @@ fdescribe('Conversation skin component', () => {
     ReadOnlyExplorationBackendApiService;
   let stateObjectFactory: StateObjectFactory;
   let platformFeatureService: PlatformFeatureService;
+  let translateService: TranslateService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
 
   let displayedCard = new StateCard(
@@ -499,6 +502,10 @@ fdescribe('Conversation skin component', () => {
         {
           provide: PlatformFeatureService,
           useClass: MockPlatformFeatureService
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -565,6 +572,7 @@ fdescribe('Conversation skin component', () => {
       ReadOnlyExplorationBackendApiService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
+    translateService = TestBed.inject(TranslateService);
     learnerDashboardBackendApiService = TestBed.inject(
       LearnerDashboardBackendApiService);
     spyOn(

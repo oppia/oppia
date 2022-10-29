@@ -18,7 +18,6 @@
 
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
@@ -41,7 +40,6 @@ import { AudioTranslationLanguageService } from './audio-translation-language.se
 import { ContentTranslationLanguageService } from './content-translation-language.service';
 import { ImagePreloaderService } from './image-preloader.service';
 import { ExplorationParams, LearnerParamsService } from './learner-params.service';
-import { MisspelledAnswerResponseUtilityService } from './misspelled-answer-response-utility.service';
 import { PlayerTranscriptService } from './player-transcript.service';
 import { StatsReportingService } from './stats-reporting.service';
 
@@ -91,9 +89,7 @@ export class ExplorationEngineService {
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,
     private statsReportingService: StatsReportingService,
-    private urlService: UrlService,
-    private misspelledAnswerResponseService:
-      MisspelledAnswerResponseUtilityService
+    private urlService: UrlService
   ) {
     this.setExplorationProperties();
   }
@@ -544,24 +540,6 @@ export class ExplorationEngineService {
 
     questionHtml = questionHtml + this._getRandomSuffix();
     nextInteractionHtml = nextInteractionHtml + this._getRandomSuffix();
-
-    // Check if the answer is only misspelled and close
-    // to the correct answer. Only to be checked if the
-    // interaction is TextInput.
-    let oldInteractionId = oldState.interaction.id;
-
-    // Work => let catchMisspellingsFeatOn =
-    // oldStateCard.getInteraction().customizationArgs.
-
-    if (oldInteractionId === AppConstants.TEXTINPUT && onSameCard) {
-      var answerIsOnlyMisspelled = this.answerClassificationService.
-        isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
-      if (answerIsOnlyMisspelled) {
-        // Change the feedbackHtml.
-        feedbackHtml = this.misspelledAnswerResponseService.
-          getFeedbackHtmlWhenAnswerMisspelled();
-      }
-    }
 
     let nextCard = StateCard.createNewCard(
       this.nextStateName, questionHtml, nextInteractionHtml,

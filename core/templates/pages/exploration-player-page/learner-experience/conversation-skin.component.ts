@@ -60,7 +60,7 @@ import { LocalStorageService } from 'services/local-storage.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { State } from 'domain/state/StateObjectFactory';
-import { InteractionRulesService } from '../services/answer-classification.service';
+import { AnswerClassificationService, InteractionRulesService } from '../services/answer-classification.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
@@ -78,6 +78,8 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 import './conversation-skin.component.css';
+import { TranslateService } from '@ngx-translate/core';
+import { cos } from 'mathjs';
 
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
@@ -213,6 +215,8 @@ export class ConversationSkinComponent {
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,
     private platformFeatureService: PlatformFeatureService,
+    private translateService: TranslateService,
+    private answerClassificationService: AnswerClassificationService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
   ) {}
 
@@ -1158,6 +1162,16 @@ export class ConversationSkinComponent {
 
           if (remainOnCurrentCard) {
             // Stay on the same card.
+            let oldStateCard: StateCard = this.playerTranscriptService.getLastCard();
+            let oldInteractionId = oldStateCard.getInteractionId();
+            if (oldInteractionId === 'TextInput') {
+              let answerIsOnlyMisspelled = this.answerClassificationService.
+                isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
+              if (answerIsOnlyMisspelled) {
+                // Change the feedbackHtml.
+                feedbackHtml = this.getFeedbackHtmlWhenAnswerMisspelled();
+              }
+            }
             this.hintsAndSolutionManagerService.recordWrongAnswer();
             this.playerTranscriptService.addNewResponse(feedbackHtml);
             let helpCardAvailable = false;
@@ -1287,6 +1301,15 @@ export class ConversationSkinComponent {
           this.answerIsBeingProcessed = false;
         }, millisecsLeftToWait);
       }
+    );
+  }
+
+  getFeedbackHtmlWhenAnswerMisspelled(): string {
+    let availableKeyCount = ExplorationPlayerConstants.
+      I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS.length;
+    const randomKeyIndex = Math.floor(Math.random() * availableKeyCount);
+    return this.translateService.instant(
+      ExplorationPlayerConstants.I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS[randomKeyIndex]
     );
   }
 

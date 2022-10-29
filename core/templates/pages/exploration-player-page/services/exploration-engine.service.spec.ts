@@ -41,15 +41,6 @@ import { PlayerTranscriptService } from './player-transcript.service';
 import { StatsReportingService } from './stats-reporting.service';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
-import { TranslateService } from '@ngx-translate/core';
-import { MisspelledAnswerResponseUtilityService } from './misspelled-answer-response-utility.service';
-
-class MockTranslateService {
-  onLangChange: EventEmitter<string> = new EventEmitter();
-  instant(key: string, interpolateParams: Object | undefined): string {
-    return key;
-  }
-}
 
 describe('Exploration engine service ', () => {
   let alertsService: AlertsService;
@@ -73,10 +64,7 @@ describe('Exploration engine service ', () => {
   let paramChangeObjectFactory: ParamChangeObjectFactory;
   let textInputService: InteractionRulesService;
   let outcomeObjectFactory: OutcomeObjectFactory;
-  let misspelledAnswerResponseUtilityService: MisspelledAnswerResponseUtilityService;
-
   let explorationDict: ExplorationBackendDict;
-  let translateService: TranslateService;
   let paramChangeDict: ParamChangeBackendDict;
   let explorationBackendResponse: FetchExplorationBackendResponse;
   let explorationFeatures: ExplorationFeatures;
@@ -385,13 +373,6 @@ describe('Exploration engine service ', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-      ],
-      providers: [
-        MisspelledAnswerResponseUtilityService,
-        {
-          provide: TranslateService,
-          useClass: MockTranslateService
-        }
       ]
     });
 
@@ -419,8 +400,6 @@ describe('Exploration engine service ', () => {
     paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
     textInputService = TestBed.get(TextInputRulesService);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
-    translateService = TestBed.inject(TranslateService);
-    misspelledAnswerResponseUtilityService = TestBed.inject(MisspelledAnswerResponseUtilityService);
   });
 
   beforeEach(() => {
@@ -533,50 +512,50 @@ describe('Exploration engine service ', () => {
       expect(isAnswerCorrect).toBe(true);
     });
 
-    it('should check for misspellings if the answer ' +
-      'is incorrect', () => {
-      let initSuccessCb = jasmine.createSpy('success');
-      let submitAnswerSuccessCb = jasmine.createSpy('success');
-      let answer = 'answoo';
-      let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createFromBackendDict({
-          dest: 'Start',
-          dest_if_really_stuck: null,
-          feedback: {
-            content_id: 'feedback_1',
-            html: 'Answer is not correct!'
-          },
-          labelled_as_correct: false,
-          param_changes: [],
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null
-        }), 1, 0, 'default_outcome');
+    // it('should check for misspellings if the answer ' +
+    //   'is incorrect', () => {
+    //   let initSuccessCb = jasmine.createSpy('success');
+    //   let submitAnswerSuccessCb = jasmine.createSpy('success');
+    //   let answer = 'answoo';
+    //   let answerClassificationResult = new AnswerClassificationResult(
+    //     outcomeObjectFactory.createFromBackendDict({
+    //       dest: 'Start',
+    //       dest_if_really_stuck: null,
+    //       feedback: {
+    //         content_id: 'feedback_1',
+    //         html: 'Answer is not correct!'
+    //       },
+    //       labelled_as_correct: false,
+    //       param_changes: [],
+    //       refresher_exploration_id: null,
+    //       missing_prerequisite_skill_id: null
+    //     }), 1, 0, 'default_outcome');
 
-      let lastCard = StateCard.createNewCard(
-        'Card 1', 'Content html', 'Interaction text', null,
-        null, null, 'content_id', audioTranslationLanguageService);
+    //   let lastCard = StateCard.createNewCard(
+    //     'Card 1', 'Content html', 'Interaction text', null,
+    //     null, null, 'content_id', audioTranslationLanguageService);
 
-      spyOn(contextService, 'isInExplorationEditorPage')
-        .and.returnValue(false);
-      spyOn(playerTranscriptService, 'getLastStateName')
-        .and.returnValue('Start');
-      spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
-      spyOn(answerClassificationService, 'isAnswerOnlyMisspelled')
-        .and.returnValue(true);
-      spyOn(Math, 'random').and.returnValue(0.45);
-      spyOn(answerClassificationService, 'getMatchingClassificationResult')
-        .and.returnValue(answerClassificationResult);
+    //   spyOn(contextService, 'isInExplorationEditorPage')
+    //     .and.returnValue(false);
+    //   spyOn(playerTranscriptService, 'getLastStateName')
+    //     .and.returnValue('Start');
+    //   spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
+    //   spyOn(answerClassificationService, 'isAnswerOnlyMisspelled')
+    //     .and.returnValue(true);
+    //   spyOn(Math, 'random').and.returnValue(0.45);
+    //   spyOn(answerClassificationService, 'getMatchingClassificationResult')
+    //     .and.returnValue(answerClassificationResult);
 
-      explorationEngineService.init(
-        explorationDict, 1, null, true, ['en'], initSuccessCb);
+    //   explorationEngineService.init(
+    //     explorationDict, 1, null, true, ['en'], initSuccessCb);
 
-      const isAnswerCorrect = explorationEngineService.submitAnswer(
-        answer, textInputService, submitAnswerSuccessCb);
+    //   const isAnswerCorrect = explorationEngineService.submitAnswer(
+    //     answer, textInputService, submitAnswerSuccessCb);
 
-      expect(submitAnswerSuccessCb).toHaveBeenCalled();
-      expect(explorationEngineService.isAnswerBeingProcessed()).toBe(false);
-      expect(isAnswerCorrect).toBe(false);
-    });
+    //   expect(submitAnswerSuccessCb).toHaveBeenCalled();
+    //   expect(explorationEngineService.isAnswerBeingProcessed()).toBe(false);
+    //   expect(isAnswerCorrect).toBe(false);
+    // });
 
     it('should not submit answer again if the answer ' +
       'is already being processed', () => {
