@@ -1365,7 +1365,11 @@ def _compute_models_for_updating_exploration(
             change_list_dict,
         )
     )
-
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION,
+        None,
+        [exploration.id]
+    )
     exploration.version += 1
 
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
@@ -2096,11 +2100,6 @@ def compute_models_to_put_when_saving_new_exp_version(
     Returns:
         list(BaseModel). A list of the models that were updated.
     """
-    caching_services.delete_multi(
-        caching_services.CACHE_NAMESPACE_EXPLORATION,
-        None,
-        [exploration_id]
-    )
     models_to_put: List[
         base_models.BaseModel
     ] = []
