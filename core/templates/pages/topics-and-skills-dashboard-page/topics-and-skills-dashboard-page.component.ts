@@ -219,7 +219,7 @@ export class TopicsAndSkillsDashboardPageComponent {
   }
 
   fetchSkills(): void {
-    if (this.moreSkillsPresent && this.nextCursor) {
+    if (this.moreSkillsPresent) {
       this.topicsAndSkillsDashboardBackendApiService
         .fetchSkillsDashboardDataAsync(
           this.filterObject, this.itemsPerPage, this.nextCursor).then(
