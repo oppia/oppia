@@ -49,12 +49,6 @@ interface TranslationContributionOpportunitiesBackendDict {
   'more': boolean;
 }
 
-interface VoiceoverContributionOpportunitiesBackendDict {
-  'opportunities': ExplorationOpportunitySummaryBackendDict[];
-  'next_cursor': string;
-  'more': boolean;
-}
-
 interface ReviewableTranslationOpportunitiesBackendDict {
   'opportunities': ExplorationOpportunitySummaryBackendDict[];
 }
@@ -66,12 +60,6 @@ interface SkillContributionOpportunities {
 }
 
 interface TranslationContributionOpportunities {
-  opportunities: ExplorationOpportunitySummary[];
-  nextCursor: string;
-  more: boolean;
-}
-
-interface VoiceoverContributionOpportunities {
   opportunities: ExplorationOpportunitySummary[];
   nextCursor: string;
   more: boolean;
@@ -162,32 +150,6 @@ export class ContributionOpportunitiesBackendApiService {
       this.urlInterpolationService.interpolateUrl(
         this.urlTemplate, {
           opportunityType: constants.OPPORTUNITY_TYPE_TRANSLATION
-        }
-      ), { params }).toPromise().then(data => {
-      const opportunities = data.opportunities.map(
-        dict => this._getExplorationOpportunityFromDict(dict));
-
-      return {
-        opportunities: opportunities,
-        nextCursor: data.next_cursor,
-        more: data.more
-      };
-    }, errorResponse => {
-      throw new Error(errorResponse.error.error);
-    });
-  }
-
-  async fetchVoiceoverOpportunitiesAsync(languageCode: string, cursor: string):
-  Promise<VoiceoverContributionOpportunities> {
-    const params = {
-      language_code: languageCode,
-      cursor: cursor
-    };
-
-    return this.http.get<VoiceoverContributionOpportunitiesBackendDict>(
-      this.urlInterpolationService.interpolateUrl(
-        this.urlTemplate, {
-          opportunityType: constants.OPPORTUNITY_TYPE_VOICEOVER
         }
       ), { params }).toPromise().then(data => {
       const opportunities = data.opportunities.map(
