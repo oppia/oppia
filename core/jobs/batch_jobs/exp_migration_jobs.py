@@ -130,13 +130,10 @@ class MigrateExplorationJob(base_jobs.JobBase):
             Result(str, Exception). The ID of the skill when the deletion was
             successful or Exception when the deletion failed.
         """
-        try:
-            caching_services.delete_multi(
-                caching_services.CACHE_NAMESPACE_EXPLORATION,
-                None, [exploration.id])
-            return result.Ok(exploration.id)
-        except Exception as e:
-            return result.Err(e)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION,
+            None, [exploration.id]
+        )
 
     @staticmethod
     def _update_exploration(
@@ -274,13 +271,11 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     'EXP PREVIOUSLY MIGRATED'))
         )
 
-        cache_deletion_job_run_results = (
+        unused_cache_deletion_job_run_results = (
             transformed_exp_objects_list
             | 'Delete exploration from cache' >> beam.Map(
                 lambda exp_object: self._delete_exploration_from_cache(
                     exp_object['exploration']))
-            | 'Generate results for cache deletion' >> (
-                job_result_transforms.ResultsToJobRunResults('CACHE DELETION'))
         )
 
         exp_related_models_to_put = (
@@ -306,7 +301,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
         return (
             (
-                cache_deletion_job_run_results,
                 migrated_exp_job_run_results,
                 exp_objects_list_job_run_results,
                 already_migrated_job_run_results
