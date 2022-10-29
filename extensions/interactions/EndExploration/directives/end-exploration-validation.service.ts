@@ -61,7 +61,7 @@ export class EndExplorationValidationService {
         });
         break;
       }
-      if (recommendedExplorationIds[i].length === 0) {
+      if (recommendedExplorationIds[i].trim().length === 0) {
         warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
           message: 'Recommended exploration ID must be non-empty.'
