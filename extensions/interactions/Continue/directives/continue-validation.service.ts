@@ -44,7 +44,7 @@ export class ContinueValidationService {
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
       customizationArgs, ['buttonText']);
 
-    if (customizationArgs.buttonText.value.unicode.length === 0) {
+    if (customizationArgs.buttonText.value.unicode.trim().length === 0) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
         message: 'The button text should not be empty.'
