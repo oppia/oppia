@@ -91,13 +91,13 @@ export class LearnerLocalNavComponent implements OnInit {
   ngOnInit(): void {
     this.explorationId = this.explorationEngineService.getExplorationId();
     let version = this.explorationEngineService.getExplorationVersion();
-    // if (version) {
+    if (version) {
       this.readOnlyExplorationBackendApiService
         .loadExplorationAsync(this.explorationId, version)
         .then((exploration) => {
           this.canEdit = exploration.can_edit;
         });
-    // }
+    }
     this.loaderService.showLoadingScreen('Loading');
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.username = userInfo.getUsername();
