@@ -19,10 +19,10 @@ from __future__ import annotations
 from extensions.interactions import base
 from proto_files import objects_pb2
 from proto_files import state_pb2
+from typing import List, Optional
 
 RULE_SPEC_DTO = state_pb2.FractionInputInstanceDto.RuleSpecDto
 
-from typing import List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover

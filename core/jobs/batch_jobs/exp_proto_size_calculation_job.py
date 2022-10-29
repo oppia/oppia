@@ -21,7 +21,6 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core import utils
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -35,19 +34,17 @@ from core.platform import models
 
 import apache_beam as beam
 import result
-from typing import Dict, Iterable, Optional, Sequence, Tuple
+from typing import Iterable, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
-    from mypy_imports import opportunity_models
 
 (base_models, exp_models, opportunity_models) = (
     models.Registry.import_models(
-        [models.Names.BASE_MODEL, models.Names.EXPLORATION,
-         models.Names.OPPORTUNITY]))
+        [models.Names.BASE_MODEL, models.Names.EXPLORATION]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -353,12 +350,12 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
 
 
 class AuditPopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
-    """Job that audits PopulateExplorationProtoSizeInBytesJob"""
+    """Job that audits PopulateExplorationProtoSizeInBytesJob."""
 
     @staticmethod
     def _count_exp_with_non_zero_attribute(
-            exp_id: str,
-            exp_model: exp_models.ExplorationModel
+        exp_id: str,
+        exp_model: exp_models.ExplorationModel
     ) -> result.Result[
         Tuple[str, exp_domain.Exploration],
         Tuple[str, Exception]
@@ -372,9 +369,9 @@ class AuditPopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
 
         Returns:
             Result((str, Exploration), (str, Exception)). Result containing
-            tuple that consists of exploration ID and either ExplorationModel object
-            or Exception.
-         """
+            tuple that consists of exploration ID and either ExplorationModel
+            object or Exception.
+        """
         with datastore_services.get_ndb_context():
             if (
                 exp_model.android_proto_size_in_bytes is not None
@@ -385,8 +382,8 @@ class AuditPopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
 
     @staticmethod
     def _count_exp_without_attribute(
-            exp_id: str,
-            exp_model: exp_models.ExplorationModel
+        exp_id: str,
+        exp_model: exp_models.ExplorationModel
     ) -> result.Result[
         Tuple[str, exp_domain.Exploration],
         Tuple[str, Exception]
@@ -400,9 +397,9 @@ class AuditPopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
 
         Returns:
             Result((str, Exploration), (str, Exception)). Result containing
-            tuple that consists of exploration ID and either ExplorationModel object
-            or Exception.
-         """
+            tuple that consists of exploration ID and either ExplorationModel
+            object or Exception.
+        """
         if not hasattr(exp_model, 'android_proto_size_in_bytes'):
             return result.Ok((exp_id, exp_model))
 
@@ -410,8 +407,8 @@ class AuditPopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
 
     @staticmethod
     def _count_exp_with_none_attribute(
-            exp_id: str,
-            exp_model: exp_models.ExplorationModel
+        exp_id: str,
+        exp_model: exp_models.ExplorationModel
     ) -> result.Result[
         Tuple[str, exp_domain.Exploration],
         Tuple[str, Exception]
@@ -425,9 +422,9 @@ class AuditPopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
 
         Returns:
             Result((str, Exploration), (str, Exception)). Result containing
-            tuple that consists of exploration ID and either ExplorationModel object
-            or Exception.
-         """
+            tuple that consists of exploration ID and either ExplorationModel
+            object or Exception.
+        """
         if (
             hasattr(exp_model, 'android_proto_size_in_bytes')
                 and exp_model.android_proto_size_in_bytes is None):
@@ -450,12 +447,8 @@ class AuditPopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
                     ndb_io.GetModels(
                         exp_models.ExplorationModel.get_all(
                             include_deleted=False)))
-                # Pylint disable is needed because pylint is not able to correctly
-                # detect that the value is passed through the pipe.
                 | 'Add exploration keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
             lambda exp_model: exp_model.id)
-                # TODO(#15871): This filter should be removed after the explorations
-                # are fixed and it is possible to migrate them.
                 | 'Remove broken exploration' >> beam.Filter(
             lambda id_and_exp: id_and_exp[0] not in (
                 'umPkwp0L1M0-', '670bU6d9JGBh'))
