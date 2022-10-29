@@ -148,11 +148,11 @@ export class ExplorationPlayerStateService {
     // For some cases, version is set only after
     // ReadOnlyExplorationBackendApiService.loadExploration() has completed.
     // Use returnDict.version for non-null version value.
-    if (collectionUrl) {
+    // if (collectionUrl) {
       this.statsReportingService.initSession(
         this.explorationId, returnDict.exploration.title, returnDict.version,
         returnDict.session_id, collectionUrl);
-    }
+    // }
     this.playthroughService.initSession(
       this.explorationId, returnDict.version,
       returnDict.record_playthrough_probability);
@@ -273,9 +273,9 @@ export class ExplorationPlayerStateService {
         this.explorationId, this.version) :
       this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
         this.explorationId);
-    if (this.storyUrlFragment === null) {
-      return;
-    }
+    // if (this.storyUrlFragment === null) {
+    //   return;
+    // }
     Promise.all([
       explorationDataPromise,
       this.pretestQuestionBackendApiService.fetchPretestQuestionsAsync(
