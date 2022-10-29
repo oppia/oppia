@@ -26,7 +26,6 @@ import { ExplorationRightsService } from './exploration-rights.service';
 import { ExplorationRightsBackendApiService } from './exploration-rights-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 
-
 describe('Exploration rights service', () => {
   let ers: ExplorationRightsService = null;
   let als: AlertsService = null;
@@ -281,6 +280,7 @@ describe('Exploration rights service', () => {
       explorationRightsBackendApiService,
       'assignVoiceArtistRoleAsyncPostData').and.returnValue(
       Promise.reject());
+    spyOn(alertsService, 'addWarning');
 
     ers.assignVoiceArtistRoleAsync('voiceArtist').then(
       successHandler, failHandler);
@@ -289,7 +289,9 @@ describe('Exploration rights service', () => {
     expect(clearWarningsSpy).not.toHaveBeenCalled();
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
-    expect(alertsService.addWarning).toHaveBeenCalled();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Could not assign voice artist to private activity.'
+    );
   }));
 
   it('should remove existing voice artist', fakeAsync(() => {
