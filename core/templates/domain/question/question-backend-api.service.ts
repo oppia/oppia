@@ -238,7 +238,7 @@ export class QuestionBackendApiService {
         let skillIdToQuestionsDict: SkillIdToQuestionsResponse = {};
 
         for (let skillId in response.skill_id_to_questions_dict) {
-          skillIdToQuestionsDict[skillId] = {}
+          skillIdToQuestionsDict[skillId] = {};
 
           skillIdToQuestionsDict[skillId].mainQuestion = (
             this.questionObjectFactory.createFromBackendDict(
