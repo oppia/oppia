@@ -32,21 +32,21 @@ export class DiagnosticTestCurrentTopicStatusModel {
   // A dict with skill ID as key and a nested dict as value. The nested dict
   // contains the main question and back question as two keys and the Question
   // object as the values of each. The main question is the first question
-  // that the learner encounters in the diagnostic test and if they attempted
-  // the main question incorrectly the backup question will be presented
-  // otherwise, the backup question will not be presented. The difficulty level
-  // for both, the main question and the backup question are the same.
+  // that the learner encounters in the diagnostic test and if they attempt
+  // the main question incorrectly the backup question will be presented.
+  // Otherwise, the backup question will not be presented. The difficulty level
+  // for both the main question and the backup question are the same.
   _skillIdToQuestionsDict: SkillIdToQuestionsDict;
 
   // A list of diagnostic test skill IDs from which questions will be presented
-  // to the learners. The eligible skill IDs are the ones which not yet been
-  // tested in the diagnostic test.
-  _eligibleSKillIds: string[];
+  // to the learners. The pending skill IDs are the ones which have not yet
+  // been tested in the diagnostic test.
+  _pendingSkillIdsToTest: string[];
 
   // A boolean variable that keeps track of whether a wrong attempt has
   // already been made in any previous questions. This lifeline option
   // allows learners to attempt another question from the same skill
-  // (back up question) if the earlier one has been attempted incorrectly.
+  // (backup question) if the earlier one has been attempted incorrectly.
   // Attempting a question incorrectly after the lifeline has been used results
   // in the topic being marked as failed.
   _lifelineIsConsumed: boolean;
@@ -60,12 +60,12 @@ export class DiagnosticTestCurrentTopicStatusModel {
   _skillIdToTestStatus: {[skillId: string]: boolean} = {};
 
   constructor(skillIdToQuestionsDict: SkillIdToQuestionsDict) {
-    this._eligibleSKillIds = Object.keys(skillIdToQuestionsDict);
+    this._pendingSkillIdsToTest = Object.keys(skillIdToQuestionsDict);
     this._skillIdToQuestionsDict = skillIdToQuestionsDict;
 
     this._lifelineIsConsumed = false;
-    for (let skillID of this._eligibleSKillIds) {
-      this._skillIdToTestStatus[skillID] = false;
+    for (let skillId of this._pendingSkillIdsToTest) {
+      this._skillIdToTestStatus[skillId] = false;
     }
   }
 
@@ -78,14 +78,14 @@ export class DiagnosticTestCurrentTopicStatusModel {
       this._skillIdToTestStatus[skillId] = false;
       // Attempting two incorrect answers should mark the topic as failed so
       // there are no eligible skill IDs left for testing.
-      this._eligibleSKillIds = [];
+      this._pendingSkillIdsToTest = [];
     } else {
       this._lifelineIsConsumed = true;
     }
   }
 
   getNextSkill(): string {
-    return this._eligibleSKillIds.shift() || '';
+    return this._pendingSkillIdsToTest.shift() || '';
   }
 
   getNextQuestion(skillId: string): Question {
@@ -106,6 +106,6 @@ export class DiagnosticTestCurrentTopicStatusModel {
   }
 
   isTopicCompletelyTested(): boolean {
-    return this._eligibleSKillIds.length === 0;
+    return this._pendingSkillIdsToTest.length === 0;
   }
 }
