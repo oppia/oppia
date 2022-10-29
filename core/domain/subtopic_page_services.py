@@ -22,14 +22,14 @@ import copy
 
 from core import feconf
 from core.domain import change_domain
+from core.domain import classroom_services
 from core.domain import learner_group_services
 from core.domain import skill_services
 from core.domain import subtopic_page_domain
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, overload
-from typing_extensions import Literal
+from typing import Dict, List, Literal, Optional, Sequence, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -419,7 +419,12 @@ def get_multi_users_subtopic_pages_progress(
                     'parent_topic_name': topic.name,
                     'thumbnail_filename': subtopic.thumbnail_filename,
                     'thumbnail_bg_color': subtopic.thumbnail_bg_color,
-                    'subtopic_mastery': subtopic_mastery
+                    'subtopic_mastery': subtopic_mastery,
+                    'parent_topic_url_fragment': topic.url_fragment,
+                    'classroom_url_fragment': (
+                        classroom_services
+                            .get_classroom_url_fragment_for_topic_id(
+                                topic.id))
                 })
 
     return all_users_subtopic_prog_summaries
@@ -455,7 +460,9 @@ def get_learner_group_syllabus_subtopic_page_summaries(
                 'parent_topic_name': topic.name,
                 'thumbnail_filename': subtopic.thumbnail_filename,
                 'thumbnail_bg_color': subtopic.thumbnail_bg_color,
-                'subtopic_mastery': None
+                'subtopic_mastery': None,
+                'parent_topic_url_fragment': topic.url_fragment,
+                'classroom_url_fragment': None
             })
 
     return all_learner_group_subtopic_page_summaries

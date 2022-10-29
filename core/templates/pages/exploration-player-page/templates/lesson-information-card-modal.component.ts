@@ -97,7 +97,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private localStorageService: LocalStorageService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private checkpointCelebrationUtilityService:
-      CheckpointCelebrationUtilityService
+      CheckpointCelebrationUtilityService,
   ) {
     super(ngbActiveModal);
   }
@@ -238,10 +238,6 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
         });
     }
     this.saveProgressMenuIsShown = true;
-  }
-
-  copyProgressUrl(): void {
-    this.clipboard.copy(this.loggedOutProgressUniqueUrl);
   }
 
   onLoginButtonClicked(): void {

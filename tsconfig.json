@@ -44,7 +44,8 @@
       "zlib": ["./node_modules/browserify-zlib"],
       "path": ["./node_modules/path-browserify"],
       "utility/*": ["core/templates/utility/*"],
-      "visualizations/*": ["extensions/visualizations/*"]
+      "visualizations/*": ["extensions/visualizations/*"],
+      "value_generators/*": ["extensions/value_generators/*"]
     }
   },
   "files": [

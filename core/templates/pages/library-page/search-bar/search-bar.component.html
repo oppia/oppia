@@ -15,7 +15,7 @@
                (ngModelChange)="searchButtonIsActive ? null : onSearchQueryChangeExec()"
                [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
                aria-label="Search bar"
-               (keydown.enter)="$event.target.blur()"
+               (keydown.enter)="$event.target.blur(); onSearchQueryChangeExec()"
                (input)="searchToBeExec($event)">
       </div>
     </div>

@@ -35,20 +35,25 @@ import { LearnerGroupSyllabusComponent } from
   './learner-group-syllabus.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+
 import { RemoveItemModalComponent } from
   '../templates/remove-item-modal.component';
 import { SyllabusAdditionSuccessModalComponent } from
   '../templates/syllabus-addition-success-modal.component';
 import { LearnerGroupPreferencesComponent } from
   './learner-group-preferences.component';
+
 import { InviteLearnersModalComponent } from
   '../templates/invite-learners-modal.component';
+
 import { LearnerGroupLearnersProgressComponent } from
   './learner-group-learners-progress.component';
 import { LearnerGroupLearnerSpecificProgressComponent } from
   './learner-group-learner-specific-progress.component';
 import { InviteSuccessfulModalComponent } from
   '../templates/invite-successful-modal.component';
+import { DeleteLearnerGroupModalComponent } from
+  '../templates/delete-learner-group-modal.component';
 import { SharedLearnerGroupComponentsModule } from 'pages/learner-group-pages/shared-learner-group-component.module';
 
 @NgModule({
@@ -61,8 +66,8 @@ import { SharedLearnerGroupComponentsModule } from 'pages/learner-group-pages/sh
     SmartRouterModule,
     RouterModule.forRoot([]),
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig),
-    SharedLearnerGroupComponentsModule
+    SharedLearnerGroupComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     EditLearnerGroupPageComponent,
@@ -74,7 +79,8 @@ import { SharedLearnerGroupComponentsModule } from 'pages/learner-group-pages/sh
     RemoveItemModalComponent,
     SyllabusAdditionSuccessModalComponent,
     InviteLearnersModalComponent,
-    InviteSuccessfulModalComponent
+    InviteSuccessfulModalComponent,
+    DeleteLearnerGroupModalComponent
   ],
   entryComponents: [
     EditLearnerGroupPageComponent,
@@ -86,7 +92,8 @@ import { SharedLearnerGroupComponentsModule } from 'pages/learner-group-pages/sh
     RemoveItemModalComponent,
     SyllabusAdditionSuccessModalComponent,
     InviteLearnersModalComponent,
-    InviteSuccessfulModalComponent
+    InviteSuccessfulModalComponent,
+    DeleteLearnerGroupModalComponent
   ],
   providers: [
     {

@@ -16,7 +16,7 @@
  * @fileoverview Component for the audio translation bar.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { downgradeComponent } from '@angular/upgrade/static';
 import WaveSurfer from 'wavesurfer.js';
@@ -52,6 +52,7 @@ import { VoiceoverRecordingService } from '../services/voiceover-recording.servi
 })
 export class AudioTranslationBarComponent implements OnInit, OnDestroy {
   @Input() isTranslationTabBusy: boolean;
+  @ViewChild('visualized') visualized!: ElementRef<Element>;
 
   directiveSubscriptions = new Subscription();
 
@@ -81,9 +82,8 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
   waveSurfer: WaveSurfer;
   recordingTimeLimit: number;
   audioIsLoading: boolean;
-  recordingTimeLimitInDateFormat: Date;
-  recordingDate: Date;
-  startingDuration: Date;
+  recordingDate: number;
+  startingDuration: number;
 
   constructor(
     private alertsService: AlertsService,
@@ -154,13 +154,13 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
       this.selectedRecording = true;
       this.checkingMicrophonePermission = false;
 
-      this.recordingDate = new Date(0, 0, 0, 0, 0, 0);
+      this.recordingDate = 0;
       this.elapsedTime = 0;
       OppiaAngularRootComponent.ngZone.runOutsideAngular(() => {
         this.timerInterval = setInterval(() => {
           OppiaAngularRootComponent.ngZone.run(() => {
             this.elapsedTime++;
-            this.recordingDate = new Date(0, 0, 0, 0, 0, this.elapsedTime);
+            this.recordingDate = this.elapsedTime;
 
             // This.recordingTimeLimit is decremented to
             // compensate for the audio recording timing inconsistency,
@@ -227,9 +227,11 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
       // Create audio play and pause for unsaved recording.
       let url = URL.createObjectURL(this.audioBlob);
       // Create visualizer for playing unsaved audio.
-      if (this.waveSurfer) {
-        this.waveSurfer.destroy();
-      }
+
+      // When new WaveSurfer is created old waveSurfer should be deleted so
+      // to do that innerHTML is turend to empty string.
+      // eslint-disable-next-line oppia/no-inner-html
+      this.visualized.nativeElement.innerHTML = '';
       this.waveSurfer = WaveSurfer.create({
         container: '#visualized',
         waveColor: '#009688',
@@ -464,11 +466,7 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.recordingTimeLimit = (
       ExplorationEditorPageConstants.RECORDING_TIME_LIMIT);
-    this.recordingTimeLimitInDateFormat = new Date(
-      0, 0, 0, 0, 0, this.recordingTimeLimit - 1);
-
-    this.startingDuration = new Date(0, 0, 0, 0, 0, 0);
-
+    this.startingDuration = 0;
     this.unsupportedBrowser = false;
     this.selectedRecording = false;
     this.isAudioAvailable = false;

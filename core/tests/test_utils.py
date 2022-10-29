@@ -77,11 +77,10 @@ from proto_files import text_classifier_pb2
 import elasticsearch
 import requests_mock
 from typing import (
-    IO, Any, Callable, Collection, Dict, Iterable, Iterator, List, Mapping,
-    Optional, OrderedDict, Pattern, Sequence, Set, Tuple, Type,
-    Union, cast, overload
+    IO, Any, Callable, Collection, Dict, Final, Iterable, Iterator, List,
+    Literal, Mapping, Optional, OrderedDict, Pattern, Sequence, Set, Tuple,
+    Type, TypedDict, Union, cast, overload
 )
-from typing_extensions import Final, Literal, TypedDict
 import webapp2
 import webtest
 

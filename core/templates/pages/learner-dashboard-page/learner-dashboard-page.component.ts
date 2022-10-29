@@ -46,9 +46,10 @@ import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PageTitleService } from 'services/page-title.service';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { UrlService } from 'services/contextual/url.service';
 
 import './learner-dashboard-page.component.css';
-
 
 @Component({
   selector: 'oppia-learner-dashboard-page',
@@ -154,6 +155,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   progressImageUrl: string = '';
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
+  LEARNER_GROUP_FEATURE_IS_ENABLED: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -170,7 +172,9 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
     private translateService: TranslateService,
-    private pageTitleService: PageTitleService
+    private pageTitleService: PageTitleService,
+    private learnerGroupBackendApiService: LearnerGroupBackendApiService,
+    private urlService: UrlService
   ) {}
 
   ngOnInit(): void {
@@ -220,6 +224,10 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
           LearnerDashboardPageConstants
             .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY
         );
+        if (this.urlService.getUrlParams().active_tab === 'learner-groups') {
+          this.activeSection = LearnerDashboardPageConstants
+            .LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS;
+        }
       }, errorResponseStatus => {
         if (
           AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {
@@ -229,11 +237,19 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       }
     );
 
+    let learnerGroupFeatureIsEnabledPromise = (
+      this.learnerGroupBackendApiService.isLearnerGroupFeatureEnabledAsync()
+    );
+    learnerGroupFeatureIsEnabledPromise.then(featureIsEnabled => {
+      this.LEARNER_GROUP_FEATURE_IS_ENABLED = featureIsEnabled;
+    });
+
     this.fetchFeedbackUpdates();
 
     Promise.all([
       userInfoPromise,
-      dashboardTopicAndStoriesDataPromise
+      dashboardTopicAndStoriesDataPromise,
+      learnerGroupFeatureIsEnabledPromise
     ]).then(() => {
       setTimeout(() => {
         this.loaderService.hideLoadingScreen();
