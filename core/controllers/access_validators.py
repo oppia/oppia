@@ -26,7 +26,7 @@ from core.domain import config_domain
 from core.domain import learner_group_services
 from core.domain import user_services
 
-from typing import Dict, TypedDict, cast
+from typing import Dict, TypedDict
 
 
 # TODO(#13605): Refactor access validation handlers to follow a single handler
@@ -40,7 +40,11 @@ class ClassroomAccessValidationHandlerNormalizedRequestDict(TypedDict):
     classroom_url_fragment: str
 
 
-class ClassroomAccessValidationHandler(base.BaseHandler):
+class ClassroomAccessValidationHandler(
+    base.BaseHandler[
+        Dict[str, str], ClassroomAccessValidationHandlerNormalizedRequestDict
+    ]
+):
     """Validates whether request made to /learn route.
     """
 
@@ -59,15 +63,10 @@ class ClassroomAccessValidationHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self) -> None:
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_request' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        request_data = cast(
-            ClassroomAccessValidationHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        classroom_url_fragment = request_data['classroom_url_fragment']
+        assert self.normalized_request is not None
+        classroom_url_fragment = self.normalized_request[
+            'classroom_url_fragment'
+        ]
         classroom = classroom_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
 
@@ -75,7 +74,9 @@ class ClassroomAccessValidationHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
 
-class ManageOwnAccountValidationHandler(base.BaseHandler):
+class ManageOwnAccountValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Validates access to preferences page.
     """
 
@@ -91,7 +92,9 @@ class ManageOwnAccountValidationHandler(base.BaseHandler):
         pass
 
 
-class ProfileExistsValidationHandler(base.BaseHandler):
+class ProfileExistsValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The world-viewable profile page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -116,7 +119,9 @@ class ProfileExistsValidationHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
 
-class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
+class ReleaseCoordinatorAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Validates access to release coordinator page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -132,7 +137,9 @@ class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
         pass
 
 
-class ViewLearnerGroupPageAccessValidationHandler(base.BaseHandler):
+class ViewLearnerGroupPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Validates access to view learner group page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -166,7 +173,9 @@ class ViewLearnerGroupPageAccessValidationHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
 
-class BlogHomePageAccessValidationHandler(base.BaseHandler):
+class BlogHomePageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Validates access to blog home page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -190,7 +199,11 @@ class BlogPostPageAccessValidationHandlerNormalizedRequestDict(TypedDict):
     blog_post_url_fragment: str
 
 
-class BlogPostPageAccessValidationHandler(base.BaseHandler):
+class BlogPostPageAccessValidationHandler(
+    base.BaseHandler[
+        Dict[str, str], BlogPostPageAccessValidationHandlerNormalizedRequestDict
+    ]
+):
     """Validates whether request made to correct blog post route."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -208,15 +221,9 @@ class BlogPostPageAccessValidationHandler(base.BaseHandler):
 
     @acl_decorators.can_access_blog_dashboard
     def get(self) -> None:
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_request' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        request_data = cast(
-            BlogPostPageAccessValidationHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        blog_post_url_fragment = request_data['blog_post_url_fragment']
+        assert self.normalized_request is not None
+        blog_post_url_fragment = self.normalized_request[
+            'blog_post_url_fragment']
         blog_post = blog_services.get_blog_post_by_url_fragment(
             blog_post_url_fragment)
 

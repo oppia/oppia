@@ -57,7 +57,7 @@ import webtest
 class OpenAccessDecoratorTests(test_utils.GenericTestBase):
     """Tests for open access decorator."""
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -95,7 +95,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
     secret = 'webhook_secret'
     invalid_secret = 'invalid'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'secret': {
@@ -168,7 +168,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
 class ViewSkillsDecoratorTests(test_utils.GenericTestBase):
     """Tests for can_view_skills decorator."""
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         REQUIRE_PAYLOAD_CSRF_CHECK = False
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
@@ -235,7 +235,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
@@ -366,7 +366,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
@@ -495,7 +495,7 @@ class RequireUserIdElseRedirectToHomepageTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -535,7 +535,7 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
@@ -624,7 +624,7 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
     published_col_id = 'col_id_1'
     private_col_id = 'col_id_2'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'collection_id': {
@@ -720,7 +720,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
     published_col_id = 'col_id_1'
     private_col_id = 'col_id_2'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'collection_id': {
@@ -826,7 +826,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
 class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
     """Tests for does_classroom_exist decorator"""
 
-    class MockDataHandler(base.BaseHandler):
+    class MockDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'classroom_url_fragment': {
@@ -841,7 +841,7 @@ class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
         def get(self, _: str) -> None:
             self.render_json({'success': True})
 
-    class MockPageHandler(base.BaseHandler):
+    class MockPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         URL_PATH_ARGS_SCHEMAS = {
             'classroom_url_fragment': {
                 'schema': {
@@ -906,7 +906,7 @@ class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
     username = 'banneduser'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -956,7 +956,7 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
     username = 'collectioneditor'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -1008,7 +1008,7 @@ class AccessCreatorDashboardTests(test_utils.GenericTestBase):
     username = 'banneduser'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -1055,7 +1055,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
     viewer_username = 'viewer'
     viewer_email = 'viewer@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'thread_id': {
@@ -1190,7 +1190,7 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
     viewer_username = 'viewer'
     viewer_email = 'viewer@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
@@ -1283,7 +1283,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
     viewer_username = 'viewer'
     viewer_email = 'viewer@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'thread_id': {
@@ -1398,7 +1398,7 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
 
     query_id = 'query_id'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'query_id': {
@@ -1465,7 +1465,7 @@ class RateExplorationTests(test_utils.GenericTestBase):
     user_email = 'user@example.com'
     exp_id = 'exp_id'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
@@ -1507,7 +1507,7 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -1553,7 +1553,7 @@ class FlagExplorationTests(test_utils.GenericTestBase):
     user_email = 'user@example.com'
     exp_id = 'exp_id'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
@@ -1595,7 +1595,7 @@ class SubscriptionToUsersTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -1630,7 +1630,7 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -1675,7 +1675,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -1752,7 +1752,7 @@ class CanAccessBlogAdminPageDecoratorTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -1824,7 +1824,7 @@ class CanManageBlogPostEditorsDecoratorTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -1897,7 +1897,7 @@ class CanAccessBlogDashboardDecoratorTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -1970,7 +1970,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
     username = 'userone'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'blog_post_id': {
@@ -2069,7 +2069,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
     username = 'userone'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'blog_post_id': {
@@ -2169,7 +2169,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -2241,7 +2241,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -2320,7 +2320,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
     TRANSLATION_ADMIN_EMAIL: Final = 'translatorExpert@app.com'
     TRANSLATION_ADMIN_USERNAME: Final = 'translationExpert'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'category': {
@@ -2441,7 +2441,7 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -2490,7 +2490,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
     private_exp_id_1 = 'exp_3'
     private_exp_id_2 = 'exp_4'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
@@ -2648,7 +2648,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     private_exp_id_1 = 'exp_3'
     private_exp_id_2 = 'exp_4'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'entity_type': {
@@ -2888,7 +2888,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
     published_exp_id = 'exp_0'
     private_exp_id = 'exp_1'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
@@ -2992,7 +2992,7 @@ class ManageOwnAccountTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -3039,7 +3039,7 @@ class AccessAdminPageTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -3095,7 +3095,7 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -3165,7 +3165,7 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
 class UploadExplorationTests(test_utils.GenericTestBase):
     """Tests for can_upload_exploration decorator."""
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -3214,7 +3214,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
     private_exp_id = 'exp_0'
     published_exp_id = 'exp_1'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
@@ -3304,7 +3304,7 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
     banned_user_email = 'banned@example.com'
     exploration_id = 'exp_id'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
@@ -3353,7 +3353,7 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
     banned_user_email = 'banned@example.com'
     exploration_id = 'exp_id'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -3405,7 +3405,7 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
         'new_value': ''
     }
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'suggestion_id': {
@@ -3494,7 +3494,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         'translation_html': ''
     }
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'suggestion_id': {
@@ -3681,7 +3681,7 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
 
     TARGET_TYPE = feconf.ENTITY_TYPE_EXPLORATION
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'target_type': {
@@ -3828,7 +3828,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
     private_exp_id = 'exp_0'
     public_exp_id = 'exp_1'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
@@ -3911,7 +3911,7 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
@@ -3986,7 +3986,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
     published_col_id = 'col_id_1'
     private_col_id = 'col_id_2'
 
-    class MockPublishHandler(base.BaseHandler):
+    class MockPublishHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'collection_id': {
@@ -4001,7 +4001,9 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         def get(self, collection_id: str) -> None:
             return self.render_json({'collection_id': collection_id})
 
-    class MockUnpublishHandler(base.BaseHandler):
+    class MockUnpublishHandler(
+        base.BaseHandler[Dict[str, str], Dict[str, str]]
+    ):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'collection_id': {
@@ -4116,7 +4118,7 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -4165,7 +4167,7 @@ class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -4215,7 +4217,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
     viewer_email = 'viewer@example.com'
     topic_id = 'topic_1'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_id': {
@@ -4292,7 +4294,7 @@ class DeleteTopicDecoratorTests(test_utils.GenericTestBase):
     viewer_email = 'viewer@example.com'
     topic_id = 'topic_1'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_id': {
@@ -4367,7 +4369,7 @@ class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
     viewer_email = 'viewer@example.com'
     topic_id = 'topic_1'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_id': {
@@ -4446,7 +4448,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
     viewer_username = 'viewer'
     viewer_email = 'viewer@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'story_id': {
@@ -4553,7 +4555,7 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
     viewer_username = 'viewer'
     viewer_email = 'viewer@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'story_id': {
@@ -4650,7 +4652,7 @@ class AccessTopicsAndSkillsDashboardDecoratorTests(test_utils.GenericTestBase):
     viewer_email = 'viewer@example.com'
     topic_id = 'topic_1'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -4722,7 +4724,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
     viewer_email = 'viewer@example.com'
     topic_id = 'topic_1'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_id': {
@@ -4818,7 +4820,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
 
-    class MockDataHandler(base.BaseHandler):
+    class MockDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_url_fragment': {
@@ -4843,7 +4845,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
         def get(self, story_url_fragment: str) -> None:
             self.render_json({'story_url_fragment': story_url_fragment})
 
-    class MockPageHandler(base.BaseHandler):
+    class MockPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         URL_PATH_ARGS_SCHEMAS = {
             'topic_url_fragment': {
                 'schema': {
@@ -5010,7 +5012,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
 
-    class MockDataHandler(base.BaseHandler):
+    class MockDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_url_fragment': {
@@ -5039,7 +5041,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         ) -> None:
             self.render_json({'subtopic_url_fragment': subtopic_url_fragment})
 
-    class MockPageHandler(base.BaseHandler):
+    class MockPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         URL_PATH_ARGS_SCHEMAS = {
             'topic_url_fragment': {
                 'schema': {
@@ -5222,7 +5224,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
 
-    class MockDataHandler(base.BaseHandler):
+    class MockDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_url_fragment': {
@@ -5242,7 +5244,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
         def get(self, topic_name: str) -> None:
             self.render_json({'topic_name': topic_name})
 
-    class MockPageHandler(base.BaseHandler):
+    class MockPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         URL_PATH_ARGS_SCHEMAS = {
             'topic_url_fragment': {
                 'schema': {
@@ -5358,7 +5360,7 @@ class CreateSkillTests(test_utils.GenericTestBase):
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -5415,7 +5417,7 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
     viewer_email = 'viewer@example.com'
     skill_id = '1'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'skill_id': {
@@ -5485,7 +5487,7 @@ class CreateTopicTests(test_utils.GenericTestBase):
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -5538,7 +5540,7 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
     banned_user_email = 'banned@example.com'
     topic_id = 'topic_1'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_id': {
@@ -5600,7 +5602,7 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_id': {
@@ -5677,7 +5679,7 @@ class PerformTasksInTaskqueueTests(test_utils.GenericTestBase):
     viewer_username = 'viewer'
     viewer_email = 'viewer@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -5728,7 +5730,7 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
     viewer_username = 'viewer'
     viewer_email = 'viewer@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -5781,7 +5783,7 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
     viewer_email = 'viewer@example.com'
     skill_id = '1'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'skill_id': {
@@ -5857,7 +5859,7 @@ class DeleteSkillDecoratorTests(test_utils.GenericTestBase):
     viewer_email = 'viewer@example.com'
     skill_id = '1'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -5907,7 +5909,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
     user_b = 'B'
     user_b_email = 'b@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'question_id': {
@@ -5998,7 +6000,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
     user_b = 'B'
     user_b_email = 'b@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'question_id': {
@@ -6101,7 +6103,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
     user_b = 'B'
     user_b_email = 'b@example.com'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'question_id': {
@@ -6181,7 +6183,7 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
 
     question_id = 'question_id'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'question_id': {
@@ -6224,7 +6226,7 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'entity_type': {
@@ -6328,7 +6330,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
     published_exp_id = 'exp_0'
     private_exp_id = 'exp_1'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'entity_type': {
@@ -6539,7 +6541,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
     private_exp_id_1 = 'exp_3'
     private_exp_id_2 = 'exp_4'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
@@ -6808,7 +6810,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         'data_format': 'html'
     }
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'suggestion_id': {
@@ -7042,7 +7044,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
 class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
     """Tests for is_from_oppia_android decorator."""
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         REQUIRE_PAYLOAD_CSRF_CHECK = False
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}

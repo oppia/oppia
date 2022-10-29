@@ -21,7 +21,9 @@ from core.controllers import base
 from typing import Dict
 
 
-class DiagnosticTestPlayerPage(base.BaseHandler):
+class DiagnosticTestPlayerPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Renders the diagnostic test player page."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}

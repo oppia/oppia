@@ -23,10 +23,10 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import beam_job_services
 
-from typing import Dict, TypedDict, cast
+from typing import Dict, TypedDict
 
 
-class BeamJobHandler(base.BaseHandler):
+class BeamJobHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handler for getting the definitions of Apache Beam jobs."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -58,7 +58,12 @@ class BeamJobRunHandlerNormalizedRequestDict(TypedDict):
     job_id: str
 
 
-class BeamJobRunHandler(base.BaseHandler):
+class BeamJobRunHandler(
+    base.BaseHandler[
+        BeamJobRunHandlerNormalizedPayloadDict,
+        BeamJobRunHandlerNormalizedRequestDict
+    ]
+):
     """Handler for managing the execution of Apache Beam jobs."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -95,27 +100,15 @@ class BeamJobRunHandler(base.BaseHandler):
 
     @acl_decorators.can_run_any_job
     def put(self) -> None:
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_payload' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        payload_data = cast(
-            BeamJobRunHandlerNormalizedPayloadDict, self.normalized_payload
-        )
-        job_name = payload_data['job_name']
+        assert self.normalized_payload is not None
+        job_name = self.normalized_payload['job_name']
         beam_job_run = beam_job_services.run_beam_job(job_name=job_name)
         self.render_json(beam_job_run.to_dict())
 
     @acl_decorators.can_run_any_job
     def delete(self) -> None:
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_request' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        payload_data = cast(
-            BeamJobRunHandlerNormalizedRequestDict, self.normalized_request
-        )
-        job_id = payload_data['job_id']
+        assert self.normalized_request is not None
+        job_id = self.normalized_request['job_id']
         beam_job_run = beam_job_services.cancel_beam_job(job_id)
         self.render_json(beam_job_run.to_dict())
 
@@ -128,7 +121,11 @@ class BeamJobRunResultHandlerNormalizedRequestDict(TypedDict):
     job_id: str
 
 
-class BeamJobRunResultHandler(base.BaseHandler):
+class BeamJobRunResultHandler(
+    base.BaseHandler[
+        Dict[str, str], BeamJobRunResultHandlerNormalizedRequestDict
+    ]
+):
     """Handler for getting the result of Apache Beam jobs."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -149,14 +146,7 @@ class BeamJobRunResultHandler(base.BaseHandler):
 
     @acl_decorators.can_run_any_job
     def get(self) -> None:
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_request' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        request_data = cast(
-            BeamJobRunResultHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        job_id = request_data['job_id']
+        assert self.normalized_request is not None
+        job_id = self.normalized_request['job_id']
         beam_job_run_result = beam_job_services.get_beam_job_run_result(job_id)
         self.render_json(beam_job_run_result.to_dict())

@@ -41,8 +41,16 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import user_services
 
-from typing import Any, Dict, Final, Mapping, Optional, TypedDict, Union
+from typing import (
+    Any, Dict, Final, Generic, Mapping, Optional, TypedDict, TypeVar, Union
+)
+
 import webapp2
+
+# Note: These private type variables are only defined to implement the Generic
+# typing structure of BaseHandler. So, do not make them public in the future.
+_NormalizedRequestDictType = TypeVar('_NormalizedRequestDictType')
+_NormalizedPayloadDictType = TypeVar('_NormalizedPayloadDictType')
 
 ONE_DAY_AGO_IN_SECS: Final = -24 * 60 * 60
 DEFAULT_CSRF_SECRET: Final = 'oppia csrf secret'
@@ -131,7 +139,10 @@ class UserFacingExceptions:
         pass
 
 
-class BaseHandler(webapp2.RequestHandler):
+class BaseHandler(
+    webapp2.RequestHandler,
+    Generic[_NormalizedPayloadDictType, _NormalizedRequestDictType]
+):
     """Base class for all Oppia handlers."""
 
     # Whether to check POST and PUT payloads for CSRF tokens prior to
@@ -195,14 +206,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
         self.current_user_is_super_admin = False
-        # Here we use type Any because dict 'self.normalized_request' can
-        # contain normalized version of arg's value, and these arg values
-        # can be of any type. So, to allow every type, we used Any here.
-        self.normalized_request: Optional[Dict[str, Any]] = None
-        # Here we use type Any because dict 'self.normalized_payload' can
-        # contain normalized version of arg's value, and these arg values
-        # can be of any type. So, to allow every type, we used Any here.
-        self.normalized_payload: Optional[Dict[str, Any]] = None
+        self.normalized_request: Optional[_NormalizedRequestDictType] = None
+        self.normalized_payload: Optional[_NormalizedPayloadDictType] = None
 
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
@@ -470,10 +475,10 @@ class BaseHandler(webapp2.RequestHandler):
                 allow_string_to_bool_conversion)
         )
 
-        self.normalized_payload = {
+        normalized_payload = {
             arg: normalized_arg_values.get(arg) for arg in payload_arg_keys
         }
-        self.normalized_request = {
+        normalized_request = {
             arg: normalized_arg_values.get(arg) for arg in request_arg_keys
         }
 
@@ -488,9 +493,22 @@ class BaseHandler(webapp2.RequestHandler):
         # execution onwards to the handler.
         for arg in keys_that_correspond_to_default_values:
             if request_method in ['GET', 'DELETE']:
-                self.normalized_request[arg] = normalized_arg_values.get(arg)
+                normalized_request[arg] = normalized_arg_values.get(arg)
             else:
-                self.normalized_payload[arg] = normalized_arg_values.get(arg)
+                normalized_payload[arg] = normalized_arg_values.get(arg)
+
+        # Here we use MyPy ignore because 'normalized_payload' is of
+        # Dict[str, Any] type, whereas 'self.normalized_payload' is a Generic
+        # type whose type can be decided while defining sub-classes. So, Due
+        # to this mismatch in types MyPy throws an error. Thus, to silence the
+        # error, we used type ignore here.
+        self.normalized_payload = normalized_payload  # type: ignore[assignment]
+        # Here we use MyPy ignore because 'normalized_request' is of
+        # Dict[str, Any] type, whereas 'self.normalized_request' is a Generic
+        # type whose type can be decided while defining sub-classes. So, Due
+        # to this mismatch in types MyPy throws an error. Thus, to silence the
+        # error, we used type ignore here.
+        self.normalized_request = normalized_request  # type: ignore[assignment]
 
         # Here we use MyPy ignore because here we assigning RaiseErrorOnGet's
         # instance to a 'get' method, and according to MyPy assignment to a
@@ -664,7 +682,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.write(load_template(filepath))
 
     def _render_exception_json_or_html(
-        self, return_type: Optional[str], values: ResponseValueDict
+        self, return_type: str, values: ResponseValueDict
     ) -> None:
         """Renders an error page, or an error JSON response.
 
@@ -821,7 +839,7 @@ class BaseHandler(webapp2.RequestHandler):
     UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
 
 
-class Error404Handler(BaseHandler):
+class Error404Handler(BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles 404 errors."""
 
     pass
@@ -950,7 +968,7 @@ class CsrfTokenManager:
             return False
 
 
-class CsrfTokenHandler(BaseHandler):
+class CsrfTokenHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles sending CSRF tokens to the frontend."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -966,7 +984,7 @@ class CsrfTokenHandler(BaseHandler):
         })
 
 
-class OppiaMLVMHandler(BaseHandler):
+class OppiaMLVMHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
     """Base class for the handlers that communicate with Oppia-ML VM instances.
     """
 

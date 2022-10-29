@@ -45,7 +45,9 @@ from core.domain import user_services
 from typing import Dict, List
 
 
-class InitializeAndroidTestDataHandler(base.BaseHandler):
+class InitializeAndroidTestDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler to initialize android specific structures."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}

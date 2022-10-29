@@ -28,13 +28,13 @@ from core.domain import config_services
 from core.domain import role_services
 from core.domain import user_services
 
-from typing import Dict, Final, List, Optional, TypedDict, Union, cast
+from typing import Dict, Final, List, Optional, TypedDict, Union
 
 BLOG_POST_EDITOR: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
 BLOG_ADMIN: Final = feconf.ROLE_ID_BLOG_ADMIN
 
 
-class BlogAdminPage(base.BaseHandler):
+class BlogAdminPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Blog Admin Page  Handler to render the frontend template."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -57,9 +57,11 @@ class BlogAdminHandlerNormalizedPayloadDict(TypedDict):
     config_property_id: Optional[str]
 
 
-# TODO(#16364): Refactor 'BlogAdminHandler' so that we don't have to use action
-# property in the request but rather have two separate handlers for each action.
-class BlogAdminHandler(base.BaseHandler):
+class BlogAdminHandler(
+    base.BaseHandler[
+        BlogAdminHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handler for the blog admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -119,15 +121,9 @@ class BlogAdminHandler(base.BaseHandler):
     def post(self) -> None:
         """Handles POST requests."""
         assert self.user_id is not None
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_payload' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        payload_data = cast(
-            BlogAdminHandlerNormalizedPayloadDict, self.normalized_payload
-        )
-        if payload_data['action'] == 'save_config_properties':
-            new_config_property_values = payload_data[
+        assert self.normalized_payload is not None
+        if self.normalized_payload['action'] == 'save_config_properties':
+            new_config_property_values = self.normalized_payload[
                 'new_config_property_values']
             if new_config_property_values is None:
                 raise Exception(
@@ -139,8 +135,8 @@ class BlogAdminHandler(base.BaseHandler):
             logging.info(
                 '[BLOG ADMIN] %s saved config property values: %s' %
                 (self.user_id, new_config_property_values))
-        elif payload_data['action'] == 'revert_config_property':
-            config_property_id = payload_data['config_property_id']
+        elif self.normalized_payload['action'] == 'revert_config_property':
+            config_property_id = self.normalized_payload['config_property_id']
             if config_property_id is None:
                 raise Exception(
                     'The config_property_id cannot be None when the action'
@@ -163,7 +159,11 @@ class BlogAdminRolesHandlerNormalizedPayloadDict(TypedDict):
     username: str
 
 
-class BlogAdminRolesHandler(base.BaseHandler):
+class BlogAdminRolesHandler(
+    base.BaseHandler[
+        BlogAdminRolesHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handler for the blog admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -195,15 +195,9 @@ class BlogAdminRolesHandler(base.BaseHandler):
     def post(self) -> None:
         """Handles POST requests."""
         assert self.user_id is not None
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_payload' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        payload_data = cast(
-            BlogAdminRolesHandlerNormalizedPayloadDict, self.normalized_payload
-        )
-        username = payload_data['username']
-        role = payload_data['role']
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
+        role = self.normalized_payload['role']
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -217,14 +211,8 @@ class BlogAdminRolesHandler(base.BaseHandler):
     @acl_decorators.can_manage_blog_post_editors
     def put(self) -> None:
         """Handles PUT requests."""
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_payload' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        payload_data = cast(
-            BlogAdminRolesHandlerNormalizedPayloadDict, self.normalized_payload
-        )
-        username = payload_data['username']
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(

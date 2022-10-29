@@ -110,7 +110,9 @@ if not constants.EMULATOR_MODE:
 logging.getLogger(name='chardet.charsetprober').setLevel(logging.INFO)
 
 
-class InternetConnectivityHandler(base.BaseHandler):
+class InternetConnectivityHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles the get request to the server from the
     frontend to check for internet connection."""
 
@@ -128,7 +130,9 @@ class InternetConnectivityHandler(base.BaseHandler):
         self.render_json({'is_internet_connected': True})
 
 
-class FrontendErrorHandler(base.BaseHandler):
+class FrontendErrorHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles errors arising from the frontend."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
@@ -140,7 +144,9 @@ class FrontendErrorHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class WarmupPage(base.BaseHandler):
+class WarmupPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles warmup requests."""
 
     @acl_decorators.open_access
@@ -149,7 +155,9 @@ class WarmupPage(base.BaseHandler):
         pass
 
 
-class SplashRedirectPage(base.BaseHandler):
+class SplashRedirectPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
     @acl_decorators.open_access

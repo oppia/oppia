@@ -78,7 +78,9 @@ AllowedAdminConfigPropertyValueTypes = Union[
 ]
 
 
-class AdminPage(base.BaseHandler):
+class AdminPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Admin page shown in the App Engine admin console."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -113,7 +115,9 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     exp_id: Optional[str]
 
 
-class AdminHandler(base.BaseHandler):
+class AdminHandler(
+    base.BaseHandler[AdminHandlerNormalizePayloadDict, Dict[str, str]]
+):
     """Handler for the admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -262,18 +266,12 @@ class AdminHandler(base.BaseHandler):
     def post(self) -> None:
         """Handles POST requests."""
         assert self.user_id is not None
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_payload' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        payload_data = cast(
-            AdminHandlerNormalizePayloadDict, self.normalized_payload
-        )
-        action = payload_data['action']
+        assert self.normalized_payload is not None
+        action = self.normalized_payload.get('action')
         try:
             result = {}
             if action == 'reload_exploration':
-                exploration_id = payload_data['exploration_id']
+                exploration_id = self.normalized_payload['exploration_id']
                 if exploration_id is None:
                     raise Exception(
                         'The \'exploration_id\' must be provided when the'
@@ -281,7 +279,7 @@ class AdminHandler(base.BaseHandler):
                     )
                 self._reload_exploration(exploration_id)
             elif action == 'reload_collection':
-                collection_id = payload_data['collection_id']
+                collection_id = self.normalized_payload['collection_id']
                 if collection_id is None:
                     raise Exception(
                         'The \'collection_id\' must be provided when the'
@@ -289,14 +287,14 @@ class AdminHandler(base.BaseHandler):
                     )
                 self._reload_collection(collection_id)
             elif action == 'generate_dummy_explorations':
-                num_dummy_exps_to_generate = payload_data[
+                num_dummy_exps_to_generate = self.normalized_payload[
                     'num_dummy_exps_to_generate']
                 if num_dummy_exps_to_generate is None:
                     raise Exception(
                         'The \'num_dummy_exps_to_generate\' must be provided'
                         ' when the action is generate_dummy_explorations.'
                     )
-                num_dummy_exps_to_publish = payload_data[
+                num_dummy_exps_to_publish = self.normalized_payload[
                     'num_dummy_exps_to_publish']
                 if num_dummy_exps_to_publish is None:
                     raise Exception(
@@ -321,7 +319,7 @@ class AdminHandler(base.BaseHandler):
             elif action == 'generate_dummy_classroom':
                 self._generate_dummy_classroom()
             elif action == 'save_config_properties':
-                new_config_property_values = payload_data[
+                new_config_property_values = self.normalized_payload[
                     'new_config_property_values']
                 if new_config_property_values is None:
                     raise Exception(
@@ -334,7 +332,7 @@ class AdminHandler(base.BaseHandler):
                 for (name, value) in new_config_property_values.items():
                     config_services.set_property(self.user_id, name, value)
             elif action == 'revert_config_property':
-                config_property_id = payload_data[
+                config_property_id = self.normalized_payload[
                     'config_property_id']
                 if config_property_id is None:
                     raise Exception(
@@ -347,7 +345,7 @@ class AdminHandler(base.BaseHandler):
                 config_services.revert_property(
                     self.user_id, config_property_id)
             elif action == 'upload_topic_similarities':
-                data = payload_data['data']
+                data = self.normalized_payload['data']
                 if data is None:
                     raise Exception(
                         'The \'data\' must be provided when the action'
@@ -355,7 +353,7 @@ class AdminHandler(base.BaseHandler):
                     )
                 recommendations_services.update_topic_similarities(data)
             elif action == 'regenerate_topic_related_opportunities':
-                topic_id = payload_data['topic_id']
+                topic_id = self.normalized_payload['topic_id']
                 if topic_id is None:
                     raise Exception(
                         'The \'topic_id\' must be provided when the action'
@@ -369,7 +367,7 @@ class AdminHandler(base.BaseHandler):
                     'opportunities_count': opportunities_count
                 }
             elif action == 'rollback_exploration_to_safe_state':
-                exp_id = payload_data['exp_id']
+                exp_id = self.normalized_payload['exp_id']
                 if exp_id is None:
                     raise Exception(
                         'The \'exp_id\' must be provided when the action'
@@ -381,19 +379,19 @@ class AdminHandler(base.BaseHandler):
                     'version': version
                 }
             elif action == 'update_feature_flag_rules':
-                feature_name = payload_data['feature_name']
+                feature_name = self.normalized_payload['feature_name']
                 if feature_name is None:
                     raise Exception(
                         'The \'feature_name\' must be provided when the action'
                         ' is update_feature_flag_rules.'
                     )
-                new_rules = payload_data['new_rules']
+                new_rules = self.normalized_payload['new_rules']
                 if new_rules is None:
                     raise Exception(
                         'The \'new_rules\' must be provided when the action'
                         ' is update_feature_flag_rules.'
                     )
-                commit_message = payload_data['commit_message']
+                commit_message = self.normalized_payload['commit_message']
                 if commit_message is None:
                     raise Exception(
                         'The \'commit_message\' must be provided when the '
@@ -954,7 +952,15 @@ class AdminRoleHandlerNormalizedPayloadDict(TypedDict):
     username: str
 
 
-class AdminRoleHandler(base.BaseHandler):
+class AdminRoleHandler(
+    base.BaseHandler[
+        AdminRoleHandlerNormalizedPayloadDict,
+        Union[
+            AdminRoleHandlerNormalizedGetRequestDict,
+            AdminRoleHandlerNormalizedDeleteRequestDict
+        ]
+    ]
+):
     """Handler for roles tab of admin page. Used to view and update roles."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1016,9 +1022,9 @@ class AdminRoleHandler(base.BaseHandler):
     def get(self) -> None:
         assert self.user_id is not None
         # Here we use cast because we are narrowing down the type of
-        # 'normalized_request' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
+        # 'normalized_request' from Union of request TypedDicts to a
+        # particular TypedDict that was defined according to the schemas.
+        # So that the type of fetched values is not considered as Any type.
         request_data = cast(
             AdminRoleHandlerNormalizedGetRequestDict,
             self.normalized_request
@@ -1072,16 +1078,9 @@ class AdminRoleHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_payload' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        payload_data = cast(
-            AdminRoleHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
-        username = payload_data['username']
-        role = payload_data['role']
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
+        role = self.normalized_payload['role']
         user_settings = user_services.get_user_settings_from_username(username)
 
         if user_settings is None:
@@ -1101,9 +1100,9 @@ class AdminRoleHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
         # Here we use cast because we are narrowing down the type of
-        # 'normalized_request' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
+        # 'normalized_request' from Union of request TypedDicts to a
+        # particular TypedDict that was defined according to the schemas.
+        # So that the type of fetched values is not considered as Any type.
         request_data = cast(
             AdminRoleHandlerNormalizedDeleteRequestDict,
             self.normalized_request
@@ -1134,7 +1133,11 @@ class TopicManagerRoleHandlerNormalizedPayloadDict(TypedDict):
     topic_id: str
 
 
-class TopicManagerRoleHandler(base.BaseHandler):
+class TopicManagerRoleHandler(
+    base.BaseHandler[
+        TopicManagerRoleHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handler to assign or deassigning manager to a topic."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1162,17 +1165,10 @@ class TopicManagerRoleHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_payload' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        payload_data = cast(
-            TopicManagerRoleHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
-        username = payload_data['username']
-        action = payload_data['action']
-        topic_id = payload_data['topic_id']
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
+        action = self.normalized_payload['action']
+        topic_id = self.normalized_payload['topic_id']
 
         user_settings = user_services.get_user_settings_from_username(username)
 
@@ -1217,7 +1213,12 @@ class BannedUsersHandlerNormalizedRequestDict(TypedDict):
     username: str
 
 
-class BannedUsersHandler(base.BaseHandler):
+class BannedUsersHandler(
+    base.BaseHandler[
+        BannedUsersHandlerNormalizedPayloadDict,
+        BannedUsersHandlerNormalizedRequestDict
+    ]
+):
     """Handler to ban and unban users."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1241,15 +1242,8 @@ class BannedUsersHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_payload' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        payload_data = cast(
-            BannedUsersHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
-        username = payload_data['username']
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
@@ -1262,15 +1256,8 @@ class BannedUsersHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_request' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        request_data = cast(
-            BannedUsersHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        username = request_data['username']
+        assert self.normalized_request is not None
+        username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
@@ -1297,7 +1284,12 @@ class AdminSuperAdminPrivilegesHandlerNormalizedRequestDict(TypedDict):
     username: str
 
 
-class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
+class AdminSuperAdminPrivilegesHandler(
+    base.BaseHandler[
+        AdminSuperAdminPrivilegesHandlerNormalizedPayloadDict,
+        AdminSuperAdminPrivilegesHandlerNormalizedRequestDict
+    ]
+):
     """Handler for granting a user super admin privileges."""
 
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1322,19 +1314,11 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        assert self.normalized_payload is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
-
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_payload' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        payload_data = cast(
-            AdminSuperAdminPrivilegesHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
-        username = payload_data['username']
+        username = self.normalized_payload['username']
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
@@ -1345,19 +1329,11 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
+        assert self.normalized_request is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
-
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_request' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        request_data = cast(
-            AdminSuperAdminPrivilegesHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        username = request_data['username']
+        username = self.normalized_request['username']
 
         user_settings = user_services.get_user_settings_from_username(username)
         if user_settings is None:
@@ -1371,7 +1347,9 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class AdminTopicsCsvFileDownloader(base.BaseHandler):
+class AdminTopicsCsvFileDownloader(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Retrieves topic similarity data for download."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
@@ -1403,7 +1381,11 @@ class DataExtractionQueryHandlerNormalizedRequestDict(TypedDict):
     num_answers: int
 
 
-class DataExtractionQueryHandler(base.BaseHandler):
+class DataExtractionQueryHandler(
+    base.BaseHandler[
+        Dict[str, str], DataExtractionQueryHandlerNormalizedRequestDict
+    ]
+):
     """Handler for data extraction query."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1435,16 +1417,9 @@ class DataExtractionQueryHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_request' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        request_data = cast(
-            DataExtractionQueryHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        exp_id = request_data['exp_id']
-        exp_version = request_data['exp_version']
+        assert self.normalized_request is not None
+        exp_id = self.normalized_request['exp_id']
+        exp_version = self.normalized_request['exp_version']
 
         exploration = exp_fetchers.get_exploration_by_id(
             exp_id, strict=False, version=exp_version)
@@ -1453,8 +1428,8 @@ class DataExtractionQueryHandler(base.BaseHandler):
                 'Entity for exploration with id %s and version %s not found.'
                 % (exp_id, exp_version))
 
-        state_name = request_data['state_name']
-        num_answers = request_data['num_answers']
+        state_name = self.normalized_request['state_name']
+        num_answers = self.normalized_request['num_answers']
 
         if state_name not in exploration.states:
             raise self.InvalidInputException(
@@ -1481,7 +1456,9 @@ class DataExtractionQueryHandler(base.BaseHandler):
         self.render_json(response)
 
 
-class SendDummyMailToAdminHandler(base.BaseHandler):
+class SendDummyMailToAdminHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """This function handles sending test emails."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -1507,7 +1484,11 @@ class UpdateUsernameHandlerNormalizedPayloadDict(TypedDict):
     new_username: str
 
 
-class UpdateUsernameHandler(base.BaseHandler):
+class UpdateUsernameHandler(
+    base.BaseHandler[
+        UpdateUsernameHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handler for renaming usernames."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -1533,16 +1514,9 @@ class UpdateUsernameHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
         assert self.user_id is not None
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_payload' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        payload_data = cast(
-            UpdateUsernameHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
-        old_username = payload_data['old_username']
-        new_username = payload_data['new_username']
+        assert self.normalized_payload is not None
+        old_username = self.normalized_payload['old_username']
+        new_username = self.normalized_payload['new_username']
 
         user_id = user_services.get_user_id_from_username(old_username)
         if user_id is None:
@@ -1558,7 +1532,9 @@ class UpdateUsernameHandler(base.BaseHandler):
         self.render_json({})
 
 
-class NumberOfDeletionRequestsHandler(base.BaseHandler):
+class NumberOfDeletionRequestsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for getting the number of pending deletion requests via admin
     page.
     """
@@ -1583,7 +1559,11 @@ class VerifyUserModelsDeletedHandlerNormalizedRequestDict(TypedDict):
     user_id: str
 
 
-class VerifyUserModelsDeletedHandler(base.BaseHandler):
+class VerifyUserModelsDeletedHandler(
+    base.BaseHandler[
+        Dict[str, str], VerifyUserModelsDeletedHandlerNormalizedRequestDict
+    ]
+):
     """Handler for getting whether any models exist for specific user ID."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1600,15 +1580,8 @@ class VerifyUserModelsDeletedHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_request' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        request_data = cast(
-            VerifyUserModelsDeletedHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        user_id = request_data['user_id']
+        assert self.normalized_request is not None
+        user_id = self.normalized_request['user_id']
 
         user_is_deleted = wipeout_service.verify_user_deleted(
             user_id, include_delete_at_end_models=True)
@@ -1624,7 +1597,11 @@ class DeleteUserHandlerNormalizedRequestDict(TypedDict):
     username: str
 
 
-class DeleteUserHandler(base.BaseHandler):
+class DeleteUserHandler(
+    base.BaseHandler[
+        Dict[str, str], DeleteUserHandlerNormalizedRequestDict
+    ]
+):
     """Handler for deleting a user with specific ID."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -1645,16 +1622,9 @@ class DeleteUserHandler(base.BaseHandler):
 
     @acl_decorators.can_delete_any_user
     def delete(self) -> None:
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_request' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        request_data = cast(
-            DeleteUserHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        user_id = request_data['user_id']
-        username = request_data['username']
+        assert self.normalized_request is not None
+        user_id = self.normalized_request['user_id']
+        username = self.normalized_request['username']
 
         user_id_from_username = (
             user_services.get_user_id_from_username(username))
@@ -1681,7 +1651,11 @@ class UpdateBlogPostHandlerNormalizedPayloadDict(TypedDict):
     published_on: str
 
 
-class UpdateBlogPostHandler(base.BaseHandler):
+class UpdateBlogPostHandler(
+    base.BaseHandler[
+        UpdateBlogPostHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handler for changing author ids and published on date in
     blog posts."""
 
@@ -1712,17 +1686,10 @@ class UpdateBlogPostHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
-        # Here we use cast because we are narrowing down the type of
-        # 'normalized_payload' from Dict[str, Any] to a particular
-        # TypedDict that was defined according to the schemas. So that
-        # the type of fetched values is not considered as Any type.
-        payload_data = cast(
-            UpdateBlogPostHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
-        blog_post_id = payload_data['blog_post_id']
-        author_username = payload_data['author_username']
-        published_on = payload_data['published_on']
+        assert self.normalized_payload is not None
+        blog_post_id = self.normalized_payload['blog_post_id']
+        author_username = self.normalized_payload['author_username']
+        published_on = self.normalized_payload['published_on']
 
         author_id = user_services.get_user_id_from_username(author_username)
         if author_id is None:
