@@ -71,7 +71,13 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_specs: []
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_5
+              normalizedStrSet:
+              - heart
+          rule_type: Contains
         tagged_skill_misconception_id: null
         training_data:
         - cheerful
@@ -102,7 +108,7 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 5
+    next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -112,6 +118,7 @@ states:
         feedback_1: {}
         feedback_2: {}
         rule_input_4: {}
+        rule_input_5: {}
     solicit_answer_details: false
     card_is_checkpoint: true
     written_translations:
@@ -122,6 +129,7 @@ states:
         feedback_1: {}
         feedback_2: {}
         rule_input_4: {}
+        rule_input_5: {}
 states_schema_version: 42
 tags: []
 title: Demonstrating string classifier

@@ -29,32 +29,32 @@ from core import utils
 from core.tests import test_utils
 from scripts import run_portserver
 
-from typing import Any, List
+from typing import List, Union
 
 
 class MockSocket:
     server_closed = False
-    port: str|int = 8181
+    port: int = 8181
 
-    def setsockopt(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
+    def setsockopt(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
         pass
 
-    def bind(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
+    def bind(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
         pass
 
-    def listen(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
+    def listen(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
         pass
 
-    def getsockname(self, *unused_args: Any) -> List[Any]: # pylint: disable=missing-docstring
+    def getsockname(self, *unused_args: str) -> List[Union[str, int]]: # pylint: disable=missing-docstring
         return ['Address', self.port]
 
-    def recv(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
+    def recv(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
         pass
 
-    def sendall(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
+    def sendall(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
         pass
 
-    def shutdown(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
+    def shutdown(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
         raise socket.error('Some error occurred.')
 
     def close(self) -> None: # pylint: disable=missing-docstring
@@ -74,21 +74,21 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.terminal_logs: list[Any] = []
-        def mock_logging(*msgs: Any) -> None:
+        self.terminal_logs: list[str] = []
+        def mock_logging(*msgs: str) -> None:
             all_messages = [*msgs]
             for msg in all_messages:
                 self.terminal_logs.append(msg)
         self.swap_log = self.swap(logging, 'info', mock_logging)
-        self.terminal_err_logs: list[Any] = []
-        def mock_logging_err(*msgs: Any) -> None:
+        self.terminal_err_logs: list[str] = []
+        def mock_logging_err(*msgs: str) -> None:
             all_messages = [*msgs]
             for msg in all_messages:
                 self.terminal_err_logs.append(msg)
         self.swap_log_err = self.swap(logging, 'error', mock_logging_err)
 
     def test_get_process_start_time_handles_ioerror(self) -> None:
-        def mock_open(*unused_args: Any, **unused_kwargs: Any) -> None:
+        def mock_open(*unused_args: str, **unused_kwargs: str) -> None:
             raise IOError('File not found.')
         pid = 12345
 
@@ -116,7 +116,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
         dummy_file_object.close()
 
     def test_get_process_command_line_handles_ioerror(self) -> None:
-        def mock_open(*unused_args: Any, **unused_kwargs: Any) -> None:
+        def mock_open(*unused_args: str, **unused_kwargs: str) -> None:
             raise IOError('File not found.')
         pid = 12345
 
@@ -146,11 +146,11 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
     def test_sock_bind_handles_error_while_creating_socket(self) -> None:
         port = 8181
-        def mock_socket(*unused_args: Any) -> None:
+        def mock_socket(*unused_args: str) -> None:
             raise socket.error('Some error occurred.')
         swap_socket = self.swap(socket, 'socket', mock_socket)
         with swap_socket:
-            returned_port = run_portserver.sock_bind( # type: ignore[no-untyped-call]
+            returned_port = run_portserver.sock_bind(
                 port, socket.SOCK_STREAM, socket.IPPROTO_TCP)
 
         self.assertIsNone(returned_port)
@@ -159,7 +159,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
         swap_socket = self.swap(
             socket, 'socket', lambda *unused_args: MockSocket())
         with swap_socket:
-            returned_port = run_portserver.sock_bind( # type: ignore[no-untyped-call]
+            returned_port = run_portserver.sock_bind(
                 8181, socket.SOCK_STREAM, socket.IPPROTO_TCP)
 
         self.assertEqual(returned_port, 8181)
@@ -168,13 +168,15 @@ class RunPortserverTests(test_utils.GenericTestBase):
         class FailingMockSocket(MockSocket):
             """Socket that fails while invoking getsockname()."""
 
-            def getsockname(self, *unused_args: Any) -> List[Any]: # pylint: disable=missing-docstring
+            # Here we use MyPy ignore because here we are changing the
+            # signature of 'getsockname' for testing purposes.
+            def getsockname(self, *unused_args: str) -> None: # type: ignore[override] # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
 
         swap_socket = self.swap(
             socket, 'socket', lambda *unused_args: FailingMockSocket())
         with swap_socket:
-            returned_port = run_portserver.sock_bind( # type: ignore[no-untyped-call]
+            returned_port = run_portserver.sock_bind(
                 8181, socket.SOCK_DGRAM, socket.IPPROTO_TCP)
 
         self.assertIsNone(returned_port)
@@ -217,7 +219,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
     def test_should_allocate_port_handles_oserror(self) -> None:
         pid = 12345
-        def mock_kill(*unused_args: Any) -> None:
+        def mock_kill(*unused_args: str) -> None:
             raise OSError('Some XYZ error occurred.')
         swap_os_kill = self.swap_with_checks(
             os, 'kill', mock_kill, expected_args=((pid, 0),))
@@ -231,13 +233,13 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
     def test_port_pool_handles_invalid_port_request(self) -> None:
         port = -1
-        port_pool = run_portserver.PortPool() # type: ignore[no-untyped-call]
+        port_pool = run_portserver.PortPool()
         error_msg = r'Port must be in the \[1, 65535\] range, not -1.'
         with self.assertRaisesRegex(ValueError, error_msg):
             port_pool.add_port_to_free_pool(port)
 
     def test_port_pool_handles_empty_port_queue(self) -> None:
-        port_pool = run_portserver.PortPool() # type: ignore[no-untyped-call]
+        port_pool = run_portserver.PortPool()
         error_msg = 'No ports being managed.'
         with self.assertRaisesRegex(RuntimeError, error_msg):
             port_pool.get_port_for_process(12345)
@@ -249,7 +251,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
         swap_is_port_free = self.swap(
             run_portserver, 'is_port_free', lambda _: True)
 
-        port_pool = run_portserver.PortPool() # type: ignore[no-untyped-call]
+        port_pool = run_portserver.PortPool()
         port_pool.add_port_to_free_pool(port)
         self.assertEqual(port_pool.num_ports(), 1)
         with swap_get_process_start_time, swap_is_port_free:
@@ -265,7 +267,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
         swap_is_port_free = self.swap(
             run_portserver, 'is_port_free', lambda _: True)
 
-        port_pool = run_portserver.PortPool() # type: ignore[no-untyped-call]
+        port_pool = run_portserver.PortPool()
         port_pool.add_port_to_free_pool(port1)
         port_pool.add_port_to_free_pool(port2)
         # By default, all port pool have an initial start time of 0.
@@ -290,7 +292,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
         swap_is_port_free = self.swap(
             run_portserver, 'is_port_free', lambda _: False)
 
-        port_pool = run_portserver.PortPool() # type: ignore[no-untyped-call]
+        port_pool = run_portserver.PortPool()
         port_pool.add_port_to_free_pool(port)
         self.assertEqual(port_pool.num_ports(), 1)
         with swap_get_process_start_time, swap_is_port_free, self.swap_log:
@@ -300,8 +302,8 @@ class RunPortserverTests(test_utils.GenericTestBase):
         self.assertIn('All ports in use.', self.terminal_logs)
 
     def test_port_server_request_handler_handles_invalid_request(self) -> None:
-        request_handler = run_portserver.PortServerRequestHandler((8181,)) # type: ignore[no-untyped-call]
-        response = request_handler.handle_port_request('abcd')
+        request_handler = run_portserver.PortServerRequestHandler((8181,))
+        response = request_handler.handle_port_request(b'abcd')
         with self.swap_log:
             request_handler.dump_stats()
 
@@ -310,8 +312,8 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
     def test_port_server_request_handler_handles_denied_allocations(
             self) -> None:
-        request_handler = run_portserver.PortServerRequestHandler((8181,)) # type: ignore[no-untyped-call]
-        response = request_handler.handle_port_request(0)
+        request_handler = run_portserver.PortServerRequestHandler((8181,))
+        response = request_handler.handle_port_request(b'0')
         with self.swap_log:
             request_handler.dump_stats()
 
@@ -319,29 +321,29 @@ class RunPortserverTests(test_utils.GenericTestBase):
         self.assertIn('denied-allocations 1', self.terminal_logs)
 
     def test_port_server_request_handler_handles_no_free_ports(self) -> None:
-        request_handler = run_portserver.PortServerRequestHandler((8181,)) # type: ignore[no-untyped-call]
+        request_handler = run_portserver.PortServerRequestHandler((8181,))
         swap_get_port = self.swap(
             run_portserver.PortPool, 'get_port_for_process',
             lambda *unused_args: 0)
         swap_should_allocate_port = self.swap(
             run_portserver, 'should_allocate_port', lambda _: True)
         with self.swap_log, swap_get_port, swap_should_allocate_port:
-            response = request_handler.handle_port_request(1010)
+            response = request_handler.handle_port_request(b'1010')
             request_handler.dump_stats()
 
-        self.assertEqual(response, '')
+        self.assertEqual(response, b'')
         self.assertIn('denied-allocations 1', self.terminal_logs)
 
     def test_port_server_request_handler_allocates_port_to_client(
             self) -> None:
-        request_handler = run_portserver.PortServerRequestHandler((8181,)) # type: ignore[no-untyped-call]
+        request_handler = run_portserver.PortServerRequestHandler((8181,))
         swap_get_port = self.swap(
             run_portserver.PortPool, 'get_port_for_process',
             lambda *unused_args: 8080)
         swap_should_allocate_port = self.swap(
             run_portserver, 'should_allocate_port', lambda _: True)
         with self.swap_log, swap_get_port, swap_should_allocate_port:
-            response = request_handler.handle_port_request(1010)
+            response = request_handler.handle_port_request(b'1010')
             request_handler.dump_stats()
 
         self.assertEqual(response, b'8080\n')
@@ -351,11 +353,11 @@ class RunPortserverTests(test_utils.GenericTestBase):
         class FailingMockSocket(MockSocket):
             """Socket that fails while invoking bind()."""
 
-            def bind(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
+            def bind(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
 
-        def dummy_handler(data: int) -> str:
-            return str(data)
+        def dummy_handler(data: bytes) -> bytes:
+            return data
 
         swap_socket = self.swap(
             socket, 'socket', lambda *unused_args: FailingMockSocket())
@@ -363,14 +365,14 @@ class RunPortserverTests(test_utils.GenericTestBase):
             'Failed to bind socket {}. Error: {}'.format(
                 8181, socket.error('Some error occurred.')))
         with swap_socket, self.assertRaisesRegex(RuntimeError, error_msg):
-            run_portserver.Server(dummy_handler, '8181') # type: ignore[no-untyped-call]
+            run_portserver.Server(dummy_handler, '8181')
 
     def test_server_closes_gracefully(self) -> None:
         mock_socket = MockSocket()
-        mock_socket.port = '\08181'
+        mock_socket.port = 8181
 
-        def dummy_handler(data: Any) -> str:
-            return str(data)
+        def dummy_handler(data: bytes) -> bytes:
+            return data
         swap_hasattr = self.swap_with_checks(
             builtins, 'hasattr', lambda *unused_args: False,
             expected_args=((socket, 'AF_UNIX'),))
@@ -378,7 +380,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
             socket, 'socket', lambda *unused_args: mock_socket)
 
         with swap_socket, swap_hasattr:
-            server = run_portserver.Server(dummy_handler, '\08181') # type: ignore[no-untyped-call]
+            server = run_portserver.Server(dummy_handler, '\08181')
             run_portserver.Server.handle_connection(MockSocket(), dummy_handler)
 
             self.assertFalse(server.socket.server_closed)
@@ -388,8 +390,8 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
     def test_server_on_close_removes_the_socket_file(self) -> None:
         path = '8181'
-        def dummy_handler(data: Any) -> str:
-            return str(data)
+        def dummy_handler(data: bytes) -> bytes:
+            return data
         swap_hasattr = self.swap_with_checks(
             builtins, 'hasattr', lambda *unused_args: False,
             expected_args=((socket, 'AF_UNIX'),))
@@ -399,7 +401,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
             os, 'remove', lambda _: None, expected_args=((path,),))
 
         with swap_socket, swap_hasattr, swap_remove:
-            server = run_portserver.Server(dummy_handler, path) # type: ignore[no-untyped-call]
+            server = run_portserver.Server(dummy_handler, path)
             self.assertFalse(server.socket.server_closed)
             server.close()
 

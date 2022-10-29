@@ -24,8 +24,7 @@ import sys
 from core import utils
 from core.tests import test_utils
 
-from typing import Dict, List, Optional
-from typing_extensions import Literal
+from typing import Dict, List, Literal, Optional
 
 from . import check_frontend_test_coverage
 
@@ -197,6 +196,10 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             'SF:/opensource/oppia/file.ts\n'
             'LF:10\n'
             'LH:9\n'
+            'end_of_record\n'
+            'SF:/opensource/oppia/file2.ts\n'
+            'LF:10\n'
+            'LH:10\n'
             'end_of_record\n'
             'SF:node_modules/oppia/anotherfile.ts\n'
             'LF:10\n'

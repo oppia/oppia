@@ -37,8 +37,8 @@ from extensions import domain
 
 from pylatexenc import latex2text
 
-from typing import Dict, List, Optional, Set, Union, cast, overload
-from typing_extensions import Final, Literal, TypedDict
+from typing import (
+    Dict, Final, List, Literal, Optional, Set, TypedDict, Union, cast, overload)
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -1774,7 +1774,13 @@ class Question(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected the question to have a solution'
             )
-        self.question_state_data.validate({}, False)
+        # Here the variable `tagged_skill_misconception_id_required`
+        # represents that the tagged skill misconception id field is
+        # required for it.
+        self.question_state_data.validate(
+            {},
+            False,
+            tagged_skill_misconception_id_required=True)
 
     def validate(self) -> None:
         """Validates the Question domain object before it is saved."""
