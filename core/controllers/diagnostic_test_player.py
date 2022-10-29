@@ -72,13 +72,26 @@ class DiagnosticTestQuestionsHandler(base.BaseHandler):
             topic_services.get_topic_id_to_diagnostic_test_skill_ids([topic_id])
         )[topic_id]
 
+        # From each skill, two questions were fetched. The first question
+        # (main question) will be presented to the learner initially and if the
+        # learner attempted incorrectly, then another question from the same
+        # skill (backup question) will be presented otherwise not. Hence the
+        # number of questions is twice the length of skill IDs.
         question_count = len(diagnostic_test_skill_ids) * 2
 
+        # A dict with skill ID as key and a nested dict as value. The nested
+        # dict contains main_question and backup_question as keys and the
+        # question dict as values. The main question and backup question are
+        # the two questions associated with a single skill. In the diagnostic
+        # test, initially, the main question will be presented to the learner
+        # and if they attempted incorrectly then the backup question will be
+        # asked otherwise not. The main question and the backup question are of
+        # the same difficulty.
         skill_id_to_questions_dict: Dict[
-            str, List[question_domain.QuestionDict]] = {}
+            str, Dict[str, List[question_domain.QuestionDict]]] = {}
 
         for skill_id in diagnostic_test_skill_ids:
-            skill_id_to_questions_dict[skill_id] = []
+            skill_id_to_questions_dict[skill_id] = {}
 
         questions = question_services.get_questions_by_skill_ids(
             question_count,
@@ -88,9 +101,18 @@ class DiagnosticTestQuestionsHandler(base.BaseHandler):
 
         for question in questions:
             linked_skill_ids = question.linked_skill_ids
-            for skill_id in linked_skill_ids:
-                skill_id_to_questions_dict[skill_id].append(
-                    question.to_dict())
+            diagnostic_test_linked_skill_ids = list(
+                set(linked_skill_ids).intersection(
+                    set(diagnostic_test_skill_ids))
+            )
+
+            for skill_id in diagnostic_test_linked_skill_ids:
+                if 'main_question' in skill_id_to_questions_dict[skill_id]:
+                    skill_id_to_questions_dict[skill_id]['main_question'] = (
+                        question.to_dict())
+                else:
+                    skill_id_to_questions_dict[skill_id]['backup_question'] = (
+                        question.to_dict())
 
         self.render_json(
             {'skill_id_to_questions_dict': skill_id_to_questions_dict}

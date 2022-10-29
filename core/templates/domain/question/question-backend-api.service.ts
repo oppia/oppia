@@ -23,7 +23,7 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
-import { QuestionBackendDict } from
+import { QuestionObjectFactory, QuestionBackendDict, Question } from
   'domain/question/QuestionObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -50,13 +50,17 @@ interface QuestionSummariesResponse {
 
 interface SkillIdToQuestionsBackendResponse {
   'skill_id_to_questions_dict': {
-    [skillId: string]: QuestionBackendDict[];
+    [skillId: string]: {
+      main_question: QuestionBackendDict;
+      backup_question: QuestionBackendDict;
+    };
   };
 }
 
 interface SkillIdToQuestionsResponse {
-  skillIdToQuestionsDict: {
-    [skillId: string]: QuestionBackendDict[];
+  [skillId: string]: {
+    mainQuestion: Question;
+    backupQuestion: Question;
   };
 }
 
@@ -66,7 +70,9 @@ interface SkillIdToQuestionsResponse {
 export class QuestionBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) {}
+    private urlInterpolationService: UrlInterpolationService,
+    private questionObjectFactory: QuestionObjectFactory
+  ) {}
 
   private _fetchQuestions(
       skillIds: string[], questionCount: number,
@@ -229,8 +235,19 @@ export class QuestionBackendApiService {
 
       this.http.get<SkillIdToQuestionsBackendResponse>(
         diagnosticTestQuestionsURL).toPromise().then((response) => {
-        resolve(
-          {skillIdToQuestionsDict: response.skill_id_to_questions_dict});
+        let skillIdToQuestionsDict: SkillIdToQuestionsResponse = {};
+
+        for (let skillId in response.skill_id_to_questions_dict) {
+          skillIdToQuestionsDict[skillId].mainQuestion = (
+            this.questionObjectFactory.createFromBackendDict(
+              response.skill_id_to_questions_dict[skillId].main_question));
+
+          skillIdToQuestionsDict[skillId].backupQuestion = (
+            this.questionObjectFactory.createFromBackendDict(
+              response.skill_id_to_questions_dict[skillId].backup_question));
+        }
+
+        resolve(skillIdToQuestionsDict);
       }, errorResponse => {
         reject(errorResponse.error.error);
       });

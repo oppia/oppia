@@ -74,7 +74,7 @@ class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):
         self.question_id_2 = question_services.get_new_question_id()
         self.question_2 = self.save_new_question(
             self.question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_id_2'])
+            self._create_valid_question_data('ABC'), ['skill_id_1'])
         self.question_dict_2 = self.question_2.to_dict()
 
         self.question_id_3 = question_services.get_new_question_id()
@@ -83,30 +83,39 @@ class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC'), ['skill_id_2'])
         self.question_dict_3 = self.question_3.to_dict()
 
+        self.question_id_4 = question_services.get_new_question_id()
+        self.question_4 = self.save_new_question(
+            self.question_id_4, self.editor_id,
+            self._create_valid_question_data('ABC'), ['skill_id_2'])
+        self.question_dict_4 = self.question_1.to_dict()
+
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id_1, 'skill_id_1', 0.5)
         question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id_2, 'skill_id_2', 0.5)
+            self.editor_id, self.question_id_2, 'skill_id_1', 0.5)
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id_3, 'skill_id_2', 0.5)
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id_4, 'skill_id_2', 0.5)
 
     def test_get_skill_id_to_question_dict_for_valid_topic_id(self) -> None:
         url = '%s/%s' % (
             feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL, self.topic_id)
         json_response = self.get_json(url)
+        expected_json_response = {
+            'skill_id_1': {
+                'main_question': self.question_dict_1,
+                'backup_question': self.question_dict_2
+            },
+            'skill_id_2': {
+                'main_question': self.question_dict_3,
+                'backup_question': self.question_dict_4
+            }
+        }
 
-        self.assertEqual(
-            list(json_response['skill_id_to_questions_dict'].keys()),
-            ['skill_id_1', 'skill_id_2']
-        )
         self.assertItemsEqual(
-            json_response['skill_id_to_questions_dict']['skill_id_1'],
-            [self.question_dict_1]
-        )
-        self.assertItemsEqual(
-            json_response['skill_id_to_questions_dict']['skill_id_2'],
-            [self.question_dict_2, self.question_dict_3]
-        )
+            json_response['skill_id_to_questions_dict'],
+            expected_json_response)
 
     def test_raise_error_for_non_existent_topic_id(self) -> None:
         non_existent_topic_id = topic_fetchers.get_new_topic_id()
