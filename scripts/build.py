@@ -677,6 +677,10 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
 
 
 def build_using_ng() -> None:
+    """Execute angular build process. This runs the angular compiler and
+    generates an ahead of time compiled bundle. This bundle can be found in the
+    dist/oppia-angular-prod folder.
+    """
     print('Building using angular cli')
     managed_ng_build_process = servers.managed_ng_build(True, False)
     with managed_ng_build_process as p:

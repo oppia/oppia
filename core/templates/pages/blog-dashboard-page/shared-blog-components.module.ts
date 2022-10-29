@@ -79,6 +79,4 @@ import { BlogPostEditorNavbarPreLogoActionComponent } from 'pages/blog-dashboard
     BlogPostEditorNavbarPreLogoActionComponent
   ],
 })
-export class SharedBlogComponentsModule {
-}
-
+export class SharedBlogComponentsModule {}

@@ -129,11 +129,7 @@ def is_oppia_server_already_running() -> bool:
 
 
 def run_ng_compilation() -> None:
-    """Runs webpack compilation.
-
-    Args:
-        source_maps: bool. Whether to compile with source maps.
-    """
+    """Runs webpack compilation."""
     max_tries = 2
     ng_bundles_dir_name = 'dist/oppia-angular'
 

@@ -103,25 +103,26 @@ export class I18nService {
           this.cookieService.put('lang', code);
           this.documentAttributeCustomizationService.addAttribute('lang', code);
           if (prevLangDirection !== langDirection) {
-            window.location.reload();
+            this.windowRef.nativeWindow.location.reload();
           }
         } else {
-          const parser = new URL(window.location.href);
+          console.log('in: ' + this.windowRef.nativeWindow.location.href);
+          const parser = new URL(this.windowRef.nativeWindow.location.href);
           const urlParamDir = parser.searchParams.get('dir');
           if (urlParamDir === langDirection) {
             return;
           }
           parser.searchParams.set('dir', langDirection);
-          if (urlParamDir !== null) {
-            window.location = parser.href as unknown as Location;
-          }
+          this.windowRef.nativeWindow.location.href = (
+            parser.href);
         }
       }
     );
 
     // Loads site language according to the language parameter in URL
     // if present.
-    this.url = new URL(this.windowRef.nativeWindow.location.toString());
+    console.log('out: ' + this.windowRef.nativeWindow.location.href);
+    this.url = new URL(this.windowRef.nativeWindow.location.href);
     const searchParams = this.url.searchParams;
 
     if (searchParams.has('lang')) {

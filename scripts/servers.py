@@ -407,11 +407,13 @@ def managed_ng_build(
         use_prod_env: bool. Whether to compile for use in production.
         watch_mode: bool. Run the compiler in watch mode, which rebuilds on file
             change.
+
     Yields:
         psutil.Process. The ng compiler process.
 
     Raises:
-        OSError. First build never completed."""
+        OSError. First build never completed.
+    """
     compiler_args = [
         common.NG_BIN_PATH, 'build'
     ]
