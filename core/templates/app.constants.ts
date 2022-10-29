@@ -36,12 +36,6 @@ export const AppConstants = {
     I18N_SIGNUP_LOADING: 'Loading',
   },
 
-  DEFAULT_RESPONSES_TO_MISSPELLINGS_I18N_KEYS: {
-    RESPONSE_1: 'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_1',
-    RESPONSE_2: 'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_2',
-    RESPONSE_3: 'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_3',
-  },
-
   ACTIVITY_STATUS_PRIVATE: 'private',
   ACTIVITY_STATUS_PUBLIC: 'public',
 
@@ -114,6 +108,8 @@ export const AppConstants = {
   // Flag to toggle the support for a new state to direct the learners
   // to if they get stuck.
   DEST_IF_REALLY_STUCK_FEAT_ENABLED: false,
+
+  TEXTINPUT: 'TextInput',
 
   // The maximum number of nodes to show in a row of the state graph.
   MAX_NODES_PER_ROW: 4,

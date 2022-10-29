@@ -32,7 +32,7 @@ import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-pag
 import { State } from 'domain/state/StateObjectFactory';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { InteractionRuleInputs, TextInputRuleInputs } from 'interactions/rule-input-defs';
-import { hasEditDistanceEqualToTwo } from 'utility/string-utility';
+import { checkEditDistance } from 'utility/string-utility';
 
 export interface InteractionRulesService {
   [ruleName: string]: (
@@ -193,7 +193,8 @@ export class AnswerClassificationService {
     const normalizedInput = inputs.x.normalizedStrSet.map(
       input => input.toLowerCase());
     return normalizedInput.some(
-      input => hasEditDistanceEqualToTwo(input, normalizedAnswer));
+      input => checkEditDistance(input, normalizedAnswer,
+        ExplorationPlayerConstants.THRESHOLD_EDIT_DISTANCE_FOR_MISSPELLINGS));
   }
 
   isAnswerOnlyMisspelled(

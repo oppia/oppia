@@ -18,6 +18,7 @@
 
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
@@ -44,7 +45,6 @@ import { MisspelledAnswerResponseUtilityService } from './misspelled-answer-resp
 import { PlayerTranscriptService } from './player-transcript.service';
 import { StatsReportingService } from './stats-reporting.service';
 
-const TEXTINPUT: string = 'TextInput';
  @Injectable({
    providedIn: 'root'
  })
@@ -553,7 +553,7 @@ export class ExplorationEngineService {
     // Work => let catchMisspellingsFeatOn =
     // oldStateCard.getInteraction().customizationArgs.
 
-    if (oldInteractionId === TEXTINPUT && onSameCard) {
+    if (oldInteractionId === AppConstants.TEXTINPUT && onSameCard) {
       var answerIsOnlyMisspelled = this.answerClassificationService.
         isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
       if (answerIsOnlyMisspelled) {

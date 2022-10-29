@@ -17,20 +17,20 @@
  * checkpoint celebration feature.
  */
 
- import { Injectable } from '@angular/core';
- import { TranslateService } from '@ngx-translate/core';
+import { Injectable } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
 
  
- @Injectable({
-   providedIn: 'root'
- })
- export class MisspelledAnswerResponseUtilityService {
-   constructor(
-     private translateService: TranslateService
-   ) {}
+@Injectable({
+  providedIn: 'root'
+})
+export class MisspelledAnswerResponseUtilityService {
+  constructor(
+    private translateService: TranslateService
+  ) {}
  
-   getFeedbackHtmlWhenAnswerMisspelled(): string {
+  getFeedbackHtmlWhenAnswerMisspelled(): string {
     let availableKeyCount = ExplorationPlayerConstants.
       I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS.length;
     const randomKeyIndex = Math.floor(Math.random() * availableKeyCount);
@@ -38,5 +38,5 @@ import { ExplorationPlayerConstants } from '../exploration-player-page.constants
       ExplorationPlayerConstants.I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS[randomKeyIndex]
     );
   }
- }
+}
  

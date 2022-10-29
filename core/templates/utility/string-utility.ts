@@ -25,8 +25,11 @@ export function camelCaseFromHyphen(str: string): string {
     });
 }
 
-export function hasEditDistanceEqualToTwo(
-  inputString: string, matchString: string): boolean {
+export function checkEditDistance(
+  inputString: string,
+  matchString: string,
+  reqdEditDistance: number
+): boolean {
   if (inputString === matchString) {
     return true;
   }

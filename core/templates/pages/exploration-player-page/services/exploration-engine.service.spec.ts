@@ -41,7 +41,15 @@ import { PlayerTranscriptService } from './player-transcript.service';
 import { StatsReportingService } from './stats-reporting.service';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
+import { TranslateService } from '@ngx-translate/core';
+import { MisspelledAnswerResponseUtilityService } from './misspelled-answer-response-utility.service';
 
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams: Object | undefined): string {
+    return key;
+  }
+}
 
 describe('Exploration engine service ', () => {
   let alertsService: AlertsService;
@@ -65,8 +73,10 @@ describe('Exploration engine service ', () => {
   let paramChangeObjectFactory: ParamChangeObjectFactory;
   let textInputService: InteractionRulesService;
   let outcomeObjectFactory: OutcomeObjectFactory;
+  let misspelledAnswerResponseUtilityService: MisspelledAnswerResponseUtilityService;
 
   let explorationDict: ExplorationBackendDict;
+  let translateService: TranslateService;
   let paramChangeDict: ParamChangeBackendDict;
   let explorationBackendResponse: FetchExplorationBackendResponse;
   let explorationFeatures: ExplorationFeatures;
@@ -375,6 +385,13 @@ describe('Exploration engine service ', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
+      ],
+      providers: [
+        MisspelledAnswerResponseUtilityService,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
       ]
     });
 
@@ -402,6 +419,8 @@ describe('Exploration engine service ', () => {
     paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
     textInputService = TestBed.get(TextInputRulesService);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    translateService = TestBed.inject(TranslateService);
+    misspelledAnswerResponseUtilityService = TestBed.inject(MisspelledAnswerResponseUtilityService);
   });
 
   beforeEach(() => {

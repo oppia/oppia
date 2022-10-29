@@ -44,6 +44,9 @@ export const ExplorationPlayerConstants = {
     'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_1',
     'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_2'],
 
+  // Threshold value of edit dtsance for judging an answer as a misspelling.
+  THRESHOLD_EDIT_DISTANCE_FOR_MISSPELLINGS: 2,
+
   /* This should match the CSS class defined in the tutor card directive. */
   AUDIO_HIGHLIGHT_CSS_CLASS: 'conversation-skin-audio-highlight',
 
