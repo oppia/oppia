@@ -280,6 +280,7 @@ export default {
   },
 
   "ALLOWED_IMAGE_FORMATS": ["svg", "png", "jpeg", "jpg", "gif"],
+  "MAX_ALLOWED_IMAGE_SIZE_IN_KB": 100,
 
   "TASK_TYPE_HIGH_BOUNCE_RATE": "high_bounce_rate",
   "TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP": "ineffective_feedback_loop",
@@ -4947,6 +4948,8 @@ export default {
     "Welcome": "#992a2b"
   },
 
+  "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": ["tabs", "skillreview"],
+
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
   "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
 
@@ -6176,7 +6179,6 @@ export default {
 
   "OPPORTUNITY_TYPE_SKILL": "skill",
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
-  "OPPORTUNITY_TYPE_VOICEOVER": "voiceover",
 
   // The bucket name is set to app_default_bucket which is used to store files
   // in GCS when local development server is running. This should be changed
