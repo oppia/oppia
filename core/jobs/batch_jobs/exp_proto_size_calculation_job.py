@@ -111,7 +111,9 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
             ExplorationChange object.
         """
         exp_version = exp_model.version
-        if exp_version < exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION:
+        if (not hasattr(
+            exp_model, 'android_proto_size_in_bytes')
+                or exp_model.android_proto_size_in_bytes is None):
             exp_change = exp_domain.ExplorationChange({
                 'cmd': (
                     exp_domain.CMD_EDIT_EXPLORATION_PROPERTY),
@@ -196,93 +198,6 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
 
         return models_to_put_values
 
-    @staticmethod
-    def _update_exploration_opportunity_summary_models(
-        exp_id: str,
-        migrated_exp: exp_domain.Exploration,
-        exp_id_to_exp_opp_summary_model: Optional[Dict[
-            str,
-            opportunity_models.ExplorationOpportunitySummaryModel
-        ]] = None
-    ) -> Optional[opportunity_models.ExplorationOpportunitySummaryModel]:
-        """Generates newly updated exploration opportunity summary models.
-
-        Args:
-            exp_id: str. The ID of the exploration to be updated.
-            migrated_exp: Exploration. The updated exploration domain object.
-            exp_id_to_exp_opp_summary_model: ExplorationOpportunitySummaryModel.
-                The exploration opportunity summary model.
-
-        Returns:
-            sequence(BaseModel). Sequence of models which should be put into
-            the datastore.
-        """
-        exp_opp_summary_model = None
-        if (
-            exp_id_to_exp_opp_summary_model is not None and
-            exp_id in exp_id_to_exp_opp_summary_model
-        ):
-            content_count = migrated_exp.get_content_count()
-            translation_counts = migrated_exp.get_translation_counts()
-            complete_translation_language_list = (
-                migrated_exp.get_languages_with_complete_translation())
-
-            exp_opp_summary_model = (
-                exp_id_to_exp_opp_summary_model[migrated_exp.id])
-            exp_opp_summary = (
-                opportunity_services
-                    .get_exploration_opportunity_summary_from_model(
-                        exp_opp_summary_model))
-            exp_opp_summary.content_count = content_count
-            exp_opp_summary.translation_counts = translation_counts
-            exp_opp_summary.incomplete_translation_language_codes = (
-                utils.compute_list_difference(
-                    exp_opp_summary
-                    .incomplete_translation_language_codes,
-                    complete_translation_language_list))
-
-            new_languages_for_voiceover = (
-                set(complete_translation_language_list) - set(
-                exp_opp_summary.language_codes_with_assigned_voice_artists)
-            )
-
-            language_codes_needing_voice_artists_set = set(
-                exp_opp_summary.language_codes_needing_voice_artists)
-            language_codes_needing_voice_artists_set |= set(
-                new_languages_for_voiceover)
-
-            exp_opp_summary.language_codes_needing_voice_artists = list(
-                language_codes_needing_voice_artists_set)
-
-            exp_opp_summary.validate()
-
-            with datastore_services.get_ndb_context():
-                exp_opp_summary_model = (
-                    opportunity_models.ExplorationOpportunitySummaryModel(
-                        id=exp_opp_summary.id,
-                        topic_id=exp_opp_summary.topic_id,
-                        topic_name=exp_opp_summary.topic_name,
-                        story_id=exp_opp_summary.story_id,
-                        story_title=exp_opp_summary.story_title,
-                        chapter_title=exp_opp_summary.chapter_title,
-                        content_count=exp_opp_summary.content_count,
-                        incomplete_translation_language_codes=(
-                            exp_opp_summary
-                                .incomplete_translation_language_codes),
-                        translation_counts=exp_opp_summary.translation_counts,
-                        language_codes_needing_voice_artists=(
-                            exp_opp_summary
-                                .language_codes_needing_voice_artists),
-                        language_codes_with_assigned_voice_artists=(
-                            exp_opp_summary
-                                .language_codes_with_assigned_voice_artists)
-                    )
-                )
-
-            datastore_services.update_timestamps_multi([exp_opp_summary_model])
-
-        return exp_opp_summary_model
-
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the exploration migration.
 
@@ -297,8 +212,6 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
                 ndb_io.GetModels(
                     exp_models.ExplorationModel.get_all(
                         include_deleted=False)))
-            # Pylint disable is needed because pylint is not able to correctly
-            # detect that the value is passed through the pipe.
             | 'Add exploration keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
                 lambda exp_model: exp_model.id)
             # TODO(#15871): This filter should be removed after the explorations
@@ -345,13 +258,12 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
             }
             | 'Merge object' >> beam.CoGroupByKey()
             | 'Get rid ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Remove unmigrated exploration object' >> beam.Filter(
+            | 'Remove error exploration object' >> beam.Filter(
         lambda x: len(x['exploration']) > 0)
             | 'Reorganize the exploration object' >> beam.Map(lambda objects: {
                 'exp_model': objects['exp_model'][0],
                 'exploration': objects['exploration'][0]}))
 
-        # exp_id_to_migrated_exp = beam.pvalue.AsDict(migrated_exp)
         exp_changes = (
                 migrated_exploration_object_list
                 | 'Generate exploration changes' >> beam.FlatMap(
@@ -370,6 +282,11 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
             }
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
+            | 'Remove unmigrated explorations objects' >> beam.Filter(
+                lambda x: (
+                        len(x['exp_changes']) > 0 and
+                        len(x['exploration']) > 0
+                ))
             | 'Reorganize the exploration objects' >> beam.Map(lambda objects: {
                 'exp_model': objects['exp_model'][0],
                 'exploration': objects['exploration'][0],
@@ -406,6 +323,17 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
                         'CACHE DELETION'))
         )
 
+        already_migrated_job_run_results = (
+                exp_objects_list
+                | 'Remove migrated explorations' >> beam.Filter(
+            lambda x: (
+                    len(x['exp_changes']) == 0 and len(x['exploration']) > 0
+            ))
+                | 'Transform previously migrated exps into job run results' >> (
+                    job_result_transforms.CountObjectsToJobRunResult(
+                        'EXP PREVIOUSLY MIGRATED'))
+        )
+
         unused_put_results = (
             exp_models_to_put
             # | 'Merge models' >> beam.Flatten()
@@ -418,7 +346,8 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
             (
                 cache_deletion_job_run_results,
                 migrated_exploration_job_run_results,
-                exp_objects_list_job_run_results,
+                already_migrated_job_run_results,
+                exp_objects_list_job_run_results
             )
             | beam.Flatten()
         )
