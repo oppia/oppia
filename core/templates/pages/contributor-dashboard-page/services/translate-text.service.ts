@@ -179,18 +179,17 @@ export class TranslateTextService {
           contentIds.push(contentId);
           let interactionId = translatableItem.interactionId;
           let ruleType = translatableItem.ruleType;
-          // if (interactionId && ruleType) {
-            this.stateAndContent.push(
-              new StateAndContent(
-                stateName, contentId,
-                translatableItem.content,
-                this.PENDING,
+          this.stateAndContent.push(
+            new StateAndContent(
+              stateName, contentId,
+              translatableItem.content,
+              this.PENDING,
                 this._isSetDataFormat(translatableItem.dataFormat) ? [] : '',
                 translatableItem.dataFormat,
                 translatableItem.contentType,
                 interactionId, ruleType
-              )
-            );
+            )
+          );
           // }
           stateHasText = true;
         }

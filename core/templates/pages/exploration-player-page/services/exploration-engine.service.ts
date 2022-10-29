@@ -115,10 +115,7 @@ export class ExplorationEngineService {
 
     if (explorationContext) {
       this._explorationId = this.contextService.getExplorationId();
-      const version = this.urlService.getExplorationVersionFromUrl();
-      // if (version) {
-        this.version = version;
-      // }
+      this.version = this.urlService.getExplorationVersionFromUrl();
       this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
       this._questionPlayerMode = this.contextService.isInQuestionPlayerMode();
       if (
@@ -278,14 +275,12 @@ export class ExplorationEngineService {
       throw new Error('Content id not found.');
     }
 
-    // if (interactionHtml) {
     let initialCard = StateCard.createNewCard(
       this.currentStateName, questionHtml, interactionHtml,
       interaction, initialState.recordedVoiceovers,
       initialState.writtenTranslations, contentId,
       this.audioTranslationLanguageService);
     successCallback(initialCard, nextFocusLabel);
-    // }
   }
 
   // Initialize the parameters in the exploration as specified in the
