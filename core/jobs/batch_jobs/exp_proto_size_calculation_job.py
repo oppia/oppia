@@ -42,7 +42,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
 
-(base_models, exp_models, opportunity_models) = (
+(base_models, exp_models) = (
     models.Registry.import_models(
         [models.Names.BASE_MODEL, models.Names.EXPLORATION]))
 datastore_services = models.Registry.import_datastore_services()
@@ -319,12 +319,31 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
                         'CACHE DELETION'))
         )
 
+        already_migrated_exp_objects = (
+            {
+                'exp_model': unmigrated_exploration_models,
+                'exp_rights_model': exp_rights_models,
+                'exploration': migrated_exp,
+                'exp_changes': exp_changes
+            }
+            | 'Merge already migrated objects' >> beam.CoGroupByKey()
+            | 'Get rid of IDs' >> beam.Values() # pylint: disable=no-value-for-parameter
+            | 'Remove migrated explorations objects' >> beam.Filter(
+                lambda x: (
+                        len(x['exp_changes']) == 0 and
+                        len(x['exploration']) > 0
+                ))
+            | 'Reorganize already migrated exploration objects' >> beam.Map(
+                lambda objects: {
+                    'exp_model': objects['exp_model'][0],
+                    'exploration': objects['exploration'][0],
+                    'exp_changes': objects['exp_changes'],
+                    'exp_rights_model': objects['exp_rights_model'][0]
+            })
+        )
+
         already_migrated_job_run_results = (
-                exp_objects_list
-                | 'Remove migrated explorations' >> beam.Filter(
-            lambda x: (
-                    len(x['exp_changes']) == 0 and len(x['exploration']) > 0
-            ))
+                already_migrated_exp_objects
                 | 'Transform previously migrated exps into job run results' >> (
                     job_result_transforms.CountObjectsToJobRunResult(
                         'EXP PREVIOUSLY MIGRATED'))
