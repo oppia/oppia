@@ -2053,24 +2053,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertIn('exp1', contributions.created_exploration_ids)
 
-    def test_add_created_exploration_id_creates_user_contribution(self) -> None:
-        user_id = 'id_x'
-
-        pre_add_contributions = user_services.get_user_contributions(
-            user_id, strict=False
-        )
-        self.assertIsNone(pre_add_contributions)
-        assert pre_add_contributions is not None
-
-        pre_add_contributions.add_created_exploration_id('exp1')
-        user_services.save_user_contributions(pre_add_contributions)
-        contributions = user_services.get_user_contributions(
-            user_id, strict=True
-        )
-
-        self.assertIsInstance(contributions, user_domain.UserContributions)
-        self.assertIn('exp1', contributions.created_exploration_ids)
-
     def test_add_edited_exploration_id(self) -> None:
         auth_id = 'someUser'
         user_email = 'user@example.com'
@@ -2087,25 +2069,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_id, strict=True
         )
         self.assertIn('exp1', contributions.edited_exploration_ids)
-
-    def test_add_edited_exploration_id_creates_user_contribution(self) -> None:
-        user_id = 'id_x'
-
-        pre_add_contributions = user_services.get_user_contributions(user_id)
-        self.assertIsNone(pre_add_contributions)
-        assert pre_add_contributions is not None
-
-        pre_add_contributions.add_edited_exploration_id('exp1')
-        user_services.save_user_contributions(pre_add_contributions)
-
-        contributions = user_services.get_user_contributions(
-            user_id, strict=True
-        )
-
-        self.assertIsInstance(contributions, user_domain.UserContributions)
-        self.assertEqual(
-            ['exp1'],
-            contributions.edited_exploration_ids)
 
     def test_is_moderator(self) -> None:
         auth_id = 'someUser'

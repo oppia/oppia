@@ -341,7 +341,6 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 states_vh_at_v1, metadata_vh_at_v1, committer_ids_at_v1
             )
             vh_model_at_v1.update_timestamps()
-            vh_model_at_v1.put()
             version_history_models[0] = vh_model_at_v1
 
             for version in range(2, exp_version + 1):
@@ -437,7 +436,6 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                             new_states_vh, new_metadata_vh, new_committer_ids
                         )
                         new_vh_model.update_timestamps()
-                        new_vh_model.put()
                         version_history_models[version - 1] = new_vh_model
                     except Exception as e:
                         logging.info('For exploration %s' % (exp_id))

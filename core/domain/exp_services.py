@@ -1223,7 +1223,7 @@ def get_updated_version_history_model(
     committer_id: str,
     old_states: Dict[str, state_domain.State],
     old_metadata: exp_domain.ExplorationMetadata
-) -> exp_models.ExplorationVersionHistoryModel:
+) -> Optional[exp_models.ExplorationVersionHistoryModel]:
     """Returns an updated ExplorationVersionHistoryModel for the new version
     of the exploration (after the commit).
 
@@ -1239,75 +1239,70 @@ def get_updated_version_history_model(
 
     Returns:
         ExplorationVersionHistoryModel. The updated version history model.
-
-    Raises:
-        Exception. The exploration version history model is not found.
     """
     version_history_model_id = (
         exp_models.ExplorationVersionHistoryModel.get_instance_id(
             exploration.id, exploration.version - 1))
     version_history_model = exp_models.ExplorationVersionHistoryModel.get(
         version_history_model_id, strict=False)
-    if version_history_model is None:
-        raise Exception(
-            'ExplorationVersionHistoryModel does not exist for '
-            'exploration id %s and version %s'
-            % (exploration.id, exploration.version - 1)
+
+    # TODO(#16433): Remove this check once version history models are generated
+    # for all exploration versions.
+    if version_history_model is not None:
+        old_states_dict = {
+            state_name: state.to_dict()
+            for state_name, state in old_states.items()
+        }
+        new_states_dict = {
+            state_name: state.to_dict()
+            for state_name, state in exploration.states.items()
+        }
+        old_metadata_dict = old_metadata.to_dict()
+        new_metadata_dict = exploration.get_metadata().to_dict()
+        states_version_history = {
+            state_name: state_domain.StateVersionHistory.from_dict(
+                state_version_history_dict)
+            for state_name, state_version_history_dict in (
+                version_history_model.state_version_history.items())
+        }
+        metadata_version_history = exp_domain.MetadataVersionHistory(
+            version_history_model.metadata_last_edited_version_number,
+            version_history_model.metadata_last_edited_committer_id)
+
+        updated_states_version_history = update_states_version_history(
+            states_version_history, change_list, old_states_dict,
+            new_states_dict, exploration.version, committer_id
         )
+        updated_metadata_version_history = update_metadata_version_history(
+            metadata_version_history, change_list, old_metadata_dict,
+            new_metadata_dict, exploration.version, committer_id)
+        updated_committer_ids = get_updated_committer_ids(
+            updated_states_version_history,
+            updated_metadata_version_history.last_edited_committer_id)
 
-    old_states_dict = {
-        state_name: state.to_dict()
-        for state_name, state in old_states.items()
-    }
-    new_states_dict = {
-        state_name: state.to_dict()
-        for state_name, state in exploration.states.items()
-    }
-    old_metadata_dict = old_metadata.to_dict()
-    new_metadata_dict = exploration.get_metadata().to_dict()
-    states_version_history = {
-        state_name: state_domain.StateVersionHistory.from_dict(
-            state_version_history_dict)
-        for state_name, state_version_history_dict in (
-            version_history_model.state_version_history.items())
-    }
-    metadata_version_history = exp_domain.MetadataVersionHistory(
-        version_history_model.metadata_last_edited_version_number,
-        version_history_model.metadata_last_edited_committer_id)
-
-    updated_states_version_history = update_states_version_history(
-        states_version_history, change_list, old_states_dict,
-        new_states_dict, exploration.version, committer_id
-    )
-    updated_metadata_version_history = update_metadata_version_history(
-        metadata_version_history, change_list, old_metadata_dict,
-        new_metadata_dict, exploration.version, committer_id)
-    updated_committer_ids = get_updated_committer_ids(
-        updated_states_version_history,
-        updated_metadata_version_history.last_edited_committer_id)
-
-    updated_version_history_model_id = (
-        exp_models.ExplorationVersionHistoryModel.get_instance_id(
-            exploration.id, exploration.version))
-    updated_version_history_model = (
-        exp_models.ExplorationVersionHistoryModel(
-            id=updated_version_history_model_id,
-            exploration_id=exploration.id,
-            exploration_version=exploration.version,
-            state_version_history={
-                state_name: version_history.to_dict()
-                for state_name, version_history in (
-                    updated_states_version_history.items())
-            },
-            metadata_last_edited_version_number=(
-                updated_metadata_version_history.last_edited_version_number
-            ),
-            metadata_last_edited_committer_id=(
-                updated_metadata_version_history.last_edited_committer_id
-            ),
-            committer_ids=updated_committer_ids
-        ))
-    return updated_version_history_model
+        updated_version_history_model_id = (
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                exploration.id, exploration.version))
+        updated_version_history_model = (
+            exp_models.ExplorationVersionHistoryModel(
+                id=updated_version_history_model_id,
+                exploration_id=exploration.id,
+                exploration_version=exploration.version,
+                state_version_history={
+                    state_name: version_history.to_dict()
+                    for state_name, version_history in (
+                        updated_states_version_history.items())
+                },
+                metadata_last_edited_version_number=(
+                    updated_metadata_version_history.last_edited_version_number
+                ),
+                metadata_last_edited_committer_id=(
+                    updated_metadata_version_history.last_edited_committer_id
+                ),
+                committer_ids=updated_committer_ids
+            ))
+        return updated_version_history_model
+    return None
 
 
 def _compute_models_for_updating_exploration(
@@ -1365,7 +1360,7 @@ def _compute_models_for_updating_exploration(
     change_list_dict = [change.to_dict() for change in change_list]
     models_to_put.extend(
         exploration_model.get_models_to_put_values(
-            feconf.MIGRATION_BOT_USERNAME,
+            committer_id,
             commit_message,
             change_list_dict,
         )
@@ -1388,8 +1383,8 @@ def _compute_models_for_updating_exploration(
         old_states,
         old_metadata
     )
-
-    models_to_put.append(version_history_model)
+    if version_history_model is not None:
+        models_to_put.append(version_history_model)
 
     # Trigger statistics model update.
     new_exp_stats = stats_services.get_stats_for_new_exp_version(
@@ -2062,6 +2057,7 @@ def update_exploration(
 
     datastore_services.update_timestamps_multi(models_to_put)
     datastore_services.put_multi(models_to_put)
+    index_explorations_given_ids([exploration_id])
 
 
 def compute_models_to_put_when_saving_new_exp_version(
@@ -2135,13 +2131,7 @@ def compute_models_to_put_when_saving_new_exp_version(
     updated_exploration = apply_change_list(exploration_id, change_list)
     if get_story_id_linked_to_exploration(exploration_id) is not None:
         validate_exploration_for_story(updated_exploration, True)
-    exploration_rights = rights_manager.get_exploration_rights(
-        updated_exploration.id
-    )
-    exploration_is_public = (
-        exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
-    )
-    updated_exploration.validate(strict=exploration_is_public)
+    updated_exploration.validate(strict=is_public)
     models_to_put.extend(
         _compute_models_for_updating_exploration(
             committer_id,
@@ -2201,6 +2191,7 @@ def compute_models_to_put_when_saving_new_exp_version(
         exp_fetchers.get_exploration_summary_from_model(exp_summary_model),
         skip_exploration_model_last_updated=True
     )
+    exp_summary.add_contribution_by_user(committer_id)
     exp_summary.version += 1
     updated_exp_summary_model: exp_models.ExpSummaryModel = (
         populate_exp_summary_model_fields(
