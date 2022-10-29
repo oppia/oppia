@@ -110,9 +110,8 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
             (str, ExplorationChange). Tuple containing exploration ID and
             ExplorationChange object.
         """
-        exp_version = exp_model.version
-        if (not hasattr(
-            exp_model, 'android_proto_size_in_bytes')
+        if (
+            not hasattr(exp_model, 'android_proto_size_in_bytes')
                 or exp_model.android_proto_size_in_bytes is None):
             exp_change = exp_domain.ExplorationChange({
                 'cmd': (
@@ -350,4 +349,190 @@ class PopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
                 exp_objects_list_job_run_results
             )
             | beam.Flatten()
+        )
+
+
+class AuditPopulateExplorationProtoSizeInBytesJob(base_jobs.JobBase):
+    """Job that audits PopulateExplorationProtoSizeInBytesJob"""
+
+    @staticmethod
+    def _count_exp_with_non_zero_attribute(
+            exp_id: str,
+            exp_model: exp_models.ExplorationModel
+    ) -> result.Result[
+        Tuple[str, exp_domain.Exploration],
+        Tuple[str, Exception]
+    ]:
+        """Counts the number of exploration models with
+        proto_size_in_bytes as a non-zero attribute.
+
+         Args:
+             exp_id: str. The ID of the exploration.
+             exp_model: ExplorationModel. The exploration model.
+
+        Returns:
+            Result((str, Exploration), (str, Exception)). Result containing
+            tuple that consists of exploration ID and either ExplorationModel object
+            or Exception.
+         """
+        with datastore_services.get_ndb_context():
+            if (
+                exp_model.android_proto_size_in_bytes is not None
+                    and exp_model.android_proto_size_in_bytes != 0):
+                return result.Ok((exp_id, exp_model))
+
+        return result.Err((exp_id, exp_model))
+
+    @staticmethod
+    def _count_exp_without_attribute(
+            exp_id: str,
+            exp_model: exp_models.ExplorationModel
+    ) -> result.Result[
+        Tuple[str, exp_domain.Exploration],
+        Tuple[str, Exception]
+    ]:
+        """Counts the number of exploration models without
+        proto_size_in_bytes attribute.
+
+         Args:
+             exp_id: str. The ID of the exploration.
+             exp_model: ExplorationModel. The exploration model.
+
+        Returns:
+            Result((str, Exploration), (str, Exception)). Result containing
+            tuple that consists of exploration ID and either ExplorationModel object
+            or Exception.
+         """
+        if not hasattr(exp_model, 'android_proto_size_in_bytes'):
+            return result.Ok((exp_id, exp_model))
+
+        return result.Err((exp_id, exp_model))
+
+    @staticmethod
+    def _count_exp_with_none_attribute(
+            exp_id: str,
+            exp_model: exp_models.ExplorationModel
+    ) -> result.Result[
+        Tuple[str, exp_domain.Exploration],
+        Tuple[str, Exception]
+    ]:
+        """Counts the number of exploration models with
+        proto_size_in_bytes attribute as none.
+
+         Args:
+             exp_id: str. The ID of the exploration.
+             exp_model: ExplorationModel. The exploration model.
+
+        Returns:
+            Result((str, Exploration), (str, Exception)). Result containing
+            tuple that consists of exploration ID and either ExplorationModel object
+            or Exception.
+         """
+        if (
+            hasattr(exp_model, 'android_proto_size_in_bytes')
+                and exp_model.android_proto_size_in_bytes is None):
+            return result.Ok((exp_id, exp_model))
+
+        return result.Err((exp_id, exp_model))
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the audit of exploration
+        proto size population migration.
+
+        Returns:
+            PCollection. A PCollection of results from the exploration
+            migration.
+        """
+
+        unmigrated_exploration_models = (
+                self.pipeline
+                | 'Get all non-deleted exploration models' >> (
+                    ndb_io.GetModels(
+                        exp_models.ExplorationModel.get_all(
+                            include_deleted=False)))
+                # Pylint disable is needed because pylint is not able to correctly
+                # detect that the value is passed through the pipe.
+                | 'Add exploration keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+            lambda exp_model: exp_model.id)
+                # TODO(#15871): This filter should be removed after the explorations
+                # are fixed and it is possible to migrate them.
+                | 'Remove broken exploration' >> beam.Filter(
+            lambda id_and_exp: id_and_exp[0] not in (
+                'umPkwp0L1M0-', '670bU6d9JGBh'))
+        )
+
+        total_exploration_objects_list = (
+            {
+                'exp_model': unmigrated_exploration_models
+            }
+            | 'Merge objects' >> beam.CoGroupByKey()
+            | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
+        )
+
+        total_exploration_objects_results = (
+            total_exploration_objects_list
+            | 'Transform exp model objects to number of results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'Total number of exploration models'))
+        )
+
+        migrated_exp_results = (
+                unmigrated_exploration_models
+                | 'Count non-zero attribute' >> beam.MapTuple(  # pylint: disable=no-value-for-parameter
+                self._count_exp_with_non_zero_attribute
+        )
+        )
+
+        migrated_exp_job_run_results = (
+                migrated_exp_results
+                | 'Filter ok explorations' >> beam.Filter(
+                    lambda result_item: result_item.is_ok())
+                | 'Results for explorations with attribute ' >> (
+                    job_result_transforms.ResultsToJobRunResults(
+                        'Explorations with non-zero proto_size_in_bytes'
+                        ' attribute'))
+        )
+
+        exp_without_attr_results = (
+                unmigrated_exploration_models
+                | 'Count models without the attribute' >> beam.MapTuple(  # pylint: disable=no-value-for-parameter
+                self._count_exp_without_attribute
+            )
+        )
+
+        exp_without_attr_job_results = (
+            exp_without_attr_results
+            | 'Filter oks for exp without attribute' >> beam.Filter(
+            lambda result_item: result_item.is_ok())
+            | 'Generate results for exp without attribute' >> (
+                    job_result_transforms.ResultsToJobRunResults(
+                        'Explorations without android_proto_size_in_bytes'
+                        ' attribute'))
+        )
+
+        exp_with_none_attr_results = (
+                unmigrated_exploration_models
+                | 'Count models with None the attribute' >> beam.MapTuple(  # pylint: disable=no-value-for-parameter
+            self._count_exp_with_none_attribute
+        )
+        )
+
+        exp_with_none_attr_job_results = (
+                exp_with_none_attr_results
+                | 'Filter oks for exp with None attribute' >> beam.Filter(
+                    lambda result_item: result_item.is_ok())
+                | 'Generate results for exp with None attribute' >> (
+                    job_result_transforms.ResultsToJobRunResults(
+                        'Explorations with android_proto_size_in_bytes'
+                        ' attribute as None'))
+        )
+
+        return (
+                (
+                    total_exploration_objects_results,
+                    exp_without_attr_job_results,
+                    migrated_exp_job_run_results,
+                    exp_with_none_attr_job_results
+                )
+                | beam.Flatten()
         )
