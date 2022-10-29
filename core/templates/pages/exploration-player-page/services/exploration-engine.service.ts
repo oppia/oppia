@@ -116,9 +116,9 @@ export class ExplorationEngineService {
     if (explorationContext) {
       this._explorationId = this.contextService.getExplorationId();
       const version = this.urlService.getExplorationVersionFromUrl();
-      if (version) {
+      // if (version) {
         this.version = version;
-      }
+      // }
       this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
       this._questionPlayerMode = this.contextService.isInQuestionPlayerMode();
       if (
@@ -273,10 +273,10 @@ export class ExplorationEngineService {
         this.exploration.initStateName, newParams);
     }
 
-    if (interactionHtml === null) {
-      this.alertsService.addWarning('Expression parsing error.');
-      return;
-    }
+    // if (interactionHtml === null) {
+    //   this.alertsService.addWarning('Expression parsing error.');
+    //   return;
+    // }
 
     let contentId = initialState.content.contentId;
     if (contentId === null) {
