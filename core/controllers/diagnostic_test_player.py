@@ -24,7 +24,7 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.domain import topic_services
 
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 
 class DiagnosticTestPlayerPage(base.BaseHandler):
@@ -88,7 +88,7 @@ class DiagnosticTestQuestionsHandler(base.BaseHandler):
         # asked otherwise not. The main question and the backup question are of
         # the same difficulty.
         skill_id_to_questions_dict: Dict[
-            str, Dict[str, List[question_domain.QuestionDict]]] = {}
+            str, Dict[str, question_domain.QuestionDict]] = {}
 
         for skill_id in diagnostic_test_skill_ids:
             skill_id_to_questions_dict[skill_id] = {}
