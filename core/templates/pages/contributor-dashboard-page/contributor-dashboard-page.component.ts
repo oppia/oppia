@@ -211,7 +211,7 @@ export class ContributorDashboardPageComponent
         }
         this.topicName = topicNames[0];
         if (
-          // prevSelectedTopicName &&
+          prevSelectedTopicName &&
           topicNames.indexOf(prevSelectedTopicName) !== -1
         ) {
           this.topicName = prevSelectedTopicName;
