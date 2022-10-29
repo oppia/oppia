@@ -10,6 +10,8 @@
 #
 apache-beam[gcp]==2.38.0
     # via -r requirements.in
+appdirs==1.4.4
+    # via fs
 attrs==20.3.0
     # via pytest
 beautifulsoup4==4.10.0
@@ -27,8 +29,6 @@ certifi==2021.5.30
     #   -r requirements.in
     #   elasticsearch
     #   requests
-cffi==1.14.5
-    # via google-crc32c
 charset-normalizer==2.0.4
     # via requests
 cloudpickle==2.0.0
@@ -51,7 +51,11 @@ fasteners==0.16
     # via google-apitools
 firebase-admin==5.2.0
     # via -r requirements.in
+fs==2.4.16
+    # via gcp-storage-emulator
 future==0.18.2
+    # via -r requirements.in
+gcp-storage-emulator==2022.6.11
     # via -r requirements.in
 google-api-core[grpc,grpcgcp]==1.31.2
     # via
@@ -150,8 +154,10 @@ google-cloud-videointelligence==1.16.1
     # via apache-beam
 google-cloud-vision==1.0.0
     # via apache-beam
-google-crc32c==1.1.2
-    # via google-resumable-media
+google-crc32c==1.3.0
+    # via
+    #   gcp-storage-emulator
+    #   google-resumable-media
 google-resumable-media==1.3.3
     # via
     #   google-cloud-bigquery
@@ -281,8 +287,6 @@ pyasn1-modules==0.2.8
     # via
     #   google-auth
     #   oauth2client
-pycparser==2.20
-    # via cffi
 pydot==1.4.2
     # via apache-beam
 pylatexenc==2.10
@@ -344,6 +348,7 @@ six==1.16.0
     #   -r requirements.in
     #   bleach
     #   fasteners
+    #   fs
     #   google-api-core
     #   google-api-python-client
     #   google-apitools
