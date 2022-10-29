@@ -634,7 +634,7 @@ describe('Exploration engine service ', () => {
         alertsService, 'addWarning').and.callThrough();
       spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
       spyOn(explorationEngineService, 'makeParams')
-        .and.returnValue(null);
+        .and.returnValue({});
 
       explorationEngineService.init(
         explorationDict, 1, null, true, ['en'], initSuccessCb);

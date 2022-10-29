@@ -171,7 +171,7 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.onSaveStateContent.emit($event);
   }
 
-  updateInteractionVisibility(newInteractionId: string | null): void {
+  updateInteractionVisibility(newInteractionId: string): void {
     this.interactionIdIsSet = Boolean(newInteractionId);
     this.currentInteractionCanHaveSolution = Boolean(
       this.interactionIdIsSet &&
@@ -216,12 +216,6 @@ export class StateEditorComponent implements OnInit, OnDestroy {
           }
           this.stateData = stateData;
           this.stateName = this.stateEditorService.getActiveStateName();
-          if (this.stateName === null) {
-            throw new Error(
-              'Expected stateName to be defined but ' +
-              'received ' + this.stateName);
-          }
-          let interactionId = this.stateData.interaction.id;
           this.stateEditorService.setInteraction(stateData.interaction);
           this.stateContentService.init(
             this.stateName, stateData.content);
@@ -230,7 +224,7 @@ export class StateEditorComponent implements OnInit, OnDestroy {
           this.stateHintsService.init(
             this.stateName, stateData.interaction.hints);
           this.stateInteractionIdService.init(
-            this.stateName, interactionId);
+            this.stateName, stateData.interaction.id);
           this.stateCustomizationArgsService.init(
             this.stateName, stateData.interaction.customizationArgs);
           this.stateNextContentIdIndexService.init(
@@ -244,7 +238,7 @@ export class StateEditorComponent implements OnInit, OnDestroy {
             this.stateName, stateData.cardIsCheckpoint);
           this.stateSolutionService.init(
             this.stateName, stateData.interaction.solution);
-          this.updateInteractionVisibility(interactionId);
+          this.updateInteractionVisibility(stateData.interaction.id);
           this.servicesInitialized = true;
         }
       )

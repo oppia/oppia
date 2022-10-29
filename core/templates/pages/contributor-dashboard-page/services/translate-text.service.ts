@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { ImagesData } from 'services/image-local-storage.service';
 
 import { TranslateTextBackendApiService } from './translate-text-backend-api.service';
-import { StateNamesToContentIdMapping, TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
+import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
@@ -59,24 +59,20 @@ export class StateAndContent {
   providedIn: 'root'
 })
 export class TranslateTextService {
-  // This property is initialized using int method and we need to do
-  // non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  activeExpId!: string;
-  activeExpVersion!: string;
-  // Below properties are null for the first time when the page is loaded.
-  activeContentId!: string | null;
-  activeStateName!: string | null;
-  activeContentText!: string | string[] | null;
-  activeContentStatus!: Status;
-  STARTING_INDEX: number = -1;
-  PENDING: Status = 'pending';
-  SUBMITTED: Status = 'submitted';
-  stateWiseContents: StateNamesToContentIdMapping = {};
-  stateWiseContentIds: Record<string, string[]> = {};
-  stateNamesList: string[] = [];
-  stateAndContent: StateAndContent[] = [];
+  STARTING_INDEX = -1;
+  PENDING = 'pending';
+  SUBMITTED = 'submitted';
+  stateWiseContents = {};
+  stateWiseContentIds = {};
+  stateNamesList = [];
+  stateAndContent = [];
   activeIndex = this.STARTING_INDEX;
+  activeExpId;
+  activeExpVersion;
+  activeContentId;
+  activeStateName: string;
+  activeContentText: string;
+  activeContentStatus: Status;
 
   constructor(
     private translateTextBackedApiService:
@@ -85,7 +81,7 @@ export class TranslateTextService {
 
   private _getNextText(): string | string[] {
     if (this.stateAndContent.length === 0) {
-      return [];
+      return null;
     }
     this.activeIndex += 1;
     this.activeStateName = this.stateAndContent[this.activeIndex].stateName;
@@ -97,7 +93,7 @@ export class TranslateTextService {
 
   private _getPreviousText(): string | string[] {
     if (this.stateAndContent.length === 0 || this.activeIndex <= 0) {
-      return [];
+      return null;
     }
     this.activeIndex -= 1;
     this.activeStateName = this.stateAndContent[this.activeIndex].stateName;
@@ -161,7 +157,7 @@ export class TranslateTextService {
     this.activeContentId = null;
     this.activeStateName = null;
     this.activeContentText = null;
-    this.activeContentStatus = this.PENDING;
+    this.activeContentStatus = this.PENDING as Status;
     this.activeExpId = expId;
     this.translateTextBackedApiService.getTranslatableTextsAsync(
       expId, languageCode).then((translatableTexts: TranslatableTexts) => {
@@ -169,7 +165,7 @@ export class TranslateTextService {
       this.activeExpVersion = translatableTexts.explorationVersion;
       for (const stateName in this.stateWiseContents) {
         let stateHasText: boolean = false;
-        const contentIds: string[] = [];
+        const contentIds = [];
         const contentIdToContentMapping = this.stateWiseContents[stateName];
         for (const contentId in contentIdToContentMapping) {
           const translatableItem = contentIdToContentMapping[contentId];
@@ -177,20 +173,18 @@ export class TranslateTextService {
             continue;
           }
           contentIds.push(contentId);
-          let interactionId = translatableItem.interactionId;
-          let ruleType = translatableItem.ruleType;
           this.stateAndContent.push(
             new StateAndContent(
               stateName, contentId,
               translatableItem.content,
-              this.PENDING,
-                this._isSetDataFormat(translatableItem.dataFormat) ? [] : '',
-                translatableItem.dataFormat,
-                translatableItem.contentType,
-                interactionId, ruleType
+              this.PENDING as Status,
+              this._isSetDataFormat(translatableItem.dataFormat) ? [] : '',
+              translatableItem.dataFormat,
+              translatableItem.contentType,
+              translatableItem.interactionId,
+              translatableItem.ruleType
             )
           );
-          // }
           stateHasText = true;
         }
 
@@ -214,8 +208,7 @@ export class TranslateTextService {
       translation = ''
     } = { ...this.stateAndContent[this.activeIndex] };
     return this._getUpdatedTextToTranslate(
-      text, this._isMoreTextAvailableForTranslation(), status,
-      translation as string);
+      text, this._isMoreTextAvailableForTranslation(), status, translation);
   }
 
   getPreviousTextToTranslate(): TranslatableItem {
@@ -225,17 +218,13 @@ export class TranslateTextService {
       translation = ''
     } = { ...this.stateAndContent[this.activeIndex] };
     return this._getUpdatedTextToTranslate(
-      text, this._isPreviousTextAvailableForTranslation(), status,
-      translation as string);
+      text, this._isPreviousTextAvailableForTranslation(), status, translation);
   }
 
   suggestTranslatedText(
       translation: string | string[], languageCode: string, imagesData:
       ImagesData[], dataFormat: string, successCallback: () => void,
       errorCallback: (reason: string) => void): void {
-    if (!this.activeContentId || !this.activeStateName) {
-      throw new Error('Active content id or state name is not set.');
-    }
     this.translateTextBackedApiService.suggestTranslatedTextAsync(
       this.activeExpId,
       this.activeExpVersion,

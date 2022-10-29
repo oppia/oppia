@@ -54,22 +54,15 @@ export class ExplorationPlayerStateService {
   private _oppiaFeedbackAvailableEventEmitter: EventEmitter<void> = (
     new EventEmitter());
 
+  currentEngineService: ExplorationEngineService | QuestionPlayerEngineService;
   explorationMode: string = ExplorationPlayerConstants.EXPLORATION_MODE.OTHER;
-  // These properties are initialized using private method and we need to do
-  // non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  currentEngineService!: ExplorationEngineService | QuestionPlayerEngineService;
-  editorPreviewMode!: boolean;
-  questionPlayerMode!: boolean;
-  explorationId!: string;
-  // Null if an exploration version can't be retrieved from the URL.
-  version!: number | null;
-  // Null if story url fragment can't be retrieved from the URL.
-  storyUrlFragment!: string | null;
-  lastCompletedCheckpoint!: string;
+  editorPreviewMode: boolean;
+  questionPlayerMode: boolean;
+  explorationId: string;
+  version: number | null;
+  storyUrlFragment: string;
+  lastCompletedCheckpoint: string;
   isLoggedOutProgressTracked: boolean = false;
-  // Unique progress tracking ID is null until the first state of the
-  // exploration is loaded.
   uniqueProgressUrlId: string | null = null;
   private _playerStateChangeEventEmitter: EventEmitter<string> = (
     new EventEmitter<string>());
@@ -121,7 +114,7 @@ export class ExplorationPlayerStateService {
       this.explorationId = this.contextService.getExplorationId();
       this.version = this.urlService.getExplorationVersionFromUrl();
 
-      if (!this.questionPlayerMode && this.version &&
+      if (!this.questionPlayerMode &&
       !('skill_editor' === this.urlService.getPathname()
         .split('/')[1].replace(/"/g, "'"))) {
         this.readOnlyExplorationBackendApiService.loadExplorationAsync(
@@ -144,15 +137,13 @@ export class ExplorationPlayerStateService {
       arePretestsAvailable: boolean,
       callback: (stateCard: StateCard, str: string) => void
   ): void {
-    let collectionUrl = this.urlService.getCollectionIdFromExplorationUrl();
     // For some cases, version is set only after
     // ReadOnlyExplorationBackendApiService.loadExploration() has completed.
     // Use returnDict.version for non-null version value.
-    // if (collectionUrl) {
-      this.statsReportingService.initSession(
-        this.explorationId, returnDict.exploration.title, returnDict.version,
-        returnDict.session_id, collectionUrl);
-    // }
+    this.statsReportingService.initSession(
+      this.explorationId, returnDict.exploration.title, returnDict.version,
+      returnDict.session_id,
+      this.urlService.getCollectionIdFromExplorationUrl());
     this.playthroughService.initSession(
       this.explorationId, returnDict.version,
       returnDict.record_playthrough_probability);
@@ -195,10 +186,10 @@ export class ExplorationPlayerStateService {
       errorCallback: () => void): void {
     this.playerCorrectnessFeedbackEnabledService.init(true);
     let questionObjects = questionDicts.map(
-      (questionDict) => {
+      function(questionDict) {
         return this.questionObjectFactory.createFromBackendDict(
           questionDict);
-      });
+      }, this);
     this.questionPlayerEngineService.init(
       questionObjects, successCallback, errorCallback);
   }
@@ -243,7 +234,7 @@ export class ExplorationPlayerStateService {
         states: explorationData.states
       }, featuresData);
       this.explorationEngineService.init(
-        explorationData, 0, null, false, [], callback);
+        explorationData, null, null, null, null, callback);
       this.playerCorrectnessFeedbackEnabledService.init(
         explorationData.correctness_feedback_enabled);
       this.numberAttemptsService.reset();
@@ -273,9 +264,6 @@ export class ExplorationPlayerStateService {
         this.explorationId, this.version) :
       this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
         this.explorationId);
-    // if (this.storyUrlFragment === null) {
-    //   return;
-    // }
     Promise.all([
       explorationDataPromise,
       this.pretestQuestionBackendApiService.fetchPretestQuestionsAsync(
@@ -374,9 +362,6 @@ export class ExplorationPlayerStateService {
   }
 
   async setUniqueProgressUrlId(): Promise<void> {
-    if (this.version === null) {
-      throw new Error('Version should not be null.');
-    }
     await this.editableExplorationBackendApiService.
       recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
         this.explorationId,
@@ -390,7 +375,7 @@ export class ExplorationPlayerStateService {
       });
   }
 
-  getUniqueProgressUrlId(): string | null {
+  getUniqueProgressUrlId(): string {
     return this.uniqueProgressUrlId;
   }
 
