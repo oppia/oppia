@@ -112,6 +112,25 @@ describe('Access validation backend api service', () => {
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
+  it('should validate whether given learner group exists', fakeAsync(() => {
+    let learnerGroupId = 'groupId';
+
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/access_validation_handler/does_learner_group_exist/' + learnerGroupId
+    );
+
+    avbas.doesLearnerGroupExist(learnerGroupId).then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/does_learner_group_exist/' + learnerGroupId);
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
   it('should not validate access to blog home page with invalid access',
     fakeAsync (() => {
       avbas.validateAccessToBlogHomePage().then(successSpy, failSpy);
