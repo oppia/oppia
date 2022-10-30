@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import os
+import re
 import tempfile
 
 from core.domain import action_registry
@@ -48,9 +49,15 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
         # before this test.
         action_registry.Registry._actions = {} # pylint: disable=protected-access
 
-        tempdir = tempfile.TemporaryDirectory(
-            prefix=os.getcwd() + '/extensions/actions/')
-        action_name = tempdir.name.split('/')[-1]
+        while(1):
+            tempdir = tempfile.TemporaryDirectory(
+                prefix=os.getcwd() + '/extensions/actions/')
+            action_name = tempdir.name.split('/')[-1]
+            # If the name of 'action' follows variable naimg conventions.
+            if re.search('[^\W0-9]\w*', action_name):
+                break
+            else:
+                tempdir.cleanup()
         action_file = os.path.join(tempdir.name, action_name + '.py')
         with open(action_file, 'w', encoding='utf8') as f:
             f.write('class FakeBaseActionSpec:\n')
