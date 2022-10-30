@@ -38,7 +38,7 @@ describe('License Page Root', () => {
   let component: LicensePageRootComponent;
   let pageHeadService: PageHeadService;
   let translateService: TranslateService;
- 
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [

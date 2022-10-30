@@ -38,13 +38,14 @@ export const ExplorationPlayerConstants = {
     'I18N_PLAYER_HINT_REQUEST_STRING_2',
     'I18N_PLAYER_HINT_REQUEST_STRING_3'],
 
-  // Array of i18n IDs for nudgind the learner towards checking the spelling.
+  // Array of i18n IDs for nudging the learner towards checking the spelling.
   I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS: [
     'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_0',
     'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_1',
-    'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_2'],
+    'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_2'
+  ],
 
-  // Threshold value of edit dtsance for judging an answer as a misspelling.
+  // Threshold value of edit distance for judging an answer as a misspelling.
   THRESHOLD_EDIT_DISTANCE_FOR_MISSPELLINGS: 2,
 
   /* This should match the CSS class defined in the tutor card directive. */

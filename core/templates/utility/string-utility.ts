@@ -51,5 +51,5 @@ export function checkEditDistance(
       }
     }
   }
-  return editDistance[inputString.length][matchString.length] <= 2;
+  return editDistance[inputString.length][matchString.length] <= reqdEditDistance;
 };
