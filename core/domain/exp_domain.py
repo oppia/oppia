@@ -3795,7 +3795,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             rule_spec['inputs']['a'] = value_b
                             rule_spec['inputs']['b'] = value_a
                         elif value_a == value_b:
-                            invalid_rules.append(rule_spec)
+                            rule_spec['rule_type'] = 'Equals'
+                            rule_spec['inputs'] = {'x': value_a}
+                            assert isinstance(rule_spec['inputs']['x'], float)
+                            rule_value = float(rule_spec['inputs']['x'])
+                            cls._set_lower_and_upper_bounds(
+                                range_var,
+                                rule_value,
+                                rule_value,
+                                lb_inclusive=True,
+                                ub_inclusive=True
+                            )
                             continue
                         rule_value_a = float(value_a)
                         rule_value_b = float(value_b)
@@ -3830,6 +3840,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
+
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
 
         state_dict['interaction']['answer_groups'] = answer_groups
 
@@ -4227,17 +4240,24 @@ class Exploration(translation_domain.BaseTranslatableObject):
         else:
             solution = None
 
-        # Fix RTE content and check for empty choices.
+        # Here we use cast because we are certain with the type
+        # of the solution and to avoid the mypy type check failure.
+        state_sol = cast(Optional[List[List[str]]], solution)
+
+        # Check for empty choices.
         empty_choices = []
         for choice_drag in choices_drag_drop:
             if html_cleaner.is_html_empty(choice_drag['html']):
                 empty_choices.append(choice_drag)
-            choice_html = choice_drag['html']
-            choice_drag['html'] = cls.fix_content(choice_html)
 
         if len(empty_choices) > 0:
             for empty_choice in empty_choices:
                 choices_drag_drop.remove(empty_choice)
+
+        # Fix content.
+        for choice_drag in choices_drag_drop:
+            choice_html = choice_drag['html']
+            choice_drag['html'] = cls.fix_content(choice_html)
 
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
@@ -4251,22 +4271,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     rule_spec['rule_type'] ==
                     'IsEqualToOrderingWithOneItemAtIncorrectPosition'
                 ):
-                    assert isinstance(rule_spec_x, list)
+                    # Here we use cast because we are certain with the type
+                    # of the rule spec and to avoid the mypy type check failure.
+                    rule_spec_val = cast(List[List[str]], rule_spec_x)
                     if len(empty_choices) > 0:
                         cls._update_rule_value_having_empty_choices(
-                            empty_choices, rule_spec_x, solution)
+                            empty_choices, rule_spec_val, state_sol)
                     # `IsEqualToOrderingWithOneItemAtIncorrectPosition`
                     # rule should not be present when `multiple items at same
                     # place` setting is turned off.
                     if not multi_item_value:
                         invalid_rules.append(rule_spec)
                     else:
-                        temp = []
-                        for x in rule_spec_x:
-                            assert isinstance(x, list)
-                            temp.append(x)
-
-                        off_by_one_rules.append(temp)
+                        off_by_one_rules.append(rule_spec_val)
 
                 # In `HasElementXBeforeElementY` rule, `X` value
                 # should not be equal to `Y` value.
@@ -4309,19 +4326,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     )
 
                 elif rule_spec['rule_type'] == 'IsEqualToOrdering':
-                    assert isinstance(rule_spec_x, list)
+                    # Here we use cast because we are certain with the type
+                    # of the rule spec and to avoid the mypy type check failure.
+                    rule_spec_val_x = cast(List[List[str]], rule_spec_x)
                     if len(empty_choices) > 0:
                         cls._update_rule_value_having_empty_choices(
-                            empty_choices, rule_spec_x, solution)
+                            empty_choices, rule_spec_val_x, state_sol)
 
                     # Multiple items cannot be in the same place iff the
                     # setting is turned off.
-                    for ele in rule_spec_x:
+                    for ele in rule_spec_val_x:
                         if not multi_item_value and len(ele) > 1:
                             invalid_rules.append(rule_spec)
 
                     # `IsEqualToOrdering` rule should not have empty values.
-                    if len(rule_spec_x) <= 0:
+                    if len(rule_spec_val_x) <= 0:
                         invalid_rules.append(rule_spec)
                     else:
                         # `IsEqualToOrdering` rule should always come before
@@ -4332,7 +4351,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             ele_position = ele_x_at_y_rule['position']
                             ele_element = ele_x_at_y_rule['element']
                             assert isinstance(ele_position, int)
-                            rule_choice = rule_spec_x[ele_position - 1]
+                            rule_choice = rule_spec_val_x[ele_position - 1]
 
                             if len(rule_choice) == 0:
                                 invalid_rules.append(rule_spec)
@@ -4345,7 +4364,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         # `IsEqualToOrderingWithOneItemAtIncorrectPosition` when
                         # they are off by one value.
                         item_to_layer_idx = {}
-                        for layer_idx, layer in enumerate(rule_spec_x):
+                        for layer_idx, layer in enumerate(rule_spec_val_x):
                             for item in layer:
                                 item_to_layer_idx[item] = layer_idx
 

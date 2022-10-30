@@ -207,9 +207,9 @@ def is_html_empty(html_str: str) -> bool:
     if html_str.strip() in ['&quot;&quot;', '\\"&quot;&quot;\\"']:
         return True
 
-    html = utils.unescape_html(html_str)
-    html = (
-        html.replace('<p>', '').replace('</p>', '').replace('<br>', '').
+    html_val = utils.unescape_html(html_str)
+    html_val = (
+        html_val.replace('<p>', '').replace('</p>', '').replace('<br>', '').
         replace('<i>', '').replace('</i>', '').replace('<span>', '').
         replace('</span>', '').replace('<b>', '').replace('</b>', '').
         replace('<ol>', '').replace('</ol>', '').replace('<ul>', '').
@@ -221,7 +221,7 @@ def is_html_empty(html_str: str) -> bool:
         replace('&nbsp;', '').replace('<em>', '').replace('</em>', '').
         replace('<strong>', '').replace('</strong>', '').replace('\"\"', '').
         replace('\'\'', ''))
-    if html.strip() == '':
+    if html_val.strip() == '':
         return True
 
     return False
