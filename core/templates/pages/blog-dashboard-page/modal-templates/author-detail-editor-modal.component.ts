@@ -34,7 +34,7 @@ export class BlogAuthorDetailsEditorComponent extends ConfirmOrCancelModal {
   authorBioEditorIsOpen: boolean = false;
   authorName!: string;
   authorBio!: string;
-  prevAuthorBio: string;
+  prevAuthorBio!: string;
   constructor(
       ngbActiveModal: NgbActiveModal,
   ) {

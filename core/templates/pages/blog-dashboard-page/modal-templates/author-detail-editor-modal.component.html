@@ -35,12 +35,12 @@
         [matTooltipDisabled]="false"
         aria-label="List that shows issues preventing to save author details"
         class="w-100">
-      <button class="btn btn-success"
-              aria-label="Save Author Details."
-              (click)="save()"
-              [disabled]="validateAuthorDetails().length !== 0">
-              {{ 'I18N_BLOG_DASHBOARD_PAGE_SAVE_BUTTON' | translate }}
-      </button>
+    <button class="btn btn-success"
+            aria-label="Save Author Details."
+            (click)="save()"
+            [disabled]="validateAuthorDetails().length !== 0">
+            {{ 'I18N_BLOG_DASHBOARD_PAGE_SAVE_BUTTON' | translate }}
+    </button>
   </span>
 </div>
 <style>

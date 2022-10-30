@@ -1002,7 +1002,7 @@ def get_blog_author_details(user_id: str) -> blog_domain.BlogAuthorDetails:
     if author_model is None:
         create_blog_author_details_model(user_id)
         author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
-    
+
     if author_model is None:
         raise Exception('Unable to fetch author details for the given user.')
 
