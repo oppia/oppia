@@ -89,7 +89,8 @@ CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC = 'remove_skill_id_from_subtopic'
 CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property'
 CMD_UPDATE_SUBTOPIC_PROPERTY = 'update_subtopic_property'
 
-CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION = 'migrate_subtopic_schema_to_latest_version' # pylint: disable=line-too-long
+CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION = (
+    'migrate_subtopic_schema_to_latest_version')
 CMD_MIGRATE_STORY_REFERENCE_SCHEMA_TO_LATEST_VERSION = (
     'migrate_story_reference_schema_to_latest_version')
 
