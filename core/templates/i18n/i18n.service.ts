@@ -106,7 +106,6 @@ export class I18nService {
             this.windowRef.nativeWindow.location.reload();
           }
         } else {
-          console.log('in: ' + this.windowRef.nativeWindow.location.href);
           const parser = new URL(this.windowRef.nativeWindow.location.href);
           const urlParamDir = parser.searchParams.get('dir');
           if (urlParamDir === langDirection) {
@@ -121,7 +120,6 @@ export class I18nService {
 
     // Loads site language according to the language parameter in URL
     // if present.
-    console.log('out: ' + this.windowRef.nativeWindow.location.href);
     this.url = new URL(this.windowRef.nativeWindow.location.href);
     const searchParams = this.url.searchParams;
 

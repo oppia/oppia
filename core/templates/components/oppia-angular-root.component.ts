@@ -123,9 +123,6 @@ export const registerCustomElements = (injector: Injector): void => {
     const rteElement = createCustomElement(
       componentMap[rteKey].component_class,
       {injector});
-    console.log(customElements.get(
-      'oppia-noninteractive-ckeditor-' +
-      ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id), a++);
     if (
       customElements.get(
         'oppia-noninteractive-ckeditor-' +

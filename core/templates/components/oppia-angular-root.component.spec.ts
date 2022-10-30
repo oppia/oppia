@@ -102,7 +102,7 @@ describe('OppiaAngularRootComponent', function() {
   it('should only intialize rteElements once', () => {
     expect(OppiaAngularRootComponent.rteElementsAreInitialized).toBeTrue();
     const componentInstance = TestBed.createComponent(
-      OppiaAngularRootComponent).componentInstance
+      OppiaAngularRootComponent).componentInstance;
     expect(componentInstance).toBeDefined();
     spyOn(customElements, 'get').and.callFake(() => WordCount);
     registerCustomElements(TestBed.inject(Injector));
