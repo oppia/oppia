@@ -23,7 +23,7 @@ import { QuestionPlayerStateService } from 'components/question-directives/quest
 import { Collection } from 'domain/collection/collection.model';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
@@ -79,6 +79,7 @@ import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/lear
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { TranslateService } from '@ngx-translate/core';
 import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -105,7 +106,7 @@ class MockPlatformFeatureService {
   }
 }
 
-describe('Conversation skin component', () => {
+fdescribe('Conversation skin component', () => {
   let fixture: ComponentFixture<ConversationSkinComponent>;
   let componentInstance: ConversationSkinComponent;
   let alertsService: AlertsService;
@@ -136,6 +137,8 @@ describe('Conversation skin component', () => {
   let localStorageService: LocalStorageService;
   let messengerService: MessengerService;
   let numberAttemptsService: NumberAttemptsService;
+  let interactionObjectFactory: InteractionObjectFactory;
+  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let playerCorrectnessFeedbackEnabledService:
     PlayerCorrectnessFeedbackEnabledService;
   let playerPositionService: PlayerPositionService;
@@ -537,7 +540,10 @@ describe('Conversation skin component', () => {
     explorationSummaryBackendApiService = TestBed.inject(
       ExplorationSummaryBackendApiService);
     fatigueDetectionService = TestBed.inject(FatigueDetectionService);
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
+    audioTranslationLanguageService = (
+      TestBed.inject(AudioTranslationLanguageService));
     guestCollectionProgressService = TestBed.inject(
       GuestCollectionProgressService);
     hintsAndSolutionManagerService = TestBed.inject(
@@ -1734,7 +1740,6 @@ describe('Conversation skin component', () => {
     spyOn(componentInstance, 'isSupplementalCardNonempty')
       .and.returnValues(false, true);
     spyOn(playerTranscriptService, 'getCard');
-    spyOn(playerTranscriptService, 'getLastCard');
     spyOn(componentInstance, 'canWindowShowTwoCards').and.returnValue(true);
     spyOn(playerPositionService, 'setDisplayedCardIndex');
     spyOn(componentInstance, 'animateToTwoCards').and.callFake((callb) => {
@@ -1778,6 +1783,26 @@ describe('Conversation skin component', () => {
     spyOn(fatigueDetectionService, 'isSubmittingTooFast').and.returnValues(
       true, false);
     spyOn(fatigueDetectionService, 'displayTakeBreakMessage');
+    let lastCardInteraction = interactionObjectFactory.createFromBackendDict({
+      id: 'TextInput',
+      answer_groups: [],
+      default_outcome: null,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        rows: {
+          value: true,
+        },
+        placeholder: {
+          value: 1,
+        }
+      },
+      hints: [],
+      solution: null
+    });
+    let lastCard = StateCard.createNewCard(
+      'Card 1', 'Content html', 'Interaction text', lastCardInteraction,
+      null, null, 'content_id', audioTranslationLanguageService);
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
     spyOn(explorationPlayerStateService.onOppiaFeedbackAvailable, 'emit');
     spyOn(componentInstance, 'showPendingCard');
     componentInstance.submitAnswer('', null);
