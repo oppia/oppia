@@ -149,6 +149,10 @@ class WarmupPage(
 ):
     """Handles warmup requests."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, str] = {'GET': {}}
+
     @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET warmup requests."""
@@ -159,6 +163,10 @@ class SplashRedirectPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, str] = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self) -> None:
