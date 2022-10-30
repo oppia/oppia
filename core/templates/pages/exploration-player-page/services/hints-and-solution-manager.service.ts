@@ -134,10 +134,8 @@ export class HintsAndSolutionManagerService {
     let funcToEnqueue = null;
     if (!this.areAllHintsExhausted()) {
       funcToEnqueue = this.releaseHint;
-    }
-    else {
+    } else {
       this._hintsExhaustedEventEmitter.emit();
-      console.log("Exhausted hints");
     }
     if (funcToEnqueue) {
       this.enqueueTimeout(
@@ -238,8 +236,7 @@ export class HintsAndSolutionManagerService {
         this.wrongAnswersSinceLastHintConsumed >= 1) {
         this.accelerateHintRelease();
       }
-    }
-    else if (this.getNumHints()){
+    } else if (this.getNumHints()) {
       this.wrongAnswersAfterHintsExhausted++;
       if (this.wrongAnswersAfterHintsExhausted > 2) {
         this._learnerReallyStuckEventEmitter.emit();

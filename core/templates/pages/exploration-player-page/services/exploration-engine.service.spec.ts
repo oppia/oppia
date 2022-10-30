@@ -590,7 +590,6 @@ describe('Exploration engine service ', () => {
       explorationEngineService.submitAnswer(
         answer, textInputService, submitAnswerSuccessCb);
 
-      // expect(alertsServiceSpy).toHaveBeenCalledTimes(2);
       expect(alertsServiceSpy)
         .toHaveBeenCalledWith('Feedback content should not be empty.');
     });

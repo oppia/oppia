@@ -529,7 +529,6 @@ export class ExplorationEngineService {
     this.nextStateName = newStateName;
     let onSameCard: boolean = (oldStateName === newStateName);
 
-    // Not sure about this.
     this._updateActiveStateIfInEditorEventEmitter.emit(newStateName);
 
     let _nextFocusLabel = this.focusManagerService.generateFocusLabel();
@@ -540,7 +539,6 @@ export class ExplorationEngineService {
       );
     }
 
-    // Not sure about this too.
     if (newParams) {
       this.learnerParamsService.init(newParams);
     }
@@ -556,13 +554,9 @@ export class ExplorationEngineService {
       this.exploration.getState(this.nextStateName).writtenTranslations,
       this.exploration.getState(this.nextStateName).content.contentId,
       this.audioTranslationLanguageService);
-    
-    console.log("\n\n");
-      console.log(newStateNameIfStuck);
-      console.log("\n\n");
+
     if (newStateNameIfStuck !== null) {
       let newStateIfStuck = this.exploration.getState(newStateNameIfStuck);
-      console.log(newStateIfStuck.name);
 
       let newParamsIfStuck = (
         newStateIfStuck ? this.makeParams(
@@ -573,12 +567,11 @@ export class ExplorationEngineService {
         return;
       }
 
-      let questionHtmlIfStuck = this.makeQuestion(newStateIfStuck, [newParamsIfStuck, {
-        answer: 'answer'
-      }]);
-      console.log(questionHtmlIfStuck);
+      let questionHtmlIfStuck = this.makeQuestion(
+        newStateIfStuck, [newParamsIfStuck, {
+          answer: 'answer'
+        }]);
       if (questionHtmlIfStuck === null) {
-        console.log("\n\nWe go in");
         this.answerIsBeingProcessed = false;
         // TODO(#13133): Remove all question related naming conventions.
         this.alertsService.addWarning('Question content should not be empty.');
@@ -592,18 +585,22 @@ export class ExplorationEngineService {
       let nextInteractionIfStuckHtml = null;
       if (this.exploration.getInteraction(this.nextStateIfStuckName).id) {
         nextInteractionIfStuckHtml = (
-          this._getInteractionHtmlByStateName(_nextFocusLabel, this.nextStateIfStuckName)
+          this._getInteractionHtmlByStateName(
+            _nextFocusLabel, this.nextStateIfStuckName)
         );
       }
 
       questionHtmlIfStuck = questionHtmlIfStuck + this._getRandomSuffix();
-      nextInteractionIfStuckHtml = nextInteractionIfStuckHtml + this._getRandomSuffix();
-    
+      nextInteractionIfStuckHtml = (
+        nextInteractionIfStuckHtml + this._getRandomSuffix());
+
       nextCardIfReallyStuck = StateCard.createNewCard(
-        this.nextStateIfStuckName, questionHtmlIfStuck, nextInteractionIfStuckHtml,
+        this.nextStateIfStuckName, questionHtmlIfStuck,
+        nextInteractionIfStuckHtml,
         this.exploration.getInteraction(this.nextStateIfStuckName),
         this.exploration.getState(this.nextStateIfStuckName).recordedVoiceovers,
-        this.exploration.getState(this.nextStateIfStuckName).writtenTranslations,
+        this.exploration.getState(
+          this.nextStateIfStuckName).writtenTranslations,
         this.exploration.getState(this.nextStateIfStuckName).content.contentId,
         this.audioTranslationLanguageService);
     }

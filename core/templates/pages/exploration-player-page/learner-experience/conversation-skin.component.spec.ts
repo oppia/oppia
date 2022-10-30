@@ -78,7 +78,6 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { ConceptCardManagerService } from '../services/concept-card-manager.service';
-import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 import { TranslateService } from '@ngx-translate/core';
 import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 
@@ -161,11 +160,8 @@ describe('Conversation skin component', () => {
   let platformFeatureService: PlatformFeatureService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   let conceptCardManagerService: ConceptCardManagerService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let translateService: TranslateService;
 
-  const WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC: number = 11000;
-  const WAIT_BEFORE_REALLY_STUCK_MSEC: number = 12000;
 
   let displayedCard = new StateCard(
     null, null, null, new Interaction(
@@ -581,7 +577,6 @@ describe('Conversation skin component', () => {
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     conceptCardManagerService = TestBed.inject(ConceptCardManagerService);
     translateService = TestBed.inject(TranslateService);
-    audioTranslationLanguageService = TestBed.inject(AudioTranslationLanguageService);
     learnerDashboardBackendApiService = TestBed.inject(
       LearnerDashboardBackendApiService);
     spyOn(
@@ -677,9 +672,9 @@ describe('Conversation skin component', () => {
     spyOnProperty(playerPositionService, 'onNewCardOpened')
       .and.returnValue(mockOnNewCardOpened);
     spyOnProperty(hintsAndSolutionManagerService, 'onHintsExhausted')
-    .and.returnValue(mockOnHintsExhausted);
+      .and.returnValue(mockOnHintsExhausted);
     spyOnProperty(conceptCardManagerService, 'onLearnerGetsReallyStuck')
-    .and.returnValue(mockOnLearnerGetsReallyStuck);
+      .and.returnValue(mockOnLearnerGetsReallyStuck);
     spyOnProperty(hintsAndSolutionManagerService, 'onLearnerReallyStuck')
       .and.returnValue(mockOnLearnerReallyStuck);
     spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
@@ -792,9 +787,9 @@ describe('Conversation skin component', () => {
     spyOnProperty(playerPositionService, 'onNewCardOpened')
       .and.returnValue(mockOnNewCardOpened);
     spyOnProperty(hintsAndSolutionManagerService, 'onHintsExhausted')
-    .and.returnValue(mockOnHintsExhausted);
+      .and.returnValue(mockOnHintsExhausted);
     spyOnProperty(conceptCardManagerService, 'onLearnerGetsReallyStuck')
-    .and.returnValue(mockOnLearnerGetsReallyStuck);
+      .and.returnValue(mockOnLearnerGetsReallyStuck);
     spyOnProperty(hintsAndSolutionManagerService, 'onLearnerReallyStuck')
       .and.returnValue(mockOnLearnerReallyStuck);
     spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
@@ -897,9 +892,9 @@ describe('Conversation skin component', () => {
     spyOnProperty(playerPositionService, 'onNewCardOpened')
       .and.returnValue(mockOnNewCardOpened);
     spyOnProperty(hintsAndSolutionManagerService, 'onHintsExhausted')
-    .and.returnValue(mockOnHintsExhausted);
+      .and.returnValue(mockOnHintsExhausted);
     spyOnProperty(conceptCardManagerService, 'onLearnerGetsReallyStuck')
-    .and.returnValue(mockOnLearnerGetsReallyStuck);
+      .and.returnValue(mockOnLearnerGetsReallyStuck);
     spyOnProperty(hintsAndSolutionManagerService, 'onLearnerReallyStuck')
       .and.returnValue(mockOnLearnerReallyStuck);
     spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
@@ -999,9 +994,9 @@ describe('Conversation skin component', () => {
     spyOnProperty(playerPositionService, 'onNewCardOpened')
       .and.returnValue(mockOnNewCardOpened);
     spyOnProperty(hintsAndSolutionManagerService, 'onHintsExhausted')
-    .and.returnValue(mockOnHintsExhausted);
+      .and.returnValue(mockOnHintsExhausted);
     spyOnProperty(conceptCardManagerService, 'onLearnerGetsReallyStuck')
-    .and.returnValue(mockOnLearnerGetsReallyStuck);
+      .and.returnValue(mockOnLearnerGetsReallyStuck);
     spyOnProperty(hintsAndSolutionManagerService, 'onLearnerReallyStuck')
       .and.returnValue(mockOnLearnerReallyStuck);
     spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
@@ -1078,13 +1073,14 @@ describe('Conversation skin component', () => {
 
   it('should release solution when the learner gets stuck' +
   ' if no stuck state exists after a predetermined time', fakeAsync(() => {
-    // Release solution if stuck state is null
+    // Release solution if stuck state is null.
     componentInstance.nextCardIfStuck = null;
     let solutionSpy = spyOn(hintsAndSolutionManagerService, 'releaseSolution');
     let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
     componentInstance.triggerIfLearnerStuckAction();
-    tick(WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
-    tick(WAIT_BEFORE_REALLY_STUCK_MSEC);
+    tick(
+      ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
+    tick(ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
     expect(solutionSpy).toHaveBeenCalled();
     expect(redirectionSpy).not.toHaveBeenCalled();
     flush();
@@ -1102,17 +1098,19 @@ describe('Conversation skin component', () => {
         [], [], null, null, [], 'EndExploration', null),
       [], null, null, '', null);
     componentInstance.triggerIfLearnerStuckAction();
-    tick(WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
-    tick(WAIT_BEFORE_REALLY_STUCK_MSEC);
+    tick(
+      ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
+    tick(ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE');
-    expect(componentInstance.nextCard).toEqual(componentInstance.nextCardIfStuck);
+    expect(componentInstance.nextCard).toEqual(
+      componentInstance.nextCardIfStuck);
     flush();
   }));
 
   it('should immediately release solution when the learner gets stuck' +
   ' if no stuck state exists', fakeAsync(() => {
-    // Release solution if stuck state is null
+    // Release solution if stuck state is null.
     componentInstance.nextCardIfStuck = null;
     let solutionSpy = spyOn(hintsAndSolutionManagerService, 'releaseSolution');
     let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
@@ -1135,8 +1133,9 @@ describe('Conversation skin component', () => {
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE');
     tick(10000);
-    expect(componentInstance.nextCard).toEqual(componentInstance.nextCardIfStuck);
-  }))
+    expect(componentInstance.nextCard).toEqual(
+      componentInstance.nextCardIfStuck);
+  }));
 
   it('should fetch completed chapters count if user is logged in',
     fakeAsync(() => {

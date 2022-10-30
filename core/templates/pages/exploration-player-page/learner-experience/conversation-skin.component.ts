@@ -80,6 +80,7 @@ import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/lear
 import './conversation-skin.component.css';
 import { ConceptCardManagerService } from '../services/concept-card-manager.service';
 import { TranslateService } from '@ngx-translate/core';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
@@ -162,6 +163,7 @@ export class ConversationSkinComponent {
   CHECKPOINTS_FEATURE_IS_ENABLED: boolean = false;
   pidInUrl: string;
   submitButtonIsDisabled = true;
+  solutionForState: Solution | null = null;
   isLearnerReallyStuck: boolean = false;
 
   constructor(
@@ -284,6 +286,7 @@ export class ConversationSkinComponent {
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardOpened.subscribe(
         (newCard: StateCard) => {
+          this.solutionForState = newCard.getSolution();
           this.nextCardIfStuck = null;
           this.triggerIfLearnerStuckAction();
         }
@@ -1038,11 +1041,11 @@ export class ConversationSkinComponent {
         // for clearing concepts.
         this.playerTranscriptService.addNewResponse(
           this.translateService.instant(
-            'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE'));
-      }
-      else {
+            'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE')
+        );
+      } else if (this.solutionForState !== null) {
         // Release solution if no separate state for addressing
-        // the stuck learner exists.
+        // the stuck learner exists and the solution exists.
         this.hintsAndSolutionManagerService.releaseSolution();
       }
     }, ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
@@ -1073,9 +1076,8 @@ export class ConversationSkinComponent {
         this.nextCard = this.nextCardIfStuck;
         this.showPendingCard();
       }, 10000);
-    }
-    else {
-      // Release solution
+    } else if (this.solutionForState !== null) {
+      // Release solution if it exists.
       this.hintsAndSolutionManagerService.releaseSolution();
     }
   }

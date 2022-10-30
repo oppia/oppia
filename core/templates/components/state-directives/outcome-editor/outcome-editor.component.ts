@@ -64,8 +64,6 @@ export class OutcomeEditorComponent implements OnInit {
   destinationEditorIsOpen: boolean = false;
   destinationIfStuckEditorIsOpen: boolean = false;
   feedbackEditorIsOpen: boolean = false;
-  destIfStuckFeatEnabled: boolean = (
-    AppConstants.DEST_IF_REALLY_STUCK_FEAT_ENABLED);
 
   onMobile: boolean = false;
   resizeSubscription!: Subscription;
