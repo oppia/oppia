@@ -44,7 +44,7 @@ def wrap_with_siblings(tag: bs4.element.Tag, p: bs4.element.Tag) -> None:
         p: bs4.element.Tag. The new p tag in soup in which the tag and
             its siblings are to be wrapped.
     """
-    independent_parents = ['p', 'pre', 'ol', 'ul', 'blockquote']
+    independent_parents = ['h1', 'p', 'pre', 'ol', 'ul', 'blockquote']
     prev_sib = list(tag.previous_siblings)
     next_sib = list(tag.next_siblings)
     index_of_first_unwrapped_sibling = -1
@@ -443,7 +443,8 @@ def validate_rte_format(
                 err_dict['strings'].append(html_data)
 
         for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
-            tab_content_json = utils.unescape_html(tabs['tab_contents-with-value'])
+            tab_content_json = utils.unescape_html(
+                tabs['tab_contents-with-value'])
             tab_content_list = json.loads(tab_content_json)
             for tab_content in tab_content_list:
                 content_html = tab_content['content']
@@ -797,7 +798,8 @@ def add_math_content_to_math_rte_components(html_string: str) -> str:
                 # double quotes(&amp;quot;) and should be a valid unicode
                 # string.
                 raw_latex = (
-                    json.loads(utils.unescape_html(math_tag['raw_latex-with-value'])))
+                    json.loads(utils.unescape_html(
+                        math_tag['raw_latex-with-value'])))
                 normalized_raw_latex = (
                     objects.UnicodeString.normalize(raw_latex))
             except Exception as e:
@@ -1034,7 +1036,8 @@ def _process_string_with_components(
                 ).replace('<br/>', '<br>')))
 
     for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
-        tab_content_json = utils.unescape_html(tabs['tab_contents-with-value'])
+        tab_content_json = utils.unescape_html(
+            tabs['tab_contents-with-value'])
         tab_content_list = json.loads(tab_content_json)
         for tab_content in tab_content_list:
             content_html = tab_content['content']

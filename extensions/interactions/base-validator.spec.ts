@@ -241,4 +241,38 @@ describe('Interaction validator', function() {
       }
     );
   });
+
+  describe('HTMLValidator', function() {
+    it('should categorize completely empty string as empty', function() {
+      const html = '   ';
+
+      expect(bivs.isHTMLEmpty(html)).toBeTrue();
+    });
+
+    it('should categorize balanced HTML tags as empty if the remaining ' +
+        'string is empty', function() {
+      const html = '  <strong>   <em>  </em></strong>';
+
+      expect(bivs.isHTMLEmpty(html)).toBeTrue();
+    });
+
+    it('should categorize balanced HTML tags as not empty if the remaining ' +
+        'string is not empty', function() {
+      const html = '  <strong>  info <em>  </em></strong>';
+
+      expect(bivs.isHTMLEmpty(html)).toBeFalse();
+    });
+
+    it('should categorize imbalanced HTML tags as not empty', function() {
+      const html = '<strong>';
+
+      expect(bivs.isHTMLEmpty(html)).toBeFalse();
+    });
+
+    it('should categorize unfilled list as empty', function() {
+      const html = '<ul><li>&nbsp;</li><li>    <strong>  </strong></li></ul>';
+
+      expect(bivs.isHTMLEmpty(html)).toBeTrue();
+    });
+  });
 });
