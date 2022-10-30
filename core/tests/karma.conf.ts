@@ -126,7 +126,7 @@ module.exports = function(config) {
           '--no-sandbox',
           '--disable-gpu',
           '--disable-dev-shm-usage',
-          '--js-flags=--max-old-space-size=2048'
+          '--js-flags=--max-old-space-size=4096'
         ]
       }
     },
