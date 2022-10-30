@@ -63,7 +63,8 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(default_tags, json_response['list_of_default_tags'])
         self.assertEqual(
             self.BLOG_ADMIN_USERNAME,
-            json_response['blog_post_summary_dicts'][0]['author_name'])
+            json_response['blog_post_summary_dicts'][0]['displayed_author_name']
+        )
         self.assertEqual(
             len(json_response['blog_post_summary_dicts']), 1)
         self.assertEqual(json_response['no_of_blog_post_summaries'], 1)
@@ -105,7 +106,8 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
             self.BLOG_ADMIN_USERNAME
         )
         self.assertEqual(
-            json_response['blog_post_summary_dicts'][0]['author_name'],
+            json_response[
+                'blog_post_summary_dicts'][0]['displayed_author_name'],
             self.BLOG_ADMIN_USERNAME
         )
 
@@ -132,7 +134,8 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
             'author account deleted'
         )
         self.assertEqual(
-            json_response['blog_post_summary_dicts'][0]['author_name'],
+            json_response[
+                'blog_post_summary_dicts'][0]['displayed_author_name'],
             'new author name'
         )
 
@@ -176,7 +179,9 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.BLOG_HOMEPAGE_DATA_URL, blog_post.url_fragment),
             )
         self.assertEqual(
-            'new author name', json_response['blog_post_dict']['author_name'])
+            'new author name',
+            json_response['blog_post_dict']['displayed_author_name']
+        )
         self.assertEqual(
             self.BLOG_ADMIN_USERNAME, json_response['author_username'])
         self.assertEqual(
@@ -201,7 +206,9 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
                 feconf.BLOG_HOMEPAGE_DATA_URL, blog_post_two.url_fragment),
             )
         self.assertEqual(
-            'new author name', json_response['blog_post_dict']['author_name'])
+            'new author name',
+            json_response['blog_post_dict']['displayed_author_name']
+        )
         self.assertEqual(
             self.BLOG_ADMIN_USERNAME, json_response['author_username'])
         self.assertEqual(
@@ -221,7 +228,9 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
                 feconf.BLOG_HOMEPAGE_DATA_URL, blog_post_two.url_fragment),
             )
         self.assertEqual(
-            'new author name', json_response['blog_post_dict']['author_name'])
+            'new author name',
+            json_response['blog_post_dict']['displayed_author_name']
+        )
         self.assertEqual(
             'author account deleted', json_response['author_username'])
         self.assertEqual(
@@ -371,7 +380,8 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
             json_response['summary_dicts'][0]['author_username'])
         self.assertEqual(
             'new author name',
-            json_response['summary_dicts'][0]['author_name'])
+            json_response['summary_dicts'][0]['displayed_author_name']
+        )
         self.assertEqual(
             len(json_response['summary_dicts']), 1)
         self.assertIsNotNone(json_response['profile_picture_data_url'])

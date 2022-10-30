@@ -161,7 +161,7 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.BLOG_EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
-            'author_name': 'new user name',
+            'displayed_author_name': 'new user name',
             'author_bio': 'general oppia user and blog post author'
         }
 
@@ -192,7 +192,7 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.BLOG_EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
-            'author_name': 1234,
+            'displayed_author_name': 1234,
             'author_bio': 'general oppia user and blog post author'
         }
         pre_update_author_details = blog_services.get_blog_author_details(
@@ -211,7 +211,7 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.BLOG_EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
-            'author_name': 'new user',
+            'displayed_author_name': 'new user',
             'author_bio': 1234
         }
         pre_update_author_details = blog_services.get_blog_author_details(
@@ -258,7 +258,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
         expected_blog_post_dict = {
             'id': u'%s' % self.blog_post.id,
-            'author_name': self.BLOG_EDITOR_USERNAME,
+            'displayed_author_name': self.BLOG_EDITOR_USERNAME,
             'title': '',
             'content': '',
             'tags': [],
@@ -279,10 +279,10 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             )
         self.assertEqual(
-            self.BLOG_EDITOR_USERNAME, json_response['author_name'])
+            self.BLOG_EDITOR_USERNAME, json_response['displayed_author_name'])
         expected_blog_post_dict = {
             'id': u'%s' % self.blog_post.id,
-            'author_name': self.BLOG_EDITOR_USERNAME,
+            'displayed_author_name': self.BLOG_EDITOR_USERNAME,
             'title': '',
             'content': '',
             'tags': [],
@@ -339,11 +339,12 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         json_response = self.get_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             )
-        self.assertEqual('new author name', json_response['author_name'])
+        self.assertEqual(
+            'new author name', json_response['displayed_author_name'])
         self.assertIsNone(json_response['profile_picture_data_url'])
         expected_blog_post_dict = {
             'id': u'%s' % self.blog_post.id,
-            'author_name': 'new author name',
+            'displayed_author_name': 'new author name',
             'title': '',
             'content': '',
             'tags': [],
