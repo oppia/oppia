@@ -1270,8 +1270,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'new_value': 'new objective'
             })
         ]
-        # We use mypy ignore because we want to test if the method can handle
-        # some invalid cmd which is not in the allowed commands of
+        # Here we use MyPy ignore because we want to test if the method can
+        # handle some invalid cmd which is not in the allowed commands of
         # exp_domain.ExplorationChange.
         changed_exploration_objective = (
             exp_services.apply_change_list(
@@ -1314,9 +1314,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'new_value': 'new objective'
             })
         ]
-        # We use mypy ignore because we want to test if the method can handle
-        # some invalid property which is not in the allowed properties of
-        # exp_domain.ExplorationChange.
+        # Here we use MyPy ignore because we want to test if the method can
+        # handle some invalid property which is not in the allowed properties
+        # of exp_domain.ExplorationChange.
         changed_exploration_objective = (
             exp_services.apply_change_list(
                 self.EXP_0_ID,
