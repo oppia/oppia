@@ -31,9 +31,9 @@ import { TextInputRulesService } from './text-input-rules.service';
 interface TextInputSchema {
   type: string;
   'ui_config': {
-    placeholder?: string;
-    rows?: number;
-    catchMisspellings?: boolean;
+    placeholder: string;
+    rows: number;
+    catchMisspellings: boolean;
   };
 }
 
@@ -94,7 +94,11 @@ export class InteractiveTextInputComponent implements OnInit {
 
     this.schema = {
       type: 'unicode',
-      ui_config: {}
+      ui_config: {
+        placeholder: 'Placeholder text',
+        rows: 1,
+        catchMisspellings: false
+      }
     };
     if (this.placeholder) {
       this.schema.ui_config.placeholder = this.placeholder;
