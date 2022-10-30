@@ -10,7 +10,7 @@
              [src]="authorProfilePicUrl"
              alt="Profile image of the author of the blog post"
              (click)="navigateToAuthorProfilePage()">
-        <mat-card-subtitle class="blog-author-name" (click)="navigateToAuthorProfilePage()">
+        <mat-card-subtitle class="blog-author-name e2e-test-author-name" (click)="navigateToAuthorProfilePage()">
           {{ blogPost.displayedAuthorName }}
         </mat-card-subtitle>
         <mat-card-subtitle class="pt-2 font-weight-light mobile-published-date" (click)="navigateToAuthorProfilePage()">
