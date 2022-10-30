@@ -1249,7 +1249,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             new_value: str = ''
 
             def __init__(
-                    self, cmd, property_name, state_name, new_value) -> None:
+                self, cmd: str, property_name: str, state_name: str,
+                new_value: str
+            ) -> None:
                 self.cmd = cmd
                 self.property_name = property_name
                 self.state_name = state_name
@@ -1268,10 +1270,13 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'new_value': 'new objective'
             })
         ]
+        # We use mypy ignore because we want to test if the method can handle
+        # some invalid cmd which is not in the allowed commands of
+        # exp_domain.ExplorationChange.
         changed_exploration_objective = (
             exp_services.apply_change_list(
                 self.EXP_0_ID,
-                change_list_objective))
+                change_list_objective)) # type: ignore[arg-type]
         self.assertEqual(
             changed_exploration_objective.objective,
             'new objective')
@@ -1288,7 +1293,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             new_value: str = ''
 
             def __init__(
-                    self, cmd, property_name, state_name, new_value) -> None:
+                self, cmd: str, property_name: str, state_name: str,
+                new_value: str
+            ) -> None:
                 self.cmd = cmd
                 self.property_name = property_name
                 self.state_name = state_name
@@ -1307,10 +1314,13 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'new_value': 'new objective'
             })
         ]
+        # We use mypy ignore because we want to test if the method can handle
+        # some invalid property which is not in the allowed properties of
+        # exp_domain.ExplorationChange.
         changed_exploration_objective = (
             exp_services.apply_change_list(
                 self.EXP_0_ID,
-                change_list_objective))
+                change_list_objective))  # type: ignore[arg-type]
         self.assertEqual(
             changed_exploration_objective.objective,
             'new objective')
