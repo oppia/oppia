@@ -22,7 +22,7 @@ import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { StateParamChangesService } from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
-import { ParamChange, ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
+import { ParamChange, ParamChangeBackendDict, ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
 import { ParamSpecs, ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { EditabilityService } from 'services/editability.service';
@@ -404,8 +404,8 @@ describe('Param Changes Editor Component', () => {
     jasmine.createSpy('moveItemInArray').and.stub();
 
     component.paramChangesService.displayed = [
-      new ParamChangeObjectFactory(),
-      new ParamChangeObjectFactory()
+      paramChangeObjectFactory.createDefault(''),
+      paramChangeObjectFactory.createDefault('')
     ];
 
     component.drop({
