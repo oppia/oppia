@@ -1807,6 +1807,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         seen_strings_contains: List[List[str]] = []
         seen_strings_startswith: List[List[str]] = []
 
+        rows_value = int(self.customization_args['rows'].value)
+        if rows_value < 1 or rows_value > 10:
+            raise utils.ValidationError(
+                'Rows value in Text interaction should be between 1 and 10.'
+            )
+
         for ans_group_idx, answer_group in enumerate(self.answer_groups):
             for rule_spec_idx, rule_spec in enumerate(answer_group.rule_specs):
                 # Rule should not be duplicate.
