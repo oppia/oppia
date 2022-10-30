@@ -25,6 +25,8 @@ from core.domain import blog_services
 from core.domain import state_domain
 from core.tests import test_utils
 
+from typing import Dict, Optional, Union
+
 
 class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
     """Tests to validate domain objects coming from frontend."""
@@ -228,7 +230,12 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
         domain_objects_validator.validate_state_dict(state_dict)
 
     def test_invalid_object_raises_exception(self) -> None:
-        invalid_state_dict = {
+        invalid_state_dict: Dict[
+            str,
+            Optional[
+                Union[int, bool, Dict[str, Dict[str, Dict[str, str]]]]
+            ]
+        ] = {
             'classifier_model_id': None,
             'written_translations': {
                 'translations_mapping': {
