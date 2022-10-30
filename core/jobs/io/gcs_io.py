@@ -52,5 +52,7 @@ class ReadFile(beam.PTransform):
         """Helper function to read the contents of a file."""
         print("***********************")
         print("file - ", filename)
-        gcs = io.gcsio.GcsIO(storage.Client())
+        gcs = io.gcsio.GcsIO()
+        print("********************************")
+        print("GCS is initialized")
         return gcs.open(filename, mode='r').read()
