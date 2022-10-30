@@ -69,8 +69,6 @@ NOT_FULLY_COVERED_FILES: Final = [
     'core/controllers/custom_landing_pages_test.py',
     'core/controllers/editor.py',
     'core/controllers/editor_test.py',
-    'core/controllers/incoming_app_feedback_report.py',
-    'core/controllers/incoming_app_feedback_report_test.py',
     'core/controllers/learner_dashboard.py',
     'core/controllers/learner_dashboard_test.py',
     'core/controllers/learner_goals.py',
