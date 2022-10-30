@@ -24,8 +24,20 @@ from core.domain import feedback_services
 from core.domain import suggestion_services
 from core.domain import user_services
 
+from typing import (
+    Any, Dict, List, Optional, Sequence, Tuple, TypedDict, TypeVar
+)
 
-def replace_user_id_with_username_in_dict(thread_dicts, user_keys):
+
+# Here we use type Any because we want to allow different TypedDict dictionaries
+# through this type variable.
+ThreadDictType = TypeVar('ThreadDictType', bound=Sequence[Any])
+
+
+def replace_user_id_with_username_in_dict(
+    thread_dicts: ThreadDictType,
+    user_keys: List[Tuple[str, str]]
+) -> ThreadDictType:
     """Replace user id with the corresponding username in the given dictionary.
 
     Args:
@@ -47,7 +59,20 @@ def replace_user_id_with_username_in_dict(thread_dicts, user_keys):
     return thread_dicts
 
 
-class ThreadListHandler(base.BaseHandler):
+class ThreadListHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ThreadListHandler's
+    normalized_Payload dictionary.
+    """
+
+    subject: str
+    text: str
+
+
+class ThreadListHandler(
+    base.BaseHandler[
+        ThreadListHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handles operations relating to feedback thread lists."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -79,7 +104,7 @@ class ThreadListHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id):
+    def get(self, exploration_id: str) -> None:
 
         feedback_thread_dicts = [
             thread.to_dict() for thread in feedback_services.get_all_threads(
@@ -100,9 +125,10 @@ class ThreadListHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_create_feedback_thread
-    def post(self, exploration_id):
-        subject = self.normalized_payload.get('subject')
-        text = self.normalized_payload.get('text')
+    def post(self, exploration_id: str) -> None:
+        assert self.normalized_payload is not None
+        subject = self.normalized_payload['subject']
+        text = self.normalized_payload['text']
 
         feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION, exploration_id, self.user_id,
@@ -110,7 +136,9 @@ class ThreadListHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ThreadListHandlerForTopicsHandler(base.BaseHandler):
+class ThreadListHandlerForTopicsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles listing of suggestions threads linked to topics."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -125,12 +153,10 @@ class ThreadListHandlerForTopicsHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_topic
-    def get(self, topic_id):
+    def get(self, topic_id: str) -> None:
 
         suggestion_thread_dicts = [
             thread.to_dict() for thread in feedback_services.get_all_threads(
@@ -146,7 +172,19 @@ class ThreadListHandlerForTopicsHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ThreadHandler(base.BaseHandler):
+class ThreadHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ThreadHandler's
+    normalized_Payload dictionary.
+    """
+
+    updated_status: Optional[str]
+    text: str
+    updated_subject: Optional[str]
+
+
+class ThreadHandler(
+    base.BaseHandler[ThreadHandlerNormalizedPayloadDict, Dict[str, str]]
+):
     """Handles operations relating to feedback threads."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -185,7 +223,7 @@ class ThreadHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_view_feedback_thread
-    def get(self, thread_id):
+    def get(self, thread_id: str) -> None:
         suggestion_id = thread_id
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_id, strict=False
@@ -211,13 +249,15 @@ class ThreadHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_comment_on_feedback_thread
-    def post(self, thread_id):
+    def post(self, thread_id: str) -> None:
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
         suggestion = suggestion_services.get_suggestion_by_id(
             thread_id, strict=False
         )
-        text = self.normalized_payload.get('text')
-        updated_status = self.normalized_payload.get('updated_status')
-        updated_subject = self.normalized_payload.get('updated_subject')
+        text = self.normalized_payload['text']
+        updated_status = self.normalized_payload['updated_status']
+        updated_subject = self.normalized_payload['updated_subject']
 
         if suggestion and updated_status:
             raise self.InvalidInputException(
@@ -242,7 +282,19 @@ class ThreadHandler(base.BaseHandler):
         })
 
 
-class RecentFeedbackMessagesHandler(base.BaseHandler):
+class RecentFeedbackMessagesHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of RecentFeedbackMessagesHandler's
+    normalized_Payload dictionary.
+    """
+
+    cursor: Optional[str]
+
+
+class RecentFeedbackMessagesHandler(
+    base.BaseHandler[
+        Dict[str, str], RecentFeedbackMessagesHandlerNormalizedRequestDict
+    ]
+):
     """Returns a list of recently-posted feedback messages.
 
     Note that this currently also includes messages posted in private
@@ -250,7 +302,7 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'cursor': {
@@ -263,7 +315,8 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_moderator_page
-    def get(self):
+    def get(self) -> None:
+        assert self.normalized_request is not None
         urlsafe_start_cursor = self.normalized_request.get('cursor')
 
         all_feedback_messages, new_urlsafe_start_cursor, more = (
@@ -282,7 +335,9 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
         })
 
 
-class FeedbackStatsHandler(base.BaseHandler):
+class FeedbackStatsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Returns Feedback stats for an exploration.
         - Number of open threads.
         - Number of total threads.
@@ -300,12 +355,10 @@ class FeedbackStatsHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id):
+    def get(self, exploration_id: str) -> None:
         feedback_thread_analytics = (
             feedback_services.get_thread_analytics(
                 exploration_id))
@@ -318,7 +371,9 @@ class FeedbackStatsHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class FeedbackThreadViewEventHandler(base.BaseHandler):
+class FeedbackThreadViewEventHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Records when the given user views a feedback thread, in order to clear
     viewed feedback messages from emails that might be sent in future to this
     user.
@@ -335,12 +390,10 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'POST': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_comment_on_feedback_thread
-    def post(self, thread_id):
+    def post(self, thread_id: str) -> None:
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
         feedback_services.clear_feedback_message_references_transactional(
             self.user_id, exploration_id, thread_id)

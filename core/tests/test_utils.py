@@ -2466,7 +2466,7 @@ title: Title
     def set_config_property(
         self,
         config_obj: config_domain.ConfigProperty,
-        new_config_value: Union[str, List[str]]
+        new_config_value: Union[str, List[str], bool, float]
     ) -> None:
         """Sets a given configuration object's value to the new value specified
         using a POST request.
