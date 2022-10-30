@@ -35,19 +35,29 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Dict, List
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import suggestion_models
+
 (suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 class ContributorDashboardPageTest(test_utils.GenericTestBase):
     """Test for showing contributor dashboard pages."""
 
-    def test_page_with_disabled_contributor_dashboard_leads_to_404(self):
+    def test_page_with_disabled_contributor_dashboard_leads_to_404(
+        self
+    ) -> None:
         config_services.set_property(
             'admin', 'contributor_dashboard_is_enabled', False)
         self.get_html_response(
             feconf.CONTRIBUTOR_DASHBOARD_URL, expected_status_int=404)
 
-    def test_page_with_enabled_contributor_dashboard_loads_correctly(self):
+    def test_page_with_enabled_contributor_dashboard_loads_correctly(
+        self
+    ) -> None:
         config_services.set_property(
             'admin', 'contributor_dashboard_is_enabled', True)
         response = self.get_html_response(feconf.CONTRIBUTOR_DASHBOARD_URL)
@@ -58,7 +68,7 @@ class ContributorDashboardPageTest(test_utils.GenericTestBase):
 class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     """Unit test for the ContributionOpportunitiesHandler."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -164,7 +174,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         config_services.set_property(
             'admin', 'contributor_dashboard_is_enabled', True)
 
-    def test_handler_with_disabled_dashboard_flag_raise_404(self):
+    def test_handler_with_disabled_dashboard_flag_raise_404(self) -> None:
         config_services.set_property(
             'admin', 'contributor_dashboard_is_enabled', True)
 
@@ -179,7 +189,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
             params={}, expected_status_int=404)
 
-    def test_get_skill_opportunity_data(self):
+    def test_get_skill_opportunity_data(self) -> None:
         response = self.get_json(
             '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
             params={})
@@ -191,7 +201,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_skill_opportunity_data_does_not_return_non_classroom_topics(
-            self):
+        self
+    ) -> None:
         config_services.revert_property(
             self.admin_id, 'classroom_pages_data')
 
@@ -204,7 +215,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
-    def test_get_skill_opportunity_data_does_not_throw_for_deleted_topics(self):
+    def test_get_skill_opportunity_data_does_not_throw_for_deleted_topics(
+        self
+    ) -> None:
         topic_services.delete_topic(self.admin_id, self.topic_id)
 
         response = self.get_json(
@@ -216,7 +229,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
-    def test_get_translation_opportunities_fetches_matching_opportunities(self):
+    def test_get_translation_opportunities_fetches_matching_opportunities(
+        self
+    ) -> None:
         response = self.get_json(
             '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
             params={'language_code': 'hi', 'topic_name': 'topic'})
@@ -228,7 +243,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
-    def test_get_skill_opportunity_data_pagination(self):
+    def test_get_skill_opportunity_data_pagination(self) -> None:
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
@@ -263,7 +278,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertFalse(next_response['more'])
             self.assertIsInstance(next_response['next_cursor'], str)
 
-    def test_get_skill_opportunity_data_pagination_multiple_fetches(self):
+    def test_get_skill_opportunity_data_pagination_multiple_fetches(
+        self
+    ) -> None:
         # Unassign topic 0 from the classroom.
         config_services.revert_property(self.admin_id, 'classroom_pages_data')
 
@@ -322,7 +339,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertFalse(response['more'])
             self.assertIsInstance(response['next_cursor'], str)
 
-    def test_get_translation_opportunity_data_pagination(self):
+    def test_get_translation_opportunity_data_pagination(self) -> None:
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
@@ -348,21 +365,24 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertFalse(next_response['more'])
             self.assertIsInstance(next_response['next_cursor'], str)
 
-    def test_get_translation_opportunity_with_invalid_language_code(self):
+    def test_get_translation_opportunity_with_invalid_language_code(
+        self
+    ) -> None:
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'invalid_lang_code'},
                 expected_status_int=400)
 
-    def test_get_translation_opportunity_without_language_code(self):
+    def test_get_translation_opportunity_without_language_code(self) -> None:
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
 
     def test_get_translation_opportunities_without_topic_name_returns_all_topics( # pylint: disable=line-too-long
-            self):
+        self
+    ) -> None:
         response = self.get_json(
             '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
             params={'language_code': 'hi'})
@@ -376,7 +396,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_translation_opportunities_with_empty_topic_name_returns_all_topics( # pylint: disable=line-too-long
-            self):
+        self
+    ) -> None:
         response = self.get_json(
             '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
             params={'language_code': 'hi', 'topic_name': ''})
@@ -389,7 +410,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
-    def test_get_opportunity_for_invalid_opportunity_type(self):
+    def test_get_opportunity_for_invalid_opportunity_type(self) -> None:
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/invalid_opportunity_type' % (
@@ -398,7 +419,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
     def test_get_reviewable_translation_opportunities_returns_in_review_suggestions( # pylint: disable=line-too-long
         self
-    ):
+    ) -> None:
         # Create a translation suggestion for exploration 0.
         change_dict = {
             'cmd': 'add_translation',
@@ -425,7 +446,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
     def test_get_reviewable_translation_opportunities_when_state_is_removed(
         self
-    ):
+    ) -> None:
         # Create a new exploration and linked story.
         continue_state_name = 'continue state'
         exp_100 = self.save_new_linear_exp_with_state_names_and_interactions(
@@ -481,7 +502,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         )
 
         init_state = exp_100.states[exp_100.init_state_name]
-        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
+        default_outcome = init_state.interaction.default_outcome
+        assert default_outcome is not None
+        default_outcome_dict = default_outcome.to_dict()
         default_outcome_dict['dest'] = 'End state'
         exp_services.update_exploration(
             self.owner_id, exp_100.id, [
@@ -508,7 +531,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
     def test_get_reviewable_translation_opportunities_when_original_content_is_removed( # pylint: disable=line-too-long
         self
-    ):
+    ) -> None:
         # Create a new exploration and linked story.
         continue_state_name = 'continue state'
         exp_100 = self.save_new_linear_exp_with_state_names_and_interactions(
@@ -591,7 +614,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
     def test_get_reviewable_translation_opportunities_with_null_topic_name(
         self
-    ):
+    ) -> None:
         # Create a translation suggestion for exploration 0.
         change_dict = {
             'cmd': 'add_translation',
@@ -613,7 +636,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['opportunities'], [self.expected_opportunity_dict_1])
 
-    def test_get_reviewable_translation_opportunities_with_invalid_topic(self):
+    def test_get_reviewable_translation_opportunities_with_invalid_topic(
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         self.get_json(
@@ -623,7 +648,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
     def test_get_reviewable_translation_opportunities_returns_opportunities_in_story_order( # pylint: disable=line-too-long
         self
-    ):
+    ) -> None:
         # Create new explorations 10, 20, 30.
         exp_10 = self.save_new_valid_exploration(
             '10',
@@ -755,7 +780,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 expected_opportunity_dict_30,
                 expected_opportunity_dict_20])
 
-    def _publish_valid_topic(self, topic, uncategorized_skill_ids):
+    def _publish_valid_topic(
+        self, topic: topic_domain.Topic, uncategorized_skill_ids: List[str]
+    ) -> None:
         """Saves and publishes a valid topic with linked skills and subtopic.
 
         Args:
@@ -799,7 +826,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 class TranslatableTextHandlerTest(test_utils.GenericTestBase):
     """Unit test for the ContributionOpportunitiesHandler."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -862,7 +889,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                     'new_value': explorations[index].id
                 })], 'Changes.')
 
-    def test_handler_with_invalid_language_code_raise_exception(self):
+    def test_handler_with_invalid_language_code_raise_exception(self) -> None:
         self.get_json('/gettranslatabletexthandler', params={
             'language_code': 'hi',
             'exp_id': '0'
@@ -873,7 +900,9 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'exp_id': '0'
         }, expected_status_int=400)
 
-    def test_handler_with_exp_id_not_for_contribution_raise_exception(self):
+    def test_handler_with_exp_id_not_for_contribution_raise_exception(
+        self
+    ) -> None:
         self.get_json('/gettranslatabletexthandler', params={
             'language_code': 'hi',
             'exp_id': '0'
@@ -888,7 +917,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'exp_id': 'not_for_contribution'
         }, expected_status_int=400)
 
-    def test_handler_returns_correct_data(self):
+    def test_handler_returns_correct_data(self) -> None:
         exp_services.update_exploration(
             self.owner_id, '0', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -932,7 +961,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(output, expected_output)
 
-    def test_handler_does_not_return_in_review_content(self):
+    def test_handler_does_not_return_in_review_content(self) -> None:
         change_dict = {
             'cmd': 'add_written_translation',
             'state_name': 'Introduction',
@@ -972,7 +1001,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
     """Tests for MachineTranslationStateTextsHandler"""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -993,7 +1022,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
 
         self.publish_exploration(self.owner_id, exp.id)
 
-    def test_handler_with_invalid_language_code_raises_exception(self):
+    def test_handler_with_invalid_language_code_raises_exception(self) -> None:
         output = self.get_json(
             '/machine_translated_state_texts_handler', params={
                 'exp_id': self.exp_id,
@@ -1009,7 +1038,9 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             output['error'], error_msg)
 
-    def test_handler_with_no_target_language_code_raises_exception(self):
+    def test_handler_with_no_target_language_code_raises_exception(
+        self
+    ) -> None:
         output = self.get_json(
             '/machine_translated_state_texts_handler', params={
                 'exp_id': self.exp_id,
@@ -1021,7 +1052,9 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             output['error'], error_msg)
 
-    def test_handler_with_invalid_exploration_id_returns_not_found(self):
+    def test_handler_with_invalid_exploration_id_returns_not_found(
+        self
+    ) -> None:
         self.get_json(
             '/machine_translated_state_texts_handler', params={
                 'exp_id': 'invalid_exploration_id',
@@ -1030,7 +1063,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'target_language_code': 'es'
             }, expected_status_int=404)
 
-    def test_handler_with_no_exploration_id_raises_exception(self):
+    def test_handler_with_no_exploration_id_raises_exception(self) -> None:
         output = self.get_json(
             '/machine_translated_state_texts_handler', params={
                 'state_name': 'End State',
@@ -1042,7 +1075,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             output['error'], error_msg)
 
-    def test_handler_with_invalid_state_name_returns_not_found(self):
+    def test_handler_with_invalid_state_name_returns_not_found(self) -> None:
         self.get_json(
             '/machine_translated_state_texts_handler', params={
                 'exp_id': self.exp_id,
@@ -1051,7 +1084,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'target_language_code': 'es'
             }, expected_status_int=404)
 
-    def test_handler_with_no_state_name_raises_exception(self):
+    def test_handler_with_no_state_name_raises_exception(self) -> None:
         output = self.get_json(
             '/machine_translated_state_texts_handler', params={
                 'exp_id': self.exp_id,
@@ -1063,7 +1096,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             output['error'], error_msg)
 
-    def test_handler_with_invalid_content_ids_returns_none(self):
+    def test_handler_with_invalid_content_ids_returns_none(self) -> None:
         exp_services.update_exploration(
             self.owner_id, self.exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1093,7 +1126,8 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(output, expected_output)
 
     def test_handler_with_invalid_content_ids_format_raises_exception(
-            self):
+        self
+    ) -> None:
         output = self.get_json(
             '/machine_translated_state_texts_handler', params={
                 'exp_id': self.exp_id,
@@ -1105,7 +1139,9 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
             output['error'],
             'Improperly formatted content_ids: invalid_format')
 
-    def test_handler_with_empty_content_ids_returns_empty_response_dict(self):
+    def test_handler_with_empty_content_ids_returns_empty_response_dict(
+        self
+    ) -> None:
         output = self.get_json(
             '/machine_translated_state_texts_handler', params={
                 'exp_id': self.exp_id,
@@ -1114,12 +1150,14 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'target_language_code': 'es'
             }, expected_status_int=200
         )
-        expected_output = {
+        expected_output: Dict[str, Dict[str, str]] = {
             'translated_texts': {}
         }
         self.assertEqual(output, expected_output)
 
-    def test_handler_with_missing_content_ids_parameter_raises_exception(self):
+    def test_handler_with_missing_content_ids_parameter_raises_exception(
+        self
+    ) -> None:
         output = self.get_json(
             '/machine_translated_state_texts_handler', params={
                 'exp_id': self.exp_id,
@@ -1132,7 +1170,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             output['error'], error_msg)
 
-    def test_handler_with_valid_input_returns_translation(self):
+    def test_handler_with_valid_input_returns_translation(self) -> None:
         exp_services.update_exploration(
             self.owner_id, self.exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1164,7 +1202,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
 class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
     """Test for the UserContributionRightsDataHandler."""
 
-    def test_guest_user_check_contribution_rights(self):
+    def test_guest_user_check_contribution_rights(self) -> None:
         response = self.get_json('/usercontributionrightsdatahandler')
 
         self.assertEqual(
@@ -1175,7 +1213,7 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
                 'can_suggest_questions': False
             })
 
-    def test_user_check_contribution_rights(self):
+    def test_user_check_contribution_rights(self) -> None:
         user_email = 'user@example.com'
         self.signup(user_email, 'user')
         user_id = self.get_user_id_from_email(user_email)
@@ -1201,7 +1239,7 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
                 'can_suggest_questions': False
             })
 
-    def test_can_suggest_questions_flag_in_response(self):
+    def test_can_suggest_questions_flag_in_response(self) -> None:
         user_email = 'user@example.com'
         self.signup(user_email, 'user')
         user_id = self.get_user_id_from_email(user_email)
@@ -1231,7 +1269,7 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
 class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
     """Test for the FeaturedTranslationLanguagesHandler."""
 
-    def test_get_featured_translation_languages(self):
+    def test_get_featured_translation_languages(self) -> None:
         response = self.get_json('/retrivefeaturedtranslationlanguages')
         self.assertEqual(
             response,
@@ -1257,7 +1295,7 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
 class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
     """Test for the TranslatableTopicNamesHandler."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -1267,7 +1305,7 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-    def test_get_translatable_topic_names(self):
+    def test_get_translatable_topic_names(self) -> None:
         response = self.get_json('/gettranslatabletopicnames')
         self.assertEqual(
             response,
@@ -1304,7 +1342,9 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
 class TranslationPreferenceHandlerTest(test_utils.GenericTestBase):
     """Test for the TranslationPreferenceHandler."""
 
-    def test_get_preferred_translation_language_when_user_is_logged_in(self):
+    def test_get_preferred_translation_language_when_user_is_logged_in(
+        self
+    ) -> None:
         user_email = 'user@example.com'
         self.signup(user_email, 'user')
         self.login(user_email)
@@ -1323,7 +1363,7 @@ class TranslationPreferenceHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['preferred_translation_language_code'], 'en')
         self.logout()
 
-    def test_handler_with_guest_user_raises_exception(self):
+    def test_handler_with_guest_user_raises_exception(self) -> None:
         response = self.get_json(
             '/preferredtranslationlanguage', expected_status_int=401)
 
@@ -1334,7 +1374,7 @@ class TranslationPreferenceHandlerTest(test_utils.GenericTestBase):
 class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
     """Test for the ContributorStatsSummariesHandler."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -1343,7 +1383,7 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-    def _publish_topic(self, topic_id, topic_name):
+    def _publish_topic(self, topic_id: str, topic_name: str) -> None:
         """Creates and publishes a topic.
 
         Args:
@@ -1364,7 +1404,7 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.admin_id, topic)
         topic_services.publish_topic(topic_id, self.admin_id)
 
-    def test_get_translation_contribution_stats(self):
+    def test_get_translation_contribution_stats(self) -> None:
         # Create and publish a topic.
         published_topic_id = 'topic_id'
         published_topic_name = 'published_topic_name'
@@ -1412,7 +1452,7 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_translation_review_stats(self):
+    def test_get_translation_review_stats(self) -> None:
         # Create and publish a topic.
         published_topic_id = 'topic_id'
         published_topic_name = 'published_topic_name'
@@ -1454,7 +1494,7 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_question_contribution_stats(self):
+    def test_get_question_contribution_stats(self) -> None:
         # Create and publish a topic.
         published_topic_id = 'topic_id'
         published_topic_name = 'published_topic_name'
@@ -1490,7 +1530,7 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_question_review_stats(self):
+    def test_get_question_review_stats(self) -> None:
         # Create and publish a topic.
         published_topic_id = 'topic_id'
         published_topic_name = 'published_topic_name'
@@ -1526,7 +1566,9 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_stats_with_invalid_contribution_type_raises_error(self):
+    def test_get_stats_with_invalid_contribution_type_raises_error(
+        self
+    ) -> None:
         self.login(self.OWNER_EMAIL)
         response = self.get_json(
             '/contributorstatssummaries/a/review/%s' % (
@@ -1537,7 +1579,9 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_stats_with_invalid_contribution_subtype_raises_error(self):
+    def test_get_stats_with_invalid_contribution_subtype_raises_error(
+        self
+    ) -> None:
         self.login(self.OWNER_EMAIL)
         response = self.get_json(
             '/contributorstatssummaries/question/a/%s' % (
@@ -1548,7 +1592,7 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_stats_without_logging_in_error(self):
+    def test_get_stats_without_logging_in_error(self) -> None:
         response = self.get_json(
             '/contributorstatssummaries/question/a/abc',
             expected_status_int=401)
@@ -1556,7 +1600,7 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'], 'You must be logged in to access this resource.')
 
-    def test_get_all_stats_of_other_users_raises_error(self):
+    def test_get_all_stats_of_other_users_raises_error(self) -> None:
         self.login(self.OWNER_EMAIL)
 
         response = self.get_json(
@@ -1574,7 +1618,7 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
 class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
     """Test for the ContributorAllStatsSummariesHandler."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -1632,7 +1676,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             last_contribution_date=datetime.date.fromtimestamp(1616173836)
         )
 
-    def _publish_topic(self, topic_id, topic_name):
+    def _publish_topic(self, topic_id: str, topic_name: str) -> None:
         """Creates and publishes a topic.
 
         Args:
@@ -1653,7 +1697,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.admin_id, topic)
         topic_services.publish_topic(topic_id, self.admin_id)
 
-    def test_get_all_stats(self):
+    def test_get_all_stats(self) -> None:
         self.login(self.OWNER_EMAIL)
 
         response = self.get_json(
@@ -1714,7 +1758,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_stats_without_logging_in_error(self):
+    def test_get_stats_without_logging_in_error(self) -> None:
         response = self.get_json(
             '/contributorallstatssummaries/abc',
             expected_status_int=401)
@@ -1722,7 +1766,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'], 'You must be logged in to access this resource.')
 
-    def test_get_all_stats_of_other_users_raises_error(self):
+    def test_get_all_stats_of_other_users_raises_error(self) -> None:
         self.login(self.OWNER_EMAIL)
 
         response = self.get_json(
