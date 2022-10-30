@@ -8225,6 +8225,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
+            a: 18.0
+            b: 18.0
+          rule_type: IsInclusivelyBetween
+        - inputs:
             x: 25.0
           rule_type: Equals
         - inputs:
@@ -8238,10 +8242,6 @@ states:
         - inputs:
             a: 17.0
             b: 15.0
-          rule_type: IsInclusivelyBetween
-        - inputs:
-            a: 18.0
-            b: 18.0
           rule_type: IsInclusivelyBetween
         tagged_skill_misconception_id: null
         training_data: []
@@ -8502,6 +8502,9 @@ states:
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
+        - inputs:
+            x: 18.0
+          rule_type: Equals
         - inputs:
             x: 25.0
           rule_type: Equals
