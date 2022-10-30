@@ -443,7 +443,8 @@ def validate_rte_format(
                 err_dict['strings'].append(html_data)
 
         for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
-            tab_content_json = utils.unescape_html(tabs['tab_contents-with-value'])
+            tab_content_json = utils.unescape_html(
+                tabs['tab_contents-with-value'])
             tab_content_list = json.loads(tab_content_json)
             for tab_content in tab_content_list:
                 content_html = tab_content['content']
@@ -796,7 +797,8 @@ def add_math_content_to_math_rte_components(html_string: str) -> str:
                 # double quotes(&amp;quot;) and should be a valid unicode
                 # string.
                 raw_latex = (
-                    json.loads(utils.unescape_html(math_tag['raw_latex-with-value'])))
+                    json.loads(utils.unescape_html(
+                        math_tag['raw_latex-with-value'])))
                 normalized_raw_latex = (
                     objects.UnicodeString.normalize(raw_latex))
             except Exception as e:
@@ -1033,7 +1035,8 @@ def _process_string_with_components(
                 ).replace('<br/>', '<br>')))
 
     for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
-        tab_content_json = utils.unescape_html(tabs['tab_contents-with-value'])
+        tab_content_json = utils.unescape_html(
+            tabs['tab_contents-with-value'])
         tab_content_list = json.loads(tab_content_json)
         for tab_content in tab_content_list:
             content_html = tab_content['content']
