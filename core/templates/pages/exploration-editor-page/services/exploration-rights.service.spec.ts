@@ -286,8 +286,10 @@ describe('Exploration rights service', () => {
       successHandler, failHandler);
     tick();
 
-    expect(explorationRightsBackendApiService
-      .assignVoiceArtistRoleAsyncPostData).toHaveBeenCalled();
+    expect(
+      explorationRightsBackendApiService
+        .assignVoiceArtistRoleAsyncPostData
+    ).toHaveBeenCalled();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'Could not assign voice artist to private activity.'
     );
