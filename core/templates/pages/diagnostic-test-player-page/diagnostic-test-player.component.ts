@@ -23,7 +23,7 @@ import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkill
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-import { DiagnosticTestModelData } from './diagnostic-test.model';
+import { DiagnosticTestTopicTrackerModel } from './diagnostic-test-topic-tracker.model';
 
 
 @Component({
@@ -32,7 +32,7 @@ import { DiagnosticTestModelData } from './diagnostic-test.model';
 })
 export class DiagnosticTestPlayerComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL: string = '';
-  diagnosticTestModelData;
+  diagnosticTestTopicTrackerModel;
   questionPlayerConfig;
   diagnosticTestStarted = false;
 
@@ -62,10 +62,10 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
     this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
       response => {
-        this.diagnosticTestModelData = new DiagnosticTestModelData(
+        this.diagnosticTestTopicTrackerModel = new DiagnosticTestTopicTrackerModel(
           response.classroomDict.topicIdToPrerequisiteTopicIds);
-        this.diagnosticTestModelData.setCurrentTopicId();
-        let currentTopicId = this.diagnosticTestModelData.getCurrentTopicId();
+        this.diagnosticTestTopicTrackerModel.setCurrentTopicId();
+        let currentTopicId = this.diagnosticTestTopicTrackerModel.getCurrentTopicId();
 
       this.topicsAndSkillsDashboardBackendApiService
         .fetchTopicIdToDiagnosticTestSkillIdsAsync([currentTopicId]).then(
