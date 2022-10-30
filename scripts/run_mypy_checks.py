@@ -79,8 +79,6 @@ NOT_FULLY_COVERED_FILES: Final = [
     'core/controllers/learner_playlist_test.py',
     'core/controllers/library.py',
     'core/controllers/library_test.py',
-    'core/controllers/oppia_root.py',
-    'core/controllers/oppia_root_test.py',
     'core/controllers/pages.py',
     'core/controllers/pages_test.py',
     'core/controllers/payload_validator.py',
