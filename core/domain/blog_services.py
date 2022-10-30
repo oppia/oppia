@@ -983,9 +983,7 @@ def create_blog_author_details_model(user_id: str) -> None:
         )
 
 
-def get_blog_author_details(user_id: str) -> Optional[
-    blog_domain.BlogAuthorDetails
-]:
+def get_blog_author_details(user_id: str) -> blog_domain.BlogAuthorDetails:
     """Returns the blog author details for the given user id. If
     blogAuthorDetailsModel is not present, a new model with default values is
     created.
@@ -994,15 +992,21 @@ def get_blog_author_details(user_id: str) -> Optional[
         user_id: str. The user id of the blog author.
 
     Returns:
-        BlogAuthorDetails. The blog author details for the given user id.
+        BlogAuthorDetails. The blog author details for the given user ID.
+
+    Raises:
+        Exception. Unable to fetch blog author details for the given user ID.
     """
     author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
 
     if author_model is None:
         create_blog_author_details_model(user_id)
         author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
+    
+    if author_model is None:
+        raise Exception('Unable to fetch author details for the given user.')
 
-    return None if not author_model else blog_domain.BlogAuthorDetails(
+    return blog_domain.BlogAuthorDetails(
         author_model.id,
         author_model.author_id,
         author_model.displayed_author_name,

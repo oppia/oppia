@@ -72,5 +72,5 @@ Registry.create_feature_flag(
 Registry.create_feature_flag(
     ParamNames.BLOG_PAGES,
     'This flag is for blog home page, blog author profile page and blog post' +
-    'page.',
+    ' page.',
     platform_parameter_domain.FeatureStages.PROD)

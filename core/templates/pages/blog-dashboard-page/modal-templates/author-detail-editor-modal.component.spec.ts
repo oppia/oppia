@@ -57,12 +57,22 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
   });
 
   it('should dismiss the modal on calling cancel function', () => {
+    component.prevAuthorBio = 'author Bio';
     component.cancel();
 
     expect(dismissSpy).toHaveBeenCalled();
   });
 
-  it('should close the modal on calling save function', () => {
+  it('should not dismiss the modal on calling cancel function if author bio' +
+  'is empty', () => {
+    component.prevAuthorBio = '';
+    component.cancel();
+
+    expect(dismissSpy).not.toHaveBeenCalled();
+  });
+
+  it('should close the modal on calling save function with valid author' +
+  'details', () => {
     component.authorName = 'test username';
     component.authorBio = 'general bio';
     let expectedAuthorDetails = {
@@ -72,5 +82,45 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
     component.save();
 
     expect(confirmSpy).toHaveBeenCalledWith(expectedAuthorDetails);
+  });
+
+  it('should not close the modal on calling save function with invalid author' +
+  'details', () => {
+    component.authorName = '';
+    component.authorBio = '';
+
+    component.save();
+
+    expect(confirmSpy).not.toHaveBeenCalledWith();
+  });
+
+  it('should validate author details', () => {
+    component.authorName = 'test username';
+    component.authorBio = 'general bio';
+    expect(component.validateAuthorDetails().length).toBe(0);
+
+    component.authorName = '';
+    component.authorBio = 'general bio';
+    expect(component.validateAuthorDetails().length).toBe(1);
+    expect(component.validateAuthorDetails()).toEqual([
+      'Author Name should not be empty.'
+    ]);
+
+    component.authorName = '';
+    component.authorBio = '';
+    expect(component.validateAuthorDetails().length).toBe(2);
+    expect(component.validateAuthorDetails()).toEqual([
+      'Author Name should not be empty.',
+      'Author Bio should not be empty.'
+    ]);
+
+    component.authorName = 'Author name exceeding character limit of 35' +
+    ' characters should raise error.';
+    component.authorBio = 'Author bio exceeding char limit of 35'.repeat(550);
+    expect(component.validateAuthorDetails().length).toBe(2);
+    expect(component.validateAuthorDetails()).toEqual([
+      'Author Name should not be more than 35 characters.',
+      'Author Bio should not be more than 250 characters.'
+    ]);
   });
 });

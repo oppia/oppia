@@ -17,6 +17,7 @@
  */
 
 import { Component } from '@angular/core';
+import { AppConstants } from 'app.constants';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
@@ -33,6 +34,7 @@ export class BlogAuthorDetailsEditorComponent extends ConfirmOrCancelModal {
   authorBioEditorIsOpen: boolean = false;
   authorName!: string;
   authorBio!: string;
+  prevAuthorBio: string;
   constructor(
       ngbActiveModal: NgbActiveModal,
   ) {
@@ -40,7 +42,33 @@ export class BlogAuthorDetailsEditorComponent extends ConfirmOrCancelModal {
   }
 
   cancel(): void {
-    super.cancel();
+    if (this.prevAuthorBio.length !== 0) {
+      super.cancel();
+    }
+  }
+
+  validateAuthorDetails(): string[] {
+    let issues = [];
+    if (this.authorName === '') {
+      issues.push(
+        'Author Name should not be empty.');
+    } else if (
+      this.authorName.length > AppConstants.MAX_AUTHOR_NAME_LENGTH) {
+      issues.push(
+        'Author Name should not be more than ' +
+        `${AppConstants.MAX_AUTHOR_NAME_LENGTH} characters.`
+      );
+    }
+    if (this.authorBio === '') {
+      issues.push(
+        'Author Bio should not be empty.');
+    } else if (this.authorBio.length > AppConstants.MAX_CHARS_IN_AUTHOR_BIO) {
+      issues.push(
+        'Author Bio should not be more than ' +
+        `${AppConstants.MAX_CHARS_IN_AUTHOR_BIO} characters.`
+      );
+    }
+    return issues;
   }
 
   save(): void {
@@ -48,6 +76,8 @@ export class BlogAuthorDetailsEditorComponent extends ConfirmOrCancelModal {
       authorName: this.authorName,
       authorBio: this.authorBio
     };
-    super.confirm(authorDetails);
+    if (this.validateAuthorDetails().length === 0) {
+      super.confirm(authorDetails);
+    }
   }
 }

@@ -6199,6 +6199,9 @@ export default {
   // Maximum allowed length of a blog post author's name.
   "MAX_AUTHOR_NAME_LENGTH": 35,
 
+  // Maximum allowed characters in a blog post author's bio.
+  "MAX_CHARS_IN_AUTHOR_BIO": 250,
+
   // Maximum allowed length of a state name.
   "MAX_STATE_NAME_LENGTH": 50,
 

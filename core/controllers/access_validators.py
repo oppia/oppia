@@ -171,9 +171,7 @@ class BlogHomePageAccessValidationHandler(base.BaseHandler):
         'GET': {}
     }
 
-    # Using type ignore[misc] here because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access
     def get(self) -> None:
         """Validates access to blog home page."""
         pass
@@ -196,9 +194,7 @@ class BlogPostPageAccessValidationHandler(base.BaseHandler):
         }
     }
 
-    # Using type ignore[misc] here because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access
     def get(self) -> None:
         # Please use type casting here instead of type ignore[union-attr] once
         # this attribute `normalized_request` has been type annotated in the
@@ -217,7 +213,7 @@ class BlogAuthorProfilePageAccessValidationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+    URL_PATH_ARGS_SCHEMAS = {
         'author_username': {
             'schema': {
                 'type': 'basestring'
@@ -228,10 +224,8 @@ class BlogAuthorProfilePageAccessValidationHandler(base.BaseHandler):
         'GET': {}
     }
 
-    # Using type ignore[misc] here because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
-    def get(self, author_username) -> None:
+    @acl_decorators.open_access
+    def get(self, author_username: str) -> None:
         author_settings = (
             user_services.get_user_settings_from_username(author_username))
 
