@@ -378,7 +378,13 @@ class AdminHandler(
                 result = {
                     'version': version
                 }
-            elif action == 'update_feature_flag_rules':
+            else:
+                # The handler schema defines the possible values of 'action'.
+                # If 'action' has a value other than those defined in the
+                # schema, a Bad Request error will be thrown. Hence, 'action'
+                # must be 'update_feature_flag_rules' if this branch is
+                # executed.
+                assert action == 'update_feature_flag_rules'
                 feature_name = self.normalized_payload['feature_name']
                 if feature_name is None:
                     raise Exception(
@@ -1045,7 +1051,15 @@ class AdminRoleHandler(
                     user_services.get_usernames_by_role(role) if role else []
                 )
             })
-        elif filter_criterion == feconf.USER_FILTER_CRITERION_USERNAME:
+        else:
+            # The handler schema defines the possible values of
+            # 'filter_criterion'. If 'filter_criterion' has a value other than
+            # those defined in the schema, a Bad Request error will be thrown.
+            # Hence, 'filter_criterion' must be
+            # 'feconf.USER_FILTER_CRITERION_USERNAME' if this branch is
+            # executed.
+            assert filter_criterion == (
+                feconf.USER_FILTER_CRITERION_USERNAME)
             username = request_data.get(feconf.USER_FILTER_CRITERION_USERNAME)
             if username is None:
                 raise Exception(
@@ -1186,13 +1200,21 @@ class TopicManagerRoleHandler(
             topic_services.assign_role(
                 user_services.get_system_user(),
                 topic_manager, topic_domain.ROLE_MANAGER, topic_id)
-        elif action == 'deassign':
+        else:
+            # The handler schema defines the possible values of 'action'.
+            # If 'action' has a value other than those defined in the schema,
+            # a Bad Request error will be thrown. Hence, 'action' must be
+            # 'deassign' if this branch is executed.
+            assert action == 'deassign'
             topic_services.deassign_manager_role_from_topic(
                 user_services.get_system_user(), user_id, topic_id)
 
-            if not topic_fetchers.get_topic_rights_with_user(user_id):
-                user_services.remove_user_role(
-                    user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+            # The case where user does not have manager rights it will be
+            # caught before in topic_services.deassign_manager_role_from_topic
+            # method.
+            assert not topic_fetchers.get_topic_rights_with_user(user_id)
+            user_services.remove_user_role(
+                user_id, feconf.ROLE_ID_TOPIC_MANAGER)
 
         self.render_json({})
 

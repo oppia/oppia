@@ -122,7 +122,8 @@ class BlogAdminHandler(
         """Handles POST requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        if self.normalized_payload['action'] == 'save_config_properties':
+        action = self.normalized_payload['action']
+        if action == 'save_config_properties':
             new_config_property_values = self.normalized_payload[
                 'new_config_property_values']
             if new_config_property_values is None:
@@ -135,7 +136,12 @@ class BlogAdminHandler(
             logging.info(
                 '[BLOG ADMIN] %s saved config property values: %s' %
                 (self.user_id, new_config_property_values))
-        elif self.normalized_payload['action'] == 'revert_config_property':
+        else:
+            # The handler schema defines the possible values of 'action'.
+            # If 'action' has a value other than those defined in the schema,
+            # a Bad Request error will be thrown. Hence, 'action' must be
+            # 'revert_config_property' if this branch is executed.
+            assert action == 'revert_config_property'
             config_property_id = self.normalized_payload['config_property_id']
             if config_property_id is None:
                 raise Exception(
