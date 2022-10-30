@@ -29,8 +29,6 @@ import { APP_BASE_HREF } from '@angular/common';
 
 import { EditLearnerGroupPageComponent } from
   './edit-learner-group-page.component';
-import { LearnerGroupOverviewComponent } from
-  './learner-group-overview.component';
 import { LearnerGroupSyllabusComponent } from
   './learner-group-syllabus.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -48,8 +46,6 @@ import { InviteLearnersModalComponent } from
 
 import { LearnerGroupLearnersProgressComponent } from
   './learner-group-learners-progress.component';
-import { LearnerGroupLearnerSpecificProgressComponent } from
-  './learner-group-learner-specific-progress.component';
 import { InviteSuccessfulModalComponent } from
   '../templates/invite-successful-modal.component';
 import { DeleteLearnerGroupModalComponent } from
@@ -71,11 +67,9 @@ import { SharedLearnerGroupComponentsModule } from 'pages/learner-group-pages/sh
   ],
   declarations: [
     EditLearnerGroupPageComponent,
-    LearnerGroupOverviewComponent,
     LearnerGroupSyllabusComponent,
     LearnerGroupLearnersProgressComponent,
     LearnerGroupPreferencesComponent,
-    LearnerGroupLearnerSpecificProgressComponent,
     RemoveItemModalComponent,
     SyllabusAdditionSuccessModalComponent,
     InviteLearnersModalComponent,
@@ -84,11 +78,9 @@ import { SharedLearnerGroupComponentsModule } from 'pages/learner-group-pages/sh
   ],
   entryComponents: [
     EditLearnerGroupPageComponent,
-    LearnerGroupOverviewComponent,
     LearnerGroupSyllabusComponent,
     LearnerGroupLearnersProgressComponent,
     LearnerGroupPreferencesComponent,
-    LearnerGroupLearnerSpecificProgressComponent,
     RemoveItemModalComponent,
     SyllabusAdditionSuccessModalComponent,
     InviteLearnersModalComponent,

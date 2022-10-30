@@ -24,6 +24,8 @@ import { CommonModule } from '@angular/common';
 import { AddSyllabusItemsComponent } from './create-group/add-syllabus-items.component';
 import { InviteLearnersComponent } from './create-group/invite-learners.component';
 import { LearnerGroupDetailsComponent } from './create-group/learner-group-details.component';
+import { LearnerGroupOverviewComponent } from './edit-group/learner-group-overview.component';
+import { LearnerGroupLearnerSpecificProgressComponent } from './edit-group/learner-group-learner-specific-progress.component';
 
 @NgModule({
   imports: [
@@ -34,16 +36,22 @@ import { LearnerGroupDetailsComponent } from './create-group/learner-group-detai
   ],
   declarations: [
     LearnerGroupDetailsComponent,
+    LearnerGroupOverviewComponent,
+    LearnerGroupLearnerSpecificProgressComponent,
     AddSyllabusItemsComponent,
     InviteLearnersComponent
   ],
   entryComponents: [
     LearnerGroupDetailsComponent,
+    LearnerGroupOverviewComponent,
+    LearnerGroupLearnerSpecificProgressComponent,
     AddSyllabusItemsComponent,
     InviteLearnersComponent
   ],
   exports: [
     LearnerGroupDetailsComponent,
+    LearnerGroupOverviewComponent,
+    LearnerGroupLearnerSpecificProgressComponent,
     AddSyllabusItemsComponent,
     InviteLearnersComponent
   ]

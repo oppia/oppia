@@ -128,8 +128,8 @@ describe('I18n service', () => {
     }
     // This sets the url to 'http://localhost:8181/?lang=invalid'
     // when initialized.
-    spyOn(windowRef.nativeWindow.location, 'toString')
-      .and.returnValue('http://localhost:8181/?lang=invalid');
+    windowRef.nativeWindow.location.href = (
+      'http://localhost:8181/?lang=invalid');
     i18nService.initialize();
 
     // Translation cache should not be updated as the language param

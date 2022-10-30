@@ -74,7 +74,7 @@ export class ExplorationEditorTabComponent
     ];
 
     constructor(
-     private editabilityService: EditabilityService,
+     public editabilityService: EditabilityService,
      private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
      private siteAnalyticsService: SiteAnalyticsService,
      private explorationStatesService: ExplorationStatesService,
@@ -84,7 +84,7 @@ export class ExplorationEditorTabComponent
      private explorationFeaturesService: ExplorationFeaturesService,
      private routerService: RouterService,
      private ngbModal: NgbModal,
-     private stateCardIsCheckpointService: StateCardIsCheckpointService,
+     public stateCardIsCheckpointService: StateCardIsCheckpointService,
      private explorationInitStateNameService: ExplorationInitStateNameService,
      private explorationWarningsService: ExplorationWarningsService,
      private explorationCorrectnessFeedbackService:

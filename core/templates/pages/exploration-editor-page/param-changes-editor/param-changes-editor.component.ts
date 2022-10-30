@@ -71,7 +71,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
      private explorationStatesService: ExplorationStatesService,
      private explorationParamSpecsService: ExplorationParamSpecsService,
      private paramChangeObjectFactory: ParamChangeObjectFactory,
-     private editabilityService: EditabilityService,
+     public editabilityService: EditabilityService,
      private urlInterpolationService: UrlInterpolationService,
      private injector: Injector,
   ) {}
