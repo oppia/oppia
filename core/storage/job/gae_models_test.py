@@ -51,6 +51,31 @@ class JobModelTest(test_utils.GenericTestBase):
         job.status_code = job_models.STATUS_CODE_CANCELED
         self.assertFalse(job.is_cancelable)
 
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'job_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_queued_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_started_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_finished_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'metadata': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'output': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'error': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'has_been_cleaned_up': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'additional_job_params': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        model = job_models.JobModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = job_models.JobModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
 
 class JobModelSetUpJobsTest(test_utils.GenericTestBase):
     """Tests for Oppia job models with setUp."""

@@ -107,8 +107,8 @@ class BlogAdminHandler(base.BaseHandler):
     def post(self) -> None:
         """Handles POST requests."""
         result = {}
-        if self.normalized_payload.get(
-                'action') == 'save_config_properties':
+        action = self.normalized_payload.get('action')
+        if action == 'save_config_properties':
             new_config_property_values = self.normalized_payload.get(
                 'new_config_property_values')
             for (name, value) in new_config_property_values.items():
@@ -116,8 +116,12 @@ class BlogAdminHandler(base.BaseHandler):
             logging.info(
                 '[BLOG ADMIN] %s saved config property values: %s' %
                 (self.user_id, new_config_property_values))
-        elif self.normalized_payload.get(
-                'action') == 'revert_config_property':
+        else:
+            # The handler schema defines the possible values of 'action'.
+            # If 'action' has a value other than those defined in the schema,
+            # a Bad Request error will be thrown. Hence, 'action' must be
+            # 'revert_config_property' if this branch is executed.
+            assert action == 'revert_config_property'
             config_property_id = (
                 self.normalized_payload.get('config_property_id'))
             config_services.revert_property(

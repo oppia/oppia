@@ -610,11 +610,25 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             'isDirected': True,
             'isWeighted': False
         }
+        weighted_labeled_graph = {
+            'vertices': [
+                {'x': 0.0, 'y': 10.0, 'label': 'vertex1'},
+                {'x': 50.0, 'y': 10.0, 'label': 'vertex2'},
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1},
+                {'src': 1, 'dst': 0, 'weight': 1},
+            ],
+            'isLabeled': True,
+            'isDirected': True,
+            'isWeighted': True
+        }
 
         mappings = [
             (empty_graph, empty_graph),
             (cycle_5_graph, cycle_5_graph),
             (directed_graph, directed_graph),
+            (weighted_labeled_graph, weighted_labeled_graph)
         ]
 
         invalid_values_with_error_messages: List[Tuple[

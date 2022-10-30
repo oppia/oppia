@@ -365,6 +365,94 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 model_class.get_filter_options_for_field(
                     InvalidFilter.INVALID_FIELD) # type: ignore[arg-type]
 
+    def test_get_filter_options_returns_correctly(self) -> None:
+        model = app_feedback_report_models.AppFeedbackReportModel
+        self.assertEqual(
+            model.get_filter_options_for_field(
+                app_feedback_report_models.FilterFieldNames.REPORT_TYPE),
+            [self.REPORT_TYPE_SUGGESTION])
+        self.assertEqual(
+            model.get_filter_options_for_field(
+                app_feedback_report_models.FilterFieldNames.PLATFORM),
+            [self.PLATFORM_ANDROID])
+        self.assertEqual(
+            model.get_filter_options_for_field(
+                app_feedback_report_models.FilterFieldNames.ENTRY_POINT),
+            [self.ENTRY_POINT_NAVIGATION_DRAWER])
+        self.assertEqual(
+            model.get_filter_options_for_field(
+                app_feedback_report_models.FilterFieldNames.SUBMITTED_ON),
+            [self.REPORT_SUBMITTED_TIMESTAMP_1.date()])
+        self.assertEqual(
+            model.get_filter_options_for_field(
+                app_feedback_report_models.FilterFieldNames
+                .ANDROID_DEVICE_MODEL),
+            [self.ANDROID_DEVICE_MODEL])
+        self.assertEqual(
+            model.get_filter_options_for_field(
+                app_feedback_report_models.FilterFieldNames.TEXT_LANGUAGE_CODE),
+            [self.TEXT_LANGUAGE_CODE_ENGLISH])
+        self.assertEqual(
+            model.get_filter_options_for_field(
+                app_feedback_report_models.FilterFieldNames
+                .ANDROID_SDK_VERSION),
+            [self.ANDROID_SDK_VERSION])
+        self.assertEqual(
+            model.get_filter_options_for_field(
+                app_feedback_report_models.FilterFieldNames
+                .AUDIO_LANGUAGE_CODE),
+            [self.AUDIO_LANGUAGE_CODE_ENGLISH])
+        self.assertEqual(
+            model.get_filter_options_for_field(
+                app_feedback_report_models.FilterFieldNames.PLATFORM_VERSION),
+            [self.PLATFORM_VERSION])
+        self.assertEqual(
+            model.get_filter_options_for_field(
+                app_feedback_report_models.FilterFieldNames
+                .ANDROID_DEVICE_COUNTRY_LOCALE_CODE),
+            [self.DEVICE_COUNTRY_LOCALE_CODE_INDIA])
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'platform': base_models.EXPORT_POLICY.EXPORTED,
+            'scrubbed_by': base_models.EXPORT_POLICY.EXPORTED,
+            'ticket_id': base_models.EXPORT_POLICY.EXPORTED,
+            'submitted_on': base_models.EXPORT_POLICY.EXPORTED,
+            'local_timezone_offset_hrs': base_models.EXPORT_POLICY.EXPORTED,
+            'report_type': base_models.EXPORT_POLICY.EXPORTED,
+            'category': base_models.EXPORT_POLICY.EXPORTED,
+            'platform_version': base_models.EXPORT_POLICY.EXPORTED,
+            'android_device_country_locale_code': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'android_device_model': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'android_sdk_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entry_point': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entry_point_topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entry_point_story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entry_point_exploration_id': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'entry_point_subtopic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'text_language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'audio_language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'android_report_info': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'android_report_info_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'web_report_info': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'web_report_info_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        model = app_feedback_report_models.AppFeedbackReportModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = app_feedback_report_models.AppFeedbackReportModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+
     def _mock_query_filters_returns_empty_list(
         self, projection: bool, distinct: bool  # pylint: disable=unused-argument
     ) -> List[str]:
@@ -455,6 +543,28 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             model.get_lowest_supported_role(), feconf.ROLE_ID_MODERATOR)
 
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'ticket_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'platform': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'github_issue_repo_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'github_issue_number': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'archived': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'newest_report_timestamp': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'report_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        model = app_feedback_report_models.AppFeedbackReportTicketModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = app_feedback_report_models.AppFeedbackReportTicketModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
 
 class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
     """Tests for the AppFeedbackReportStatsModel class."""
@@ -511,6 +621,40 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
             'android', self.TICKET_ID, self.STATS_DATE)
 
         self.assertEqual(entity_id, entity_id_copy)
+
+    def test_null_ticket_id_is_handled(self) -> None:
+        model_class = (
+            app_feedback_report_models.AppFeedbackReportStatsModel)
+        entity_id = model_class.calculate_id(
+            'android', None, self.STATS_DATE)
+        self.assertEqual(
+            entity_id,
+            '%s:%s:%s' % (
+                'android', 'unticketed_android_reports_stats_ticket_id',
+                self.STATS_DATE.isoformat())
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'ticket_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'platform': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'stats_tracking_date': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'total_reports_submitted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'daily_param_stats_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'daily_param_stats': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        model = app_feedback_report_models.AppFeedbackReportStatsModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = app_feedback_report_models.AppFeedbackReportStatsModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
     def test_get_stats_for_ticket(self) -> None:
         entity_id = (

@@ -59,7 +59,7 @@ class StateCounterModelTests(test_utils.GenericTestBase):
     def test_get_state_counter_model(self) -> None:
         # This tests whether get_or_create() can get/fetch the model when the
         # model is created by creating an instance.
-        stats_models.StateCounterModel(id='exp_id1.state_name')
+        stats_models.StateCounterModel(id='exp_id1.state_name').put()
 
         model_instance = stats_models.StateCounterModel.get_or_create(
             'exp_id1', 'state_name')
