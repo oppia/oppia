@@ -11153,7 +11153,6 @@ tags: []
 title: ''
 """)
 
-        self.maxDiff = None
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_drag_and_drop_interac_1)
         self.assertEqual(
