@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the ngJoyRide library.
+ * @fileoverview Routing module for blog home page.
  */
 
-require('static/ng-joyride-b117e0/ng-joyride.js');
+import { NgModule } from '@angular/core';
+import { Route, RouterModule } from '@angular/router';
+import { BlogPostPageRootComponent } from './blog-post-page-root.component';
+
+const routes: Route[] = [
+  {
+    path: '',
+    component: BlogPostPageRootComponent
+  }
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forChild(routes)
+  ],
+  exports: [
+    RouterModule
+  ]
+})
+
+export class BlogPostPageRoutingModule {}

@@ -13,19 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in classroom-admin panel.
+ * @fileoverview Directives required in diagnostic test player panel.
  */
 
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import 'angular-ui-sortable';
 import 'angular-ui-validate';
 
 angular.module('oppia', [
   require('angular-cookies'), 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'ui.bootstrap', 'ui.sortable', 'ui.validate'
+  'ui.bootstrap', 'ui.validate'
 ]);
 
 require('Polyfills.ts');

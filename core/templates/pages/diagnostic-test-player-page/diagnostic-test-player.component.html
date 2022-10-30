@@ -1,17 +1,11 @@
 <div class="diagnostic-test-container">
-  <div>
-    <button class="btn oppia-diagnostic-test-button oppia-back-button"
-            (click)="returnBackToClassroom()"
-            translate="I18N_DIAGNOSTIC_TEST_BACK_BUTTON">
-    </button>
-  </div>
   <div class="oppia-diagnostic-test-session">Learner Diagnostic Test</div>
   <mat-card class="introductory-card" *ngIf="!diagnosticTestStarted">
     <div class="oppia-introductory-container">
       <div class="oppia-image">
-        <img [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
+        <img class="oppia-otter-image" [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
       </div>
-      <div class="test-introduction-container">
+      <div>
         <p class="test-introduction-text">
           <span translate="I18N_DIAGNOSTIC_TEST_INTRO_TEXT_1"></span>
         </p>
@@ -33,34 +27,23 @@
 
 <style>
   .oppia-image {
-    margin-right: 5%;
+    align-items: center;
+    display: flex;
+    margin-right: 60px;
   }
   .oppia-introductory-container {
     display: flex;
   }
-  .start-test-button {
-    display: flex;
-    margin: auto;
-    margin-top: 10%;
-  }
   .introductory-card {
-    height: 350px;
     margin: auto;
-    margin-top: 5%;
-    padding: 35px;
-    width: 600px;
-  }
-  .oppia-back-button {
-    margin: 10px;
-    position: absolute;
-    text-transform: uppercase;
+    margin-top: 5vh;
+    overflow: auto;
+    padding: 60px;
+    width: 704px;
   }
   .test-introduction-text {
     font-family: 'Roboto', Arial, sans-serif;
-    font-size: 1.2em;
-  }
-  .test-introduction-container {
-    width: 400px;
+    font-size: 1.5em;
   }
   .oppia-diagnostic-test-session {
     color: #01645c;
@@ -70,11 +53,16 @@
     margin-top: 20px;
     text-align: center;
   }
-  .oppia-diagnostic-test-button {
+  .oppia-diagnostic-test-start-button {
     background-color: #00645c;
     color: #fff;
+    float: right;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 1.1em;
+    font-size: 1.2em;
+    margin-top: 5vh;
     text-transform: uppercase;
+  }
+  .oppia-otter-image {
+    max-width: 7em;
   }
 </style>
