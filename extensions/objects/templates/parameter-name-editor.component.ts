@@ -30,7 +30,7 @@ import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/serv
 })
 export class ParameterNameEditorComponent implements OnInit {
   @Output() valueChanged = new EventEmitter();
-  @Output() validityChange = new EventEmitter<Record<'error', boolean>>();4
+  @Output() validityChange = new EventEmitter<Record<'error', boolean>>();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
