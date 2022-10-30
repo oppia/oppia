@@ -39,7 +39,7 @@ export class HintsAndSolutionManagerService {
   tooltipTimeout: NodeJS.Timeout | null = null;
 
   ACCELERATED_HINT_WAIT_TIME_MSEC: number = 10000;
-  WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 20000;
+  WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 500;
 
   _solutionViewedEventEmitter = new EventEmitter();
   _learnerReallyStuckEventEmitter = new EventEmitter();
