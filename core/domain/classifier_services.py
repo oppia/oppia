@@ -31,8 +31,7 @@ from core.domain import fs_services
 from core.domain import state_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence
-from typing_extensions import TypedDict
+from typing import Dict, List, Optional, Sequence, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover

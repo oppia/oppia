@@ -39,8 +39,7 @@ import subprocess
 import sys
 
 from types import TracebackType
-from typing import Dict, List, Optional, Tuple, Type
-from typing_extensions import Final
+from typing import Dict, Final, List, Optional, Tuple, Type
 
 # `pre_push_hook.py` is symlinked into `/.git/hooks`, so we explicitly import
 # the current working directory so that Git knows where to find python_utils.

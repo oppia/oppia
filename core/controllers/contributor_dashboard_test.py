@@ -228,20 +228,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
-    def test_get_voiceover_opportunity_data(self):
-        response = self.get_json(
-            '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={'language_code': 'en'})
-
-        self.assertEqual(len(response['opportunities']), 3)
-        self.assertEqual(
-            response['opportunities'], [
-                self.expected_opportunity_dict_1,
-                self.expected_opportunity_dict_2,
-                self.expected_opportunity_dict_3])
-        self.assertFalse(response['more'])
-        self.assertIsInstance(response['next_cursor'], str)
-
     def test_get_skill_opportunity_data_pagination(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
@@ -362,41 +348,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertFalse(next_response['more'])
             self.assertIsInstance(next_response['next_cursor'], str)
 
-    def test_get_voiceover_opportunity_data_pagination(self):
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
-            response = self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'en'})
-            self.assertEqual(len(response['opportunities']), 1)
-            self.assertEqual(
-                response['opportunities'], [self.expected_opportunity_dict_1])
-            self.assertTrue(response['more'])
-            self.assertIsInstance(response['next_cursor'], str)
-
-            next_cursor = response['next_cursor']
-            next_response = self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'en', 'cursor': next_cursor})
-
-            self.assertEqual(len(next_response['opportunities']), 1)
-            self.assertEqual(
-                next_response['opportunities'],
-                [self.expected_opportunity_dict_2])
-            self.assertTrue(next_response['more'])
-            self.assertIsInstance(next_response['next_cursor'], str)
-
-            next_cursor = next_response['next_cursor']
-            next_response = self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'en', 'cursor': next_cursor})
-
-            self.assertEqual(len(next_response['opportunities']), 1)
-            self.assertEqual(
-                next_response['opportunities'],
-                [self.expected_opportunity_dict_3])
-            self.assertFalse(next_response['more'])
-            self.assertIsInstance(next_response['next_cursor'], str)
-
     def test_get_translation_opportunity_with_invalid_language_code(self):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
@@ -408,19 +359,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                expected_status_int=400)
-
-    def test_get_voiceover_opportunity_with_invalid_language_code(self):
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
-            self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'invalid_lang_code'},
-                expected_status_int=400)
-
-    def test_get_voiceover_opportunity_without_language_code(self):
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
-            self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
 
     def test_get_translation_opportunities_without_topic_name_returns_all_topics( # pylint: disable=line-too-long
@@ -1639,9 +1577,11 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
@@ -1714,6 +1654,23 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         topic.skill_ids_for_diagnostic_test = ['skill_id_3']
         topic_services.save_new_topic(self.admin_id, topic)
         topic_services.publish_topic(topic_id, self.admin_id)
+
+    def test_stats_for_new_user_are_empty(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        class MockStats:
+            translation_contribution_stats = None
+            translation_review_stats = None
+            question_contribution_stats = None
+            question_review_stats = None
+
+        swap_get_stats = self.swap_with_checks(
+            suggestion_services, 'get_all_contributor_stats',
+            lambda _: MockStats(), expected_args=((self.new_user_id,),))
+
+        with swap_get_stats:
+            response = self.get_json(
+                '/contributorallstatssummaries/%s' % self.NEW_USER_USERNAME)
+        self.assertEqual(response, {})
 
     def test_get_all_stats(self):
         self.login(self.OWNER_EMAIL)

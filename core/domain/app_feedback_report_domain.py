@@ -27,8 +27,7 @@ from core.domain import app_feedback_report_constants
 from core.domain import story_domain
 from core.domain import topic_domain
 
-from typing import Any, Dict, List, Match, Optional, Union
-from typing_extensions import TypedDict
+from typing import Any, Dict, List, Match, Optional, TypedDict, Union
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.

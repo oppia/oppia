@@ -23,14 +23,12 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { InviteLearnersComponent } from './invite-learners.component';
 import { LearnerGroupBackendApiService } from
   'domain/learner_group/learner-group-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
 import { LearnerGroupUserInfo } from
   'domain/learner_group/learner-group-user-info.model';
 
 describe('InviteLearnersComponent', () => {
   let component: InviteLearnersComponent;
   let fixture: ComponentFixture<InviteLearnersComponent>;
-  let alertsService: AlertsService;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
 
   const userInfo = LearnerGroupUserInfo.createFromBackendDict({
@@ -52,7 +50,6 @@ describe('InviteLearnersComponent', () => {
   });
 
   beforeEach(() => {
-    alertsService = TestBed.inject(AlertsService);
     learnerGroupBackendApiService = TestBed.inject(
       LearnerGroupBackendApiService);
     fixture = TestBed.createComponent(InviteLearnersComponent);
@@ -77,46 +74,42 @@ describe('InviteLearnersComponent', () => {
     })
   );
 
-  it('should show alert message when trying to add an invalid learners to ' +
+  it('should show error message when trying to add an invalid learners to ' +
   'the learner group', fakeAsync(() => {
     const userInfo2 = LearnerGroupUserInfo.createFromBackendDict({
       username: 'username2',
       profile_picture_data_url: '',
       error: 'You cannot invite yourself to the learner group.'
     });
-    const alertServiceSpy = spyOn(alertsService, 'addInfoMessage');
-
     spyOn(learnerGroupBackendApiService, 'searchNewLearnerToAddAsync')
       .and.returnValue(Promise.resolve(userInfo2));
 
     expect(component.invitedUsersInfo).toEqual([]);
     expect(component.invitedUsernames).toEqual([]);
 
-    component.alertTimeout = 2;
     component.onSearchQueryChangeExec('username2');
 
-    tick(100);
+    tick();
 
-    expect(alertServiceSpy).toHaveBeenCalled();
     expect(component.invitedUsersInfo).toEqual([]);
     expect(component.invitedUsernames).toEqual([]);
+    expect(component.errorMessage).toEqual(
+      'You cannot invite yourself to the learner group.');
   }));
 
-  it('should show alert message when trying to add an already invited ' +
+  it('should show error message when trying to add an already invited ' +
   'learner to the learner group', fakeAsync(() => {
-    const alertServiceSpy = spyOn(alertsService, 'addInfoMessage');
-
     component.invitedUsersInfo = [userInfo];
     component.invitedUsernames = ['username1'];
 
-    component.alertTimeout = 2;
     component.onSearchQueryChangeExec('username1');
 
-    tick(100);
+    tick();
 
-    expect(alertServiceSpy).toHaveBeenCalled();
     expect(component.invitedUsersInfo).toEqual([userInfo]);
     expect(component.invitedUsernames).toEqual(['username1']);
+    expect(component.errorMessage).toEqual(
+      'User with username username1 has been already invited.');
   }));
 
   it('should remove invited learner successfully', () => {

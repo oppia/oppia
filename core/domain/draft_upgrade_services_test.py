@@ -27,8 +27,7 @@ from core.domain import exp_services
 from core.domain import state_domain
 from core.tests import test_utils
 
-from typing import Dict
-from typing_extensions import Final
+from typing import Dict, Final
 
 
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):

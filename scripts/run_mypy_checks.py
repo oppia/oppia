@@ -27,8 +27,7 @@ import sys
 from scripts import common
 from scripts import install_third_party_libs
 
-from typing import List, Optional, Tuple
-from typing_extensions import Final
+from typing import Final, List, Optional, Tuple
 
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES: Final = [
@@ -312,7 +311,6 @@ def main(args: Optional[List[str]] = None) -> int:
         sys.path.insert(1, directory)
 
     install_third_party_libraries(parsed_args.skip_install)
-    common.fix_third_party_imports()
 
     print('Installing Mypy and stubs for third party libraries.')
     return_code, mypy_exec_path = install_mypy_prerequisites(
