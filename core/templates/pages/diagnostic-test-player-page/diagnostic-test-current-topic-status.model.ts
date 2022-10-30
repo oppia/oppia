@@ -23,8 +23,8 @@ import { Question } from 'domain/question/QuestionObjectFactory';
 
 export interface SkillIdToQuestionsDict {
   [skillId: string]: {
-    mainQuestion: Question;
-    backupQuestion: Question;
+    mainQuestion?: Question;
+    backupQuestion?: Question;
   };
 }
 

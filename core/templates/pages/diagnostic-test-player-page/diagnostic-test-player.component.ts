@@ -32,7 +32,7 @@ import { DiagnosticTestTopicTrackerModel } from './diagnostic-test-topic-tracker
 })
 export class DiagnosticTestPlayerComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL: string = '';
-  diagnosticTestTopicTrackerModel;
+  diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel;
   questionPlayerConfig;
   diagnosticTestStarted = false;
 
@@ -58,29 +58,13 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
   startDiagnosticTest(): void {
     // fetch the math topic ID.
-    const classroomId = 'eaNl5TUmpwZs';
+    const classroomId = 'DVNYWPrAjtzh';
 
     this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
       response => {
         this.diagnosticTestTopicTrackerModel = new DiagnosticTestTopicTrackerModel(
           response.classroomDict.topicIdToPrerequisiteTopicIds);
-        this.diagnosticTestTopicTrackerModel.setCurrentTopicId();
-        let currentTopicId = this.diagnosticTestTopicTrackerModel.getCurrentTopicId();
-
-      this.topicsAndSkillsDashboardBackendApiService
-        .fetchTopicIdToDiagnosticTestSkillIdsAsync([currentTopicId]).then(
-          (responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
-            let diagnosticTestSkillIds = (
-              responseDict.topicIdToDiagnosticTestSkillIds[currentTopicId]);
-
-            this.questionPlayerConfig = {
-              resultActionButtons: [],
-              skillList: diagnosticTestSkillIds,
-              questionCount: 2,
-              questionsSortedByDifficulty: true
-            };
-            this.diagnosticTestStarted = true;
-          });
+        this.diagnosticTestStarted = true
       }
     );
   }

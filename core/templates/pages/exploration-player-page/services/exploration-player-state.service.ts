@@ -25,7 +25,7 @@ import { PretestQuestionBackendApiService } from 'domain/question/pretest-questi
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
-import { DiagnosticTestModelData } from 'pages/diagnostic-test-player-page/diagnostic-test.model';
+import { DiagnosticTestTopicTrackerModel } from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ExplorationFeatures, ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
@@ -327,15 +327,13 @@ export class ExplorationPlayerStateService {
   }
 
   initializeDiagnosticPlayer(
-      config: QuestionPlayerConfigDict,
-      diagnosticTestModelData: DiagnosticTestModelData,
+      diagnosticTestTopicTrackerModel,
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback?: () => void
   ): void {
     this.setDiagnosticTestPlayerMode();
     this.diagnosticTestPlayerEngineService.init(
-      config,
-      diagnosticTestModelData,
+      diagnosticTestTopicTrackerModel,
       successCallback,
       errorCallback
     );

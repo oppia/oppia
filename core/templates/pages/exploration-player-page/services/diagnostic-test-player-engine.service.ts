@@ -17,7 +17,6 @@
  */
 
 import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
@@ -34,10 +33,9 @@ import { ExplorationHtmlFormatterService } from 'services/exploration-html-forma
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
-import { DiagnosticTestModelData } from 'pages/diagnostic-test-player-page/diagnostic-test.model';
-import { DiagnosticTestTopicStateData } from 'pages/diagnostic-test-player-page/diagnostic-test-topic-state.model';
+import { DiagnosticTestCurrentTopicStatusModel } from 'pages/diagnostic-test-player-page/diagnostic-test-current-topic-status.model';
+import { DiagnosticTestTopicTrackerModel } from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
-import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 @Injectable({
     providedIn: 'root'
@@ -47,9 +45,14 @@ export class DiagnosticTestPlayerEngineService {
   private questions: Question[] = [];
   private currentIndex: number = null;
   private nextIndex: number = null;
-  private diagnosticTestModelData;
-  private diagnosticTestTopicStateData;
-  private currentQuestion;
+  private diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel;
+  private diagnosticTestCurrentTopicStatusModel:
+    DiagnosticTestCurrentTopicStatusModel;
+  private currentQuestion: Question;
+  private currentTopicId: string;
+  private currentSkillId: string;
+  private numberOfAttemptedQuestions: number;
+  private focusLabel;
 
   constructor(
     private alertsService: AlertsService,
@@ -59,57 +62,30 @@ export class DiagnosticTestPlayerEngineService {
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
-    private questionObjectFactory: QuestionObjectFactory,
-    private questionBackendApiService: QuestionBackendApiService,
-    private topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService) {
-  }
-
-  getSkillIdToQuestionsDict(skillIds, questions) {
-    let skillIdToQuestions = {};
-
-    for (let skillId of skillIds) {
-      skillIdToQuestions[skillId] = [];
-    }
-
-    for (let skillId of skillIds) {
-      for (let question of questions) {
-        let linkedSkillIds = question.getLinkedSkillIds();
-        if (linkedSkillIds.indexOf(skillId) !== -1) {
-          skillIdToQuestions[skillId].push(question);
-        }
-      }
-    }
-    return skillIdToQuestions;
+    private questionBackendApiService: QuestionBackendApiService) {
   }
 
   init(
-      config,
-      diagnosticTestModelData,
+      diagnosticTestTopicTrackerModel,
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback?: () => void
   ) {
-    let skillIdToQuestions = {};
-    this.diagnosticTestModelData = diagnosticTestModelData;
+    this.diagnosticTestTopicTrackerModel = diagnosticTestTopicTrackerModel;
+    this.currentTopicId = (
+      this.diagnosticTestTopicTrackerModel.selectNextTopicIdToTest());
 
-    this.questionBackendApiService.fetchQuestionsAsync(
-      config.skillList,
-      config.questionCount,
-      config.questionsSortedByDifficulty
-    ).then((questionData) => {
-      let questions = questionData.map(
-        function(questionDict) {
-          return this.questionObjectFactory.createFromBackendDict(
-            questionDict);
-      }, this);
+    this.questionBackendApiService.fetchDiagnosticTestQuestionsAsync(
+      this.currentTopicId).then((response) => {
+      this.diagnosticTestCurrentTopicStatusModel = (
+        new DiagnosticTestCurrentTopicStatusModel(response));
 
-      skillIdToQuestions = this.getSkillIdToQuestionsDict(
-        config.skillList, questions);
+      const stateCard = this.createCard();
 
-      this.diagnosticTestTopicStateData = new DiagnosticTestTopicStateData(
-        skillIdToQuestions);
+      if (!stateCard) {
+        errorCallback();
+      }
 
-      this.createCard(successCallback, errorCallback);
+      successCallback(stateCard, this.focusLabel);
     });
   }
 
@@ -130,135 +106,134 @@ export class DiagnosticTestPlayerEngineService {
           isFinalQuestion: boolean,
           focusLabel: string) => void
   ): boolean {
-    const answerString = answer as string;
+
     const oldState = this.currentQuestion.getStateData();
     const classificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(
         null, oldState.interaction, answer,
         interactionRulesService));
-    const answerGroupIndex = classificationResult.answerGroupIndex;
     const answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
 
+    this.numberOfAttemptedQuestions += 1;
 
-
-
-    let taggedSkillMisconceptionId = null;
-    if (oldState.interaction.answerGroups[answerGroupIndex]) {
-      taggedSkillMisconceptionId =
-        oldState.interaction.answerGroups[answerGroupIndex]
-          .taggedSkillMisconceptionId;
-    }
-
-    // Use angular.copy() to clone the object
-    // since classificationResult.outcome points
-    // at oldState.interaction.default_outcome.
-    const outcome = angular.copy(classificationResult.outcome);
-    // Compute the data for the next state.
-    const oldParams = {
-      answer: answerString
-    };
-    let newState = null;
-    if (answerIsCorrect && (this.currentIndex < this.questions.length - 1)) {
-      newState = this.questions[this.currentIndex + 1].getStateData();
+    if (answerIsCorrect) {
+      this.diagnosticTestCurrentTopicStatusModel.recordCorrectAttempt(
+        this.currentSkillId);
     } else {
-      newState = oldState;
+      this.diagnosticTestCurrentTopicStatusModel.recordIncorrectAttempt(
+        this.currentSkillId);
     }
 
-    let questionHtml = this.makeQuestion(newState, [oldParams, {
-      answer: 'answer'
-    }]);
-    if (questionHtml === null) {
-      this.alertsService.addWarning('Question name should not be empty.');
-      return;
+    let currentTopicIsCompletelyTested = (
+      this.diagnosticTestCurrentTopicStatusModel.isTopicCompletelyTested());
+
+    if (currentTopicIsCompletelyTested) {
+      let topicIsPassed = (
+        this.diagnosticTestCurrentTopicStatusModel.isTopicPassed());
+
+      if (topicIsPassed) {
+        this.diagnosticTestTopicTrackerModel.recordTopicPassed(
+          this.currentTopicId);
+      } else {
+        this.diagnosticTestTopicTrackerModel.recordTopicFailed(
+          this.currentTopicId);
+      }
+
+      // Check whether the diagnostic test is finished.
+
+      this.currentTopicId = (
+        this.diagnosticTestTopicTrackerModel.selectNextTopicIdToTest());
+      this.questionBackendApiService.fetchDiagnosticTestQuestionsAsync(
+        this.currentTopicId
+      ).then((response) => {
+        this.diagnosticTestCurrentTopicStatusModel = (
+          new DiagnosticTestCurrentTopicStatusModel(response));
+
+        let stateCard = this.createCard();
+        successCallback(
+          stateCard, false, null,
+          null, null, null, false, null,
+          null, null, false, this.focusLabel
+        );
+        return answerIsCorrect;
+      });
+    } else {
+      let stateCard = this.createCard();
+      successCallback(
+        stateCard, false, null,
+        null, null, null, false, null,
+        null, null, false, this.focusLabel
+      );
+      return answerIsCorrect;
     }
-
-    const interactionId = oldState.interaction.id;
-    const interactionIsInline = (
-      !interactionId ||
-      InteractionSpecsConstants.
-        INTERACTION_SPECS[interactionId].display_mode ===
-        AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
-    const refreshInteraction = (
-      answerIsCorrect || interactionIsInline);
-
-    // add comment
-    const onSameCard = false;
-
-    const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
-    let nextCard = null;
-    // if (!isFinalQuestion) {
-    //   let nextInteractionHtml = this.getNextInteractionHtml(_nextFocusLabel);
-
-    //   questionHtml = questionHtml + this.getRandomSuffix();
-    //   nextInteractionHtml = nextInteractionHtml + this.getRandomSuffix();
-    //   nextCard = StateCard.createNewCard(
-    //     'true', questionHtml, nextInteractionHtml,
-    //     this.getNextStateData().interaction,
-    //     this.getNextStateData().recordedVoiceovers,
-    //     this.getNextStateData().writtenTranslations,
-    //     this.getNextStateData().content.contentId,
-    //     this.audioTranslationLanguageService
-    //   );
-    // }
-    successCallback(
-      nextCard, refreshInteraction, null,
-      null,
-      null, null, onSameCard, taggedSkillMisconceptionId,
-      null, null, false, _nextFocusLabel);
-    return answerIsCorrect;
   }
 
   getLanguageCode(): string {
     return (
-      this.diagnosticTestTopicStateData.getCurrentQuestion().getLanguageCode());
+      this.diagnosticTestCurrentTopicStatusModel.getNextQuestion(
+        this.currentSkillId).getLanguageCode());
   }
 
   recordNewCardAdded(): void {
-    this.currentIndex = this.nextIndex;
     this.contextService.setCustomEntityContext(
-      AppConstants.ENTITY_TYPE.QUESTION, this.getCurrentQuestionId());
-  }
-  getCurrentQuestionId(): string {
-    return this.diagnosticTestTopicStateData.getCurrentQuestion().getId();
+      AppConstants.ENTITY_TYPE.QUESTION, this.currentQuestion.getId()
+    );
   }
 
-  createCard(
-      successCallback:(initialCard: StateCard, nextFocusLabel: string) => void,
-      errorCallback: () => void
-  ) {
-    const question = this.diagnosticTestTopicStateData.getNextQuestion();
-    const stateData = question.getStateData();
+  private makeQuestion(
+      newState: State, envs: Record<string, string>[]): string {
+    return this.expressionInterpolationService.processHtml(
+      newState.content.html, envs);
+  }
 
+  createCard() {
+    this.currentSkillId = (
+      this.diagnosticTestCurrentTopicStatusModel.getNextSkill());
+    this.currentQuestion = (
+      this.diagnosticTestCurrentTopicStatusModel.getNextQuestion(
+        this.currentSkillId));
+    const stateData = this.currentQuestion.getStateData();
     const questionHtml = this.makeQuestion(stateData, []);
     if (questionHtml === null) {
       this.alertsService.addWarning('Question name should not be empty.');
-      errorCallback();
       return;
     }
+
     const interaction = stateData.interaction;
-    const nextFocusLabel = this.focusManagerService.generateFocusLabel();
+    this.focusLabel = this.focusManagerService.generateFocusLabel();
 
     const interactionId = interaction.id;
     let interactionHtml = null;
 
     if (interactionId) {
-      interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
-        interactionId, interaction.customizationArgs, true, nextFocusLabel,
-        null);
+      interactionHtml = (
+        this.explorationHtmlFormatterService.getInteractionHtml(
+          interactionId, interaction.customizationArgs,
+          true, this.focusLabel, null)
+      );
     }
-    const initialCard =
-      StateCard.createNewCard(
+
+    return StateCard.createNewCard(
         null, questionHtml, interactionHtml, interaction,
-        stateData.recordedVoiceovers,
-        stateData.writtenTranslations, stateData.content.contentId,
-        this.audioTranslationLanguageService);
-    successCallback(initialCard, nextFocusLabel);
+        stateData.recordedVoiceovers, stateData.writtenTranslations,
+        stateData.content.contentId, this.audioTranslationLanguageService
+    );
   }
 
-  // Evaluate question string.
-  private makeQuestion(
-      newState: State, envs: Record<string, string>[]): string {
-    return this.expressionInterpolationService.processHtml(
-      newState.content.html, envs);
+
+  isDiagnosticTestFinished(): boolean {
+    const lengthOfEligibleTopicIds = (
+      this.diagnosticTestTopicTrackerModel.getEligibleTopicIds().length
+    );
+
+    if (lengthOfEligibleTopicIds === 0) {
+      return true;
+    }
+
+    if (lengthOfEligibleTopicIds > 0 && this.numberOfAttemptedQuestions >= 15) {
+      return true;
+    }
+
+    return false;
   }
 }

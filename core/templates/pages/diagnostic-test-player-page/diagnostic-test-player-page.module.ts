@@ -38,6 +38,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { DiagnosticTestPlayerComponent } from './diagnostic-test-player.component';
+import { InteractiveTextInputComponent } from '../../../../extensions/interactions/TextInput/directives/oppia-interactive-text-input.component';
 
 declare var angular: ng.IAngularStatic;
 
@@ -59,9 +60,11 @@ declare var angular: ng.IAngularStatic;
   ],
   declarations: [
     DiagnosticTestPlayerComponent,
+    InteractiveTextInputComponent,
   ],
   entryComponents: [
     DiagnosticTestPlayerComponent,
+    InteractiveTextInputComponent,
   ],
   providers: [
     {

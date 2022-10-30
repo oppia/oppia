@@ -93,7 +93,7 @@ const TIME_NUM_CARDS_CHANGE_MSEC = 500;
 })
 export class ConversationSkinComponent {
   @Input() questionPlayerConfig;
-  @Input() diagnosticTestModel;
+  @Input() diagnosticTestTopicTrackerModel;
   directiveSubscriptions = new Subscription();
   // The minimum width, in pixels, needed to be able to show two cards
   // side-by-side.
@@ -1038,15 +1038,14 @@ export class ConversationSkinComponent {
     this.hasInteractedAtLeastOnce = false;
     this.recommendedExplorationSummaries = [];
     this.playerPositionService.init(this._navigateToDisplayedCard.bind(this));
-    if (this.questionPlayerConfig && !this.diagnosticTestModel) {
+    if (this.questionPlayerConfig) {
       this.explorationPlayerStateService.initializeQuestionPlayer(
         this.questionPlayerConfig,
         this._initializeDirectiveComponents.bind(this),
         this.showQuestionAreNotAvailable);
-    } else if(this.questionPlayerConfig && this.diagnosticTestModel) {
+    } else if(this.diagnosticTestTopicTrackerModel) {
       this.explorationPlayerStateService.initializeDiagnosticPlayer(
-        this.questionPlayerConfig,
-        this.diagnosticTestModel,
+        this.diagnosticTestTopicTrackerModel,
         this._initializeDirectiveComponents.bind(this)
       );
     } else {
@@ -1073,9 +1072,12 @@ export class ConversationSkinComponent {
       }
     }
 
-    if (!this.explorationPlayerStateService.isInQuestionMode() &&
-      !this.isInPreviewMode &&
-      AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
+    if (
+        !this.explorationPlayerStateService.isInQuestionMode() &&
+        !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode() &&
+        !this.isInPreviewMode &&
+        AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE
+      ) {
       this.initLearnerAnswerInfoService(
         this.explorationId, this.explorationEngineService.getState(),
         answer, interactionRulesService,

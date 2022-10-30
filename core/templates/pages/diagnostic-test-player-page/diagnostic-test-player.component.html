@@ -20,7 +20,7 @@
     </button>
   </mat-card>
   <div *ngIf="diagnosticTestStarted">
-    <oppia-conversation-skin [questionPlayerConfig]="questionPlayerConfig" [diagnosticTestModel]="diagnosticTestModelData">
+    <oppia-conversation-skin [diagnosticTestTopicTrackerModel]="diagnosticTestTopicTrackerModel">
     </oppia-conversation-skin>
   </div>
 </div>
