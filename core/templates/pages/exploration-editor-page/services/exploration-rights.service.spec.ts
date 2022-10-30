@@ -280,15 +280,14 @@ describe('Exploration rights service', () => {
       explorationRightsBackendApiService,
       'assignVoiceArtistRoleAsyncPostData').and.returnValue(
       Promise.reject());
-    spyOn(alertsService, 'addWarning');
+    spyOn(alertsService, 'addWarning').and.callThrough();
 
     ers.assignVoiceArtistRoleAsync('voiceArtist').then(
       successHandler, failHandler);
     tick();
 
-    expect(clearWarningsSpy).not.toHaveBeenCalled();
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
+    expect(explorationRightsBackendApiService
+      .assignVoiceArtistRoleAsyncPostData).toHaveBeenCalled();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'Could not assign voice artist to private activity.'
     );
