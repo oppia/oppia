@@ -1653,9 +1653,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ]
         self.state.interaction.answer_groups = (
             test_ans_group_for_numeric_interaction)
-        self._assert_validation_error(
-            self.new_exploration, 'Rule \'1\' from answer group \'0\' will '
-            'never be matched because it is made redundant by the above rules')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule \'1\' from answer group \'0\' will '
+            'never be matched because it is made redundant by the above rules'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs = self.state.interaction.answer_groups[0].rule_specs
         rule_specs.remove(rule_specs[1])
 
@@ -1665,20 +1667,26 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'equal to zero in NumericInput interaction.')
         rule_specs.remove(rule_specs[1])
 
-        self._assert_validation_error(
-            self.new_exploration, 'The rule \'1\' of answer group \'0\' having '
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' having '
             'rule type \'IsInclusivelyBetween\' have `a` value greater than `b`'
-            ' value in NumericInput interaction.')
+            ' value in NumericInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[1])
 
-        self._assert_validation_error(
-            self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
-            'NumericInput interaction is already present.')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' of '
+            'NumericInput interaction is already present.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[1])
 
-        self._assert_validation_error(
-            self.new_exploration, 'Rule \'2\' from answer group \'0\' will '
-            'never be matched because it is made redundant by the above rules')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule \'2\' from answer group \'0\' will '
+            'never be matched because it is made redundant by the above rules'
+        ):
+            self.new_exploration.validate(strict=True)
 
         self.state.recorded_voiceovers.add_content_id_for_voiceover(
             'feedback_0')
