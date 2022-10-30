@@ -54,7 +54,7 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
                 prefix=os.getcwd() + '/extensions/actions/')
             action_name = tempdir.name.split('/')[-1]
             # If the name of 'action' follows variable naimg conventions.
-            if re.search(r'[^\W0-9]\w*', action_name):
+            if re.match(r'[^\W0-9]\w*', action_name):
                 break
             tempdir.cleanup()
         action_file = os.path.join(tempdir.name, action_name + '.py')
