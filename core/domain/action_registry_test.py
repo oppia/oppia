@@ -49,15 +49,14 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
         # before this test.
         action_registry.Registry._actions = {} # pylint: disable=protected-access
 
-        while(1):
+        while True:
             tempdir = tempfile.TemporaryDirectory(
                 prefix=os.getcwd() + '/extensions/actions/')
             action_name = tempdir.name.split('/')[-1]
             # If the name of 'action' follows variable naimg conventions.
-            if re.search('[^\W0-9]\w*', action_name):
+            if re.search(r'[^\W0-9]\w*', action_name):
                 break
-            else:
-                tempdir.cleanup()
+            tempdir.cleanup()
         action_file = os.path.join(tempdir.name, action_name + '.py')
         with open(action_file, 'w', encoding='utf8') as f:
             f.write('class FakeBaseActionSpec:\n')

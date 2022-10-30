@@ -1254,7 +1254,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 self.property_name = property_name
                 self.state_name = state_name
                 self.new_value = new_value
-        
+
         change_list_objective = [
             MockExplorationChange(
                 cmd='some_invalid_command',
@@ -1293,7 +1293,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 self.property_name = property_name
                 self.state_name = state_name
                 self.new_value = new_value
-        
+
         change_list_objective = [
             MockExplorationChange(
                 cmd=exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -5206,10 +5206,10 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         def mock_get_exploration_version_history_model(
-                id: str, strict: bool) -> None:
+                instance_id: str, strict: bool) -> None: # pylint: disable=unused-argument
             return None
         with self.swap_with_checks(
-            exp_models.ExplorationVersionHistoryModel,'get',
+            exp_models.ExplorationVersionHistoryModel, 'get',
             mock_get_exploration_version_history_model
         ):
             exp_services.revert_version_history(
@@ -8956,7 +8956,7 @@ title: Title
         exp_services.update_logged_out_user_progress(
             self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Introduction', 1)
 
-        ## Make 'New state' a checkpoint.
+        # Make 'New state' a checkpoint.
         # Now version of the exploration becomes 2.
         change_list = _get_change_list(
             'New state',
@@ -9030,7 +9030,7 @@ title: Title
             logged_out_user_data.
                 most_recently_reached_checkpoint_state_name, 'Introduction')
 
-        ## Make 'New state' a checkpoint.
+        # Make 'New state' a checkpoint.
         # Now version of the exploration becomes 2.
         change_list = _get_change_list(
             'New state',
