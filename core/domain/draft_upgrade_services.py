@@ -313,6 +313,81 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
+    def _convert_states_v52_dict_to_v53_dict(
+        cls, draft_change_list: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
+        """Converts from version 52 to 53. Version 53 fixes general
+        state, interaction and rte data. This will update the drafts
+        for state and RTE part but won't be able to do for interaction.
+        The `ExplorationChange` object for interaction is divided into
+        further properties and we won't be able to collect enough info
+        to update the draft.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+
+        Raises:
+            InvalidDraftConversionException. The conversion cannot be
+                completed.
+        """
+        drafts_to_remove = [
+            exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            exp_domain.STATE_PROPERTY_INTERACTION_STICKY,
+            exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS,
+            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
+            exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
+            exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+            exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+        ]
+        for exp_change in draft_change_list:
+            if exp_change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
+                continue
+
+            if exp_change.property_name in drafts_to_remove:
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
+
+            if exp_change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
+                assert isinstance(exp_change.new_value, dict)
+                html = exp_change.new_value['html']
+                html = exp_domain.Exploration.fix_content(html)
+                exp_change.new_value['html'] = html
+
+            elif exp_change.property_name == (
+                exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
+            ):
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
+                assert isinstance(exp_change.new_value, dict)
+                written_translations = exp_change.new_value
+
+                for translations in (
+                    written_translations['translations_mapping'].values()
+                ):
+                    for written_translation in translations.values():
+                        if written_translation['data_format'] == 'html':
+                            if isinstance(
+                                written_translation['translation'], list
+                            ):
+                                # Translation of type html should only be str,
+                                # cannot be of type list.
+                                raise InvalidDraftConversionException(
+                                    'Conversion cannot be completed.')
+
+                            fixed_translation = (
+                                exp_domain.Exploration.fix_content(
+                                    written_translation['translation']))
+                            written_translation['translation'] = (
+                                fixed_translation)
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v51_dict_to_v52_dict(
         cls, draft_change_list: List[exp_domain.ExplorationChange]
     ) -> List[exp_domain.ExplorationChange]:

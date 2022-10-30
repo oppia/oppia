@@ -166,7 +166,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 'does not match the latest schema version %s' % (
                     self.EXP_1_ID,
                     '1',
-                    '52',
+                    '53',
                     '60'
                 )
         )
