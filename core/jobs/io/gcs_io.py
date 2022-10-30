@@ -19,6 +19,7 @@
 from apache_beam import io
 from apache_beam import pvalue
 from core.platform import models
+from google.cloud import storage
 
 from typing import List
 
@@ -51,5 +52,5 @@ class ReadFile(beam.PTransform):
         """Helper function to read the contents of a file."""
         print("***********************")
         print("file - ", filename)
-        gcs = io.gcsio.GcsIO()
-        return gcs.open(filename, mode='r')
+        gcs = io.gcsio.GcsIO(storage.Client())
+        return gcs.open(filename, mode='r').read()
