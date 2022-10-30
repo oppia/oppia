@@ -27,6 +27,7 @@ from core.domain import image_services
 from core.domain import user_services
 from core.tests import test_utils
 from proto_files import text_classifier_pb2
+from typing import Any
 
 
 class GcsFileSystemUnitTests(test_utils.GenericTestBase):
@@ -292,6 +293,28 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             destination_fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
         self.assertTrue(
             destination_fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
+
+    def test_compressed_and_micro_files_are_not_overwritten_if_already_present(
+            self) -> None:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
+            original_image_content = f.read()
+        def mock_isfile(*unused_args: Any) -> bool: # pylint: disable=unused-argument
+            return True
+        def mock_commit(*unused_args: Any) -> None: # pylint: disable=unused-argument
+            return None
+
+        commit_counter = test_utils.CallCounter(mock_commit)
+        swap_isfile = self.swap(
+            fs_services.GcsFileSystem, 'isfile', mock_isfile)
+        swap_commit = self.swap(
+            fs_services.GcsFileSystem, 'commit', mock_commit)
+        with swap_isfile, swap_commit:
+            fs_services.save_original_and_compressed_versions_of_image(
+                self.FILENAME, 'exploration', self.EXPLORATION_ID,
+                original_image_content, 'image', True)
+        self.assertEqual(commit_counter.times_called, 0)
 
 
 class FileSystemClassifierDataTests(test_utils.GenericTestBase):

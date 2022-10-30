@@ -223,7 +223,10 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             'filepath-with-value="&quot;img2.svg&quot;" caption-with-value='
             '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
             '</oppia-noninteractive-image>',
-            '<oppia-noninteractive-image '
+            '<oppia-noninteractive-video autoplay-with-value="false" '
+            'end-with-value="0" start-with-value="0" '
+            'video_id-with-value="&amp;quot;lorem&amp;quot;">'
+            '</oppia-noninteractive-video><oppia-noninteractive-image '
             'filepath-with-value="&quot;img3.svg&quot;" caption-with-value='
             '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
             '</oppia-noninteractive-image><oppia-noninteractive-image '

@@ -72,6 +72,13 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '<p>hello</p><p>this is case <b>3</b> for <i>'
                 'testing</i> the </p><p>function</p>'
             )
+        }, {
+            'html_content': (
+                '<p>hello this is </p><br/>test case 4<br/>'
+            ),
+            'expected_output': (
+                '<p>hello this is </p><p><br/>test case 4<br/></p>'
+            )
         }]
         for index, test_case in enumerate(test_cases):
             soup = bs4.BeautifulSoup(test_case['html_content'], 'html.parser')
@@ -81,6 +88,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 tag = soup.find(name='br')
             elif index == 2:
                 tag = soup.find(name='b')
+            else:
+                tag = soup.find(name='br')
             html_validation_service.wrap_with_siblings(tag, soup.new_tag('p'))
             self.assertEqual(str(soup), test_case['expected_output'])
 
@@ -108,6 +117,10 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'quot;hello&amp;quot;}]\"></oppia-noninteractive-tabs>'
             ),
             (
+                '<oppia-noninteractive-collapsible content-with-value='
+                '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
+                'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;'
+                'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>'
                 '<oppia-noninteractive-collapsible '
                 'heading-with-value="&amp;quot;'
                 'lorem ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
@@ -1296,6 +1309,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'expected_output': '<p>Hello this is <span>testing \u2192 '
                 '\u201c \u2209 \u2158 \u2019 \u221a \u2208 \u2155 \u2159 '
                 '\u2018 \u2014 \u200b \u2209</span></p>'
+            },
+            {
+                'html_string': '<oppia-noninteractive-collapsible><p>Hello'
+                    '\xc2</p></oppia-noninteractive-collapsible>',
+                'expected_output': '<oppia-noninteractive-collapsible><p>Hello'
+                    '</p></oppia-noninteractive-collapsible>'
             }
         ]
         for test_case in test_cases:
