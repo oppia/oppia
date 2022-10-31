@@ -145,12 +145,12 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   validateEmailAddress(): boolean {
     // A simple check for basic email validation.
     let regex = new RegExp(AppConstants.EMAIL_REGEX);
-    return regex.test(this.emailAddress);
+    return regex.test(String(this.emailAddress));
   }
 
   subscribeToAndroidList(): void {
     this.androidUpdatesBackendApiService.subscribeUserToAndroidList(
-      this.emailAddress, this.name
+      String(this.emailAddress), String(this.name)
     ).then((status) => {
       if (status) {
         this.alertsService.addInfoMessage('Done!', 1000);
