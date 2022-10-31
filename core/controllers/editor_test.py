@@ -1438,7 +1438,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR
+                'new_member_role': rights_domain.ROLE_EDITOR,
+                'viewable_if_private': None
             }, csrf_token=csrf_token)
         self.logout()
 
@@ -1500,7 +1501,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.OWNER_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR
+                'new_member_role': rights_domain.ROLE_EDITOR,
+                'make_community_owned': False,
+                'viewable_if_private': None
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response['error'],
@@ -1537,7 +1540,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.VIEWER_USERNAME,
-                'new_member_role': rights_domain.ROLE_VIEWER
+                'new_member_role': rights_domain.ROLE_VIEWER,
+                'viewable_if_private': None
             }, csrf_token=csrf_token)
         self.logout()
 
@@ -1580,7 +1584,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR
+                'new_member_role': rights_domain.ROLE_EDITOR,
+                'viewable_if_private': None
             }, csrf_token=csrf_token)
 
         # Check that collaborator can add a new state called 'State B'.
@@ -1630,7 +1635,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR
+                'new_member_role': rights_domain.ROLE_EDITOR,
+                'viewable_if_private': None
             }, csrf_token=csrf_token)
 
         # Check that collaborator cannot add new members.
@@ -1691,7 +1697,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_domain.ROLE_VIEWER
+                'new_member_role': rights_domain.ROLE_VIEWER,
+                'viewable_if_private': None
             }, csrf_token=csrf_token)
 
         # Check that collaborator cannot add a new state called 'State B'.
@@ -1747,7 +1754,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             rights_url, {
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_domain.ROLE_VIEWER
+                'new_member_role': rights_domain.ROLE_VIEWER,
+                'viewable_if_private': None
             }, csrf_token=csrf_token)
 
         # Check that collaborator cannot add new members.
@@ -1771,6 +1779,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'version': exploration.version,
                 'new_member_username': self.COLLABORATOR2_USERNAME,
                 'new_member_role': rights_domain.ROLE_EDITOR,
+                'viewable_if_private': None
             }, csrf_token=csrf_token,
             expected_status_int=401
         )
@@ -1926,7 +1935,10 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.put_json(
             rights_url, {
                 'version': exploration.version,
-                'make_community_owned': True
+                'make_community_owned': True,
+                'new_member_username': None,
+                'new_member_role': None,
+                'viewable_if_private': None
             }, csrf_token=csrf_token)
 
         self.logout()
@@ -1982,7 +1994,10 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         response = self.put_json(
             rights_url, {
                 'version': 1,
-                'make_community_owned': True
+                'make_community_owned': True,
+                'new_member_username': None,
+                'new_member_role': None,
+                'viewable_if_private': None
             }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -2051,7 +2066,11 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
             {
                 'version': exploration.version,
-                'new_member_username': 'invalid_new_member_username'},
+                'new_member_username': 'invalid_new_member_username',
+                'make_community_owned': False,
+                'new_member_role': None,
+                'viewable_if_private': None
+            },
             csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -2071,7 +2090,11 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
             {
                 'version': exploration.version,
-                'new_member_username': self.VIEWER_USERNAME},
+                'new_member_username': self.VIEWER_USERNAME,
+                'make_community_owned': False,
+                'new_member_role': None,
+                'viewable_if_private': None
+            },
             csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -2090,7 +2113,11 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
             {
                 'version': exploration.version,
-                'viewable_if_private': True}, csrf_token=csrf_token)
+                'viewable_if_private': True,
+                'new_member_username': None,
+                'new_member_role': None,
+                'make_community_owned': False,
+            }, csrf_token=csrf_token)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration_rights = rights_manager.get_exploration_rights(exp_id)
         self.assertTrue(exploration_rights.viewable_if_private)
@@ -2104,7 +2131,13 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         response = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-            {'version': exploration.version}, csrf_token=csrf_token,
+            {
+                'version': exploration.version,
+                'new_member_username': None,
+                'make_community_owned': False,
+                'new_member_role': None,
+                'viewable_if_private': None
+            }, csrf_token=csrf_token,
             expected_status_int=400)
 
         self.assertEqual(
@@ -3288,7 +3321,8 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
                 'filename_prefix': filename_prefix
             },
             csrf_token=csrf_token,
-            expected_status_int=400
+            expected_status_int=400,
+            upload_files=(('image', 'unused_filename', b''),)
         )
 
         error_msg = ('No image supplied')
