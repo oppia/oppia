@@ -110,13 +110,6 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                 self._get_translation_opportunity_dicts(
                     language_code, topic_name, search_cursor))
 
-        elif opportunity_type == constants.OPPORTUNITY_TYPE_VOICEOVER:
-            if language_code is None:
-                raise self.InvalidInputException
-            opportunities, next_cursor, more = (
-                self._get_voiceover_opportunity_dicts(
-                    language_code, search_cursor))
-
         else:
             raise self.PageNotFoundException
 
@@ -214,32 +207,6 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         opportunities, next_cursor, more = (
             opportunity_services.get_translation_opportunities(
                 language_code, topic_name, search_cursor))
-        opportunity_dicts = [opp.to_dict() for opp in opportunities]
-        return opportunity_dicts, next_cursor, more
-
-    def _get_voiceover_opportunity_dicts(self, language_code, search_cursor):
-        """Returns a list of voiceover opportunity dicts.
-
-        Args:
-            language_code: str. The language for which voiceover opportunities
-                should be fetched.
-            search_cursor: str or None. If provided, the list of returned
-                entities starts from this datastore cursor. Otherwise, the
-                returned entities start from the beginning of the full list of
-                entities.
-
-        Returns:
-            3-tuple(opportunities, cursor, more). where:
-            opportunities: list(dict). A list of ExplorationOpportunitySummary
-                dicts.
-            cursor: str or None. A query cursor pointing to the next batch of
-                results. If there are no more results, this might be None.
-            more: bool. If True, there are (probably) more results after this
-                batch. If False, there are no further results after this batch.
-        """
-        opportunities, next_cursor, more = (
-            opportunity_services.get_voiceover_opportunities(
-                language_code, search_cursor))
         opportunity_dicts = [opp.to_dict() for opp in opportunities]
         return opportunity_dicts, next_cursor, more
 

@@ -6,7 +6,7 @@
       (mouseleave)="$event.stopPropagation(); onEditButtonHover()"
       class="nav-item">
     <a href="#" ngbTooltip="Editor" (click)="selectMainTab()" class="nav-link e2e-test-main-tab">
-      <i class="material-icons">&#xE254;</i>
+      <i class="fas fa-pen"></i>
     </a>
     <div *ngIf="getWarningsCount()"
          class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
@@ -28,7 +28,7 @@
   <!-- Settings -->
   <li [ngClass]="{'active': getActiveTabName() === 'settings'}" class="nav-item">
     <a href="#" ngbTooltip="Settings" placement="bottom" (click)="selectSettingsTab()" class="nav-link e2e-test-settings-tab">
-      <i class="material-icons">&#xE8B8;</i>
+      <i class="fas fa-cog"></i>
     </a>
   </li>
 
@@ -43,7 +43,7 @@
        rel="noopener"
        ngbTooltip="Player (new tab)"
        placement="bottom" class="nav-link">
-      <i class="material-icons">&#xE037;</i>
+      <i class="fas fa-play"></i>
       <div *ngIf="getWarningsCount()"
            class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
            (click)="selectMainTab()">
@@ -84,20 +84,18 @@
             [disabled]="!isCollectionSaveable()">
       <span *ngIf="!isSaveInProgress()">
         <span *ngIf="collectionRights.isPrivate()">
-          <i class="material-icons md-18 oppia-save-publish-button-icon"
+          <i class="fas fa-save oppia-save-publish-button-icon"
              alt="Save Collection">
-            &#xE161;
           </i>
-          <span class="oppia-save-publish-button-label float-left">Save Draft</span>
+          <span class="oppia-save-publish-button-label">Save Draft</span>
           <span class="d-none d-md-block float-left oppia-change-count"
                 *ngIf="getChangeListCount() > 0">
             ({{ getChangeListCount() }})
           </span>
         </span>
         <span *ngIf="collectionRights.isPublic()" title="Publish Changes">
-          <i class="material-icons md-18 oppia-save-publish-button-icon"
+          <i class="fas fa-cloud-upload-alt oppia-save-publish-button-icon"
              alt="Publish Changes">
-            &#xE2C3;
           </i>
           <span class="oppia-save-publish-button-label">Publish Changes</span>
         </span>

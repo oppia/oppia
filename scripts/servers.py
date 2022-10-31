@@ -586,7 +586,7 @@ def managed_webdriverio_server(
     sharding_instances: int = 1,
     chrome_version: Optional[str] = None,
     mobile: bool = False,
-    **kwargs: Any
+    stdout: int = subprocess.PIPE
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the WebdriverIO server gracefully.
 
@@ -602,7 +602,8 @@ def managed_webdriverio_server(
         chrome_version: str|None. The version of Google Chrome to run the tests
             on. If None, then the currently-installed version of Google Chrome
             is used instead.
-        **kwargs: dict(str: *). Keyword arguments passed to psutil.Popen.
+        stdout: int. This parameter specifies the executed program's standard
+            output file handle.
         mobile: bool. Whether to run the webdriverio tests in mobile mode.
 
     Yields:
@@ -647,7 +648,7 @@ def managed_webdriverio_server(
     # constants, so there is no risk of a shell-injection attack.
     managed_webdriverio_proc = managed_process(
         webdriverio_args, human_readable_name='WebdriverIO Server', shell=True,
-        raise_on_nonzero_exit=False, **kwargs)
+        raise_on_nonzero_exit=False, stdout=stdout)
 
     try:
         with managed_webdriverio_proc as proc:

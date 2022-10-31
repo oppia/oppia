@@ -86,6 +86,20 @@ describe('Translation tab component', () => {
     closeTour() {}
   }
 
+  class MockUserExplorationPermissionsService {
+    getPermissionsAsync() {
+      return Promise.resolve({
+        canVoiceover: true
+      } as ExplorationPermissions);
+    }
+
+    fetchPermissionsAsync() {
+      return Promise.resolve({
+        canVoiceover: true
+      } as ExplorationPermissions);
+    }
+  }
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -99,6 +113,15 @@ describe('Translation tab component', () => {
         JoyrideStepService,
         JoyrideOptionsService,
         JoyrideStepsContainerService,
+        // The UserExplorationPermissionsService has been
+        // mocked here because spying the function of
+        // UserExplorationPermissionsService is not able to
+        // stop afterAll error i.e. ContextService should not
+        // be used outside the context of an exploration or a question.
+        {
+          provide: UserExplorationPermissionsService,
+          useClass: MockUserExplorationPermissionsService,
+        },
         {
           provide: JoyrideService,
           useClass: MockJoyrideService,

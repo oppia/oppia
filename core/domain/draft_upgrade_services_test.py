@@ -27,8 +27,7 @@ from core.domain import exp_services
 from core.domain import state_domain
 from core.tests import test_utils
 
-from typing import Dict
-from typing_extensions import Final
+from typing import Dict, Final
 
 
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):
@@ -168,10 +167,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
-    def test_convert_states_v52_dict_to_v53_dict_without_state_changes(
+    def test_convert_states_v53_dict_to_v54_dict_without_state_changes(
         self
     ) -> None:
-        draft_change_list_1_v52 = [
+        draft_change_list_1_v53 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -179,19 +178,18 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        # Migrate exploration to state schema version 53.
-        self.create_and_migrate_new_exploration('52', '53')
-        migrated_draft_change_list_1_v53 = (
+        self.create_and_migrate_new_exploration('53', '54')
+        migrated_draft_change_list_1_v54 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list_1_v52, 1, 2, self.EXP_ID))
-        # Verify that changes are upgraded to v53.
-        self.assertFalse(migrated_draft_change_list_1_v53 is None)
+                draft_change_list_1_v53, 1, 2, self.EXP_ID))
 
-    def test_convert_states_v52_dict_to_v53_dict_with_state_changes(
+        self.assertFalse(migrated_draft_change_list_1_v54 is None)
+
+    def test_convert_states_v53_dict_to_v54_dict_with_state_changes(
         self
     ) -> None:
         new_value: Dict[str, str] = {}
-        draft_change_list_1_v52 = [
+        draft_change_list_1_v53 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -213,12 +211,216 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         ]
 
         # Migrate exploration to state schema version 53.
-        self.create_and_migrate_new_exploration('52', '53')
-        migrated_draft_change_list_1_v53 = (
+        self.create_and_migrate_new_exploration('53', '54')
+        migrated_draft_change_list_1_v54 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list_1_v52, 1, 2, self.EXP_ID))
+                draft_change_list_1_v53, 1, 2, self.EXP_ID))
         # Verify that changes are not upgraded to v53.
-        self.assertIsNone(migrated_draft_change_list_1_v53)
+        self.assertIsNone(migrated_draft_change_list_1_v54)
+
+    def test_convert_states_v52_dict_to_v53_dict(self) -> None:
+        ans_group_1 = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state_name', None, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Try again</p>'),
+                True, [], 'Not None', None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            'Not None'
+        ).to_dict()
+
+        ans_group_2 = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state_name',
+                None,
+                state_domain.SubtitledHtml('feedback_1', '<p>Feedback</p>'),
+                False,
+                [],
+                None,
+                None
+            ),
+            [],
+            [],
+            None
+        ).to_dict()
+
+        interaction_answer_groups = [
+            ans_group_1,
+            ans_group_2
+        ]
+
+        draft_change_list_v52_1 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state_name',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                'new_value': interaction_answer_groups
+            })
+        ]
+
+        draft_change_list_v52_2 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'New state',
+                'old_value': state_domain.SubtitledHtml(
+                    'content', '').to_dict(),
+                'new_value': state_domain.SubtitledHtml(
+                    'content',
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&quot;abc.png&quot;" caption-with-value="&quot;'
+                    '&quot;"></oppia-noninteractive-image>'
+                ).to_dict()
+            })
+        ]
+
+        draft_change_list_v52_3 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'New state',
+                'old_value': state_domain.SubtitledHtml(
+                    'content', '').to_dict(),
+                'new_value': state_domain.SubtitledHtml(
+                    'content', (
+                    '<oppia-noninteractive-tabs tab_contents-with-value=\"'
+                    '[{&amp;quot;title&amp;quot;:&amp;quot;Title1&amp;'
+                    'quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
+                    '&amp;gt;Content1&amp;lt;/p&amp;gt;&amp;quot;},'
+                    '{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;'
+                    ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;'
+                    'gt;Content2&amp;lt;/p&amp;gt;&amp;lt;'
+                    'oppia-noninteractive-image filepath-with-value=\\'
+                    '&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;'
+                    'amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/'
+                    'oppia-noninteractive-image&amp;gt;&amp;quot;}]\">'
+                    '</oppia-noninteractive-tabs>')).to_dict()
+                }
+            )
+        ]
+
+        draft_change_list_v52_4 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS),
+                'state_name': 'New state',
+                'old_value': state_domain.WrittenTranslations({
+                    'content': {
+                        'en': state_domain.WrittenTranslation(
+                            'html', '', False)
+                    }
+                }).to_dict(),
+                'new_value': state_domain.WrittenTranslations({
+                    'content': {
+                        'en': state_domain.WrittenTranslation(
+                            'html',
+                            (
+                                '<oppia-noninteractive-image '
+                                'filepath-with-value="&quot;abc.png&quot;" '
+                                'caption-with-value="&quot;&quot;">'
+                                '</oppia-noninteractive-image>'
+                            ),
+                            True
+                        )
+                    }
+                }).to_dict()
+            })
+        ]
+
+        draft_change_list_v52_5 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'auto_tts_enabled',
+                'new_value': True,
+            })
+        ]
+
+        draft_change_list_v52_6 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS),
+                'state_name': 'New state',
+                'old_value': state_domain.WrittenTranslations({
+                    'content': {
+                        'en': state_domain.WrittenTranslation(
+                            'html', '', False)
+                    }
+                }).to_dict(),
+                'new_value': state_domain.WrittenTranslations({
+                    'content': {
+                        'en': state_domain.WrittenTranslation(
+                            'html', ['content'], True
+                        )
+                    }
+                }).to_dict()
+            })
+        ]
+
+        self.create_and_migrate_new_exploration('52', '53')
+
+        migrated_draft_change_list_v53_1 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v52_1, 1, 2, self.EXP_ID)
+        )
+        assert migrated_draft_change_list_v53_1 is None
+
+        migrated_draft_change_list_v53_2 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v52_2, 1, 2, self.EXP_ID)
+        )
+        assert migrated_draft_change_list_v53_2 is not None
+        self.assertEqual(
+            [change.to_dict() for change in draft_change_list_v52_2],
+            [change.to_dict() for change in migrated_draft_change_list_v53_2]
+        )
+
+        migrated_draft_change_list_v53_3 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v52_3, 1, 2, self.EXP_ID)
+        )
+        assert migrated_draft_change_list_v53_3 is not None
+        self.assertEqual(
+            [change.to_dict() for change in draft_change_list_v52_3],
+            [change.to_dict() for change in migrated_draft_change_list_v53_3]
+        )
+
+        migrated_draft_change_list_v53_4 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v52_4, 1, 2, self.EXP_ID)
+        )
+        assert migrated_draft_change_list_v53_4 is not None
+        self.assertEqual(
+            [change.to_dict() for change in draft_change_list_v52_4],
+            [change.to_dict() for change in migrated_draft_change_list_v53_4]
+        )
+
+        migrated_draft_change_list_v53_5 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v52_5, 1, 2, self.EXP_ID)
+        )
+        assert migrated_draft_change_list_v53_5 is not None
+        self.assertEqual(
+            [change.to_dict() for change in draft_change_list_v52_5],
+            [change.to_dict() for change in migrated_draft_change_list_v53_5]
+        )
+
+        migrated_draft_change_list_v53_6 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v52_6, 1, 2, self.EXP_ID)
+        )
+        assert migrated_draft_change_list_v53_6 is None
 
     def test_convert_states_v51_dict_to_v52_dict(self) -> None:
         draft_change_list_v51_1 = [

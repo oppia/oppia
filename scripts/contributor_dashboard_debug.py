@@ -41,8 +41,7 @@ from core.constants import constants
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 import requests
-from typing import Dict, Iterator, List
-from typing_extensions import Final
+from typing import Dict, Final, Iterator, List
 
 FIREBASE_AUTH_EMULATOR_HOST: Final = (
     'localhost:%s' % feconf.FIREBASE_EMULATOR_PORT)

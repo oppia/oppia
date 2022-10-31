@@ -284,7 +284,7 @@ export class ContextService {
     let pathnameArray = this.urlService.getPathname().split('/');
     for (let i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'edit-learner-group' ||
-          pathnameArray[i] === 'learner-groups') {
+          pathnameArray[i] === 'learner-group') {
         this.learnerGroupId = pathnameArray[i + 1];
         return pathnameArray[i + 1];
       }
@@ -322,6 +322,13 @@ export class ContextService {
     return (
       this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR);
+  }
+
+  isInBlogPostEditorPage(): boolean {
+    return (
+      this.getPageContext() ===
+        ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD
+    );
   }
 
   canAddOrEditComponents(): boolean {

@@ -37,8 +37,9 @@ from extensions import domain
 
 from pylatexenc import latex2text
 
-from typing import Dict, List, Optional, Set, Tuple, Union, cast, overload
-from typing_extensions import Final, Literal, TypedDict
+from typing import (
+    Dict, Final, List, Literal, Optional, Set, Tuple, TypedDict, Union, cast,
+    overload)
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -1655,19 +1656,37 @@ class Question(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _convert_state_v52_dict_to_v53_dict(
-        cls,
-        question_state_dict: state_domain.StateDict
-    ) -> Tuple[state_domain.StateDict, int]:
-        """Converts from v52 to v53. Version 53 removes next_content_id_index
-        and WrittenTranslation from State. This version also updates the
-        content-ids for each translatable field in the state with its new
-        content-id.
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
+        """Converts from version 52 to 53. Version 53 fixes errored data present
+        in exploration state, RTE and interactions.
 
         Args:
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
                 initialize a State domain object.
 
+        Returns:
+            dict. The converted question_state_dict.
+        """
+
+        # The version 53 only fixes the data for `Exploration` and make
+        # no changes in the `Question` that is why we are simply returning.
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v53_dict_to_v54_dict(
+        cls,
+        question_state_dict: state_domain.StateDict
+    ) -> Tuple[state_domain.StateDict, int]:
+        """Converts from v53 to v54. Version 54 removes next_content_id_index
+        and WrittenTranslation from State. This version also updates the
+        content-ids for each translatable field in the state with its new
+        content-id.
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
         Returns:
             dict. The converted question_state_dict.
         """
@@ -1679,7 +1698,7 @@ class Question(translation_domain.BaseTranslatableObject):
         del question_state_dict['written_translations'] # type: ignore[misc]
         states_dict, next_content_id_index = (
             state_domain.State
-            .update_old_content_id_to_new_content_id_in_v52_states({
+            .update_old_content_id_to_new_content_id_in_v53_states({
                 'question_state': question_state_dict
             })
         )
@@ -1709,7 +1728,7 @@ class Question(translation_domain.BaseTranslatableObject):
 
         Returns:
             int|None. The next content id index if the current state schema
-            version is 52 else None.
+            version is 53 else None.
         """
         versioned_question_state['state_schema_version'] = (
             current_state_schema_version + 1)
@@ -1717,7 +1736,7 @@ class Question(translation_domain.BaseTranslatableObject):
         conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
             current_state_schema_version, current_state_schema_version + 1))
 
-        if current_state_schema_version == 52:
+        if current_state_schema_version == 53:
             versioned_question_state['state'], next_content_id_index = (
                 conversion_fn(versioned_question_state['state'])
             )
