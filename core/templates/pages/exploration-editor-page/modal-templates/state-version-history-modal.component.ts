@@ -39,7 +39,7 @@ interface mergeviewOptions {
 }
 
 @Component({
-  selector: 'oppia-state-version-history',
+  selector: 'oppia-state-version-history-modal',
   templateUrl: './state-version-history-modal.component.html',
 })
 export class StateVersionHistoryModalComponent

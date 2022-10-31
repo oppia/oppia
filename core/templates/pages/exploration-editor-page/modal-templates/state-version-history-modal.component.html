@@ -35,8 +35,7 @@
   </div>
   <ng-template #elseBlock>
     <div class="interstitial-loading">
-      Loading diff data
-      <loading-dots></loading-dots>
+      <div class="spinner-border" style="height: 4rem; width: 4rem;"></div>
     </div>
   </ng-template>
 </div>
@@ -67,27 +66,10 @@
   .CodeMirror-merge, .CodeMirror-merge .CodeMirror {
     height: 55vh;
   }
-  .state-diff-modal .modal-dialog {
-    max-width: 1200px;
-    width: 90%;
-  }
-  .state-diff-modal .modal-body {
-    height: 60vh;
+  .modal-body {
+    height: 405px;
     margin-top: -30px;
-  }
-  .state-diff-modal .colgroup-1 {
-    width: 47%;
-    word-wrap: break-word;
-  }
-  .state-diff-modal .colgroup-2 {
-    width: 6%;
-  }
-  .state-diff-modal .colgroup-3 {
-    width: 47%;
-    word-wrap: break-word;
-  }
-  .state-diff-modal .oppia-click-arrows-text {
-    margin-bottom: 20px;
+    overflow: auto;
   }
   .previous-commit {
     margin-right: auto;

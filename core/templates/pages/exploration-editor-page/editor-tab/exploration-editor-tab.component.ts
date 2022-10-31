@@ -18,7 +18,7 @@
 
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { JoyrideService } from 'ngx-joyride';
 import cloneDeep from 'lodash/cloneDeep';
@@ -45,8 +45,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StateEditorRefreshService } from '../services/state-editor-refresh.service';
 import { LoaderService } from 'services/loader.service';
 import { GraphDataService } from '../services/graph-data.service';
-import { StateDiffData, VersionHistoryService } from '../services/version-history.service';
-import { StateVersionHistoryModalComponent } from '../modal-templates/state-version-history-modal.component';
+import { VersionHistoryService } from '../services/version-history.service';
 import { StateVersionHistoryResponse, VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 import { ContextService } from 'services/context.service';
 
@@ -334,49 +333,6 @@ export class ExplorationEditorTabComponent
 
     refreshWarnings(): void {
       this.explorationWarningsService.updateWarnings();
-    }
-
-    getLastEditedVersionNumber(): number {
-      return (
-        this.versionHistoryService.getBackwardStateDiffData().oldVersionNumber
-      );
-    }
-
-    getLastEditedCommitterUsername(): string {
-      return (
-        this.versionHistoryService.getBackwardStateDiffData().committerUsername
-      );
-    }
-
-    canShowExploreVersionHistoryButton(): boolean {
-      return this.versionHistoryService.canShowBackwardStateDiffData();
-    }
-
-    onClickExploreVersionHistoryButton(): void {
-      const modalRef: NgbModalRef = this.ngbModal.open(
-        StateVersionHistoryModalComponent, {
-          backdrop: true,
-          windowClass: 'metadata-diff-modal',
-          size: 'xl'
-        });
-
-      const stateDiffData: StateDiffData = (
-        this.versionHistoryService.getBackwardStateDiffData());
-      modalRef.componentInstance.newState = stateDiffData.newState;
-      modalRef.componentInstance.oldState = stateDiffData.oldState;
-      modalRef.componentInstance.newStateName = stateDiffData.newState.name;
-      modalRef.componentInstance.oldStateName = stateDiffData.oldState.name;
-      modalRef.componentInstance.committerUsername = (
-        stateDiffData.committerUsername);
-      modalRef.componentInstance.oldVersion = stateDiffData.oldVersionNumber;
-
-      modalRef.result.then(() => {
-        this.versionHistoryService
-          .setCurrentPositionInStateVersionHistoryList(0);
-      }, () => {
-        this.versionHistoryService
-          .setCurrentPositionInStateVersionHistoryList(0);
-      });
     }
 
     initStateEditor(): void {

@@ -50,7 +50,7 @@ import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { TranslationBackendDict } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { ContextService } from 'services/context.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { StateDiffData, VersionHistoryService } from '../services/version-history.service';
+import { VersionHistoryService } from '../services/version-history.service';
 import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 
 describe('Exploration editor tab component', () => {
@@ -966,66 +966,5 @@ describe('Exploration editor tab component', () => {
 
     expect(editabilityService.onEndTutorial).toHaveBeenCalled();
     expect(component.tutorialInProgress).toBe(false);
-  });
-
-  it('should get the last edited version number for the active state', () => {
-    spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
-      oldVersionNumber: 3
-    } as StateDiffData);
-
-    expect(component.getLastEditedVersionNumber()).toEqual(3);
-  });
-
-  it('should get the last edited committer username for the active state',
-    () => {
-      spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
-        committerUsername: 'some'
-      } as StateDiffData);
-
-      expect(component.getLastEditedCommitterUsername()).toEqual('some');
-    });
-
-  it('should get whether version history can be explored', () => {
-    spyOn(
-      versionHistoryService, 'canShowBackwardStateDiffData'
-    ).and.returnValue(true);
-
-    expect(component.canShowExploreVersionHistoryButton()).toBeTrue();
-  });
-
-  it('should open the state version history modal on clicking the explore ' +
-  'version history button', () => {
-    class MockComponentInstance {
-      compoenentInstance: {
-        newState: null;
-        newStateName: 'A';
-        oldState: null;
-        oldStateName: 'B';
-        headers: {
-          leftPane: '';
-          rightPane: '';
-        };
-      };
-    }
-    spyOn(ngbModal, 'open').and.returnValues({
-      componentInstance: MockComponentInstance,
-      result: Promise.resolve()
-    } as NgbModalRef, {
-      componentInstance: MockComponentInstance,
-      result: Promise.reject()
-    } as NgbModalRef);
-    let stateData = stateObjectFactory
-      .createFromBackendDict('State', stateObject);
-    spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
-      oldState: stateData,
-      newState: stateData,
-      oldVersionNumber: 3
-    } as StateDiffData);
-
-    component.onClickExploreVersionHistoryButton();
-
-    expect(ngbModal.open).toHaveBeenCalled();
-
-    component.onClickExploreVersionHistoryButton();
   });
 });

@@ -186,7 +186,8 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     TranslatorOverviewComponent,
     StateTranslationStatusGraphComponent,
     TranslationTabComponent,
-    ExplorationEditorPageComponent
+    ExplorationEditorPageComponent,
+    StateVersionHistoryComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -253,7 +254,8 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     TranslatorOverviewComponent,
     StateTranslationStatusGraphComponent,
     TranslationTabComponent,
-    ExplorationEditorPageComponent
+    ExplorationEditorPageComponent,
+    StateVersionHistoryComponent
   ],
   providers: [
     {
@@ -290,6 +292,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StateVersionHistoryModalComponent } from './modal-templates/state-version-history-modal.component';
 import { MetadataVersionHistoryModalComponent } from './modal-templates/metadata-version-history-modal.component';
+import { StateVersionHistoryComponent } from './editor-tab/state-version-history/state-version-history.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
