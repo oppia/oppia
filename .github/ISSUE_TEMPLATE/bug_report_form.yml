@@ -49,7 +49,7 @@ body:
   - type: dropdown
     attributes:
       label: Operating System
-      description: Please select the operating system you're using.
+      description: Please select the operating system you're using. **Example:** "Windows". If you're using multiple Operating systems, please select all that apply.
       multiple: true
       options:
         - Windows
@@ -61,6 +61,7 @@ body:
   - type: dropdown
     attributes:
       label: What browsers are you seeing the problem on?
+      description: Please select the browser you're using. If you're using multiple browsers, please select all that apply.
       multiple: true
       options:
         - Chrome
@@ -75,7 +76,7 @@ body:
   - type: input
     attributes:
       label: Browser version
-      description: Please enter the version of the browser you're using.
+      description: Please enter the version of the browser you're using. **Example:** "90.0.4430.212". You can find this by clicking on the three dots in the top right corner of your browser and selecting "Help" or "About". If you're using multiple browsers, please enter the version for each browser. **Example:** "90.0.4430.212 (Chrome), 88.1.1 (Firefox)"
     validations:
       required: false
   - type: textarea
