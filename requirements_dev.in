@@ -17,6 +17,7 @@ pycodestyle==2.8.0
 pylint==2.11.1
 git+https://github.com/oppia/pylint-quotes.git@0.2.4
 pyyaml==6.0
+rcssmin==1.1.1
 six==1.16.0
 typing-extensions==4.0.1
 webtest==3.0.0

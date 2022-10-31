@@ -309,15 +309,6 @@
           "css": ["dist/angular-ui-tree.min.css"]
         }
       }
-    },
-    "oppiaTools": {
-      "yuiCompressor": {
-        "version": "2.4.8",
-        "downloadFormat": "files",
-        "url": "https://github.com/yui/yuicompressor/releases/download/v2.4.8",
-        "files": ["yuicompressor-2.4.8.jar"],
-        "targetDirPrefix": "yuicompressor-"
-      }
     }
   }
 }
