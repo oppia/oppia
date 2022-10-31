@@ -71,6 +71,15 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
                 ['invalid_id'], strict=True
             )
 
+    def test_no_error_raised_if_model_is_fetched_without_strict_and_invalid_id(
+        self
+    ) -> None:
+        learner_group_user_models = (
+            learner_group_fetchers.get_learner_group_models_by_ids(
+                ['invalid_id'], strict=False
+            ))
+        self.assertIsNone(learner_group_user_models[0])
+
     def test_get_learner_groups_of_facilitator(self) -> None:
         fake_facilitator_id = 'fake_facilitator_id'
         fake_learner_groups = (
@@ -99,6 +108,24 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
             learner_group_fetchers.can_multi_learners_share_progress(
                 [self.LEARNER_ID_1, self.LEARNER_ID_2], self.LEARNER_GROUP_ID
             ), [True, False])
+
+    def test_can_multi_learners_share_progress_with_invalid_user_ids(self) -> None:
+        self.assertEqual(
+            learner_group_fetchers.can_multi_learners_share_progress(
+                [self.LEARNER_ID_1, self.LEARNER_ID_2], self.LEARNER_GROUP_ID
+            ), [])
+
+    def test_can_multi_learners_share_progress_with_invalid_group_id(self) -> None:
+        learner_group_services.add_learner_to_learner_group(
+            self.LEARNER_GROUP_ID, self.LEARNER_ID_1, True)
+
+        learner_group_services.add_learner_to_learner_group(
+            self.LEARNER_GROUP_ID, self.LEARNER_ID_2, False)
+
+        self.assertEqual(
+            learner_group_fetchers.can_multi_learners_share_progress(
+                [self.LEARNER_ID_1, self.LEARNER_ID_2], 'invalid_group_id'
+            ), [])
 
     def test_get_invited_learner_groups_of_learner(self) -> None:
         fake_learner_id = 'fake_learner_id'
