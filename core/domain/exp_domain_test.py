@@ -1668,9 +1668,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_specs.remove(rule_specs[1])
 
         with self.assertRaisesRegex(
-            utils.ValidationError, 'The rule \'1\' of answer group \'0\' having '
-            'rule type \'IsInclusivelyBetween\' have `a` value greater than `b`'
-            ' value in NumericInput interaction.'
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' '
+            'having rule type \'IsInclusivelyBetween\' have `a` value greater '
+            'than `b` value in NumericInput interaction.'
         ):
             self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[1])
@@ -2617,8 +2617,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.state.interaction.customization_args['rows'].value = 5
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' having '
-            'rule type \'Contains\' will never be matched because it '
+            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' '
+            'having rule type \'Contains\' will never be matched because it '
             'is made redundant by the above \'contains\' rule.'
         ):
             self.new_exploration.validate(strict=True)
@@ -2626,8 +2626,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_specs.remove(rule_specs[0])
 
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' having '
-            'rule type \'StartsWith\' will never be matched because it '
+            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' '
+            'having rule type \'StartsWith\' will never be matched because it '
             'is made redundant by the above \'StartsWith\' rule.'
         ):
             self.new_exploration.validate(strict=True)
@@ -2635,8 +2635,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_specs.remove(rule_specs[0])
 
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' having '
-            'rule type \'StartsWith\' will never be matched because it '
+            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' '
+            'having rule type \'StartsWith\' will never be matched because it '
             'is made redundant by the above \'contains\' rule.'
         ):
             self.new_exploration.validate(strict=True)
@@ -2644,8 +2644,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_specs.remove(rule_specs[0])
 
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' having '
-            'rule type \'Equals\' will never be matched because it '
+            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' '
+            'having rule type \'Equals\' will never be matched because it '
             'is made redundant by the above \'contains\' rule.'
         ):
             self.new_exploration.validate(strict=True)
@@ -2653,8 +2653,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_specs.remove(rule_specs[0])
 
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' having '
-            'rule type \'Equals\' will never be matched because it '
+            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' '
+            'having rule type \'Equals\' will never be matched because it '
             'is made redundant by the above \'StartsWith\' rule.'
         ):
             self.new_exploration.validate(strict=True)
