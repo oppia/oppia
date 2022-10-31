@@ -1141,10 +1141,15 @@ export class ConversationSkinComponent {
             this.explorationActuallyStarted = true;
           }
         }
-        if (!this.explorationPlayerStateService.isInQuestionMode()) {
+        if (
+            !this.explorationPlayerStateService.isInQuestionMode() &&
+            !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
+        ) {
           this.explorationPlayerStateService.onPlayerStateChange.emit(
             nextCard.getStateName());
-        } else {
+        } else if (
+          !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
+        ) {
           this.questionPlayerStateService.answerSubmitted(
             this.questionPlayerEngineService.getCurrentQuestion(),
             !remainOnCurrentCard,
