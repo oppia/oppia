@@ -16,7 +16,7 @@
 
 """Provides an Apache Beam API for operating on GCS."""
 
-from apache_beam import io
+from apache_beam.io.gcp.gcsio import GcsIO
 from apache_beam import pvalue
 from core.platform import models
 from google.cloud import storage
@@ -33,18 +33,13 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class ReadFile(beam.PTransform):
-    def __init__(self, filenames: List[str]) -> None:
-        """"""
-        super().__init__()
-        self.filenames = filenames
 
     def expand(
-       self, pbegin: pvalue.PBegin
+       self, filenames: beam.PCollection
     ) -> beam.PCollection[datastore_services.Model]:
         """Returns PCollection with file data."""
         return (
-            pbegin.pipeline
-            | 'List of filenames' >> beam.Create(self.filenames)
+            filenames
             | 'Read the file' >> beam.Map(lambda file: self._read_file(file))
         )
 
@@ -52,7 +47,7 @@ class ReadFile(beam.PTransform):
         """Helper function to read the contents of a file."""
         print("***********************")
         print("file - ", filename)
-        gcs = io.gcsio.GcsIO()
+        gcs = GcsIO(storage.Client)
         print("********************************")
         print("GCS is initialized")
         return gcs.open(filename, mode='r').read()

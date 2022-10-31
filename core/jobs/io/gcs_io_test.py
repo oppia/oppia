@@ -26,6 +26,8 @@ import os
 from google.cloud import storage
 from gcp_storage_emulator.server import create_server
 
+import apache_beam as beam
+
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models
@@ -61,15 +63,33 @@ def gcs_emulator():
     print("**************************************")
     print(bucket.name)
 
-    server.stop()
+    return server
 
 
 class ReadFileTest(job_test_utils.PipelinedTestBase):
     """"""
     def test_read_from_gcs(self):
-        gcs_emulator()
+        # server = gcs_emulator()
+        os.environ["STORAGE_EMULATOR_HOST"] = "http://localhost:9023"
+        client = storage.Client()
+
+        bucket = client.bucket('test-bucket')
+        blob = bucket.blob("blob1")
+        print("**********************************")
+        print(blob.name)
+        # blob.upload_from_string("test1")
+        blob = bucket.blob("blob2")
+        # blob.upload_from_string("test2")
         filenames = ['gs://test-bucket/blob1', 'gs://test-bucket/blob2']
-        model_pcoll = (
-            self.pipeline | gcs_io.ReadFile(filenames)
+        filename_p_collec = (
+            self.pipeline | beam.Create(filenames)
         )
-        self.assert_pcoll_equal(model_pcoll, ["blob"])
+        model_pcoll = (
+            filename_p_collec | gcs_io.ReadFile()
+        )
+        pcoll = (
+            self.pipeline
+            | 'create result' >> beam.Create(["test1", "test2"])
+        )
+        self.assert_pcoll_equal(model_pcoll, pcoll)
+        # server.stop()
