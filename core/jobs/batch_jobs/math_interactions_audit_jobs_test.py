@@ -44,6 +44,7 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
 
     EXP_1_ID: Final = 'exp_1_id'
     EXP_2_ID: Final = 'exp_2_id'
+    EXP_3_ID: Final = 'exp_3_id'
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -145,7 +146,38 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
         ]
         exp_model_2.update_timestamps()
 
-        datastore_services.put_multi([exp_model_1, exp_model_2])
+        exp_model_3 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_3_ID,
+            title='exploration 3 title',
+            category='category',
+            objective='objective',
+            language_code='cs',
+            init_state_name='state',
+            states_schema_version=48,
+            states={
+                'init_state': state_domain.State.create_default_state(
+                    'state', is_initial_state=True
+                ).to_dict(),
+                'text_state': state_domain.State.create_default_state(
+                    'state', is_initial_state=True
+                ).to_dict(),
+                'end_state': state_domain.State.create_default_state(
+                    'state', is_initial_state=True
+                ).to_dict()
+            }
+        )
+
+        exp_model_3.states['text_state']['interaction']['id'] = ('TextInput')
+        exp_model_3.states['text_state']['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'rule_type': 'CaseSensitiveEquals',
+                'inputs': {'x': ''}
+            }]
+        }]
+        exp_model_3.update_timestamps()
+
+        datastore_services.put_multi([exp_model_1, exp_model_2, exp_model_3])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
