@@ -1056,7 +1056,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             lambda *unused_args: []
         ):
             story_services.update_story(
-                self.owner_id, self.STORY_ID,[story_domain.StoryChange({
+                self.owner_id, self.STORY_ID, [story_domain.StoryChange({
                     'cmd': 'update_story_node_property',
                     'property_name': 'exploration_id',
                     'node_id': 'node_1',
@@ -1100,7 +1100,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             lambda *unused_args: []
         ):
             story_services.update_story(
-                self.owner_id, self.STORY_ID,[story_domain.StoryChange({
+                self.owner_id, self.STORY_ID, [story_domain.StoryChange({
                     'cmd': 'update_story_node_property',
                     'property_name': 'exploration_id',
                     'node_id': 'node_1',
