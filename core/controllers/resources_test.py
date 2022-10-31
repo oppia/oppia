@@ -564,7 +564,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             {'filename': self.TEST_AUDIO_FILE_MP3},
             csrf_token=csrf_token,
             upload_files=(('raw_audio_file', 'unused_filename', raw_audio),),
-            expected_status_int=404
+            expected_status_int=400
         )
         self.logout()
 
@@ -665,8 +665,12 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
                 upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
             )
         self.logout()
-        self.assertEqual(
-            response_dict['error'], 'Audio not recognized as a flac file')
+
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object cafe.flac')
+        self.assertEqual(response_dict['error'], error_msg)
 
     def test_audio_upload_mpeg_container(self):
         self.login(self.EDITOR_EMAIL)
@@ -711,11 +715,11 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(
-            response_dict['error'],
-            'Invalid filename extension: it should have '
-            'one of the following extensions: %s'
-            % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object test.flac')
+        self.assertEqual(response_dict['error'], error_msg)
 
     def test_upload_empty_audio(self):
         """Test upload of empty audio."""
@@ -773,11 +777,11 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(
-            response_dict['error'],
-            'No filename extension: it should have '
-            'one of the following extensions: '
-            '%s' % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object test')
+        self.assertEqual(response_dict['error'], error_msg)
 
     def test_exceed_max_length_detected(self):
         """Test that audio file is less than max playback length."""
