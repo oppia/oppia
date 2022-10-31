@@ -103,7 +103,7 @@ class MockStateEditorService {
   }
 }
 
-fdescribe('Customize Interaction Modal Component', () => {
+describe('Customize Interaction Modal Component', () => {
   let component: CustomizeInteractionModalComponent;
   let contextService: ContextService;
   let changeDetectorRef: ChangeDetectorRef;
