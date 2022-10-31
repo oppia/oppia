@@ -27,7 +27,6 @@ from core.domain import image_services
 from core.domain import user_services
 from core.tests import test_utils
 from proto_files import text_classifier_pb2
-from typing import Any
 
 
 class GcsFileSystemUnitTests(test_utils.GenericTestBase):
@@ -300,9 +299,11 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             original_image_content = f.read()
-        def mock_isfile(self: fs_services.GcsFileSystem, *unused_args: str) -> bool: # pylint: disable=unused-argument
+        def mock_isfile(
+                self: fs_services.GcsFileSystem, *unused_args: str) -> bool: # pylint: disable=unused-argument
             return True
-        def mock_commit(self: fs_services.GcsFileSystem, *unused_args: str) -> None: # pylint: disable=unused-argument
+        def mock_commit(
+                self: fs_services.GcsFileSystem, *unused_args: str) -> None: # pylint: disable=unused-argument
             return None
 
         commit_counter = test_utils.CallCounter(mock_commit)

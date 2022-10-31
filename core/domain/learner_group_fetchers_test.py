@@ -109,13 +109,15 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
                 [self.LEARNER_ID_1, self.LEARNER_ID_2], self.LEARNER_GROUP_ID
             ), [True, False])
 
-    def test_can_multi_learners_share_progress_with_invalid_user_ids(self) -> None:
+    def test_can_multi_learners_share_progress_with_invalid_user_ids(
+            self) -> None:
         self.assertEqual(
             learner_group_fetchers.can_multi_learners_share_progress(
                 [self.LEARNER_ID_1, self.LEARNER_ID_2], self.LEARNER_GROUP_ID
             ), [])
 
-    def test_can_multi_learners_share_progress_with_invalid_group_id(self) -> None:
+    def test_can_multi_learners_share_progress_with_invalid_group_id(
+            self) -> None:
         learner_group_services.add_learner_to_learner_group(
             self.LEARNER_GROUP_ID, self.LEARNER_ID_1, True)
 
