@@ -821,6 +821,537 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Skill id skill_id_1 is already present in the target subtopic'):
             self.topic.move_skill_id_to_subtopic(1, 2, 'skill_id_1')
 
+    def test_skill_id_not_present_old_subtopic(self) -> None:
+        self.topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-one'),
+            topic_domain.Subtopic(
+                2, 'Another title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-two')]
+        with self.assertRaisesRegex(
+            Exception,
+            'Skill id skill_not_exist is not present in the given old subtopic'
+        ):
+            self.topic.move_skill_id_to_subtopic(1, 2, 'skill_not_exist')
+
+    def test_validate_topic_bad_story_reference(self) -> None:
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
+        self.topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2#'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_3')
+        ]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Invalid story ID: story_id_2#'
+        ):
+            self.topic.validate()
+
+    def test_story_ref_to_dict(self) -> None:
+        test_story_dict = {
+            'story_id': 'story_id_1',
+            'story_is_published': False
+        }
+        story_ref_obj = (
+            topic_domain.StoryReference.
+            create_default_story_reference('story_id_1')
+        )
+        story_ref_dict = story_ref_obj.to_dict()
+        self.assertDictEqual(test_story_dict, story_ref_dict)
+
+    def test_story_ref_from_dict(self) -> None:
+        test_story_dict = topic_domain.StoryReference(
+            'story_id_1', False
+        ).to_dict()
+        test_story_obj = topic_domain.StoryReference.from_dict(test_story_dict)
+        self.assertEqual(test_story_obj.story_id, 'story_id_1')
+        self.assertEqual(test_story_obj.story_is_published, False)
+
+    def test_create_default_subtopic(self) -> None:
+        subtopic_id = 1
+        subtopic_title = 'subtopic_title'
+        url_frag = 'url_frag'
+        subtopic_obj = topic_domain.Subtopic.create_default_subtopic(
+            subtopic_id,
+            subtopic_title,
+            url_frag
+        )
+        self.assertEqual(subtopic_id, subtopic_obj.id)
+        self.assertEqual(subtopic_title, subtopic_obj.title)
+        self.assertEqual(url_frag, subtopic_obj.url_fragment)
+
+    def test_remove_skill_id_not_present_exception(self) -> None:
+        skill_id = 'skill_id_123'
+        topic = self.topic
+        with self.assertRaisesRegex(
+            Exception,
+            'Skill id %s is not present in the old subtopic' % skill_id
+        ):
+            topic.remove_skill_id_from_subtopic(1, skill_id)
+
+    def test_update_subtopic_thumbnail(self) -> None:
+        """Tests that when we update the subtopic thumbail size
+        and filename that those attributes of the object come
+        back with the updated values.
+        """
+        self.topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-one'
+            ),
+            topic_domain.Subtopic(
+                2, 'Another title', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-two'
+            )
+        ]
+        new_filename = 'new_filename.svg'
+        new_filesize = 12345
+        subtopic_index = self.topic.get_subtopic_index(1)
+        self.assertNotEqual(
+            new_filename,
+            self.topic.subtopics[subtopic_index].thumbnail_filename
+        )
+        self.assertNotEqual(
+            new_filesize,
+            self.topic.subtopics[subtopic_index].thumbnail_size_in_bytes
+        )
+        self.topic.update_subtopic_thumbnail_filename_and_size(
+            1, new_filename, new_filesize
+        )
+        self.assertEqual(
+            new_filename,
+            self.topic.subtopics[subtopic_index].thumbnail_filename
+        )
+        self.assertEqual(
+            new_filesize,
+            self.topic.subtopics[subtopic_index].thumbnail_size_in_bytes
+        )
+
+    def test_delete_subtopic(self) -> None:
+        """Tests that when we delete a subtopic, its skill_id gets moved to
+        uncategorized, that subtopic doesn't exist on the topic and that
+        there are the correct number of subtopics on the topic.
+        """
+        subtopic_id_to_delete = 1
+        skill_id_moved = 'skill_id_1'
+        self.topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-one'),
+            topic_domain.Subtopic(
+                2, 'Another title', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-two')]
+        self.assertNotEqual(1, len(self.topic.subtopics))
+        self.assertNotEqual(
+            [skill_id_moved],
+            self.topic.uncategorized_skill_ids
+        )
+        self.topic.delete_subtopic(subtopic_id_to_delete)
+        self.assertEqual(1, len(self.topic.subtopics))
+        self.assertEqual([skill_id_moved], self.topic.uncategorized_skill_ids)
+        with self.assertRaisesRegex(
+            Exception,
+            'The subtopic with id %s does not exist.' % subtopic_id_to_delete
+        ):
+            self.topic.get_subtopic_index(1)
+
+    def test_move_skill_id_from_subtopic_to_subtopic(self) -> None:
+        """Checks that move_skill_id_to_subtopic works when moving a skill_id
+        from an existing subtopic to a new subtopic returns the expected
+        updated values for skill_ids associated with each subtopic.
+        """
+        expected_subtopic1_skills: list[str] = []
+        expected_subtopic2_skills = ['skill_id_2', 'skill_id_1']
+        self.topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-one'),
+            topic_domain.Subtopic(
+                2, 'Another title', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-two')]
+        self.assertNotEqual(
+            self.topic.subtopics[0].skill_ids,
+            expected_subtopic1_skills
+        )
+        self.assertNotEqual(
+            self.topic.subtopics[1].skill_ids,
+            expected_subtopic2_skills
+        )
+        self.topic.move_skill_id_to_subtopic(1, 2, 'skill_id_1')
+        self.assertEqual(
+            self.topic.subtopics[0].skill_ids,
+            expected_subtopic1_skills
+        )
+        self.assertEqual(
+            self.topic.subtopics[1].skill_ids,
+            expected_subtopic2_skills
+        )
+
+    def test_move_skill_id_from_uncategorized_to_subtopic(self) -> None:
+        """Checks that move_skill_id_to_subtopic works when moving a skill_id
+        from an existing subtopic to a new subtopic returns the expected
+        updated values for skill_ids associated with each subtopic.
+        """
+        expected_subtopic_skills = ['skill_id_2', 'skill_id_3']
+        expected_uncategorized_skills: list[str] = []
+        self.topic.uncategorized_skill_ids = ['skill_id_3']
+        self.topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-one'),
+            topic_domain.Subtopic(
+                2, 'Another title', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-two')]
+        self.assertNotEqual(
+            self.topic.subtopics[1].skill_ids,
+            expected_subtopic_skills
+        )
+        self.assertNotEqual(
+            self.topic.uncategorized_skill_ids,
+            expected_uncategorized_skills
+        )
+        self.topic.move_skill_id_to_subtopic(None, 2, 'skill_id_3')
+        self.assertEqual(
+            self.topic.subtopics[1].skill_ids,
+            expected_subtopic_skills
+        )
+        self.assertEqual(
+            self.topic.uncategorized_skill_ids,
+            expected_uncategorized_skills
+        )
+
+    def test_add_subtopic(self) -> None:
+        """Checkts that if next_subtopic_id isn't correct
+        an exception is raised. Also checks for the sub topic
+        getting added to the topic.
+        """
+        incorrect_new_subtopic_id = 3
+        correct_new_subtopic_id = 2
+        expected_subtopic_id = self.topic.next_subtopic_id
+        with self.assertRaisesRegex(
+            Exception,
+            'The given new subtopic id %s is not equal to the expected next '
+            'subtopic id: %s' % (
+                incorrect_new_subtopic_id,
+                expected_subtopic_id
+            )
+        ):
+            self.topic.add_subtopic(
+                incorrect_new_subtopic_id,
+                'subtopic_3',
+                'url_frag'
+            )
+        self.topic.add_subtopic(
+            correct_new_subtopic_id,
+            'subtopic_title',
+            'url_frag'
+            )
+        self.assertEqual(2, len(self.topic.subtopics))
+
+    def test_update_practice_tab_is_displayed(self) -> None:
+        self.assertFalse(self.topic.practice_tab_is_displayed)
+        self.topic.update_practice_tab_is_displayed(True)
+        self.assertTrue(self.topic.practice_tab_is_displayed)
+
+    def test_update_page_title_fragment_for_web(self) -> None:
+        updated_frag = 'updated fragment'
+        self.assertNotEqual(
+            self.topic.page_title_fragment_for_web,
+            updated_frag
+        )
+        self.topic.update_page_title_fragment_for_web(updated_frag)
+        self.assertEqual(self.topic.page_title_fragment_for_web, updated_frag)
+
+    def test_update_meta_tag_content(self) -> None:
+        updated_meta_tag = 'updated meta tag'
+        self.assertNotEqual(self.topic.meta_tag_content, updated_meta_tag)
+        self.topic.update_meta_tag_content(updated_meta_tag)
+        self.assertEqual(self.topic.meta_tag_content, updated_meta_tag)
+
+    def test_update_description(self) -> None:
+        updated_desc = 'updated description'
+        self.assertNotEqual(self.topic.description, updated_desc)
+        self.topic.update_description(updated_desc)
+        self.assertEqual(self.topic.description, updated_desc)
+
+    def test_update_thumbnail_file_and_size(self) -> None:
+        updated_file_name = 'file_name.svg'
+        updated_size = 1234
+        self.assertNotEqual(self.topic.thumbnail_filename, updated_file_name)
+        self.assertNotEqual(self.topic.thumbnail_size_in_bytes, updated_size)
+        self.topic.update_thumbnail_filename_and_size(
+            updated_file_name,
+            updated_size
+        )
+        self.assertEqual(self.topic.thumbnail_filename, updated_file_name)
+        self.assertEqual(self.topic.thumbnail_size_in_bytes, updated_size)
+
+    def test_update_url_fragment(self) -> None:
+        url_frag = 'url fragment'
+        self.assertNotEqual(self.topic.url_fragment, url_frag)
+        self.topic.update_url_fragment(url_frag)
+        self.assertEqual(self.topic.url_fragment, url_frag)
+
+    def test_update_name(self) -> None:
+        updated_name = 'updated name'
+        self.assertNotEqual(self.topic.name, updated_name)
+        self.topic.update_name(updated_name)
+        self.assertEqual(self.topic.name, updated_name)
+
+    def test_update_name_bytes(self) -> None:
+        updated_name = b'updated name'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Name should be a string.'
+        ):
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
+            self.topic.update_name(updated_name) # type: ignore[arg-type]
+
+    @classmethod
+    def _schema_update_vers_dict(
+        cls,
+        current_schema: int,
+        topic: topic_domain.Topic
+    ) -> topic_domain.VersionedSubtopicsDict:
+        """Sets up the VersionendSubtopicsDict for the schema update tests."""
+        topic.update_subtopic_title(1, 'abcdefghijklmnopqrstuvwxyz')
+        subtopic_dict = topic.subtopics[topic.get_subtopic_index(1)].to_dict()
+        vers_subtopic_dict = topic_domain.VersionedSubtopicsDict(
+            {
+                'schema_version': current_schema,
+                'subtopics': [subtopic_dict]
+            }
+        )
+        topic.update_subtopics_from_model(
+            vers_subtopic_dict,
+            current_schema,
+            topic.id
+        )
+        return vers_subtopic_dict
+
+    def test_subtopic_schema_v1_to_v2(self) -> None:
+        current_schema = 1
+        vers_subtopic_dict = TopicDomainUnitTests._schema_update_vers_dict(
+            current_schema,
+            self.topic
+        )
+        self.assertEqual(
+            vers_subtopic_dict['subtopics'][0]['thumbnail_filename'],
+            None
+        )
+        self.assertEqual(
+            vers_subtopic_dict['subtopics'][0]['thumbnail_bg_color'],
+            None
+        )
+        self.assertEqual(
+            vers_subtopic_dict['schema_version'],
+            current_schema + 1
+        )
+
+    def test_subtopic_schema_v2_to_v3(self) -> None:
+        expected_frag = 'abcdefghijklmnopqrstuvwxy'
+        current_schema = 2
+        vers_subtopic_dict = TopicDomainUnitTests._schema_update_vers_dict(
+            current_schema,
+            self.topic
+        )
+        self.assertEqual(
+            vers_subtopic_dict['subtopics'][0]['url_fragment'],
+            expected_frag
+        )
+        self.assertEqual(
+            vers_subtopic_dict['schema_version'],
+            current_schema + 1
+        )
+
+    def test_subtopic_schema_v3_to_v4(self) -> None:
+        current_schema = 3
+        self.topic.thumbnail_size_in_bytes = 12345
+        vers_subtopic_dict = TopicDomainUnitTests._schema_update_vers_dict(
+            current_schema,
+            self.topic
+        )
+        self.assertEqual(
+            vers_subtopic_dict['subtopics'][0]['thumbnail_size_in_bytes'],
+            None
+        )
+
+    class MockTopicObject(topic_domain.Topic):
+        """Mocks Topic domain object."""
+
+        @classmethod
+        def _convert_story_reference_v1_dict_to_v2_dict(
+            cls, story_reference: topic_domain.StoryReferenceDict
+        ) -> topic_domain.StoryReferenceDict:
+            """Converts v1 story reference dict to v2."""
+            return story_reference
+
+    def test_story_schema_update(self) -> None:
+        story_id = 'story_id'
+        story_published = True
+        schema_version = 1
+        story_ref_dict = topic_domain.StoryReference(
+            story_id,
+            story_published
+        ).to_dict()
+        vers_story_ref_dict = topic_domain.VersionedStoryReferencesDict(
+            {
+                'schema_version': 1,
+                'story_references': [story_ref_dict]
+            }
+        )
+        swap_topic_object = self.swap(
+            topic_domain,
+            'Topic',
+            self.MockTopicObject
+        )
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION', 2)
+        with swap_topic_object, current_schema_version_swap:
+            topic_domain.Topic.update_story_references_from_model(
+                vers_story_ref_dict,
+                schema_version
+            )
+        self.assertEqual(
+            vers_story_ref_dict['schema_version'],
+            2
+        )
+
+    def test_is_valid_topic_id(self) -> None:
+        """This test is needed for complete branch coverage.
+        We need to go from the if statement and directly exit
+        the method.
+        """
+        topic_id = 'abcdefghijkl'
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except utils.ValidationError:
+            self.fail('This test should pass and not raise an exception')
+
+    def test_invalid_topic_id(self) -> None:
+        topic_id = 'a'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Topic id %s is invalid' % topic_id
+        ):
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+
+    def _setup_stories(self, topic: topic_domain.Topic) -> None:
+        """This setups up stories for various story tests."""
+        topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2')
+        ]
+        topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_10'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_11'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_12')
+        ]
+
+    def test_publish_story(self) -> None:
+        topic = self.topic
+        self._setup_stories(topic)
+        topic.publish_story('story_id')
+        self.assertEqual(
+            topic.canonical_story_references[0].story_is_published,
+            True
+        )
+        topic.publish_story('story_id_10')
+        self.assertEqual(
+            topic.additional_story_references[0].story_is_published,
+            True
+        )
+
+    def test_publish_story_not_exist(self) -> None:
+        topic = self.topic
+        self._setup_stories(topic)
+        with self.assertRaisesRegex(
+            Exception,
+            'Story with given id doesn\'t exist in the topic'
+        ):
+            topic.publish_story('story_id_110')
+
+    def test_unpublish_story(self) -> None:
+        topic = self.topic
+        self._setup_stories(topic)
+        topic.publish_story('story_id_11')
+        topic.unpublish_story('story_id_11')
+        topic.publish_story('story_id')
+        topic.unpublish_story('story_id')
+        self.assertEqual(
+            topic.additional_story_references[0].story_is_published,
+            False
+        )
+        self.assertEqual(
+            topic.canonical_story_references[1].story_is_published,
+            False
+        )
+
+    def test_validate_same_subtopic_url(self) -> None:
+        self.topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-one'),
+            topic_domain.Subtopic(
+                1, 'Another title', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-two')]
+        self.topic.subtopics[0].url_fragment = 'abc'
+        self.topic.subtopics[1].url_fragment = 'abc'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Subtopic url fragments are not unique across '
+            'subtopics in the topic'
+        ):
+            self.topic.validate()
+
+    def test_validate_no_story_references(self) -> None:
+        """This is needed for branch coverage when there are no
+        story references and validate is run on a topic.
+        """
+        self.topic.canonical_story_references = []
+        self.topic.additional_story_references = []
+        try:
+            self.topic.validate()
+        except Exception:
+            self.fail('There are no story references for topic')
+
+    def test_unpublish_story_not_exist(self) -> None:
+        topic = self.topic
+        self._setup_stories(topic)
+        with self.assertRaisesRegex(
+            Exception,
+            'Story with given id doesn\'t exist in the topic'
+        ):
+            topic.unpublish_story('story_id_110')
+
     def test_topic_export_import_returns_original_object(self) -> None:
         """Checks that to_dict and from_dict preserves all the data within a
         Topic during export and import.
@@ -833,6 +1364,18 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         """Checks that serializing and then deserializing a default topic
         works as intended by leaving the topic unchanged.
         """
+        self.assertEqual(
+            self.topic.to_dict(),
+            topic_domain.Topic.deserialize(
+                self.topic.serialize()).to_dict())
+
+    def test_serialize_with_created_on_last_updated_set(self) -> None:
+        """Checks that serializing and then deserializing a default topic
+        works as intended by leaving the topic unchanged. Added values
+        for self.topic.created_on and last_updated.
+        """
+        self.topic.created_on = datetime.datetime.now()
+        self.topic.last_updated = datetime.datetime.now()
         self.assertEqual(
             self.topic.to_dict(),
             topic_domain.Topic.deserialize(
