@@ -154,6 +154,7 @@ export class ConversationSkinComponent {
   completedStateNames: string[] = [];
   prevSessionStatesProgress: string[] = [];
   mostRecentlyReachedCheckpoint: string;
+  numberOfIncorrectSubmissions: number = 0;
   showProgressClearanceMessage: boolean = false;
   alertMessageTimeout = 6000;
   // 'completedChaptersCount' is fetched via a HTTP request.
@@ -287,6 +288,7 @@ export class ConversationSkinComponent {
       this.playerPositionService.onNewCardOpened.subscribe(
         (newCard: StateCard) => {
           this.solutionForState = newCard.getSolution();
+          this.numberOfIncorrectSubmissions = 0;
           this.nextCardIfStuck = null;
           this.triggerIfLearnerStuckAction();
         }
@@ -1043,7 +1045,10 @@ export class ConversationSkinComponent {
           this.translateService.instant(
             'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE')
         );
-      } else if (this.solutionForState !== null) {
+      } else if (this.solutionForState !== null &&
+        this.numberOfIncorrectSubmissions >=
+        ExplorationPlayerConstants.
+          MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION) {
         // Release solution if no separate state for addressing
         // the stuck learner exists and the solution exists.
         this.hintsAndSolutionManagerService.releaseSolution();
@@ -1076,7 +1081,10 @@ export class ConversationSkinComponent {
         this.nextCard = this.nextCardIfStuck;
         this.showPendingCard();
       }, 10000);
-    } else if (this.solutionForState !== null) {
+    } else if (this.solutionForState !== null &&
+      this.numberOfIncorrectSubmissions >=
+      ExplorationPlayerConstants.
+        MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION) {
       // Release solution if it exists.
       this.hintsAndSolutionManagerService.releaseSolution();
     }
@@ -1259,6 +1267,7 @@ export class ConversationSkinComponent {
 
           if (remainOnCurrentCard) {
             // Stay on the same card.
+            this.numberOfIncorrectSubmissions++;
             this.hintsAndSolutionManagerService.recordWrongAnswer();
             this.conceptCardManagerService.recordWrongAnswer();
             this.playerTranscriptService.addNewResponse(feedbackHtml);

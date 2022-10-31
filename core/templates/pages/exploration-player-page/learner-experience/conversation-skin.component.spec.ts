@@ -80,6 +80,7 @@ import { EditableExplorationBackendApiService } from 'domain/exploration/editabl
 import { ConceptCardManagerService } from '../services/concept-card-manager.service';
 import { TranslateService } from '@ngx-translate/core';
 import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 
 class MockWindowRef {
   nativeWindow = {
@@ -160,6 +161,7 @@ describe('Conversation skin component', () => {
   let platformFeatureService: PlatformFeatureService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   let conceptCardManagerService: ConceptCardManagerService;
+  let solutionObjectFactory: SolutionObjectFactory;
   let translateService: TranslateService;
 
 
@@ -498,6 +500,7 @@ describe('Conversation skin component', () => {
         MockTranslatePipe
       ],
       providers: [
+        SolutionObjectFactory,
         {
           provide: WindowRef,
           useClass: MockWindowRef
@@ -565,6 +568,7 @@ describe('Conversation skin component', () => {
       RefresherExplorationConfirmationModalService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     statsReportingService = TestBed.inject(StatsReportingService);
+    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
@@ -1077,6 +1081,9 @@ describe('Conversation skin component', () => {
     componentInstance.nextCardIfStuck = null;
     let solutionSpy = spyOn(hintsAndSolutionManagerService, 'releaseSolution');
     let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
+    componentInstance.solutionForState = solutionObjectFactory.createNew(
+      true, 'answer', 'Html', 'XyzID');
+    componentInstance.numberOfIncorrectSubmissions = 3;
     componentInstance.triggerIfLearnerStuckAction();
     tick(
       ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
@@ -1114,6 +1121,9 @@ describe('Conversation skin component', () => {
     componentInstance.nextCardIfStuck = null;
     let solutionSpy = spyOn(hintsAndSolutionManagerService, 'releaseSolution');
     let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
+    componentInstance.solutionForState = solutionObjectFactory.createNew(
+      true, 'answer', 'Html', 'XyzID');
+    componentInstance.numberOfIncorrectSubmissions = 3;
     componentInstance.triggerIfLearnerStuckActionDirectly();
     expect(solutionSpy).toHaveBeenCalled();
     expect(redirectionSpy).not.toHaveBeenCalled();

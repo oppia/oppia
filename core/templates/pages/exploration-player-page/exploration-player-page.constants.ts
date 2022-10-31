@@ -51,6 +51,8 @@ export const ExplorationPlayerConstants = {
   // after which the learner is said to be really stuck.
   MAX_INCORRECT_ANSWERS_BEFORE_REALLY_STUCK: 3,
 
+  MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION: 3,
+
   // Array of i18n IDs for the possible hint request strings.
   HINT_REQUEST_STRING_I18N_IDS: [
     'I18N_PLAYER_HINT_REQUEST_STRING_1',
