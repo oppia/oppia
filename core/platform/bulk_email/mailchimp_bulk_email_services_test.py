@@ -81,6 +81,10 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                         # Email: test2@example.com.
                         'email_hash': '43b05f394d5611c54a1a9e8e20baee21',
                         'status': 'subscribed'
+                    }, {
+                        # Email: test4@example.com, but intentionally
+                        # incorrect to trigger failure.
+                        'email_hash': 'incorrecthash'
                     }]
                     self.tags = self.MailchimpTags()
 
@@ -286,9 +290,16 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     self.user_email_3, {}, 'Web',
                     can_receive_email_updates=True))
-            self.assertFalse(return_status)
+            self.assertTrue(return_status)
             self.assertEqual(
                 mailchimp.lists.members.users_data[2]['status'], 'subscribed')
+
+            # Creates a mailchimp entry for a new user.
+            return_status = (
+                mailchimp_bulk_email_services.add_or_update_user_status(
+                    'test4@example.com', {}, 'Web',
+                    can_receive_email_updates=True))
+            self.assertFalse(return_status)
 
             # Here we use MyPy ignore because attribute 'users_data' can only
             # accept Dict but for testing purposes here we are providing None
@@ -359,10 +370,10 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         swap_username = self.swap(feconf, 'MAILCHIMP_USERNAME', 'username')
 
         with swap_mailchimp_context, swap_api, swap_username:
-            self.assertEqual(len(mailchimp.lists.members.users_data), 2)
+            self.assertEqual(len(mailchimp.lists.members.users_data), 3)
             mailchimp_bulk_email_services.permanently_delete_user_from_list(
                 self.user_email_1)
-            self.assertEqual(len(mailchimp.lists.members.users_data), 1)
+            self.assertEqual(len(mailchimp.lists.members.users_data), 2)
 
             # Here we use MyPy ignore because attribute 'users_data' can only
             # accept Dict but for testing purposes here we are providing None
