@@ -1118,7 +1118,9 @@ export class ConversationSkinComponent {
           isFirstHit, isFinalQuestion, focusLabel) => {
         this.nextCard = nextCard;
         if (!this._editorPreviewMode &&
-            !this.explorationPlayerStateService.isInQuestionMode()) {
+            !this.explorationPlayerStateService.isInQuestionMode() &&
+            !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
+        ) {
           let oldStateName =
             this.playerPositionService.getCurrentStateName();
           if (!remainOnCurrentCard) {
