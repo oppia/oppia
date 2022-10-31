@@ -1,4 +1,4 @@
-name: Simplified Feature request form
+name: Feature request
 description: Suggest an idea for this project
 title: "[Feature Request]: "
 labels: ["triage needed", "enhancement"]
@@ -10,7 +10,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Before filing a new issue, please do a quick search to check that it hasn't already been filed on the [issue tracker](https://github.com/oppia/oppia/issues) by typing the issue in the search box next to the "New issue" button.
+        Before filing a new issue, **please do a quick search** to check that it hasn't already been filed on the issue tracker. You can do this by going to [this link](https://github.com/oppia/oppia/issues) and typing some words related to the issue in the search box next to the "New issue" button.
   - type: textarea
     id: problem
     attributes:
