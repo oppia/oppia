@@ -1,5 +1,5 @@
 ---
-name: Bug report (full Markdown) 
+name: Bug report (full Markdown)
 about: Create a report to help us improve (using Markdown)
 labels: triage needed, bug
 ---

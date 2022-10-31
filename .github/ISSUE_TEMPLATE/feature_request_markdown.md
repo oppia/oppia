@@ -1,5 +1,5 @@
 ---
-name: Feature request (full Markdown) 
+name: Feature request (full Markdown)
 about: Suggest an idea for this project (using Markdown)
 labels: triage needed, enhancement
 ---
