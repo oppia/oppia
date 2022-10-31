@@ -447,7 +447,7 @@ export class SettingsTabComponent
     });
   }
 
-  editVoiseArtist(newVoiceArtistUsername: string): void {
+  editVoiceArtist(newVoiceArtistUsername: string): void {
     this.explorationRightsService.assignVoiceArtistRoleAsync(
       newVoiceArtistUsername);
     this.closeVoiceoverForm();

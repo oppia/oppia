@@ -866,7 +866,7 @@ describe('Settings Tab Component', () => {
 
     spyOn(explorationRightsService, 'assignVoiceArtistRoleAsync')
       .and.returnValue(Promise.resolve());
-    component.editVoiseArtist('Username1');
+    component.editVoiceArtist('Username1');
 
     expect(explorationRightsService.assignVoiceArtistRoleAsync)
       .toHaveBeenCalledWith('Username1');
