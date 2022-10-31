@@ -22,7 +22,7 @@ import logging
 
 from core import feconf
 from core.constants import constants
-from core.domain import exp_domain, exp_fetchers
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
@@ -1050,7 +1050,11 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         )
 
         self.publish_exploration(self.owner_id, exp_id)
-        with self.swap(story_services, 'validate_explorations_for_story', lambda *unused_args: []):
+        with self.swap(
+            story_services,
+            'validate_explorations_for_story',
+            lambda *unused_args: []
+        ):
             story_services.update_story(
                 self.owner_id, self.STORY_ID,[story_domain.StoryChange({
                     'cmd': 'update_story_node_property',
@@ -1061,7 +1065,11 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 })], 'Changes.')
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        with self.swap(exp_domain.Exploration, 'get_languages_with_complete_translation', lambda _: ['hi']):
+        with self.swap(
+            exp_domain.Exploration,
+            'get_languages_with_complete_translation',
+            lambda _: ['hi']
+        ):
             exp_opportunity_summary = (
                 opportunity_services.create_exp_opportunity_summary(
                     topic, story, exploration))
@@ -1124,7 +1132,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 'cmd': 'edit_state_property',
                 'property_name': 'content'
                 })], 'Update 1')
-        
+
         with self.swap(
             exp_domain.Exploration,
             'get_languages_with_complete_translation',
@@ -1132,14 +1140,17 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         ):
             opportunity_services.update_opportunity_with_updated_exploration(
                 exp_id)
-        
-        exp_opportunity_summary = (
+
+        updated_opportunity_summary = (
             opportunity_services.get_exploration_opportunity_summary_by_id(
                 exp_opportunity_summary.id))
 
-        self.assertEqual(exp_opportunity_summary.id, exp_id)
-        self.assertEqual(exp_opportunity_summary.topic_id, self.TOPIC_ID)
-        self.assertEqual(exp_opportunity_summary.story_id, self.STORY_ID)
+        assert updated_opportunity_summary is not None
+        self.assertEqual(updated_opportunity_summary.id, exp_id)
+        self.assertEqual(
+            updated_opportunity_summary.topic_id, self.TOPIC_ID)
+        self.assertEqual(
+            updated_opportunity_summary.story_id, self.STORY_ID)
         self.assertNotIn(
             'hi',
-            exp_opportunity_summary.incomplete_translation_language_codes)
+            updated_opportunity_summary.incomplete_translation_language_codes)

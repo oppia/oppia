@@ -484,4 +484,3 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             learner_playlist_services
             .get_all_collection_ids_in_learner_playlist(
                 self.user_id), [self.COL_ID_0])
-

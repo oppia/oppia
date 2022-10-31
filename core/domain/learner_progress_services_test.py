@@ -1057,7 +1057,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.TOPIC_ID_1)
         self.assertEqual(self._get_all_learnt_topic_ids(
             self.user_id), [])
-    
+
     def test_remove_collection_from_completed_list(self) -> None:
         self.assertEqual(self._get_all_completed_collection_ids(
             self.user_id), [])
