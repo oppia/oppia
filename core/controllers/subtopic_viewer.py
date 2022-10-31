@@ -60,6 +60,25 @@ class SubtopicPageDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {
+        
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'topic_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'subtopic_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_access_subtopic_viewer_page
     def get(self, topic_name, subtopic_id):
         """Handles GET requests.
