@@ -26,8 +26,7 @@ from core.tests import test_utils
 from scripts import install_third_party_libs
 from scripts import run_mypy_checks
 
-from typing import List, Optional, Tuple
-from typing_extensions import Final
+from typing import Final, List, Optional, Tuple
 
 PYTHON_CMD: Final = 'python3'
 MYPY_SCRIPT_MODULE: Final = 'scripts.run_mypy_checks'

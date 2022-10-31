@@ -35,7 +35,7 @@ from core.domain import summary_services
 from core.domain import user_services
 from core.tests import test_utils
 
-from typing_extensions import Final
+from typing import Final
 
 
 class ExplorationDisplayableSummariesTest(
@@ -273,7 +273,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         The sequence of events is:
         - (1) Admin logs in.
         - (2) Admin access admin page.
-        - (3) Admin reloads exploration with id '2'.
+        - (3) Admin reloads exploration with id '3'.
         - (4) Admin logs out.
         """
 
@@ -284,33 +284,37 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         self.post_json(
             '/adminhandler', {
                 'action': 'reload_exploration',
-                'exploration_id': '2'
+                'exploration_id': '3'
             }, csrf_token=csrf_token)
         self.logout()
 
     def test_get_library_groups(self) -> None:
-        """The exploration with id '2' is an exploration in the Mathematics
+        """The exploration with id '3' is an exploration in the Mathematics
         category. The call to get_library_groups() should return the
         exploration as part of the Mathematics & Statistics group.
         """
         library_groups = summary_services.get_library_groups([])
         expected_exploration_summary_dict = {
-            'category': u'Algorithms',
-            'community_owned': True,
-            'id': '2',
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
-            'num_views': 0,
-            'objective': u'discover the binary search algorithm',
-            'ratings': feconf.get_empty_ratings(),
-            'status': u'public',
-            'tags': [],
-            'title': u'The Lazy Magician',
-            'thumbnail_bg_color': '#d0982a',
-            'thumbnail_icon_url': '/subjects/Algorithms.svg',
+            'id': '3',
+            'title': 'Root Linear Coefficient Theorem',
+            'activity_type': 'exploration',
+            'category': u'Algebra',
+            'objective': 'discover the Root Linear Coefficient Theorem',
+            'language_code': 'en',
+            'human_readable_contributors_summary': {},
+            'status': 'public',
+            'ratings': {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
+            'thumbnail_bg_color': '#cd672b',
+            'num_views': 0
         }
         expected_group = {
-            'categories': ['Algorithms', 'Computing', 'Programming'],
-            'header_i18n_id': 'I18N_LIBRARY_GROUPS_COMPUTING',
+            'categories': [
+                'Mathematics', 'Algebra', 'Arithmetic',
+                'Calculus', 'Combinatorics', 'Geometry', 'Graph Theory',
+                'Logic', 'Probability', 'Statistics', 'Trigonometry'
+            ],
+            'header_i18n_id': 'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
         }
 
         self.assertEqual(len(library_groups), 1)

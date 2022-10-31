@@ -44,8 +44,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Union
-from typing_extensions import Final
+from typing import Dict, Final, List, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -3410,43 +3409,6 @@ class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(scores_dict, {})
 
 
-class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
-    """Tests for the ExplorationVoiceoverApplication class."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup('author@example.com', 'author')
-        self.author_id = self.get_user_id_from_email('author@example.com')
-
-        suggestion_models.GeneralVoiceoverApplicationModel(
-            id='application_id',
-            target_type='exploration',
-            target_id='0',
-            status='review',
-            author_id=self.author_id,
-            final_reviewer_id=None,
-            language_code='en',
-            filename='filename.mp3',
-            content='<p>content</p>',
-            rejection_message=None).put()
-        self.voiceover_application_model = (
-            suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
-                'application_id'))
-
-    def test_get_voiceover_application_from_model_with_invalid_type_raise_error(
-        self
-    ) -> None:
-        suggestion_services.get_voiceover_application(
-            self.voiceover_application_model.id)
-
-        self.voiceover_application_model.target_type = 'invalid_type'
-        with self.assertRaisesRegex(
-            Exception,
-            'Invalid target type for voiceover application: invalid_type'):
-            suggestion_services.get_voiceover_application(
-                self.voiceover_application_model.id)
-
-
 class ReviewableSuggestionEmailInfoUnitTests(
         test_utils.GenericTestBase):
     """Tests the methods related to the ReviewableSuggestionEmailInfo class.
@@ -3724,8 +3686,11 @@ class ReviewableSuggestionEmailInfoUnitTests(
     ) -> None:
         translation_suggestion = (
             self._create_translation_suggestion_with_translation_html(
-                '<p>translation with rte'
-                '<oppia-noninteractive-math></oppia-noninteractive-math></p>'))
+                '<p> translation with rte'
+                '<oppia-noninteractive-math math_content-with-value=\''
+                '{&amp;quot;raw_latex&amp;quot;:&amp;quot;+,-,-,+&amp;'
+                'quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;'
+                'mathImg.svg&amp;quot;}\'></oppia-noninteractive-math></p>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
@@ -3750,9 +3715,11 @@ class ReviewableSuggestionEmailInfoUnitTests(
     ) -> None:
         translation_suggestion = (
             self._create_translation_suggestion_with_translation_html(
-                '<p>translation with rte'
-                '<oppia-noninteractive-image></oppia-noninteractive-image>'
-                '</p>'))
+                '<p> translation with rte'
+                '<oppia-noninteractive-image alt-with-value=\'&amp;quot;'
+                'test&amp;quot;\' caption-with-value=\'&amp;quot;&amp;'
+                'quot;\' filepath-with-value=\'&amp;quot;img.svg&amp;quot;'
+                '\'></oppia-noninteractive-image></p>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
@@ -3778,7 +3745,10 @@ class ReviewableSuggestionEmailInfoUnitTests(
         translation_suggestion = (
             self._create_translation_suggestion_with_translation_html(
                 '<p> translation with rte'
-                '<oppia-noninteractive-link></oppia-noninteractive-link> </p>'))
+                '<oppia-noninteractive-link text-with-value=\'&amp;quot;'
+                'codebase&amp;quot;\' url-with-value=\'&amp;quot;'
+                'https://github.com/oppia/oppia/&amp;quot;\'>'
+                '</oppia-noninteractive-link></p>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
@@ -3804,8 +3774,14 @@ class ReviewableSuggestionEmailInfoUnitTests(
         translation_suggestion = (
             self._create_translation_suggestion_with_translation_html(
                 '<p> translation with rte'
-                '<oppia-noninteractive-link></oppia-noninteractive-link>'
-                '</p><oppia-noninteractive-link></oppia-noninteractive-link>'))
+                '<oppia-noninteractive-link text-with-value=\'&amp;quot;'
+                'codebase&amp;quot;\' url-with-value=\'&amp;quot;'
+                'https://github.com/oppia/oppia/&amp;quot;\'>'
+                '</oppia-noninteractive-link></p>'
+                '<oppia-noninteractive-link text-with-value=\'&amp;quot;'
+                'codebase&amp;quot;\' url-with-value=\'&amp;quot;'
+                'https://github.com/oppia/oppia/&amp;quot;\'>'
+                '</oppia-noninteractive-link>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
@@ -3831,8 +3807,14 @@ class ReviewableSuggestionEmailInfoUnitTests(
         translation_suggestion = (
             self._create_translation_suggestion_with_translation_html(
                 '<p> translation with rte'
-                '<oppia-noninteractive-link></oppia-noninteractive-link>'
-                '</p><oppia-noninteractive-math></oppia-noninteractive-math>'))
+                '<oppia-noninteractive-link text-with-value=\'&amp;quot;'
+                'codebase&amp;quot;\' url-with-value=\'&amp;quot;'
+                'https://github.com/oppia/oppia/&amp;quot;\'>'
+                '</oppia-noninteractive-link></p>'
+                '<oppia-noninteractive-math math_content-with-value=\''
+                '{&amp;quot;raw_latex&amp;quot;:&amp;quot;+,-,-,+&amp;'
+                'quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;'
+                'mathImg.svg&amp;quot;}\'></oppia-noninteractive-math>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 translation_suggestion.suggestion_type,
@@ -3885,7 +3867,10 @@ class ReviewableSuggestionEmailInfoUnitTests(
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
                 '<p> question with rte'
-                '<oppia-noninteractive-math></oppia-noninteractive-math> </p>'))
+                '<oppia-noninteractive-math math_content-with-value=\''
+                '{&amp;quot;raw_latex&amp;quot;:&amp;quot;+,-,-,+&amp;'
+                'quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;'
+                'mathImg.svg&amp;quot;}\'></oppia-noninteractive-math></p>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
@@ -3911,8 +3896,10 @@ class ReviewableSuggestionEmailInfoUnitTests(
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
                 '<p> question with rte'
-                '<oppia-noninteractive-image></oppia-noninteractive-image>'
-                '</p>'))
+                '<oppia-noninteractive-image alt-with-value=\'&amp;quot;'
+                'testing&amp;quot;\' caption-with-value=\'&amp;quot;&amp;'
+                'quot;\' filepath-with-value=\'&amp;quot;img.svg&amp;quot;'
+                '\'></oppia-noninteractive-image></p>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
@@ -3937,7 +3924,10 @@ class ReviewableSuggestionEmailInfoUnitTests(
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
                 '<p> question with rte'
-                '<oppia-noninteractive-link></oppia-noninteractive-link> </p>'))
+                '<oppia-noninteractive-link text-with-value=\'&amp;quot;'
+                'codebase&amp;quot;\' url-with-value=\'&amp;quot;'
+                'https://github.com/oppia/oppia/&amp;quot;\'>'
+                '</oppia-noninteractive-link></p>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
@@ -3963,8 +3953,14 @@ class ReviewableSuggestionEmailInfoUnitTests(
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
                 '<p> question with rte'
-                '<oppia-noninteractive-link></oppia-noninteractive-link>'
-                '</p><oppia-noninteractive-link></oppia-noninteractive-link>'))
+                '<oppia-noninteractive-link text-with-value=\'&amp;quot;'
+                'codebase&amp;quot;\' url-with-value=\'&amp;quot;'
+                'https://github.com/oppia/oppia/&amp;quot;\'>'
+                '</oppia-noninteractive-link></p>'
+                '<oppia-noninteractive-link text-with-value=\'&amp;quot;'
+                'codebase&amp;quot;\' url-with-value=\'&amp;quot;'
+                'https://github.com/oppia/oppia/&amp;quot;\'>'
+                '</oppia-noninteractive-link>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
@@ -3990,8 +3986,14 @@ class ReviewableSuggestionEmailInfoUnitTests(
         question_suggestion = (
             self._create_question_suggestion_with_question_html_content(
                 '<p> question with rte'
-                '<oppia-noninteractive-link></oppia-noninteractive-link>'
-                '</p><oppia-noninteractive-math></oppia-noninteractive-math>'))
+                '<oppia-noninteractive-link text-with-value=\'&amp;quot;'
+                'codebase&amp;quot;\' url-with-value=\'&amp;quot;'
+                'https://github.com/oppia/oppia/&amp;quot;\'>'
+                '</oppia-noninteractive-link></p>'
+                '<oppia-noninteractive-math math_content-with-value=\''
+                '{&amp;quot;raw_latex&amp;quot;:&amp;quot;+,-,-,+&amp;'
+                'quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;'
+                'mathImg.svg&amp;quot;}\'></oppia-noninteractive-math>'))
         expected_reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 question_suggestion.suggestion_type,
