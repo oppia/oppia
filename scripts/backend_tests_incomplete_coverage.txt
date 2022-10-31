@@ -75,7 +75,6 @@ core.domain.story_services_test
 core.domain.subtopic_page_domain_test
 core.domain.suggestion_registry_test
 core.domain.summary_services_test
-core.domain.topic_domain_test
 core.domain.topic_services_test
 core.domain.translation_domain_test
 core.domain.user_domain_test
