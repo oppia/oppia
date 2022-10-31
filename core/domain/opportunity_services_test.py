@@ -22,7 +22,7 @@ import logging
 
 from core import feconf
 from core.constants import constants
-from core.domain import exp_domain
+from core.domain import exp_domain, exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
@@ -31,11 +31,13 @@ from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -1033,3 +1035,111 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             opportunity_services.regenerate_opportunities_related_to_topic(
                 self.TOPIC_ID
             )
+
+    def test_create_exp_opportunity_summary_for_exp_in_translated_language(
+            self) -> None:
+        exp_id = 'exp_id'
+        exploration = self.save_new_valid_exploration(
+            exp_id,
+            self.owner_id,
+            title='title',
+            category=constants.ALL_CATEGORIES[0],
+            end_state_name='End State',
+            correctness_feedback_enabled=True,
+            language_code='hi'
+        )
+
+        self.publish_exploration(self.owner_id, exp_id)
+        with self.swap(story_services, 'validate_explorations_for_story', lambda *unused_args: []):
+            story_services.update_story(
+                self.owner_id, self.STORY_ID,[story_domain.StoryChange({
+                    'cmd': 'update_story_node_property',
+                    'property_name': 'exploration_id',
+                    'node_id': 'node_1',
+                    'old_value': '0',
+                    'new_value': exp_id
+                })], 'Changes.')
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        with self.swap(exp_domain.Exploration, 'get_languages_with_complete_translation', lambda _: ['hi']):
+            exp_opportunity_summary = (
+                opportunity_services.create_exp_opportunity_summary(
+                    topic, story, exploration))
+        self.assertEqual(exp_opportunity_summary.id, exp_id)
+        self.assertEqual(exp_opportunity_summary.topic_id, self.TOPIC_ID)
+        self.assertEqual(exp_opportunity_summary.story_id, self.STORY_ID)
+        self.assertNotIn(
+            'hi',
+            exp_opportunity_summary.incomplete_translation_language_codes)
+
+    def test_update_exp_opportunity_summary_for_exp_in_translated_language(
+            self) -> None:
+        exp_id = 'exp_id'
+        exploration = self.save_new_valid_exploration(
+            exp_id,
+            self.owner_id,
+            title='title',
+            category=constants.ALL_CATEGORIES[0],
+            end_state_name='End State',
+            correctness_feedback_enabled=True,
+            language_code='hi'
+        )
+
+        self.publish_exploration(self.owner_id, exp_id)
+        with self.swap(
+            story_services,
+            'validate_explorations_for_story',
+            lambda *unused_args: []
+        ):
+            story_services.update_story(
+                self.owner_id, self.STORY_ID,[story_domain.StoryChange({
+                    'cmd': 'update_story_node_property',
+                    'property_name': 'exploration_id',
+                    'node_id': 'node_1',
+                    'old_value': '0',
+                    'new_value': exp_id
+                })], 'Changes.')
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        exp_opportunity_summary = (
+            opportunity_services.create_exp_opportunity_summary(
+                topic, story, exploration))
+
+        with self.swap(
+            exp_services,
+            'validate_exploration_for_story',
+            lambda *unused_args: []
+        ):
+            exp_services.update_exploration(
+                self.owner_id, exp_id, [exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+                })], 'Update 1')
+        
+        with self.swap(
+            exp_domain.Exploration,
+            'get_languages_with_complete_translation',
+            lambda _: ['hi']
+        ):
+            opportunity_services.update_opportunity_with_updated_exploration(
+                exp_id)
+        
+        exp_opportunity_summary = (
+            opportunity_services.get_exploration_opportunity_summary_by_id(
+                exp_opportunity_summary.id))
+
+        self.assertEqual(exp_opportunity_summary.id, exp_id)
+        self.assertEqual(exp_opportunity_summary.topic_id, self.TOPIC_ID)
+        self.assertEqual(exp_opportunity_summary.story_id, self.STORY_ID)
+        self.assertNotIn(
+            'hi',
+            exp_opportunity_summary.incomplete_translation_language_codes)

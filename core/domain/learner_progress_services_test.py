@@ -990,6 +990,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_completed_story_ids(
             self.user_id), [])
 
+        # Cannot remove a story from non existing CompletedActivitiesModel.
+        learner_progress_services.remove_story_from_completed_list(
+            self.user_id, self.STORY_ID_0)
+        self.assertEqual(self._get_all_completed_story_ids(
+            self.user_id), [])
+
         # Add two stories to the completed list.
         learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
@@ -1020,6 +1026,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_learnt_topic_ids(
             self.user_id), [])
 
+        # Cannot remove a topic from non exisitng CompletedActivitiesModel.
+        learner_progress_services.remove_topic_from_learnt_list(
+            self.user_id, self.TOPIC_ID_0)
+        self.assertEqual(self._get_all_learnt_topic_ids(
+            self.user_id), [])
+
         # Add two topics to the learnt list.
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_0)
@@ -1044,6 +1056,42 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         learner_progress_services.remove_topic_from_learnt_list(
             self.user_id, self.TOPIC_ID_1)
         self.assertEqual(self._get_all_learnt_topic_ids(
+            self.user_id), [])
+    
+    def test_remove_collection_from_completed_list(self) -> None:
+        self.assertEqual(self._get_all_completed_collection_ids(
+            self.user_id), [])
+
+        # Cannot remove a collection from non exisitng CompletedActivitiesModel.
+        learner_progress_services.remove_collection_from_completed_list(
+            self.user_id, self.COL_ID_0)
+        self.assertEqual(self._get_all_completed_collection_ids(
+            self.user_id), [])
+
+        # Add two collections to the completed list.
+        learner_progress_services.mark_collection_as_completed(
+            self.user_id, self.COL_ID_0)
+        learner_progress_services.mark_collection_as_completed(
+            self.user_id, self.COL_ID_1)
+        self.assertEqual(self._get_all_completed_collection_ids(
+            self.user_id), [self.COL_ID_0, self.COL_ID_1])
+
+        # Remove one collection.
+        learner_progress_services.remove_collection_from_completed_list(
+            self.user_id, self.COL_ID_0)
+        self.assertEqual(self._get_all_completed_collection_ids(
+            self.user_id), [self.COL_ID_1])
+
+        # Removing the same collection again has no effect.
+        learner_progress_services.remove_collection_from_completed_list(
+            self.user_id, self.COL_ID_0)
+        self.assertEqual(self._get_all_completed_collection_ids(
+            self.user_id), [self.COL_ID_1])
+
+        # Removing another collection.
+        learner_progress_services.remove_collection_from_completed_list(
+            self.user_id, self.COL_ID_1)
+        self.assertEqual(self._get_all_completed_collection_ids(
             self.user_id), [])
 
     def test_get_all_completed_exp_ids(self) -> None:

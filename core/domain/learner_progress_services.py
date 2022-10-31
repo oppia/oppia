@@ -1612,6 +1612,7 @@ def _get_filtered_all_topic_summaries(
         list(TopicSummary). Filtered list of TopicSummary domain
         objects of the topics in the edit goals.
     """
+    print('\n\n\n', topic_ids, '\n\n\n')
     filtered_all_topic_summaries = []
     all_topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
     for index, topic_summary in enumerate(topic_summaries):

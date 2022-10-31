@@ -421,6 +421,27 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
+    def test_mark_exploration_to_be_played_later_handles_duplication(
+            self) -> None:
+        self.assertEqual(
+            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
+                self.user_id), [])
+
+        # Add an exploration to the learner playlist.
+        learner_playlist_services.mark_exploration_to_be_played_later(
+            self.user_id, self.EXP_ID_0)
+        self.assertEqual(
+            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
+                self.user_id), [self.EXP_ID_0])
+
+        # Trying to add the exploration again to the playlist.
+        learner_playlist_services.mark_exploration_to_be_played_later(
+            self.user_id, self.EXP_ID_0)
+        # Checking that the exploration id is not duplicated.
+        self.assertEqual(
+            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
+                self.user_id), [self.EXP_ID_0])
+
     def test_get_all_learner_playlist_collection_ids(self) -> None:
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
@@ -439,3 +460,28 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
+
+    def test_mark_collection_to_be_played_later_handles_duplication(
+            self) -> None:
+        self.assertEqual(
+            learner_playlist_services
+            .get_all_collection_ids_in_learner_playlist(
+                self.user_id), [])
+
+        # Add a collection to the learner playlist.
+        learner_playlist_services.mark_collection_to_be_played_later(
+            self.user_id, self.COL_ID_0)
+        self.assertEqual(
+            learner_playlist_services
+            .get_all_collection_ids_in_learner_playlist(
+                self.user_id), [self.COL_ID_0])
+
+        # Trying to add the collection again to the learner playlist.
+        learner_playlist_services.mark_collection_to_be_played_later(
+            self.user_id, self.COL_ID_0)
+        # Checking that the collection id is not duplicated.
+        self.assertEqual(
+            learner_playlist_services
+            .get_all_collection_ids_in_learner_playlist(
+                self.user_id), [self.COL_ID_0])
+
