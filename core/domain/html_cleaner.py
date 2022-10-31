@@ -24,14 +24,12 @@ import logging
 import urllib
 
 from core import utils
+from core.constants import constants
 from core.domain import rte_component_registry
 
 import bleach
 import bs4
 from typing import Any, Dict, Final, List, TypedDict
-
-
-empty_values = ['&quot;&quot;', '', '\'\'', '\"\"', '<p></p>']
 
 
 # TODO(#15982): Here we use type Any because `customization_args` can accept
@@ -79,6 +77,7 @@ ATTRS_WHITELIST: Final = {
     'code': [],
     'div': [],
     'em': [],
+    'h1': [],
     'hr': [],
     'i': [],
     'li': [],
@@ -196,6 +195,38 @@ def get_rte_components(html_string: str) -> List[ComponentsDict]:
     return components
 
 
+def is_html_empty(html_str: str) -> bool:
+    """Checks if the html is empty or not.
+
+    Args:
+        html_str: str. The html that needs to be validated.
+
+    Returns:
+        bool. Returns True if the html is empty.
+    """
+    if html_str.strip() in ['&quot;&quot;', '\\"&quot;&quot;\\"']:
+        return True
+
+    html_val = utils.unescape_html(html_str)
+    html_val = (
+        html_val.replace('<p>', '').replace('</p>', '').replace('<br>', '').
+        replace('<i>', '').replace('</i>', '').replace('<span>', '').
+        replace('</span>', '').replace('<b>', '').replace('</b>', '').
+        replace('<ol>', '').replace('</ol>', '').replace('<ul>', '').
+        replace('</ul>', '').replace('<h1>', '').replace('</h1>', '').
+        replace('<h2>', '').replace('</h2>', '').replace('<h3>', '').
+        replace('</h3>', '').replace('<h4>', '').replace('</h4>', '').
+        replace('<h5>', '').replace('</h5>', '').replace('<h6>', '').
+        replace('</h6>', '').replace('<li>', '').replace('</li>', '').
+        replace('&nbsp;', '').replace('<em>', '').replace('</em>', '').
+        replace('<strong>', '').replace('</strong>', '').replace('\"\"', '').
+        replace('\'\'', ''))
+    if html_val.strip() == '':
+        return True
+
+    return False
+
+
 def _raise_validation_errors_for_escaped_html_tag(
     tag: bs4.BeautifulSoup, attr: str, tag_name: str
 ) -> None:
@@ -215,7 +246,7 @@ def _raise_validation_errors_for_escaped_html_tag(
             '%s tag does not have \'%s\' attribute.' % (tag_name, attr)
         )
 
-    if tag[attr].strip() in empty_values:
+    if is_html_empty(tag[attr]):
         raise utils.ValidationError(
             '%s tag \'%s\' attribute should not be empty.' % (tag_name, attr)
         )
@@ -241,7 +272,7 @@ def _raise_validation_errors_for_unescaped_html_tag(
         )
 
     attr_value = utils.unescape_html(tag[attr])[1:-1].replace('\\"', '')
-    if attr_value.strip() in empty_values:
+    if is_html_empty(attr_value):
         raise utils.ValidationError(
             '%s tag \'%s\' attribute should not be empty.' % (tag_name, attr)
         )
@@ -307,14 +338,6 @@ def validate_rte_tags(
                 'Image tag does not have \'alt-with-value\' attribute.'
             )
 
-        alt_value = utils.unescape_html(
-            tag['alt-with-value'])[1:-1].replace('\\"', '')
-        if len(alt_value.strip()) < 5:
-            raise utils.ValidationError(
-                'The length of the image tag \'alt-with-value\' '
-                'attribute value should be at least 5 characters.'
-            )
-
         if not tag.has_attr('caption-with-value'):
             raise utils.ValidationError(
                 'Image tag does not have \'caption-with-value\' attribute.'
@@ -335,7 +358,7 @@ def validate_rte_tags(
 
         filepath_value = utils.unescape_html(
             tag['filepath-with-value'])[1:-1].replace('\\"', '')
-        if filepath_value.strip() in empty_values:
+        if is_html_empty(filepath_value):
             raise utils.ValidationError(
                 'Image tag \'filepath-with-value\' attribute should not '
                 'be empty.'
@@ -409,6 +432,13 @@ def validate_rte_tags(
             'Link'
         )
 
+        url = tag['url-with-value'].replace('&quot;', '').replace(' ', '')
+        if utils.get_url_scheme(url) not in constants.ACCEPTABLE_SCHEMES:
+            raise utils.ValidationError(
+                'Link should be prefix with acceptable schemas '
+                f'which are {constants.ACCEPTABLE_SCHEMES}'
+            )
+
     for tag in soup.find_all('oppia-noninteractive-math'):
         if not tag.has_attr('math_content-with-value'):
             raise utils.ValidationError(
@@ -416,7 +446,7 @@ def validate_rte_tags(
                 'attribute.'
             )
 
-        if tag['math_content-with-value'].strip() in empty_values:
+        if is_html_empty(tag['math_content-with-value']):
             raise utils.ValidationError(
                 'Math tag \'math_content-with-value\' attribute should not '
                 'be empty.'
@@ -430,7 +460,7 @@ def validate_rte_tags(
                 'attribute.'
             )
 
-        if math_content_list['raw_latex'].strip() in empty_values:
+        if is_html_empty(math_content_list['raw_latex']):
             raise utils.ValidationError(
                 'Math tag \'raw_latex-with-value\' attribute should not '
                 'be empty.'
@@ -442,7 +472,7 @@ def validate_rte_tags(
                 'attribute.'
             )
 
-        if math_content_list['svg_filename'].strip() in empty_values:
+        if is_html_empty(math_content_list['svg_filename']):
             raise utils.ValidationError(
                 'Math tag \'svg_filename-with-value\' attribute should not '
                 'be empty.'
@@ -489,7 +519,7 @@ def _raise_validation_errors_for_empty_tabs_content(
             'No %s attribute is present inside the tabs tag.' % (name)
         )
 
-    if content_dict[name].strip() in empty_values:
+    if is_html_empty(content_dict[name]):
         raise utils.ValidationError(
             '%s present inside tabs tag is empty.' % (name)
         )
@@ -554,7 +584,7 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
         )
         collapsible_content = json.loads(
             collapsible_content_json).replace('\\"', '')
-        if collapsible_content.strip() in empty_values:
+        if is_html_empty(collapsible_content):
             raise utils.ValidationError(
                 'No collapsible content is present inside the tag.'
             )
@@ -574,7 +604,7 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
         )
         collapsible_heading = json.loads(
             collapsible_heading_json).replace('\\"', '')
-        if collapsible_heading.strip() in empty_values:
+        if is_html_empty(collapsible_heading):
             raise utils.ValidationError(
                 'Heading attribute inside the collapsible tag is empty.'
             )
