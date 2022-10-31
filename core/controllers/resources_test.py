@@ -718,7 +718,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         error_msg = (
             'Schema validation for \'filename\' failed: Validation failed: '
             'is_regex_matched ({\'regex_pattern\': '
-            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object test.flac')
+            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object test.wav')
         self.assertEqual(response_dict['error'], error_msg)
 
     def test_upload_empty_audio(self):
