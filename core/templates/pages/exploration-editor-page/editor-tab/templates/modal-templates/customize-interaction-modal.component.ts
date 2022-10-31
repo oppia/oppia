@@ -253,12 +253,11 @@ export class CustomizeInteractionModalComponent
     this.isinteractionOpen = true;
   }
 
-  ButtonEnabledOnEndExploration(): boolean {
+  buttonEnabledOnEndExploration(): boolean {
     /*
-      There is a condition for the END EXPLORATION interaction
-      We have to check that the last input field for adding
-      the exploration Ids must be non-empty
-      Save Interaction button should be disable for empty input
+      For the EndExploration interaction, we check whether the last input field is empty or not.
+      Since checking recommended exploration ID's validity is an expensive operation, it is only
+      checked in the interaction validations and not here in real-time.
     */
     let inputField = document.
       getElementsByClassName('oppia-exploration-id-input');
@@ -267,7 +266,7 @@ export class CustomizeInteractionModalComponent
     }
     let inputValue = angular.element(
       inputField[inputField.length - 1]).attr('ng-reflect-model');
-    if (inputValue !== '') {
+    if (inputValue === undefined || inputValue.length > 0) {
       return true;
     }
   }
@@ -276,14 +275,13 @@ export class CustomizeInteractionModalComponent
     let explorationTitle = this.getTitle(
       this.stateInteractionIdService.displayed);
     if (explorationTitle === AppConstants.INTERACTION_NAMES.END_EXPLORATION) {
-      return this.ButtonEnabledOnEndExploration();
-    } else {
-      return !!(
-        this.hasCustomizationArgs &&
-        this.stateInteractionIdService.displayed &&
-        this.getCustomizationArgsWarningsList().length === 0
-      );
+      return this.buttonEnabledOnEndExploration();
     }
+    return !!(
+      this.hasCustomizationArgs &&
+      this.stateInteractionIdService.displayed &&
+      this.getCustomizationArgsWarningsList().length === 0
+    );
   }
 
   getSaveInteractionButtonTooltip(): string {

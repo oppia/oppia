@@ -103,7 +103,7 @@ class MockStateEditorService {
   }
 }
 
-describe('Customize Interaction Modal Component', () => {
+fdescribe('Customize Interaction Modal Component', () => {
   let component: CustomizeInteractionModalComponent;
   let contextService: ContextService;
   let changeDetectorRef: ChangeDetectorRef;
@@ -240,7 +240,7 @@ describe('Customize Interaction Modal Component', () => {
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
-  it('should enable Save Interaction button when no recommendation IDs', () => {
+  it('should enable Save Interaction button when no recommendation IDs are provided', () => {
     spyOn(component, 'getTitle').and.returnValue(
       AppConstants.INTERACTION_NAMES.END_EXPLORATION);
 
@@ -253,7 +253,7 @@ describe('Customize Interaction Modal Component', () => {
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
-  it('should enable Save Interaction button when exploration IDs added', () => {
+  it('should enable Save Interaction button when exploration IDs are provided', () => {
     spyOn(component, 'getTitle').and
       .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
 
@@ -268,16 +268,15 @@ describe('Customize Interaction Modal Component', () => {
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
-  it('should disable Save Interaction button when empty exploration ID', () => {
+  it('should enable Save Interaction button when no exploration ID is provided', () => {
     spyOn(component, 'getTitle').and
       .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
 
-    let inputValue = '';
     let className = 'oppia-exploration-id-input';
 
     spyOn(
       document, 'getElementsByClassName'
-    ).withArgs(className).and.returnValue(inputValue as any);
+    ).withArgs(className).and.returnValue(undefined);
 
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
