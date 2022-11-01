@@ -178,19 +178,27 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             'tagged_skill_misconception_id': self.tagged_skill_misconception_id
         }
 
+    # TODO(#16467): Remove `validate` argument after validating all Question
+    # states by writing a migration and audit job. As the validation for
+    # answer group is common between Exploration and Question and the Question
+    # data is not yet migrated, we do not want to call the validations
+    # while we load the Question.
     @classmethod
-    def from_dict(cls, answer_group_dict: AnswerGroupDict) -> AnswerGroup:
+    def from_dict(
+        cls, answer_group_dict: AnswerGroupDict, validate: bool = True
+    ) -> AnswerGroup:
         """Return a AnswerGroup domain object from a dict.
 
         Args:
             answer_group_dict: dict. The dict representation of AnswerGroup
                 object.
+            validate: bool. False, when the validations should not be called.
 
         Returns:
             AnswerGroup. The corresponding AnswerGroup domain object.
         """
         return cls(
-            Outcome.from_dict(answer_group_dict['outcome']),
+            Outcome.from_dict(answer_group_dict['outcome'], validate=validate),
             [RuleSpec.from_dict(rs)
              for rs in answer_group_dict['rule_specs']],
             answer_group_dict['training_data'],
@@ -430,18 +438,25 @@ class Hint(translation_domain.BaseTranslatableObject):
             'hint_content': self.hint_content.to_dict(),
         }
 
+    # TODO(#16467): Remove `validate` argument after validating all Question
+    # states by writing a migration and audit job. As the validation for
+    # hint is common between Exploration and Question and the Question
+    # data is not yet migrated, we do not want to call the validations
+    # while we load the Question.
     @classmethod
-    def from_dict(cls, hint_dict: HintDict) -> Hint:
+    def from_dict(cls, hint_dict: HintDict, validate: bool = True) -> Hint:
         """Return a Hint domain object from a dict.
 
         Args:
             hint_dict: dict. The dict representation of Hint object.
+            validate: bool. False, when the validations should not be called.
 
         Returns:
             Hint. The corresponding Hint domain object.
         """
         hint_content = SubtitledHtml.from_dict(hint_dict['hint_content'])
-        hint_content.validate()
+        if validate:
+            hint_content.validate()
         return cls(hint_content)
 
     def validate(self) -> None:
@@ -544,23 +559,31 @@ class Solution(translation_domain.BaseTranslatableObject):
             'explanation': self.explanation.to_dict(),
         }
 
+    # TODO(#16467): Remove `validate` argument after validating all Question
+    # states by writing a migration and audit job. As the validation for
+    # solution is common between Exploration and Question and the Question
+    # data is not yet migrated, we do not want to call the validations
+    # while we load the Question.
     @classmethod
     def from_dict(
         cls,
         interaction_id: str,
-        solution_dict: SolutionDict
+        solution_dict: SolutionDict,
+        validate: bool = True
     ) -> Solution:
         """Return a Solution domain object from a dict.
 
         Args:
             interaction_id: str. The interaction id.
             solution_dict: dict. The dict representation of Solution object.
+            validate: bool. False, when the validations should not be called.
 
         Returns:
             Solution. The corresponding Solution domain object.
         """
         explanation = SubtitledHtml.from_dict(solution_dict['explanation'])
-        explanation.validate()
+        if validate:
+            explanation.validate()
         return cls(
             interaction_id,
             solution_dict['answer_is_exclusive'],
@@ -839,26 +862,34 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             'solution': self.solution.to_dict() if self.solution else None,
         }
 
+    # TODO(#16467): Remove `validate` argument after validating all Question
+    # states by writing a migration and audit job. As the validation for
+    # interaction is common between Exploration and Question and the Question
+    # data is not yet migrated, we do not want to call the validations
+    # while we load the Question.
     @classmethod
     def from_dict(
-        cls, interaction_dict: InteractionInstanceDict
+        cls, interaction_dict: InteractionInstanceDict, validate: bool = True
     ) -> InteractionInstance:
         """Return a InteractionInstance domain object from a dict.
 
         Args:
             interaction_dict: dict. The dict representation of
                 InteractionInstance object.
+            validate: bool. False, when the validations should not be called.
 
         Returns:
             InteractionInstance. The corresponding InteractionInstance domain
             object.
         """
         default_outcome_dict = (
-            Outcome.from_dict(interaction_dict['default_outcome'])
+            Outcome.from_dict(
+                interaction_dict['default_outcome'], validate=validate)
             if interaction_dict['default_outcome'] is not None else None)
         solution_dict = (
             Solution.from_dict(
-                interaction_dict['id'], interaction_dict['solution'])
+                interaction_dict['id'], interaction_dict['solution'],
+                validate=validate)
             if (
                 interaction_dict['solution'] is not None and
                 interaction_dict['id'] is not None
@@ -876,11 +907,16 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         return cls(
             interaction_dict['id'],
             customization_args,
-            [AnswerGroup.from_dict(h)
-             for h in interaction_dict['answer_groups']],
+            (
+                [AnswerGroup.from_dict(h, validate=validate)
+                for h in interaction_dict['answer_groups']]
+            ),
             default_outcome_dict,
             interaction_dict['confirmed_unclassified_answers'],
-            [Hint.from_dict(h) for h in interaction_dict['hints']],
+            (
+                [Hint.from_dict(h, validate=validate)
+                for h in interaction_dict['hints']]
+            ),
             solution_dict)
 
     @property
@@ -2795,18 +2831,27 @@ class Outcome(translation_domain.BaseTranslatableObject):
             'missing_prerequisite_skill_id': self.missing_prerequisite_skill_id
         }
 
+    # TODO(#16467): Remove `validate` argument after validating all Question
+    # states by writing a migration and audit job. As the validation for
+    # outcome is common between Exploration and Question and the Question
+    # data is not yet migrated, we do not want to call the validations
+    # while we load the Question.
     @classmethod
-    def from_dict(cls, outcome_dict: OutcomeDict) -> Outcome:
+    def from_dict(
+        cls, outcome_dict: OutcomeDict, validate: bool = True
+    ) -> Outcome:
         """Return a Outcome domain object from a dict.
 
         Args:
             outcome_dict: dict. The dict representation of Outcome object.
+            validate: bool. False, when the validations should not be called.
 
         Returns:
             Outcome. The corresponding Outcome domain object.
         """
         feedback = SubtitledHtml.from_dict(outcome_dict['feedback'])
-        feedback.validate()
+        if validate:
+            feedback.validate()
         return cls(
             outcome_dict['dest'],
             outcome_dict['dest_if_really_stuck'],
@@ -5199,23 +5244,31 @@ class State(translation_domain.BaseTranslatableObject):
             'next_content_id_index': self.next_content_id_index
         }
 
+    # TODO(#16467): Remove `validate` argument after validating all Question
+    # states by writing a migration and audit job. As the validation for
+    # states is common between Exploration and Question and the Question
+    # data is not yet migrated, we do not want to call the validations
+    # while we load the Question.
     @classmethod
-    def from_dict(cls, state_dict: StateDict) -> State:
+    def from_dict(cls, state_dict: StateDict, validate: bool = True) -> State:
         """Return a State domain object from a dict.
 
         Args:
             state_dict: dict. The dict representation of State object.
+            validate: bool. False, when the validations should not be called.
 
         Returns:
             State. The corresponding State domain object.
         """
         content = SubtitledHtml.from_dict(state_dict['content'])
-        content.validate()
+        if validate:
+            content.validate()
         return cls(
             content,
             [param_domain.ParamChange.from_dict(param)
              for param in state_dict['param_changes']],
-            InteractionInstance.from_dict(state_dict['interaction']),
+            InteractionInstance.from_dict(
+                state_dict['interaction'], validate=validate),
             RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
             WrittenTranslations.from_dict(state_dict['written_translations']),
             state_dict['solicit_answer_details'],
