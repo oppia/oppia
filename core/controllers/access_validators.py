@@ -217,7 +217,11 @@ class BlogAuthorProfilePageAccessValidationHandler(base.BaseHandler):
         'author_username': {
             'schema': {
                 'type': 'basestring'
-            }
+            },
+            'validators': [{
+                'id': 'has_length_at_most',
+                'max_value': constants.MAX_AUTHOR_NAME_LENGTH
+            }]
         }
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
@@ -231,14 +235,10 @@ class BlogAuthorProfilePageAccessValidationHandler(base.BaseHandler):
 
         if author_settings is None:
             raise self.PageNotFoundException(
-                Exception(
-                    'User with given username does not exist'
-                )
+                'User with given username does not exist'
             )
 
         if not user_services.is_user_blog_post_author(author_settings.user_id):
             raise self.PageNotFoundException(
-                Exception(
-                    'User with given username is not a blog post author.'
-                )
+                'User with given username is not a blog post author.'
             )

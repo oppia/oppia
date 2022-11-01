@@ -109,8 +109,8 @@ class BlogPostModelTest(test_utils.GenericTestBase):
 
         # Test create method.
         with self.assertRaisesRegex(
-            Exception, 'A blog post with the given blog post ID exists'
-            ' already.'):
+            Exception,
+            'A blog post with the given blog post ID exists already.'):
 
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
@@ -544,8 +544,8 @@ class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
 
         # Test create method.
         with self.assertRaisesRegex(
-            Exception, 'A blog author details model for given user already'
-            ' exists.'):
+            Exception,
+            'A blog author details model for given user already exists.'):
 
             # Swap dependent method get_by_author to simulate collision every
             # time.

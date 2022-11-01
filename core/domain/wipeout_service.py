@@ -1477,7 +1477,7 @@ def _pseudonymize_blog_post_models(
         for blog_post_model in blog_post_models_list:
             if blog_post_model.author_id == user_id:
                 blog_post_model.author_id = pseudonymized_id
-            blog_post_model.update_timestamps()
+                blog_post_model.update_timestamps()
 
         blog_post_summary_models_list: List[
             Union[
@@ -1491,7 +1491,7 @@ def _pseudonymize_blog_post_models(
         for blog_post_summary in blog_post_summary_models_list:
             if blog_post_summary.author_id == user_id:
                 blog_post_summary.author_id = pseudonymized_id
-            blog_post_summary.update_timestamps()
+                blog_post_summary.update_timestamps()
         datastore_services.put_multi(
             blog_post_models_list + blog_post_summary_models_list)
 
@@ -1501,6 +1501,7 @@ def _pseudonymize_blog_post_models(
                     model.author_id = pseudonymized_id
                     model.update_timestamps()
                     model.put()
+                    break
 
     blog_post_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[

@@ -47,7 +47,7 @@ class BlogPostModelDataDict(TypedDict):
 
 
 class BlogAuthorDetailsModelDict(TypedDict):
-    """Dictionary representing the export data of  BlogAuthorDetailsModel."""
+    """Dictionary representing the export data of BlogAuthorDetailsModel."""
 
     displayed_author_name: str
     author_bio: str
