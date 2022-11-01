@@ -24,9 +24,7 @@ from core.domain import feedback_services
 from core.domain import suggestion_services
 from core.domain import user_services
 
-from typing import (
-    Any, Dict, List, Optional, Tuple, TypedDict, TypeVar
-)
+from typing import Any, Dict, List, Optional, Tuple, TypedDict, TypeVar
 
 
 # Here we use type Any because we want to allow list of different
