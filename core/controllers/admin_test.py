@@ -92,6 +92,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
 
     def test_admin_page_rights(self) -> None:
         """Test access rights to the admin page."""
@@ -157,10 +158,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot reload an exploration in production.')
-        with assert_raises_regexp_context_manager, prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
                     'action': 'reload_exploration',
@@ -169,14 +169,268 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_without_exp_id_reload_exp_action_is_not_performed(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'exploration_id\' must be provided when the action '
+            'is reload_exploration.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'reload_exploration',
+                    'exploration_id': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_collection_id_reload_collection_action_is_not_performed(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'collection_id\' must be provided when the action '
+            'is reload_collection.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'reload_collection',
+                    'collection_id': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_num_dummy_exps_generate_dummy_exp_action_is_not_performed(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'num_dummy_exps_to_generate\' must be provided when the '
+            'action is generate_dummy_explorations.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_explorations',
+                    'num_dummy_exps_to_generate': None,
+                    'num_dummy_exps_to_publish': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_num_dummy_exps_to_publish_action_is_not_performed(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'num_dummy_exps_to_publish\' must be provided when the '
+            'action is generate_dummy_explorations.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_explorations',
+                    'num_dummy_exps_to_generate': 5,
+                    'num_dummy_exps_to_publish': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_new_config_property_values_action_is_not_performed(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'new_config_property_values\' must be provided when the '
+            'action is save_config_properties.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'save_config_properties',
+                    'new_config_property_values': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_config_property_id_action_is_not_performed(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'config_property_id\' must be provided when the action '
+            'is revert_config_property.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'revert_config_property',
+                    'config_property_id': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_data_action_upload_topic_similarities_is_not_performed(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'data\' must be provided when the action is '
+            'upload_topic_similarities.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'upload_topic_similarities',
+                    'data': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_topic_id_action_regenerate_topic_is_not_performed(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'topic_id\' must be provided when the action is '
+            'regenerate_topic_related_opportunities.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'regenerate_topic_related_opportunities',
+                    'topic_id': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_exp_id_action_rollback_exploration_is_not_performed(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'exp_id\' must be provided when the action is '
+            'rollback_exploration_to_safe_state.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'rollback_exploration_to_safe_state',
+                    'exp_id': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_feature_name_action_update_feature_flag_is_not_performed(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'feature_name\' must be provided when the action is '
+            'update_feature_flag_rules.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'update_feature_flag_rules',
+                    'feature_name': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_new_rules_action_update_feature_flag_is_not_performed(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'new_rules\' must be provided when the action is '
+            'update_feature_flag_rules.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'update_feature_flag_rules',
+                    'feature_name': 'new_feature',
+                    'new_rules': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_commit_message_action_update_feature_flag_is_not_performed(
+        self
+    ) -> None:
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'dev']]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'commit_message\' must be provided when the action is '
+            'update_feature_flag_rules.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'update_feature_flag_rules',
+                    'feature_name': 'new_feature',
+                    'new_rules': new_rule_dicts,
+                    'commit_message': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
     def test_cannot_load_new_structures_data_in_production_mode(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot load new structures data in production.')
-        with assert_raises_regexp_context_manager, prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
                     'action': 'generate_dummy_new_structures_data'
@@ -199,10 +453,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy skills in production.')
-        with assert_raises_regexp_context_manager, prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
                     'action': 'generate_dummy_new_skill_data'
@@ -213,10 +466,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy classroom in production.')
-        with assert_raises_regexp_context_manager, prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
                     'action': 'generate_dummy_classroom'
@@ -251,10 +503,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot reload a collection in production.')
-        with assert_raises_regexp_context_manager, prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
                     'action': 'reload_collection',
@@ -929,8 +1180,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
-        # Replace the stored instance with None in order to trigger unexpected
-        # exception during update.
+        # Here we use MyPy ignore because we are assigning a None value
+        # where instance of 'PlatformParameter' is expected, and this is
+        # done to Replace the stored instance with None in order to
+        # trigger the unexpected exception during update.
         platform_parameter_registry.Registry.parameter_registry[
             feature.name] = None  # type: ignore[assignment]
         with feature_list_ctx, feature_set_ctx:
@@ -1248,6 +1501,35 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             'usernames': ['user1']
         })
         self.logout()
+
+    def test_if_filter_criterion_is_username_and_username_is_not_provided(
+        self
+    ) -> None:
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        with self.assertRaisesRegex(
+            Exception,
+            'The username must be provided when the filter criterion '
+            'is \'username\'.'
+        ):
+            self.get_json(
+                feconf.ADMIN_ROLE_HANDLER_URL,
+                params={'filter_criterion': 'username'}
+            )
+
+    def test_if_filter_criterion_is_role_and_role_is_not_provided(
+        self
+    ) -> None:
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        with self.assertRaisesRegex(
+            Exception,
+            'The role must be provided when the filter criterion is \'role\'.'
+        ):
+            self.get_json(
+                feconf.ADMIN_ROLE_HANDLER_URL,
+                params={'filter_criterion': 'role'}
+            )
 
     def test_invalid_username_in_filter_criterion_and_update_role(self) -> None:
         username = 'myinvaliduser'
@@ -1652,7 +1934,7 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
                 'managed_topic_ids': []
             })
 
-    def test_banning_a_topic_manger_should_remove_user_from_topics(
+    def test_banning_topic_manager_should_remove_user_from_topics(
         self
     ) -> None:
         user_email = 'user1@example.com'
@@ -1825,6 +2107,32 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         extracted_answers = response['data']
         self.assertEqual(len(extracted_answers), 1)
         self.assertEqual(extracted_answers[0]['answer'], 'first answer')
+
+    def test_raises_error_if_no_state_answer_exists_while_data_extraction(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        payload = {
+            'exp_id': self.EXP_ID,
+            'exp_version': self.exploration.version,
+            'state_name': self.exploration.init_state_name,
+            'num_answers': 0
+        }
+
+        swap_state_answers = self.swap_to_always_return(
+            stats_services, 'get_state_answers', None
+        )
+        with swap_state_answers:
+            response = self.get_json(
+                '/explorationdataextractionhandler',
+                params=payload,
+                expected_status_int=500
+            )
+        self.assertEqual(
+            response['error'],
+            'No state answer exists for the given exp_id: exp, '
+            'exp_version: 1 and state_name: Introduction'
+        )
 
     def test_handler_when_exp_version_is_not_int_throws_exception(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)

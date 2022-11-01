@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import abc
 import base64
 import datetime
 import functools
@@ -34,12 +35,21 @@ from core import utils
 from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
+from core.domain import classifier_domain
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import user_services
 
-from typing import Any, Dict, Final, Mapping, Optional, TypedDict, Union
+from typing import (
+    Any, Dict, Final, Generic, Mapping, Optional, TypedDict, TypeVar, Union
+)
+
 import webapp2
+
+# Note: These private type variables are only defined to implement the Generic
+# typing structure of BaseHandler. So, do not make them public in the future.
+_NormalizedRequestDictType = TypeVar('_NormalizedRequestDictType')
+_NormalizedPayloadDictType = TypeVar('_NormalizedPayloadDictType')
 
 ONE_DAY_AGO_IN_SECS: Final = -24 * 60 * 60
 DEFAULT_CSRF_SECRET: Final = 'oppia csrf secret'
@@ -128,7 +138,10 @@ class UserFacingExceptions:
         pass
 
 
-class BaseHandler(webapp2.RequestHandler):
+class BaseHandler(
+    webapp2.RequestHandler,
+    Generic[_NormalizedPayloadDictType, _NormalizedRequestDictType]
+):
     """Base class for all Oppia handlers."""
 
     # Whether to check POST and PUT payloads for CSRF tokens prior to
@@ -146,13 +159,13 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    # Using Dict[str, Any] here because the following schema can have a
-    # recursive structure and currently mypy doesn't support recursive type
-    # currently. See: https://github.com/python/mypy/issues/731
+    # Here we use type Any because the sub-classes of BaseHandler can contain
+    # different schemas with different types of values, like str, complex Dicts
+    # and etc.
     URL_PATH_ARGS_SCHEMAS: Optional[Dict[str, Any]] = None
-    # Using Dict[str, Any] here because the following schema can have a
-    # recursive structure and currently mypy doesn't support recursive type
-    # currently. See: https://github.com/python/mypy/issues/731
+    # Here we use type Any because the sub-classes of BaseHandler can contain
+    # different schemas with different types of values, like str, complex Dicts
+    # and etc.
     HANDLER_ARGS_SCHEMAS: Optional[Dict[str, Any]] = None
 
     def __init__(  # pylint: disable=super-init-not-called
@@ -192,14 +205,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
         self.current_user_is_super_admin = False
-        # Here we use type Any because dict 'self.normalized_request' can
-        # contain normalized version of arg's value, and these arg values
-        # can be of any type. So, to allow every type, we used Any here.
-        self.normalized_request: Optional[Dict[str, Any]] = None
-        # Here we use type Any because dict 'self.normalized_payload' can
-        # contain normalized version of arg's value, and these arg values
-        # can be of any type. So, to allow every type, we used Any here.
-        self.normalized_payload: Optional[Dict[str, Any]] = None
+        self.normalized_request: Optional[_NormalizedRequestDictType] = None
+        self.normalized_payload: Optional[_NormalizedPayloadDictType] = None
 
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
@@ -230,9 +237,11 @@ class BaseHandler(webapp2.RequestHandler):
                 # the not-fully registered user.
                 email = auth_claims.email
                 if email is None:
-                    raise Exception(
+                    logging.exception(
                         'No email address was found for the user.'
                     )
+                    auth_services.destroy_auth_session(self.response)
+                    return
                 if 'signup?' in self.request.uri:
                     user_settings = (
                         user_services.create_new_user(auth_id, email))
@@ -447,7 +456,10 @@ class BaseHandler(webapp2.RequestHandler):
 
         try:
             if self.HANDLER_ARGS_SCHEMAS is None:
-                raise Exception
+                raise Exception(
+                    'No \'HANDLER_ARGS_SCHEMAS\' Found for the '
+                    'handler class: %s' % handler_class_name
+                )
             schema_for_request_method = self.HANDLER_ARGS_SCHEMAS[
                 request_method]
         except Exception as e:
@@ -462,10 +474,10 @@ class BaseHandler(webapp2.RequestHandler):
                 allow_string_to_bool_conversion)
         )
 
-        self.normalized_payload = {
+        normalized_payload = {
             arg: normalized_arg_values.get(arg) for arg in payload_arg_keys
         }
-        self.normalized_request = {
+        normalized_request = {
             arg: normalized_arg_values.get(arg) for arg in request_arg_keys
         }
 
@@ -480,9 +492,22 @@ class BaseHandler(webapp2.RequestHandler):
         # execution onwards to the handler.
         for arg in keys_that_correspond_to_default_values:
             if request_method in ['GET', 'DELETE']:
-                self.normalized_request[arg] = normalized_arg_values.get(arg)
+                normalized_request[arg] = normalized_arg_values.get(arg)
             else:
-                self.normalized_payload[arg] = normalized_arg_values.get(arg)
+                normalized_payload[arg] = normalized_arg_values.get(arg)
+
+        # Here we use MyPy ignore because 'normalized_payload' is of
+        # Dict[str, Any] type, whereas 'self.normalized_payload' is a Generic
+        # type whose type can be decided while defining sub-classes. So, Due
+        # to this mismatch in types MyPy throws an error. Thus, to silence the
+        # error, we used type ignore here.
+        self.normalized_payload = normalized_payload  # type: ignore[assignment]
+        # Here we use MyPy ignore because 'normalized_request' is of
+        # Dict[str, Any] type, whereas 'self.normalized_request' is a Generic
+        # type whose type can be decided while defining sub-classes. So, Due
+        # to this mismatch in types MyPy throws an error. Thus, to silence the
+        # error, we used type ignore here.
+        self.normalized_request = normalized_request  # type: ignore[assignment]
 
         # Here we use MyPy ignore because here we assigning RaiseErrorOnGet's
         # instance to a 'get' method, and according to MyPy assignment to a
@@ -519,6 +544,8 @@ class BaseHandler(webapp2.RequestHandler):
             not feconf.ENABLE_MAINTENANCE_MODE or
             self.current_user_is_site_maintainer)
 
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'get' method with different number of arguments and types.
     def get(self, *args: Any, **kwargs: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle GET requests."""
         logging.warning('Invalid URL requested: %s', self.request.uri)
@@ -527,8 +554,10 @@ class BaseHandler(webapp2.RequestHandler):
             'error': 'Could not find the page %s.' % self.request.uri,
             'status_code': 404
         }
-        self._render_exception(404, values)
+        self._render_exception(values)
 
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'post' method with different number of arguments and types.
     def post(self, *args: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle POST requests.
 
@@ -537,6 +566,8 @@ class BaseHandler(webapp2.RequestHandler):
         """
         raise self.PageNotFoundException
 
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'put' method with different number of arguments and types.
     def put(self, *args: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle PUT requests.
 
@@ -545,6 +576,8 @@ class BaseHandler(webapp2.RequestHandler):
         """
         raise self.PageNotFoundException
 
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'delete' method with different number of arguments and types.
     def delete(self, *args: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle DELETE requests.
 
@@ -553,12 +586,16 @@ class BaseHandler(webapp2.RequestHandler):
         """
         raise self.PageNotFoundException
 
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'head' method with different number of arguments and types.
     def head(self, *args: Any, **kwargs: Any) -> None:
         """Method to handle HEAD requests. The webapp library automatically
         makes sure that HEAD only returns the headers of GET request.
         """
         return self.get(*args, **kwargs)
 
+    # Here we use type Any because the argument 'values' can accept various
+    # kinds of dictionaries that needs to be sent as a JSON response.
     def render_json(self, values: Union[str, Mapping[str, Any]]) -> None:
         """Prepares JSON response to be sent to the client.
 
@@ -593,9 +630,14 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.headers['Content-Disposition'] = (
             'attachment; filename=%s' % filename)
         self.response.charset = 'utf-8'
-        # We use this super in order to bypass the write method
-        # in webapp2.Response, since webapp2.Response doesn't support writing
-        # bytes.
+        # Here we use MyPy ignore because according to MyPy super can
+        # accept 'super class and self' as arguments but here we are passing
+        # 'webapp2.Response, and self.response' which confuses MyPy about the
+        # typing of super, and due to this MyPy is unable to recognize the
+        # 'write' method and throws an error. This change in arguments is
+        # done because we use 'super' method in order to bypass the write
+        # method in webapp2.Response, since webapp2.Response doesn't support
+        # writing bytes.
         super(webapp2.Response, self.response).write(file.getvalue())  # type: ignore[misc] # pylint: disable=bad-super-call
 
     def render_template(
@@ -639,7 +681,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.write(load_template(filepath))
 
     def _render_exception_json_or_html(
-        self, return_type: Optional[str], values: ResponseValueDict
+        self, return_type: str, values: ResponseValueDict
     ) -> None:
         """Renders an error page, or an error JSON response.
 
@@ -671,19 +713,16 @@ class BaseHandler(webapp2.RequestHandler):
             self.render_json(values)
 
     def _render_exception(
-        self, error_code: int, values: ResponseValueDict
+        self, values: ResponseValueDict
     ) -> None:
         """Renders an error page, or an error JSON response.
 
         Args:
-            error_code: int. The HTTP status code (expected to be one of
-                400, 401, 404 or 500).
             values: dict. The key-value pairs to include in the response.
         """
         # The error codes here should be in sync with the error pages
         # generated via webpack.common.config.ts.
-        assert error_code in [400, 401, 404, 500]
-        values['status_code'] = error_code
+        assert values['status_code'] in [400, 401, 404, 500]
         method = self.request.environ['REQUEST_METHOD']
 
         if method == 'GET':
@@ -700,7 +739,9 @@ class BaseHandler(webapp2.RequestHandler):
                 self.DELETE_HANDLER_ERROR_RETURN_TYPE, values)
         else:
             logging.warning('Not a recognized request method.')
-            self._render_exception_json_or_html(None, values)
+            self._render_exception_json_or_html(
+                feconf.HANDLER_TYPE_JSON, values
+            )
 
     def handle_exception(
         self, exception: BaseException, unused_debug_mode: bool
@@ -736,7 +777,7 @@ class BaseHandler(webapp2.RequestHandler):
                     'error': 'You must be logged in to access this resource.',
                     'status_code': 401
                 }
-                self._render_exception(401, values)
+                self._render_exception(values)
             else:
                 self.redirect(user_services.create_login_url(self.request.uri))
             return
@@ -751,7 +792,7 @@ class BaseHandler(webapp2.RequestHandler):
                 'error': 'Could not find the page %s.' % self.request.uri,
                 'status_code': 404
             }
-            self._render_exception(404, values)
+            self._render_exception(values)
             return
 
         logging.exception('Exception raised: %s', exception)
@@ -762,7 +803,7 @@ class BaseHandler(webapp2.RequestHandler):
                 'error': str(exception),
                 'status_code': 401
             }
-            self._render_exception(401, values)
+            self._render_exception(values)
             return
 
         if isinstance(exception, self.InvalidInputException):
@@ -771,7 +812,7 @@ class BaseHandler(webapp2.RequestHandler):
                 'error': str(exception),
                 'status_code': 400
             }
-            self._render_exception(400, values)
+            self._render_exception(values)
             return
 
         if isinstance(exception, self.InternalErrorException):
@@ -780,7 +821,7 @@ class BaseHandler(webapp2.RequestHandler):
                 'error': str(exception),
                 'status_code': 500
             }
-            self._render_exception(500, values)
+            self._render_exception(values)
             return
 
         self.error(500)
@@ -788,7 +829,7 @@ class BaseHandler(webapp2.RequestHandler):
             'error': str(exception),
             'status_code': 500
         }
-        self._render_exception(500, values)
+        self._render_exception(values)
 
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
@@ -797,7 +838,7 @@ class BaseHandler(webapp2.RequestHandler):
     UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
 
 
-class Error404Handler(BaseHandler):
+class Error404Handler(BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles 404 errors."""
 
     pass
@@ -809,6 +850,8 @@ class RaiseErrorOnGet:
     def __init__(self, message: str) -> None:
         self.error_message = message
 
+    # Here we use type Any because the 'get' method can accept arbitrary number
+    # of arguments with different types.
     def get(self, *args: Any, **kwargs: Any) -> None:
         """Raises an error when invoked."""
         raise ValueError(self.error_message)
@@ -924,7 +967,7 @@ class CsrfTokenManager:
             return False
 
 
-class CsrfTokenHandler(BaseHandler):
+class CsrfTokenHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles sending CSRF tokens to the frontend."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -940,14 +983,14 @@ class CsrfTokenHandler(BaseHandler):
         })
 
 
-class OppiaMLVMHandler(BaseHandler):
+class OppiaMLVMHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
     """Base class for the handlers that communicate with Oppia-ML VM instances.
     """
 
-    # Here we use type Any because this method is implemented in a subclasses
-    # with a return type. So, if we define return type as None here then
-    # subclasses will throw error for incompatible signature.
-    def extract_request_message_vm_id_and_signature(self) -> Any:
+    @abc.abstractmethod
+    def extract_request_message_vm_id_and_signature(
+        self
+    ) -> classifier_domain.OppiaMLAuthInfo:
         """Returns the OppiaMLAuthInfo domain object containing
         information from the incoming request that is necessary for
         authentication.

@@ -59,7 +59,7 @@ export class MultipleChoiceInputValidationService {
 
     for (var i = 0; i < customizationArgs.choices.value.length; i++) {
       var choice = customizationArgs.choices.value[i].html;
-      if (choice.trim().length === 0) {
+      if (this.baseInteractionValidationServiceInstance.isHTMLEmpty(choice)) {
         areAnyChoicesEmpty = true;
       }
       if (seenChoices.indexOf(choice) !== -1) {

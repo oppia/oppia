@@ -741,7 +741,9 @@ def get_user_actions_info(
     Returns:
         UserActionsInfo. User object with system committer user id.
     """
-    roles = get_user_roles_from_id(user_id)
+    roles = (
+        get_user_roles_from_id(user_id) if user_id else [feconf.ROLE_ID_GUEST]
+    )
     actions = role_services.get_all_actions(roles)
     return user_domain.UserActionsInfo(user_id, roles, actions)
 
@@ -2297,33 +2299,6 @@ def can_review_translation_suggestions(
     user_contribution_rights = get_user_contribution_rights(user_id)
     reviewable_language_codes = (
         user_contribution_rights.can_review_translation_for_language_codes)
-    if language_code is not None:
-        return language_code in reviewable_language_codes
-    else:
-        return bool(reviewable_language_codes)
-
-
-def can_review_voiceover_applications(
-    user_id: str, language_code: Optional[str] = None
-) -> bool:
-    """Returns whether the user can review voiceover applications in any
-    language or in the given language.
-
-    NOTE: If the language_code is provided then this method will check whether
-    the user can review voiceover in the given language code else it will
-    check whether the user can review in any language.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        language_code: str. The code of the language.
-
-    Returns:
-        bool. Whether the user can review voiceover applications in any language
-        or in the given language.
-    """
-    user_contribution_rights = get_user_contribution_rights(user_id)
-    reviewable_language_codes = (
-        user_contribution_rights.can_review_voiceover_for_language_codes)
     if language_code is not None:
         return language_code in reviewable_language_codes
     else:

@@ -114,11 +114,13 @@
                         <input placeholder="Add a new tag (using lowercase letters and spaces)..."
                                class="e2e-test-chip-list-tags"
                                pattern="[a-z]"
+                               [maxLength]="30"
                                [matChipInputFor]="chipList"
                                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                                [matChipInputAddOnBlur]="addOnBlur"
                                (matChipInputTokenEnd)="add($event)">
                       </mat-chip-list>
+                      <mat-hint *ngIf="explorationTags.length >= 10" class="oppia-settings-tab-error-message">Can only contain 10 tags max</mat-hint>
                     </mat-form-field>
                   </div>
                 </div>
@@ -441,7 +443,7 @@
                        placeholder="Voice artist username"
                        type="text">
               </div>
-              <button (click)="editVoiseArtist(newVoicAartistUsername)" class="btn btn-secondary e2e-test-add-voice-artist-role-button" value="Save">Save</button>
+              <button (click)="editVoiceArtist(newVoicAartistUsername)" class="btn btn-secondary e2e-test-add-voice-artist-role-button" value="Save">Save</button>
               <button type="button"
                       class="btn btn-secondary"
                       (click)="closeVoiceoverForm()">
@@ -690,6 +692,10 @@
 </div>
 
 <style>
+  .oppia-settings-tab-error-message {
+    color: #f00;
+  }
+
   .mat-form-field {
     width: 100%;
   }

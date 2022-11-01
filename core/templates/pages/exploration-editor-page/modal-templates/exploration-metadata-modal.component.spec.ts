@@ -120,6 +120,116 @@ describe('Exploration Metadata Modal Component', () => {
       fixture.detectChanges();
     });
 
+    it('should be able to add exploration editor tags', fakeAsync(() => {
+      component.explorationTags = [];
+      explorationTagsService.displayed = [];
+      component.add({
+        value: 'name',
+        input: {
+          value: ''
+        }
+      } as MatChipInputEvent);
+      tick();
+
+      expect(explorationTagsService.displayed).toEqual(['name']);
+    }));
+
+    it('should not add same exploration editor tags' +
+      'when user enter same tag again', fakeAsync(() => {
+      component.explorationTags = [];
+      explorationTagsService.displayed = [];
+      component.add({
+        value: 'name',
+        input: {
+          value: ''
+        }
+      } as MatChipInputEvent);
+      tick();
+
+      expect(explorationTagsService.displayed).toEqual(['name']);
+
+      // When user try to enter same tag again.
+      component.add({
+        value: 'name',
+        input: {
+          value: ''
+        }
+      } as MatChipInputEvent);
+      tick();
+      expect(explorationTagsService.displayed).toEqual(['name']);
+    }));
+
+    it('should be able to add multiple exploration editor tags',
+      fakeAsync(() => {
+        component.explorationTags = [];
+        explorationTagsService.displayed = [];
+
+        component.add({
+          value: 'tag-one',
+          input: {
+            value: ''
+          }
+        } as MatChipInputEvent);
+        tick();
+
+        component.add({
+          value: 'tag-two',
+          input: {
+            value: ''
+          }
+        } as MatChipInputEvent);
+        tick();
+
+        component.add({
+          value: 'tag-three',
+          input: {
+            value: ''
+          }
+        } as MatChipInputEvent);
+        tick();
+
+        expect(explorationTagsService.displayed).toEqual(
+          ['tag-one', 'tag-two', 'tag-three']);
+      }));
+
+    it('should be able to remove multiple exploration editor tags',
+      fakeAsync(() => {
+        component.explorationTags = ['tag-one', 'tag-two', 'tag-three'];
+        explorationTagsService.displayed = ['tag-one', 'tag-two', 'tag-three'];
+
+        component.remove('tag-two');
+        tick();
+
+        component.remove('tag-three');
+        tick();
+
+        expect(explorationTagsService.displayed).toEqual(
+          ['tag-one']);
+      }));
+
+
+    it('should be able to remove exploration editor tags', fakeAsync(() => {
+      component.explorationTags = [];
+      explorationTagsService.displayed = [];
+
+      component.add({
+        value: 'first',
+        input: {
+          value: ''
+        }
+      } as MatChipInputEvent);
+      component.add({
+        value: 'second',
+        input: {
+          value: ''
+        }
+      } as MatChipInputEvent);
+
+      component.remove('second');
+      tick();
+      expect(explorationTagsService.displayed).toEqual(['first']);
+    }));
+
     it('should initialize component properties after Component is initialized',
       fakeAsync(() => {
         let TOTAL_CATEGORIES = 42;

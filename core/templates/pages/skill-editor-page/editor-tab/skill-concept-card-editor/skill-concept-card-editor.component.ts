@@ -58,6 +58,7 @@ export class SkillConceptCardEditorComponent implements OnInit {
   isEditable: boolean = false;
   skillEditorCardIsShown: boolean = false;
   workedExamplesListIsShown: boolean = false;
+  windowIsNarrow!: boolean;
   COMPONENT_NAME_WORKED_EXAMPLE = (
     AppConstants.COMPONENT_NAME_WORKED_EXAMPLE);
 
@@ -200,6 +201,16 @@ export class SkillConceptCardEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
+    this.directiveSubscriptions.add(
+      this.windowDimensionsService.getResizeEvent().subscribe(
+        () => {
+          this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
+          this.workedExamplesListIsShown = (
+            !this.windowIsNarrow);
+        }
+      ));
+
     this.isEditable = true;
     this.skill = this.skillEditorStateService.getSkill();
     this.initBindableFieldsDict();
@@ -210,6 +221,15 @@ export class SkillConceptCardEditorComponent implements OnInit {
       this.skillEditorStateService.onSkillChange.subscribe(
         () => {
           this.initBindableFieldsDict();
+        }
+      )
+    );
+    this.directiveSubscriptions.add(
+      this.windowDimensionsService.getResizeEvent().subscribe(
+        () => {
+          this.workedExamplesListIsShown = (
+            !this.windowDimensionsService.isWindowNarrow()
+          );
         }
       )
     );

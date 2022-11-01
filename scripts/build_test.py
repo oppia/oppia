@@ -48,7 +48,7 @@ MOCK_TEMPLATES_DEV_DIR = os.path.join(TEST_SOURCE_DIR, 'templates', '')
 
 MOCK_TSC_OUTPUT_LOG_FILEPATH = os.path.join(
     TEST_SOURCE_DIR, 'mock_tsc_output_log.txt')
-INVALID_FILENAME = 'invalid_filename.js'
+INVALID_FILENAME = 'invalid_filename.css'
 INVALID_INPUT_FILEPATH = os.path.join(
     TEST_DIR, INVALID_FILENAME)
 INVALID_OUTPUT_FILEPATH = os.path.join(
@@ -68,18 +68,12 @@ class BuildTests(test_utils.GenericTestBase):
     def test_minify_func_with_invalid_filepath(self) -> None:
         """Tests minify_func with an invalid filepath."""
         with self.assertRaisesRegex(
-            subprocess.CalledProcessError,
-            'returned non-zero exit status 1') as called_process:
+            OSError, r'\[Errno 2\] No such file or directory:'
+        ):
             build.minify_func(
                 INVALID_INPUT_FILEPATH,
                 INVALID_OUTPUT_FILEPATH,
                 INVALID_FILENAME)
-        # Here we use MyPy ignore because the stubs of 'assertRaisesRegex' do
-        # not contain any returncode attribute, so because of this MyPy throws
-        # an '"Exception" has no attribute "returncode"' error. Thus to avoid
-        # the error, we used ignore here.
-        # `returncode` is the exit status of the child process.
-        self.assertEqual(called_process.exception.returncode, 1)  # type: ignore[attr-defined]
 
     def test_minify_and_create_sourcemap(self) -> None:
         """Tests _minify_and_create_sourcemap with an invalid filepath."""
