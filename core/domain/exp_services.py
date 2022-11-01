@@ -1765,7 +1765,16 @@ def publish_exploration_and_update_user_profiles(
         committer: UserActionsInfo. UserActionsInfo object for the user who
             made the commit.
         exp_id: str. The id of the exploration to be published.
+
+    Raises:
+        Exception. To publish explorations and update users\' profiles,
+            user must be logged in and have admin access.
     """
+    if committer.user_id is None:
+        raise Exception(
+            'To publish explorations and update users\' profiles, '
+            'user must be logged in and have admin access.'
+        )
     rights_manager.publish_exploration(committer, exp_id)
     exp_title = exp_fetchers.get_exploration_by_id(exp_id).title
     email_subscription_services.inform_subscribers(

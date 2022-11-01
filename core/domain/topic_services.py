@@ -1339,7 +1339,7 @@ def check_can_edit_topic(
         return True
     if role_services.ACTION_EDIT_OWNED_TOPIC not in user.actions:
         return False
-    if topic_rights.is_manager(user.user_id):
+    if user.user_id and topic_rights.is_manager(user.user_id):
         return True
 
     return False
@@ -1357,8 +1357,14 @@ def deassign_user_from_all_topics(
 
     Raises:
         Exception. The committer does not have rights to modify a role.
+        Exception. Guest users are not allowed to deassing users from
+            all topics.
     """
     topic_rights_list = topic_fetchers.get_topic_rights_with_user(user_id)
+    if committer.user_id is None:
+        raise Exception(
+            'Guest users are not allowed to deassing users from all topics.'
+        )
     for topic_rights in topic_rights_list:
         topic_rights.manager_ids.remove(user_id)
         commit_cmds = [topic_domain.TopicRightsChange({
@@ -1389,7 +1395,13 @@ def deassign_manager_role_from_topic(
 
     Raises:
         Exception. The committer does not have rights to modify a role.
+        Exception. Guest users are not allowed to deassing manager role
+            from topic.
     """
+    if committer.user_id is None:
+        raise Exception(
+            'Guest users are not allowed to deassing manager role from topic.'
+        )
     topic_rights = topic_fetchers.get_topic_rights(topic_id)
     if user_id not in topic_rights.manager_ids:
         raise Exception('User does not have manager rights in topic.')
@@ -1431,8 +1443,14 @@ def assign_role(
         Exception. The assignee is already a manager for the topic.
         Exception. The assignee doesn't have enough rights to become a manager.
         Exception. The role is invalid.
+        Exception. Guest user is not allowed to assign roles to a user.
+        Exception. The role of the Guest user cannot be changed.
     """
     committer_id = committer.user_id
+    if committer_id is None:
+        raise Exception(
+            'Guest user is not allowed to assign roles to a user.'
+        )
     topic_rights = topic_fetchers.get_topic_rights(topic_id)
     if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
             committer.actions):
@@ -1443,6 +1461,10 @@ def assign_role(
         raise Exception(
             'UnauthorizedUserException: Could not assign new role.')
 
+    if assignee.user_id is None:
+        raise Exception(
+            'Cannot change the role of the Guest user.'
+        )
     assignee_username = user_services.get_username(assignee.user_id)
     if role_services.ACTION_EDIT_OWNED_TOPIC not in assignee.actions:
         raise Exception(

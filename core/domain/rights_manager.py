@@ -619,12 +619,17 @@ def check_can_access_activity(
             role_services.ACTION_PLAY_ANY_PUBLIC_ACTIVITY in user.actions)
     elif activity_rights.is_private():
         return bool(
-            (role_services.ACTION_PLAY_ANY_PRIVATE_ACTIVITY in user.actions) or
-            activity_rights.is_viewer(user.user_id) or
-            activity_rights.is_owner(user.user_id) or
-            activity_rights.is_editor(user.user_id) or
-            activity_rights.is_voice_artist(user.user_id) or
-            activity_rights.viewable_if_private)
+            role_services.ACTION_PLAY_ANY_PRIVATE_ACTIVITY in user.actions or
+            (
+                user.user_id and (
+                    activity_rights.is_viewer(user.user_id) or
+                    activity_rights.is_owner(user.user_id) or
+                    activity_rights.is_editor(user.user_id) or
+                    activity_rights.is_voice_artist(user.user_id) or
+                    activity_rights.viewable_if_private
+                )
+            )
+        )
     return False
 
 
@@ -649,8 +654,12 @@ def check_can_edit_activity(
     if role_services.ACTION_EDIT_OWNED_ACTIVITY not in user.actions:
         return False
 
-    if (activity_rights.is_owner(user.user_id) or
-            activity_rights.is_editor(user.user_id)):
+    if (
+        user.user_id and (
+            activity_rights.is_owner(user.user_id) or
+            activity_rights.is_editor(user.user_id)
+        )
+    ):
         return True
 
     if (activity_rights.community_owned or
@@ -685,9 +694,13 @@ def check_can_voiceover_activity(
     if role_services.ACTION_EDIT_OWNED_ACTIVITY not in user.actions:
         return False
 
-    if (activity_rights.is_owner(user.user_id) or
+    if (
+        user.user_id and (
+            activity_rights.is_owner(user.user_id) or
             activity_rights.is_editor(user.user_id) or
-            activity_rights.is_voice_artist(user.user_id)):
+            activity_rights.is_voice_artist(user.user_id)
+        )
+    ):
         return True
 
     if (activity_rights.community_owned or
@@ -762,11 +775,16 @@ def check_can_delete_activity(
     if activity_rights is None:
         return False
 
+    if user.user_id is None:
+        return False
+
     if role_services.ACTION_DELETE_ANY_ACTIVITY in user.actions:
         return True
-    elif (activity_rights.is_private() and
-          (role_services.ACTION_DELETE_OWNED_PRIVATE_ACTIVITY in user.actions)
-          and activity_rights.is_owner(user.user_id)):
+    elif (
+        activity_rights.is_private() and
+        role_services.ACTION_DELETE_OWNED_PRIVATE_ACTIVITY in user.actions and
+        activity_rights.is_owner(user.user_id)
+    ):
         return True
     elif (activity_rights.is_published() and
           (role_services.ACTION_DELETE_ANY_PUBLIC_ACTIVITY in user.actions)):
@@ -792,6 +810,9 @@ def check_can_modify_core_activity_roles(
         bool. Whether the user can modify roles for given activity.
     """
     if activity_rights is None:
+        return False
+
+    if user.user_id is None:
         return False
 
     if activity_rights.community_owned or activity_rights.cloned_from:
@@ -859,7 +880,7 @@ def check_can_publish_activity(
         return True
 
     if role_services.ACTION_PUBLISH_OWNED_ACTIVITY in user.actions:
-        if activity_rights.is_owner(user.user_id):
+        if user.user_id and activity_rights.is_owner(user.user_id):
             return True
 
     return False
@@ -930,8 +951,13 @@ def _assign_role(
         Exception. The activity is already publicly viewable.
         Exception. The role is invalid.
         Exception. No activity_rights exists for the given activity id.
+        Exception. Guest user is not allowed to assign roles.
     """
     committer_id = committer.user_id
+    if committer_id is None:
+        raise Exception(
+            'Guest user is not allowed to assign roles.'
+        )
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     if activity_rights is None:
@@ -1077,8 +1103,13 @@ def _deassign_role(
         Exception. UnauthorizedUserException: Could not deassign role.
         Exception. This user does not have any role for the given activity.
         Exception. No activity_rights exists for the given activity id.
+        Exception. Guest user is not allowed to deassign roles.
     """
     committer_id = committer.user_id
+    if committer_id is None:
+        raise Exception(
+            'Guest user is not allowed to deassign roles.'
+        )
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     if activity_rights is None:
@@ -1161,8 +1192,13 @@ def _release_ownership_of_activity(
     Raises:
         Exception. The committer does not have release rights.
         Exception. The activity rights does not exist for the given activity_id.
+        Exception. Guest user is not allowed to release ownership of activity.
     """
     committer_id = committer.user_id
+    if committer_id is None:
+        raise Exception(
+            'Guest user is not allowed to release ownership of activity.'
+        )
     activity_rights = _get_activity_rights(
         activity_type, activity_id, strict=True
     )
@@ -1255,8 +1291,13 @@ def _publish_activity(
     Raises:
         Exception. The committer does not have rights to publish the
             activity.
+        Exception. Guest user is not allowed to publish activities.
     """
     committer_id = committer.user_id
+    if committer_id is None:
+        raise Exception(
+            'Guest user is not allowed to publish activities.'
+        )
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     if not check_can_publish_activity(committer, activity_rights):
@@ -1291,8 +1332,13 @@ def _unpublish_activity(
     Raises:
         Exception. The committer does not have rights to unpublish the
             activity.
+        Exception. Guest user is not allowed to unpublish activities.
     """
     committer_id = committer.user_id
+    if committer_id is None:
+        raise Exception(
+            'Guest user is not allowed to unpublish activities.'
+        )
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     if not check_can_unpublish_activity(committer, activity_rights):
@@ -1419,8 +1465,13 @@ def set_private_viewability_of_exploration(
         Exception. The committer does not have the permission to perform change
             action.
         Exception. If the viewable_if_private property is already as desired.
+        Exception. Guest user is not allowed to set viewability of exploration.
     """
     committer_id = committer.user_id
+    if committer_id is None:
+        raise Exception(
+            'Guest user is not allowed to set viewability of exploration.'
+        )
     exploration_rights = get_exploration_rights(exploration_id)
 
     # The user who can publish activity can change its private viewability.

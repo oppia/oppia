@@ -387,10 +387,13 @@ class TestUtilsTests(test_utils.GenericTestBase):
             self.save_new_linear_exp_with_state_names_and_interactions(
                 'exp_id', 'owner_id', ['state_name'], [])
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_cannot_perform_delete_json_with_non_dict_params(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'Expected params to be a dict'):
-            self.delete_json('random_url', params='invalid_params')
+            self.delete_json('random_url', params='invalid_params')  # type: ignore[arg-type]
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally

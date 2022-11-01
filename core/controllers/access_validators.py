@@ -26,20 +26,31 @@ from core.domain import config_domain
 from core.domain import learner_group_services
 from core.domain import user_services
 
-from typing import Dict # isort: skip
+from typing import Dict, TypedDict
 
 
 # TODO(#13605): Refactor access validation handlers to follow a single handler
 # pattern.
 
-class ClassroomAccessValidationHandler(base.BaseHandler):
+class ClassroomAccessValidationHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of ClassroomAccessValidationHandler's
+    normalized_request dictionary.
+    """
+
+    classroom_url_fragment: str
+
+
+class ClassroomAccessValidationHandler(
+    base.BaseHandler[
+        Dict[str, str], ClassroomAccessValidationHandlerNormalizedRequestDict
+    ]
+):
     """Validates whether request made to /learn route.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'classroom_url_fragment': {
@@ -52,26 +63,26 @@ class ClassroomAccessValidationHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self) -> None:
-        # Please use type casting here instead of type ignore[union-attr] once
-        # this attribute `normalized_request` has been type annotated in the
-        # parent class BaseHandler.
-        classroom_url_fragment = self.normalized_request.get( # type: ignore[union-attr]
-            'classroom_url_fragment')
-        classroom = classroom_services.get_classroom_by_url_fragment( # type: ignore[no-untyped-call]
+        assert self.normalized_request is not None
+        classroom_url_fragment = self.normalized_request[
+            'classroom_url_fragment'
+        ]
+        classroom = classroom_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
 
         if not classroom:
             raise self.PageNotFoundException
 
 
-class ManageOwnAccountValidationHandler(base.BaseHandler):
+class ManageOwnAccountValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Validates access to preferences page.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
@@ -81,7 +92,9 @@ class ManageOwnAccountValidationHandler(base.BaseHandler):
         pass
 
 
-class ProfileExistsValidationHandler(base.BaseHandler):
+class ProfileExistsValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The world-viewable profile page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -93,29 +106,27 @@ class ProfileExistsValidationHandler(base.BaseHandler):
             }
         }
     }
-
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self, username: str) -> None:
         """Validates access to profile page."""
 
-        user_settings = user_services.get_user_settings_from_username( # type: ignore[no-untyped-call]
+        user_settings = user_services.get_user_settings_from_username(
             username)
 
         if not user_settings:
             raise self.PageNotFoundException
 
 
-class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
+class ReleaseCoordinatorAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Validates access to release coordinator page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
@@ -126,7 +137,9 @@ class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
         pass
 
 
-class ViewLearnerGroupPageAccessValidationHandler(base.BaseHandler):
+class ViewLearnerGroupPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Validates access to view learner group page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -142,7 +155,6 @@ class ViewLearnerGroupPageAccessValidationHandler(base.BaseHandler):
             }
         }
     }
-
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
@@ -150,6 +162,7 @@ class ViewLearnerGroupPageAccessValidationHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id: str) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
         if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
             raise self.PageNotFoundException
 
@@ -160,13 +173,14 @@ class ViewLearnerGroupPageAccessValidationHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
 
-class BlogHomePageAccessValidationHandler(base.BaseHandler):
+class BlogHomePageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Validates access to blog home page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
@@ -177,13 +191,24 @@ class BlogHomePageAccessValidationHandler(base.BaseHandler):
         pass
 
 
-class BlogPostPageAccessValidationHandler(base.BaseHandler):
+class BlogPostPageAccessValidationHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of BlogPostPageAccessValidationHandler's
+    normalized_request dictionary.
+    """
+
+    blog_post_url_fragment: str
+
+
+class BlogPostPageAccessValidationHandler(
+    base.BaseHandler[
+        Dict[str, str], BlogPostPageAccessValidationHandlerNormalizedRequestDict
+    ]
+):
     """Validates whether request made to correct blog post route."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'blog_post_url_fragment': {
@@ -196,12 +221,10 @@ class BlogPostPageAccessValidationHandler(base.BaseHandler):
 
     @acl_decorators.can_access_blog_dashboard
     def get(self) -> None:
-        # Please use type casting here instead of type ignore[union-attr] once
-        # this attribute `normalized_request` has been type annotated in the
-        # parent class BaseHandler.
-        blog_post_url_fragment = self.normalized_request.get( # type: ignore[union-attr]
-            'blog_post_url_fragment')
-        blog_post = blog_services.get_blog_post_by_url_fragment( # type: ignore[no-untyped-call]
+        assert self.normalized_request is not None
+        blog_post_url_fragment = self.normalized_request[
+            'blog_post_url_fragment']
+        blog_post = blog_services.get_blog_post_by_url_fragment(
             blog_post_url_fragment)
 
         if not blog_post:

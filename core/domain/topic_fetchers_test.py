@@ -124,6 +124,15 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         assert topic is not None
         self.assertEqual(topic.name, 'Name')
 
+    def test_raises_error_if_wrong_name_is_used_to_get_topic_by_name(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No Topic exists for the given topic name: wrong_topic_name'
+        ):
+            topic_fetchers.get_topic_by_name('wrong_topic_name', strict=True)
+
     def test_get_topic_rights_is_none(self) -> None:
         fake_topic_id = topic_fetchers.get_new_topic_id()
         fake_topic: Optional[topic_domain.TopicRights] = (

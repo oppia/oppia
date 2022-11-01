@@ -1246,8 +1246,8 @@ DEPRECATED_ROLE_ACTION_UPDATE = 'update'
 ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
 ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
-USER_FILTER_CRITERION_ROLE = 'role'
-USER_FILTER_CRITERION_USERNAME = 'username'
+USER_FILTER_CRITERION_ROLE: Final = 'role'
+USER_FILTER_CRITERION_USERNAME: Final = 'username'
 
 # Max questions allowed in a session of practice questions.
 QUESTION_BATCH_SIZE = 10

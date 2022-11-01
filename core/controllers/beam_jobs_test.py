@@ -88,9 +88,9 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
         model = beam_job_services.create_beam_job_run_model('FooJob')
 
         with self.swap_to_always_return(jobs_manager, 'run_job', value=model):
-            response = self.put_json( # type: ignore[no-untyped-call]
+            response = self.put_json(
                 '/beam_job_run', {'job_name': 'FooJob'},
-                csrf_token=self.get_new_csrf_token()) # type: ignore[no-untyped-call]
+                csrf_token=self.get_new_csrf_token())
 
         self.assertEqual(
             response,
@@ -106,7 +106,7 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
         swap_cancel_beam_job = self.swap_to_always_return(
             beam_job_services, 'cancel_beam_job', value=run)
         with swap_cancel_beam_job:
-            response = self.delete_json('/beam_job_run', {'job_id': model.id}) # type: ignore[no-untyped-call]
+            response = self.delete_json('/beam_job_run', {'job_id': model.id})
 
         self.assertEqual(response, run.to_dict())
 

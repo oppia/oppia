@@ -44,20 +44,7 @@ EXCLUDED_DIRECTORIES: Final = [
 
 # List of files who should be type-annotated but are not.
 NOT_FULLY_COVERED_FILES: Final = [
-    'core/controllers/access_validators.py',
-    'core/controllers/access_validators_test.py',
-    'core/controllers/acl_decorators.py',
-    'core/controllers/acl_decorators_test.py',
-    'core/controllers/admin.py',
-    'core/controllers/admin_test.py',
-    'core/controllers/android_e2e_config.py',
-    'core/controllers/android_e2e_config_test.py',
-    'core/controllers/base.py',
     'core/controllers/base_test.py',
-    'core/controllers/beam_jobs.py',
-    'core/controllers/beam_jobs_test.py',
-    'core/controllers/blog_admin.py',
-    'core/controllers/blog_admin_test.py',
     'core/controllers/blog_dashboard.py',
     'core/controllers/blog_dashboard_test.py',
     'core/controllers/blog_homepage.py',
