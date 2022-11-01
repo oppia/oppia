@@ -222,7 +222,7 @@ class ExplorationHandler(
             raise base.BaseHandler.InvalidInputException(
                 'This exploration cannot be edited. Please contact the admin.')
 
-        commit_message = self.normalized_payload['commit_message']
+        commit_message = self.normalized_payload.get('commit_message')
         change_list = self.normalized_payload['change_list']
 
         changes_are_mergeable = exp_services.are_changes_mergeable(
@@ -398,9 +398,9 @@ class ExplorationRightsHandler(
 
         make_community_owned = (
             self.normalized_payload['make_community_owned'])
-        new_member_username = self.normalized_payload['new_member_username']
-        new_member_role = self.normalized_payload['new_member_role']
-        viewable_if_private = self.normalized_payload['viewable_if_private']
+        new_member_username = self.normalized_payload.get('new_member_username')
+        new_member_role = self.normalized_payload.get('new_member_role')
+        viewable_if_private = self.normalized_payload.get('viewable_if_private')
 
         if new_member_username:
             new_member_id = user_services.get_user_id_from_username(
@@ -660,7 +660,7 @@ class UserExplorationEmailsHandler(
 
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        mute = self.normalized_payload['mute']
+        mute = self.normalized_payload.get('mute')
         message_type = self.normalized_payload['message_type']
 
         if message_type == feconf.MESSAGE_TYPE_FEEDBACK:
@@ -1066,7 +1066,7 @@ class ResolveIssueHandlerNormalizedPayloadDict(TypedDict):
     normalized_request dictionary.
     """
 
-    exp_issue_object: stats_domain.ExplorationIssue
+    exp_issue_object: Optional[stats_domain.ExplorationIssue]
     exp_version: int
 
 
@@ -1107,7 +1107,7 @@ class ResolveIssueHandler(
     def post(self, exp_id: str) -> None:
         """Handles POST requests."""
         assert self.normalized_payload is not None
-        exp_issue_object = self.normalized_payload['exp_issue_object']
+        exp_issue_object = self.normalized_payload.get('exp_issue_object')
         exp_version = self.normalized_payload['exp_version']
 
         exp_issues = stats_services.get_exp_issues(

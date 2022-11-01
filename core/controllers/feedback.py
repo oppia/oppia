@@ -256,8 +256,8 @@ class ThreadHandler(
             thread_id, strict=False
         )
         text = self.normalized_payload['text']
-        updated_status = self.normalized_payload['updated_status']
-        updated_subject = self.normalized_payload['updated_subject']
+        updated_status = self.normalized_payload.get('updated_status')
+        updated_subject = self.normalized_payload.get('updated_subject')
 
         if suggestion and updated_status:
             raise self.InvalidInputException(

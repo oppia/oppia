@@ -304,7 +304,7 @@ class EmailDashboardResultPage(
 
         email_subject = self.normalized_payload['email_subject']
         email_body = self.normalized_payload['email_body']
-        max_recipients = self.normalized_payload['max_recipients']
+        max_recipients = self.normalized_payload.get('max_recipients')
         email_intent = self.normalized_payload['email_intent']
         user_query_services.send_email_to_qualified_users(
             query_id, email_subject, email_body, email_intent, max_recipients)
