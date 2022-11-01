@@ -231,7 +231,7 @@ class ViewLearnerGroupPageAccessValidationHandlerTests(
 class BlogHomePageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Checks the access to the blog home page and its rendering."""
 
-    def test_blog_home_page_access_without_logging_in(self):
+    def test_blog_home_page_access_without_logging_in(self) -> None:
         self.get_html_response(
             '%s/can_access_blog_home_page' %
             ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
@@ -283,7 +283,7 @@ class BlogPostPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         blog_post_model.update_timestamps()
         blog_post_model.put()
 
-    def test_blog_post_page_access_without_logging_in(self):
+    def test_blog_post_page_access_without_logging_in(self) -> None:
         self.get_html_response(
             '%s/can_access_blog_post_page?blog_post_url_fragment=sample-url' %
             ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
