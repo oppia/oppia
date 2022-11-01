@@ -25,7 +25,7 @@ from core.domain import suggestion_services
 from core.domain import user_services
 
 from typing import (
-    Any, Dict, List, Optional, Sequence, Tuple, TypedDict, TypeVar
+    Any, Dict, List, Optional, Tuple, TypedDict, TypeVar
 )
 
 
