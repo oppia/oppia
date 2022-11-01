@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import builtins
+
 from core.domain import playthrough_issue_registry
 from core.tests import test_utils
 from extensions.issues.CyclicStateTransitions import CyclicStateTransitions
@@ -44,6 +46,16 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         playthrough_issue_registry.Registry._issues = {} # pylint: disable=protected-access
         super().tearDown()
 
+    def test_cannot_get_issues_that_do_not_inherit_base_exploration_issue_spec(
+            self) -> None:
+        class FakeAction: # pylint: disable=missing-docstring
+            some_property: int
+        swap_getattr = self.swap(
+            builtins, 'getattr', lambda *unused_args: FakeAction)
+        with swap_getattr:
+            all_issues = playthrough_issue_registry.Registry.get_all_issues()
+        self.assertEqual(all_issues, [])
+
     def test_issue_registry(self) -> None:
         """Do some sanity checks on the issue registry."""
         self.assertEqual(
@@ -57,6 +69,8 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
             self.assertIsInstance(
                 playthrough_issue_registry.Registry.get_issue_by_type(
                     issue_type), _class)
+        self.assertEqual(
+            len(playthrough_issue_registry.Registry.get_all_issues()), 3)
 
     def test_incorrect_issue_registry_types(self) -> None:
         """Tests that an error is raised when fetching an incorrect issue
