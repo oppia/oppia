@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import builtins
 import os
 import tempfile
 
@@ -42,30 +43,12 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
         # all branches of action_registry.py. Hence, we manually empty it
         # before this test.
         action_registry.Registry._actions = {} # pylint: disable=protected-access
-
-        wrapper_directory = tempfile.TemporaryDirectory(
-                prefix=os.getcwd() + '/')
-        action_name = 'FakeAction'
-        action_dir = os.path.join(wrapper_directory.name, action_name)
-        os.mkdir(action_dir)
-        action_file = os.path.join(action_dir, action_name + '.py')
-        with open(action_file, 'w', encoding='utf8') as f:
-            f.write('class FakeBaseActionSpec:\n')
-            f.write('\tsome_property: int = 0\n\n')
-            f.write('class %s(FakeBaseActionSpec):\n' % action_name)
-            f.write('\tsome_property: int = 1\n')
-
-        def mock_get_all_action_types() -> List[str]:
-            return [action_name]
-        swap_get_all_action_types = self.swap(
-            action_registry.Registry, 'get_all_action_types',
-            mock_get_all_action_types)
-        swap_actions_dir = self.swap(
-            feconf, 'ACTIONS_DIR', wrapper_directory.name.split('/')[-1])
-        with swap_get_all_action_types, swap_actions_dir:
+        class FakeAction:
+            some_property: int
+        swap_getattr = self.swap(
+            builtins, 'getattr', lambda *unused_args: FakeAction)
+        with swap_getattr:
             all_actions = action_registry.Registry.get_all_actions()
-
-        wrapper_directory.cleanup()
         self.assertEqual(all_actions, [])
 
     def test_cannot_get_action_by_invalid_type(self) -> None:
