@@ -278,7 +278,7 @@ var ExplorationEditorPage = function() {
       }
       await action.click('Save draft', saveButtonMobile[0]);
       if (commitMessage) {
-        await action.sendValue(
+        await action.setValue(
           'Commit message input', commitMessageInput, commitMessage);
       }
       await action.click('Save draft button', commitChangesButton);
