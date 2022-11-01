@@ -866,7 +866,6 @@ def apply_change_list(
                 # Collection domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
                 # collection is sufficient to apply the schema migration.
-                continue
 
         return collection
 

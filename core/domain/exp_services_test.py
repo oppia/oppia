@@ -9631,12 +9631,26 @@ title: Title
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, change_list, '')
 
+        # Mark 'Third state' as a checkpoint.
+        # Now version of the exploration becomes 3.
+        change_list = _get_change_list(
+            'Third state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
         # Second checkpoint reached as logged in user.
         user_services.update_learner_checkpoint_progress(
             self.viewer_id,
             self.EXP_ID,
             'New state',
-            2
+            3
+        )
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Third state', 3)
+        exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
+            self.viewer_id, self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID
         )
 
         # First checkpoint reached again by logged out user in older
@@ -9655,23 +9669,23 @@ title: Title
         assert exp_user_data is not None
 
         self.assertEqual(
-            exp_user_data.most_recently_reached_checkpoint_exp_version, 2)
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 3)
         self.assertEqual(
             exp_user_data.most_recently_reached_checkpoint_state_name,
-            'New state'
+            'Third state'
         )
         self.assertEqual(
             exp_user_data.furthest_reached_checkpoint_exp_version,
-            2
+            3
         )
         self.assertEqual(
             exp_user_data.furthest_reached_checkpoint_state_name,
-            'New state'
+            'Third state'
         )
 
         self.logout()
 
-    def test_logged_in_progress_in_updated_with_less_progress_in_newer_exp(
+    def test_logged_in_progress_is_not_updated_with_less_progress_in_newer_exp(
             self) -> None:
         self.login(self.VIEWER_EMAIL)
         exp_user_data = exp_fetchers.get_exploration_user_data(
