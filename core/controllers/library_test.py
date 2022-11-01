@@ -42,7 +42,7 @@ CAN_EDIT_STR = 'can_edit'
 class OldLibraryRedirectPageTest(test_utils.GenericTestBase):
     """Test for redirecting the old library page URL to the new one."""
 
-    def test_old_library_page_url(self):
+    def test_old_library_page_url(self) -> None:
         """Test to validate that the old library page url redirects
         to the new one.
         """
@@ -53,7 +53,7 @@ class OldLibraryRedirectPageTest(test_utils.GenericTestBase):
 
 class LibraryPageTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -62,12 +62,12 @@ class LibraryPageTests(test_utils.GenericTestBase):
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
-    def test_library_page(self):
+    def test_library_page(self) -> None:
         """Test access to the library page."""
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
         response.mustcontain('<oppia-root></oppia-root>')
 
-    def test_library_handler_demo_exploration(self):
+    def test_library_handler_demo_exploration(self) -> None:
         """Test the library data handler on demo explorations."""
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual({
@@ -120,7 +120,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
-    def test_library_handler_for_created_explorations(self):
+    def test_library_handler_for_created_explorations(self) -> None:
         """Test the library data handler for manually created explorations."""
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
@@ -193,7 +193,9 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
-    def test_library_handler_with_exceeding_query_limit_logs_error(self):
+    def test_library_handler_with_exceeding_query_limit_logs_error(
+        self
+    ) -> None:
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual({
             'is_super_admin': False,
@@ -206,7 +208,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
         observed_log_messages = []
 
-        def _mock_logging_function(msg, *_):
+        def _mock_logging_function(msg: str, *_: str) -> None:
             """Mocks logging.error()."""
             observed_log_messages.append(msg)
 
@@ -222,7 +224,9 @@ class LibraryPageTests(test_utils.GenericTestBase):
                 '1 activities were fetched to load the library page. '
                 'You may be running up against the default query limits.')
 
-    def test_library_handler_with_given_category_and_language_code(self):
+    def test_library_handler_with_given_category_and_language_code(
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         exp_id = exp_fetchers.get_new_exploration_id()
@@ -242,7 +246,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_library_handler_with_invalid_category(self):
+    def test_library_handler_with_invalid_category(self) -> None:
         response_1 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
             'category': 'missing-outer-parens',
             'language_code': '("en")'
@@ -267,7 +271,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
         )
         self.assertEqual(response_2['error'], error_msg)
 
-    def test_library_handler_with_invalid_language_code(self):
+    def test_library_handler_with_invalid_language_code(self) -> None:
         response_1 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
             'category': '("A category")',
             'language_code': 'missing-outer-parens'
@@ -295,12 +299,12 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
 class LibraryIndexHandlerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-    def test_library_index_handler_for_user_preferred_language(self):
+    def test_library_index_handler_for_user_preferred_language(self) -> None:
         """Test whether the handler returns the correct language preference."""
         # Since the default language is 'en', the language preference for the
         # viewer is changed to 'de' to test if the preference returned is user's
@@ -326,7 +330,9 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['de'],
         }, response_dict)
 
-    def test_library_index_handler_update_top_rated_activity_summary_dict(self):
+    def test_library_index_handler_update_top_rated_activity_summary_dict(
+        self
+    ) -> None:
         """Test the handler for top rated explorations."""
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
         self.assertDictContainsSubset({
@@ -368,7 +374,9 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, activity_summary_dicts[0])
 
-    def test_library_index_handler_updates_featured_activity_summary_dict(self):
+    def test_library_index_handler_updates_featured_activity_summary_dict(
+        self
+    ) -> None:
         """Test the handler for featured explorations."""
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
         self.assertDictContainsSubset({
@@ -417,18 +425,18 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
 
 class LibraryGroupPageTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-    def test_library_group_pages(self):
+    def test_library_group_pages(self) -> None:
         """Test access to the top rated and recently published pages."""
         self.get_html_response(feconf.LIBRARY_TOP_RATED_URL)
 
         self.get_html_response(feconf.LIBRARY_RECENTLY_PUBLISHED_URL)
 
-    def test_library_group_page_for_user_preferred_language(self):
+    def test_library_group_page_for_user_preferred_language(self) -> None:
         """Test whether the handler returns the correct language preference."""
         # Since the default language is 'en', the language preference for the
         # viewer is changed to 'de' to test if the preference returned is user's
@@ -455,7 +463,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['de'],
         }, response_dict)
 
-    def test_handler_for_recently_published_library_group_page(self):
+    def test_handler_for_recently_published_library_group_page(self) -> None:
         """Test library handler for recently published group page."""
         response_dict = self.get_json(
             feconf.LIBRARY_GROUP_DATA_URL,
@@ -486,7 +494,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
-    def test_handler_for_top_rated_library_group_page(self):
+    def test_handler_for_top_rated_library_group_page(self) -> None:
         """Test library handler for top rated group page."""
 
         # Load a public demo exploration.
@@ -556,7 +564,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
 
 class CategoryConfigTests(test_utils.GenericTestBase):
 
-    def test_thumbnail_icons_exist_for_each_category(self):
+    def test_thumbnail_icons_exist_for_each_category(self) -> None:
         all_categories = list(constants.CATEGORIES_TO_COLORS.keys())
 
         # Test that an icon exists for each default category.
@@ -575,7 +583,7 @@ class LibraryRedirectPageTest(test_utils.GenericTestBase):
     """Test for redirecting the old 'gallery' page URL to the
     library index page."""
 
-    def test_old_gallery_page_url(self):
+    def test_old_gallery_page_url(self) -> None:
         """Test to validate that the old gallery page url redirects
         to the library index page.
         """
@@ -590,7 +598,7 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
     PUBLIC_EXP_ID_EDITOR = 'eid1'
     PRIVATE_EXP_ID_VIEWER = 'eid2'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -610,7 +618,7 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(
             self.editor, self.PUBLIC_EXP_ID_EDITOR)
 
-    def test_can_get_public_exploration_summaries(self):
+    def test_can_get_public_exploration_summaries(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response_dict = self.get_json(
@@ -630,7 +638,7 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_can_get_editable_private_exploration_summaries(self):
+    def test_can_get_editable_private_exploration_summaries(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response_dict = self.get_json(
@@ -679,7 +687,9 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_cannot_get_private_exploration_summaries_when_logged_out(self):
+    def test_cannot_get_private_exploration_summaries_when_logged_out(
+        self
+    ) -> None:
         response_dict = self.get_json(
             feconf.EXPLORATION_SUMMARIES_DATA_URL,
             params={
@@ -696,7 +706,9 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(summaries[0]['id'], self.PUBLIC_EXP_ID_EDITOR)
         self.assertEqual(summaries[0]['status'], 'public')
 
-    def test_handler_with_invalid_stringified_exp_ids_raises_error_404(self):
+    def test_handler_with_invalid_stringified_exp_ids_raises_error_404(
+        self
+    ) -> None:
         # 'stringified_exp_ids' should be a list.
         self.get_json(
             feconf.EXPLORATION_SUMMARIES_DATA_URL,
@@ -718,7 +730,7 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
     """Test Collection Summaries Handler."""
 
-    def test_access_collection(self):
+    def test_access_collection(self) -> None:
         response_dict = self.get_json(
             feconf.COLLECTION_SUMMARIES_DATA_URL,
             params={'stringified_collection_ids': json.dumps('0')})
