@@ -1392,7 +1392,6 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             .PlatformParameterFilter.from_dict(filter_dict))
         filter_domain.validate()
 
-
     def test_validate_filter_with_invalid_type_raises_exception(self) -> None:
         filter_domain = (
             parameter_domain
@@ -1475,7 +1474,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
                 {'type': 'app_version_flavor', 'conditions': []}
             ))
         filter_domain.validate()
-    
+
 
 class PlatformParameterRuleTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterRule."""
