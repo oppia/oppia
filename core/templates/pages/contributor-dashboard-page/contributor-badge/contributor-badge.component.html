@@ -15,7 +15,7 @@
                     [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : mobileTranslationBadgesShown}">
                   Translation
               </div>
-              <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
+              <div *ngIf="userCanSuggestQuestions || userCanReviewQuestionSuggestions" class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
                     (click)="selectBadgeType(false)"
                     [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : !mobileTranslationBadgesShown}">
                   Question
@@ -23,7 +23,7 @@
             </div>
         </div>
     </div>
-    <div class="stats-contribution-type-mobile-container" [hidden]="!mobileTranslationBadgesShown">
+    <div class="stats-contribution-type-mobile-container" [hidden]="!mobileTranslationBadgesShown || languages.length === 0">
         <div class="dropdown-label">Language</div>
         <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
             <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleMobileLanguageDropdown()">
@@ -180,6 +180,16 @@
             </div>
         </div>
     </div>
+    <mat-card [hidden]="dataLoading" *ngIf="(mobileTranslationBadgesShown && !translationBadges[selectedLanguage])" layout="row" class="contributions-required-container mobile-badge-container list-view-item">
+      <div class="oppia-contributions-required-message">
+        Start contributing to see your badges!
+      </div>
+    </mat-card>
+    <mat-card [hidden]="dataLoading" *ngIf="!translationBadges[selectedLanguage] && !(userCanSuggestQuestions || userCanReviewQuestionSuggestions)" layout="row" class="contributions-required-container non-mobile-badge-containier list-view-item">
+      <div class="oppia-contributions-required-message">
+        Start contributing to see your badges!
+      </div>
+    </mat-card>
     <div class="oppia-lazy-loading-container"
          [hidden]="!dataLoading">
       <lazy-loading></lazy-loading>
@@ -188,6 +198,10 @@
 </div>
 
 <style>
+  .contributions-required-container {
+    height: 300px;
+    margin-top: 70px
+  }
   .non-mobile-badge-containier {
     display: block;
   }
