@@ -24,6 +24,7 @@ import pprint
 
 from core import feconf
 from core.domain import beam_job_services
+from core.domain import caching_services
 from core.jobs import base_jobs
 from core.jobs import job_options
 from core.jobs.io import cache_io
@@ -129,9 +130,17 @@ def run_job(
     job = job_class(pipeline)
     job_name = job_class.__name__
 
+    # Clear cache before running the job to be sure that the cache
+    # does not affect the job.
+    caching_services.flush_memory_caches()
+
     # NOTE: Exceptions raised within this context are logged and suppressed.
     with _job_bookkeeping_context(job_name) as run_model:
-        _ = job.run() | job_io.PutResults(run_model.id) | cache_io.FlushCache()
+        _ = (
+            job.run()
+            | job_io.PutResults(run_model.id)
+            | cache_io.FlushCache()
+        )
 
         run_result = pipeline.run()
 

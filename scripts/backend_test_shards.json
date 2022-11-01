@@ -56,6 +56,7 @@
         "core.jobs.batch_jobs.story_migration_jobs_test",
         "core.jobs.batch_jobs.email_deletion_jobs_test",
         "core.jobs.batch_jobs.blog_post_search_indexing_jobs_test",
+        "core.jobs.batch_jobs.rejecting_suggestion_for_invalid_content_ids_jobs_test",
         "core.jobs.io.cache_io_test",
         "scripts.contributor_dashboard_debug_test"
     ],
