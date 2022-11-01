@@ -23,7 +23,6 @@ import tempfile
 
 from core import feconf
 from core.domain import action_registry
-from core.platform import models
 from core.tests import test_utils
 from typing import List
 
