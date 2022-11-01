@@ -20,7 +20,6 @@
 
 import { Question } from './QuestionObjectFactory';
 
-
 export class DiagnosticTestQuestionsModel {
   _mainQuestion: Question;
   _backupQuestion: Question;
