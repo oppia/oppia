@@ -161,4 +161,4 @@ class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Skill with ID: skill_id_2, should contain atleast 2 question')
+            'Skill with ID: skill_id_2, should contain 2 questions')

@@ -84,18 +84,6 @@ class DiagnosticTestQuestionsHandler(base.BaseHandler):
         # number of questions is twice the length of skill IDs.
         question_count = len(diagnostic_test_skill_ids) * 2
 
-        # A dict with skill ID as key and a nested dict as value. The nested
-        # dict contains main_question and backup_question as keys and the
-        # question dict as values. The main question and backup question are
-        # the two questions associated with a single skill. In the diagnostic
-        # test, initially, the main question will be presented to the learner
-        # and if they attempted incorrectly then the backup question will be
-        # asked otherwise not. The main question and the backup question are of
-        # the same difficulty.
-        skill_id_to_questions_dict: Dict[
-            str, Dict[str, question_domain.QuestionDict]] = (
-                collections.defaultdict(dict))
-
         skill_id_to_questions_map: Dict[
             str, List[question_domain.Question]] = (
                 collections.defaultdict(list))
@@ -114,10 +102,22 @@ class DiagnosticTestQuestionsHandler(base.BaseHandler):
             for skill_id in diagnostic_test_linked_skill_ids:
                 skill_id_to_questions_map[skill_id].append(question)
 
+        # A dict with skill ID as key and a nested dict as value. The nested
+        # dict contains main_question and backup_question as keys and the
+        # question dict as values. The main question and backup question are
+        # the two questions associated with a single skill. In the diagnostic
+        # test, initially, the main question will be presented to the learner
+        # and if they attempted incorrectly then the backup question will be
+        # asked otherwise not. The main question and the backup question are of
+        # the same difficulty.
+        skill_id_to_questions_dict: Dict[
+            str, Dict[str, question_domain.QuestionDict]] = (
+                collections.defaultdict(dict))
+
         for skill_id, linked_questions in skill_id_to_questions_map.items():
-            if len(questions) != 2:
+            if len(linked_questions) != 2:
                 raise self.InvalidInputException(
-                    'Skill with ID: %s, should contain atleast 2 question'
+                    'Skill with ID: %s, should contain 2 questions'
                     % skill_id)
 
             # Each diagnostic test skill contains two questions. The first
