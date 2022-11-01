@@ -232,8 +232,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         this.contextService.getExplorationId()),
       this.threadDataBackendApiService.getFeedbackThreadsAsync(),
       this.userService.getUserInfoAsync()
-    ]).then(async (
-      [explorationData, featuresData, _, userInfo]) => {
+    ]).then(async([explorationData, featuresData, _, userInfo]) => {
       if ((explorationData as ExplorationData).exploration_is_linked_to_story) {
         this.explorationIsLinkedToStory = true;
         this.contextService.setExplorationIsLinkedToStory();

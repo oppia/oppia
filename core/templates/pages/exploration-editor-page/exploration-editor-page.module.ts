@@ -99,7 +99,7 @@ import { StateTranslationStatusGraphComponent } from './translation-tab/state-tr
 import { TranslationTabComponent } from './translation-tab/translation-tab.component';
 import { ValueGeneratorEditorComponent } from './param-changes-editor/value-generator-editor.component';
 import { ParamChangesEditorComponent } from './param-changes-editor/param-changes-editor.component';
-import { ExplorationEditorPageComponent } from './exploration-editor-page.component'
+import { ExplorationEditorPageComponent } from './exploration-editor-page.component';
 
 @NgModule({
   imports: [

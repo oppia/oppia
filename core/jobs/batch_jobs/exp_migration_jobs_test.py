@@ -28,11 +28,11 @@ from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import rights_domain
 from core.domain import rights_manager
-from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_migration_jobs
@@ -46,15 +46,15 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
-    from mypy_imports import translation_models
     from mypy_imports import stats_models
+    from mypy_imports import translation_models
 
 (
     exp_models, opportunity_models,
     stats_models, translation_models
 ) = models.Registry.import_models([
     models.Names.EXPLORATION, models.Names.OPPORTUNITY,
-    models.Names.STATS, models.Names.TRANSLATION
+    models.Names.STATISTICS, models.Names.TRANSLATION
 ])
 
 
@@ -68,7 +68,7 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
-objective: ''
+objective: Objective for the exploration...
 param_changes: []
 param_specs: {}
 schema_version: 46
@@ -176,7 +176,7 @@ states:
         content: {}
 states_schema_version: 41
 tags: []
-title: Title
+title: Title of exploration
 """)
 # Exploration migration backend tests with BEAM jobs involves creating and
 # publishing the exploration. This requires a ElasticSearch stub for running
@@ -459,7 +459,9 @@ class MigrateExplorationJobTests(
             job_run_result.JobRunResult(
                 stdout='EXP MIGRATED SUCCESS: 1', stderr=''),
             job_run_result.JobRunResult(
-                stdout='TRANSLATION MODELS GENERATED SUCCESS: 1')
+                stdout='TRANSLATION MODELS GENERATED SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='EXP PROCESSED SUCCESS: 1', stderr='')
         ])
 
         updated_opp_model = (
@@ -495,7 +497,7 @@ class MigrateExplorationJobTests(
         exp_model = exp_models.ExplorationModel(
             id=self.NEW_EXP_ID,
             category=EXP_V46_DICT['category'],
-            title=EXP_V46_DICT['title'],
+            title='',
             objective=EXP_V46_DICT['objective'],
             language_code=EXP_V46_DICT['language_code'],
             tags=EXP_V46_DICT['tags'],
@@ -536,21 +538,6 @@ class MigrateExplorationJobTests(
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
-        for i in range(2):
-            translation_models.EntityTranslationsModel.create_new(
-                feconf.TranslatableEntityType.EXPLORATION.value,
-                exp_model.id,
-                exp_model.version - i,
-                'hi',
-                {}
-            ).put()
-
-        all_translation_models: (
-            Sequence[translation_models.EntityTranslationsModel]) = (
-            translation_models.EntityTranslationsModel.get_all().fetch())
-
-        self.assertEqual(len(all_translation_models), 2)
-
         owner_action = user_services.get_user_actions_info(
             feconf.SYSTEM_COMMITTER_ID)
         exp_services.publish_exploration_and_update_user_profiles(
@@ -576,41 +563,14 @@ class MigrateExplorationJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='CACHE DELETION SUCCESS: 1', stderr=''),
-            job_run_result.JobRunResult(
-                stdout='EXP MIGRATED SUCCESS: 1', stderr=''),
-            job_run_result.JobRunResult(
-                stdout='TRANSLATION MODELS GENERATED SUCCESS: 1')
+                stdout='', stderr=(
+                    'EXP PROCESSED ERROR: "(\'exp_1\', ValidationError("Please '
+                    'fix the following issues before saving this exploration: '
+                    '1. A title must be specified (in the \'Settings\' tab). '
+                    '"))": 1'
+                )
+            )
         ])
-
-        updated_opp_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get(
-                self.NEW_EXP_ID))
-        updated_opp_summary = (
-              opportunity_services
-                  .get_exploration_opportunity_summary_from_model(
-                      updated_opp_model))
-
-        expected_opp_summary_dict = {
-            'id': 'exp_1',
-            'topic_name': 'topic',
-            'chapter_title': 'Title 1',
-            'story_title': 'A story title',
-            'content_count': 4,
-            'translation_counts': {
-                'hi': 0
-            },
-            'translation_in_review_counts': {}}
-
-        self.assertEqual(
-            updated_opp_summary.to_dict(), expected_opp_summary_dict)
-
-        all_translation_models = (
-            translation_models.EntityTranslationsModel.get_all().fetch())
-
-        self.assertEqual(len(all_translation_models), 3)
-        self.assertEqual(
-            [m.entity_version for m in all_translation_models], [0, 1, 2])
 
 
 # Exploration migration backend tests with BEAM jobs involves creating and
@@ -854,46 +814,80 @@ class AuditExplorationMigrationJobTests(
             updated_opp_summary.to_dict(), expected_opp_summary_dict)
 
     def test_unmigrated_invalid_published_exp_raise_error(self) -> None:
-        swap_states_schema_48 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 48)
-        swap_exp_schema_53 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 53)
+        exp_model = exp_models.ExplorationModel(
+            id=self.NEW_EXP_ID,
+            category=EXP_V46_DICT['category'],
+            title='',
+            objective=EXP_V46_DICT['objective'],
+            language_code=EXP_V46_DICT['language_code'],
+            tags=EXP_V46_DICT['tags'],
+            blurb=EXP_V46_DICT['blurb'],
+            author_notes=EXP_V46_DICT['author_notes'],
+            states_schema_version=EXP_V46_DICT['states_schema_version'],
+            init_state_name=EXP_V46_DICT['init_state_name'],
+            states=EXP_V46_DICT['states'],
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+            correctness_feedback_enabled=EXP_V46_DICT[
+                'correctness_feedback_enabled']
+        )
+        rights_manager.create_new_exploration_rights(
+            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_summary_model = exp_models.ExpSummaryModel(**{
+            'id': self.NEW_EXP_ID,
+            'title': exp_model.title,
+            'category': exp_model.category,
+            'objective': exp_model.objective,
+            'language_code': exp_model.language_code,
+            'tags': exp_model.tags,
+            'ratings': None,
+            'scaled_average_rating': 4.0,
+            'exploration_model_last_updated': exp_model.last_updated,
+            'exploration_model_created_on': exp_model.created_on,
+            'first_published_msec': None,
+            'status': constants.ACTIVITY_STATUS_PRIVATE,
+            'community_owned': False,
+            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
+            'editor_ids': [],
+            'voice_artist_ids': [],
+            'viewer_ids': [],
+            'contributor_ids': [],
+            'contributors_summary': {},
+            'version': exp_model.version
+        })
+        exp_summary_model.update_timestamps()
+        exp_summary_model.put()
 
-        with swap_states_schema_48, swap_exp_schema_53:
-            exploration = exp_domain.Exploration.create_default_exploration(
-                self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
-            exp_services.save_new_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exploration)
+        owner_action = user_services.get_user_actions_info(
+            feconf.SYSTEM_COMMITTER_ID)
+        exp_services.publish_exploration_and_update_user_profiles(
+            owner_action, self.NEW_EXP_ID)
+        opportunity_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel(
+                id=self.NEW_EXP_ID,
+                topic_id='topic_id1',
+                topic_name='topic',
+                story_id='story_id_1',
+                story_title='A story title',
+                chapter_title='Title 1',
+                content_count=20,
+                incomplete_translation_language_codes=['hi', 'ar'],
+                translation_counts={'hi': 1, 'ar': 2},
+                language_codes_needing_voice_artists=['en'],
+                language_codes_with_assigned_voice_artists=[]))
+        opportunity_model.put()
 
-            owner_action = user_services.get_user_actions_info(
-                feconf.SYSTEM_COMMITTER_ID)
-            exp_services.publish_exploration_and_update_user_profiles(
-                owner_action, self.NEW_EXP_ID)
-            opportunity_model = (
-                opportunity_models.ExplorationOpportunitySummaryModel(
-                    id=self.NEW_EXP_ID,
-                    topic_id='topic_id1',
-                    topic_name='topic',
-                    story_id='story_id_1',
-                    story_title='A story title',
-                    chapter_title='Title 1',
-                    content_count=20,
-                    incomplete_translation_language_codes=['hi', 'ar'],
-                    translation_counts={'hi': 1, 'ar': 2},
-                    language_codes_needing_voice_artists=['en'],
-                    language_codes_with_assigned_voice_artists=[]))
-            opportunity_model.put()
+        self.create_story_linked_to_exploration()
 
-            self.create_story_linked_to_exploration()
-
-            self.assertEqual(exploration.states_schema_version, 48)
+        self.assertEqual(exp_model.states_schema_version, 41)
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stderr=(
-                    'EXP PROCESSED ERROR: "(\'exp_1\', ''ValidationError('
-                    '\'This state does not have any interaction specified.\')'
-                    ')": 1'
+                stdout='', stderr=(
+                    'EXP PROCESSED ERROR: "(\'exp_1\', ValidationError("Please '
+                    'fix the following issues before saving this exploration: '
+                    '1. A title must be specified (in the \'Settings\' tab). '
+                    '"))": 1'
                 )
             )
         ])
@@ -1021,71 +1015,6 @@ class ExpSnapshotsMigrationAuditJobTests(
     NEW_EXP_ID = 'exp_id1'
     EXP_TITLE = 'title'
 
-    def create_exploration_with_states_schema_version(
-        self,
-        states_schema_version: int,
-        exp_id: str,
-        user_id: str,
-        states_dict: Dict[str, state_domain.StateDict]
-    ) -> None:
-        """Saves a new default exploration with the given states dictionary in
-        the given state schema version. All passed state dictionaries in
-        'states_dict' must have the states schema version indicated by
-        'states_schema_version'.
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating explorations. This is
-        because the latter approach would result in an exploration with the
-        *current* states schema version.
-
-        Args:
-            states_schema_version: int. The state schema version.
-            exp_id: str. The exploration ID.
-            user_id: str. The user_id of the creator.
-            states_dict: dict. The dict representation of all the states, in the
-                given states schema version.
-        """
-        exp_model = exp_models.ExplorationModel(
-            id=exp_id,
-            category='category',
-            title='title',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
-            blurb='',
-            author_notes='',
-            states_schema_version=states_schema_version,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=states_dict,
-            param_specs={},
-            param_changes=[]
-        )
-        rights_manager.create_new_exploration_rights(exp_id, user_id)
-
-        commit_message = 'New exploration created with title \'title\'.'
-        exp_model.commit(
-            user_id, commit_message, [{
-                'cmd': 'create_new',
-                'title': 'title',
-                'category': 'category',
-            }])
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
-        exp_summary_model = exp_models.ExpSummaryModel(
-            id=exp_id,
-            title='title',
-            category='category',
-            objective='Old objective',
-            language_code='en',
-            tags=[],
-            ratings=feconf.get_empty_ratings(),
-            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-            status=exp_rights.status,
-            community_owned=exp_rights.community_owned,
-            owner_ids=exp_rights.owner_ids,
-            contributor_ids=[],
-            contributors_summary={},
-        )
-        exp_summary_model.put()
-
     def test_migration_audit_job_does_not_convert_up_to_date_exp(self) -> None:
         """Tests that the snapshot migration audit job does not convert a
         snapshot that is already the latest states schema version.
@@ -1094,8 +1023,12 @@ class ExpSnapshotsMigrationAuditJobTests(
         # affected by the job.
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
+        content_id_generator = translation_domain.ContentIdGenerator()
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'EndExploration')
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator)
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index)
         init_state.update_interaction_default_outcome(None)
         exp_services.save_new_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration)
@@ -1120,8 +1053,12 @@ class ExpSnapshotsMigrationAuditJobTests(
         """
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
+        content_id_generator = translation_domain.ContentIdGenerator()
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'EndExploration')
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator)
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index)
         init_state.update_interaction_default_outcome(None)
         exp_services.save_new_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration)
@@ -1417,8 +1354,12 @@ class ExpSnapshotsMigrationJobTests(
         # job.
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
+        content_id_generator = translation_domain.ContentIdGenerator()
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'EndExploration')
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator)
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index)
         init_state.update_interaction_default_outcome(None)
         exp_services.save_new_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration)
@@ -1495,8 +1436,12 @@ class ExpSnapshotsMigrationJobTests(
         """
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
+        content_id_generator = translation_domain.ContentIdGenerator()
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'EndExploration')
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator)
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index)
         init_state.update_interaction_default_outcome(None)
         exp_services.save_new_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration)

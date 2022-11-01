@@ -166,15 +166,19 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
             states_schema_version=48,
             states={
                 'init_state': state_domain.State.create_default_state(
-                    'state', is_initial_state=True
+                    'state', 'content_0', 'default_outcome_1',
+                    is_initial_state=True
                 ).to_dict(),
                 'text_state': state_domain.State.create_default_state(
-                    'state', is_initial_state=True
+                    'state', 'content_2', 'default_outcome_3',
+                    is_initial_state=True
                 ).to_dict(),
                 'end_state': state_domain.State.create_default_state(
-                    'state', is_initial_state=True
+                    'state', 'content_4', 'default_outcome_5',
+                    is_initial_state=True
                 ).to_dict()
-            }
+            },
+            next_content_id_index=6
         )
 
         exp_model_3.states['text_state']['interaction']['id'] = ('TextInput')

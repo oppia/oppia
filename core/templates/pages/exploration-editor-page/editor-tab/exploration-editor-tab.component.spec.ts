@@ -48,7 +48,6 @@ import { Router } from '@angular/router';
 import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
 import { State } from 'domain/state/StateObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { TranslationBackendDict } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { ContextService } from 'services/context.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ExplorationNextContentIdIndexService } from '../services/exploration-next-content-id-index.service';
@@ -426,28 +425,28 @@ describe('Exploration editor tab component', () => {
     });
 
   it('should correctly initialize generateContentIdService', () => {
-      explorationNextContentIdIndexService.init(5);
+    explorationNextContentIdIndexService.init(5);
 
-      generateContentIdService.getNextStateId('content');
-      expect(explorationNextContentIdIndexService.displayed).toBe(6);
-      expect(explorationNextContentIdIndexService.savedMemento).toBe(5);
+    generateContentIdService.getNextStateId('content');
+    expect(explorationNextContentIdIndexService.displayed).toBe(6);
+    expect(explorationNextContentIdIndexService.savedMemento).toBe(5);
 
-      generateContentIdService.revertUnusedContentIdIndex();
-      expect(explorationNextContentIdIndexService.displayed).toBe(5);
-      expect(explorationNextContentIdIndexService.savedMemento).toBe(5);
-    });
+    generateContentIdService.revertUnusedContentIdIndex();
+    expect(explorationNextContentIdIndexService.displayed).toBe(5);
+    expect(explorationNextContentIdIndexService.savedMemento).toBe(5);
+  });
 
   it('should correctly save next contentId index', () => {
-      explorationNextContentIdIndexService.init(5);
-      generateContentIdService.getNextStateId('content');
-      expect(explorationNextContentIdIndexService.displayed).toBe(6);
-      expect(explorationNextContentIdIndexService.savedMemento).toBe(5);
+    explorationNextContentIdIndexService.init(5);
+    generateContentIdService.getNextStateId('content');
+    expect(explorationNextContentIdIndexService.displayed).toBe(6);
+    expect(explorationNextContentIdIndexService.savedMemento).toBe(5);
 
-      component.saveNextContentIdIndex();
+    component.saveNextContentIdIndex();
 
-      expect(explorationNextContentIdIndexService.displayed).toBe(6);
-      expect(explorationNextContentIdIndexService.savedMemento).toBe(6);
-    });
+    expect(explorationNextContentIdIndexService.displayed).toBe(6);
+    expect(explorationNextContentIdIndexService.savedMemento).toBe(6);
+  });
 
   it('should get state content placeholder text when init state name' +
       ' is equal to active state name', () => {

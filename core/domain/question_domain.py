@@ -1683,10 +1683,12 @@ class Question(translation_domain.BaseTranslatableObject):
         and WrittenTranslation from State. This version also updates the
         content-ids for each translatable field in the state with its new
         content-id.
+
         Args:
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
                 initialize a State domain object.
+
         Returns:
             dict. The converted question_state_dict.
         """

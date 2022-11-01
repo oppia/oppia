@@ -248,7 +248,7 @@ export class ExplorationEditorTabComponent
       let state = this.explorationStatesService.getState(stateName);
       let recordedVoiceovers = state.recordedVoiceovers;
       const shouldPrompt = contentIds.some(contentId => {
-        return recordedVoiceovers.hasUnflaggedVoiceovers(contentId)
+        return recordedVoiceovers.hasUnflaggedVoiceovers(contentId);
       });
 
       if (shouldPrompt) {
