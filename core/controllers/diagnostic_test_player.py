@@ -16,15 +16,17 @@
 
 from __future__ import annotations
 
+import collections
+
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import question_domain
 from core.domain import question_services
-from core.domain import topic_services
+from core.domain import topic_fetchers
 
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 
 class DiagnosticTestPlayerPage(
@@ -47,9 +49,8 @@ class DiagnosticTestQuestionsHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {
+
+    URL_PATH_ARGS_SCHEMAS = {
         'topic_id': {
             'schema': {
                 'type': 'basestring',
@@ -60,18 +61,19 @@ class DiagnosticTestQuestionsHandler(base.BaseHandler):
             }
         }
     }
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access # type: ignore[misc]
     def get(self, topic_id: str) -> None:
-        try:
-            diagnostic_test_skill_ids = (
-                topic_services.get_topic_id_to_diagnostic_test_skill_ids(
-                    [topic_id]))[topic_id]
-        except Exception as e:
-            raise self.PageNotFoundException(e)
+
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+        if topic is None:
+            raise self.PageNotFoundException(
+                'No corresponding topic exists for the given topic ID.')
+
+        diagnostic_test_skill_ids = topic.skill_ids_for_diagnostic_test
 
         # From each skill, two questions were fetched. The first question
         # (main question) will be presented to the learner initially and if the
@@ -80,19 +82,9 @@ class DiagnosticTestQuestionsHandler(base.BaseHandler):
         # number of questions is twice the length of skill IDs.
         question_count = len(diagnostic_test_skill_ids) * 2
 
-        # A dict with skill ID as key and a nested dict as value. The nested
-        # dict contains main_question and backup_question as keys and the
-        # question dict as values. The main question and backup question are
-        # the two questions associated with a single skill. In the diagnostic
-        # test, initially, the main question will be presented to the learner
-        # and if they attempted incorrectly then the backup question will be
-        # asked otherwise not. The main question and the backup question are of
-        # the same difficulty.
-        skill_id_to_questions_dict: Dict[
-            str, Dict[str, question_domain.QuestionDict]] = {}
-
-        for skill_id in diagnostic_test_skill_ids:
-            skill_id_to_questions_dict[skill_id] = {}
+        skill_id_to_questions_map: Dict[
+            str, List[question_domain.Question]] = (
+                collections.defaultdict(list))
 
         questions = question_services.get_questions_by_skill_ids(
             question_count,
@@ -103,17 +95,38 @@ class DiagnosticTestQuestionsHandler(base.BaseHandler):
         for question in questions:
             linked_skill_ids = question.linked_skill_ids
             diagnostic_test_linked_skill_ids = list(
-                set(linked_skill_ids).intersection(
-                    set(diagnostic_test_skill_ids))
-            )
+                set(linked_skill_ids) & set(diagnostic_test_skill_ids))
 
             for skill_id in diagnostic_test_linked_skill_ids:
-                if 'main_question' not in skill_id_to_questions_dict[skill_id]:
-                    skill_id_to_questions_dict[skill_id]['main_question'] = (
-                        question.to_dict())
-                else:
-                    skill_id_to_questions_dict[skill_id]['backup_question'] = (
-                        question.to_dict())
+                skill_id_to_questions_map[skill_id].append(question)
+
+        # A dict with skill ID as key and a nested dict as value. The nested
+        # dict contains main_question and backup_question as keys and the
+        # question dict as values. The main question and backup question are
+        # the two questions associated with a single skill. In the diagnostic
+        # test, initially, the main question will be presented to the learner
+        # and if they attempted incorrectly then the backup question will be
+        # asked otherwise not. The main question and the backup question are of
+        # the same difficulty.
+        skill_id_to_questions_dict: Dict[
+            str, Dict[str, question_domain.QuestionDict]] = (
+                collections.defaultdict(dict))
+
+        for skill_id, linked_questions in skill_id_to_questions_map.items():
+            if len(linked_questions) != 2:
+                raise self.InvalidInputException(
+                    'Skill with ID: %s, should contain 2 questions'
+                    % skill_id)
+
+            # Each diagnostic test skill contains two questions. The first
+            # question is considered the main question and the second one is
+            # considered the backup question.
+            skill_id_to_questions_dict[skill_id][
+                feconf.DIAGNOSTIC_TEST_MAIN_QUESTION_FOR_SKILL] = (
+                    linked_questions[0].to_dict())
+            skill_id_to_questions_dict[skill_id][
+                feconf.DIAGNOSTIC_TEST_BACKUP_QUESTION_FOR_SKILL] = (
+                    linked_questions[1].to_dict())
 
         self.render_json(
             {'skill_id_to_questions_dict': skill_id_to_questions_dict}

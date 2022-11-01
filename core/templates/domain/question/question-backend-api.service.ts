@@ -23,12 +23,13 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
-import { QuestionObjectFactory, QuestionBackendDict, Question } from
+import { QuestionObjectFactory, QuestionBackendDict } from
   'domain/question/QuestionObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { QuestionSummaryForOneSkillBackendDict } from
   'domain/question/question-summary-for-one-skill-object.model';
+import { DiagnosticTestQuestionsModel } from './diagnostic-test-questions.model';
 
 interface QuestionCountBackendResponse {
   'total_question_count': number;
@@ -58,10 +59,7 @@ interface SkillIdToQuestionsBackendResponse {
 }
 
 interface SkillIdToQuestionsResponse {
-  [skillId: string]: {
-    mainQuestion?: Question;
-    backupQuestion?: Question;
-  };
+  [skillId: string]: DiagnosticTestQuestionsModel;
 }
 
 @Injectable({
@@ -238,15 +236,15 @@ export class QuestionBackendApiService {
         let skillIdToQuestionsDict: SkillIdToQuestionsResponse = {};
 
         for (let skillId in response.skill_id_to_questions_dict) {
-          skillIdToQuestionsDict[skillId] = {};
-
-          skillIdToQuestionsDict[skillId].mainQuestion = (
+          const mainQuestion = (
             this.questionObjectFactory.createFromBackendDict(
               response.skill_id_to_questions_dict[skillId].main_question));
-
-          skillIdToQuestionsDict[skillId].backupQuestion = (
+          const backupQuestion = (
             this.questionObjectFactory.createFromBackendDict(
               response.skill_id_to_questions_dict[skillId].backup_question));
+
+          skillIdToQuestionsDict[skillId] = new DiagnosticTestQuestionsModel(
+            mainQuestion, backupQuestion);
         }
 
         resolve(skillIdToQuestionsDict);
