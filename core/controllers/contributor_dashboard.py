@@ -1013,6 +1013,9 @@ def _get_client_side_stats(
         # TODO(#16051): TranslationContributionStats to use
         # first_contribution_date and last_contribution_date.
         if 'contribution_dates' in stats_dict.keys():
+            # Here we use cast because we are narrowing down the type of
+            # 'stats_dict' from Union of various TypedDicts to a particular
+            # TypedDict type.
             translation_contributor_stats_dict = cast(
                 suggestion_registry.TranslationContributionStatsDict,
                 stats_dict
@@ -1026,6 +1029,9 @@ def _get_client_side_stats(
             # from TypedDict.
             del translation_contributor_stats_dict['contribution_dates']  # type: ignore[misc]
         else:
+            # Here we use cast because we are narrowing down the type of
+            # 'stats_dict' from Union of various TypedDicts to a particular
+            # set of Union of TypedDicts type.
             review_and_translation_dicts = cast(
                 Union[
                     suggestion_registry.TranslationReviewStatsDict,

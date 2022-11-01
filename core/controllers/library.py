@@ -82,11 +82,11 @@ def get_matching_activity_dicts(
         exp_services.get_exploration_ids_matching_query(
             query_string, categories, language_codes, offset=search_offset))
     activity_list: List[UnionSummaryDictType] = []
-    for exp_summary_dict in summary_services.get_displayable_collection_summary_dicts_matching_ids(
+    for exp_summary_dict in summary_services.get_displayable_collection_summary_dicts_matching_ids(  # pylint: disable=line-too-long
         collection_ids
     ):
         activity_list.append(exp_summary_dict)
-    for summary_dict in summary_services.get_displayable_exp_summary_dicts_matching_ids(
+    for summary_dict in summary_services.get_displayable_exp_summary_dicts_matching_ids(  # pylint: disable=line-too-long
         exp_ids
     ):
         activity_list.append(summary_dict)
