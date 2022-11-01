@@ -423,6 +423,46 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['opportunities'], [self.expected_opportunity_dict_1])
 
+    def test_get_reviewable_translation_opportunities_filtering_language( # pylint: disable=line-too-long
+        self
+    ):
+        # Create a translation suggestion for exploration 0.
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0', 1, self.owner_id, change_dict, 'description')
+
+        # Create a translation suggestion for exploration 1 with a different language.
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'es',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content 2.</p>'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '1', 1, self.owner_id, change_dict, 'description 2')
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        response = self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+            params={'language': 'es'})
+
+        # Should only return opportunities in Spanish.
+        self.assertEqual(
+            response['opportunities'], [self.expected_opportunity_dict_2])
+
     def test_get_reviewable_translation_opportunities_when_state_is_removed(
         self
     ):
