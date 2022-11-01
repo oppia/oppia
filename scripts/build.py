@@ -27,6 +27,8 @@ import shutil
 import subprocess
 import threading
 
+import rcssmin
+
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
@@ -81,8 +83,6 @@ DEPENDENCIES_FILE_PATH = os.path.join('dependencies.json')
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
 
-YUICOMPRESSOR_DIR = os.path.join(
-    os.pardir, 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
 WEBPACK_FILE = os.path.join('node_modules', 'webpack', 'bin', 'webpack.js')
@@ -267,7 +267,7 @@ def set_constants_to_default() -> None:
     modify_constants(prod_env=False, emulator_mode=True, maintenance_mode=False)
 
 
-def _minify(source_path: str, target_path: str) -> None:
+def _minify_css(source_path: str, target_path: str) -> None:
     """Runs the given file through a minifier and outputs it to target_path.
 
     Args:
@@ -275,22 +275,13 @@ def _minify(source_path: str, target_path: str) -> None:
         target_path: str. Absolute path to location where to copy
             the minified file.
     """
-    # The -Xmxn argument is an attempt to limit the max memory used when the
-    # minification process is running on CircleCI. Note that, from local
-    # experiments, 18m seems to work, but 12m is too small and results in an
-    # out-of-memory error.
-    # https://circleci.com/blog/how-to-handle-java-oom-errors/
-    # Use relative path to avoid java command line parameter parse error on
-    # Windows. Convert to posix style path because the java program requires
-    # the filepath arguments to be in posix path style.
-    target_path = common.convert_to_posixpath(
-        os.path.relpath(target_path))
     source_path = common.convert_to_posixpath(
         os.path.relpath(source_path))
-    yuicompressor_dir = common.convert_to_posixpath(YUICOMPRESSOR_DIR)
-    cmd = 'java -Xmx24m -jar %s -o %s %s' % (
-        yuicompressor_dir, target_path, source_path)
-    subprocess.check_call(cmd, shell=True)
+    target_path = common.convert_to_posixpath(
+        os.path.relpath(target_path))
+    with utils.open_file(source_path, 'r') as source_file:
+        with utils.open_file(target_path, 'w') as target_file:
+            target_file.write(rcssmin.cssmin(source_file.read()))
 
 
 def write_to_file_stream(file_stream: TextIO, content: str) -> None:
@@ -639,7 +630,7 @@ def minify_third_party_libs(third_party_directory_path: str) -> None:
 
     _minify_and_create_sourcemap(
         third_party_js_filepath, minified_third_party_js_filepath)
-    _minify(third_party_css_filepath, minified_third_party_css_filepath)
+    _minify_css(third_party_css_filepath, minified_third_party_css_filepath)
     # Clean up un-minified third_party.js and third_party.css.
     safe_delete_file(third_party_js_filepath)
     safe_delete_file(third_party_css_filepath)
@@ -933,13 +924,11 @@ def minify_func(source_path: str, target_path: str, filename: str) -> None:
     if filename.endswith('.html'):
         print('Building %s' % source_path)
         with utils.open_file(source_path, 'r+') as source_html_file:
-            with utils.open_file(
-                target_path, 'w+') as minified_html_file:
+            with utils.open_file(target_path, 'w+') as minified_html_file:
                 process_html(source_html_file, minified_html_file)
-    elif ((filename.endswith('.css') or filename.endswith('.js')) and
-          not skip_minify):
+    elif filename.endswith('.css') and not skip_minify:
         print('Minifying %s' % source_path)
-        _minify(source_path, target_path)
+        _minify_css(source_path, target_path)
     else:
         print('Copying %s' % source_path)
         safe_copy_file(source_path, target_path)
