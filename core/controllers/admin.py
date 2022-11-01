@@ -271,7 +271,7 @@ class AdminHandler(
         try:
             result = {}
             if action == 'reload_exploration':
-                exploration_id = self.normalized_payload['exploration_id']
+                exploration_id = self.normalized_payload.get('exploration_id')
                 if exploration_id is None:
                     raise Exception(
                         'The \'exploration_id\' must be provided when the'
@@ -279,7 +279,7 @@ class AdminHandler(
                     )
                 self._reload_exploration(exploration_id)
             elif action == 'reload_collection':
-                collection_id = self.normalized_payload['collection_id']
+                collection_id = self.normalized_payload.get('collection_id')
                 if collection_id is None:
                     raise Exception(
                         'The \'collection_id\' must be provided when the'
@@ -287,15 +287,15 @@ class AdminHandler(
                     )
                 self._reload_collection(collection_id)
             elif action == 'generate_dummy_explorations':
-                num_dummy_exps_to_generate = self.normalized_payload[
-                    'num_dummy_exps_to_generate']
+                num_dummy_exps_to_generate = self.normalized_payload.get(
+                    'num_dummy_exps_to_generate')
                 if num_dummy_exps_to_generate is None:
                     raise Exception(
                         'The \'num_dummy_exps_to_generate\' must be provided'
                         ' when the action is generate_dummy_explorations.'
                     )
-                num_dummy_exps_to_publish = self.normalized_payload[
-                    'num_dummy_exps_to_publish']
+                num_dummy_exps_to_publish = self.normalized_payload.get(
+                    'num_dummy_exps_to_publish')
                 if num_dummy_exps_to_publish is None:
                     raise Exception(
                         'The \'num_dummy_exps_to_publish\' must be provided'
@@ -319,8 +319,8 @@ class AdminHandler(
             elif action == 'generate_dummy_classroom':
                 self._generate_dummy_classroom()
             elif action == 'save_config_properties':
-                new_config_property_values = self.normalized_payload[
-                    'new_config_property_values']
+                new_config_property_values = self.normalized_payload.get(
+                    'new_config_property_values')
                 if new_config_property_values is None:
                     raise Exception(
                         'The \'new_config_property_values\' must be provided'
@@ -332,8 +332,8 @@ class AdminHandler(
                 for (name, value) in new_config_property_values.items():
                     config_services.set_property(self.user_id, name, value)
             elif action == 'revert_config_property':
-                config_property_id = self.normalized_payload[
-                    'config_property_id']
+                config_property_id = self.normalized_payload.get(
+                    'config_property_id')
                 if config_property_id is None:
                     raise Exception(
                         'The \'config_property_id\' must be provided'
@@ -345,7 +345,7 @@ class AdminHandler(
                 config_services.revert_property(
                     self.user_id, config_property_id)
             elif action == 'upload_topic_similarities':
-                data = self.normalized_payload['data']
+                data = self.normalized_payload.get('data')
                 if data is None:
                     raise Exception(
                         'The \'data\' must be provided when the action'
@@ -353,7 +353,7 @@ class AdminHandler(
                     )
                 recommendations_services.update_topic_similarities(data)
             elif action == 'regenerate_topic_related_opportunities':
-                topic_id = self.normalized_payload['topic_id']
+                topic_id = self.normalized_payload.get('topic_id')
                 if topic_id is None:
                     raise Exception(
                         'The \'topic_id\' must be provided when the action'
@@ -367,7 +367,7 @@ class AdminHandler(
                     'opportunities_count': opportunities_count
                 }
             elif action == 'rollback_exploration_to_safe_state':
-                exp_id = self.normalized_payload['exp_id']
+                exp_id = self.normalized_payload.get('exp_id')
                 if exp_id is None:
                     raise Exception(
                         'The \'exp_id\' must be provided when the action'
@@ -385,19 +385,19 @@ class AdminHandler(
                 # must be 'update_feature_flag_rules' if this branch is
                 # executed.
                 assert action == 'update_feature_flag_rules'
-                feature_name = self.normalized_payload['feature_name']
+                feature_name = self.normalized_payload.get('feature_name')
                 if feature_name is None:
                     raise Exception(
                         'The \'feature_name\' must be provided when the action'
                         ' is update_feature_flag_rules.'
                     )
-                new_rules = self.normalized_payload['new_rules']
+                new_rules = self.normalized_payload.get('new_rules')
                 if new_rules is None:
                     raise Exception(
                         'The \'new_rules\' must be provided when the action'
                         ' is update_feature_flag_rules.'
                     )
-                commit_message = self.normalized_payload['commit_message']
+                commit_message = self.normalized_payload.get('commit_message')
                 if commit_message is None:
                     raise Exception(
                         'The \'commit_message\' must be provided when the '
