@@ -27,17 +27,15 @@ from core.domain import topic_services
 from typing import Any, Dict
 
 
-class DiagnosticTestPlayerPage(base.BaseHandler):
+class DiagnosticTestPlayerPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Renders the diagnostic test player page."""
 
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Type[str, Any] is used to match the type defined for this attribute in
-    # its parent class `base.BaseHandler`.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests."""
         self.render_template('diagnostic-test-player-page.mainpage.html') # type: ignore[no-untyped-call]

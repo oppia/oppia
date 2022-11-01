@@ -182,9 +182,12 @@ export class ExplorationRightsService {
     return this.explorationRightsBackendApiService
       .assignVoiceArtistRoleAsyncPostData(
         this.explorationDataService.explorationId,
-        newVoiceArtistUsername).then(() => {
+        newVoiceArtistUsername).then((response) => {
         this.alertsService.clearWarnings();
         this.voiceArtistNames.push(newVoiceArtistUsername);
+      }, (response) => {
+        this.alertsService.addWarning(
+          'Could not assign voice artist to private activity.');
       });
   }
 
