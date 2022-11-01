@@ -18,10 +18,10 @@
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
 import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { DiagnosticTestQuestionsModel } from './diagnostic-test-questions.model';
 
 
 describe('Question backend Api service', () => {
@@ -651,11 +651,11 @@ describe('Question backend Api service', () => {
       }
     };
 
+    const diagnosticTestQuestionsModel: DiagnosticTestQuestionsModel = (
+      new DiagnosticTestQuestionsModel(question1, question2));
+
     const expectedResponse = {
-      skillID1: {
-        mainQuestion: question1,
-        backupQuestion: question2
-      }
+      skillID1: diagnosticTestQuestionsModel
     };
 
     req.flush(backendResponse);
