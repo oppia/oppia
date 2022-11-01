@@ -76,7 +76,7 @@ class RejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
                 total_content_ids.append(content_id)
 
         for suggestion in suggestions:
-            suggestion_change = suggestion.change_cmd
+            suggestion_change = suggestion.change
             if not suggestion_change['content_id'] in total_content_ids:
                 suggestion.status = suggestion_models.STATUS_REJECTED
 
@@ -190,7 +190,7 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
                 total_content_ids.append(content_id)
 
         for suggestion in suggestions:
-            suggestion_change = suggestion.change_cmd
+            suggestion_change = suggestion.change
             if not suggestion_change['content_id'] in total_content_ids:
                 info_for_missing_content_id.append(
                     {

@@ -74,7 +74,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
             author_id=self.VALID_USER_ID_1,
-            change_cmd={},
+            change={},
             score_category='irelevant',
             status=suggestion_models.STATUS_IN_REVIEW,
             target_type='exploration',
@@ -92,7 +92,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id=self.VALID_USER_ID_1,
-            change_cmd={
+            change={
                 'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'state',
                 'content_id': 'content_id',
@@ -151,7 +151,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             id='suggestion_id',
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id=self.VALID_USER_ID_1,
-            change_cmd={
+            change={
                 'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'state',
                 'content_id': 'content_id',
@@ -186,7 +186,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id=self.VALID_USER_ID_1,
-            change_cmd={
+            change={
                 'cmd': exp_domain.DEPRECATED_CMD_ADD_TRANSLATION,
                 'state_name': 'state',
                 'content_id': 'content_id',
@@ -245,7 +245,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id=self.VALID_USER_ID_1,
-            change_cmd={
+            change={
                 'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'state',
                 'content_id': 'content_id',
@@ -305,7 +305,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id=self.VALID_USER_ID_1,
-            change_cmd={
+            change={
                 'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'state',
                 'content_id': 'content_id',
@@ -375,7 +375,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id=self.VALID_USER_ID_1,
-            change_cmd={
+            change={
                 'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'state',
                 'content_id': 'content_id',
@@ -433,7 +433,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id=self.VALID_USER_ID_1,
-            change_cmd={
+            change={
                 'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'state',
                 'content_id': 'content_id',
@@ -454,7 +454,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id=self.VALID_USER_ID_1,
-            change_cmd={
+            change={
                 'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'state',
                 'content_id': 'content_id',

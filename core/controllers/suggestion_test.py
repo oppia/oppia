@@ -324,7 +324,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         new_content = state_domain.SubtitledHtml(
             'content', '<p>new content html</p>').to_dict()
-        change_cmd = {
+        change = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'State 1',
@@ -333,7 +333,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION, exp_id, 1,
-            self.editor_id, change_cmd, 'sample description')
+            self.editor_id, change, 'sample description')
 
         suggestion_id = suggestion_services.query_suggestions(
             [('author_id', self.editor_id), (
@@ -1897,7 +1897,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         new_content = state_domain.SubtitledHtml(
             'content', '<p>new content html</p>').to_dict()
-        change_cmd = {
+        change = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'State 1',
@@ -1906,7 +1906,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION, exp_id, 1,
-            self.author_id, change_cmd, 'sample description')
+            self.author_id, change, 'sample description')
 
         suggestion_id = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (

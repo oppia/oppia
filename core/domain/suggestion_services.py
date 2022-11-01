@@ -267,7 +267,7 @@ def get_suggestion_from_model(
         suggestion_model.id, suggestion_model.target_id,
         suggestion_model.target_version_at_submission,
         suggestion_model.status, suggestion_model.author_id,
-        suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
+        suggestion_model.final_reviewer_id, suggestion_model.change,
         suggestion_model.score_category, suggestion_model.language_code,
         suggestion_model.edited_by_reviewer, suggestion_model.last_updated)
 
@@ -646,7 +646,7 @@ def _update_suggestions(
         suggestion_models_to_update.append(suggestion_model)
         suggestion_model.status = suggestion.status
         suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
-        suggestion_model.change_cmd = suggestion.change.to_dict()
+        suggestion_model.change = suggestion.change.to_dict()
         suggestion_model.score_category = suggestion.score_category
         suggestion_model.language_code = suggestion.language_code
         suggestion_model.edited_by_reviewer = suggestion.edited_by_reviewer

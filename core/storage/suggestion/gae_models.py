@@ -129,7 +129,7 @@ class GeneralSuggestionExportDataDict(TypedDict):
     target_id: str
     target_version_at_submission: int
     status: str
-    change_cmd: Dict[str, change_domain.AcceptableChangeDictTypes]
+    change: Dict[str, change_domain.AcceptableChangeDictTypes]
     language_code: str
     edited_by_reviewer: bool
 
@@ -168,7 +168,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     final_reviewer_id = datastore_services.StringProperty(indexed=True)
     # The change command linked to the suggestion. Contains the details of the
     # change.
-    change_cmd = datastore_services.JsonProperty(required=True)
+    change = datastore_services.JsonProperty(required=True)
     # The category to score the suggestor in. This field will contain 2 values
     # separated by a ., the first will be a value from SCORE_TYPE_CHOICES and
     # the second will be the subcategory of the suggestion.
@@ -210,7 +210,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             # we do not want to reveal internal user ids.
             'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'final_reviewer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'change_cmd': base_models.EXPORT_POLICY.EXPORTED,
+            'change': base_models.EXPORT_POLICY.EXPORTED,
             'score_category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.EXPORTED,
             'edited_by_reviewer': base_models.EXPORT_POLICY.EXPORTED
@@ -240,7 +240,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             status: str,
             author_id: str,
             final_reviewer_id: Optional[str],
-            change_cmd: Mapping[
+            change: Mapping[
                 str, change_domain.AcceptableChangeDictTypes
             ],
             score_category: str,
@@ -260,7 +260,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             final_reviewer_id: str|None. The ID of the reviewer who has
                 accepted/rejected the suggestion, or None if no reviewer is
                 assigned.
-            change_cmd: dict. The actual content of the suggestion.
+            change: dict. The actual content of the suggestion.
             score_category: str. The scoring category for the suggestion.
             thread_id: str. The ID of the feedback thread linked to the
                 suggestion.
@@ -283,7 +283,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             target_type=target_type, target_id=target_id,
             target_version_at_submission=target_version_at_submission,
             status=status, author_id=author_id,
-            final_reviewer_id=final_reviewer_id, change_cmd=change_cmd,
+            final_reviewer_id=final_reviewer_id, change=change,
             score_category=score_category, language_code=language_code).put()
 
     @classmethod
@@ -783,7 +783,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     suggestion_model
                     .target_version_at_submission),
                 'status': suggestion_model.status,
-                'change_cmd': suggestion_model.change_cmd,
+                'change': suggestion_model.change,
                 'language_code': suggestion_model.language_code,
                 'edited_by_reviewer': suggestion_model.edited_by_reviewer
             }

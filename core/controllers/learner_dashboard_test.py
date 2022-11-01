@@ -1050,7 +1050,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         new_content = state_domain.SubtitledHtml(
             'content', '<p>new content html</p>').to_dict()
-        change_cmd = {
+        change = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'Welcome!',
@@ -1061,7 +1061,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1, 1,
             suggestion_models.STATUS_IN_REVIEW, self.editor_id, None,
-            change_cmd, 'score category', thread_id, None)
+            change, 'score category', thread_id, None)
 
         suggestion_thread = feedback_services.get_thread(thread_id)
         suggestion = suggestion_services.get_suggestion_by_id(thread_id)

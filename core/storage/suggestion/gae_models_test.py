@@ -48,13 +48,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     topic_name = 'topic'
     target_id = 'exp1'
     target_version_at_submission = 1
-    change_cmd: Mapping[
+    change: Mapping[
         str, change_domain.AcceptableChangeDictTypes
     ] = {}
-    # Language code that would normally be derived from the change_cmd.
+    # Language code that would normally be derived from the change.
     translation_language_code = 'en'
     # Language code that would normally be derived from the question_dict in
-    # the change_cmd.
+    # the change.
     question_language_code = 'en'
     mocked_datetime_utcnow = datetime.datetime(2020, 6, 15, 5)
 
@@ -65,35 +65,35 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_1',
-            'reviewer_1', self.change_cmd, self.score_category,
+            'reviewer_1', self.change, self.score_category,
             'exploration.exp1.thread_1', None)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_ACCEPTED, 'author_2',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_2', None)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_ACCEPTED, 'author_2',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_3', None)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_2',
-            'reviewer_3', self.change_cmd, self.score_category,
+            'reviewer_3', self.change, self.score_category,
             'exploration.exp1.thread_4', None)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_5', None)
 
     def test_get_all_in_review_translation_suggestions_by_exp_ids(
@@ -110,7 +110,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_1',
-            'reviewer_3', self.change_cmd, self.score_category,
+            'reviewer_3', self.change, self.score_category,
             suggestion_id, 'en')
 
         created_suggestion_model = model.get_by_id(suggestion_id)
@@ -177,7 +177,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_3', self.change_cmd, self.score_category,
+            'reviewer_3', self.change, self.score_category,
             'exploration.exp1.thread_6', None)
 
         suggestion_id = 'exploration.exp1.thread_6'
@@ -204,7 +204,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             observed_suggestion_model.final_reviewer_id, 'reviewer_3')
         self.assertEqual(
             observed_suggestion_model.score_category, self.score_category)
-        self.assertEqual(observed_suggestion_model.change_cmd, self.change_cmd)
+        self.assertEqual(observed_suggestion_model.change, self.change)
 
     def test_create_suggestion_fails_if_id_collides_with_existing_one(
         self
@@ -217,7 +217,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
                 suggestion_models.STATUS_IN_REVIEW, 'author_3',
-                'reviewer_3', self.change_cmd,
+                'reviewer_3', self.change,
                 self.score_category, 'exploration.exp1.thread_1', None)
 
     def test_get_suggestions_by_type(self) -> None:
@@ -358,7 +358,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_6', self.translation_language_code)
 
         queries = [('language_code', self.translation_language_code)]
@@ -374,14 +374,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_6', self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_4',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_7', self.translation_language_code)
         # Create accepted and rejected suggestions that should not be returned.
         suggestion_models.GeneralSuggestionModel.create(
@@ -389,14 +389,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_ACCEPTED, 'author_4',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_8', self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_4',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_9', self.translation_language_code)
 
         suggestions = (
@@ -426,14 +426,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_6', self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_4',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_7', self.translation_language_code)
 
         suggestions = (
@@ -460,14 +460,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_6', self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_4',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_7', self.translation_language_code)
 
         suggestions, offset_1 = (
@@ -497,14 +497,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             suggestion_1_id, self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_4',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             suggestion_2_id, self.translation_language_code)
 
         results, offset_1 = (
@@ -556,14 +556,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             suggestion_1_id, self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_4',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             suggestion_2_id, self.translation_language_code)
 
         results, offset = (
@@ -591,14 +591,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL,
             'skill_1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, 'category1',
+            'reviewer_2', self.change, 'category1',
             suggestion_1_id, self.question_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
             'skill_1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_4',
-            'reviewer_2', self.change_cmd, 'category1',
+            'reviewer_2', self.change, 'category1',
             suggestion_2_id, self.question_language_code)
 
         results, offset_1 = (
@@ -648,7 +648,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, user_id,
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             authored_translation_suggestion_id, self.translation_language_code)
         # Translation suggestion created by a different user.
         suggestion_models.GeneralSuggestionModel.create(
@@ -656,7 +656,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_4',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             non_authored_translation_suggestion_id,
             self.translation_language_code)
         # User created question suggestion.
@@ -665,7 +665,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL,
             'skill_1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, user_id,
-            'reviewer_2', self.change_cmd, 'category1',
+            'reviewer_2', self.change, 'category1',
             authored_question_suggestion_id, self.question_language_code)
 
         results, translation_suggestion_offset = (
@@ -711,7 +711,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_6', self.translation_language_code)
 
         # Assert that there is one translation suggestion with the given
@@ -729,14 +729,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_6', self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_4',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_7', self.translation_language_code)
 
         with self.swap(feconf, 'DEFAULT_SUGGESTION_QUERY_LIMIT', 1):
@@ -755,14 +755,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_6', self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_ACCEPTED, 'author_4',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_7', self.translation_language_code)
 
         suggestions = (
@@ -780,14 +780,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_6', self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_4',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_7', self.translation_language_code)
 
         suggestions = (
@@ -805,7 +805,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_4',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_7', 'hi')
 
         suggestions = (
@@ -822,14 +822,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp2', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_7', self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp3', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_8', self.translation_language_code)
 
         # Assert that there are two translation suggestions with the given
@@ -857,14 +857,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp4', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_9', self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp5', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread_10', self.translation_language_code)
 
         with self.swap(feconf, 'DEFAULT_SUGGESTION_QUERY_LIMIT', 1):
@@ -915,7 +915,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread1', None)
         # This mocked list cannot be empty because then the query will fail.
         mocked_contributor_dashboard_suggestion_types = [
@@ -942,7 +942,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread1', self.translation_language_code)
 
         # Make sure the threshold is nonzero.
@@ -965,7 +965,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION,
                 'exp1', self.target_version_at_submission,
                 suggestion_models.STATUS_IN_REVIEW, 'author_3',
-                'reviewer_2', self.change_cmd, self.score_category,
+                'reviewer_2', self.change, self.score_category,
                 'exploration.exp1.thread1', self.translation_language_code)
         mocked_threshold_review_wait_time_in_days = 2
         mocked_datetime_less_than_review_wait_time_threshold = (
@@ -993,7 +993,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION,
                 'exp1', self.target_version_at_submission,
                 suggestion_models.STATUS_IN_REVIEW, 'author_3',
-                'reviewer_2', self.change_cmd, self.score_category,
+                'reviewer_2', self.change, self.score_category,
                 'exploration.exp1.thread1', self.translation_language_code)
         mocked_threshold_review_wait_time_in_days = 2
         mocked_datetime_eq_review_wait_time_threshold = (
@@ -1021,7 +1021,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread1', self.translation_language_code)
 
         with self.swap(
@@ -1043,7 +1043,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION,
                 'exp1', self.target_version_at_submission,
                 suggestion_models.STATUS_IN_REVIEW, 'author_3',
-                'reviewer_2', self.change_cmd, self.score_category,
+                'reviewer_2', self.change, self.score_category,
                 'exploration.exp1.thread1', self.translation_language_code)
         with self.mock_datetime_utcnow(
             self.mocked_datetime_utcnow + datetime.timedelta(days=2)):
@@ -1052,7 +1052,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_SKILL,
                 'skill_1', self.target_version_at_submission,
                 suggestion_models.STATUS_IN_REVIEW, 'author_3',
-                'reviewer_2', self.change_cmd, 'category1',
+                'reviewer_2', self.change, 'category1',
                 'skill1.thread1', self.question_language_code)
         mocked_threshold_review_wait_time_in_days = 3
         mocked_datetime_past_review_wait_time_threshold = (
@@ -1085,21 +1085,21 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread1', 'fr')
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp2', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp2.thread1', 'en')
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp3', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp3.thread1', 'hi')
 
         with self.swap(
@@ -1130,35 +1130,35 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, 'category1',
+            'reviewer_2', self.change, 'category1',
             'exploration.exp1.thread_6', None)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_2',
-            'reviewer_2', self.change_cmd, 'category2',
+            'reviewer_2', self.change, 'category2',
             'exploration.exp1.thread_7', None)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_2',
-            'reviewer_2', self.change_cmd, 'category3',
+            'reviewer_2', self.change, 'category3',
             'exploration.exp1.thread_8', None)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_2',
-            'reviewer_2', self.change_cmd, 'category1',
+            'reviewer_2', self.change, 'category1',
             'exploration.exp1.thread_9', None)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, 'category2',
+            'reviewer_2', self.change, 'category2',
             'exploration.exp1.thread_10', None)
 
         self.assertEqual(len(
@@ -1198,14 +1198,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, 'category1',
+            'reviewer_2', self.change, 'category1',
             'exploration.exp1.thread_11', None)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_3',
-            'reviewer_2', self.change_cmd, 'category2',
+            'reviewer_2', self.change, 'category2',
             'exploration.exp1.thread_12', None)
         score_categories = (
             suggestion_models.GeneralSuggestionModel.get_all_score_categories())
@@ -1219,21 +1219,21 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL,
             'skill_1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, 'category1',
+            'reviewer_2', self.change, 'category1',
             'skill1.thread1', self.question_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
             'skill_2', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, 'category2',
+            'reviewer_2', self.change, 'category2',
             'skill2.thread1', self.question_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
             'skill_3', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, 'category2',
+            'reviewer_2', self.change, 'category2',
             'skill3.thread1', self.question_language_code)
 
         question_suggestion_models = (
@@ -1257,21 +1257,21 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread1', self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp2', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp2.thread1', self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp3', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp3.thread1', self.translation_language_code)
         # Create a translation suggestion that has a different language code.
         suggestion_models.GeneralSuggestionModel.create(
@@ -1279,7 +1279,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp4', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp4.thread1', 'fr')
 
         translation_suggestion_models = (
@@ -1333,14 +1333,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp1.thread1', self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp2', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change, self.score_category,
             'exploration.exp2.thread1', self.translation_language_code)
 
         with self.swap(
@@ -1366,14 +1366,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL,
             'skill_1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, 'category1',
+            'reviewer_2', self.change, 'category1',
             'skill1.thread1', self.question_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
             'skill_2', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change_cmd, 'category2',
+            'reviewer_2', self.change, 'category2',
             'skill2.thread1', self.question_language_code)
 
         with self.swap(
@@ -1405,7 +1405,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         test_export_status = suggestion_models.STATUS_IN_REVIEW
         test_export_author = 'test_export_author'
         test_export_reviewer = 'test_export_reveiwer'
-        test_export_change_cmd = self.change_cmd
+        test_export_change = self.change
         test_export_score_category = 'category1'
         test_export_thread_id = 'exploration.exp1.thread_export'
         test_export_language_code = 'en'
@@ -1419,7 +1419,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             test_export_status,
             test_export_author,
             test_export_reviewer,
-            test_export_change_cmd,
+            test_export_change,
             test_export_score_category,
             test_export_thread_id,
             test_export_language_code
@@ -1436,7 +1436,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 'target_id': test_export_target_id,
                 'target_version_at_submission': test_export_target_version,
                 'status': test_export_status,
-                'change_cmd': test_export_change_cmd,
+                'change': test_export_change,
                 'language_code': test_export_language_code,
                 'edited_by_reviewer': test_export_edited_by_reviewer
             },
@@ -1458,7 +1458,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'status': base_models.EXPORT_POLICY.EXPORTED,
             'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'final_reviewer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'change_cmd': base_models.EXPORT_POLICY.EXPORTED,
+            'change': base_models.EXPORT_POLICY.EXPORTED,
             'score_category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.EXPORTED,
             'edited_by_reviewer': base_models.EXPORT_POLICY.EXPORTED

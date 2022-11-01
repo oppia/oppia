@@ -364,7 +364,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     THREAD_MESSAGE_COUNT: Final = 0
     MESSAGE_TEXT: Final = 'Export test text.'
     MESSAGE_RECEIEVED_VIA_EMAIL: Final = False
-    CHANGE_CMD: Dict[str, str] = {}
+    CHANGE: Dict[str, str] = {}
     SCORE_CATEGORY_1: Final = 'category_1'
     SCORE_CATEGORY_2: Final = 'category_2'
     SCORE_CATEGORY: str = (
@@ -624,7 +624,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             self.EXPLORATION_IDS[0], 1,
             suggestion_models.STATUS_IN_REVIEW, self.USER_ID_1,
-            'reviewer_1', self.CHANGE_CMD, self.SCORE_CATEGORY,
+            'reviewer_1', self.CHANGE, self.SCORE_CATEGORY,
             'exploration.exp1.thread_1', None)
 
         # Setup for TopicRightsModel.
@@ -1569,7 +1569,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'target_id': self.EXPLORATION_IDS[0],
                 'target_version_at_submission': 1,
                 'status': suggestion_models.STATUS_IN_REVIEW,
-                'change_cmd': self.CHANGE_CMD
+                'change': self.CHANGE
             }
         }
         expected_exploration_rights_data = {

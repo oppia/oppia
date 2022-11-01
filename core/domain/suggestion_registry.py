@@ -824,7 +824,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         author_id: str. The ID of the user who submitted the suggestion.
         final_reviewer_id: str. The ID of the reviewer who has accepted/rejected
             the suggestion.
-        change_cmd: QuestionChange. The change associated with the suggestion.
+        change: QuestionChange. The change associated with the suggestion.
         score_category: str. The scoring category for the suggestion.
         last_updated: datetime.datetime. Date and time when the suggestion
             was last updated.
@@ -877,7 +877,7 @@ class SuggestionAddQuestion(BaseSuggestion):
 
     def _update_change_to_latest_state_schema_version(self) -> None:
         """Holds the responsibility of performing a step-by-step, sequential
-        update of the state structure inside the change_cmd based on the schema
+        update of the state structure inside the change based on the schema
         version of the current state dictionary.
 
         Raises:
