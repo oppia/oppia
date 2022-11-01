@@ -19,13 +19,9 @@
 from __future__ import annotations
 
 import builtins
-import os
-import tempfile
 
-from core import feconf
 from core.domain import action_registry
 from core.tests import test_utils
-from typing import List
 
 
 class ActionRegistryUnitTests(test_utils.GenericTestBase):
@@ -43,7 +39,7 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
         # all branches of action_registry.py. Hence, we manually empty it
         # before this test.
         action_registry.Registry._actions = {} # pylint: disable=protected-access
-        class FakeAction:
+        class FakeAction: # pylint: disable=missing-docstring
             some_property: int
         swap_getattr = self.swap(
             builtins, 'getattr', lambda *unused_args: FakeAction)
