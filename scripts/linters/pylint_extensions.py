@@ -30,6 +30,7 @@ from core import handler_schema_constants
 from pylint import utils as pylint_utils
 
 from .. import docstrings_checker
+from .. import run_mypy_checks
 
 # List of punctuation symbols that can be used at the end of
 # comments and docstrings.
@@ -52,9 +53,7 @@ ALLOWED_LINES_OF_GAP_IN_COMMENT = 15
 # in these dirs which causes linters to throw an error. So, once these dirs
 # are annotated completely, we can remove these dirs from this list and fix
 # the lint errors accordingly.
-EXCLUDED_TYPE_COMMENT_DIRECTORIES = [
-    'core/controllers/',
-]
+EXCLUDED_TYPE_COMMENT_DIRECTORIES = run_mypy_checks.NOT_FULLY_COVERED_FILES
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
