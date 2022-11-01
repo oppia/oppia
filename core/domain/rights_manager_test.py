@@ -924,6 +924,88 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             'Remove TestUser from role editor for exploration'
         )
 
+    def test_guest_user_cannot_assign_roles_for_exploration(self) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest user is not allowed to assign roles.'
+        ):
+            rights_manager.assign_role_for_exploration(
+                guest_user, 'exp_id', 'assignee_id', rights_domain.ROLE_VIEWER
+            )
+
+    def test_guest_user_cannot_deassign_roles_for_exploration(self) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest user is not allowed to deassign roles.'
+        ):
+            rights_manager.deassign_role_for_exploration(
+                guest_user, 'exp_id', 'assignee_id'
+            )
+
+    def test_guest_user_cannot_release_ownership_of_exploration(self) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest user is not allowed to release ownership of activity.'
+        ):
+            rights_manager.release_ownership_of_exploration(
+                guest_user, 'exp_id'
+            )
+
+    def test_guest_user_cannot_publish_exploration_activities(self) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest user is not allowed to publish activities.'
+        ):
+            rights_manager.publish_exploration(guest_user, 'exp_id')
+
+    def test_guest_user_cannot_unpublish_exploration_activities(self) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest user is not allowed to unpublish activities.'
+        ):
+            rights_manager.unpublish_exploration(guest_user, 'exp_id')
+
+    def test_guest_user_cannot_set_viewability_of_exploration(self) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest user is not allowed to set viewability of exploration.'
+        ):
+            rights_manager.set_private_viewability_of_exploration(
+                guest_user, 'exp_id', False
+            )
+
+    def test_guest_user_cannot_perform_activity_actions(self) -> None:
+        collection_services.load_demo('0')
+        collection_rights = rights_manager.get_collection_rights('0')
+        guest_user = user_services.get_user_actions_info(None)
+
+        # Testing guest user is not allowed to delete activity.
+        self.assertFalse(
+            rights_manager.check_can_delete_activity(
+                guest_user, collection_rights
+            )
+        )
+
+        # Testing guest user is not allowed to modify core activity roles.
+        self.assertFalse(
+            rights_manager.check_can_modify_core_activity_roles(
+                guest_user, collection_rights
+            )
+        )
+
+        # Testing guest user is not allowed to publish activity.
+        self.assertFalse(
+            rights_manager.check_can_publish_activity(
+                guest_user, collection_rights
+            )
+        )
+
 
 class CollectionRightsTests(test_utils.GenericTestBase):
     """Test that rights for actions on collections work as expected."""
