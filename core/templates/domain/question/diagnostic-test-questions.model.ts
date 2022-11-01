@@ -18,7 +18,7 @@
  */
 
 
-import { Question } from "./QuestionObjectFactory";
+import { Question } from './QuestionObjectFactory';
 
 
 export class DiagnosticTestQuestionsModel {

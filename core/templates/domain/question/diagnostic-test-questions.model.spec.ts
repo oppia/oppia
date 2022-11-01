@@ -16,7 +16,7 @@
  * @fileoverview Tests for the diagnostic test questions model.
  */
 
-import { DiagnosticTestQuestionsModel } from "./diagnostic-test-questions.model";
+import { DiagnosticTestQuestionsModel } from './diagnostic-test-questions.model';
 import { Question, QuestionBackendDict, QuestionObjectFactory } from './QuestionObjectFactory';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -268,10 +268,10 @@ describe('Diagnostic test questions model', () => {
   });
 
   it('should be able to create model', () => {
-    const diagnosticTestQuestionsModel = new DiagnosticTestQuestionsModel(
+    diagnosticTestQuestionsModel = new DiagnosticTestQuestionsModel(
       question1, question2);
 
     expect(diagnosticTestQuestionsModel.getMainQuestion()).toEqual(question1);
     expect(diagnosticTestQuestionsModel.getBackupQuestion()).toEqual(question2);
-  })
+  });
 });
