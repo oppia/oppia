@@ -3785,11 +3785,11 @@ class State(translation_domain.BaseTranslatableObject):
         self.interaction.id = interaction_id
         self.interaction.answer_groups = []
 
-    def update_linked_skill_id(self, linked_skill_id: str) -> None:
+    def update_linked_skill_id(self, linked_skill_id: Optional[str]) -> None:
         """Update the state linked skill id attribute.
 
         Args:
-            linked_skill_id: str. The linked skill id to state.
+            linked_skill_id: str|None. The linked skill id to state.
         """
         self.linked_skill_id = linked_skill_id
 
