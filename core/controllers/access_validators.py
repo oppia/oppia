@@ -231,7 +231,9 @@ class BlogPostPageAccessValidationHandler(
             raise self.PageNotFoundException
 
 
-class BlogAuthorProfilePageAccessValidationHandler(base.BaseHandler):
+class BlogAuthorProfilePageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Validates whether request made to correct blog author page route."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

@@ -340,14 +340,14 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.add_user_role(
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
 
-    def test_blog_author_profile_page_access_without_logging_in(self):
+    def test_blog_author_profile_page_access_without_logging_in(self) -> None:
         self.get_html_response(
             '%s/can_access_blog_author_profile_page/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX, self.BLOG_ADMIN_USERNAME
             ), expected_status_int=200
         )
 
-    def test_blog_author_profile_page_access_after_logging_in(self):
+    def test_blog_author_profile_page_access_after_logging_in(self) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.get_html_response(
@@ -357,7 +357,7 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         )
         self.logout()
 
-    def test_blog_author_profile_page_access_as_blog_admin(self):
+    def test_blog_author_profile_page_access_as_blog_admin(self) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
         self.get_html_response(
             '%s/can_access_blog_author_profile_page/%s' % (
