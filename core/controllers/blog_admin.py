@@ -28,30 +28,44 @@ from core.domain import config_services
 from core.domain import role_services
 from core.domain import user_services
 
-BLOG_POST_EDITOR = feconf.ROLE_ID_BLOG_POST_EDITOR
-BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN
+from typing import Dict, Final, List, Optional, TypedDict, Union
+
+BLOG_POST_EDITOR: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
+BLOG_ADMIN: Final = feconf.ROLE_ID_BLOG_ADMIN
 
 
-class BlogAdminPage(base.BaseHandler):
+class BlogAdminPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Blog Admin Page  Handler to render the frontend template."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_blog_admin_page
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
 
         self.render_template('blog-admin-page.mainpage.html')
 
 
-class BlogAdminHandler(base.BaseHandler):
+class BlogAdminHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of BlogAdminHandler's normalized_payload
+    dictionary.
+    """
+
+    action: str
+    new_config_property_values: Optional[Dict[str, Union[List[str], int]]]
+    config_property_id: Optional[str]
+
+
+class BlogAdminHandler(
+    base.BaseHandler[
+        BlogAdminHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handler for the blog admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {
@@ -106,33 +120,61 @@ class BlogAdminHandler(base.BaseHandler):
     @acl_decorators.can_access_blog_admin_page
     def post(self) -> None:
         """Handles POST requests."""
-        result = {}
-        if self.normalized_payload.get(
-                'action') == 'save_config_properties':
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        action = self.normalized_payload['action']
+        if action == 'save_config_properties':
             new_config_property_values = self.normalized_payload.get(
                 'new_config_property_values')
+            if new_config_property_values is None:
+                raise Exception(
+                    'The new_config_property_values cannot be None when the'
+                    ' action is save_config_properties.'
+                )
             for (name, value) in new_config_property_values.items():
                 config_services.set_property(self.user_id, name, value)
             logging.info(
                 '[BLOG ADMIN] %s saved config property values: %s' %
                 (self.user_id, new_config_property_values))
-        elif self.normalized_payload.get(
-                'action') == 'revert_config_property':
-            config_property_id = (
-                self.normalized_payload.get('config_property_id'))
+        else:
+            # The handler schema defines the possible values of 'action'.
+            # If 'action' has a value other than those defined in the schema,
+            # a Bad Request error will be thrown. Hence, 'action' must be
+            # 'revert_config_property' if this branch is executed.
+            assert action == 'revert_config_property'
+            config_property_id = self.normalized_payload.get(
+                'config_property_id')
+            if config_property_id is None:
+                raise Exception(
+                    'The config_property_id cannot be None when the action'
+                    ' is revert_config_property.'
+                )
             config_services.revert_property(
                 self.user_id, config_property_id)
             logging.info(
                 '[BLOG ADMIN] %s reverted config property: %s' %
                 (self.user_id, config_property_id))
-        self.render_json(result)
+        self.render_json({})
 
 
-class BlogAdminRolesHandler(base.BaseHandler):
+class BlogAdminRolesHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of BlogAdminRolesHandler's normalized_payload
+    dictionary.
+    """
+
+    role: str
+    username: str
+
+
+class BlogAdminRolesHandler(
+    base.BaseHandler[
+        BlogAdminRolesHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handler for the blog admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'role': {
@@ -159,8 +201,10 @@ class BlogAdminRolesHandler(base.BaseHandler):
     @acl_decorators.can_manage_blog_post_editors
     def post(self) -> None:
         """Handles POST requests."""
-        username = self.normalized_payload.get('username')
-        role = self.normalized_payload.get('role')
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
+        role = self.normalized_payload['role']
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -174,7 +218,8 @@ class BlogAdminRolesHandler(base.BaseHandler):
     @acl_decorators.can_manage_blog_post_editors
     def put(self) -> None:
         """Handles PUT requests."""
-        username = self.normalized_payload.get('username')
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
