@@ -166,15 +166,24 @@ classroom-page .oppia-classroom-page-subheading-text {
   }
 }
 
-@media screen and (max-width: 1080px) {
+@media screen and (max-width: 1806px) {
   .oppia-classroom-details {
-    margin-top: 40px;
+    margin-top: 1vh;
+    padding-top: 1vh;
   }
 }
 
-@media screen and (max-width: 940px) {
+@media screen and (max-width: 1489px) {
   .oppia-classroom-details {
-    margin-top: 50px;
+    margin-top: 2.4vh;
+    padding-top: 2.4vh;
+  }
+}
+
+@media screen and (max-width: 1321px) {
+  .oppia-classroom-details {
+    margin-top: 3.8vh;
+    padding-top: 3.8vh;
   }
 }
 
