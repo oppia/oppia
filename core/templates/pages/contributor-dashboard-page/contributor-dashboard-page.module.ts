@@ -70,33 +70,39 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
+    ContributorBadgeComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
     OpportunitiesListComponent,
     ContributorStatsComponent,
+    TranslationBadgeComponent,
     TranslationLanguageSelectorComponent,
     TranslationOpportunitiesComponent,
     TranslationSuggestionReviewModalComponent,
     TranslationTopicSelectorComponent,
     TranslationModalComponent,
     ContributionsAndReview,
+    QuestionBadgeComponent,
     QuestionOpportunitiesComponent,
     ContributorDashboardPageComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
+    ContributorBadgeComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
     OpportunitiesListComponent,
     ContributorStatsComponent,
+    TranslationBadgeComponent,
     TranslationLanguageSelectorComponent,
     TranslationOpportunitiesComponent,
     TranslationSuggestionReviewModalComponent,
     TranslationTopicSelectorComponent,
     TranslationModalComponent,
     ContributionsAndReview,
+    QuestionBadgeComponent,
     QuestionOpportunitiesComponent,
     ContributorDashboardPageComponent
   ],
@@ -133,6 +139,9 @@ import { downgradeModule } from '@angular/upgrade/static';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { ToastrModule } from 'ngx-toastr';
 import { ContributorStatsComponent } from './contributor-stats/contributor-stats.component';
+import { TranslationBadgeComponent } from './translation-badge/translation-badge.component';
+import { QuestionBadgeComponent } from './question-badge/question-badge.component';
+import { ContributorBadgeComponent } from './contributor-badge/contributor-badge.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

@@ -1,0 +1,128 @@
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for TranslationBadgeComponent.
+ */
+
+import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TranslationBadgeComponent } from './translation-badge.component';
+import { AppConstants } from 'app.constants';
+
+describe('Translation bdge component', () => {
+  let component: TranslationBadgeComponent;
+  let fixture: ComponentFixture<TranslationBadgeComponent>;
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        TranslationBadgeComponent
+      ],
+      providers: [],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+  beforeEach(waitForAsync(() => {
+    fixture = TestBed.createComponent(TranslationBadgeComponent);
+    component = fixture.componentInstance;
+  }));
+
+  afterEach(() => {
+    fixture.destroy();
+  });
+
+  describe('when a submission badge is passed ', () => {
+    it('should show submission badges', fakeAsync(() => {
+      component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
+      component.value = 1;
+      component.language = 'Hindi';
+
+      fixture.detectChanges();
+
+      expect(component.contributionTypeText).toEqual('Submission');
+      expect(component.language).toEqual('Hindi');
+    }));
+
+    it('should show review badges', fakeAsync(() => {
+      component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW;
+      component.value = 1;
+      component.language = 'Hindi';
+
+      fixture.detectChanges();
+
+      expect(component.contributionTypeText).toEqual('Review');
+      expect(component.language).toEqual('Hindi');
+    }));
+
+    it('should show correction badges', fakeAsync(() => {
+      component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION;
+      component.value = 1;
+      component.language = 'Hindi';
+
+      fixture.detectChanges();
+
+      expect(component.contributionTypeText).toEqual('Correction');
+      expect(component.language).toEqual('Hindi');
+    }));
+
+    it('should show multiple badges', fakeAsync(() => {
+      component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
+      component.value = 10;
+      component.language = 'Hindi';
+
+      fixture.detectChanges();
+
+      expect(component.contributionTypeText).toEqual('Submissions');
+      expect(component.language).toEqual('Hindi');
+    }));
+  });
+
+  describe('when a long language text is given ', () => {
+    it('should decrease the font size', fakeAsync(() => {
+      component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
+      component.value = 1;
+      component.language = 'Netherlands';
+
+      fixture.detectChanges();
+
+      expect(component.fontSize).toEqual('10px');
+      expect(component.language).toEqual('Netherlands');
+    }));
+
+    it('should decrease the line height', fakeAsync(() => {
+      component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
+      component.value = 1;
+      component.language = 'Bahasa Indonesia';
+
+      fixture.detectChanges();
+
+      expect(component.fontSize).toEqual('10px');
+      expect(component.lineHeight).toEqual('90%');
+    }));
+  });
+
+  describe('when an invalid type is passed ', () => {
+    it('should throw an error', fakeAsync(() => {
+      component.type = 'invalid';
+
+      expect(() => {
+        fixture.detectChanges();
+        tick();
+      }).toThrowError();
+      flush();
+    }));
+  });
+});
