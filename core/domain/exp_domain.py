@@ -5336,7 +5336,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
-    def _convert_v58_dict_to_v58_dict(
+    def _convert_v58_dict_to_v59_dict(
         cls, exploration_dict: VersionedExplorationDict
     ) -> VersionedExplorationDict:
         """Converts a v58 exploration dict into a v59 exploration dict.
@@ -5353,7 +5353,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration_dict['schema_version'] = 59
 
         exploration_dict['states'], next_content_id_index = (
-            cls._convert_states_v52_dict_to_v53_dict(
+            cls._convert_states_v53_dict_to_v54_dict(
                 exploration_dict['states'])
         )
         exploration_dict['states_schema_version'] = 54
