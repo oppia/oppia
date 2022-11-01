@@ -26,8 +26,6 @@ from core.tests import test_utils
 
 
 class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
-    OWNER_EMAIL = 'owner@example.com'
-    OWNER_USERNAME = 'owner'
 
     TOPIC_ID_1 = 'Topic_id_1'
     TOPIC_NAME_1 = 'Topic name 1'
@@ -59,7 +57,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
         'dummy-subtopic-zero'
     )
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -101,7 +99,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
             subtopics=[self.subtopic_4], next_subtopic_id=1)
         topic_services.publish_topic(self.TOPIC_ID_4, self.curriculum_admin_id)
 
-    def test_add_topic_to_learner_goal(self):
+    def test_add_topic_to_learner_goal(self) -> None:
         self.login(self.VIEWER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -178,7 +176,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_remove_topic_from_learner_goals(self):
+    def test_remove_topic_from_learner_goals(self) -> None:
         self.login(self.VIEWER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
