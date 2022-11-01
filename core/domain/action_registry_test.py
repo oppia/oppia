@@ -22,6 +22,7 @@ import os
 import re
 import tempfile
 
+from core import feconf
 from core.domain import action_registry
 from core.platform import models
 from core.tests import test_utils
@@ -49,15 +50,12 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
         # before this test.
         action_registry.Registry._actions = {} # pylint: disable=protected-access
 
-        while True:
-            tempdir = tempfile.TemporaryDirectory(
-                prefix=os.getcwd() + '/extensions/actions/')
-            action_name = tempdir.name.split('/')[-1]
-            # If the name of 'action' follows variable naimg conventions.
-            if re.match(r'[^\W0-9]\w*', action_name):
-                break
-            tempdir.cleanup()
-        action_file = os.path.join(tempdir.name, action_name + '.py')
+        wrapper_directory = tempfile.TemporaryDirectory(
+                prefix=os.getcwd() + '/')
+        action_name = 'FakeAction'
+        action_dir = os.path.join(wrapper_directory.name, action_name)
+        os.mkdir(action_dir)
+        action_file = os.path.join(action_dir, action_name + '.py')
         with open(action_file, 'w', encoding='utf8') as f:
             f.write('class FakeBaseActionSpec:\n')
             f.write('\tsome_property: int = 0\n\n')
@@ -65,19 +63,17 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
             f.write('\tsome_property: int = 1\n')
 
         def mock_get_all_action_types() -> List[str]:
-            predefined_action_types = stats_models.ALLOWED_ACTION_TYPES
-            updated_action_types = [action_name, *predefined_action_types]
-            return updated_action_types
+            return [action_name]
         swap_get_all_action_types = self.swap(
             action_registry.Registry, 'get_all_action_types',
             mock_get_all_action_types)
-        with swap_get_all_action_types:
+        swap_actions_dir = self.swap(
+            feconf, 'ACTIONS_DIR', wrapper_directory.name.split('/')[-1])
+        with swap_get_all_action_types, swap_actions_dir:
             all_actions = action_registry.Registry.get_all_actions()
 
-        tempdir.cleanup()
-        self.assertEqual(len(all_actions), 3)
-        self.assertEqual(
-            all_actions, action_registry.Registry.get_all_actions())
+        wrapper_directory.cleanup()
+        self.assertEqual(all_actions, [])
 
     def test_cannot_get_action_by_invalid_type(self) -> None:
         # Testing with invalid action type.
@@ -88,5 +84,6 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
 
     def test_can_get_action_by_valid_type(self) -> None:
         # Testing with valid action type.
-        self.assertIsNotNone(
-            action_registry.Registry.get_action_by_type('ExplorationStart'))
+        action = action_registry.Registry.get_action_by_type('ExplorationStart')
+        self.assertIsNotNone(action)
+        self.assertIn(action, action_registry.Registry.get_all_actions())
