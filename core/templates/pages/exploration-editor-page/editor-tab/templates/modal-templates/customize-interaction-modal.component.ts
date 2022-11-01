@@ -255,9 +255,10 @@ export class CustomizeInteractionModalComponent
 
   buttonEnabledOnEndExploration(): boolean {
     /*
-      For the EndExploration interaction, we check whether the last input field is empty or not.
-      Since checking recommended exploration ID's validity is an expensive operation, it is only
-      checked in the interaction validations and not here in real-time.
+      For the EndExploration interaction, we check whether the last input field
+      is empty or not.
+      Since checking recommended exploration ID's validity is an expensive operation,
+      it is only checked in the interaction validations and not here in real-time.
     */
     let inputField = document.
       getElementsByClassName('oppia-exploration-id-input');
