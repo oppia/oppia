@@ -19,11 +19,14 @@
 from apache_beam.io.gcp.gcsio import GcsIO
 from apache_beam import pvalue
 from core.platform import models
-from google.cloud import storage
+# from google.cloud import storage
+from apache_beam.internal.gcp import auth
+from apache_beam.io.gcp.internal.clients import storage
 
 from typing import List
 
 import apache_beam as beam
+import httplib2
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -33,6 +36,11 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class ReadFile(beam.PTransform):
+
+    def _create_client(self):
+        return storage.StorageV1(
+          get_credentials=False,
+          url="http://localhost:9023")
 
     def expand(
        self, filenames: beam.PCollection
@@ -47,7 +55,8 @@ class ReadFile(beam.PTransform):
         """Helper function to read the contents of a file."""
         print("***********************")
         print("file - ", filename)
-        gcs = GcsIO(storage.Client)
+        client = self._create_client()
+        gcs = GcsIO(client)
         print("********************************")
-        print("GCS is initialized")
+        print("GCS bucket - ", gcs.get_bucket('test-bucket'))
         return gcs.open(filename, mode='r').read()

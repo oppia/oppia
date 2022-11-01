@@ -73,13 +73,23 @@ class ReadFileTest(job_test_utils.PipelinedTestBase):
         os.environ["STORAGE_EMULATOR_HOST"] = "http://localhost:9023"
         client = storage.Client()
 
-        bucket = client.bucket('test-bucket')
+        bucket = client.get_bucket('test-bucket')
+        bucket.delete_blobs(["blob1", "blob2"])
+        bucket.delete()
+
+        bucket = client.create_bucket('test-bucket')
         blob = bucket.blob("blob1")
         print("**********************************")
         print(blob.name)
-        # blob.upload_from_string("test1")
+        blob.upload_from_string("test1")
         blob = bucket.blob("blob2")
-        # blob.upload_from_string("test2")
+        blob.upload_from_string("test2")
+        for blob in bucket.list_blobs():
+            content = blob.download_as_bytes()
+            print("**************************************")
+            print(f"Blob [{blob.name}]: {content}")
+        print("**************************************")
+        print(bucket.name)
         filenames = ['gs://test-bucket/blob1', 'gs://test-bucket/blob2']
         filename_p_collec = (
             self.pipeline | beam.Create(filenames)
