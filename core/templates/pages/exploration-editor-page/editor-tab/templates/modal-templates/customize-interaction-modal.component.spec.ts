@@ -240,8 +240,8 @@ describe('Customize Interaction Modal Component', () => {
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
-  it('should enable Save Interaction button when no recommendation IDs'
-  + 'are provided', () => {
+  it('should enable Save Interaction button when no recommendation IDs' +
+  ' are provided', () => {
     spyOn(component, 'getTitle').and.returnValue(
       AppConstants.INTERACTION_NAMES.END_EXPLORATION);
 
@@ -254,8 +254,8 @@ describe('Customize Interaction Modal Component', () => {
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
-  it('should enable Save Interaction button when exploration IDs'
-  + 'are provided', () => {
+  it('should enable Save Interaction button when exploration IDs' +
+  ' are provided', () => {
     spyOn(component, 'getTitle').and
       .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
 
@@ -270,8 +270,8 @@ describe('Customize Interaction Modal Component', () => {
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
-  it('should enable Save Interaction button when no exploration ID'
-  +' is provided', () => {
+  it('should enable Save Interaction button when no exploration ID' +
+  ' is provided', () => {
     spyOn(component, 'getTitle').and
       .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
 
