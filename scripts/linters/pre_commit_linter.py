@@ -592,7 +592,6 @@ def main(args=None):
     )
 
     install_third_party_libs.main()
-    common.fix_third_party_imports()
 
     print('Starting Linter....')
 

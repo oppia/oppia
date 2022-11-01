@@ -1,11 +1,11 @@
 import datetime
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, Pattern
+from re import Pattern
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 
 class Request:
     uri: str
     environ: Dict[str, Any]
-    body: Dict[str, Any]
     route_kwargs: Dict[str, Any]
     path: str
     cookies: Dict[str, str] = ...
@@ -17,13 +17,13 @@ class Request:
 
     @classmethod
     def blank(
-            cls,
-            path: str,
-            environ: Dict[str, Any] = ...,
-            base_url: str = ...,
-            headers: List[Tuple[str, str]] = ...,
-            POST: Dict[str, Any] = ...,
-            **kwargs: Any
+        cls,
+        path: str,
+        environ: Dict[str, Any] = ...,
+        base_url: str = ...,
+        headers: List[Tuple[str, str]] = ...,
+        POST: Dict[str, Any] = ...,
+        **kwargs: Any
     ) -> Request: ...
 
 class ResponseHeaders(Dict[str, Any]):
@@ -37,50 +37,50 @@ class Response:
     pragma: Any
     expires: Any
 
-    def write(self, *args: Any, **Kwargs: Any) -> Any: ...
+    def write(self, content: Union[bytes, str]) -> None: ...
     def set_cookie(
-            self,
-            key: str,
-            value: str = ...,
-            max_age: Union[datetime.timedelta, float] = ...,
-            secure: Optional[bool] = ...,
-            overwrite: Optional[bool] = ...,
-            httponly: Optional[bool] = ...,
-            path: str = ...,
-            domain: Optional[str] = ...,
-            comment: Optional[str] = ...,
+        self,
+        key: str,
+        value: str = ...,
+        max_age: Union[datetime.timedelta, float] = ...,
+        secure: Optional[bool] = ...,
+        overwrite: Optional[bool] = ...,
+        httponly: Optional[bool] = ...,
+        path: str = ...,
+        domain: Optional[str] = ...,
+        comment: Optional[str] = ...,
     ) -> None: ...
 
     def delete_cookie(
-            self,
-            key: str,
-            path: str = ...,
-            domain: Optional[str] = ...
+        self,
+        key: str,
+        path: str = ...,
+        domain: Optional[str] = ...
     ) -> None: ...
 
 class WSGIApplication:
     debug: bool
 
     def __init__(
-            self,
-            routes: List[Route] = ...,
-            debug: bool = ...,
-            config: Dict[str, Any] = ...
+        self,
+        routes: List[Route] = ...,
+        debug: bool = ...,
+        config: Dict[str, Any] = ...
     ) -> None: ...
 
     def __call__(
-            self,
-            environ: Dict[str, str],
-            start_response: Response
+        self,
+        environ: Dict[str, str],
+        start_response: Response
     ) -> Response: ...
 
 class Route:
     def __init__(
-            self,
-            template: Union[str, Pattern[Any]],
-            handler: Callable[..., object],
-            *,
-            name: str = ...
+        self,
+        template: Union[str, Pattern[str]],
+        handler: Callable[..., object],
+        *,
+        name: str = ...
     ) -> None: ...
 
 class RequestHandler:

@@ -58,11 +58,14 @@ if MYPY:  # pragma: no cover
 AllowedRuleSpecInputTypes = Union[
     str,
     int,
+    float,
     List[str],
     List[List[str]],
     # Here we use type Any because some rule specs have deeply nested types,
     # such as for the `NumberWithUnits` interaction.
-    Mapping[str, Union[str, List[str], int, bool, Dict[str, int], List[Any]]],
+    Mapping[
+        str, Union[str, List[str], int, bool, float, Dict[str, int], List[Any]]
+    ],
 ]
 
 # TODO(#15982): Here we use type Any because `CustomizationArgsDictType` is a
@@ -966,6 +969,53 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             outcomes.append(self.default_outcome)
         return outcomes
 
+    def _validate_continue_interaction(self) -> None:
+        """Validates Continue interaction."""
+        text_value = (
+            self.customization_args['buttonText'].value.unicode_str)
+        if len(text_value) > 20:
+            raise utils.ValidationError(
+                'The `continue` interaction text length should be atmost '
+                '20 characters.'
+            )
+
+    def _validate_end_interaction(self) -> None:
+        """Validates End interaction."""
+        recc_exp_ids = (
+            self.customization_args['recommendedExplorationIds'].value)
+        if len(recc_exp_ids) > 3:
+            raise utils.ValidationError(
+                'The total number of recommended explorations inside End '
+                'interaction should be atmost 3.'
+            )
+
+    def _validates_choices_should_be_unique_and_nonempty(
+        self, choices: List[SubtitledHtml]
+    ) -> None:
+        """Validates that the choices should be unique and non empty.
+
+        Args:
+            choices: List[state_domain.SubtitledHtml]. Choices that needs to
+                be validated.
+
+        Raises:
+            utils.ValidationError. Choice is empty.
+            utils.ValidationError. Choice is duplicate.
+        """
+        seen_choices = []
+        for choice in choices:
+            if html_cleaner.is_html_empty(choice.html):
+                raise utils.ValidationError(
+                    'Choices should be non empty.'
+                )
+
+            if choice.html not in seen_choices:
+                seen_choices.append(choice.html)
+            else:
+                raise utils.ValidationError(
+                    'Choices should be unique.'
+                )
+
     def _set_lower_and_upper_bounds(
         self,
         range_var: RangeVariableDict,
@@ -1239,6 +1289,10 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             'HasIntegerPartEqualTo',
             'HasNoFractionalPart'
         ]
+        rules_that_can_have_improper_fractions = [
+            'IsExactlyEqualTo',
+            'HasFractionalPartExactlyEqualTo'
+        ]
         lower_infinity = float('-inf')
         upper_infinity = float('inf')
         allow_non_zero_integ_part = (
@@ -1279,15 +1333,14 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                 f'in FractionInput interaction.'
                             )
 
-                    if not allow_imp_frac and whole != 0:
-                        raise utils.ValidationError(
-                            f'The rule \'{rule_spec_index}\' of '
-                            f'answer group \'{ans_group_index}\' do '
-                            f'not have value in proper fraction '
-                            f'in FractionInput interaction.'
+                    if (
+                        not allow_imp_frac and
+                        den <= num and
+                        (
+                            rule_spec.rule_type in
+                            rules_that_can_have_improper_fractions
                         )
-
-                    if not allow_imp_frac and den <= num:
+                    ):
                         raise utils.ValidationError(
                             f'The rule \'{rule_spec_index}\' of '
                             f'answer group \'{ans_group_index}\' do '
@@ -1453,6 +1506,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """
         rule_spec_till_now: List[RuleSpecDict] = []
 
+        choices = self.customization_args['choices'].value
+        self._validates_choices_should_be_unique_and_nonempty(choices)
+
         for ans_group_index, answer_group in enumerate(self.answer_groups):
             for rule_spec_index, rule_spec in enumerate(
                 answer_group.rule_specs
@@ -1485,6 +1541,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             self.customization_args['maxAllowableSelectionCount'].value)
         rule_spec_till_now: List[RuleSpecDict] = []
 
+        choices = self.customization_args['choices'].value
+        self._validates_choices_should_be_unique_and_nonempty(choices)
+
         # Minimum number of selections should be no greater than maximum
         # number of selections.
         if min_value > max_value:
@@ -1494,7 +1553,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 f'which is {str(max_value)} '
                 f'in ItemSelectionInput interaction.'
             )
-        choices = self.customization_args['choices'].value
 
         # There should be enough choices to have minimum number
         # of selections.
@@ -1558,6 +1616,15 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         ele_x_at_y_rules = []
         rule_spec_till_now: List[RuleSpecDict] = []
         equal_ordering_one_at_incorec_posn = []
+
+        choices = self.customization_args['choices'].value
+        if len(choices) < 2:
+            raise utils.ValidationError(
+                'There should be atleast 2 values inside DragAndDrop '
+                'interaction.'
+            )
+
+        self._validates_choices_should_be_unique_and_nonempty(choices)
 
         for ans_group_index, answer_group in enumerate(self.answer_groups):
             for rule_spec_index, rule_spec in enumerate(
@@ -1887,6 +1954,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # to figure out a way to put these validations following the
         # same format.
         interaction_id_to_validation_func = {
+            'Continue': self._validate_continue_interaction,
+            'EndExploration': self._validate_end_interaction,
             'NumericInput': self._validate_numeric_input,
             'FractionInput': self._validate_fraction_input,
             'NumberWithUnits': self._validate_number_with_units_input,
@@ -2140,7 +2209,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             dict. A dictionary of customization argument names to the
             InteractionCustomizationArg domain object's.
         """
-        if interaction_id is None:
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids()
+        )
+        interaction_id_is_valid = interaction_id not in all_interaction_ids
+        if interaction_id_is_valid or interaction_id is None:
             return {}
 
         ca_specs_dict = (
@@ -5191,19 +5264,11 @@ class State(translation_domain.BaseTranslatableObject):
                 Hint.convert_html_in_hint(hint, conversion_fn))
 
         interaction_id = state_dict['interaction']['id']
-        if interaction_id is None:
-            return state_dict
-
-        # TODO(#11950): Drop the following 'if' clause once all snapshots have
-        # been migrated. This is currently causing issues in migrating old
-        # snapshots to schema v34 because MathExpressionInput was still around
-        # at the time. It is conceptually OK to ignore customization args here
-        # because the MathExpressionInput has no customization arg fields.
-        if interaction_id == 'MathExpressionInput':
-            if state_dict['interaction']['solution'] is not None:
-                state_dict['interaction']['solution']['explanation']['html'] = (
-                    conversion_fn(state_dict['interaction']['solution'][
-                        'explanation']['html']))
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids()
+        )
+        interaction_id_is_valid = interaction_id not in all_interaction_ids
+        if interaction_id_is_valid or interaction_id is None:
             return state_dict
 
         if state_dict['interaction']['solution'] is not None:

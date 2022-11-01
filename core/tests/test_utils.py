@@ -2795,7 +2795,10 @@ title: Title
 
     # Here we use type Any because this method can return a JSON response
     # whose value can be of any type, like int, bool, str, and other
-    # types too.
+    # types too. Also, the 'params' argument can accept different types
+    # of dictionaries that need to be sent over to the handler, those
+    # dictionaries can contain any type of values. So, to allow different
+    # dictionaries, we used Any type here.
     def get_json(
         self,
         url: str,
@@ -2900,14 +2903,20 @@ title: Title
 
     # Here we use type Any because this method can return JSON response Dict
     # whose values can contain different types of values, like int, bool,
-    # str and other types too.
-    def delete_json(  # pylint: disable=dangerous-default-value
+    # str and other types too. Also, the 'params' argument can accept different
+    # types of dictionaries that need to be sent over to the handler, those
+    # dictionaries can contain any type of values. So, to allow different
+    # dictionaries, we used Any type here.
+    def delete_json(
         self,
         url: str,
-        params: Dict[str, Any] = {},
+        params: Optional[Dict[str, Any]] = None,
         expected_status_int: int = 200
     ) -> Dict[str, Any]:
         """Delete object on the server using a JSON call."""
+        if params is None:
+            params = {}
+
         if params:
             self.assertIsInstance(
                 params, dict,
@@ -3007,7 +3016,10 @@ title: Title
 
     # Here we use type Any because this method can return JSON response Dict
     # whose values can contain different types of values, like int, bool,
-    # str and other types too.
+    # str and other types too. Also, the 'payload' argument can accept
+    # different types of dictionaries that need to be sent over to the handler,
+    # those dictionaries can contain any type of values. So, to allow different
+    # dictionaries, we used Any type here.
     def put_json(
         self,
         url: str,

@@ -17,12 +17,16 @@
 from __future__ import annotations
 
 from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import blog_services
 from core.domain import classroom_services
+from core.domain import config_domain
+from core.domain import learner_group_services
 from core.domain import user_services
 
-from typing import Dict, TypedDict, cast
+from typing import Dict, TypedDict
 
 
 # TODO(#13605): Refactor access validation handlers to follow a single handler
@@ -36,7 +40,11 @@ class ClassroomAccessValidationHandlerNormalizedRequestDict(TypedDict):
     classroom_url_fragment: str
 
 
-class ClassroomAccessValidationHandler(base.BaseHandler):
+class ClassroomAccessValidationHandler(
+    base.BaseHandler[
+        Dict[str, str], ClassroomAccessValidationHandlerNormalizedRequestDict
+    ]
+):
     """Validates whether request made to /learn route.
     """
 
@@ -55,11 +63,10 @@ class ClassroomAccessValidationHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self) -> None:
-        request_data = cast(
-            ClassroomAccessValidationHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        classroom_url_fragment = request_data['classroom_url_fragment']
+        assert self.normalized_request is not None
+        classroom_url_fragment = self.normalized_request[
+            'classroom_url_fragment'
+        ]
         classroom = classroom_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
 
@@ -67,21 +74,27 @@ class ClassroomAccessValidationHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
 
-class ManageOwnAccountValidationHandler(base.BaseHandler):
+class ManageOwnAccountValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Validates access to preferences page.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_manage_own_account
     def get(self) -> None:
         pass
 
 
-class ProfileExistsValidationHandler(base.BaseHandler):
+class ProfileExistsValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The world-viewable profile page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -106,15 +119,113 @@ class ProfileExistsValidationHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
 
-class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
+class ReleaseCoordinatorAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Validates access to release coordinator page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_release_coordinator_page
     def get(self) -> None:
         """Handles GET requests."""
         pass
+
+
+class ViewLearnerGroupPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to view learner group page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self, learner_group_id: str) -> None:
+        """Handles GET requests."""
+        assert self.user_id is not None
+        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+            raise self.PageNotFoundException
+
+        is_valid_request = learner_group_services.is_user_learner(
+            self.user_id, learner_group_id)
+
+        if not is_valid_request:
+            raise self.PageNotFoundException
+
+
+class BlogHomePageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to blog home page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_blog_dashboard
+    def get(self) -> None:
+        """Validates access to blog home page."""
+        pass
+
+
+class BlogPostPageAccessValidationHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of BlogPostPageAccessValidationHandler's
+    normalized_request dictionary.
+    """
+
+    blog_post_url_fragment: str
+
+
+class BlogPostPageAccessValidationHandler(
+    base.BaseHandler[
+        Dict[str, str], BlogPostPageAccessValidationHandlerNormalizedRequestDict
+    ]
+):
+    """Validates whether request made to correct blog post route."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'blog_post_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_blog_dashboard
+    def get(self) -> None:
+        assert self.normalized_request is not None
+        blog_post_url_fragment = self.normalized_request[
+            'blog_post_url_fragment']
+        blog_post = blog_services.get_blog_post_by_url_fragment(
+            blog_post_url_fragment)
+
+        if not blog_post:
+            raise self.PageNotFoundException
