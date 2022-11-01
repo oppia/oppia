@@ -2027,8 +2027,8 @@ class MockTopicObject(topic_domain.Topic):
 
     @classmethod
     def _convert_story_reference_v1_dict_to_v2_dict(
-        cls, story_reference: topic_domain.StoryReference
-    ) -> topic_domain.StoryReference:
+        cls, story_reference: topic_domain.StoryReferenceDict
+    ) -> topic_domain.StoryReferenceDict:
         """Converts v1 story reference dict to v2."""
         return story_reference
 
