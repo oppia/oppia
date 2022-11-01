@@ -364,6 +364,8 @@ class PlatformParameterFilter:
         elif self._type == 'app_version':
             matched = self._match_version_expression(
                 op, value, context.app_version)
+        else:
+            raise Exception('Unsupported filter type \'%s\'' % self._type)
 
         return matched
 

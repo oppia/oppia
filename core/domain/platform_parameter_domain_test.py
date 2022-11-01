@@ -373,6 +373,19 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
 
         self.assertEqual(filter_domain.to_dict(), filter_dict)
 
+    def test_evaluate_with_invalid_filter_type_raises_error(self) -> None:
+        filter_dict: parameter_domain.PlatformParameterFilterDict = {
+            'type': 'invalid_filter',
+            'conditions': [['=', 'dev']]
+        }
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+        dev_context = self._create_example_context(mode='DEV')
+        with self.assertRaisesRegex(
+                Exception, 'Unsupported filter type \'invalid_filter\''):
+            filter_domain.evaluate(dev_context)
+
     def test_evaluate_dev_server_mode_filter_with_dev_env_returns_true(
         self
     ) -> None:
@@ -1370,6 +1383,15 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
         filter_domain.validate()
+        filter_dict: parameter_domain.PlatformParameterFilterDict = {
+                'type': 'browser_type',
+                'conditions': [['=', 'Chrome']]
+            }
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+        filter_domain.validate()
+
 
     def test_validate_filter_with_invalid_type_raises_exception(self) -> None:
         filter_domain = (
@@ -1435,14 +1457,25 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
     ) -> None:
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [['=', 'invalid']]}
-            ))
+            .PlatformParameterFilter.from_dict({
+                'type': 'app_version_flavor',
+                'conditions': [['=', 'beta'], ['=', 'invalid']]
+            }))
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid app version flavor \'invalid\''):
             filter_domain.validate()
 
+    def test_validate_filter_with_type_app_version_flavor_and_empty_conditions(
+        self
+    ) -> None:
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': []}
+            ))
+        filter_domain.validate()
+    
 
 class PlatformParameterRuleTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterRule."""
