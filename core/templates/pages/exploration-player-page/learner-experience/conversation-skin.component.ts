@@ -1239,12 +1239,14 @@ export class ConversationSkinComponent {
             // the feedback, and display a 'Continue' button.
             this.pendingCardWasSeenBefore = false;
             this.displayedCard.markAsCompleted();
+            console.log('nnn')
             if (isFinalQuestion) {
               if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
                 // We will redirect to the results page here.
                 this.questionSessionCompleted = true;
               }
               this.moveToExploration = true;
+              console.log('different card')
               if (feedbackHtml) {
                 this.playerTranscriptService.addNewResponse(feedbackHtml);
                 if (
@@ -1255,6 +1257,7 @@ export class ConversationSkinComponent {
                   });
                 }
               } else {
+                console.log('in the else');
                 this.showUpcomingCard();
               }
               this.answerIsBeingProcessed = false;

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utility service for the question player for an exploration.
+ * @fileoverview Utility service for the diagnostic test player.
  */
 
 import { Injectable } from '@angular/core';
@@ -26,7 +26,6 @@ import { StateCard } from 'domain/state_card/state-card.model';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
@@ -36,15 +35,14 @@ import { AudioTranslationLanguageService } from
 import { DiagnosticTestCurrentTopicStatusModel } from 'pages/diagnostic-test-player-page/diagnostic-test-current-topic-status.model';
 import { DiagnosticTestTopicTrackerModel } from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
+import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
+
 
 @Injectable({
     providedIn: 'root'
 })
 export class DiagnosticTestPlayerEngineService {
   private answerIsBeingProcessed: boolean = false;
-  private questions: Question[] = [];
-  private currentIndex: number = null;
-  private nextIndex: number = null;
   private diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel;
   private diagnosticTestCurrentTopicStatusModel:
     DiagnosticTestCurrentTopicStatusModel;
@@ -62,7 +60,9 @@ export class DiagnosticTestPlayerEngineService {
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
-    private questionBackendApiService: QuestionBackendApiService) {
+    private questionBackendApiService: QuestionBackendApiService,
+    private diagnosticTestPlayerStatusService:
+      DiagnosticTestPlayerStatusService) {
   }
 
   init(
@@ -93,20 +93,19 @@ export class DiagnosticTestPlayerEngineService {
       answer: InteractionAnswer,
       interactionRulesService: InteractionRulesService,
       successCallback: (
-          nextCard: StateCard,
-          refreshInteraction: boolean,
-          feedbackHtml: string,
-          feedbackAudioTranslations: BindableVoiceovers,
-          refresherExplorationId,
-          missingPrerequisiteSkillId,
-          remainOnCurrentCard: boolean,
-          taggedSkillMisconceptionId: string,
-          wasOldStateInitial,
-          isFirstHit,
-          isFinalQuestion: boolean,
-          focusLabel: string) => void
+        nextCard: StateCard,
+        refreshInteraction: boolean,
+        feedbackHtml: string,
+        feedbackAudioTranslations: BindableVoiceovers,
+        refresherExplorationId,
+        missingPrerequisiteSkillId,
+        remainOnCurrentCard: boolean,
+        taggedSkillMisconceptionId: string,
+        wasOldStateInitial,
+        isFirstHit,
+        isFinalQuestion: boolean,
+        focusLabel: string) => void
   ): boolean {
-
     const oldState = this.currentQuestion.getStateData();
     const classificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(
@@ -139,10 +138,14 @@ export class DiagnosticTestPlayerEngineService {
           this.currentTopicId);
       }
 
-      // Check whether the diagnostic test is finished.
+      if (this.isDiagnosticTestFinished()) {
+        this.diagnosticTestPlayerStatusService
+          .onDiagnosticTestSessionCompleted.emit(true);
+      }
 
       this.currentTopicId = (
         this.diagnosticTestTopicTrackerModel.selectNextTopicIdToTest());
+
       this.questionBackendApiService.fetchDiagnosticTestQuestionsAsync(
         this.currentTopicId
       ).then((response) => {
@@ -194,14 +197,14 @@ export class DiagnosticTestPlayerEngineService {
         this.currentSkillId));
     const stateData = this.currentQuestion.getStateData();
     const questionHtml = this.makeQuestion(stateData, []);
+
     if (questionHtml === null) {
       this.alertsService.addWarning('Question name should not be empty.');
       return;
     }
 
-    const interaction = stateData.interaction;
     this.focusLabel = this.focusManagerService.generateFocusLabel();
-
+    const interaction = stateData.interaction;
     const interactionId = interaction.id;
     let interactionHtml = null;
 
@@ -214,12 +217,11 @@ export class DiagnosticTestPlayerEngineService {
     }
 
     return StateCard.createNewCard(
-        null, questionHtml, interactionHtml, interaction,
-        stateData.recordedVoiceovers, stateData.writtenTranslations,
-        stateData.content.contentId, this.audioTranslationLanguageService
+      null, questionHtml, interactionHtml, interaction,
+      stateData.recordedVoiceovers, stateData.writtenTranslations,
+      stateData.content.contentId, this.audioTranslationLanguageService
     );
   }
-
 
   isDiagnosticTestFinished(): boolean {
     const lengthOfEligibleTopicIds = (
@@ -229,8 +231,10 @@ export class DiagnosticTestPlayerEngineService {
     if (lengthOfEligibleTopicIds === 0) {
       return true;
     }
-
-    if (lengthOfEligibleTopicIds > 0 && this.numberOfAttemptedQuestions >= 15) {
+    if (
+        lengthOfEligibleTopicIds > 0 &&
+        this.numberOfAttemptedQuestions >= 15
+    ) {
       return true;
     }
 

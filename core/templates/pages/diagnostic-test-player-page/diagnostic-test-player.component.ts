@@ -24,6 +24,8 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { DiagnosticTestTopicTrackerModel } from './diagnostic-test-topic-tracker.model';
+import { Subscription } from 'rxjs';
+import { DiagnosticTestPlayerStatusService } from './diagnostic-test-player-status.service';
 
 
 @Component({
@@ -33,8 +35,10 @@ import { DiagnosticTestTopicTrackerModel } from './diagnostic-test-topic-tracker
 export class DiagnosticTestPlayerComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL: string = '';
   diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel;
-  questionPlayerConfig;
   diagnosticTestStarted = false;
+
+  componentSubscription = new Subscription();
+
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -42,7 +46,8 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private classroomBackendApiService: ClassroomBackendApiService,
     private topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService
+    TopicsAndSkillsDashboardBackendApiService,
+    private diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService
   ) {}
 
   ngOnInit(): void {
@@ -50,6 +55,14 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/oppia_avatar_100px.svg'));
+
+    this.componentSubscription.add(
+      this.diagnosticTestPlayerStatusService
+        .onDiagnosticTestSessionCompleted.subscribe((result) => {
+          console.log('in the component');
+          console.log(result);
+        })
+    );
   }
 
   returnBackToClassroom(): void {
