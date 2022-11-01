@@ -707,8 +707,8 @@ class UserContributionRightsDataHandler(
         """Handles GET requests."""
         contribution_rights = None
         if self.username:
-            # Here we assert the 'user_id' is not None because we are sure that
-            # if 'username' exists then 'user_id' is also going to exists.
+            # Here we are sure that 'user_id' is not None because if 'username'
+            # exists then 'user_id' is also going to exists.
             assert self.user_id is not None
             contribution_rights = user_services.get_user_contribution_rights(
                 self.user_id)

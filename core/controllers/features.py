@@ -26,9 +26,7 @@ from typing import Dict
 
 
 class ExplorationFeaturesHandler(
-    base.BaseHandler[
-        Dict[str, str], Dict[str, str]
-    ]
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Returns features the given exploration is configured to support."""
 

@@ -194,8 +194,9 @@ class ExplorationHandler(
                 self.user_id and not has_seen_editor_tutorial)
             exploration_data['show_state_translation_tutorial_on_load'] = bool(
                 self.user_id and not has_seen_translation_tutorial)
-            # Here we use MyPy ignore because here we are defining a new key on
-            # on well defined TypedDict dictionary.
+            # Here we use MyPy ignore because here we are defining a new
+            # 'exploration_is_linked_to_story' key on a well defined TypedDict
+            # dictionary.
             exploration_data['exploration_is_linked_to_story'] = (  # type: ignore[misc]
                 exp_services.get_story_id_linked_to_exploration(
                     exploration_id) is not None)
@@ -531,7 +532,7 @@ class ExplorationStatusHandler(
 
 class ExplorationModeratorRightsHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of ExplorationModeratorRightsHandler's
-    normalized_request dictionary.
+    normalized_payload dictionary.
     """
 
     email_body: str
@@ -605,7 +606,7 @@ class ExplorationModeratorRightsHandler(
 
 class UserExplorationEmailsHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of UserExplorationEmailsHandler's
-    normalized_request dictionary.
+    normalized_payload dictionary.
     """
 
     mute: Optional[bool]
@@ -754,7 +755,7 @@ class ExplorationFileDownloader(
 
 class StateYamlHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of StateYamlHandler's
-    normalized_request dictionary.
+    normalized_payload dictionary.
     """
 
     state_dict: state_domain.StateDict
@@ -1063,7 +1064,7 @@ class FetchPlaythroughHandler(
 
 class ResolveIssueHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of ResolveIssueHandler's
-    normalized_request dictionary.
+    normalized_payload dictionary.
     """
 
     exp_issue_object: Optional[stats_domain.ExplorationIssue]
@@ -1391,7 +1392,7 @@ class TopUnresolvedAnswersHandler(
 
 class ExplorationEditsAllowedHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of ExplorationEditsAllowedHandler's
-    normalized_request dictionary.
+    normalized_payload dictionary.
     """
 
     edits_are_allowed: bool

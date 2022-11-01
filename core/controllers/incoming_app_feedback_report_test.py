@@ -117,7 +117,8 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             datetime.datetime.fromtimestamp(1615519337))
 
     def test_incoming_report_with_invalid_headers_raises_exception(
-            self) -> None:
+        self
+    ) -> None:
         token = self.get_new_csrf_token()
         # Webtest requires explicit str-types headers.
         invalid_headers = {

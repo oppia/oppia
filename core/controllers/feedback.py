@@ -29,9 +29,9 @@ from typing import (
 )
 
 
-# Here we use type Any because we want to allow different TypedDict dictionaries
-# through this type variable.
-ThreadDictType = TypeVar('ThreadDictType', bound=Sequence[Any])
+# Here we use type Any because we want to allow list of different
+# TypedDict dictionaries through this type variable.
+ThreadDictType = TypeVar('ThreadDictType', bound=List[Any])
 
 
 def replace_user_id_with_username_in_dict(
@@ -284,7 +284,7 @@ class ThreadHandler(
 
 class RecentFeedbackMessagesHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of RecentFeedbackMessagesHandler's
-    normalized_Payload dictionary.
+    normalized_request dictionary.
     """
 
     cursor: Optional[str]

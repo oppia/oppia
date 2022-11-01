@@ -160,7 +160,7 @@ def validate_state_dict(
     """
     state_object = state_domain.State.from_dict(state_dict)
     state_object.validate(
-        exp_param_specs_dict={}, allow_null_interaction=True)
+        exp_param_specs_dict=None, allow_null_interaction=True)
     # State dict is used as dictionary form in the handler and the data is not
     # transferred into the domain layer. Hence dict form of the data is returned
     # after schema validation.
