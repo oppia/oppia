@@ -1375,22 +1375,22 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             )
 
     def test_validate_filter_passes_without_exception(self) -> None:
-        filter_dict: parameter_domain.PlatformParameterFilterDict = {
+        filter_dict1: parameter_domain.PlatformParameterFilterDict = {
             'type': 'server_mode',
             'conditions': [['=', 'dev'], ['=', 'prod']]
         }
-        filter_domain = (
+        filter_domain1 = (
             parameter_domain
-            .PlatformParameterFilter.from_dict(filter_dict))
-        filter_domain.validate()
-        filter_dict: parameter_domain.PlatformParameterFilterDict = {
+            .PlatformParameterFilter.from_dict(filter_dict1))
+        filter_domain1.validate()
+        filter_dict2: parameter_domain.PlatformParameterFilterDict = {
                 'type': 'browser_type',
                 'conditions': [['=', 'Chrome']]
             }
-        filter_domain = (
+        filter_domain2 = (
             parameter_domain
-            .PlatformParameterFilter.from_dict(filter_dict))
-        filter_domain.validate()
+            .PlatformParameterFilter.from_dict(filter_dict2))
+        filter_domain2.validate()
 
     def test_validate_filter_with_invalid_type_raises_exception(self) -> None:
         filter_domain = (
