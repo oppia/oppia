@@ -385,6 +385,18 @@ def get_random_choice(alist: List[T]) -> T:
     return alist[index]
 
 
+def get_url_scheme(url: str) -> str:
+    """Gets the url scheme used by a link.
+
+    Args:
+        url: str. The URL.
+
+    Returns:
+        str. Returns the URL scheme.
+    """
+    return urllib.parse.urlparse(url).scheme
+
+
 def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
     """Converts a PNG base64 data URL to a PNG binary data.
 

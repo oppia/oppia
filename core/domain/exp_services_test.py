@@ -298,6 +298,19 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
 
+    def test_raises_error_if_guest_user_try_to_publish_the_exploration(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'To publish explorations and update users\' profiles, '
+            'user must be logged in and have admin access.'
+        ):
+            exp_services.publish_exploration_and_update_user_profiles(
+                guest_user, 'exp_id'
+            )
+
     def test_get_exploration_titles_and_categories(self) -> None:
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories([]), {})

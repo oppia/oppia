@@ -1618,7 +1618,27 @@ class Question(translation_domain.BaseTranslatableObject):
     def _convert_state_v52_dict_to_v53_dict(
         cls, question_state_dict: state_domain.StateDict
     ) -> state_domain.StateDict:
-        """Converts from version 52 to 53. Version 53 adds
+        """Converts from version 52 to 53. Version 53 fixes errored data present
+        in exploration state, RTE and interactions.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+
+        # The version 53 only fixes the data for `Exploration` and make
+        # no changes in the `Question` that is why we are simply returning.
+        return question_state_dict
+    
+    @classmethod
+    def _convert_state_v53_dict_to_v54_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
+        """Converts from version 53 to 54. Version 54 adds
         catchMisspellings customization arg to TextInput
         interaction which allows creators to detect misspellings.
 

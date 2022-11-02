@@ -114,6 +114,24 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.user_admin = user_services.get_user_actions_info(
             self.user_id_admin)
 
+    def test_raises_error_if_guest_user_trying_to_deassign_roles_from_topic(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest users are not allowed to deassing users from all topics.'
+        ):
+            topic_services.deassign_user_from_all_topics(guest_user, 'user_id')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest users are not allowed to deassing manager role from topic.'
+        ):
+            topic_services.deassign_manager_role_from_topic(
+                guest_user, 'user_id', 'topic_id'
+            )
+
     def test_get_story_titles_in_topic(self) -> None:
         story_titles = topic_services.get_story_titles_in_topic(
             self.topic)
@@ -1437,6 +1455,28 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_services.check_can_edit_topic(
             user_y, topic_rights))
 
+    def test_guest_user_cannot_assign_roles(self) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest user is not allowed to assign roles to a user.'
+        ):
+            topic_services.assign_role(
+                guest_user, self.user_b,
+                topic_domain.ROLE_MANAGER, self.TOPIC_ID)
+
+    def test_roles_of_guest_user_cannot_be_changed_until_guest_is_logged_in(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Cannot change the role of the Guest user.'
+        ):
+            topic_services.assign_role(
+                self.user_admin, guest_user,
+                topic_domain.ROLE_MANAGER, self.TOPIC_ID)
+
     def test_role_cannot_be_assigned_to_non_topic_manager(self) -> None:
         with self.assertRaisesRegex(
             Exception,
@@ -2027,8 +2067,8 @@ class MockTopicObject(topic_domain.Topic):
 
     @classmethod
     def _convert_story_reference_v1_dict_to_v2_dict(
-        cls, story_reference: topic_domain.StoryReference
-    ) -> topic_domain.StoryReference:
+        cls, story_reference: topic_domain.StoryReferenceDict
+    ) -> topic_domain.StoryReferenceDict:
         """Converts v1 story reference dict to v2."""
         return story_reference
 
