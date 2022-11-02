@@ -21,6 +21,7 @@ from __future__ import annotations
 import logging
 
 from core import feconf
+from core.constants import constants
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -54,8 +55,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
     @staticmethod
     def _migrate_exploration(
-        exp_id: str,
-        exp_model: exp_models.ExplorationModel
+        exp_model: exp_models.ExplorationModel,
+        exp_is_published: bool
     ) -> result.Result[
         Tuple[str, exp_domain.Exploration],
         Tuple[str, Exception]
@@ -64,8 +65,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
         exploration object.
 
         Args:
-            exp_id: str. The ID of the exploration.
             exp_model: ExplorationModel. The exploration model to migrate.
+            exp_is_published: bool. Whether the exploration is published or not.
 
         Returns:
             Result((str, Exploration), (str, Exception)). Result containing
@@ -75,19 +76,19 @@ class MigrateExplorationJob(base_jobs.JobBase):
         """
         try:
             exploration = exp_fetchers.get_exploration_from_model(exp_model)
-            exploration.validate()
+            exploration.validate(strict=exp_is_published)
 
             with datastore_services.get_ndb_context():
                 if exp_services.get_story_id_linked_to_exploration(
-                        exp_id) is not None:
+                        exp_model.id) is not None:
                     exp_services.validate_exploration_for_story(
                         exploration, True)
 
         except Exception as e:
             logging.exception(e)
-            return result.Err((exp_id, e))
+            return result.Err((exp_model.id, e))
 
-        return result.Ok((exp_id, exploration))
+        return result.Ok((exp_model.id, exploration))
 
     @staticmethod
     def _generate_exploration_changes(
@@ -203,10 +204,40 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     'umPkwp0L1M0-', '670bU6d9JGBh'))
         )
 
+        exp_rights_models = (
+            self.pipeline
+            | 'Get all non-deleted exploration rights models' >> (
+                ndb_io.GetModels(exp_models.ExplorationRightsModel.get_all()))
+            | 'Add exploration rights ID' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+                lambda exp_rights_model: exp_rights_model.id)
+            # TODO(#15871): This filter should be removed after the explorations
+            # are fixed and it is possible to migrate them.
+            | 'Remove exp rights for broken explorations' >> beam.Filter(
+                lambda exp_rights_model: exp_rights_model[0] not in (
+                    'umPkwp0L1M0-', '670bU6d9JGBh'))
+        )
+
+        exp_publication_status = (
+            exp_rights_models
+            | 'Extract publication status' >> beam.MapTuple(
+                lambda exp_id, exp_rights: (
+                    exp_id,
+                    exp_rights.status == constants.ACTIVITY_STATUS_PUBLIC
+                )
+            )
+        )
+
         migrated_exp_results = (
-            unmigrated_exploration_models
+            (
+                unmigrated_exploration_models,
+                exp_publication_status
+            )
+            | 'Merge model and staus' >> beam.CoGroupByKey()
+            | 'Get rid of exp ID' >> beam.Values() # pylint: disable=no-value-for-parameter
             | 'Transform and migrate model' >> beam.MapTuple( # pylint: disable=no-value-for-parameter
-                self._migrate_exploration)
+                lambda exploration_models, status: self._migrate_exploration(
+                    exploration_models[0], status[0])
+                )
         )
 
         migrated_exp = (
@@ -316,8 +347,7 @@ class AuditExplorationMigrationJob(base_jobs.JobBase):
 
     @staticmethod
     def _migrate_exploration(
-        exp_id: str,
-        exp_model: exp_models.ExplorationModel
+        exp_model: exp_models.ExplorationModel, exp_is_published: bool
     ) -> result.Result[
         Tuple[str, exp_domain.Exploration],
         Tuple[str, Exception]
@@ -326,8 +356,8 @@ class AuditExplorationMigrationJob(base_jobs.JobBase):
         exploration object.
 
         Args:
-            exp_id: str. The ID of the exploration.
             exp_model: ExplorationModel. The exploration model to migrate.
+            exp_is_published: bool. Whether the exploration is published or not.
 
         Returns:
             Result((str, Exploration), (str, Exception)). Result containing
@@ -337,20 +367,19 @@ class AuditExplorationMigrationJob(base_jobs.JobBase):
         """
         try:
             exploration = exp_fetchers.get_exploration_from_model(exp_model)
-            exploration.validate()
+            exploration.validate(strict=exp_is_published)
 
             with datastore_services.get_ndb_context():
                 if exp_services.get_story_id_linked_to_exploration(
-                    exp_id
-                ) is not None:
+                        exp_model.id) is not None:
                     exp_services.validate_exploration_for_story(
                         exploration, True)
 
         except Exception as e:
             logging.exception(e)
-            return result.Err((exp_id, e))
+            return result.Err((exp_model.id, e))
 
-        return result.Ok((exp_id, exploration))
+        return result.Ok((exp_model.id, exploration))
 
     @staticmethod
     def _generate_exploration_changes(
@@ -405,10 +434,33 @@ class AuditExplorationMigrationJob(base_jobs.JobBase):
                     'umPkwp0L1M0-', '670bU6d9JGBh'))
         )
 
+        exp_publication_status = (
+            self.pipeline
+            | 'Get all non-deleted exploration rights models' >> (
+                ndb_io.GetModels(exp_models.ExplorationRightsModel.get_all()))
+            | 'Extract publication status' >> beam.Map(
+                lambda exp_rights: (
+                    exp_rights.id,
+                    exp_rights.status == constants.ACTIVITY_STATUS_PUBLIC
+                )
+            )
+            # TODO(#15871): This filter should be removed after the explorations
+            # are fixed and it is possible to migrate them.
+            | 'Remove exp rights for broken exps' >> beam.Filter(
+                lambda exp_rights: exp_rights[0] not in (
+                    'umPkwp0L1M0-', '670bU6d9JGBh'))
+        )
+
         migrated_exp_results = (
-            unmigrated_exploration_models
+            (
+                unmigrated_exploration_models,
+                exp_publication_status
+            )
+            | 'Merge model and staus' >> beam.CoGroupByKey()
+            | 'Get rid of exp ID' >> beam.Values() # pylint: disable=no-value-for-parameter
             | 'Transform and migrate model' >> beam.MapTuple( # pylint: disable=no-value-for-parameter
-                self._migrate_exploration)
+                lambda exploration_models, status: self._migrate_exploration(
+                    exploration_models[0], status[0]))
         )
 
         migrated_exp = (
@@ -641,7 +693,8 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
                     exp_domain.Exploration.update_states_from_model(
                         versioned_exploration_states,
                         current_state_schema_version,
-                        exp_id)
+                        exp_id,
+                        exploration_model.language_code)
                 current_state_schema_version += 1
             except Exception as e:
                 error_message = (
@@ -781,7 +834,8 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
                     exp_domain.Exploration.update_states_from_model(
                         versioned_exploration_states,
                         current_state_schema_version,
-                        exp_id)
+                        exp_id,
+                        exploration_model.language_code)
                 current_state_schema_version += 1
             except Exception as e:
                 error_message = (

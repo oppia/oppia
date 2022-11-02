@@ -60,25 +60,68 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
 
+from typing import Dict, List, Optional, TypedDict, Union, cast
 
-class AdminPage(base.BaseHandler):
+
+class ClassroomPageDataDict(TypedDict):
+    """Dict representation of classroom page's data dictionary."""
+
+    course_details: str
+    name: str
+    topic_ids: List[str]
+    topic_list_intro: str
+    url_fragment: str
+
+
+AllowedAdminConfigPropertyValueTypes = Union[
+    str, bool, float, Dict[str, str], List[str], ClassroomPageDataDict
+]
+
+
+class AdminPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Admin page shown in the App Engine admin console."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_admin_page
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
 
         self.render_template('admin-page.mainpage.html')
 
 
-class AdminHandler(base.BaseHandler):
+class AdminHandlerNormalizePayloadDict(TypedDict):
+    """Dict representation of AdminHandler's normalized_payload
+    dictionary.
+    """
+
+    action: Optional[str]
+    exploration_id: Optional[str]
+    collection_id: Optional[str]
+    num_dummy_exps_to_generate: Optional[int]
+    num_dummy_exps_to_publish: Optional[int]
+    new_config_property_values: Optional[
+        Dict[str, AllowedAdminConfigPropertyValueTypes]
+    ]
+    config_property_id: Optional[str]
+    data: Optional[str]
+    topic_id: Optional[str]
+    feature_name: Optional[str]
+    commit_message: Optional[str]
+    new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
+    exp_id: Optional[str]
+
+
+class AdminHandler(
+    base.BaseHandler[AdminHandlerNormalizePayloadDict, Dict[str, str]]
+):
     """Handler for the admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {
@@ -185,7 +228,7 @@ class AdminHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         demo_exploration_ids = list(feconf.DEMO_EXPLORATIONS.keys())
 
@@ -220,22 +263,44 @@ class AdminHandler(base.BaseHandler):
         })
 
     @acl_decorators.can_access_admin_page
-    def post(self):
+    def post(self) -> None:
         """Handles POST requests."""
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
         action = self.normalized_payload.get('action')
         try:
             result = {}
             if action == 'reload_exploration':
                 exploration_id = self.normalized_payload.get('exploration_id')
+                if exploration_id is None:
+                    raise Exception(
+                        'The \'exploration_id\' must be provided when the'
+                        ' action is reload_exploration.'
+                    )
                 self._reload_exploration(exploration_id)
             elif action == 'reload_collection':
                 collection_id = self.normalized_payload.get('collection_id')
+                if collection_id is None:
+                    raise Exception(
+                        'The \'collection_id\' must be provided when the'
+                        ' action is reload_collection.'
+                    )
                 self._reload_collection(collection_id)
             elif action == 'generate_dummy_explorations':
                 num_dummy_exps_to_generate = self.normalized_payload.get(
                     'num_dummy_exps_to_generate')
+                if num_dummy_exps_to_generate is None:
+                    raise Exception(
+                        'The \'num_dummy_exps_to_generate\' must be provided'
+                        ' when the action is generate_dummy_explorations.'
+                    )
                 num_dummy_exps_to_publish = self.normalized_payload.get(
                     'num_dummy_exps_to_publish')
+                if num_dummy_exps_to_publish is None:
+                    raise Exception(
+                        'The \'num_dummy_exps_to_publish\' must be provided'
+                        ' when the action is generate_dummy_explorations.'
+                    )
 
                 if num_dummy_exps_to_generate < num_dummy_exps_to_publish:
                     raise self.InvalidInputException(
@@ -256,6 +321,11 @@ class AdminHandler(base.BaseHandler):
             elif action == 'save_config_properties':
                 new_config_property_values = self.normalized_payload.get(
                     'new_config_property_values')
+                if new_config_property_values is None:
+                    raise Exception(
+                        'The \'new_config_property_values\' must be provided'
+                        ' when the action is save_config_properties.'
+                    )
                 logging.info(
                     '[ADMIN] %s saved config property values: %s' %
                     (self.user_id, new_config_property_values))
@@ -264,6 +334,11 @@ class AdminHandler(base.BaseHandler):
             elif action == 'revert_config_property':
                 config_property_id = self.normalized_payload.get(
                     'config_property_id')
+                if config_property_id is None:
+                    raise Exception(
+                        'The \'config_property_id\' must be provided'
+                        ' when the action is revert_config_property.'
+                    )
                 logging.info(
                     '[ADMIN] %s reverted config property: %s' %
                     (self.user_id, config_property_id))
@@ -271,9 +346,19 @@ class AdminHandler(base.BaseHandler):
                     self.user_id, config_property_id)
             elif action == 'upload_topic_similarities':
                 data = self.normalized_payload.get('data')
+                if data is None:
+                    raise Exception(
+                        'The \'data\' must be provided when the action'
+                        ' is upload_topic_similarities.'
+                    )
                 recommendations_services.update_topic_similarities(data)
             elif action == 'regenerate_topic_related_opportunities':
                 topic_id = self.normalized_payload.get('topic_id')
+                if topic_id is None:
+                    raise Exception(
+                        'The \'topic_id\' must be provided when the action'
+                        ' is regenerate_topic_related_opportunities.'
+                    )
                 opportunities_count = (
                     opportunity_services
                     .regenerate_opportunities_related_to_topic(
@@ -283,15 +368,41 @@ class AdminHandler(base.BaseHandler):
                 }
             elif action == 'rollback_exploration_to_safe_state':
                 exp_id = self.normalized_payload.get('exp_id')
+                if exp_id is None:
+                    raise Exception(
+                        'The \'exp_id\' must be provided when the action'
+                        ' is rollback_exploration_to_safe_state.'
+                    )
                 version = (
                     exp_services.rollback_exploration_to_safe_state(exp_id))
                 result = {
                     'version': version
                 }
-            elif action == 'update_feature_flag_rules':
+            else:
+                # The handler schema defines the possible values of 'action'.
+                # If 'action' has a value other than those defined in the
+                # schema, a Bad Request error will be thrown. Hence, 'action'
+                # must be 'update_feature_flag_rules' if this branch is
+                # executed.
+                assert action == 'update_feature_flag_rules'
                 feature_name = self.normalized_payload.get('feature_name')
+                if feature_name is None:
+                    raise Exception(
+                        'The \'feature_name\' must be provided when the action'
+                        ' is update_feature_flag_rules.'
+                    )
                 new_rules = self.normalized_payload.get('new_rules')
+                if new_rules is None:
+                    raise Exception(
+                        'The \'new_rules\' must be provided when the action'
+                        ' is update_feature_flag_rules.'
+                    )
                 commit_message = self.normalized_payload.get('commit_message')
+                if commit_message is None:
+                    raise Exception(
+                        'The \'commit_message\' must be provided when the '
+                        'action is update_feature_flag_rules.'
+                    )
 
                 try:
                     feature_services.update_feature_flag_rules(
@@ -312,7 +423,7 @@ class AdminHandler(base.BaseHandler):
             self.render_json({'error': str(e)})
             raise e
 
-    def _reload_exploration(self, exploration_id):
+    def _reload_exploration(self, exploration_id: str) -> None:
         """Reloads the exploration in dev_mode corresponding to the given
         exploration id.
 
@@ -333,7 +444,11 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot reload an exploration in production.')
 
     def _create_dummy_question(
-            self, question_id, question_content, linked_skill_ids):
+        self,
+        question_id: str,
+        question_content: str,
+        linked_skill_ids: List[str]
+    ) -> question_domain.Question:
         """Creates a dummy question object with the given question ID.
 
         Args:
@@ -396,7 +511,9 @@ class AdminHandler(base.BaseHandler):
             constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids, [])
         return question
 
-    def _create_dummy_skill(self, skill_id, skill_description, explanation):
+    def _create_dummy_skill(
+        self, skill_id: str, skill_description: str, explanation: str
+    ) -> skill_domain.Skill:
         """Creates a dummy skill object with the given values.
 
         Args:
@@ -419,7 +536,7 @@ class AdminHandler(base.BaseHandler):
         skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
         return skill
 
-    def _load_dummy_new_structures_data(self):
+    def _load_dummy_new_structures_data(self) -> None:
         """Loads the database with two topics (one of which is empty), a story
         and three skills in the topic (two of them in a subtopic) and a question
         attached to each skill.
@@ -428,6 +545,7 @@ class AdminHandler(base.BaseHandler):
             Exception. Cannot load new structures data in production mode.
             Exception. User does not have enough rights to generate data.
         """
+        assert self.user_id is not None
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
@@ -529,7 +647,9 @@ class AdminHandler(base.BaseHandler):
                                'greater than another number.'
             }]
 
-            def generate_dummy_story_nodes(node_id, exp_id, title, description):
+            def generate_dummy_story_nodes(
+                node_id: int, exp_id: str, title: str, description: str
+            ) -> None:
                 """Generates and connects sequential story nodes.
 
                 Args:
@@ -538,7 +658,7 @@ class AdminHandler(base.BaseHandler):
                     title: str. The title of the story node.
                     description: str. The description of the story node.
                 """
-
+                assert self.user_id is not None
                 story.add_node(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
                     title)
@@ -588,7 +708,7 @@ class AdminHandler(base.BaseHandler):
         else:
             raise Exception('Cannot load new structures data in production.')
 
-    def _generate_dummy_skill_and_questions(self):
+    def _generate_dummy_skill_and_questions(self) -> None:
         """Generate and loads the database with a skill and 15 questions
         linked to the skill.
 
@@ -596,6 +716,7 @@ class AdminHandler(base.BaseHandler):
             Exception. Cannot load new structures data in production mode.
             Exception. User does not have enough rights to generate data.
         """
+        assert self.user_id is not None
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
@@ -619,7 +740,7 @@ class AdminHandler(base.BaseHandler):
         else:
             raise Exception('Cannot generate dummy skills in production.')
 
-    def _reload_collection(self, collection_id):
+    def _reload_collection(self, collection_id: str) -> None:
         """Reloads the collection in dev_mode corresponding to the given
         collection id.
 
@@ -629,6 +750,7 @@ class AdminHandler(base.BaseHandler):
         Raises:
             Exception. Cannot reload a collection in production.
         """
+        assert self.user_id is not None
         if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s reloaded collection %s' %
@@ -640,7 +762,8 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot reload a collection in production.')
 
     def _generate_dummy_explorations(
-            self, num_dummy_exps_to_generate, num_dummy_exps_to_publish):
+        self, num_dummy_exps_to_generate: int, num_dummy_exps_to_publish: int
+    ) -> None:
         """Generates and publishes the given number of dummy explorations.
 
         Args:
@@ -652,7 +775,7 @@ class AdminHandler(base.BaseHandler):
         Raises:
             Exception. Environment is not DEVMODE.
         """
-
+        assert self.user_id is not None
         if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s generated %s number of dummy explorations' %
@@ -679,13 +802,14 @@ class AdminHandler(base.BaseHandler):
         else:
             raise Exception('Cannot generate dummy explorations in production.')
 
-    def _generate_dummy_classroom(self):
+    def _generate_dummy_classroom(self) -> None:
         """Generate and loads the database with a classroom.
 
         Raises:
             Exception. Cannot generate dummy classroom in production.
             Exception. User does not have enough rights to generate data.
         """
+        assert self.user_id is not None
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
@@ -763,18 +887,18 @@ class AdminHandler(base.BaseHandler):
             classroom_url_fragment_1 = 'first-classroom'
             classroom_url_fragment_2 = 'second-classroom'
 
-            topic_dependency_for_classroom_1 = {
+            topic_dependency_for_classroom_1: Dict[str, list[str]] = {
                 topic_id_1: [],
                 topic_id_2: [topic_id_1],
                 topic_id_3: [topic_id_1],
                 topic_id_4: [topic_id_2],
                 topic_id_5: [topic_id_3]
             }
-            topic_dependency_for_classroom_2 = {
+            topic_dependency_for_classroom_2: Dict[str, List[str]] = {
                 topic_id_6: []
             }
 
-            classroom_dict_1 = {
+            classroom_dict_1: classroom_config_domain.ClassroomDict = {
                 'classroom_id': classroom_id_1,
                 'name': classroom_name_1,
                 'url_fragment': classroom_url_fragment_1,
@@ -783,7 +907,7 @@ class AdminHandler(base.BaseHandler):
                 'topic_id_to_prerequisite_topic_ids': (
                     topic_dependency_for_classroom_1)
             }
-            classroom_dict_2 = {
+            classroom_dict_2: classroom_config_domain.ClassroomDict = {
                 'classroom_id': classroom_id_2,
                 'name': classroom_name_2,
                 'url_fragment': classroom_url_fragment_2,
@@ -806,11 +930,47 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot generate dummy classroom in production.')
 
 
-class AdminRoleHandler(base.BaseHandler):
+class AdminRoleHandlerNormalizedGetRequestDict(TypedDict):
+    """Dict representation of AdminRoleHandler's GET normalized_request
+    dictionary.
+    """
+
+    filter_criterion: str
+    role: Optional[str]
+    username: Optional[str]
+
+
+class AdminRoleHandlerNormalizedDeleteRequestDict(TypedDict):
+    """Dict representation of AdminRoleHandler's DELETE normalized_request
+    dictionary.
+    """
+
+    role: str
+    username: str
+
+
+class AdminRoleHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of AdminRoleHandler's normalized_payload
+    dictionary.
+    """
+
+    role: str
+    username: str
+
+
+class AdminRoleHandler(
+    base.BaseHandler[
+        AdminRoleHandlerNormalizedPayloadDict,
+        Union[
+            AdminRoleHandlerNormalizedGetRequestDict,
+            AdminRoleHandlerNormalizedDeleteRequestDict
+        ]
+    ]
+):
     """Handler for roles tab of admin page. Used to view and update roles."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'filter_criterion': {
@@ -865,22 +1025,50 @@ class AdminRoleHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self):
-        filter_criterion = self.normalized_request.get(
-            'filter_criterion')
+    def get(self) -> None:
+        assert self.user_id is not None
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Union of request TypedDicts to a
+        # particular TypedDict that was defined according to the schemas.
+        # So that the type of fetched values is not considered as Any type.
+        request_data = cast(
+            AdminRoleHandlerNormalizedGetRequestDict,
+            self.normalized_request
+        )
+        filter_criterion = request_data['filter_criterion']
         if filter_criterion == feconf.USER_FILTER_CRITERION_ROLE:
-            role = self.normalized_request.get(
-                feconf.USER_FILTER_CRITERION_ROLE)
+            role = request_data.get(feconf.USER_FILTER_CRITERION_ROLE)
+            if role is None:
+                raise Exception(
+                    'The role must be provided when the filter criterion '
+                    'is \'role\'.'
+                )
             role_services.log_role_query(
                 self.user_id, feconf.ROLE_ACTION_VIEW_BY_ROLE,
                 role=role)
             self.render_json({
-                'usernames': user_services.get_usernames_by_role(role)
+                'usernames': (
+                    user_services.get_usernames_by_role(role) if role else []
+                )
             })
-        elif filter_criterion == feconf.USER_FILTER_CRITERION_USERNAME:
-            username = self.normalized_request.get(
+        else:
+            # The handler schema defines the possible values of
+            # 'filter_criterion'. If 'filter_criterion' has a value other than
+            # those defined in the schema, a Bad Request error will be thrown.
+            # Hence, 'filter_criterion' must be
+            # 'feconf.USER_FILTER_CRITERION_USERNAME' if this branch is
+            # executed.
+            assert filter_criterion == (
                 feconf.USER_FILTER_CRITERION_USERNAME)
-            user_id = user_services.get_user_id_from_username(username)
+            username = request_data.get(feconf.USER_FILTER_CRITERION_USERNAME)
+            if username is None:
+                raise Exception(
+                    'The username must be provided when the filter criterion '
+                    'is \'username\'.'
+                )
+            user_id = (
+                user_services.get_user_id_from_username(username)
+            )
             role_services.log_role_query(
                 self.user_id, feconf.ROLE_ACTION_VIEW_BY_USERNAME,
                 username=username)
@@ -903,9 +1091,10 @@ class AdminRoleHandler(base.BaseHandler):
             self.render_json(user_roles_dict)
 
     @acl_decorators.can_access_admin_page
-    def put(self):
-        username = self.normalized_payload.get('username')
-        role = self.normalized_payload.get('role')
+    def put(self) -> None:
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
+        role = self.normalized_payload['role']
         user_settings = user_services.get_user_settings_from_username(username)
 
         if user_settings is None:
@@ -923,9 +1112,17 @@ class AdminRoleHandler(base.BaseHandler):
         self.render_json({})
 
     @acl_decorators.can_access_admin_page
-    def delete(self):
-        username = self.normalized_request.get('username')
-        role = self.normalized_request.get('role')
+    def delete(self) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Union of request TypedDicts to a
+        # particular TypedDict that was defined according to the schemas.
+        # So that the type of fetched values is not considered as Any type.
+        request_data = cast(
+            AdminRoleHandlerNormalizedDeleteRequestDict,
+            self.normalized_request
+        )
+        username = request_data['username']
+        role = request_data['role']
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
@@ -940,11 +1137,25 @@ class AdminRoleHandler(base.BaseHandler):
         self.render_json({})
 
 
-class TopicManagerRoleHandler(base.BaseHandler):
+class TopicManagerRoleHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of TopicManagerRoleHandler's normalized_payload
+    dictionary.
+    """
+
+    username: str
+    action: str
+    topic_id: str
+
+
+class TopicManagerRoleHandler(
+    base.BaseHandler[
+        TopicManagerRoleHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handler to assign or deassigning manager to a topic."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'username': {
@@ -967,10 +1178,11 @@ class TopicManagerRoleHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self):
-        username = self.normalized_payload.get('username')
-        action = self.normalized_payload.get('action')
-        topic_id = self.normalized_payload.get('topic_id')
+    def put(self) -> None:
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
+        action = self.normalized_payload['action']
+        topic_id = self.normalized_payload['topic_id']
 
         user_settings = user_services.get_user_settings_from_username(username)
 
@@ -988,22 +1200,51 @@ class TopicManagerRoleHandler(base.BaseHandler):
             topic_services.assign_role(
                 user_services.get_system_user(),
                 topic_manager, topic_domain.ROLE_MANAGER, topic_id)
-        elif action == 'deassign':
+        else:
+            # The handler schema defines the possible values of 'action'.
+            # If 'action' has a value other than those defined in the schema,
+            # a Bad Request error will be thrown. Hence, 'action' must be
+            # 'deassign' if this branch is executed.
+            assert action == 'deassign'
             topic_services.deassign_manager_role_from_topic(
                 user_services.get_system_user(), user_id, topic_id)
 
-            if not topic_fetchers.get_topic_rights_with_user(user_id):
-                user_services.remove_user_role(
-                    user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+            # The case where user does not have manager rights it will be
+            # caught before in topic_services.deassign_manager_role_from_topic
+            # method.
+            assert not topic_fetchers.get_topic_rights_with_user(user_id)
+            user_services.remove_user_role(
+                user_id, feconf.ROLE_ID_TOPIC_MANAGER)
 
         self.render_json({})
 
 
-class BannedUsersHandler(base.BaseHandler):
+class BannedUsersHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of BannedUsersHandler's normalized_payload
+    dictionary.
+    """
+
+    username: str
+
+
+class BannedUsersHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of BannedUsersHandler's normalized_request
+    dictionary.
+    """
+
+    username: str
+
+
+class BannedUsersHandler(
+    base.BaseHandler[
+        BannedUsersHandlerNormalizedPayloadDict,
+        BannedUsersHandlerNormalizedRequestDict
+    ]
+):
     """Handler to ban and unban users."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'username': {
@@ -1022,8 +1263,9 @@ class BannedUsersHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self):
-        username = self.normalized_payload.get('username')
+    def put(self) -> None:
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
@@ -1035,8 +1277,9 @@ class BannedUsersHandler(base.BaseHandler):
         self.render_json({})
 
     @acl_decorators.can_access_admin_page
-    def delete(self):
-        username = self.normalized_request.get('username')
+    def delete(self) -> None:
+        assert self.normalized_request is not None
+        username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
@@ -1047,12 +1290,33 @@ class BannedUsersHandler(base.BaseHandler):
         self.render_json({})
 
 
-class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
+class AdminSuperAdminPrivilegesHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of AdminSuperAdminPrivilegesHandler's
+    normalized_payload dictionary.
+    """
+
+    username: str
+
+
+class AdminSuperAdminPrivilegesHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of AdminSuperAdminPrivilegesHandler's
+    normalized_request dictionary.
+    """
+
+    username: str
+
+
+class AdminSuperAdminPrivilegesHandler(
+    base.BaseHandler[
+        AdminSuperAdminPrivilegesHandlerNormalizedPayloadDict,
+        AdminSuperAdminPrivilegesHandlerNormalizedRequestDict
+    ]
+):
     """Handler for granting a user super admin privileges."""
 
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'username': {
@@ -1071,12 +1335,12 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self):
+    def put(self) -> None:
+        assert self.normalized_payload is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
-
-        username = self.normalized_payload.get('username')
+        username = self.normalized_payload['username']
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
@@ -1086,12 +1350,12 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_access_admin_page
-    def delete(self):
+    def delete(self) -> None:
+        assert self.normalized_request is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
-
-        username = self.normalized_request.get('username')
+        username = self.normalized_request['username']
 
         user_settings = user_services.get_user_settings_from_username(username)
         if user_settings is None:
@@ -1105,15 +1369,17 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class AdminTopicsCsvFileDownloader(base.BaseHandler):
+class AdminTopicsCsvFileDownloader(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Retrieves topic similarity data for download."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_admin_page
-    def get(self):
+    def get(self) -> None:
         topic_similarities = (
             recommendations_services.get_topic_similarities_as_csv()
         )
@@ -1126,11 +1392,26 @@ class AdminTopicsCsvFileDownloader(base.BaseHandler):
         )
 
 
-class DataExtractionQueryHandler(base.BaseHandler):
+class DataExtractionQueryHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of DataExtractionQueryHandler's
+    normalized_request dictionary.
+    """
+
+    exp_id: str
+    exp_version: int
+    state_name: str
+    num_answers: int
+
+
+class DataExtractionQueryHandler(
+    base.BaseHandler[
+        Dict[str, str], DataExtractionQueryHandlerNormalizedRequestDict
+    ]
+):
     """Handler for data extraction query."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'exp_id': {
@@ -1157,9 +1438,10 @@ class DataExtractionQueryHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self):
-        exp_id = self.normalized_request.get('exp_id')
-        exp_version = self.normalized_request.get('exp_version')
+    def get(self) -> None:
+        assert self.normalized_request is not None
+        exp_id = self.normalized_request['exp_id']
+        exp_version = self.normalized_request['exp_version']
 
         exploration = exp_fetchers.get_exploration_by_id(
             exp_id, strict=False, version=exp_version)
@@ -1168,8 +1450,8 @@ class DataExtractionQueryHandler(base.BaseHandler):
                 'Entity for exploration with id %s and version %s not found.'
                 % (exp_id, exp_version))
 
-        state_name = self.normalized_request.get('state_name')
-        num_answers = self.normalized_request.get('num_answers')
+        state_name = self.normalized_request['state_name']
+        num_answers = self.normalized_request['num_answers']
 
         if state_name not in exploration.states:
             raise self.InvalidInputException(
@@ -1178,6 +1460,13 @@ class DataExtractionQueryHandler(base.BaseHandler):
 
         state_answers = stats_services.get_state_answers(
             exp_id, exp_version, state_name)
+        if state_answers is None:
+            raise Exception(
+                'No state answer exists for the given exp_id: %s,'
+                ' exp_version: %s and state_name: %s' %
+                (exp_id, exp_version, state_name)
+
+            )
         extracted_answers = state_answers.get_submitted_answer_dict_list()
 
         if num_answers > 0:
@@ -1189,15 +1478,18 @@ class DataExtractionQueryHandler(base.BaseHandler):
         self.render_json(response)
 
 
-class SendDummyMailToAdminHandler(base.BaseHandler):
+class SendDummyMailToAdminHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """This function handles sending test emails."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'POST': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_access_admin_page
-    def post(self):
+    def post(self) -> None:
         username = self.username
+        assert username is not None
         if feconf.CAN_SEND_EMAILS:
             email_manager.send_dummy_mail_to_admin(username)
             self.render_json({})
@@ -1205,10 +1497,23 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
             raise self.InvalidInputException('This app cannot send emails.')
 
 
-class UpdateUsernameHandler(base.BaseHandler):
+class UpdateUsernameHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of UpdateUsernameHandler's
+    normalized_payload dictionary.
+    """
+
+    old_username: str
+    new_username: str
+
+
+class UpdateUsernameHandler(
+    base.BaseHandler[
+        UpdateUsernameHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handler for renaming usernames."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'old_username': {
@@ -1229,9 +1534,11 @@ class UpdateUsernameHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self):
-        old_username = self.normalized_payload.get('old_username')
-        new_username = self.normalized_payload.get('new_username')
+    def put(self) -> None:
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        old_username = self.normalized_payload['old_username']
+        new_username = self.normalized_payload['new_username']
 
         user_id = user_services.get_user_id_from_username(old_username)
         if user_id is None:
@@ -1247,28 +1554,42 @@ class UpdateUsernameHandler(base.BaseHandler):
         self.render_json({})
 
 
-class NumberOfDeletionRequestsHandler(base.BaseHandler):
+class NumberOfDeletionRequestsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for getting the number of pending deletion requests via admin
     page.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_admin_page
-    def get(self):
+    def get(self) -> None:
         self.render_json({
             'number_of_pending_deletion_models': (
                 wipeout_service.get_number_of_pending_deletion_requests())
         })
 
 
-class VerifyUserModelsDeletedHandler(base.BaseHandler):
+class VerifyUserModelsDeletedHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of VerifyUserModelsDeletedHandler's
+    normalized_request dictionary.
+    """
+
+    user_id: str
+
+
+class VerifyUserModelsDeletedHandler(
+    base.BaseHandler[
+        Dict[str, str], VerifyUserModelsDeletedHandlerNormalizedRequestDict
+    ]
+):
     """Handler for getting whether any models exist for specific user ID."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'user_id': {
@@ -1280,18 +1601,32 @@ class VerifyUserModelsDeletedHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self):
-        user_id = self.normalized_request.get('user_id')
+    def get(self) -> None:
+        assert self.normalized_request is not None
+        user_id = self.normalized_request['user_id']
 
         user_is_deleted = wipeout_service.verify_user_deleted(
             user_id, include_delete_at_end_models=True)
         self.render_json({'related_models_exist': not user_is_deleted})
 
 
-class DeleteUserHandler(base.BaseHandler):
+class DeleteUserHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of DeleteUserHandler's
+    normalized_request dictionary.
+    """
+
+    user_id: str
+    username: str
+
+
+class DeleteUserHandler(
+    base.BaseHandler[
+        Dict[str, str], DeleteUserHandlerNormalizedRequestDict
+    ]
+):
     """Handler for deleting a user with specific ID."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'DELETE': {
             'user_id': {
@@ -1308,9 +1643,10 @@ class DeleteUserHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_delete_any_user
-    def delete(self):
-        user_id = self.normalized_request.get('user_id')
-        username = self.normalized_request.get('username')
+    def delete(self) -> None:
+        assert self.normalized_request is not None
+        user_id = self.normalized_request['user_id']
+        username = self.normalized_request['username']
 
         user_id_from_username = (
             user_services.get_user_id_from_username(username))
@@ -1327,11 +1663,25 @@ class DeleteUserHandler(base.BaseHandler):
         self.render_json({'success': True})
 
 
-class UpdateBlogPostHandler(base.BaseHandler):
+class UpdateBlogPostHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of UpdateBlogPostHandler's
+    normalized_payload dictionary.
+    """
+
+    blog_post_id: str
+    author_username: str
+    published_on: str
+
+
+class UpdateBlogPostHandler(
+    base.BaseHandler[
+        UpdateBlogPostHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handler for changing author ids and published on date in
     blog posts."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'blog_post_id': {
@@ -1357,10 +1707,11 @@ class UpdateBlogPostHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self):
-        blog_post_id = self.normalized_payload.get('blog_post_id')
-        author_username = self.normalized_payload.get('author_username')
-        published_on = self.normalized_payload.get('published_on')
+    def put(self) -> None:
+        assert self.normalized_payload is not None
+        blog_post_id = self.normalized_payload['blog_post_id']
+        author_username = self.normalized_payload['author_username']
+        published_on = self.normalized_payload['published_on']
 
         author_id = user_services.get_user_id_from_username(author_username)
         if author_id is None:
