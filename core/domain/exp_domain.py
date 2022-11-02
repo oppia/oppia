@@ -4993,35 +4993,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v52_dict_to_v53_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 52 to 53. Version 53 adds
-        catchMisspellings customization arg to TextInput
-        interaction which allows creators to detect misspellings.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'TextInput':
-                customization_args = state_dict['interaction'][
-                    'customization_args']
-                customization_args.update({
-                    'catchMisspellings': {
-                        'value': False
-                    }
-                })
-
-        return states_dict
-
-    @classmethod
     def update_states_from_model(
         cls,
         versioned_exploration_states: VersionedExplorationStatesDict,
