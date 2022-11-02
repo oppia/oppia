@@ -205,12 +205,14 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
     def test_dependencies_syntax_testing_with_valid_syntax(self):
         install_third_party.test_dependencies_syntax(
-            'files', {
-                'url': 'https://github.com/yui/yuicompressor/v2.4.8#md5=123456',
-                'files': ['yuicompressor-2.4.8.jar'],
-                'version': '2.4.8',
-                'targetDirPrefix': 'yuicompressor-',
-                'downloadFormat': 'files'})
+            'zip', {
+                'version': 'c26ebb9baaf0abc060c8a13254dad283c6ee7304',
+                'downloadFormat': 'zip',
+                'url': 'https://github.com/oppia/MIDI.js/archive/c26e.zip',
+                'rootDirPrefix': 'MIDI.js-',
+                'targetDir': 'midi-js-c26ebb'
+            }
+        )
 
     def test_dependencies_syntax_with_missing_mandatory_key(self):
         print_arr = []
@@ -220,10 +222,12 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         with print_swap, self.assertRaisesRegex(SystemExit, '1'):
             install_third_party.test_dependencies_syntax(
                 'files', {
-                    'files': ['yuicompressor-2.4.8.jar'],
-                    'version': '2.4.8',
-                    'targetDirPrefix': 'yuicompressor-',
-                    'downloadFormat': 'files'})
+                    'files': ['MathJax-2.7.5.jar'],
+                    'version': '2.7.5',
+                    'targetDirPrefix': 'MathJax-',
+                    'downloadFormat': 'files'
+                }
+            )
         self.assertTrue(
             'This key is missing or misspelled: "url".' in print_arr)
 
@@ -269,13 +273,18 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_return_json(unused_filepath):
             return {
                 'dependencies': {
-                    'oppiaTools': {
-                        'yuiCompressor': {
-                            'url': 'https://github.com/yui/v2.4.8',
-                            'files': ['yuicompressor-2.4.8.jar'],
-                            'version': '2.4.8',
-                            'targetDirPrefix': 'yuicompressor-',
-                            'downloadFormat': 'files'}}}}
+                    'frontend': {
+                        'mathJax': {
+                            'url': 'https://github.com/mathjax/2.7.5',
+                            'files': ['MathJax-2.7.5.jar'],
+                            'version': '2.7.5',
+                            'targetDirPrefix': 'MathJax-',
+                            'downloadFormat': 'files'
+                        }
+                    }
+                }
+            }
+
         return_json_swap = self.swap(
             install_third_party, 'return_json', mock_return_json)
         with return_json_swap:
@@ -285,21 +294,23 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_return_json(unused_filepath):
             return {
                 'dependencies': {
-                    'oppiaTools': {
-                        'yuiCompressor': {
-                            'url': 'https://github.com/yui/v2.4.8',
-                            'files': ['yuicompressor-2.4.8.jar'],
-                            'version': '2.4.8',
-                            'targetDirPrefix': 'yuicompressor-'}}}}
+                    'frontend': {
+                        'mathJax': {
+                            'version': '2.7.5',
+                            'url': 'https://github.com/mathjax/2.7.5.zip',
+                            'targetDirPrefix': 'MathJax-'
+                        }
+                    }
+                }
+            }
         return_json_swap = self.swap(
             install_third_party, 'return_json', mock_return_json)
         with return_json_swap, self.assertRaisesRegex(
             Exception,
             re.escape(
-                'downloadFormat not specified in {\'url\': '
-                '\'https://github.com/yui/v2.4.8\', \'files\': '
-                '[\'yuicompressor-2.4.8.jar\'], \'version\': \'2.4.8\', '
-                '\'targetDirPrefix\': \'yuicompressor-\'}'
+                'downloadFormat not specified in {\'version\': \'2.7.5\', '
+                '\'url\': \'https://github.com/mathjax/2.7.5.zip\', '
+                '\'targetDirPrefix\': \'MathJax-\'}'
             )
         ):
             install_third_party.validate_dependencies('filepath')
@@ -323,13 +334,6 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             return {
                 'dependencies': {
                     'oppiaTools': {
-                        'yuiCompressor': {
-                            'url': 'https://github.com/yui/v2.4.8',
-                            'files': ['yuicompressor-2.4.8.jar'],
-                            'version': '2.4.8',
-                            'targetDirPrefix': 'yuicompressor-',
-                            'downloadFormat': 'files'
-                        },
                         'bleach': {
                             'version': '3.1.0',
                             'downloadFormat': 'zip',
@@ -350,7 +354,18 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                             'downloadFormat': 'zip',
                             'url': 'https://bootstrap/bootstrap-4.3.1-dist.zip',
                             'rootDir': 'bootstrap-4.3.1-dist',
-                            'targetDir': 'bootstrap'}}}}
+                            'targetDir': 'bootstrap'
+                        },
+                        'angularTest': {
+                            'version': '1.8.2',
+                            'downloadFormat': 'files',
+                            'url': 'https://code.angularjs.org/1.8.2',
+                            'targetDirPrefix': 'angularjs-',
+                            'files': ['angular-mocks.js']
+                        },
+                    }
+                }
+            }
 
         def mock_validate_dependencies(unused_filepath):
             check_function_calls['validate_dependencies_is_called'] = True

@@ -23,17 +23,15 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import beam_job_services
 
-from typing import Any, Dict # isort: skip
+from typing import Dict, TypedDict
 
 
-class BeamJobHandler(base.BaseHandler):
+class BeamJobHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handler for getting the definitions of Apache Beam jobs."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
-        'GET': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_run_any_job
     def get(self) -> None:
@@ -43,12 +41,34 @@ class BeamJobHandler(base.BaseHandler):
         self.render_json({'jobs': [j.to_dict() for j in sorted_beam_jobs]})
 
 
-class BeamJobRunHandler(base.BaseHandler):
+class BeamJobRunHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of BeamJobRunHandler's normalized_payload
+    dictionary.
+    """
+
+    job_name: str
+    job_id: str
+
+
+class BeamJobRunHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of BeamJobRunHandler's normalized_request
+    dictionary.
+    """
+
+    job_id: str
+
+
+class BeamJobRunHandler(
+    base.BaseHandler[
+        BeamJobRunHandlerNormalizedPayloadDict,
+        BeamJobRunHandlerNormalizedRequestDict
+    ]
+):
     """Handler for managing the execution of Apache Beam jobs."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
             'job_name': {
@@ -80,25 +100,37 @@ class BeamJobRunHandler(base.BaseHandler):
 
     @acl_decorators.can_run_any_job
     def put(self) -> None:
-        job_name: str = (
-            self.normalized_payload.get('job_name')
-            if self.normalized_payload else '')
+        assert self.normalized_payload is not None
+        job_name = self.normalized_payload['job_name']
         beam_job_run = beam_job_services.run_beam_job(job_name=job_name)
         self.render_json(beam_job_run.to_dict())
 
     @acl_decorators.can_run_any_job
     def delete(self) -> None:
-        job_id = self.normalized_payload.get('job_id')
+        assert self.normalized_request is not None
+        job_id = self.normalized_request['job_id']
         beam_job_run = beam_job_services.cancel_beam_job(job_id)
         self.render_json(beam_job_run.to_dict())
 
 
-class BeamJobRunResultHandler(base.BaseHandler):
+class BeamJobRunResultHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of BeamJobRunResultHandler's
+    normalized_request dictionary.
+    """
+
+    job_id: str
+
+
+class BeamJobRunResultHandler(
+    base.BaseHandler[
+        Dict[str, str], BeamJobRunResultHandlerNormalizedRequestDict
+    ]
+):
     """Handler for getting the result of Apache Beam jobs."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'job_id': {
                 'schema': {
@@ -114,6 +146,7 @@ class BeamJobRunResultHandler(base.BaseHandler):
 
     @acl_decorators.can_run_any_job
     def get(self) -> None:
-        job_id = self.normalized_request.get('job_id')
+        assert self.normalized_request is not None
+        job_id = self.normalized_request['job_id']
         beam_job_run_result = beam_job_services.get_beam_job_run_result(job_id)
         self.render_json(beam_job_run_result.to_dict())

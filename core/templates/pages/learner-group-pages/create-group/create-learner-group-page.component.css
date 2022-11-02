@@ -233,6 +233,26 @@
   cursor: pointer;
 }
 
+@media screen and (max-width: 768px) {
+  .oppia-create-learner-group {
+    background: #fff;
+    width: 100%;
+  }
+
+  .oppia-create-learner-group .oppia-create-learner-group-title {
+    padding: 60px 20px 0;
+  }
+
+  .oppia-create-learner-group .oppia-create-learner-group-tab-container {
+    box-shadow: unset;
+    padding: 32px 20px 30px 20px;
+  }
+
+  .oppia-learner-group-created-container {
+    height: unset;
+  }
+}
+
 @media screen and (max-width: 575px) {
   .oppia-create-learner-group .oppia-learner-group-progressbar li:before {
     left: -30%;
