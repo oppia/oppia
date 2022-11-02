@@ -204,7 +204,10 @@ class LearnerGroupModel(base_models.BaseModel):
                     'subtopic_page_ids': [],
                     'story_ids': []
                 }
-            elif user_id in learner_group_model.facilitator_user_ids:
+            else:
+                # To get to this branch, the user_id would need to be in
+                # facilitator_user_ids.
+                assert user_id in learner_group_model.facilitator_user_ids
                 learner_group_data = {
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
@@ -278,7 +281,10 @@ class LearnerGroupModel(base_models.BaseModel):
 
             # If the user has been invited to join the group, delete the
             # user from the invited_learner_user_ids list.
-            elif user_id in learner_group_model.invited_learner_user_ids:
+            else:
+                # To get to this branch, the user_id would need to be in
+                # invited_learner_user_ids.
+                assert user_id in learner_group_model.invited_learner_user_ids
                 learner_group_model.invited_learner_user_ids.remove(user_id)
 
             learner_group_models_to_put.append(learner_group_model)
@@ -288,8 +294,8 @@ class LearnerGroupModel(base_models.BaseModel):
 
     @classmethod
     def get_by_facilitator_id(
-            cls, facilitator_id: str
-        ) -> Sequence[LearnerGroupModel]:
+        cls, facilitator_id: str
+    ) -> Sequence[LearnerGroupModel]:
         """Returns a list of all LearnerGroupModels that have the given
         facilitator id.
 
@@ -304,6 +310,51 @@ class LearnerGroupModel(base_models.BaseModel):
         found_models: Sequence[LearnerGroupModel] = cls.get_all().filter(
             datastore_services.any_of(
                 cls.facilitator_user_ids == facilitator_id
+        )).fetch()
+
+        return found_models
+
+    @classmethod
+    def get_by_learner_user_id(
+        cls, learner_user_id: str
+    ) -> Sequence[LearnerGroupModel]:
+        """Returns a list of all LearnerGroupModels that have the given
+        user id as a learner.
+
+        Args:
+            learner_user_id: str. The id of the learner.
+
+        Returns:
+            list(LearnerGroupModel)|None. A list of all LearnerGroupModels that
+            the given learner is part of or None if no such learner group
+            models exist.
+        """
+        found_models: Sequence[LearnerGroupModel] = cls.get_all().filter(
+            datastore_services.any_of(
+                cls.learner_user_ids == learner_user_id
+        )).fetch()
+
+        return found_models
+
+    @classmethod
+    def get_by_invited_learner_user_id(
+        cls, invited_learner_user_id: str
+    ) -> Sequence[LearnerGroupModel]:
+        """Returns a list of all LearnerGroupModels which the given user has
+        been invited to join.
+
+        Args:
+            invited_learner_user_id: str. The id of the learner invited to
+                join the groups.
+
+        Returns:
+            list(LearnerGroupModel)|None. A list of all LearnerGroupModels that
+            the given learner is being invited to join or None if no such
+            learner group models exist.
+        """
+        found_models: Sequence[LearnerGroupModel] = cls.get_all().filter(
+            datastore_services.any_of(
+                cls.invited_learner_user_ids == invited_learner_user_id
         )).fetch()
 
         return found_models

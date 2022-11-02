@@ -22,6 +22,9 @@ export default {
   // in the URL for topics that are not yet attached to a classroom.
   "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
 
+  // Acceptable URL schemes for links.
+  "ACCEPTABLE_SCHEMES": ["https", ""],
+
   // The default classroom URL fragment to use when the provided classroom URL
   // fragment in the controller is invalid.
   "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",
@@ -280,6 +283,7 @@ export default {
   },
 
   "ALLOWED_IMAGE_FORMATS": ["svg", "png", "jpeg", "jpg", "gif"],
+  "MAX_ALLOWED_IMAGE_SIZE_IN_KB": 100,
 
   "TASK_TYPE_HIGH_BOUNCE_RATE": "high_bounce_rate",
   "TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP": "ineffective_feedback_loop",
@@ -4947,6 +4951,8 @@ export default {
     "Welcome": "#992a2b"
   },
 
+  "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": ["tabs", "skillreview"],
+
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
   "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
 
@@ -5687,11 +5693,13 @@ export default {
       // eslint-disable-next-line max-len
       "Use respectful pronouns (like “आप” instead of “तुम/तू ”) and a corresponding respectful tone like “करिये, करेंगे”.",
       // eslint-disable-next-line max-len
-      "Use the same voice (active or passive) as in the original English text.",
+      "Feel free to change the voice and order of phrases to make the text readable.",
       // eslint-disable-next-line max-len
       "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Hindi as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes.",
       // eslint-disable-next-line max-len
-      "If the original card has “components” (such as pictures, links, and equations), these need to be added to the translated content. You can use the “Copy tool” for this -- click on the Copy tool and then click on the component you want to carry over. Also, double-click on the image and translate the alt text (and caption, if any)."
+      "If the original card has “components” (such as pictures, links, and equations), these need to be added to the translated content. You can use the “Copy tool” for this -- click on the Copy tool and then click on the component you want to carry over. Also, double-click on the image and translate the alt text (and caption, if any).",
+      // eslint-disable-next-line max-len
+      "Refer to Glossary - https://docs.google.com/spreadsheets/d/13NMEnYqLZuMbeX1Z6XXG-femHkKNAN8KwjhaC67EkxI/edit#gid=0"
     ],
     // Spanish.
     "es": [
@@ -6174,7 +6182,6 @@ export default {
 
   "OPPORTUNITY_TYPE_SKILL": "skill",
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
-  "OPPORTUNITY_TYPE_VOICEOVER": "voiceover",
 
   // The bucket name is set to app_default_bucket which is used to store files
   // in GCS when local development server is running. This should be changed
@@ -6766,6 +6773,15 @@ export default {
           "CONTENT": "Read the latest on what's new and exciting with Oppia."
         }
       ]
+    },
+    "LEARNER_GROUP_VIEWER": {
+      "ROUTE": "learner-group/:learner_group_id",
+      "TITLE": "I18N_LEARNER_GROUP_PAGE_TITLE",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
     },
     "SPLASH": {
       "ROUTE": "",

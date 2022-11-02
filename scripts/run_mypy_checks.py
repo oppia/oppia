@@ -44,20 +44,7 @@ EXCLUDED_DIRECTORIES: Final = [
 
 # List of files who should be type-annotated but are not.
 NOT_FULLY_COVERED_FILES: Final = [
-    'core/controllers/access_validators.py',
-    'core/controllers/access_validators_test.py',
-    'core/controllers/acl_decorators.py',
-    'core/controllers/acl_decorators_test.py',
-    'core/controllers/admin.py',
-    'core/controllers/admin_test.py',
-    'core/controllers/android_e2e_config.py',
-    'core/controllers/android_e2e_config_test.py',
-    'core/controllers/base.py',
     'core/controllers/base_test.py',
-    'core/controllers/beam_jobs.py',
-    'core/controllers/beam_jobs_test.py',
-    'core/controllers/blog_admin.py',
-    'core/controllers/blog_admin_test.py',
     'core/controllers/blog_dashboard.py',
     'core/controllers/blog_dashboard_test.py',
     'core/controllers/blog_homepage.py',
@@ -311,7 +298,6 @@ def main(args: Optional[List[str]] = None) -> int:
         sys.path.insert(1, directory)
 
     install_third_party_libraries(parsed_args.skip_install)
-    common.fix_third_party_imports()
 
     print('Installing Mypy and stubs for third party libraries.')
     return_code, mypy_exec_path = install_mypy_prerequisites(

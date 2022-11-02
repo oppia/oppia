@@ -298,6 +298,19 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
 
+    def test_raises_error_if_guest_user_try_to_publish_the_exploration(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'To publish explorations and update users\' profiles, '
+            'user must be logged in and have admin access.'
+        ):
+            exp_services.publish_exploration_and_update_user_profiles(
+                guest_user, 'exp_id'
+            )
+
     def test_get_exploration_titles_and_categories(self) -> None:
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories([]), {})
@@ -7995,7 +8008,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
 
         migration_change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': 51,
+            'from_version': 52,
             'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         })]
         exp_services.update_exploration(

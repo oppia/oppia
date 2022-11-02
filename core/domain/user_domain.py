@@ -519,14 +519,15 @@ class UserSettings:
 class UserActionsInfo:
     """A class representing information of user actions.
     Attributes:
-        user_id: str. The unique ID of the user.
+        user_id: str|None. The unique ID of the user, or None if the user
+            is not logged in.
         roles: list(str). The roles of the user.
         actions: list(str). A list of actions accessible to the role.
     """
 
     def __init__(
         self,
-        user_id: str,
+        user_id: Optional[str],
         roles: List[str],
         actions: List[str]
     ) -> None:
@@ -535,7 +536,7 @@ class UserActionsInfo:
         self._actions = actions
 
     @property
-    def user_id(self) -> str:
+    def user_id(self) -> Optional[str]:
         """Returns the unique ID of the user.
 
         Returns:

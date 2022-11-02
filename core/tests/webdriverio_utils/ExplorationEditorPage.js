@@ -97,7 +97,6 @@ var ExplorationEditorPage = function() {
   var navigateToStatsTabButton = $('.e2e-test-stats-tab');
   var navigateToTranslationTabButton = $('.e2e-test-translation-tab');
   var prePublicationConfirmButton = $('.e2e-test-confirm-pre-publication');
-  var previewTabLearnerViewCard = $('.e2e-test-learner-view-card-content');
   var publishChangesButtonTextContainer = $(
     '.e2e-test-publish-changes-message');
   var publishExplorationButton = $('.e2e-test-publish-exploration');
@@ -279,7 +278,7 @@ var ExplorationEditorPage = function() {
       }
       await action.click('Save draft', saveButtonMobile[0]);
       if (commitMessage) {
-        await action.sendValue(
+        await action.setValue(
           'Commit message input', commitMessageInput, commitMessage);
       }
       await action.click('Save draft button', commitChangesButton);
@@ -408,8 +407,11 @@ var ExplorationEditorPage = function() {
   };
 
   this.waitForPreviewTabToLoad = async function() {
-    await waitFor.visibilityOf(
-      previewTabLearnerViewCard, 'Preview Tab learner card is not visible');
+    // We need to use browser.pause in order to explicitly wait for preview tab
+    // to load because waitFor.pageToFullyLoad only works when we navigate to
+    // preview tab for the first time.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(2000);
   };
 
   this.navigateToSettingsTab = async function() {
