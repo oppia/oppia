@@ -3129,14 +3129,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     customisation_args[ca_name].get_content_ids()
                 )
 
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains written_translations property.
         translations_mapping = (
-            state_dict['written_translations']['translations_mapping'])
+            state_dict['written_translations']['translations_mapping'])  # type: ignore[misc]
         new_translations_mapping = {
              content_id: translation_item for
              content_id, translation_item in translations_mapping.items()
              if content_id in content_id_list
         }
-        state_dict['written_translations']['translations_mapping'] = (
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains written_translations property.
+        state_dict['written_translations']['translations_mapping'] = (  # type: ignore[misc]
             new_translations_mapping)
 
         voiceovers_mapping = (
@@ -3341,7 +3345,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         # Marking the content ids that needs update.
         for content_id in content_ids_of_choices_to_update:
-            choice_translations = state_dict['written_translations'][
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains written_translations property.
+            choice_translations = state_dict['written_translations'][  # type: ignore[misc]
                 'translations_mapping'][content_id]
             for translation in choice_translations.values():
                 translation['needs_update'] = True
@@ -3615,7 +3621,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 state_dict['interaction']['customization_args'][
                     'buttonText']['value']['unicode_str'] = 'Continue'
 
-            continue_button_translations = state_dict['written_translations'][
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains written_translations property.
+            continue_button_translations = state_dict['written_translations'][ # type: ignore[misc]
                 'translations_mapping'][content_id]
             for translation in continue_button_translations.values():
                 translation['needs_update'] = True
@@ -4903,8 +4911,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state['content']['html'] = cls.fix_content(html)
 
             # Fix tags for written translations.
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains written_translations property.
             written_translations = (
-                state['written_translations']['translations_mapping'])
+                state['written_translations']['translations_mapping'])  # type: ignore[misc]
             for translation_item in written_translations.values():
                 for translation in translation_item.values():
                     if isinstance(translation['translation'], list):
@@ -4989,7 +4999,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         current_states_schema_version: int,
         init_state_name: str,
         language_code: str
-    ) -> None:
+    ) -> Optional[int]:
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
@@ -5343,9 +5353,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Removes written_translation, next_content_id_index from state properties
         and also introduces next_content_id_index variable into
         exploration level.
+
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v58.
+
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v59.

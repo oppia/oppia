@@ -7176,16 +7176,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
@@ -7213,7 +7214,7 @@ states:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -7223,29 +7224,18 @@ states:
       id: NumericInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 7
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
-        default_outcome: {}
+        content_0: {}
+        default_outcome_1: {}
         feedback_2: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content:
-          hi:
-            data_format: html
-            needs_update: false
-            translation:
-            - <p>choicewa</p>
-        default_outcome: {}
-        feedback_2: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_3
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -7258,16 +7248,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_3: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -7445,16 +7431,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: '<p>Content of RTE</p>
 
         <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
@@ -7502,13 +7489,13 @@ states:
       customization_args:
         buttonText:
           value:
-            content_id: ca_buttonText_0
+            content_id: ca_buttonText_2
             unicode_str: Continue
       default_outcome:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -7518,34 +7505,23 @@ states:
       id: Continue
       solution: null
     linked_skill_id: null
-    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_buttonText_0:
+        ca_buttonText_2:
           hi:
             duration_secs: 2.324875
             file_size_bytes: 37198
             filename: default_outcome-hi-en-7hl9iw3az8.mp3
             needs_update: true
-        content: {}
-        default_outcome: {}
+        content_0: {}
+        default_outcome_1: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_buttonText_0:
-          hi:
-            data_format: html
-            needs_update: true
-            translation: <p><oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;"
-              caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image></p>
-        content: {}
-        default_outcome: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_3
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -7561,20 +7537,15 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_3: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
-
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_rte)
         self.assertEqual(
@@ -7707,16 +7678,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Continue and End interaction validation</p>
     interaction:
       answer_groups: []
@@ -7724,13 +7696,13 @@ states:
       customization_args:
         buttonText:
           value:
-            content_id: ca_buttonText_0
+            content_id: ca_buttonText_2
             unicode_str: Continue
       default_outcome:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
             &amp;quot;&amp;lt;p&amp;gt;A noun is a person, place, or thing.  A noun
             can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;:
@@ -7745,33 +7717,23 @@ states:
       id: Continue
       solution: null
     linked_skill_id: null
-    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_buttonText_0:
+        ca_buttonText_2:
           hi:
             duration_secs: 2.324875
             file_size_bytes: 37198
             filename: default_outcome-hi-en-7hl9iw3az8.mp3
             needs_update: true
-        content: {}
-        default_outcome: {}
+        content_0: {}
+        default_outcome_1: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_buttonText_0:
-          hi:
-            data_format: html
-            needs_update: true
-            translation: <p>choicewa</p>
-        content: {}
-        default_outcome: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_3
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -7787,16 +7749,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_3: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -7906,16 +7864,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: hi
+next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Continue and End interaction validation</p>
     interaction:
       answer_groups: []
@@ -7923,13 +7882,13 @@ states:
       customization_args:
         buttonText:
           value:
-            content_id: ca_buttonText_0
+            content_id: ca_buttonText_2
             unicode_str: Continue
       default_outcome:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -7939,24 +7898,18 @@ states:
       id: Continue
       solution: null
     linked_skill_id: null
-    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_buttonText_0: {}
-        content: {}
-        default_outcome: {}
+        ca_buttonText_2: {}
+        content_0: {}
+        default_outcome_1: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_buttonText_0: {}
-        content: {}
-        default_outcome: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_3
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -7972,16 +7925,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_3: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -8309,16 +8258,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
@@ -8378,7 +8328,7 @@ states:
           dest: Introduction
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_5
+            content_id: feedback_4
             html: <p>cv</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -8398,7 +8348,7 @@ states:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -8406,7 +8356,7 @@ states:
         refresher_exploration_id: null
       hints:
       - hint_content:
-          content_id: hint
+          content_id: hint_5
           html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
             &amp;quot;&amp;lt;p&amp;gt;A noun is a person, place, or thing.  A noun
             can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;:
@@ -8416,30 +8366,21 @@ states:
       id: NumericInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 7
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
-        default_outcome: {}
+        content_0: {}
+        default_outcome_1: {}
         feedback_2: {}
         feedback_3: {}
-        feedback_5: {}
-        hint: {}
+        feedback_4: {}
+        hint_5: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_2: {}
-        feedback_3: {}
-        feedback_5: {}
-        hint: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_6
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -8452,16 +8393,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_6: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -8739,16 +8676,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
@@ -8756,7 +8694,7 @@ states:
           dest: end
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_8
+            content_id: feedback_2
             html: <p>jj</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -8776,7 +8714,7 @@ states:
           dest: Introduction
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_10
+            content_id: feedback_3
             html: <p>hj</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -8796,7 +8734,7 @@ states:
           dest: Introduction
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_11
+            content_id: feedback_4
             html: <p>hj</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -8816,7 +8754,7 @@ states:
           dest: Introduction
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_12
+            content_id: feedback_5
             html: <p>ll</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -8836,7 +8774,7 @@ states:
           value: true
         customPlaceholder:
           value:
-            content_id: ca_customPlaceholder_7
+            content_id: ca_customPlaceholder_6
             unicode_str: ''
         requireSimplestForm:
           value: false
@@ -8844,7 +8782,7 @@ states:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -8854,32 +8792,22 @@ states:
       id: FractionInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 14
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_customPlaceholder_7: {}
-        content: {}
-        default_outcome: {}
-        feedback_10: {}
-        feedback_11: {}
-        feedback_12: {}
-        feedback_8: {}
+        ca_customPlaceholder_6: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_customPlaceholder_7: {}
-        content: {}
-        default_outcome: {}
-        feedback_10: {}
-        feedback_11: {}
-        feedback_12: {}
-        feedback_8: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_7
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -8892,16 +8820,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_7: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -9048,16 +8972,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 5
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
@@ -9065,7 +8990,7 @@ states:
           dest: end
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_8
+            content_id: feedback_2
             html: <p>jj</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -9089,7 +9014,7 @@ states:
           value: true
         customPlaceholder:
           value:
-            content_id: ca_customPlaceholder_7
+            content_id: ca_customPlaceholder_3
             unicode_str: ''
         requireSimplestForm:
           value: false
@@ -9097,7 +9022,7 @@ states:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -9107,26 +9032,19 @@ states:
       id: FractionInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 14
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_customPlaceholder_7: {}
-        content: {}
-        default_outcome: {}
-        feedback_8: {}
+        ca_customPlaceholder_3: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_customPlaceholder_7: {}
-        content: {}
-        default_outcome: {}
-        feedback_8: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_4
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -9139,16 +9057,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_4: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -9348,16 +9262,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
@@ -9365,7 +9280,7 @@ states:
           dest: end
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_17
+            content_id: feedback_2
             html: ''
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -9381,7 +9296,7 @@ states:
           dest: Introduction
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_18
+            content_id: feedback_3
             html: <p>a</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -9397,11 +9312,11 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: ca_choices_13
+          - content_id: ca_choices_4
             html: <p>Choice 1</p>
-          - content_id: ca_choices_15
+          - content_id: ca_choices_5
             html: <p>1</p>
-          - content_id: ca_choices_17
+          - content_id: ca_choices_6
             html: <p>Choice 2</p>
         showChoicesInShuffledOrder:
           value: true
@@ -9409,7 +9324,7 @@ states:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -9419,41 +9334,27 @@ states:
       id: MultipleChoiceInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 20
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_13:
+        ca_choices_4:
           hi:
             duration_secs: 2.324875
             file_size_bytes: 37198
             filename: default_outcome-hi-en-7hl9iw3az8.mp3
             needs_update: true
-        ca_choices_15: {}
-        ca_choices_17: {}
-        content: {}
-        default_outcome: {}
-        feedback_17: {}
-        feedback_18: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        feedback_3: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_13:
-          hi:
-            data_format: html
-            needs_update: true
-            translation: <p>choicewa</p>
-        ca_choices_15: {}
-        ca_choices_17: {}
-        content: {}
-        default_outcome: {}
-        feedback_17: {}
-        feedback_18: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_7
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -9466,16 +9367,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_7: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -9595,13 +9492,7 @@ states:
         refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
-      solution:
-        answer_is_exclusive: true
-        correct_answer:
-          - <p>1</p>
-        explanation:
-          content_id: solution
-          html: This is <i>solution</i> for state1
+      solution: null
     linked_skill_id: null
     next_content_id_index: 26
     param_changes: []
@@ -9670,16 +9561,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 9
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
@@ -9687,7 +9579,7 @@ states:
           dest: Introduction
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_24
+            content_id: feedback_2
             html: <p>dff</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -9696,12 +9588,12 @@ states:
         rule_specs:
         - inputs:
             x:
-            - ca_choices_20
-            - ca_choices_21
+            - ca_choices_4
+            - ca_choices_5
           rule_type: Equals
         - inputs:
             x:
-            - ca_choices_20
+            - ca_choices_4
           rule_type: ContainsAtLeastOneOf
         tagged_skill_misconception_id: null
         training_data: []
@@ -9709,7 +9601,7 @@ states:
           dest: end
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_25
+            content_id: feedback_3
             html: <p>gg</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -9718,14 +9610,14 @@ states:
         rule_specs:
         - inputs:
             x:
-            - ca_choices_20
+            - ca_choices_4
           rule_type: Equals
         - inputs:
             x:
-            - ca_choices_20
-            - ca_choices_21
-            - ca_choices_22
-            - ca_choices_23
+            - ca_choices_4
+            - ca_choices_5
+            - ca_choices_6
+            - ca_choices_7
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -9733,14 +9625,14 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: ca_choices_20
+          - content_id: ca_choices_4
             html: <p>1</p>
-          - content_id: ca_choices_21
+          - content_id: ca_choices_5
             html: <p>2<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;"
               caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image></p>
-          - content_id: ca_choices_22
+          - content_id: ca_choices_6
             html: <p>3</p>
-          - content_id: ca_choices_23
+          - content_id: ca_choices_7
             html: <p>4</p>
         maxAllowableSelectionCount:
           value: 4
@@ -9750,7 +9642,7 @@ states:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -9758,44 +9650,25 @@ states:
         refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
-      solution:
-        answer_is_exclusive: true
-        correct_answer:
-        - <p>1</p>
-        explanation:
-          content_id: solution
-          html: This is <i>solution</i> for state1
+      solution: null
     linked_skill_id: null
-    next_content_id_index: 26
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_20: {}
-        ca_choices_21: {}
-        ca_choices_22: {}
-        ca_choices_23: {}
-        content: {}
-        default_outcome: {}
-        feedback_24: {}
-        feedback_25: {}
-        solution: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        feedback_3: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_20: {}
-        ca_choices_21: {}
-        ca_choices_22: {}
-        ca_choices_23: {}
-        content: {}
-        default_outcome: {}
-        feedback_24: {}
-        feedback_25: {}
-        solution: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_8
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -9808,16 +9681,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_8: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -10035,16 +9904,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
@@ -10052,7 +9922,7 @@ states:
           dest: end
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_25
+            content_id: feedback_2
             html: <p>gg</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -10061,15 +9931,15 @@ states:
         rule_specs:
         - inputs:
             x:
-            - ca_choices_22
+            - ca_choices_5
           rule_type: Equals
         - inputs:
             x:
-            - ca_choices_20
+            - ca_choices_3
           rule_type: Equals
         - inputs:
             x:
-            - ca_choices_21
+            - ca_choices_4
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -10077,11 +9947,11 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: ca_choices_20
+          - content_id: ca_choices_3
             html: <p>1</p>
-          - content_id: ca_choices_21
+          - content_id: ca_choices_4
             html: <p>2</p>
-          - content_id: ca_choices_22
+          - content_id: ca_choices_5
             html: <p>3</p>
         maxAllowableSelectionCount:
           value: 4
@@ -10091,7 +9961,7 @@ states:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -10101,30 +9971,21 @@ states:
       id: ItemSelectionInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 28
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_20: {}
-        ca_choices_21: {}
-        ca_choices_22: {}
-        content: {}
-        default_outcome: {}
-        feedback_25: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_20: {}
-        ca_choices_21: {}
-        ca_choices_22: {}
-        content: {}
-        default_outcome: {}
-        feedback_25: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_6
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -10137,16 +9998,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_6: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -10307,16 +10164,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
@@ -10324,7 +10182,7 @@ states:
           dest: Introduction
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_25
+            content_id: feedback_2
             html: <p>dff</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -10333,8 +10191,8 @@ states:
         rule_specs:
         - inputs:
             x:
-            - ca_choices_20
-            - ca_choices_21
+            - ca_choices_3
+            - ca_choices_4
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -10342,13 +10200,13 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: ca_choices_20
+          - content_id: ca_choices_3
             html: <p>1</p>
-          - content_id: ca_choices_21
+          - content_id: ca_choices_4
             html: <p>2</p>
-          - content_id: ca_choices_22
+          - content_id: ca_choices_5
             html: <p>3</p>
-          - content_id: ca_choices_23
+          - content_id: ca_choices_6
             html: <p>4</p>
         maxAllowableSelectionCount:
           value: 4
@@ -10358,7 +10216,7 @@ states:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -10368,32 +10226,22 @@ states:
       id: ItemSelectionInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 26
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_20: {}
-        ca_choices_21: {}
-        ca_choices_22: {}
-        ca_choices_23: {}
-        content: {}
-        default_outcome: {}
-        feedback_25: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_20: {}
-        ca_choices_21: {}
-        ca_choices_22: {}
-        ca_choices_23: {}
-        content: {}
-        default_outcome: {}
-        feedback_25: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_7
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -10406,16 +10254,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_7: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -10548,16 +10392,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 6
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
@@ -10565,7 +10410,7 @@ states:
           dest: end
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_24
+            content_id: feedback_2
             html: <p>dff</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -10574,7 +10419,7 @@ states:
         rule_specs:
         - inputs:
             x:
-            - ca_choices_20
+            - ca_choices_3
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -10582,9 +10427,9 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: ca_choices_20
+          - content_id: ca_choices_3
             html: <p>1</p>
-          - content_id: ca_choices_21
+          - content_id: ca_choices_4
             html: <p>2</p>
         maxAllowableSelectionCount:
           value: 4
@@ -10594,7 +10439,7 @@ states:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -10604,28 +10449,20 @@ states:
       id: ItemSelectionInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 26
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_20: {}
-        ca_choices_21: {}
-        content: {}
-        default_outcome: {}
-        feedback_24: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_20: {}
-        ca_choices_21: {}
-        content: {}
-        default_outcome: {}
-        feedback_24: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_5
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -10638,16 +10475,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_5: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -10880,16 +10713,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
@@ -10897,7 +10731,7 @@ states:
           dest: end
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_33
+            content_id: feedback_2
             html: ''
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -10905,15 +10739,15 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: ca_choices_27
+            x: ca_choices_4
             y: 2
           rule_type: HasElementXAtPositionY
         - inputs:
             x:
-            - - ca_choices_29
-            - - ca_choices_28
-            - - ca_choices_27
-            - - ca_choices_26
+            - - ca_choices_6
+            - - ca_choices_5
+            - - ca_choices_4
+            - - ca_choices_3
           rule_type: IsEqualToOrdering
         tagged_skill_misconception_id: null
         training_data: []
@@ -10923,19 +10757,19 @@ states:
           value: false
         choices:
           value:
-          - content_id: ca_choices_26
+          - content_id: ca_choices_3
             html: <p>1</p>
-          - content_id: ca_choices_27
+          - content_id: ca_choices_4
             html: <p>2</p>
-          - content_id: ca_choices_28
+          - content_id: ca_choices_5
             html: <p>3</p>
-          - content_id: ca_choices_29
+          - content_id: ca_choices_6
             html: <p>4</p>
       default_outcome:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -10945,32 +10779,22 @@ states:
       id: DragAndDropSortInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 34
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_26: {}
-        ca_choices_27: {}
-        ca_choices_28: {}
-        ca_choices_29: {}
-        content: {}
-        default_outcome: {}
-        feedback_33: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_26: {}
-        ca_choices_27: {}
-        ca_choices_28: {}
-        ca_choices_29: {}
-        content: {}
-        default_outcome: {}
-        feedback_33: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_7
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -10983,16 +10807,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_7: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -11148,16 +10968,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
@@ -11165,7 +10986,7 @@ states:
           dest: end
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_33
+            content_id: feedback_2
             html: ''
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -11174,17 +10995,17 @@ states:
         rule_specs:
         - inputs:
             x:
-            - - ca_choices_29
-              - ca_choices_28
-            - - ca_choices_27
-            - - ca_choices_26
+            - - ca_choices_6
+              - ca_choices_5
+            - - ca_choices_4
+            - - ca_choices_3
           rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
         - inputs:
             x:
-            - - ca_choices_26
-            - - ca_choices_27
-            - - ca_choices_28
-            - - ca_choices_29
+            - - ca_choices_3
+            - - ca_choices_4
+            - - ca_choices_5
+            - - ca_choices_6
           rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
         tagged_skill_misconception_id: null
         training_data: []
@@ -11194,19 +11015,19 @@ states:
           value: true
         choices:
           value:
-          - content_id: ca_choices_26
+          - content_id: ca_choices_3
             html: <p>1</p>
-          - content_id: ca_choices_27
+          - content_id: ca_choices_4
             html: <p>2</p>
-          - content_id: ca_choices_28
+          - content_id: ca_choices_5
             html: <p>3</p>
-          - content_id: ca_choices_29
+          - content_id: ca_choices_6
             html: <p>4</p>
       default_outcome:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -11216,32 +11037,22 @@ states:
       id: DragAndDropSortInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 34
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_26: {}
-        ca_choices_27: {}
-        ca_choices_28: {}
-        ca_choices_29: {}
-        content: {}
-        default_outcome: {}
-        feedback_33: {}
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_26: {}
-        ca_choices_27: {}
-        ca_choices_28: {}
-        ca_choices_29: {}
-        content: {}
-        default_outcome: {}
-        feedback_33: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_7
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -11254,16 +11065,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_7: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -11435,16 +11242,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
@@ -11452,7 +11260,7 @@ states:
           dest: end
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_33
+            content_id: feedback_2
             html: ''
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -11461,13 +11269,13 @@ states:
         rule_specs:
         - inputs:
             x:
-            - - ca_choices_28
-            - - ca_choices_29
+            - - ca_choices_4
+            - - ca_choices_5
           rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
         - inputs:
             x:
-            - - ca_choices_29
-            - - ca_choices_28
+            - - ca_choices_5
+            - - ca_choices_4
           rule_type: IsEqualToOrdering
         tagged_skill_misconception_id: null
         training_data: []
@@ -11477,15 +11285,15 @@ states:
           value: true
         choices:
           value:
-          - content_id: ca_choices_28
+          - content_id: ca_choices_4
             html: <p>1</p>
-          - content_id: ca_choices_29
+          - content_id: ca_choices_5
             html: <p>2</p>
       default_outcome:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -11496,36 +11304,27 @@ states:
       solution:
         answer_is_exclusive: true
         correct_answer:
-        - - ca_choices_29
-        - - ca_choices_28
+        - - ca_choices_5
+        - - ca_choices_4
         explanation:
-          content_id: solution
+          content_id: solution_3
           html: This is <i>solution</i> for state1
     linked_skill_id: null
-    next_content_id_index: 34
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_28: {}
-        ca_choices_29: {}
-        content: {}
-        default_outcome: {}
-        feedback_33: {}
-        solution: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        solution_3: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_28: {}
-        ca_choices_29: {}
-        content: {}
-        default_outcome: {}
-        feedback_33: {}
-        solution: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_6
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -11538,16 +11337,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_6: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -11564,7 +11359,6 @@ title: ''
         """Tests the migration of invalid TextInput interaction exploration
         data from version less than 58.
         """
-
         sample_yaml_content_for_text_interac_1: str = (
             """author_notes: ''
 auto_tts_enabled: false
@@ -11849,16 +11643,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 15
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
@@ -11866,7 +11661,7 @@ states:
           dest: end
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_35
+            content_id: feedback_2
             html: ''
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -11875,7 +11670,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              contentId: rule_input_36
+              contentId: rule_input_3
               normalizedStrSet:
               - and
               - drop
@@ -11886,7 +11681,7 @@ states:
           dest: Introduction
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_38
+            content_id: feedback_4
             html: <p>sd</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -11895,7 +11690,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              contentId: rule_input_39
+              contentId: rule_input_5
               normalizedStrSet:
               - ze
           rule_type: StartsWith
@@ -11905,7 +11700,7 @@ states:
           dest: Introduction
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_41
+            content_id: feedback_6
             html: <p>sd</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -11914,7 +11709,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              contentId: rule_input_42
+              contentId: rule_input_7
               normalizedStrSet:
               - he
           rule_type: Contains
@@ -11924,7 +11719,7 @@ states:
           dest: Introduction
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_44
+            content_id: feedback_8
             html: <p>ssd</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -11933,7 +11728,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              contentId: rule_input_45
+              contentId: rule_input_9
               normalizedStrSet:
               - abc
           rule_type: Contains
@@ -11943,7 +11738,7 @@ states:
           dest: Introduction
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_47
+            content_id: feedback_10
             html: <p>sd</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -11952,13 +11747,13 @@ states:
         rule_specs:
         - inputs:
             x:
-              contentId: rule_input_48
+              contentId: rule_input_11
               normalizedStrSet:
               - dog
           rule_type: StartsWith
         - inputs:
             x:
-              contentId: rule_input_50
+              contentId: rule_input_12
               normalizedStrSet:
               - beautiful
           rule_type: Equals
@@ -11968,7 +11763,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ca_placeholder_34
+            content_id: ca_placeholder_13
             unicode_str: ''
         rows:
           value: 10
@@ -11976,7 +11771,7 @@ states:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -11986,46 +11781,29 @@ states:
       id: TextInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 50
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_placeholder_34: {}
-        content: {}
-        default_outcome: {}
-        feedback_35: {}
-        feedback_38: {}
-        feedback_41: {}
-        feedback_44: {}
-        feedback_47: {}
-        rule_input_36: {}
-        rule_input_39: {}
-        rule_input_42: {}
-        rule_input_45: {}
-        rule_input_48: {}
-        rule_input_50: {}
+        ca_placeholder_13: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_10: {}
+        feedback_2: {}
+        feedback_4: {}
+        feedback_6: {}
+        feedback_8: {}
+        rule_input_11: {}
+        rule_input_12: {}
+        rule_input_3: {}
+        rule_input_5: {}
+        rule_input_7: {}
+        rule_input_9: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_placeholder_34: {}
-        content: {}
-        default_outcome: {}
-        feedback_35: {}
-        feedback_38: {}
-        feedback_41: {}
-        feedback_44: {}
-        feedback_47: {}
-        rule_input_36: {}
-        rule_input_39: {}
-        rule_input_42: {}
-        rule_input_45: {}
-        rule_input_48: {}
-        rule_input_50: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_14
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -12038,16 +11816,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_14: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -12179,16 +11953,17 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
+next_content_id_index: 6
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: <p>Numeric interaction validation</p>
     interaction:
       answer_groups:
@@ -12196,7 +11971,7 @@ states:
           dest: end
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_35
+            content_id: feedback_2
             html: ''
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -12205,7 +11980,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              contentId: rule_input_36
+              contentId: rule_input_3
               normalizedStrSet:
               - and
               - drop
@@ -12216,7 +11991,7 @@ states:
       customization_args:
         placeholder:
           value:
-            content_id: ca_placeholder_34
+            content_id: ca_placeholder_4
             unicode_str: ''
         rows:
           value: 1
@@ -12224,7 +11999,7 @@ states:
         dest: end
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: <p>df</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -12234,28 +12009,20 @@ states:
       id: TextInput
       solution: null
     linked_skill_id: null
-    next_content_id_index: 50
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_placeholder_34: {}
-        content: {}
-        default_outcome: {}
-        feedback_35: {}
-        rule_input_36: {}
+        ca_placeholder_4: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        rule_input_3: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_placeholder_34: {}
-        content: {}
-        default_outcome: {}
-        feedback_35: {}
-        rule_input_36: {}
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_5
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -12268,16 +12035,12 @@ states:
       id: EndExploration
       solution: null
     linked_skill_id: null
-    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
+        content_5: {}
     solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)

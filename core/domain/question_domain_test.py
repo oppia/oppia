@@ -2235,8 +2235,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state_schema_version'], 52)
 
     def test_question_state_dict_conversion_from_v52_to_v53(self) -> None:
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
+        content_id_generator = translation_domain.ContentIdGenerator()
+        question_data = question_domain.Question.create_default_question_state(
+            content_id_generator
+        ).to_dict()
 
         test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,

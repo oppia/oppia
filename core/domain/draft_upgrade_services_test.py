@@ -25,6 +25,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.tests import test_utils
 
 from typing import Dict, Final
@@ -313,17 +314,17 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': (
-                    exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS),
+                    exp_domain.DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS),
                 'state_name': 'New state',
-                'old_value': state_domain.WrittenTranslations({
+                'old_value': translation_domain.WrittenTranslations({
                     'content': {
-                        'en': state_domain.WrittenTranslation(
+                        'en': translation_domain.WrittenTranslation(
                             'html', '', False)
                     }
                 }).to_dict(),
-                'new_value': state_domain.WrittenTranslations({
+                'new_value': translation_domain.WrittenTranslations({
                     'content': {
-                        'en': state_domain.WrittenTranslation(
+                        'en': translation_domain.WrittenTranslation(
                             'html',
                             (
                                 '<oppia-noninteractive-image '
@@ -350,17 +351,17 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': (
-                    exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS),
+                    exp_domain.DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS),
                 'state_name': 'New state',
-                'old_value': state_domain.WrittenTranslations({
+                'old_value': translation_domain.WrittenTranslations({
                     'content': {
-                        'en': state_domain.WrittenTranslation(
+                        'en': translation_domain.WrittenTranslation(
                             'html', '', False)
                     }
                 }).to_dict(),
-                'new_value': state_domain.WrittenTranslations({
+                'new_value': translation_domain.WrittenTranslations({
                     'content': {
-                        'en': state_domain.WrittenTranslation(
+                        'en': translation_domain.WrittenTranslation(
                             'html', ['content'], True
                         )
                     }

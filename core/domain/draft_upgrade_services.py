@@ -301,11 +301,14 @@ class DraftUpgradeUtil:
         """Converts draft change list from state version 53 to 54. Version 54
         changes content ids for content and removes written_translation property
         form the state, converting draft to anew version won't be possible.
+
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
+
         Returns:
             list(ExplorationChange). The converted draft_change_list.
+
         Raises:
             InvalidDraftConversionException. The conversion cannot be
                 completed.
@@ -364,7 +367,7 @@ class DraftUpgradeUtil:
                 exp_change.new_value['html'] = html
 
             elif exp_change.property_name == (
-                exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
+                exp_domain.DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS
             ):
                 # Ruling out the possibility of any other type for mypy
                 # type checking.

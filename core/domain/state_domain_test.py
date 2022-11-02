@@ -2080,14 +2080,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
-                'solution': {
-                    'answer_is_exclusive': True,
-                    'correct_answer': '42',
-                    'explanation': {
-                        'content_id': 'solution',
-                        'html': html_with_old_math_schema
-                    }
-                },
                 'answer_groups': [answer_group_with_old_math_schema],
                 'default_outcome': {
                     'param_changes': [],
@@ -2116,7 +2108,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'content_id': 'hint_2',
                             'html': html_with_old_math_schema
                         }
-                    }]
+                    }],
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [html_with_old_math_schema],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                }
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
@@ -2133,14 +2138,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
-                'solution': {
-                    'answer_is_exclusive': True,
-                    'correct_answer': '42',
-                    'explanation': {
-                        'content_id': 'solution',
-                        'html': html_with_new_math_schema
-                    }
-                },
                 'answer_groups': [answer_group_with_new_math_schema],
                 'default_outcome': {
                     'param_changes': [],
@@ -2169,7 +2166,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'content_id': 'hint_2',
                             'html': html_with_new_math_schema
                         }
-                    }]
+                    }],
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [html_with_old_math_schema],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                }
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
