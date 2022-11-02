@@ -294,7 +294,8 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             destination_fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
     def test_compressed_and_micro_files_are_not_overwritten_if_already_present(
-            self) -> None:
+        self
+    ) -> None:
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:

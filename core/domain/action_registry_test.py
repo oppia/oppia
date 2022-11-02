@@ -33,7 +33,8 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
             len(action_registry.Registry.get_all_actions()), 3)
 
     def test_cannot_get_actions_that_do_not_inherit_base_learner_action_spec(
-            self) -> None:
+        self
+    ) -> None:
         # The dict '_actions' is a class property which once gets populated,
         # doesn't call '_refresh()' method again making it difficult to test
         # all branches of action_registry.py. Hence, we manually empty it

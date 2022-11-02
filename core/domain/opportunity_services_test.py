@@ -1037,7 +1037,8 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             )
 
     def test_create_exp_opportunity_summary_for_exp_in_translated_language(
-            self) -> None:
+        self
+    ) -> None:
         exp_id = 'exp_id'
         exploration = self.save_new_valid_exploration(
             exp_id,
@@ -1081,7 +1082,8 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             exp_opportunity_summary.incomplete_translation_language_codes)
 
     def test_update_exp_opportunity_summary_for_exp_in_translated_language(
-            self) -> None:
+        self
+    ) -> None:
         exp_id = 'exp_id'
         exploration = self.save_new_valid_exploration(
             exp_id,

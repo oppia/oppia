@@ -1564,7 +1564,8 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION)
 
     def test_suggestion_emails_are_not_sent_if_user_cannot_recieve_email(
-            self) -> None:
+        self
+    ) -> None:
         expected_email_html_body = (
             'Hi editor,<br>'
             'newuser has submitted a new suggestion for your Oppia '
@@ -1821,7 +1822,8 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION)
 
     def test_feedback_message_emails_are_not_sent_if_user_cannot_recieve_email(
-            self) -> None:
+        self
+    ) -> None:
         user_services.update_email_preferences(
             self.new_user_id, False, False, False, False)
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -2031,7 +2033,8 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
                 sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
 
     def test_reviewer_onboard_emails_are_not_sent_if_user_cannot_recieve_email(
-            self) -> None:
+        self
+    ) -> None:
         user_services.update_email_preferences(
             self.reviewer_id, False, False, False, False)
         with self.can_send_emails_ctx:
@@ -2112,7 +2115,8 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS)
 
     def test_review_notifications_are_not_sent_if_user_cannot_recieve_email(
-            self) -> None:
+        self
+    ) -> None:
         user_services.update_email_preferences(
             self.reviewer_id, False, False, False, False)
         with self.can_send_emails_ctx:
@@ -2157,7 +2161,8 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 0)
 
     def test_achievements_emails_are_not_sent_if_user_cannot_recieve_email(
-            self) -> None:
+        self
+    ) -> None:
         user_services.update_email_preferences(
             self.user_id, False, False, False, False)
         contributor_ranking_email_info = (

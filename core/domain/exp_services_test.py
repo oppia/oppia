@@ -9015,7 +9015,8 @@ title: Title
                 most_recently_reached_checkpoint_state_name, 'Introduction')
 
     def test_update_logged_out_user_checkpoint_progress_on_older_exp_version(
-            self) -> None:
+        self
+    ) -> None:
         logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
             self.UNIQUE_PROGRESS_URL_ID
         )
@@ -9602,7 +9603,8 @@ title: Title
         self.logout()
 
     def test_logged_in_progress_is_not_updated_with_older_exp_progress(
-            self) -> None:
+        self
+    ) -> None:
         self.login(self.VIEWER_EMAIL)
         exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)
@@ -9686,7 +9688,8 @@ title: Title
         self.logout()
 
     def test_logged_in_progress_is_not_updated_with_less_progress_in_newer_exp(
-            self) -> None:
+        self
+    ) -> None:
         self.login(self.VIEWER_EMAIL)
         exp_user_data = exp_fetchers.get_exploration_user_data(
             self.viewer_id, self.EXP_ID)

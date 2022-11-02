@@ -117,7 +117,8 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
             ), [])
 
     def test_can_multi_learners_share_progress_with_invalid_group_id(
-            self) -> None:
+        self
+    ) -> None:
         learner_group_services.add_learner_to_learner_group(
             self.LEARNER_GROUP_ID, self.LEARNER_ID_1, True)
 

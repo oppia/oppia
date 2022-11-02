@@ -422,7 +422,8 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
     def test_mark_exploration_to_be_played_later_handles_duplication(
-            self) -> None:
+        self
+    ) -> None:
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.user_id), [])
@@ -462,7 +463,8 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
     def test_mark_collection_to_be_played_later_handles_duplication(
-            self) -> None:
+        self
+    ) -> None:
         self.assertEqual(
             learner_playlist_services
             .get_all_collection_ids_in_learner_playlist(
