@@ -33,13 +33,16 @@ Immediately upon receiving a report of a security problem, a member of Oppia’s
 
 The tech lead will designate one VRT member as the VRT lead responsible for driving our response. The VRT lead will immediately (ideally within 24 hours) investigate the report and classify it as:
 
-* Won’t fix: The app is working as intended, the bug is not important enough for us to spend resources fixing, or the requested feature is not something we plan to implement.
+* **Won’t fix**: The app is working as intended, the bug is not important enough for us to spend resources fixing, or the requested feature is not something we plan to implement.
 * **Bug**: The problem identified is legitimate, but it is not a security issue. It will be resolved through our normal bug-fixing process.
 * **Feature request**: The report identifies a new feature that should be implemented. It will be handled through our normal feature-development process.
 * **Low-severity vulnerability**: The report identifies a security vulnerability that does not meet the high-severity criteria. It will be resolved through our normal bug-fixing process.
+
+  For example, suppose we improperly sanitized user-provided data at the models layer such that user-provided code could be executed, but validation checks at the controller layer prevented an attacker from actually exploiting the vulnerability. This would be a security vulnerability because the models layer should not allow user-provided code to execute, but it would be low-severity because the controllers layer would prevent exploitation.
+
 * **High-severity vulnerability**: The report identifies an exploitable security vulnerability that, if exploited, could result in any of the following:
   * (Confidentiality) Unauthorized access to personal user data.
-  * (Integrity) Unauthorized edits to any user data.
+  * (Integrity) Unauthorized edits to any data.
   * (Availability) Degraded system performance of the platform for users.
 
 Note that while the VRT contains multiple individuals, it’s ultimately expected that the VRT lead drives the effort. This should be in collaboration with VRT members, but in cases of urgent vulnerabilities the VRT lead can operate authoritatively to mitigate or remediate the issue (i.e. they do not need VRT consensus or review, but they should leverage VRT team members as a source for information and help).
