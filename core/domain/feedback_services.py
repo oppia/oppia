@@ -30,8 +30,7 @@ from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple, Type, cast
-from typing_extensions import Final
+from typing import Dict, Final, List, Optional, Tuple, Type, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover

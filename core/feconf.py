@@ -25,8 +25,7 @@ import os
 
 from core.constants import constants
 
-from typing import Callable, Dict, List, Union
-from typing_extensions import Final, TypedDict
+from typing import Callable, Dict, Final, List, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -253,7 +252,6 @@ ENTITY_TYPE_TOPIC = 'topic'
 ENTITY_TYPE_SKILL = 'skill'
 ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
-ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
 
 IMAGE_CONTEXT_QUESTION_SUGGESTIONS = 'question_suggestions'
 IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS = 'exploration_suggestions'
@@ -337,7 +335,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 52
+CURRENT_STATE_SCHEMA_VERSION = 53
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -676,7 +674,6 @@ EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
 EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS = (
     'add_contributor_dashboard_reviewers'
 )
-EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
 EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
 EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS = (
     'notify_contributor_dashboard_achievements'
@@ -838,14 +835,16 @@ LINEAR_INTERACTION_IDS = ['Continue']
 DEMO_EXPLORATIONS = {
     u'0': 'welcome',
     u'1': 'multiples.yaml',
-    u'2': 'binary_search',
+    # Exploration with ID 2 was removed as it contained string values inside
+    # NumericInput interaction.
     u'3': 'root_linear_coefficient_theorem',
     u'4': 'three_balls',
     # TODO(bhenning): Replace demo exploration '5' with a new exploration
     # described in #1376.
     u'6': 'boot_verbs.yaml',
     u'7': 'hola.yaml',
-    u'8': 'adventure.yaml',
+    # Exploration with ID 8 was removed as it contained string values inside
+    # NumericInput interaction.
     u'9': 'pitch_perfect.yaml',
     u'10': 'test_interactions',
     u'11': 'modeling_graphs',
@@ -896,8 +895,6 @@ TASK_URL_FLAG_EXPLORATION_EMAILS = (
     '%s/email/flagexplorationemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_INSTANT_FEEDBACK_EMAILS = (
     '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
-TASK_URL_SUGGESTION_EMAILS = (
-    '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS = (
     '%s/email/contributordashboardachievementnotificationemailhandler' % (
         TASKQUEUE_URL_PREFIX))
@@ -913,6 +910,7 @@ CLASSROOM_ADMIN_PAGE_URL = '/classroom-admin'
 BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
 BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
 BLOG_DASHBOARD_URL = '/blog-dashboard'
+DIAGNOSTIC_TEST_PLAYER_PAGE_URL = '/diagnostic-test-player'
 BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
 BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'
@@ -1084,6 +1082,8 @@ USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
 FACILITATOR_DASHBOARD_HANDLER = '/facilitator_dashboard_handler'
 FACILITATOR_DASHBOARD_PAGE_URL = '/facilitator-dashboard'
+LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER = (
+    '/learner_dashboard_learner_groups_handler')
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
 EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
 CLASSROOM_ADMIN_DATA_HANDLER_URL = '/classroom_admin_data_handler'
@@ -1246,8 +1246,8 @@ DEPRECATED_ROLE_ACTION_UPDATE = 'update'
 ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
 ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
-USER_FILTER_CRITERION_ROLE = 'role'
-USER_FILTER_CRITERION_USERNAME = 'username'
+USER_FILTER_CRITERION_ROLE: Final = 'role'
+USER_FILTER_CRITERION_USERNAME: Final = 'username'
 
 # Max questions allowed in a session of practice questions.
 QUESTION_BATCH_SIZE = 10

@@ -36,6 +36,7 @@ var ExplorationEditorMainTab = function() {
   var addResponseDetails = $('.e2e-test-add-response-details');
   var addResponseHeader = $('.e2e-test-add-response-modal-header');
   var answerDescription = $('.e2e-test-answer-description');
+  var answerDescriptionElement = $('.e2e-test-answer-description-fragment');
   var answerTab = $('.e2e-test-answer-tab');
   var ckEditorElement = $('.e2e-test-ck-editor');
   var defaultResponseTab = $('.e2e-test-default-response-tab');
@@ -74,7 +75,7 @@ var ExplorationEditorMainTab = function() {
   var nodeLabelLocator = '.e2e-test-node-label';
   var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
   var openOutcomeFeedBackEditor = $('.e2e-test-open-outcome-feedback-editor');
-  var postTutorialPopover = $('.ng-joyride .popover-content');
+  var postTutorialPopover = $('.joyride .popover-content');
   var responseBody = function(responseNum) {
     return $(`.e2e-test-response-body-${responseNum}`);
   };
@@ -89,7 +90,7 @@ var ExplorationEditorMainTab = function() {
   var stateNodeLabel = function(nodeElement) {
     return nodeElement.$(nodeLabelLocator);
   };
-  var titleElement = $('.ng-joyride-title');
+  var titleElement = $('.e2e-test-joyride-title');
 
   /*
    * Buttons
@@ -142,7 +143,7 @@ var ExplorationEditorMainTab = function() {
       editorWelcomeModal, 'Editor Welcome modal takes too long to disappear');
 
     // Otherwise, if the editor tutorial shows up, exit it.
-    var skipButtons = await $$('.ng-joyride .skipBtn');
+    var skipButtons = await $$('.joyride-step__close');
     if (await skipButtons.length === 1) {
       await action.click('Skip button', skipButtons[0]);
     } else if (await skipButtons.length !== 0) {
@@ -153,7 +154,7 @@ var ExplorationEditorMainTab = function() {
 
   this.finishTutorial = async function() {
     // Finish the tutorial.
-    var finishTutorialButtons = await $$('button=Finish');
+    var finishTutorialButtons = await $$('.joyride-button=done');
     await waitFor.elementToBeClickable(
       finishTutorialButtons[0],
       'Finish Tutorial Stage button is not clickable');
@@ -176,11 +177,11 @@ var ExplorationEditorMainTab = function() {
     ];
     for (const HEADING of tutorialTabHeadings) {
     // Use: await tutorialTabHeadings.forEach(async function(heading) {
-      var tutorialTabHeadingElement = $(`.popover-title=${HEADING}`);
+      var tutorialTabHeadingElement = $(`.e2e-test-joyride-title=${HEADING}`);
       await waitFor.visibilityOf(
-        tutorialTabHeadingElement, 'Tutorial: ' + HEADING + 'is not visible');
+        tutorialTabHeadingElement, 'Tutorial: ' + HEADING + ' is not visible');
       // Progress to the next instruction in the tutorial.
-      var nextTutorialStageButtons = await $$('.ng-joyride .nextBtn');
+      var nextTutorialStageButtons = await $$('.joyride-step__next-container');
       await waitFor.elementToBeClickable(
         nextTutorialStageButtons[0],
         'Next Tutorial Stage button is not clickable');
@@ -736,6 +737,9 @@ var ExplorationEditorMainTab = function() {
     }
     var parameterTypes = _getRuleParameterTypes(interactionId, ruleName);
     expect(parameterValues.length).toEqual(parameterTypes.length);
+    await waitFor.visibilityOf(
+      answerDescriptionElement,
+      'Answer description fragement is not visible');
     var answerDescriptionFragment = await $$(
       '.e2e-test-answer-description-fragment');
     for (var i = 0; i < parameterValues.length; i++) {

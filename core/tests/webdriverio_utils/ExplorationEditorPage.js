@@ -278,7 +278,7 @@ var ExplorationEditorPage = function() {
       }
       await action.click('Save draft', saveButtonMobile[0]);
       if (commitMessage) {
-        await action.sendValue(
+        await action.setValue(
           'Commit message input', commitMessageInput, commitMessage);
       }
       await action.click('Save draft button', commitChangesButton);
@@ -404,6 +404,14 @@ var ExplorationEditorPage = function() {
   this.navigateToPreviewTab = async function() {
     await action.click('Preview tab button', navigateToPreviewTabButton);
     await waitFor.pageToFullyLoad();
+  };
+
+  this.waitForPreviewTabToLoad = async function() {
+    // We need to use browser.pause in order to explicitly wait for preview tab
+    // to load because waitFor.pageToFullyLoad only works when we navigate to
+    // preview tab for the first time.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(2000);
   };
 
   this.navigateToSettingsTab = async function() {
