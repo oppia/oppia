@@ -193,7 +193,7 @@ ANDROID_APP_CONTEXT_DICT_SCHEMA = {
 
 class IncomingAndroidFeedbackReportHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of IncomingAndroidFeedbackReportHandler's
-    normalized_Payload dictionary.
+    normalized_payload dictionary.
     """
 
     report: app_feedback_report_domain.AndroidFeedbackReportDict
