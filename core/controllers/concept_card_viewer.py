@@ -24,7 +24,9 @@ from core.domain import skill_fetchers
 from typing import Dict, List
 
 
-class ConceptCardDataHandler(base.BaseHandler):
+class ConceptCardDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """A card that shows the explanation of a skill's concept."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

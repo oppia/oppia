@@ -36,7 +36,9 @@ from core.jobs.batch_jobs import user_stats_computation_jobs
 from typing import Dict
 
 
-class CronModelsCleanupHandler(base.BaseHandler):
+class CronModelsCleanupHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for cleaning up models that are marked as deleted and marking
     specific types of models as deleted.
     """
@@ -60,7 +62,9 @@ class CronModelsCleanupHandler(base.BaseHandler):
         return self.render_json({})
 
 
-class CronUserDeletionHandler(base.BaseHandler):
+class CronUserDeletionHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for running the user deletion one off job."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -76,7 +80,9 @@ class CronUserDeletionHandler(base.BaseHandler):
         return self.render_json({})
 
 
-class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
+class CronFullyCompleteUserDeletionHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for running the fully complete user deletion one off job."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -93,7 +99,8 @@ class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
 
 
 class CronMailReviewersContributorDashboardSuggestionsHandler(
-        base.BaseHandler):
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for mailing reviewers suggestions on the Contributor
     Dashboard that need review.
     """
@@ -130,7 +137,8 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
 
 
 class CronMailAdminContributorDashboardBottlenecksHandler(
-        base.BaseHandler):
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for mailing admins if there are bottlenecks that are causing a
     longer reviewer turnaround time on the Contributor Dashboard.
     """
@@ -187,7 +195,9 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
         return self.render_json({})
 
 
-class CronAppFeedbackReportsScrubberHandlerPage(base.BaseHandler):
+class CronAppFeedbackReportsScrubberHandlerPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for scrubbing app feedback reports that are expiring."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -204,7 +214,9 @@ class CronAppFeedbackReportsScrubberHandlerPage(base.BaseHandler):
             feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
 
 
-class CronDashboardStatsHandler(base.BaseHandler):
+class CronDashboardStatsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for appending dashboard stats to a list."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -219,7 +231,9 @@ class CronDashboardStatsHandler(base.BaseHandler):
                 user_stats_computation_jobs.CollectWeeklyDashboardStatsJob))
 
 
-class CronExplorationRecommendationsHandler(base.BaseHandler):
+class CronExplorationRecommendationsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for computing exploration recommendations."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -235,7 +249,9 @@ class CronExplorationRecommendationsHandler(base.BaseHandler):
                 .ComputeExplorationRecommendationsJob))
 
 
-class CronActivitySearchRankHandler(base.BaseHandler):
+class CronActivitySearchRankHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for computing activity search ranks."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -249,7 +265,9 @@ class CronActivitySearchRankHandler(base.BaseHandler):
             job_class=exp_search_indexing_jobs.IndexExplorationsInSearchJob)
 
 
-class CronBlogPostSearchRankHandler(base.BaseHandler):
+class CronBlogPostSearchRankHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for indexing blog post in search handler."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -264,7 +282,9 @@ class CronBlogPostSearchRankHandler(base.BaseHandler):
         )
 
 
-class CronTranslationContributionStatsHandler(base.BaseHandler):
+class CronTranslationContributionStatsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for running the translation contribution stats populate job."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

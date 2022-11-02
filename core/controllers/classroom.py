@@ -26,7 +26,7 @@ from core.domain import classroom_services
 from core.domain import config_domain
 from core.domain import topic_fetchers
 
-from typing import Dict, TypedDict, cast
+from typing import Dict, TypedDict
 
 SCHEMA_FOR_CLASSROOM_ID = {
     'type': 'basestring',
@@ -37,7 +37,9 @@ SCHEMA_FOR_CLASSROOM_ID = {
 }
 
 
-class ClassroomDataHandler(base.BaseHandler):
+class ClassroomDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Manages the data that needs to be displayed to a learner on the classroom
     page.
     """
@@ -62,12 +64,11 @@ class ClassroomDataHandler(base.BaseHandler):
         assert classroom is not None
         topic_ids = classroom.topic_ids
         topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
-        topic_rights = topic_fetchers.get_multi_topic_rights(
-            topic_ids, strict=True
-        )
+        topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
         topic_summary_dicts = []
         for index, summary in enumerate(topic_summaries):
-            if summary is not None:
+            topic_right = topic_rights[index]
+            if summary is not None and topic_right is not None:
                 topic_summary_dict = summary.to_dict()
                 classroom_page_topic_summary_dict = {
                     'id': topic_summary_dict['id'],
@@ -95,7 +96,7 @@ class ClassroomDataHandler(base.BaseHandler):
                         topic_summary_dict['topic_model_created_on']),
                     'topic_model_last_updated': (
                         topic_summary_dict['topic_model_last_updated']),
-                    'is_published': topic_rights[index].topic_is_published
+                    'is_published': topic_right.topic_is_published
                 }
                 topic_summary_dicts.append(
                     classroom_page_topic_summary_dict
@@ -110,7 +111,9 @@ class ClassroomDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ClassroomPromosStatusHandler(base.BaseHandler):
+class ClassroomPromosStatusHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The handler for checking whether the classroom promos are enabled."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -128,7 +131,9 @@ class ClassroomPromosStatusHandler(base.BaseHandler):
         })
 
 
-class DefaultClassroomRedirectPage(base.BaseHandler):
+class DefaultClassroomRedirectPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Redirects to the default classroom page."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -140,7 +145,9 @@ class DefaultClassroomRedirectPage(base.BaseHandler):
         self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
 
 
-class ClassroomAdminPage(base.BaseHandler):
+class ClassroomAdminPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Renders the classroom admin page."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -152,7 +159,9 @@ class ClassroomAdminPage(base.BaseHandler):
         self.render_template('classroom-admin-page.mainpage.html')
 
 
-class ClassroomAdminDataHandler(base.BaseHandler):
+class ClassroomAdminDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Fetches relevant data for the classroom admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -171,7 +180,9 @@ class ClassroomAdminDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class NewClassroomIdHandler(base.BaseHandler):
+class NewClassroomIdHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Creates a new classroom ID."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -195,7 +206,11 @@ class ClassroomHandlerNormalizedPayloadDict(TypedDict):
     classroom_dict: classroom_config_domain.Classroom
 
 
-class ClassroomHandler(base.BaseHandler):
+class ClassroomHandler(
+    base.BaseHandler[
+        ClassroomHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Edits classroom data."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -234,11 +249,8 @@ class ClassroomHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def put(self, classroom_id: str) -> None:
         """Updates properties of a given classroom."""
-        payload_data = cast(
-            ClassroomHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
-        classroom = payload_data['classroom_dict']
+        assert self.normalized_payload is not None
+        classroom = self.normalized_payload['classroom_dict']
         if classroom_id != classroom.classroom_id:
             raise self.InvalidInputException(
                 'Classroom ID of the URL path argument must match with the ID '
@@ -255,7 +267,9 @@ class ClassroomHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ClassroomUrlFragmentHandler(base.BaseHandler):
+class ClassroomUrlFragmentHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """A data handler for checking if a classroom with given url fragment
     exists.
     """

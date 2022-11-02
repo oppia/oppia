@@ -26,7 +26,7 @@ from core.domain import summary_services
 from typing import Dict
 
 
-class CollectionPage(base.BaseHandler):
+class CollectionPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Page describing a single collection."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -45,7 +45,7 @@ class CollectionPage(base.BaseHandler):
         self.render_template('collection-player-page.mainpage.html')
 
 
-class CollectionDataHandler(base.BaseHandler):
+class CollectionDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides the data for a single collection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

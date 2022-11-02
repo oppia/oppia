@@ -26,11 +26,11 @@ from core.domain import exp_fetchers
 from core.domain import state_domain
 from proto_files import training_job_response_payload_pb2
 
-from typing import Dict, List, Optional, TypedDict, cast
+from typing import Dict, List, TypedDict
 
 
 def validate_job_result_message_proto(
-    job_result_proto: (  # type: ignore[name-defined]
+    job_result_proto: (
         training_job_response_payload_pb2.TrainingJobResponsePayload.JobResult
     )
 ) -> bool:
@@ -55,11 +55,16 @@ class TrainedClassifierHandlerNormalizedRequestDict(TypedDict):
     """
 
     exploration_id: str
-    exploration_version: Optional[str]
+    exploration_version: str
     state_name: str
 
 
-class TrainedClassifierHandler(base.OppiaMLVMHandler):
+class TrainedClassifierHandler(
+    base.OppiaMLVMHandler[
+        Dict[str, str],
+        TrainedClassifierHandlerNormalizedRequestDict
+    ]
+):
     """This handler stores the result of the training job in datastore and
     updates the status of the job.
     """
@@ -146,18 +151,16 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
         Retrieves the name of the file on GCS storing the trained model
         parameters and transfers it to the frontend.
         """
-        request_data = cast(
-            TrainedClassifierHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        exploration_id = request_data['exploration_id']
-        state_name = request_data['state_name']
+        assert self.normalized_request is not None
+        exploration_id = self.normalized_request['exploration_id']
+        state_name = self.normalized_request['state_name']
 
         try:
-            if request_data['exploration_version'] is None:
-                raise Exception
-            exp_version = int(request_data[
-                'exploration_version'])
+            if self.normalized_request.get('exploration_version') is None:
+                raise Exception(
+                    'Error: No exploration version is provided.'
+                )
+            exp_version = int(self.normalized_request['exploration_version'])
             exploration = exp_fetchers.get_exploration_by_id(
                 exploration_id, version=exp_version)
             interaction_id = exploration.states[state_name].interaction.id
@@ -166,7 +169,7 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
                 'Entity for exploration with id %s, version %s and state %s '
                 'not found.' % (
                         exploration_id,
-                        request_data['exploration_version'],
+                        self.normalized_request['exploration_version'],
                         state_name
                     )
                 ) from e
@@ -246,7 +249,12 @@ class NextJobHandlerResponseDict(TypedDict):
     training_data: List[state_domain.TrainingDataDict]
 
 
-class NextJobHandler(base.OppiaMLVMHandler):
+class NextJobHandler(
+    base.OppiaMLVMHandler[
+        NextJobHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """This handler fetches next job to be processed according to the time
     and sends back job_id, algorithm_id and training data to the VM.
     """
@@ -282,13 +290,10 @@ class NextJobHandler(base.OppiaMLVMHandler):
             tuple(str). Message at index 0, vm_id at index 1 and signature at
             index 2.
         """
-        payload_data = cast(
-            NextJobHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
-        signature = payload_data['signature']
-        vm_id = payload_data['vm_id']
-        message = payload_data['message']
+        assert self.normalized_payload is not None
+        signature = self.normalized_payload['signature']
+        vm_id = self.normalized_payload['vm_id']
+        message = self.normalized_payload['message']
         return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
 
     @acl_decorators.is_from_oppia_ml
@@ -297,7 +302,7 @@ class NextJobHandler(base.OppiaMLVMHandler):
         next_job = classifier_services.fetch_next_job()
         if next_job is None:
             return self.render_json({})
-    
+
         classifier_services.mark_training_job_pending(next_job.job_id)
         response: NextJobHandlerResponseDict = {
             'job_id': next_job.job_id,

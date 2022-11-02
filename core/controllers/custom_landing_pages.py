@@ -24,7 +24,9 @@ from core.controllers import base
 from typing import Dict
 
 
-class FractionLandingRedirectPage(base.BaseHandler):
+class FractionLandingRedirectPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The handler redirecting to the Fractions landing page."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -36,7 +38,9 @@ class FractionLandingRedirectPage(base.BaseHandler):
         self.redirect('/math/fractions')
 
 
-class TopicLandingRedirectPage(base.BaseHandler):
+class TopicLandingRedirectPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The handler redirecting the old landing page URL to the new one."""
 
     URL_PATH_ARGS_SCHEMAS = {

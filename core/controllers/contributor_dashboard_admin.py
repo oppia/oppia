@@ -27,7 +27,7 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.domain import user_services
 
-from typing import Dict, List, Optional, TypedDict, Union, cast
+from typing import Dict, List, Optional, TypedDict, Union
 
 
 class TranslationContributionStatsDict(TypedDict):
@@ -47,7 +47,9 @@ class TranslationContributionStatsDict(TypedDict):
     language: str
 
 
-class ContributorDashboardAdminPage(base.BaseHandler):
+class ContributorDashboardAdminPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for the contributor dashboard admin page."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -76,7 +78,12 @@ class ContributionRightsHandlerNormalizedRequestDict(TypedDict):
     language_code: Optional[str]
 
 
-class ContributionRightsHandler(base.BaseHandler):
+class ContributionRightsHandler(
+    base.BaseHandler[
+        ContributionRightsHandlerNormalizedPayloadDict,
+        ContributionRightsHandlerNormalizedRequestDict
+    ]
+):
     """Handles contribution rights of a user on contributor dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -125,17 +132,14 @@ class ContributionRightsHandler(base.BaseHandler):
 
     @acl_decorators.can_manage_contributors_role
     def post(self, category: str) -> None:
-        payload_data = cast(
-            ContributionRightsHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
-        username = payload_data['username']
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
             raise self.InvalidInputException('Invalid username: %s' % username)
 
-        language_code = payload_data.get('language_code', None)
+        language_code = self.normalized_payload.get('language_code', None)
 
         if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
             if user_services.can_review_translation_suggestions(
@@ -177,17 +181,14 @@ class ContributionRightsHandler(base.BaseHandler):
 
     @acl_decorators.can_manage_contributors_role
     def delete(self, category: str) -> None:
-        request_data = cast(
-            ContributionRightsHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        username = request_data['username']
+        assert self.normalized_request is not None
+        username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
                 'Invalid username: %s' % username)
 
-        language_code = request_data.get('language_code')
+        language_code = self.normalized_request.get('language_code')
 
         if (category ==
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
@@ -239,7 +240,12 @@ class ContributorUsersListHandlerNormalizedRequestDict(TypedDict):
     language_code: Optional[str]
 
 
-class ContributorUsersListHandler(base.BaseHandler):
+class ContributorUsersListHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        ContributorUsersListHandlerNormalizedRequestDict
+    ]
+):
     """Handler to show users with contribution rights."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -267,11 +273,8 @@ class ContributorUsersListHandler(base.BaseHandler):
 
     @acl_decorators.can_manage_contributors_role
     def get(self, category: str) -> None:
-        request_data = cast(
-            ContributorUsersListHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        language_code = request_data.get('language_code')
+        assert self.normalized_request is not None
+        language_code = self.normalized_request.get('language_code')
         usernames = user_services.get_contributor_usernames(
             category, language_code=language_code)
         self.render_json({'usernames': usernames})
@@ -285,7 +288,12 @@ class ContributionRightsDataHandlerNormalizedRequestDict(TypedDict):
     username: str
 
 
-class ContributionRightsDataHandler(base.BaseHandler):
+class ContributionRightsDataHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        ContributionRightsDataHandlerNormalizedRequestDict
+    ]
+):
     """Handler to show the contribution rights of a user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -302,11 +310,8 @@ class ContributionRightsDataHandler(base.BaseHandler):
 
     @acl_decorators.can_access_contributor_dashboard_admin_page
     def get(self) -> None:
-        request_data = cast(
-            ContributionRightsDataHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        username = request_data['username']
+        assert self.normalized_request is not None
+        username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -335,7 +340,12 @@ class TranslationContributionStatsHandlerNormalizedRequestDict(TypedDict):
     username: str
 
 
-class TranslationContributionStatsHandler(base.BaseHandler):
+class TranslationContributionStatsHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        TranslationContributionStatsHandlerNormalizedRequestDict
+    ]
+):
     """Handler to show the translation contribution stats of a user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -352,11 +362,8 @@ class TranslationContributionStatsHandler(base.BaseHandler):
 
     @acl_decorators.can_access_contributor_dashboard_admin_page
     def get(self) -> None:
-        request_data = cast(
-            TranslationContributionStatsHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        username = request_data['username']
+        assert self.normalized_request is not None
+        username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -364,7 +371,6 @@ class TranslationContributionStatsHandler(base.BaseHandler):
         translation_contribution_stats = (
             suggestion_services.get_all_translation_contribution_stats(user_id)
         )
-        print(translation_contribution_stats, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
         self.render_json({
             'translation_contribution_stats': (
                 self._get_complete_translation_contribution_stats(
@@ -394,6 +400,10 @@ class TranslationContributionStatsHandler(base.BaseHandler):
                     months of format: "%b %Y", e.g. "Jan 2021".
             Unnecessary keys language_code, topic_id, contribution_dates,
             contributor_user_id are consequently deleted.
+
+        Raises:
+            Exception. No topic associated with the
+                TranslationContributionStats.
         """
         translation_contribution_stats_dicts = [
             stats.to_dict() for stats in translation_contribution_stats

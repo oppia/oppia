@@ -28,7 +28,7 @@ from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import user_services
 
-from typing import Dict, List, Optional, TypedDict, cast
+from typing import Dict, List, Optional, TypedDict
 
 
 class BlogCardSummaryDict(TypedDict):
@@ -72,7 +72,9 @@ def _get_blog_card_summary_dicts_for_dashboard(
     return summary_dicts
 
 
-class BlogDashboardPage(base.BaseHandler):
+class BlogDashboardPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Blog Dashboard Page Handler to render the frontend template."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -85,7 +87,9 @@ class BlogDashboardPage(base.BaseHandler):
         self.render_template('blog-dashboard-page.mainpage.html')
 
 
-class BlogDashboardDataHandler(base.BaseHandler):
+class BlogDashboardDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Provides user data for the blog dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -159,7 +163,12 @@ class BlogPostHandlerNormalizedRequestDict(TypedDict):
     image: bytes
 
 
-class BlogPostHandler(base.BaseHandler):
+class BlogPostHandler(
+    base.BaseHandler[
+        BlogPostHandlerNormalizedPayloadDict,
+        BlogPostHandlerNormalizedRequestDict
+    ]
+):
     """Handler for blog dashboard editor"""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -183,8 +192,7 @@ class BlogPostHandler(base.BaseHandler):
                     'type': 'object_dict',
                     'validation_method': (
                         validation_method.validate_change_dict_for_blog_post),
-                },
-                'default_value': None
+                }
             },
         },
         'POST': {
@@ -258,18 +266,15 @@ class BlogPostHandler(base.BaseHandler):
     @acl_decorators.can_edit_blog_post
     def put(self, blog_post_id: str) -> None:
         """Updates properties of the given blog post."""
-        payload_data = cast(
-            BlogPostHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
+        assert self.normalized_payload is not None
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post_rights = (
             blog_services.get_blog_post_rights(blog_post_id, strict=True))
         blog_post_currently_published = blog_post_rights.blog_post_is_published
-        change_dict = payload_data['change_dict']
+        change_dict = self.normalized_payload['change_dict']
 
         blog_services.update_blog_post(blog_post_id, change_dict)
-        new_publish_status = payload_data['new_publish_status']
+        new_publish_status = self.normalized_payload['new_publish_status']
         if new_publish_status:
             blog_services.publish_blog_post(blog_post_id)
         elif blog_post_currently_published:
@@ -286,17 +291,11 @@ class BlogPostHandler(base.BaseHandler):
     @acl_decorators.can_edit_blog_post
     def post(self, blog_post_id: str) -> None:
         """Stores thumbnail of the blog post in the datastore."""
-        payload_data = cast(
-            BlogPostHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
-        request_data = cast(
-            BlogPostHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
+        assert self.normalized_request is not None
+        assert self.normalized_payload is not None
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
-        raw_image = request_data['image']
-        thumbnail_filename = payload_data['thumbnail_filename']
+        raw_image = self.normalized_request['image']
+        thumbnail_filename = self.normalized_payload['thumbnail_filename']
         try:
             file_format = image_validation_services.validate_image_and_filename(
                 raw_image, thumbnail_filename)

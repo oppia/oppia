@@ -38,7 +38,7 @@ from core.domain import summary_services
 from core.domain import topic_fetchers
 from core.domain import user_services
 
-from typing import Dict, Final, List, TypedDict, cast
+from typing import Dict, Final, List, TypedDict
 
 EXPLORATION_ID_KEY: Final = 'exploration_id'
 COLLECTION_ID_KEY: Final = 'collection_id'
@@ -67,7 +67,9 @@ class DisplayableExplorationSummaryDict(TypedDict):
     num_total_threads: int
 
 
-class OldContributorDashboardRedirectPage(base.BaseHandler):
+class OldContributorDashboardRedirectPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Redirects the old contributor dashboard URL to the new one."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -79,7 +81,9 @@ class OldContributorDashboardRedirectPage(base.BaseHandler):
         self.redirect('/contributor-dashboard', permanent=True)
 
 
-class OldCreatorDashboardRedirectPage(base.BaseHandler):
+class OldCreatorDashboardRedirectPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Redirects the old creator dashboard URL to the new one."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -91,7 +95,9 @@ class OldCreatorDashboardRedirectPage(base.BaseHandler):
         self.redirect(feconf.CREATOR_DASHBOARD_URL, permanent=True)
 
 
-class CreatorDashboardPage(base.BaseHandler):
+class CreatorDashboardPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Page showing the user's creator dashboard."""
 
     ADDITIONAL_DEPENDENCY_IDS = ['codemirror']
@@ -112,7 +118,11 @@ class CreatorDashboardHandlerNormalizedPayloadDict(TypedDict):
     display_preference: str
 
 
-class CreatorDashboardHandler(base.BaseHandler):
+class CreatorDashboardHandler(
+    base.BaseHandler[
+        CreatorDashboardHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Provides data for the user's creator dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -199,7 +209,6 @@ class CreatorDashboardHandler(base.BaseHandler):
                     feedback_analytics_dict['num_total_threads'])
             })
 
-
         displayable_exploration_summary_dicts = sorted(
             displayable_exploration_summary_dicts,
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
@@ -242,9 +251,9 @@ class CreatorDashboardHandler(base.BaseHandler):
                 feedback_thread_analytics)
         }
         if dashboard_stats:
-            average_ratings = dashboard_stats.get('average_ratings')
+            average_ratings = dashboard_stats_dict.get('average_ratings')
             if average_ratings:
-                dashboard_stats['average_ratings'] = (
+                dashboard_stats_dict['average_ratings'] = (
                     _round_average_ratings(average_ratings))
 
         last_week_stats = (
@@ -344,11 +353,9 @@ class CreatorDashboardHandler(base.BaseHandler):
     @acl_decorators.can_access_creator_dashboard
     def post(self) -> None:
         assert self.user_id is not None
-        payload_data = cast(
-            CreatorDashboardHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
-        creator_dashboard_display_pref = payload_data['display_preference']
+        assert self.normalized_payload is not None
+        creator_dashboard_display_pref = self.normalized_payload[
+            'display_preference']
         user_services.update_user_creator_dashboard_display(
             self.user_id, creator_dashboard_display_pref)
         self.render_json({})
@@ -362,7 +369,12 @@ class NewExplorationHandlerNormalizedPayloadDict(TypedDict):
     title: str
 
 
-class NewExplorationHandler(base.BaseHandler):
+class NewExplorationHandler(
+    base.BaseHandler[
+        NewExplorationHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Creates a new exploration."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -381,11 +393,8 @@ class NewExplorationHandler(base.BaseHandler):
     def post(self) -> None:
         """Handles POST requests."""
         assert self.user_id is not None
-        payload_data = cast(
-            NewExplorationHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
-        title = payload_data['title']
+        assert self.normalized_payload is not None
+        title = self.normalized_payload['title']
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -397,7 +406,9 @@ class NewExplorationHandler(base.BaseHandler):
         })
 
 
-class NewCollectionHandler(base.BaseHandler):
+class NewCollectionHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Creates a new collection."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -425,7 +436,12 @@ class UploadExplorationHandlerNormalizedRequestDict(TypedDict):
     yaml_file: str
 
 
-class UploadExplorationHandler(base.BaseHandler):
+class UploadExplorationHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        UploadExplorationHandlerNormalizedRequestDict
+    ]
+):
     """Uploads a new exploration."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -443,11 +459,8 @@ class UploadExplorationHandler(base.BaseHandler):
     def post(self) -> None:
         """Handles POST requests."""
         assert self.user_id is not None
-        payload_data = cast(
-            UploadExplorationHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        yaml_content = payload_data['yaml_file']
+        assert self.normalized_request is not None
+        yaml_content = self.normalized_request['yaml_file']
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         if constants.ALLOW_YAML_FILE_UPLOAD:

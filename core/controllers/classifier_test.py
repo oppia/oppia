@@ -37,11 +37,11 @@ from core.tests import test_utils
 from proto_files import text_classifier_pb2
 from proto_files import training_job_response_payload_pb2
 
+from typing import Dict, List, Tuple, Union
+
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import classifier_models
-
-from typing import Dict, List, Tuple, Union
 
 (classifier_models,) = models.Registry.import_models([models.Names.CLASSIFIER])
 
@@ -111,7 +111,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         classifier_training_job_model.put()
 
         self.job_result = (
-            training_job_response_payload_pb2.TrainingJobResponsePayload.  # type: ignore[attr-defined]
+            training_job_response_payload_pb2.TrainingJobResponsePayload.
             JobResult())
         self.job_result.job_id = self.job_id
 

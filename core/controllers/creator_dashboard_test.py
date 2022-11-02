@@ -39,9 +39,9 @@ from typing import Dict, Final, List, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import user_models
-    from mypy_imports import suggestion_models
     from mypy_imports import feedback_models
+    from mypy_imports import suggestion_models
+    from mypy_imports import user_models
 
 (
     user_models, suggestion_models, feedback_models
@@ -549,8 +549,11 @@ class CreationButtonsTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         response = self.post_json(
-            feconf.UPLOAD_EXPLORATION_URL, {}, csrf_token=csrf_token,
-            expected_status_int=401)
+            feconf.UPLOAD_EXPLORATION_URL,
+            {'yaml_file': ''},
+            csrf_token=csrf_token,
+            expected_status_int=401
+        )
         self.assertEqual(
             response['error'],
             'You do not have credentials to upload explorations.')

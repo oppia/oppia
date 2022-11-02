@@ -30,7 +30,7 @@ from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import summary_services
 
-from typing import Dict, List, Optional, TypedDict, cast
+from typing import Dict, List, Optional, TypedDict
 
 
 def _require_valid_version(
@@ -48,7 +48,9 @@ def _require_valid_version(
             % (collection_version, version_from_payload))
 
 
-class CollectionEditorPage(base.BaseHandler):
+class CollectionEditorPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The editor page for a single collection."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -76,7 +78,12 @@ class EditableCollectionDataHandlerNormalizedPayloadDict(TypedDict):
     change_list: List[collection_domain.CollectionChange]
 
 
-class EditableCollectionDataHandler(base.BaseHandler):
+class EditableCollectionDataHandler(
+    base.BaseHandler[
+        EditableCollectionDataHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """A data handler for collections which supports writing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -138,16 +145,13 @@ class EditableCollectionDataHandler(base.BaseHandler):
         """Updates properties of the given collection."""
         assert self.user_id is not None
 
-        payload_data = cast(
-            EditableCollectionDataHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
+        assert self.normalized_payload is not None
         collection = collection_services.get_collection_by_id(collection_id)
-        version = payload_data['version']
+        version = self.normalized_payload.get('version')
         _require_valid_version(version, collection.version)
 
-        commit_message = payload_data['commit_message']
-        change_list = payload_data['change_list']
+        commit_message = self.normalized_payload.get('commit_message')
+        change_list = self.normalized_payload['change_list']
 
         collection_services.update_collection(
             self.user_id,
@@ -169,7 +173,9 @@ class EditableCollectionDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class CollectionRightsHandler(base.BaseHandler):
+class CollectionRightsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles management of collection editing rights."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -188,6 +194,9 @@ class CollectionRightsHandler(base.BaseHandler):
 
         Args:
             collection_id: str. ID for the collection.
+
+        Raises:
+            Exception. No collection found for the given collection_id.
         """
         (collection, collection_rights) = (
             collection_services.get_collection_and_collection_rights_by_id(
@@ -220,7 +229,12 @@ class CollectionPublishHandlerNormalizedPayloadDict(TypedDict):
     version: Optional[int]
 
 
-class CollectionPublishHandler(base.BaseHandler):
+class CollectionPublishHandler(
+    base.BaseHandler[
+        CollectionPublishHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Handles the publication of the given collection."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -247,11 +261,8 @@ class CollectionPublishHandler(base.BaseHandler):
         collection = collection_services.get_collection_by_id(
             collection_id, strict=True
         )
-        payload_data = cast(
-            CollectionPublishHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
-        version = payload_data['version']
+        assert self.normalized_payload is not None
+        version = self.normalized_payload.get('version')
         _require_valid_version(version, collection.version)
 
         collection.validate(strict=True)
@@ -286,7 +297,12 @@ class CollectionUnpublishHandlerNormalizedPayloadDict(TypedDict):
     version: Optional[int]
 
 
-class CollectionUnpublishHandler(base.BaseHandler):
+class CollectionUnpublishHandler(
+    base.BaseHandler[
+        CollectionUnpublishHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Handles the unpublication of the given collection."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -310,12 +326,9 @@ class CollectionUnpublishHandler(base.BaseHandler):
     @acl_decorators.can_unpublish_collection
     def put(self, collection_id: str) -> None:
         """Unpublishes the given collection."""
+        assert self.normalized_payload is not None
         collection = collection_services.get_collection_by_id(collection_id)
-        payload_data = cast(
-            CollectionUnpublishHandlerNormalizedPayloadDict,
-            self.normalized_payload
-        )
-        version = payload_data['version']
+        version = self.normalized_payload.get('version')
         _require_valid_version(version, collection.version)
 
         rights_manager.unpublish_collection(self.user, collection_id)
@@ -346,7 +359,12 @@ class ExplorationMetadataSearchHandlerNormalizedRequestDict(TypedDict):
     offset: Optional[int]
 
 
-class ExplorationMetadataSearchHandler(base.BaseHandler):
+class ExplorationMetadataSearchHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        ExplorationMetadataSearchHandlerNormalizedRequestDict
+    ]
+):
     """Provides data for exploration search."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -374,14 +392,11 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
         # accepts base64 bytes, thus we need to encode the base64 string to
         # base64 bytes, then decode them to just bytes and then decode those
         # back to string.
-        request_data = cast(
-            ExplorationMetadataSearchHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        q = request_data['q'].encode('utf-8')
+        assert self.normalized_request is not None
+        q = self.normalized_request['q'].encode('utf-8')
         query_string = base64.b64decode(q).decode('utf-8')
 
-        search_offset = request_data.get('offset')
+        search_offset = self.normalized_request.get('offset')
 
         collection_node_metadata_list, new_search_offset = (
             summary_services.get_exp_metadata_dicts_matching_query(
