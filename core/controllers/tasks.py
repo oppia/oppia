@@ -20,7 +20,7 @@ import json
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import email_manager
+from core.domain import email_manager, feedback_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -131,6 +131,25 @@ class ContributorDashboardAchievementEmailHandler(base.BaseHandler):
 class InstantFeedbackMessageEmailHandler(base.BaseHandler):
     """Handles task of sending feedback message emails instantly."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'user_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'reference_dict': {
+                'schema': {
+                    'type': 'object_dict',
+                    'object_class': feedback_domain.FeedbackMessageReference
+                },
+                'default_value': None
+            }  
+        }
+    }
+    
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
