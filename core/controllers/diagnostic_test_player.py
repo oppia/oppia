@@ -26,7 +26,7 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.domain import topic_fetchers
 
-from typing import Any, Dict, List
+from typing import Dict, List
 
 
 class DiagnosticTestPlayerPage(
@@ -40,10 +40,12 @@ class DiagnosticTestPlayerPage(
     @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests."""
-        self.render_template('diagnostic-test-player-page.mainpage.html') # type: ignore[no-untyped-call]
+        self.render_template('diagnostic-test-player-page.mainpage.html')
 
 
-class DiagnosticTestQuestionsHandler(base.BaseHandler):
+class DiagnosticTestQuestionsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler class to fetch the questions from the diagnostic test skills of
     the given topic ID.
     """
@@ -65,7 +67,7 @@ class DiagnosticTestQuestionsHandler(base.BaseHandler):
         'GET': {}
     }
 
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access
     def get(self, topic_id: str) -> None:
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
