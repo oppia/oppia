@@ -208,11 +208,11 @@ export const AppConstants = {
   CONTRIBUTION_STATS_SUBTYPE_SUBMISSION: 'submission',
   CONTRIBUTION_STATS_SUBTYPE_REVIEW: 'review',
   CONTRIBUTION_STATS_TYPES: {
-    TRANSALTION_CONTRIBUTION: {
+    TRANSLATION_CONTRIBUTION: {
       NAME: 'translationContribution',
       DISPLAY_NAME: 'Translation Contributions'
     },
-    TRANSALTION_REVIEW: {
+    TRANSLATION_REVIEW: {
       NAME: 'translationReview',
       DISPLAY_NAME: 'Translation Reviews'
     },

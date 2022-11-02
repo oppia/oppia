@@ -107,6 +107,8 @@ export class ContributionsAndReview
 
   SUGGESTION_TYPE_QUESTION: string;
   SUGGESTION_TYPE_TRANSLATE: string;
+  ACCOMPLISHMENTS_TYPE_STATS: string;
+  ACCOMPLISHMENTS_TYPE_BADGE: string;
   TAB_TYPE_CONTRIBUTIONS: string;
   TAB_TYPE_REVIEWS: string;
   TAB_TYPE_ACCOMPLISHMENTS: string;
@@ -118,7 +120,7 @@ export class ContributionsAndReview
   activeSuggestionType: string;
   activeAccomplishmentType: string;
   dropdownShown: boolean;
-  isAccomplishmentsTab: boolean;
+  activeTabIsAccomplishments: boolean;
   activeDropdownTabChoice: string;
   reviewTabs: TabDetails[] = [];
   accomplishmentsTabs: TabDetails[] = [];
@@ -129,7 +131,9 @@ export class ContributionsAndReview
     };
   };
 
-  accomplismentsEnabled: boolean = false;
+  TAB_TYPES_TO_NAMES = {};
+
+  accomplishmentsTabIsEnabled: boolean = false;
   defaultContributionType: string = 'translationContribution';
   SUGGESTION_LABELS = {
     review: {
@@ -393,49 +397,30 @@ export class ContributionsAndReview
     }
   }
 
-  getActiveDropdownTabChoice(): string {
-    if (this.activeTabType === this.TAB_TYPE_ACCOMPLISHMENTS) {
-      if (this.activeAccomplishmentType === 'stats') {
-        return 'Contribution Stats';
-      }
-      return 'Badges';
-    }
-
-    if (this.activeTabType === this.TAB_TYPE_REVIEWS) {
-      if (this.activeSuggestionType === this.SUGGESTION_TYPE_QUESTION) {
-        return 'Review Questions';
-      }
-      return 'Review Translations';
-    }
-
-    if (this.activeSuggestionType === this.SUGGESTION_TYPE_QUESTION) {
-      return 'Questions';
-    }
-
-    return 'Translations';
+  getActiveDropdownTabChoice(tabType: string, subType: string): string {
+    return this.TAB_TYPES_TO_NAMES[tabType][subType];
   }
 
   switchToTab(tabType: string, subType: string): void {
     this.activeTabType = tabType;
     this.dropdownShown = false;
+    this.activeDropdownTabChoice = this.getActiveDropdownTabChoice(
+      tabType, subType);
+
     if (tabType === this.TAB_TYPE_ACCOMPLISHMENTS) {
-      this.isAccomplishmentsTab = true;
-      this.activeAccomplishmentType = subType;
-      this.activeDropdownTabChoice = this.getActiveDropdownTabChoice();
       this.activeSuggestionType = '';
-      this.contributionAndReviewService.setActiveSuggestionType('');
-      return;
+      this.activeTabIsAccomplishments = true;
+      this.activeAccomplishmentType = subType;
+    } else {
+      this.activeSuggestionType = subType;
+      this.activeTabIsAccomplishments = false;
+      this.activeAccomplishmentType = '';
+      this.contributionAndReviewService.setActiveTabType(tabType);
+      this.contributionAndReviewService.setActiveSuggestionType(subType);
+      this.activeExplorationId = null;
+      this.contributionOpportunitiesService
+        .reloadOpportunitiesEventEmitter.emit();
     }
-    this.activeSuggestionType = subType;
-    this.contributionAndReviewService.setActiveTabType(tabType);
-    this.contributionAndReviewService.setActiveSuggestionType(subType);
-    this.activeDropdownTabChoice = this.getActiveDropdownTabChoice();
-    this.dropdownShown = false;
-    this.activeExplorationId = null;
-    this.contributionOpportunitiesService
-      .reloadOpportunitiesEventEmitter.emit();
-    this.activeAccomplishmentType = '';
-    this.isAccomplishmentsTab = false;
   }
 
   toggleDropdown(): void {
@@ -522,9 +507,25 @@ export class ContributionsAndReview
   ngOnInit(): void {
     this.SUGGESTION_TYPE_QUESTION = 'add_question';
     this.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
+    this.ACCOMPLISHMENTS_TYPE_STATS = 'stats';
+    this.ACCOMPLISHMENTS_TYPE_BADGE = 'badges';
     this.TAB_TYPE_CONTRIBUTIONS = 'contributions';
     this.TAB_TYPE_REVIEWS = 'reviews';
     this.TAB_TYPE_ACCOMPLISHMENTS = 'accomplishments';
+    this.TAB_TYPES_TO_NAMES = {
+      [this.TAB_TYPE_CONTRIBUTIONS]: {
+        [this.SUGGESTION_TYPE_TRANSLATE]: 'Translations',
+        [this.SUGGESTION_TYPE_QUESTION]: 'Questions'
+      },
+      [this.TAB_TYPE_REVIEWS]: {
+        [this.SUGGESTION_TYPE_TRANSLATE]: 'Review Translations',
+        [this.SUGGESTION_TYPE_QUESTION]: 'Review Questions'
+      },
+      [this.TAB_TYPE_ACCOMPLISHMENTS]: {
+        [this.ACCOMPLISHMENTS_TYPE_BADGE]: 'Badges',
+        [this.ACCOMPLISHMENTS_TYPE_STATS]: 'Contribution Stats'
+      }
+    };
     this.activeExplorationId = null;
     this.contributions = {};
     this.userDetailsLoading = true;
@@ -532,10 +533,10 @@ export class ContributionsAndReview
     this.activeTabType = '';
     this.activeSuggestionType = '';
     this.dropdownShown = false;
-    this.isAccomplishmentsTab = false;
+    this.activeTabIsAccomplishments = false;
     this.activeDropdownTabChoice = '';
     this.reviewTabs = [];
-    this.accomplismentsEnabled = (
+    this.accomplishmentsTabIsEnabled = (
       this.featureService.status.ContributorDashboardAccomplishments.isEnabled);
     this.contributionTabs = [
       {

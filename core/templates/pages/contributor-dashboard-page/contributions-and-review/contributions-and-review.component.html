@@ -32,7 +32,7 @@
           </div>
         </div>
         <div class="oppia-contributions-option-group-label"
-             *ngIf="userIsLoggedIn && accomplismentsEnabled">
+             *ngIf="userIsLoggedIn && accomplishmentsTabIsEnabled">
           Accomplishments
         </div>
         <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of accomplishmentsTabs">
@@ -67,7 +67,7 @@
           </button>
         </div>
       </div>
-      <div class="oppia-contributions-side-navbar-part" *ngIf="userIsLoggedIn && accomplismentsEnabled">
+      <div class="oppia-contributions-side-navbar-part" *ngIf="userIsLoggedIn && accomplishmentsTabIsEnabled">
         <div class="oppia-contributions-navbar-items-list" navbar-label="Accomplishments">
           <div class="oppia-contributions-navbar-item" *ngFor="let tab of accomplishmentsTabs">
             <button *ngIf="tab && tab.enabled"
@@ -80,18 +80,18 @@
       </div>
     </div>
   </div>
-  <div [ngClass]="!isAccomplishmentsTab ? 'oppia-contributions-show-review-container' : 'oppia-contributor-accomplishments-container'">
+  <div [ngClass]="!activeTabIsAccomplishments ? 'oppia-contributions-show-review-container' : 'oppia-contributor-accomplishments-container'">
     <div class="oppia-login-required" *ngIf="!userDetailsLoading && !userIsLoggedIn">
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
-      <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTab"
+      <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !activeTabIsAccomplishments"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
                                 [labelRequired]="!activeReviewTab"
                                 [showOpportunityButton]="true">
       </oppia-opportunities-list>
-      <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab() && !isAccomplishmentsTab">
+      <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab() && !activeTabIsAccomplishments">
         <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
           <button aria-label="Back to reviewable lessons"
                   (click)="onClickBackToReviewableLessons()"
@@ -108,9 +108,8 @@
                                   [showOpportunityButton]="false">
         </oppia-opportunities-list>
       </div>
-      <div *ngIf="isAccomplishmentsTab && accomplismentsEnabled && activeAccomplishmentType === 'stats'">
-        <contributor-stats
-                            [type]="defaultContributionType">
+      <div *ngIf="activeTabIsAccomplishments && accomplishmentsTabIsEnabled && activeAccomplishmentType === 'stats'">
+        <contributor-stats [type]="defaultContributionType">
         </contributor-stats>
       </div>
     </div>
