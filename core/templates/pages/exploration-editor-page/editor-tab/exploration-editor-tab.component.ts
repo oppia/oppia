@@ -46,6 +46,7 @@ import { StateEditorRefreshService } from '../services/state-editor-refresh.serv
 import { LoaderService } from 'services/loader.service';
 import { GraphDataService } from '../services/graph-data.service';
 import { ExplorationNextContentIdIndexService } from '../services/exploration-next-content-id-index.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 @Component({
   selector: 'oppia-exploration-editor-tab',
@@ -93,6 +94,7 @@ export class ExplorationEditorTabComponent
       private explorationCorrectnessFeedbackService:
         ExplorationCorrectnessFeedbackService,
       private focusManagerService: FocusManagerService,
+      private generateContentIdService: GenerateContentIdService,
       private stateEditorRefreshService: StateEditorRefreshService,
       private loaderService: LoaderService,
       private graphDataService: GraphDataService,
@@ -414,6 +416,13 @@ export class ExplorationEditorTabComponent
 
       this.interactionIsShown = false;
       this.removeTutorialSaveButtonIfNoPermissions();
+      this.generateContentIdService.init(() => {
+        let indexToUse = this.explorationNextContentIdIndexService.displayed;
+        this.explorationNextContentIdIndexService.displayed += 1;
+        return indexToUse;
+      }, () => {
+        this.explorationNextContentIdIndexService.restoreFromMemento();
+      });
     }
 
     ngOnDestroy(): void {
