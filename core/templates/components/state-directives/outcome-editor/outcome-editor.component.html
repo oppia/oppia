@@ -181,44 +181,6 @@
   </div>
 </div>
 
-<div class="oppia-correctness-label-editor" *ngIf="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
-  <div *ngIf="!isEditable"
-       title="{{ isEditable ? 'Edit correctness setting' : '' }}"
-       class="h-100">
-    <div class="oppia-readonly-rule-tile"
-         [ngClass]="{'oppia-editable-section': isEditable}">
-      <div class="oppia-rule-details-header">
-        <div class="oppia-click-to-start-editing"
-             *ngIf="isEditable" (click)="openCorrectnessLabelEditor()">
-          <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
-             title="Edit Correctness setting">&#xE254;
-          </i>
-        </div>
-
-        <strong class="oppia-outcome-heading">The answers falling under this group are
-          <span *ngIf="outcome && outcome.labelledAsCorrect" class="oppia-correct-text">
-            correct
-          </span>
-          <span *ngIf="outcome && !outcome.labelledAsCorrect" class="oppia-incorrect-text">
-            incorrect
-          </span>
-        </strong>
-      </div>
-    </div>
-  </div>
-
-  <div class="oppia-outcome-container" *ngIf="isEditable">
-    <div *ngIf="outcome">
-      <input class="mr-2 e2e-test-editor-correctness-toggle"
-             type="checkbox"
-             [disabled]="isSelfLoop(savedOutcome)"
-             [(ngModel)]="outcome.labelledAsCorrect"
-             (change)="onChangeCorrectnessLabel()">
-    </div>
-    <strong class="oppia-outcome-heading">The answers in this group are correct</strong>
-  </div>
-</div>
-
 <div *ngIf="!destinationIfStuckEditorIsOpen && !isInQuestionMode() && outcome && !outcome.labelledAsCorrect"
      class="h-100"
      title="{{ isEditable ? 'Change the if stuck destination card' : '' }}">
@@ -227,8 +189,8 @@
     <div class="oppia-rule-preview oppia-transition-200">
       <div class="oppia-click-to-start-editing protractor-test-open-outcome-dest-if-stuck-editor"
            *ngIf="isEditable" (click)="openDestinationIfStuckEditor()">
-        <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
-           title="Edit If Stuck Destination">&#xE254;
+        <i *ngIf="isEditable" class="fas fa-pen oppia-editor-edit-icon float-right"
+           title="Edit If Stuck Destination">
         </i>
       </div>
 
@@ -269,5 +231,43 @@
     </div>
 
     <div class="oppia-clear"></div>
+  </div>
+</div>
+
+<div class="oppia-correctness-label-editor" *ngIf="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
+  <div *ngIf="!isEditable"
+       title="{{ isEditable ? 'Edit correctness setting' : '' }}"
+       class="h-100">
+    <div class="oppia-readonly-rule-tile"
+         [ngClass]="{'oppia-editable-section': isEditable}">
+      <div class="oppia-rule-details-header">
+        <div class="oppia-click-to-start-editing"
+             *ngIf="isEditable" (click)="openCorrectnessLabelEditor()">
+          <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
+             title="Edit Correctness setting">&#xE254;
+          </i>
+        </div>
+
+        <strong class="oppia-outcome-heading">The answers falling under this group are
+          <span *ngIf="outcome && outcome.labelledAsCorrect" class="oppia-correct-text">
+            correct
+          </span>
+          <span *ngIf="outcome && !outcome.labelledAsCorrect" class="oppia-incorrect-text">
+            incorrect
+          </span>
+        </strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="oppia-outcome-container" *ngIf="isEditable">
+    <div *ngIf="outcome">
+      <input class="mr-2 e2e-test-editor-correctness-toggle"
+             type="checkbox"
+             [disabled]="isSelfLoop(savedOutcome)"
+             [(ngModel)]="outcome.labelledAsCorrect"
+             (change)="onChangeCorrectnessLabel()">
+    </div>
+    <strong class="oppia-outcome-heading">The answers in this group are correct</strong>
   </div>
 </div>

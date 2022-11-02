@@ -1055,7 +1055,7 @@ export class ConversationSkinComponent {
       }
     }, ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
     this.timeout = setTimeout(() => {
-      if (this.nextCardIfStuck) {
+      if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
         // Redirect the learner.
         this.nextCard = this.nextCardIfStuck;
         this.showPendingCard();
@@ -1073,7 +1073,7 @@ export class ConversationSkinComponent {
       this.responseTimeout = null;
     }
     // Directly trigger action for the really stuck learner.
-    if (this.nextCardIfStuck) {
+    if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
       this.playerTranscriptService.addNewResponse(
         this.translateService.instant(
           'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE'));
