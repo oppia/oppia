@@ -434,11 +434,9 @@ class LearnerDashboardFeedbackThreadHandler(
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
         if suggestion:
-            if authors_settings[0] is None:
-                raise Exception(
-                    'No author exist for the given author id: %s'
-                    % author_ids[0]
-                )
+            suggestion_author_setting = user_services.get_user_settings(
+                author_ids[0], strict=True
+            )
             if not isinstance(
                 suggestion,
                 suggestion_registry.SuggestionEditStateContent
@@ -455,9 +453,9 @@ class LearnerDashboardFeedbackThreadHandler(
                 'suggestion_html': suggestion.change.new_value['html'],
                 'current_content_html': current_content_html,
                 'description': suggestion_thread.subject,
-                'author_username': authors_settings[0].username,
+                'author_username': suggestion_author_setting.username,
                 'author_picture_data_url': (
-                    authors_settings[0].profile_picture_data_url),
+                    suggestion_author_setting.profile_picture_data_url),
                 'created_on_msecs': utils.get_time_in_millisecs(
                     messages[0].created_on)
             }

@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -29,6 +31,7 @@ from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
+from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -1017,6 +1020,44 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(messages_summary['author_username'], None)
         self.assertEqual(messages_summary['author_picture_data_url'], None)
+
+    def test_raises_error_if_wrong_type_of_suggestion_provided(self) -> None:
+        self.login(self.EDITOR_EMAIL)
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>This is a content.</p>',
+            'translation_html': '<p>This is translated html.</p>',
+            'data_format': 'html'
+        }
+        translation_suggestion = suggestion_registry.SuggestionTranslateContent(
+            'exploration.exp1.thread1', 'exp1',
+            1, suggestion_models.STATUS_ACCEPTED, 'author',
+            'review_id', change_dict, 'translation.Algebra',
+            'en', False,
+            utils.get_time_in_millisecs(
+                datetime.datetime(2016, 4, 10, 0, 0, 0, 0))
+        )
+
+        response_dict = self.get_json(
+            '%s/%s' %
+            (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
+        )
+        thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
+        thread_url = '%s/%s' % (
+            feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL, thread_id)
+        with self.swap_to_always_return(
+            suggestion_services, 'get_suggestion_by_id', translation_suggestion
+        ):
+            with self.assertRaisesRegex(
+                Exception,
+                'No edit state content suggestion found for the given '
+                'thread_id: %s' % thread_id
+            ):
+                self.get_json(thread_url)
 
     def test_get_suggestions_after_updating_suggestion_summary(self) -> None:
         self.login(self.EDITOR_EMAIL)
