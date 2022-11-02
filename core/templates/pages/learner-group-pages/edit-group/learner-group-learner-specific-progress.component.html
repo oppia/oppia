@@ -19,7 +19,7 @@
           <div *ngIf="learnerProgress" class="all-subtopics-progress">
             <div *ngFor="let topicName of topicNames" class="progress-dropdown">
               <mat-accordion>
-                <mat-expansion-panel hideToggle>
+                <mat-expansion-panel hideToggle expanded>
                   <mat-expansion-panel-header>
                     <mat-panel-title>
                       <div class="story-info-summary-container">
@@ -72,7 +72,7 @@
         <div *ngIf="learnerProgress" class="all-stories-progress">
           <div *ngFor="let storyProgress of learnerProgress.storiesProgress; let storyIndex = index" class="progress-dropdown story-progress-dropdown">
             <mat-accordion>
-              <mat-expansion-panel hideToggle>
+              <mat-expansion-panel hideToggle expanded>
                 <mat-expansion-panel-header>
                   <mat-panel-title>
                     <div class="story-info-summary-container">
