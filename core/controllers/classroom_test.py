@@ -26,8 +26,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
 
-from typing import cast
-
 
 class ClassroomTopicSummaryDict(topic_domain.TopicSummaryDict):
     """Dict representation of classroom topic summary dict."""
@@ -136,21 +134,68 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
         json_response = self.get_json(
             '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
-        public_topic_summary_dict: ClassroomTopicSummaryDict = (
-            cast(
-                ClassroomTopicSummaryDict,
-                topic_fetchers.get_topic_summary_by_id(topic_id_2).to_dict()
-            )
+        topic_summary_dict = (
+            topic_fetchers.get_topic_summary_by_id(topic_id_2).to_dict()
         )
-        public_topic_summary_dict['is_published'] = True
-        private_topic_summary_dict: ClassroomTopicSummaryDict = (
-            cast(
-                ClassroomTopicSummaryDict,
-                topic_fetchers.get_topic_summary_by_id(topic_id_1).to_dict()
-            )
+        public_topic_summary_dict = {
+            'id': topic_summary_dict['id'],
+            'name': topic_summary_dict['name'],
+            'url_fragment': topic_summary_dict['url_fragment'],
+            'language_code': topic_summary_dict['language_code'],
+            'description': topic_summary_dict['description'],
+            'version': topic_summary_dict['version'],
+            'canonical_story_count': (
+                topic_summary_dict['canonical_story_count']),
+            'additional_story_count': (
+                topic_summary_dict['additional_story_count']),
+            'uncategorized_skill_count': (
+                topic_summary_dict['uncategorized_skill_count']),
+            'subtopic_count': topic_summary_dict['subtopic_count'],
+            'total_skill_count': (
+                topic_summary_dict['total_skill_count']),
+            'total_published_node_count': (
+                topic_summary_dict['total_published_node_count']),
+            'thumbnail_filename': (
+                topic_summary_dict['thumbnail_filename']),
+            'thumbnail_bg_color': (
+                topic_summary_dict['thumbnail_bg_color']),
+            'topic_model_created_on': (
+                topic_summary_dict['topic_model_created_on']),
+            'topic_model_last_updated': (
+                topic_summary_dict['topic_model_last_updated']),
+            'is_published': True
+        }
+        topic_summary_dict = (
+            topic_fetchers.get_topic_summary_by_id(topic_id_1).to_dict()
         )
-        private_topic_summary_dict['is_published'] = False
-
+        private_topic_summary_dict = {
+            'id': topic_summary_dict['id'],
+            'name': topic_summary_dict['name'],
+            'url_fragment': topic_summary_dict['url_fragment'],
+            'language_code': topic_summary_dict['language_code'],
+            'description': topic_summary_dict['description'],
+            'version': topic_summary_dict['version'],
+            'canonical_story_count': (
+                topic_summary_dict['canonical_story_count']),
+            'additional_story_count': (
+                topic_summary_dict['additional_story_count']),
+            'uncategorized_skill_count': (
+                topic_summary_dict['uncategorized_skill_count']),
+            'subtopic_count': topic_summary_dict['subtopic_count'],
+            'total_skill_count': (
+                topic_summary_dict['total_skill_count']),
+            'total_published_node_count': (
+                topic_summary_dict['total_published_node_count']),
+            'thumbnail_filename': (
+                topic_summary_dict['thumbnail_filename']),
+            'thumbnail_bg_color': (
+                topic_summary_dict['thumbnail_bg_color']),
+            'topic_model_created_on': (
+                topic_summary_dict['topic_model_created_on']),
+            'topic_model_last_updated': (
+                topic_summary_dict['topic_model_last_updated']),
+            'is_published': False
+        }
         expected_dict = {
             'name': 'math',
             'topic_summary_dicts': [

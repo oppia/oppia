@@ -39,9 +39,8 @@ from core.platform import models
 from core.tests import test_utils
 import main
 
-import webtest
-
 from typing import Dict, Final, List, Set, Union
+import webtest
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -507,7 +506,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             suggestion_registry.ReviewableSuggestionEmailInfo
         ),
         expected_reviewable_suggestion_email_info: (
-           suggestion_registry.ReviewableSuggestionEmailInfo 
+           suggestion_registry.ReviewableSuggestionEmailInfo
         )
     ) -> None:
         """Asserts that the reviewable suggestion email info is equal to the
