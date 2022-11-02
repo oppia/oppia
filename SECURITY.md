@@ -31,7 +31,7 @@ Immediately upon receiving a report of a security problem, a member of Oppia’s
 * Include developers (most likely 1-2) with expertise in the part of the app affected by the problem.
 * Include as few developers as possible to avoid premature publication of the problem.
 
-The tech lead should designate one VRT member as the VRT lead responsible for driving our response. The VRT lead should immediately (ideally within 24 hours) investigate the report and classify it as:
+The tech lead will designate one VRT member as the VRT lead responsible for driving our response. The VRT lead will immediately (ideally within 24 hours) investigate the report and classify it as:
 
 * Won’t fix: The app is working as intended, the bug is not important enough for us to spend resources fixing, or the requested feature is not something we plan to implement.
 * **Bug**: The problem identified is legitimate, but it is not a security issue. It will be resolved through our normal bug-fixing process.
@@ -40,11 +40,11 @@ The tech lead should designate one VRT member as the VRT lead responsible for dr
 * **High-severity vulnerability**: The report identifies an exploitable security vulnerability that, if exploited, could result in any of the following:
   * (Confidentiality) Unauthorized access to personal user data.
   * (Integrity) Unauthorized edits to any user data.
-  * (Availability) Degraded system performance for the platform for users.
+  * (Availability) Degraded system performance of the platform for users.
 
 Note that while the VRT contains multiple individuals, it’s ultimately expected that the VRT lead drives the effort. This should be in collaboration with VRT members, but in cases of urgent vulnerabilities the VRT lead can operate authoritatively to mitigate or remediate the issue (i.e. they do not need VRT consensus or review, but they should leverage VRT team members as a source for information and help).
 
-The VRT lead should notify the reporter of the classification and the reasoning behind the VRT’s decision within 7 days of the acknowledgement email. This notification should include links to any issues that were opened as a result of the report. For problems classified as bugs, feature requests, or low-severity vulnerabilities, issues should be opened and assigned to the relevant team.
+The VRT lead will notify the reporter of the classification and the reasoning behind the VRT’s decision within 7 days of the acknowledgement email. This notification should include links to any issues that were opened as a result of the report. For problems classified as bugs, feature requests, or low-severity vulnerabilities, issues will be opened and assigned to the relevant team.
 
 The rest of this document describes how we handle high-severity vulnerabilities.
 
@@ -52,12 +52,12 @@ The rest of this document describes how we handle high-severity vulnerabilities.
 
 ### Create a Coordination Channel
 
-If the problem is confirmed as a high-severity vulnerability, the VRT will open a [GitHub security advisory](https://docs.github.com/en/code-security/repository-security-advisories/about-github-security-advisories-for-repositories) and, if both the VRT and reporter agree, add the reporter to the advisory so we can collaborate on it. We will coordinate work on the vulnerability on:
+If the problem is confirmed as a high-severity vulnerability, the VRT will open a [GitHub security advisory](https://docs.github.com/en/code-security/repository-security-advisories/about-github-security-advisories-for-repositories) and, if both the VRT and reporter agree, add the reporter to the advisory so we can collaborate on it. We will coordinate work on the vulnerability via:
 
 * **The GitHub security advisory.** These advisories will let us collaborate in private, and they are appropriate in cases where disclosing the vulnerability prior to remediating it could put our users or developers at risk.
 * **(Optionally) An additional GitHub issue and pull request.** This will immediately disclose the vulnerability, and we will take this approach when immediate disclosure poses little risk to our users and developers. For example, when the vulnerability is already publicly known. Unlike security advisories, CI checks can run on these PRs.
 
-Note that we should create a GitHub security advisory even if we choose to collaborate on a fix using an open issue or PR because we’ll want to publish the advisory when disclosing the vulnerability.
+Note that we will create a GitHub security advisory even if we choose to collaborate on a fix using an open issue or PR because we’ll want to publish the advisory when disclosing the vulnerability.
 
 ### Request a CVE
 
@@ -65,13 +65,13 @@ A CVE should be requested for all security vulnerabilities. Since we create a Gi
 
 ### Develop a Patch
 
-Regardless of which approach we take, the VRT will prioritize developing a patch to fix the vulnerability. If the vulnerability is easily exploitable, remediation should take priority over all other work. Remediation should be completed within 7 days of the report being classified as a high-severity vulnerability.
+Regardless of which approach we take, the VRT will prioritize developing a patch to fix the vulnerability. If the vulnerability is easily exploitable, remediation will take priority over all other work. Remediation should be completed within 7 days of the report being classified as a high-severity vulnerability.
 
 ## Disclose
 
-We generally follow a 90-day disclosure timeframe, meaning that we ask that reporters give us 90 days to fix vulnerabilities before publicly disclosing them. 90 days should be viewed as an upper bound, and we should aim to remediate vulnerabilities as quickly as possible. In all cases, the disclosure timeline should be explicitly coordinated with the reporter, and we should arrange to publicly disclose the vulnerability simultaneously with the reporter. Our disclosure will include credit for the reporter if they so wish.
+We generally follow a 90-day disclosure timeframe, meaning that we ask that reporters give us 90 days to fix vulnerabilities before publicly disclosing them. 90 days should be viewed as an upper bound, and we aim to remediate vulnerabilities as quickly as possible. In all cases, the disclosure timeline will be explicitly coordinated with the reporter, and we prefer to publicly disclose the vulnerability simultaneously with the reporter. Our disclosure will include credit for the reporter if they so wish.
 
-In rare cases, it may be appropriate to delay public disclosure even after the patch has been published and deployed. However, since our source code is public, we should assume that attackers will quickly reverse-engineer the vulnerability from our patch and so err on the side of disclosing early.
+In rare cases, it may be appropriate to delay public disclosure even after the patch has been published and deployed. However, since our source code is public, we must assume that attackers will quickly reverse-engineer the vulnerability from our patch and so err on the side of disclosing early.
 
 Our public disclosure should take the form of a published GitHub Security Advisory. Here is a template:
 
@@ -90,12 +90,12 @@ A brief (as short as possible, about a paragraph) summary of the vulnerability u
 
 ## Severity
 <!--
-[Low, Medium, HIGH, **CRITICAL**] - Accompany your assessment with a motivation, and even a good attack scenario to explain the risk associated with the vulnerability.
+[Low, Medium, HIGH, **CRITICAL**] - Accompany your assessment with a motivation, and even a good attack scenario to explain the risk associated with the vulnerability. Determine severity based on CVSS (https://www.first.org/cvss/user-guide).
 -->
 
 ## Proof of Concept
 <!--
-Code or command lines. We want to offer a concrete, usable, and repeatable way for the reader to reproduce the issue you are raising so they can test fixes and mitigations.
+Code or command lines. We want to offer a concrete, usable, and repeatable way for the reader to reproduce the issue. Often, this will be the proof of concept provided by the reporter.
 -->
 
 ## Remediation and Mitigation
@@ -105,7 +105,7 @@ Known remediations. If one is a software update, note the version(s) that fix it
 
 ## Further Analysis
 <!--
-If you wish to add more context or information, we recommend adding it after the critical sections mentioned here. If you know the vulnerability has been exploited in the wild, add that here.
+If you wish to add more context or information, we recommend adding it after the critical sections mentioned here. Also add whether you believe this vulnerability has been exploited in the wild.
 -->
 
 ## Timeline
