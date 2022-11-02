@@ -58,13 +58,14 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
         blog_services.update_blog_post(blog_post.id, self.change_dict)
         blog_services.publish_blog_post(blog_post.id)
 
-    def test_get_blog_homepage_data(self):
+    def test_get_blog_homepage_data(self) -> None:
         self.login(self.user_email)
         json_response = self.get_json(
             '%s?offset=0' % (feconf.BLOG_HOMEPAGE_DATA_URL),
             )
         default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post').value
+            'list_of_default_tags_for_blog_post', strict=True
+        ).value
         self.assertEqual(default_tags, json_response['list_of_default_tags'])
         self.assertEqual(
             self.BLOG_ADMIN_USERNAME,
@@ -127,7 +128,7 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.blog_post_one = blog_services.create_new_blog_post(
             self.blog_admin_id)
-        self.change_dict = {
+        self.change_dict: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title',
             'thumbnail_filename': 'thumbnail.svg',
             'content': '<p>Hello Bloggers</p>',
@@ -175,7 +176,7 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(json_response['summary_dicts']), 1)
         self.assertIsNotNone(json_response['profile_picture_data_url'])
 
-    def test_should_get_correct_recommendations_for_post_page(self):
+    def test_should_get_correct_recommendations_for_post_page(self) -> None:
         self.signup(
             self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.add_user_role(
@@ -186,7 +187,7 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
 
         blog_post_two_id = (
             blog_services.create_new_blog_post(self.blog_admin_id).id)
-        change_dict_two = {
+        change_dict_two: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title Two',
             'thumbnail_filename': 'thumbnail.svg',
             'content': '<p>Hello Blog</p>',
@@ -197,7 +198,7 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
 
         blog_post_three_id = (
             blog_services.create_new_blog_post(blog_editor_id).id)
-        change_dict_three = {
+        change_dict_three: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title Three',
             'thumbnail_filename': 'thumbnail_filename.svg',
             'content': '<p>Hello Blog</p>',
@@ -209,7 +210,7 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
 
         blog_post_four_id = (
             blog_services.create_new_blog_post(blog_editor_id).id)
-        change_dict_four = {
+        change_dict_four: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title Four',
             'thumbnail_filename': 'thumbnail_filename.svg',
             'content': '<p>Hello Blog</p>',
@@ -261,7 +262,7 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             json_response['summary_dicts'][1]['id'], blog_post_two_id)
 
-    def test_raise_exception_if_blog_post_does_not_exists(self):
+    def test_raise_exception_if_blog_post_does_not_exists(self) -> None:
         self.login(self.user_email)
         blog_post = blog_services.get_blog_post_by_id(self.blog_post_one.id)
         self.get_json(
@@ -489,7 +490,8 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
             })
 
         default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post').value
+            'list_of_default_tags_for_blog_post', strict=True
+        ).value
         self.assertEqual(default_tags, response_dict['list_of_default_tags'])
         self.assertEqual(len(response_dict['blog_post_summaries_list']), 1)
         self.assertEqual(
