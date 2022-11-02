@@ -300,9 +300,11 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             original_image_content = f.read()
+
         def mock_isfile(
                 self: fs_services.GcsFileSystem, *unused_args: str) -> bool: # pylint: disable=unused-argument
             return True
+
         def mock_commit(
                 self: fs_services.GcsFileSystem, *unused_args: str) -> None: # pylint: disable=unused-argument
             return None

@@ -40,6 +40,7 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
         # all branches of action_registry.py. Hence, we manually empty it
         # before this test.
         action_registry.Registry._actions = {} # pylint: disable=protected-access
+
         class FakeAction: # pylint: disable=missing-docstring
             some_property: int
         swap_getattr = self.swap(
