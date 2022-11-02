@@ -20,9 +20,10 @@ import json
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import email_manager, feedback_domain
+from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import stats_services
@@ -146,10 +147,10 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
                     'object_class': feedback_domain.FeedbackMessageReference
                 },
                 'default_value': None
-            }  
+            }
         }
     }
-    
+
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
         payload = json.loads(self.request.body)
