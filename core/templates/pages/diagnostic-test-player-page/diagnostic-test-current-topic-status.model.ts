@@ -19,13 +19,11 @@
  * in the diagnostic test.
  */
 
+import { DiagnosticTestQuestionsModel } from 'domain/question/diagnostic-test-questions.model';
 import { Question } from 'domain/question/QuestionObjectFactory';
 
 export interface SkillIdToQuestionsDict {
-  [skillId: string]: {
-    mainQuestion: Question;
-    backupQuestion: Question;
-  };
+  [skillId: string]: DiagnosticTestQuestionsModel;
 }
 
 export class DiagnosticTestCurrentTopicStatusModel {
@@ -90,9 +88,9 @@ export class DiagnosticTestCurrentTopicStatusModel {
 
   getNextQuestion(skillId: string): Question {
     if (this._lifelineIsConsumed) {
-      return this._skillIdToQuestionsDict[skillId].backupQuestion;
+      return this._skillIdToQuestionsDict[skillId].getBackupQuestion();
     } else {
-      return this._skillIdToQuestionsDict[skillId].mainQuestion;
+      return this._skillIdToQuestionsDict[skillId].getMainQuestion();
     }
   }
 
@@ -107,5 +105,9 @@ export class DiagnosticTestCurrentTopicStatusModel {
 
   isTopicCompletelyTested(): boolean {
     return this._pendingSkillIdsToTest.length === 0;
+  }
+
+  isLifelineConsumeed(): boolean {
+    return this._lifelineIsConsumed;
   }
 }

@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { Question, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { Question } from 'domain/question/QuestionObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
@@ -39,18 +39,19 @@ import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-
 
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class DiagnosticTestPlayerEngineService {
   private answerIsBeingProcessed: boolean = false;
-  private diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel;
-  private diagnosticTestCurrentTopicStatusModel:
+  private diagnosticTestTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
+  private diagnosticTestCurrentTopicStatusModel!:
     DiagnosticTestCurrentTopicStatusModel;
-  private currentQuestion: Question;
-  private currentTopicId: string;
-  private currentSkillId: string;
-  private numberOfAttemptedQuestions: number;
-  private focusLabel;
+
+  private currentQuestion!: Question;
+  private currentTopicId!: string;
+  private currentSkillId!: string;
+  private numberOfAttemptedQuestions!: number;
+  private focusLabel!: string;
 
   constructor(
     private alertsService: AlertsService,
@@ -66,10 +67,10 @@ export class DiagnosticTestPlayerEngineService {
   }
 
   init(
-      diagnosticTestTopicTrackerModel,
+      diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel,
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback?: () => void
-  ) {
+  ): void {
     this.diagnosticTestTopicTrackerModel = diagnosticTestTopicTrackerModel;
     this.currentTopicId = (
       this.diagnosticTestTopicTrackerModel.selectNextTopicIdToTest());
@@ -80,8 +81,10 @@ export class DiagnosticTestPlayerEngineService {
         new DiagnosticTestCurrentTopicStatusModel(response));
 
       const stateCard = this.createCard();
+      this.numberOfAttemptedQuestions = 0;
 
-      if (!stateCard) {
+      let questionHtml = stateCard.getContentHtml();
+      if (questionHtml === null) {
         errorCallback();
       }
 
@@ -97,12 +100,12 @@ export class DiagnosticTestPlayerEngineService {
         refreshInteraction: boolean,
         feedbackHtml: string,
         feedbackAudioTranslations: BindableVoiceovers,
-        refresherExplorationId,
-        missingPrerequisiteSkillId,
+        refresherExplorationId: string,
+        missingPrerequisiteSkillId: string,
         remainOnCurrentCard: boolean,
         taggedSkillMisconceptionId: string,
-        wasOldStateInitial,
-        isFirstHit,
+        wasOldStateInitial: boolean,
+        isFirstHit: boolean,
         isFinalQuestion: boolean,
         focusLabel: string) => void
   ): boolean {
@@ -141,6 +144,7 @@ export class DiagnosticTestPlayerEngineService {
       if (this.isDiagnosticTestFinished()) {
         this.diagnosticTestPlayerStatusService
           .onDiagnosticTestSessionCompleted.emit(true);
+        return;
       }
 
       this.currentTopicId = (
@@ -183,15 +187,17 @@ export class DiagnosticTestPlayerEngineService {
     );
   }
 
-  private makeQuestion(
+  makeQuestion(
       newState: State, envs: Record<string, string>[]): string {
     return this.expressionInterpolationService.processHtml(
       newState.content.html, envs);
   }
 
-  createCard() {
-    this.currentSkillId = (
-      this.diagnosticTestCurrentTopicStatusModel.getNextSkill());
+  createCard(): StateCard {
+    if (!this.diagnosticTestCurrentTopicStatusModel.isLifelineConsumeed()) {
+      this.currentSkillId = (
+        this.diagnosticTestCurrentTopicStatusModel.getNextSkill());
+    }
     this.currentQuestion = (
       this.diagnosticTestCurrentTopicStatusModel.getNextQuestion(
         this.currentSkillId));
@@ -200,7 +206,6 @@ export class DiagnosticTestPlayerEngineService {
 
     if (questionHtml === null) {
       this.alertsService.addWarning('Question name should not be empty.');
-      return;
     }
 
     this.focusLabel = this.focusManagerService.generateFocusLabel();
@@ -223,6 +228,10 @@ export class DiagnosticTestPlayerEngineService {
     );
   }
 
+  static get MAX_ALLOWED_QUESTIONS_IN_THE_DIAGNOSTIC_TEST(): number {
+    return AppConstants.MAX_ALLOWED_QUESTIONS_IN_THE_DIAGNOSTIC_TEST;
+  }
+
   isDiagnosticTestFinished(): boolean {
     const lengthOfEligibleTopicIds = (
       this.diagnosticTestTopicTrackerModel.getEligibleTopicIds().length
@@ -232,12 +241,33 @@ export class DiagnosticTestPlayerEngineService {
       return true;
     }
     if (
-        lengthOfEligibleTopicIds > 0 &&
-        this.numberOfAttemptedQuestions >= 15
+      lengthOfEligibleTopicIds > 0 &&
+        this.numberOfAttemptedQuestions >= DiagnosticTestPlayerEngineService
+          .MAX_ALLOWED_QUESTIONS_IN_THE_DIAGNOSTIC_TEST
     ) {
       return true;
     }
 
     return false;
+  }
+
+  getCurrentQuestion(): Question {
+    return this.currentQuestion;
+  }
+
+  getCurrentSkillId(): string {
+    return this.currentSkillId;
+  }
+
+  getCurrentTopicId(): string {
+    return this.currentTopicId;
+  }
+
+  getTotalNumberOfAttemptedQuestions(): number {
+    return this.numberOfAttemptedQuestions;
+  }
+
+  getFailedTopicIds(): string[] {
+    return this.diagnosticTestTopicTrackerModel.getFailedTopicIds();
   }
 }

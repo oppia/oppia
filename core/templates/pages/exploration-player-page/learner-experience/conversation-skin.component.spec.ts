@@ -77,6 +77,7 @@ import { ConversationSkinComponent } from './conversation-skin.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
+import { DiagnosticTestTopicTrackerModel } from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 
 class MockWindowRef {
   nativeWindow = {
@@ -1386,6 +1387,25 @@ describe('Conversation skin component', () => {
     componentInstance._nextFocusLabel = 'focus_label';
     componentInstance.initializePage();
     tick(100);
+
+    componentInstance.questionPlayerConfig = null;
+    let topicIdToPrerequisiteTopicIds = {
+      topicId1: [],
+      topicId2: ['topicId1'],
+      topicId3: ['topicId2']
+    };
+
+    componentInstance.diagnosticTestTopicTrackerModel = (
+      new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds));
+
+    spyOn(explorationPlayerStateService, 'initializeDiagnosticPlayer');
+
+    componentInstance.initializePage();
+    tick(100);
+
+    expect(playerPositionService.init).toHaveBeenCalled();
+    expect(explorationPlayerStateService.initializeDiagnosticPlayer)
+      .toHaveBeenCalled();
   }));
 
   it('should tell if window can show two cards', () => {

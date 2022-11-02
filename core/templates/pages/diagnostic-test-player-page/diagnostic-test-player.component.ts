@@ -59,29 +59,9 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     this.componentSubscription.add(
       this.diagnosticTestPlayerStatusService
         .onDiagnosticTestSessionCompleted.subscribe((result) => {
-          console.log('in the component');
-          console.log(result);
         })
     );
   }
-
-  returnBackToClassroom(): void {
-    this.windowRef.nativeWindow.location.href = '/learn/math';
-  }
-
-  startDiagnosticTest(): void {
-    // fetch the math topic ID.
-    const classroomId = 'DVNYWPrAjtzh';
-
-    this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
-      response => {
-        this.diagnosticTestTopicTrackerModel = new DiagnosticTestTopicTrackerModel(
-          response.classroomDict.topicIdToPrerequisiteTopicIds);
-        this.diagnosticTestStarted = true
-      }
-    );
-  }
-
 }
 
 angular.module('oppia').directive(
