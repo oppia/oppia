@@ -343,7 +343,7 @@ class ReviewableOpportunitiesHandler(
             exploration opportunity summaries.
 
         Raises:
-            Exception. Error: No exploration_id found with the node_id.
+            Exception. Error No exploration_id found with the node_id.
         """
         # 1. Fetch the eligible topics.
         # 2. Fetch the stories for the topics.
@@ -988,7 +988,7 @@ def _get_client_side_stats(
         are consequently deleted.
 
     Raises:
-        Exception. Error: No topic_id associated with stats object.
+        Exception. Error No topic_id associated with stats object.
     """
     stats_dicts = [
         stats.to_dict() for stats in backend_stats
@@ -1009,7 +1009,7 @@ def _get_client_side_stats(
     for stats_dict in stats_dicts:
         # Here we are asserting that 'stats_dict['topic_id']' will never be None
         # because above we are already handling the case of None 'topic_id' by
-        # raising an exception. 
+        # raising an exception.
         assert stats_dict['topic_id'] is not None
         # Here we use MyPy ignore because 'stats_dict' is of union type
         # and MyPy is unable to infer on which TypedDict 'topic_name' key
