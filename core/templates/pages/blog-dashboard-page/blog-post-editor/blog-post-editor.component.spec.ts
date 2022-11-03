@@ -321,7 +321,7 @@ describe('Blog Post Editor Component', () => {
 
     component.saveDraft();
 
-    expect(component.saveInProgress).toBe(true);
+    expect(component.saveInProgress).toBeTrue();
     expect(component.updateBlogPostData).toHaveBeenCalledWith(false);
   });
 

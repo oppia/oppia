@@ -14,6 +14,39 @@
   max-width: 560px;
 }
 
+.oppia-invite-learners .oppia-search-bar-text-input.input-invalid {
+  border-color: #c30000;
+}
+
+.oppia-invite-learners .oppia-search-bar-text-input.input-invalid:focus {
+  box-shadow: 0 0 0 0.25rem rgb(195, 0, 0, 0.25);
+}
+
+.oppia-invite-learners .oppia-search-bar-error-message {
+  color: #c30000;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.oppia-invite-learners .oppia-search-bar-input-field-container {
+  display: flex;
+  gap: 20px;
+}
+
+.oppia-invite-learners .oppia-search-bar-button {
+  align-items: center;
+  background: #27635c;
+  color: #fff;
+  display: flex;
+  font-size: 16px;
+  font-weight: 500;
+  height: 36px;
+  margin-top: 14px;
+  max-width: fit-content;
+  padding: 12px 24px;
+  width: 44%;
+}
+
 .oppia-invite-learners .invited-learners-inner-container {
   background: rgba(39, 99, 92, 0.05);
   border-radius: 4px;
@@ -53,4 +86,17 @@
   color: #9e9e9e;
   font-size: 14px;
   margin: auto;
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-invite-learners .oppia-search-bar-button {
+    height: 46px;
+    margin-top: 15px;
+  }
+}
+
+@media screen and (max-width: 620px) {
+  .oppia-invite-learners .oppia-search-bar-button .invite-learner-button-text {
+    display: none;
+  }
 }

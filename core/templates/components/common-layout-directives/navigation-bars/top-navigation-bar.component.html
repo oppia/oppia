@@ -30,12 +30,13 @@
     </picture>
   </a>
 </div>
-<div class="nav-mobile-header-text-container"
-     *ngIf="headerText?.length">
-  <span class="nav-mobile-header-editor">
+<div class="nav-mobile-header-text-container">
+  <span *ngIf="headerText?.length"
+        class="nav-mobile-header-editor">
     {{ headerText }}
   </span>
-  <span class="nav-mobile-header-text">
+  <span *ngIf="subheaderText?.length"
+        class="nav-mobile-header-text">
     {{ subheaderText }}
   </span>
 </div>
@@ -469,6 +470,13 @@
              href="/contributor-dashboard"
              class="dropdown-item nav-link e2e-test-learner-dashboard-link">
             <span [innerHTML]="'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate"></span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="LEARNER_GROUPS_FEATURE_IS_ENABLED">
+          <a (click)="closeSubmenuIfNotMobile($event)"
+             href="/facilitator-dashboard"
+             class="dropdown-item nav-link">
+            <span [innerHTML]="'I18N_TOPNAV_FACILITATOR_DASHBOARD' | translate"></span>
           </a>
         </li>
         <li class="nav-item">

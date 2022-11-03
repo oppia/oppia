@@ -250,16 +250,6 @@
         "rootDirPrefix": "MIDI.js-",
         "targetDir": "midi-js-c26ebb"
       },
-      "ngJoyride": {
-        "version": "b117e019582433995393f81e2006a6bc36ca1cf2",
-        "downloadFormat": "zip",
-        "url": "https://github.com/oppia/ng-joyride/archive/b117e019582433995393f81e2006a6bc36ca1cf2.zip",
-        "rootDirPrefix": "ng-joyride-",
-        "targetDir": "ng-joyride-b117e0",
-        "bundle": {
-          "css": ["ng-joyride.css"]
-        }
-      },
       "select2": {
         "version": "4.0.3",
         "downloadFormat": "zip",
@@ -318,15 +308,6 @@
         "bundle": {
           "css": ["dist/angular-ui-tree.min.css"]
         }
-      }
-    },
-    "oppiaTools": {
-      "yuiCompressor": {
-        "version": "2.4.8",
-        "downloadFormat": "files",
-        "url": "https://github.com/yui/yuicompressor/releases/download/v2.4.8",
-        "files": ["yuicompressor-2.4.8.jar"],
-        "targetDirPrefix": "yuicompressor-"
       }
     }
   }
