@@ -38,22 +38,22 @@ describe('Diagnostic test current topic status model', () => {
     question1 = new Question(
       'question1',
       stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
-       '', 1, ['skillID1'], [], 2
+      '', 1, ['skillID1'], [], 2
     );
     question2 = new Question(
       'question2',
       stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
-       '', 1, ['skillID2'], [], 2
+      '', 1, ['skillID2'], [], 2
     );
     question3 = new Question(
       'question3',
       stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
-       '', 1, ['skillID3'], [], 2
+      '', 1, ['skillID3'], [], 2
     );
     question4 = new Question(
       'question4',
       stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
-       '', 1, ['skillID4'], [], 2
+      '', 1, ['skillID4'], [], 2
     );
     question5 = new Question(
       'question5',
