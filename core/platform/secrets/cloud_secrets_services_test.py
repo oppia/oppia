@@ -44,4 +44,3 @@ class CloudSecretsServicesTests(test_utils.GenericTestBase):
         ):
             secret = cloud_secrets_services.get_secret('name')
             self.assertIsNone(secret)
-
