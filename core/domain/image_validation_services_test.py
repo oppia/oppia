@@ -63,10 +63,10 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         self._assert_image_validation_error(
             self.raw_image,
-            None,
+            None,  # type: ignore[arg-type]
             feconf.ENTITY_TYPE_EXPLORATION,
             'No filename supplied'
-        )  # type: ignore[arg-type]
+        )
 
         large_image = '<svg><path d="%s" /></svg>' % (
             'M150 0 L75 200 L225 200 Z ' * 4000)
