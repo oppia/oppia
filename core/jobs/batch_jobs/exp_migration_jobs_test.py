@@ -124,7 +124,7 @@ class MigrateExplorationJobTests(
             ])
 
         migrated_exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
-        self.assertEqual(migrated_exp_model.states_schema_version, 53)
+        self.assertEqual(migrated_exp_model.states_schema_version, 54)
 
     def test_broken_exp_is_not_migrated(self) -> None:
         exploration_rights = rights_domain.ActivityRights(
