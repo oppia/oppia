@@ -187,7 +187,6 @@ export class AddAnswerGroupModalComponent
      this.tmpOutcome = this.outcomeObjectFactory.createNew(
        this.questionModeEnabled ? null : this.stateName,
        feedbackContentId, '', []);
-     this.tmpOutcome.destIfReallyStuck = this.stateName;
    }
 
    updateAnswerGroupFeedback(outcome: Outcome): void {
