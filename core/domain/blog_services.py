@@ -631,8 +631,8 @@ def generate_url_fragment(title: str, blog_post_id: str) -> str:
     Returns:
         str. The url fragment of the blog post.
     """
-    lower_title = title.lower()
-    hyphenated_title = lower_title.replace(' ', '-')
+    lower_title = title.lower().replace(':', '')
+    hyphenated_title = lower_title.replace('  ', ' ').replace(' ', '-')
     lower_id = blog_post_id.lower()
     return hyphenated_title + '-' + lower_id
 
