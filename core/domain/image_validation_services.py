@@ -32,7 +32,7 @@ ONE_MB_IN_BYTES = 1 * 1024 * 1024
 def validate_image_and_filename(
     raw_image: Union[str, bytes],
     filename: str,
-    entity_type: Optional[str],
+    entity_type: Optional[str] = None,
 ) -> str:
     """Validates the image data and its filename.
 
