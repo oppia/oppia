@@ -18,6 +18,7 @@
 
 import 'globalthis/auto';
 import 'proxy-polyfill';
+import '@webcomponents/custom-elements';
 
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {

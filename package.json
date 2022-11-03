@@ -145,6 +145,7 @@
     "@ngx-translate/http-loader": "^6.0.0",
     "@types/angular-translate": "^2.16.2",
     "@types/howler": "^2.2.2",
+    "@webcomponents/custom-elements": "^1.5.1",
     "angular": "^1.8.2",
     "angular-cookies": "^1.8.2",
     "angular-route": "^1.8.2",
