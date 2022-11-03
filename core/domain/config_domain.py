@@ -417,7 +417,7 @@ class Registry:
 
         Args:
             name: str. The name of the configuration property.
-            strict: bool. Fails noisily if no config property exist.
+            strict: bool. Whether to fail noisily if no config property exist.
 
         Returns:
             instance. The instance of the specified configuration property.

@@ -567,7 +567,7 @@ def get_topic_summary_by_id(
     Args:
         topic_id: str. ID of the topic summary.
         strict: bool. Whether to fail noisily if no topic summary with the given
-            id exists in the datastore.
+            id exist in the datastore.
 
     Returns:
         TopicSummary or None. The topic summary domain object corresponding to

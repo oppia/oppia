@@ -24,9 +24,17 @@ from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import classroom_services
 from core.domain import config_domain
+from core.domain import topic_domain
 from core.domain import topic_fetchers
 
-from typing import Dict, TypedDict
+from typing import Dict, List, TypedDict
+
+
+class ClassroomTopicSummaryDict(topic_domain.TopicSummaryDict):
+    """Dict representation of classroom topic summary dict."""
+
+    is_published: bool
+
 
 SCHEMA_FOR_CLASSROOM_ID = {
     'type': 'basestring',
@@ -61,16 +69,19 @@ class ClassroomDataHandler(
         classroom = classroom_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
 
+        # Here we are asserting that classroom can never be none, because
+        # in the decorator `does_classroom_exist` we are already handling
+        # the None case of classroom.
         assert classroom is not None
         topic_ids = classroom.topic_ids
         topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
         topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
-        topic_summary_dicts = []
+        topic_summary_dicts: List[ClassroomTopicSummaryDict] = []
         for index, summary in enumerate(topic_summaries):
             topic_right = topic_rights[index]
             if summary is not None and topic_right is not None:
                 topic_summary_dict = summary.to_dict()
-                classroom_page_topic_summary_dict = {
+                classroom_page_topic_summary_dict: ClassroomTopicSummaryDict = {
                     'id': topic_summary_dict['id'],
                     'name': topic_summary_dict['name'],
                     'url_fragment': topic_summary_dict['url_fragment'],

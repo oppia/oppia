@@ -144,7 +144,6 @@ class EditableCollectionDataHandler(
     def put(self, collection_id: str) -> None:
         """Updates properties of the given collection."""
         assert self.user_id is not None
-
         assert self.normalized_payload is not None
         collection = collection_services.get_collection_by_id(collection_id)
         version = self.normalized_payload.get('version')
@@ -258,10 +257,10 @@ class CollectionPublishHandler(
     @acl_decorators.can_publish_collection
     def put(self, collection_id: str) -> None:
         """Publishes the given collection."""
+        assert self.normalized_payload is not None
         collection = collection_services.get_collection_by_id(
             collection_id, strict=True
         )
-        assert self.normalized_payload is not None
         version = self.normalized_payload.get('version')
         _require_valid_version(version, collection.version)
 

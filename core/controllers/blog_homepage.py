@@ -37,7 +37,7 @@ MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST: Final = (
 
 
 class BlogCardSummaryDict(TypedDict):
-    """Type for the dict representation of blog_card_summary_dicts."""
+    """Type for the dict representation of blog_card_summary_dict."""
 
     id: str
     title: str

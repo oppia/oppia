@@ -45,11 +45,9 @@ if MYPY:  # pragma: no cover
 
 (
     user_models, suggestion_models, feedback_models
-) = (
-    models.Registry.import_models([
-        models.Names.USER, models.Names.SUGGESTION, models.Names.FEEDBACK
-    ])
-)
+) = models.Registry.import_models([
+    models.Names.USER, models.Names.SUGGESTION, models.Names.FEEDBACK
+])
 
 
 class OldContributorDashboardRedirectPageTest(test_utils.GenericTestBase):

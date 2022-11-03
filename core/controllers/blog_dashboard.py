@@ -32,7 +32,7 @@ from typing import Dict, List, Optional, TypedDict
 
 
 class BlogCardSummaryDict(TypedDict):
-    """Type for the dict representation of blog_card_summary_dicts."""
+    """Type for the dict representation of blog_card_summary_dict."""
 
     id: str
     title: str
@@ -223,21 +223,10 @@ class BlogPostHandler(
             [blog_post.author_id], strict=True, include_marked_deleted=True)
         username = user_settings[0].username
 
-        max_no_of_tags_config_property = (
-            config_domain.Registry.get_config_property(
-                'max_number_of_tags_assigned_to_blog_post'
-            )
-        )
-        assert max_no_of_tags_config_property is not None
-        max_no_of_tags = max_no_of_tags_config_property.value
-
-        list_of_default_tags_config_property = (
-            config_domain.Registry.get_config_property(
-                'list_of_default_tags_for_blog_post'
-            )
-        )
-        assert list_of_default_tags_config_property is not None
-        list_of_default_tags = list_of_default_tags_config_property.value
+        max_no_of_tags = config_domain.Registry.get_config_property(
+            'max_number_of_tags_assigned_to_blog_post', strict=True).value
+        list_of_default_tags = config_domain.Registry.get_config_property(
+            'list_of_default_tags_for_blog_post', strict=True).value
 
         blog_post_dict = blog_post.to_dict()
         blog_post_dict_for_dashboard = {

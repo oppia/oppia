@@ -560,7 +560,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_rights[0].topic_is_published)
         self.assertIsNone(topic_rights[1])
 
-    def test_raises_error_while_fetching_topic_rights_strictly(self) -> None:
+    def test_raises_error_if_wrong_topic_rights_fetched_strictly(self) -> None:
         with self.assertRaisesRegex(
             Exception,
             'No topic_rights exists for the given topic_id: invalid_topic_id'

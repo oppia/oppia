@@ -822,7 +822,7 @@ def check_can_modify_core_activity_roles(
         return True
     if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_OWNED_ACTIVITY in
             user.actions):
-        if user.user_id and activity_rights.is_owner(user.user_id):
+        if activity_rights.is_owner(user.user_id):
             return True
     return False
 

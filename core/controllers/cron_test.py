@@ -51,12 +51,10 @@ if MYPY:  # pragma: no cover
 
 (
     app_feedback_report_models, exp_models, suggestion_models, user_models
-) = models.Registry.import_models(
-    [
-        models.Names.APP_FEEDBACK_REPORT, models.Names.EXPLORATION,
-        models.Names.SUGGESTION, models.Names.USER
-    ]
-)
+) = models.Registry.import_models([
+    models.Names.APP_FEEDBACK_REPORT, models.Names.EXPLORATION,
+    models.Names.SUGGESTION, models.Names.USER
+])
 
 
 class CronJobTests(test_utils.GenericTestBase):

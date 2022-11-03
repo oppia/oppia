@@ -350,30 +350,29 @@ def fetch_gravatar(email: str) -> str:
 
 @overload
 def get_user_settings(
-    user_id: Optional[str]
+    user_id: str
 ) -> user_domain.UserSettings: ...
 
 
 @overload
 def get_user_settings(
-    user_id: Optional[str], *, strict: Literal[True]
+    user_id: str, *, strict: Literal[True]
 ) -> user_domain.UserSettings: ...
 
 
 @overload
 def get_user_settings(
-    user_id: Optional[str], *, strict: Literal[False]
+    user_id: str, *, strict: Literal[False]
 ) -> Optional[user_domain.UserSettings]: ...
 
 
 def get_user_settings(
-    user_id: Optional[str], strict: bool = True
+    user_id: str, strict: bool = True
 ) -> Optional[user_domain.UserSettings]:
     """Return the user settings for a single user.
 
     Args:
-        user_id: str|None. The unique ID of the user, or None if
-            the user is not logged in.
+        user_id: str. The unique ID of the user.
         strict: bool. Whether to fail noisily if no user with the given
             id exists in the datastore. Defaults to True.
 
@@ -444,12 +443,11 @@ def get_user_settings_by_auth_id(
         return None
 
 
-def get_user_roles_from_id(user_id: Optional[str]) -> List[str]:
+def get_user_roles_from_id(user_id: str) -> List[str]:
     """Returns roles of the user with given user_id.
 
     Args:
-        user_id: str|None. The unique ID of the user, or None if
-            the user is not logged in.
+        user_id: str. The unique ID of the user.
 
     Returns:
         list(str). Roles of the user with given id.

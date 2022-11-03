@@ -27,12 +27,6 @@ from core.domain import topic_services
 from core.tests import test_utils
 
 
-class ClassroomTopicSummaryDict(topic_domain.TopicSummaryDict):
-    """Dict representation of classroom topic summary dict."""
-
-    is_published: bool
-
-
 class BaseClassroomControllerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
