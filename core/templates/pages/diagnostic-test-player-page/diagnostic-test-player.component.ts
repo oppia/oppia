@@ -18,14 +18,8 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-import { DiagnosticTestTopicTrackerModel } from './diagnostic-test-topic-tracker.model';
-import { Subscription } from 'rxjs';
-import { DiagnosticTestPlayerStatusService } from './diagnostic-test-player-status.service';
 
 
 @Component({
@@ -34,20 +28,11 @@ import { DiagnosticTestPlayerStatusService } from './diagnostic-test-player-stat
 })
 export class DiagnosticTestPlayerComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL: string = '';
-  diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel;
   diagnosticTestStarted = false;
-
-  componentSubscription = new Subscription();
-
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
-    private classroomBackendApiService: ClassroomBackendApiService,
-    private topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService,
-    private diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService
   ) {}
 
   ngOnInit(): void {
@@ -55,12 +40,6 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/oppia_avatar_100px.svg'));
-
-    this.componentSubscription.add(
-      this.diagnosticTestPlayerStatusService
-        .onDiagnosticTestSessionCompleted.subscribe((result) => {
-        })
-    );
   }
 }
 

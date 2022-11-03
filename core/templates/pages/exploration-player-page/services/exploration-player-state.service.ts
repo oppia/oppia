@@ -61,6 +61,7 @@ export class ExplorationPlayerStateService {
     QuestionPlayerEngineService |
     DiagnosticTestPlayerEngineService
   );
+
   explorationMode: string = ExplorationPlayerConstants.EXPLORATION_MODE.OTHER;
   editorPreviewMode: boolean;
   questionPlayerMode: boolean;
@@ -327,7 +328,7 @@ export class ExplorationPlayerStateService {
   }
 
   initializeDiagnosticPlayer(
-      diagnosticTestTopicTrackerModel,
+      diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel,
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback?: () => void
   ): void {
@@ -365,7 +366,7 @@ export class ExplorationPlayerStateService {
   isInDiagnosticTestPlayerMode(): boolean {
     return (
       this.explorationMode ===
-      ExplorationPlayerConstants.EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER)
+      ExplorationPlayerConstants.EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER);
   }
 
   isInStoryChapterMode(): boolean {

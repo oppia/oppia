@@ -36,6 +36,7 @@ import { DiagnosticTestCurrentTopicStatusModel } from 'pages/diagnostic-test-pla
 import { DiagnosticTestTopicTrackerModel } from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
+import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 
 
 @Injectable({
@@ -68,8 +69,7 @@ export class DiagnosticTestPlayerEngineService {
 
   init(
       diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel,
-      successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
-      errorCallback?: () => void
+      successCallback: (initialCard: StateCard, nextFocusLabel: string) => void
   ): void {
     this.diagnosticTestTopicTrackerModel = diagnosticTestTopicTrackerModel;
     this.currentTopicId = (
@@ -82,11 +82,6 @@ export class DiagnosticTestPlayerEngineService {
 
       const stateCard = this.createCard();
       this.numberOfAttemptedQuestions = 0;
-
-      let questionHtml = stateCard.getContentHtml();
-      if (questionHtml === null) {
-        errorCallback();
-      }
 
       successCallback(stateCard, this.focusLabel);
     });
@@ -107,14 +102,28 @@ export class DiagnosticTestPlayerEngineService {
         wasOldStateInitial: boolean,
         isFirstHit: boolean,
         isFinalQuestion: boolean,
-        focusLabel: string) => void
-  ): boolean {
-    const oldState = this.currentQuestion.getStateData();
-    const classificationResult = (
+        focusLabel: string
+      ) => void
+  ): boolean|undefined {
+    const oldState: State = this.currentQuestion.getStateData();
+    const classificationResult: AnswerClassificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(
-        null, oldState.interaction, answer,
+        oldState.name as string, oldState.interaction, answer,
         interactionRulesService));
     const answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
+
+    let stateCard: StateCard;
+    let refreshInteraction: boolean = false;
+    let feedbackHtml: string = '';
+    let feedbackAudioTranslations: BindableVoiceovers = {};
+    let refresherExplorationId: string = '';
+    let missingPrerequisiteSkillId: string = '';
+    let remainOnCurrentCard: boolean = false;
+    let taggedSkillMisconceptionId: string = '';
+    let wasOldStateInitial: boolean = false;
+    let isFirstHit: boolean = true;
+    let isFinalQuestion: boolean = false;
+    let focusLabel: string;
 
     this.numberOfAttemptedQuestions += 1;
 
@@ -156,20 +165,28 @@ export class DiagnosticTestPlayerEngineService {
         this.diagnosticTestCurrentTopicStatusModel = (
           new DiagnosticTestCurrentTopicStatusModel(response));
 
-        let stateCard = this.createCard();
+        stateCard = this.createCard();
+        focusLabel = this.focusLabel;
+
         successCallback(
-          stateCard, false, null,
-          null, null, null, false, null,
-          null, null, false, this.focusLabel
+          stateCard, refreshInteraction, feedbackHtml,
+          feedbackAudioTranslations, refresherExplorationId,
+          missingPrerequisiteSkillId, remainOnCurrentCard,
+          taggedSkillMisconceptionId, wasOldStateInitial, isFirstHit,
+          isFinalQuestion, focusLabel
         );
         return answerIsCorrect;
       });
     } else {
-      let stateCard = this.createCard();
+      stateCard = this.createCard();
+      focusLabel = this.focusLabel;
+
       successCallback(
-        stateCard, false, null,
-        null, null, null, false, null,
-        null, null, false, this.focusLabel
+        stateCard, refreshInteraction, feedbackHtml,
+        feedbackAudioTranslations, refresherExplorationId,
+        missingPrerequisiteSkillId, remainOnCurrentCard,
+        taggedSkillMisconceptionId, wasOldStateInitial, isFirstHit,
+        isFinalQuestion, focusLabel
       );
       return answerIsCorrect;
     }
@@ -183,7 +200,7 @@ export class DiagnosticTestPlayerEngineService {
 
   recordNewCardAdded(): void {
     this.contextService.setCustomEntityContext(
-      AppConstants.ENTITY_TYPE.QUESTION, this.currentQuestion.getId()
+      AppConstants.ENTITY_TYPE.QUESTION, this.currentQuestion.getId() as string
     );
   }
 
@@ -201,17 +218,17 @@ export class DiagnosticTestPlayerEngineService {
     this.currentQuestion = (
       this.diagnosticTestCurrentTopicStatusModel.getNextQuestion(
         this.currentSkillId));
-    const stateData = this.currentQuestion.getStateData();
-    const questionHtml = this.makeQuestion(stateData, []);
+    const stateData: State = this.currentQuestion.getStateData();
+    const questionHtml: string = this.makeQuestion(stateData, []);
 
-    if (questionHtml === null) {
+    if (questionHtml === '') {
       this.alertsService.addWarning('Question name should not be empty.');
     }
 
     this.focusLabel = this.focusManagerService.generateFocusLabel();
     const interaction = stateData.interaction;
     const interactionId = interaction.id;
-    let interactionHtml = null;
+    let interactionHtml: string = '';
 
     if (interactionId) {
       interactionHtml = (
@@ -222,9 +239,10 @@ export class DiagnosticTestPlayerEngineService {
     }
 
     return StateCard.createNewCard(
-      null, questionHtml, interactionHtml, interaction,
-      stateData.recordedVoiceovers, stateData.writtenTranslations,
-      stateData.content.contentId, this.audioTranslationLanguageService
+      stateData.name as string, questionHtml, interactionHtml as string,
+      interaction, stateData.recordedVoiceovers, stateData.writtenTranslations,
+      stateData.content.contentId as string,
+      this.audioTranslationLanguageService
     );
   }
 

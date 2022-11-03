@@ -180,7 +180,6 @@ describe('Diagnostic test engine service', () => {
   it(
     'should be able to load first card after initialization', fakeAsync(() => {
       let initSuccessCb = jasmine.createSpy('success');
-      let initErrorCb = jasmine.createSpy('fail');
 
       // A linear graph with 3 nodes.
       const topicIdToPrerequisiteTopicIds = {
@@ -208,7 +207,7 @@ describe('Diagnostic test engine service', () => {
         undefined);
 
       diagnosticTestPlayerEngineService.init(
-        diagnosticTestTopicTrackerModel, initSuccessCb, initErrorCb);
+        diagnosticTestTopicTrackerModel, initSuccessCb);
       tick();
 
       expect(diagnosticTestPlayerEngineService.getCurrentSkillId()).toEqual(
@@ -220,7 +219,6 @@ describe('Diagnostic test engine service', () => {
 
   it('should thorw warning when question html is empty', fakeAsync(() => {
     let initSuccessCb = jasmine.createSpy('success');
-    let initErrorCb = jasmine.createSpy('fail');
 
     // A linear graph with 3 nodes.
     const topicIdToPrerequisiteTopicIds = {
@@ -245,7 +243,7 @@ describe('Diagnostic test engine service', () => {
       alertsService, 'addWarning').and.callThrough();
 
     spyOn(diagnosticTestPlayerEngineService, 'makeQuestion').and.returnValue(
-      null);
+      '');
 
     // Initially, the current question should be undefined since the engine
     // is not initialized.
@@ -253,7 +251,7 @@ describe('Diagnostic test engine service', () => {
       undefined);
 
     diagnosticTestPlayerEngineService.init(
-      diagnosticTestTopicTrackerModel, initSuccessCb, initErrorCb);
+      diagnosticTestTopicTrackerModel, initSuccessCb);
     tick();
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
@@ -265,7 +263,6 @@ describe('Diagnostic test engine service', () => {
     'current skill is answered incorrectly', fakeAsync(() => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let initSuccessCb = jasmine.createSpy('success');
-      let initErrorCb = jasmine.createSpy('fail');
 
       // A linear graph with 3 nodes.
       const topicIdToPrerequisiteTopicIds = {
@@ -293,7 +290,7 @@ describe('Diagnostic test engine service', () => {
         undefined);
 
       diagnosticTestPlayerEngineService.init(
-        diagnosticTestTopicTrackerModel, initSuccessCb, initErrorCb);
+        diagnosticTestTopicTrackerModel, initSuccessCb);
       tick();
 
       expect(diagnosticTestPlayerEngineService.getCurrentSkillId()).toEqual(
@@ -333,7 +330,6 @@ describe('Diagnostic test engine service', () => {
     'from current skill is answered correctly', fakeAsync(() => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let initSuccessCb = jasmine.createSpy('success');
-      let initErrorCb = jasmine.createSpy('fail');
 
       // A linear graph with 3 nodes.
       const topicIdToPrerequisiteTopicIds = {
@@ -361,7 +357,7 @@ describe('Diagnostic test engine service', () => {
         undefined);
 
       diagnosticTestPlayerEngineService.init(
-        diagnosticTestTopicTrackerModel, initSuccessCb, initErrorCb);
+        diagnosticTestTopicTrackerModel, initSuccessCb);
       tick();
 
       let answer = 'answer';
@@ -395,7 +391,6 @@ describe('Diagnostic test engine service', () => {
     fakeAsync(() => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let initSuccessCb = jasmine.createSpy('success');
-      let initErrorCb = jasmine.createSpy('fail');
 
       // A linear graph with a single node.
       const topicIdToPrerequisiteTopicIds = {
@@ -415,7 +410,7 @@ describe('Diagnostic test engine service', () => {
         Promise.resolve(diagnosticTestCurrentTopicStatusModel));
 
       diagnosticTestPlayerEngineService.init(
-        diagnosticTestTopicTrackerModel, initSuccessCb, initErrorCb);
+        diagnosticTestTopicTrackerModel, initSuccessCb);
       tick();
 
       let answer = 'answer';
@@ -451,7 +446,6 @@ describe('Diagnostic test engine service', () => {
 
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let initSuccessCb = jasmine.createSpy('success');
-      let initErrorCb = jasmine.createSpy('fail');
 
       // A linear graph with 3 nodes.
       const topicIdToPrerequisiteTopicIds = {
@@ -479,7 +473,7 @@ describe('Diagnostic test engine service', () => {
         undefined);
 
       diagnosticTestPlayerEngineService.init(
-        diagnosticTestTopicTrackerModel, initSuccessCb, initErrorCb);
+        diagnosticTestTopicTrackerModel, initSuccessCb);
       tick();
 
       let answer = 'answer';
@@ -534,7 +528,6 @@ describe('Diagnostic test engine service', () => {
     'submitted and a new card is recorded', fakeAsync(() => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let initSuccessCb = jasmine.createSpy('success');
-      let initErrorCb = jasmine.createSpy('fail');
 
       // A linear graph with 3 nodes.
       const topicIdToPrerequisiteTopicIds = {
@@ -562,7 +555,7 @@ describe('Diagnostic test engine service', () => {
         undefined);
 
       diagnosticTestPlayerEngineService.init(
-        diagnosticTestTopicTrackerModel, initSuccessCb, initErrorCb);
+        diagnosticTestTopicTrackerModel, initSuccessCb);
       tick();
 
       let languageCode = diagnosticTestPlayerEngineService.getLanguageCode();
@@ -591,7 +584,6 @@ describe('Diagnostic test engine service', () => {
   it('should progress through topics in the diagnostic test', fakeAsync(() => {
     let submitAnswerSuccessCb = jasmine.createSpy('success');
     let initSuccessCb = jasmine.createSpy('success');
-    let initErrorCb = jasmine.createSpy('fail');
 
     // A linear graph with 3 nodes.
     const topicIdToPrerequisiteTopicIds = {
@@ -613,7 +605,7 @@ describe('Diagnostic test engine service', () => {
       Promise.resolve(diagnosticTestCurrentTopicStatusModel));
 
     diagnosticTestPlayerEngineService.init(
-      diagnosticTestTopicTrackerModel, initSuccessCb, initErrorCb);
+      diagnosticTestTopicTrackerModel, initSuccessCb);
     tick();
 
     let answer = 'answer';

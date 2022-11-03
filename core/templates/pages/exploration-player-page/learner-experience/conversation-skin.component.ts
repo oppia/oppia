@@ -1043,7 +1043,7 @@ export class ConversationSkinComponent {
         this.questionPlayerConfig,
         this._initializeDirectiveComponents.bind(this),
         this.showQuestionAreNotAvailable);
-    } else if(this.diagnosticTestTopicTrackerModel) {
+    } else if (this.diagnosticTestTopicTrackerModel) {
       this.explorationPlayerStateService.initializeDiagnosticPlayer(
         this.diagnosticTestTopicTrackerModel,
         this._initializeDirectiveComponents.bind(this)
@@ -1073,11 +1073,11 @@ export class ConversationSkinComponent {
     }
 
     if (
-        !this.explorationPlayerStateService.isInQuestionMode() &&
+      !this.explorationPlayerStateService.isInQuestionMode() &&
         !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode() &&
         !this.isInPreviewMode &&
         AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE
-      ) {
+    ) {
       this.initLearnerAnswerInfoService(
         this.explorationId, this.explorationEngineService.getState(),
         answer, interactionRulesService,
@@ -1142,7 +1142,7 @@ export class ConversationSkinComponent {
           }
         }
         if (
-            !this.explorationPlayerStateService.isInQuestionMode() &&
+          !this.explorationPlayerStateService.isInQuestionMode() &&
             !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
         ) {
           this.explorationPlayerStateService.onPlayerStateChange.emit(
@@ -1239,14 +1239,12 @@ export class ConversationSkinComponent {
             // the feedback, and display a 'Continue' button.
             this.pendingCardWasSeenBefore = false;
             this.displayedCard.markAsCompleted();
-            console.log('nnn')
             if (isFinalQuestion) {
               if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
                 // We will redirect to the results page here.
                 this.questionSessionCompleted = true;
               }
               this.moveToExploration = true;
-              console.log('different card')
               if (feedbackHtml) {
                 this.playerTranscriptService.addNewResponse(feedbackHtml);
                 if (
@@ -1257,7 +1255,6 @@ export class ConversationSkinComponent {
                   });
                 }
               } else {
-                console.log('in the else');
                 this.showUpcomingCard();
               }
               this.answerIsBeingProcessed = false;

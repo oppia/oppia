@@ -15,14 +15,10 @@
       </div>
     </div>
     <button class="btn oppia-diagnostic-test-button start-test-button"
-          (click)="startDiagnosticTest()"
-          translate="I18N_DIAGNOSTIC_TEST_START_BUTTON">
+            disabled="true"
+            translate="I18N_DIAGNOSTIC_TEST_START_BUTTON">
     </button>
   </mat-card>
-  <div *ngIf="diagnosticTestStarted">
-    <oppia-conversation-skin [diagnosticTestTopicTrackerModel]="diagnosticTestTopicTrackerModel">
-    </oppia-conversation-skin>
-  </div>
 </div>
 
 <style>
