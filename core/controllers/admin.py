@@ -831,18 +831,68 @@ class AdminHandler(
             skill_id_5 = skill_services.get_new_skill_id()
             skill_id_6 = skill_services.get_new_skill_id()
 
+            question_id_1 = question_services.get_new_question_id()
+            question_id_2 = question_services.get_new_question_id()
+            question_id_3 = question_services.get_new_question_id()
+            question_id_4 = question_services.get_new_question_id()
+            question_id_5 = question_services.get_new_question_id()
+            question_id_6 = question_services.get_new_question_id()
+            question_id_7 = question_services.get_new_question_id()
+            question_id_8 = question_services.get_new_question_id()
+            question_id_9 = question_services.get_new_question_id()
+            question_id_10 = question_services.get_new_question_id()
+            question_id_11 = question_services.get_new_question_id()
+            question_id_12 = question_services.get_new_question_id()
+            question_id_13 = question_services.get_new_question_id()
+
+            question_1 = self._create_dummy_question(
+                question_id_1, 'Question 1', [skill_id_1])
+            question_2 = self._create_dummy_question(
+                question_id_2, 'Question 2', [skill_id_1])
+            question_3 = self._create_dummy_question(
+                question_id_3, 'Question 3', [skill_id_2])
+            question_4 = self._create_dummy_question(
+                question_id_3, 'Question 4', [skill_id_2])
+            question_5 = self._create_dummy_question(
+                question_id_3, 'Question 5', [skill_id_3])
+            question_6 = self._create_dummy_question(
+                question_id_3, 'Question 6', [skill_id_3])
+            question_7 = self._create_dummy_question(
+                question_id_3, 'Question 7', [skill_id_4])
+            question_8 = self._create_dummy_question(
+                question_id_3, 'Question 8', [skill_id_4])
+            question_9 = self._create_dummy_question(
+                question_id_3, 'Question 9', [skill_id_5])
+            question_10 = self._create_dummy_question(
+                question_id_3, 'Question 10', [skill_id_5])
+            question_11 = self._create_dummy_question(
+                question_id_3, 'Question 11', [skill_id_6])
+            question_12 = self._create_dummy_question(
+                question_id_3, 'Question 12', [skill_id_6])
+
             topic_1 = topic_domain.Topic.create_default_topic(
                 topic_id_1, 'Topic1', 'topic-one', 'description', 'fragm')
+            topic_1.skill_ids_for_diagnostic_test = [skill_id_1]
+
             topic_2 = topic_domain.Topic.create_default_topic(
                 topic_id_2, 'Topic2', 'topic-two', 'description', 'fragm')
+            topic_2.skill_ids_for_diagnostic_test = [skill_id_2]
+
             topic_3 = topic_domain.Topic.create_default_topic(
                 topic_id_3, 'Topic3', 'topic-three', 'description', 'fragm')
+            topic_3.skill_ids_for_diagnostic_test = [skill_id_3]
+
             topic_4 = topic_domain.Topic.create_default_topic(
                 topic_id_4, 'Topic4', 'topic-four', 'description', 'fragm')
+            topic_4.skill_ids_for_diagnostic_test = [skill_id_4]
+
             topic_5 = topic_domain.Topic.create_default_topic(
                 topic_id_5, 'Topic5', 'topic-five', 'description', 'fragm')
+            topic_5.skill_ids_for_diagnostic_test = [skill_id_5]
+
             topic_6 = topic_domain.Topic.create_default_topic(
                 topic_id_6, 'Topic6', 'topic-six', 'description', 'fragm')
+            topic_6.skill_ids_for_diagnostic_test = [skill_id_6]
 
             skill_1 = self._create_dummy_skill(
                 skill_id_1, 'Skill1', '<p>Dummy Explanation 1</p>')
@@ -856,6 +906,19 @@ class AdminHandler(
                 skill_id_5, 'Skill5', '<p>Dummy Explanation 5</p>')
             skill_6 = self._create_dummy_skill(
                 skill_id_6, 'Skill6', '<p>Dummy Explanation 6</p>')
+
+            question_services.add_question(self.user_id, question_1)
+            question_services.add_question(self.user_id, question_2)
+            question_services.add_question(self.user_id, question_3)
+            question_services.add_question(self.user_id, question_4)
+            question_services.add_question(self.user_id, question_5)
+            question_services.add_question(self.user_id, question_6)
+            question_services.add_question(self.user_id, question_7)
+            question_services.add_question(self.user_id, question_8)
+            question_services.add_question(self.user_id, question_9)
+            question_services.add_question(self.user_id, question_10)
+            question_services.add_question(self.user_id, question_11)
+            question_services.add_question(self.user_id, question_12)
 
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)
