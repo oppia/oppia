@@ -85,7 +85,7 @@ class DiagnosticTestQuestionsHandler(
         question_count = len(diagnostic_test_skill_ids) * 2
 
         skill_id_to_questions_map: Dict[
-            str, List[question_domain.Question]] = (
+            str, List[question_domain.QuestionDict]] = (
                 collections.defaultdict(list))
 
         questions = question_services.get_questions_by_skill_ids(
@@ -93,14 +93,21 @@ class DiagnosticTestQuestionsHandler(
             diagnostic_test_skill_ids,
             require_medium_difficulty=True
         )
-
+        question_dicts = []
         for question in questions:
-            linked_skill_ids = question.linked_skill_ids
-            diagnostic_test_linked_skill_ids = list(
-                set(linked_skill_ids) & set(diagnostic_test_skill_ids))
+            question_dict = question.to_dict()
+            if question_dict not in question_dicts:
+                question_dicts.append(question_dict)
 
-            for skill_id in diagnostic_test_linked_skill_ids:
-                skill_id_to_questions_map[skill_id].append(question)
+        for question_dict in question_dicts:
+            diagnostic_test_skill_id = list(
+                set(question_dict['linked_skill_ids']) &
+                set(diagnostic_test_skill_ids)
+            )[0]
+
+            if len(skill_id_to_questions_map[diagnostic_test_skill_id]) < 2:
+                skill_id_to_questions_map[diagnostic_test_skill_id].append(
+                    question_dict)
 
         # A dict with skill ID as key and a nested dict as value. The nested
         # dict contains main_question and backup_question as keys and the
@@ -115,20 +122,18 @@ class DiagnosticTestQuestionsHandler(
                 collections.defaultdict(dict))
 
         for skill_id, linked_questions in skill_id_to_questions_map.items():
-            if len(linked_questions) != 2:
-                raise self.InvalidInputException(
-                    'Skill with ID: %s, should contain 2 questions'
-                    % skill_id)
+            if len(linked_questions) < 2:
+                continue
 
             # Each diagnostic test skill contains two questions. The first
             # question is considered the main question and the second one is
             # considered the backup question.
             skill_id_to_questions_dict[skill_id][
-                feconf.DIAGNOSTIC_TEST_MAIN_QUESTION_FOR_SKILL] = (
-                    linked_questions[0].to_dict())
+                feconf.DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN] = (
+                    linked_questions[0])
             skill_id_to_questions_dict[skill_id][
-                feconf.DIAGNOSTIC_TEST_BACKUP_QUESTION_FOR_SKILL] = (
-                    linked_questions[1].to_dict())
+                feconf.DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP] = (
+                    linked_questions[1])
 
         self.render_json(
             {'skill_id_to_questions_dict': skill_id_to_questions_dict}

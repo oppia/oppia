@@ -143,22 +143,3 @@ class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):
             non_existent_topic_id)
 
         self.get_json(url, expected_status_int=404)
-
-    def test_raise_error_when_skill_does_not_contains_two_questions(
-        self
-    ) -> None:
-        question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id_1, 'skill_id_1', 0.5)
-        question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id_2, 'skill_id_1', 0.5)
-        question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id_3, 'skill_id_2', 0.5)
-
-        url = '%s/%s' % (
-            feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL, self.topic_id)
-
-        json_response = self.get_json(url, expected_status_int=400)
-
-        self.assertEqual(
-            json_response['error'],
-            'Skill with ID: skill_id_2, should contain 2 questions')
