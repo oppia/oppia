@@ -375,7 +375,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         }
 
         with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'), 'rb',
+            os.path.join(feconf.TESTS_DATA_DIR, 'dummy_large_image.jpg'), 'rb',
             encoding=None
         ) as f:
             raw_image = f.read()
@@ -388,7 +388,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             expected_status_int=400)
 
         self.assertEqual(
-            json_response['error'], 'Image exceeds file size limit of 100 KB.')
+            json_response['error'], 'Image exceeds file size limit of 1024 KB.')
 
     def test_guest_can_not_delete_blog_post(self):
         response = self.delete_json(
