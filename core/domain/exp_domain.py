@@ -3219,10 +3219,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Converts from version 53 to 54. Version 54 adds
         catchMisspellings customization arg to TextInput
         interaction which allows creators to detect misspellings.
+
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
         Returns:
             dict. The converted states_dict.
         """
