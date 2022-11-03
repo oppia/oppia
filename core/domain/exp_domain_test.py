@@ -12015,7 +12015,7 @@ title: ''
         """Tests the migration of invalid TextInput interaction exploration
         data from version less than 58.
         """
-        self.maxDiff = None
+
         sample_yaml_content_for_text_interac_1: str = (
             """author_notes: ''
 auto_tts_enabled: false
@@ -12417,6 +12417,8 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_34
@@ -12665,6 +12667,8 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_34
