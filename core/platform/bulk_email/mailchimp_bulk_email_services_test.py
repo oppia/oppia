@@ -146,7 +146,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                     if data['email_address'] == 'test3@example.com':
                         self.users_data.append({
                             # Email: test3@example.com.
-                            'email': 'fedd8b80a7a813966263853b9af72151',
+                            'email_hash': 'fedd8b80a7a813966263853b9af72151',
                             'status': data['status']
                         })
                     elif data['email_address'] == 'test4@example.com':
@@ -285,14 +285,14 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 'unsubscribed')
 
             # Creates a mailchimp entry for a new user.
-            self.assertEqual(len(mailchimp.lists.members.users_data), 2)
+            self.assertEqual(len(mailchimp.lists.members.users_data), 3)
             return_status = (
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     self.user_email_3, {}, 'Web',
                     can_receive_email_updates=True))
             self.assertTrue(return_status)
             self.assertEqual(
-                mailchimp.lists.members.users_data[2]['status'], 'subscribed')
+                mailchimp.lists.members.users_data[3]['status'], 'subscribed')
 
             # Creates a mailchimp entry for a new user.
             return_status = (
@@ -345,13 +345,13 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
 
         with swap_mailchimp_context, swap_api, swap_username:
             # Creates a mailchimp entry for a deleted user.
-            self.assertEqual(len(mailchimp.lists.members.users_data), 2)
+            self.assertEqual(len(mailchimp.lists.members.users_data), 3)
             return_status = (
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     'test4@example.com', {}, 'Web',
                     can_receive_email_updates=True))
             self.assertFalse(return_status)
-            self.assertEqual(len(mailchimp.lists.members.users_data), 2)
+            self.assertEqual(len(mailchimp.lists.members.users_data), 3)
 
             # Create user raises exception for other errors.
             with self.assertRaisesRegex(
