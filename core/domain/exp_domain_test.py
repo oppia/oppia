@@ -7630,7 +7630,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -7718,7 +7718,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -7899,7 +7899,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8021,7 +8021,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -8161,7 +8161,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8247,7 +8247,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -8360,7 +8360,7 @@ language_code: hi
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8432,7 +8432,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -8763,7 +8763,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8912,7 +8912,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -9193,7 +9193,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9352,7 +9352,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -9502,7 +9502,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9599,7 +9599,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -9802,7 +9802,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9926,7 +9926,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -10124,7 +10124,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10268,7 +10268,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -10489,7 +10489,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10597,7 +10597,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -10761,7 +10761,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10866,7 +10866,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -11002,7 +11002,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11098,7 +11098,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -11334,7 +11334,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11443,7 +11443,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -11602,7 +11602,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11714,7 +11714,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -11889,7 +11889,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11998,7 +11998,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -12015,7 +12015,7 @@ title: ''
         """Tests the migration of invalid TextInput interaction exploration
         data from version less than 58.
         """
-
+        self.maxDiff = None
         sample_yaml_content_for_text_interac_1: str = (
             """author_notes: ''
 auto_tts_enabled: false
@@ -12303,7 +12303,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12498,7 +12498,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -12633,7 +12633,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12728,7 +12728,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
