@@ -25,6 +25,7 @@ from core.constants import constants
 
 from google import auth
 from google.cloud import secretmanager
+from typing import Optional
 
 # The 'auth.default()' returns tuple of credentials and project ID. As we are
 # only interested in credentials, we are using '[0]' to access it.
@@ -35,7 +36,7 @@ CLIENT = secretmanager.SecretManagerServiceClient(
 
 
 @functools.lru_cache(maxsize=64)
-def get_secret(name: str) -> str:
+def get_secret(name: str) -> Optional[str]:
     """Gets the value of a secret.
 
     Args:
@@ -46,5 +47,9 @@ def get_secret(name: str) -> str:
     """
     secret_name = (
         f'projects/{feconf.OPPIA_PROJECT_ID}/secrets/{name}/versions/latest')
-    response = CLIENT.access_secret_version(request={'name': secret_name})
+    try:
+        response = CLIENT.access_secret_version(request={'name': secret_name})
+    except Exception:
+        return None
+
     return response.payload.data.decode('utf-8')

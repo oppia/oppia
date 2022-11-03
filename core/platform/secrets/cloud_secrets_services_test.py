@@ -35,3 +35,13 @@ class CloudSecretsServicesTests(test_utils.GenericTestBase):
         ):
             secret = cloud_secrets_services.get_secret('name')
             self.assertEqual(secret, 'secret')
+
+    def test_get_secret_returns_none_when_secret_does_not_exist(self) -> None:
+        with self.swap_to_always_raise(
+            cloud_secrets_services.CLIENT,
+            'access_secret_version',
+            Exception('Secret not found')
+        ):
+            secret = cloud_secrets_services.get_secret('name')
+            self.assertIsNone(secret)
+
