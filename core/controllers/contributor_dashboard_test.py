@@ -25,6 +25,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -443,6 +444,38 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # suggestions in review (exploration 0).
         self.assertEqual(
             response['opportunities'], [self.expected_opportunity_dict_1])
+
+    def test_raises_error_if_story_contain_none_exploration_id(self) -> None:
+        # Create a new exploration and linked story.
+        continue_state_name = 'continue state'
+        exp_100 = self.save_new_linear_exp_with_state_names_and_interactions(
+            '100',
+            self.owner_id,
+            ['Introduction', continue_state_name, 'End state'],
+            ['TextInput', 'Continue'],
+            category='Algebra',
+            correctness_feedback_enabled=True
+        )
+        self.publish_exploration(self.owner_id, exp_100.id)
+        self.create_story_for_translation_opportunity(
+            self.owner_id, self.admin_id, 'story_id_100', self.topic_id,
+            exp_100.id)
+        story = story_fetchers.get_story_by_id('story_id_100')
+        story.story_contents.nodes[0].exploration_id = None
+        swap_with_corrupt_story = self.swap_to_always_return(
+            story_fetchers, 'get_stories_by_ids', [story]
+        )
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.assertRaisesRegex(
+            Exception,
+            'Error: No exploration_id found with the node_id: node_1'
+        ):
+            with swap_with_corrupt_story:
+                self.get_json(
+                    '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+                    params={'topic_name': 'topic'}
+                )
 
     def test_get_reviewable_translation_opportunities_when_state_is_removed(
         self
@@ -1715,6 +1748,30 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             response = self.get_json(
                 '/contributorallstatssummaries/%s' % self.NEW_USER_USERNAME)
         self.assertEqual(response, {})
+
+    def test_raises_error_if_no_topic_id_associated_with_stats_object(
+        self
+    ) -> None:
+        self.login(self.OWNER_EMAIL)
+        user_id = user_services.get_user_id_from_username(self.OWNER_USERNAME)
+        assert user_id is not None
+        stats = suggestion_services.get_all_translation_contribution_stats(
+            user_id
+        )
+        stats[0].topic_id = None
+
+        swap_with_corrupt_data = self.swap_to_always_return(
+            suggestion_services, 'get_all_translation_contribution_stats', stats
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Error: No topic_id associated with stats: '
+            'TranslationContributionStats.'
+        ):
+            with swap_with_corrupt_data:
+                self.get_json(
+                    '/contributorallstatssummaries/%s' % self.OWNER_USERNAME)
 
     def test_get_all_stats(self) -> None:
         self.login(self.OWNER_EMAIL)

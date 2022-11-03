@@ -340,6 +340,9 @@ class ReviewableOpportunitiesHandler(
         Returns:
             list(ExplorationOpportunitySummary). A list of the matching
             exploration opportunity summaries.
+
+        Raises:
+            Exception. Error: No exploration_id found with the node_id.
         """
         # 1. Fetch the eligible topics.
         # 2. Fetch the stories for the topics.
@@ -362,11 +365,11 @@ class ReviewableOpportunitiesHandler(
         topic_exp_ids = []
         for story in topic_stories:
             for node in story.story_contents.get_ordered_nodes():
-                # Here 'node.exploration_id' can never be None because
-                # 'node.exploration_id' can only be None initially, when
-                # the story creator has just created a story with the
-                # basic storyline.
-                assert node.exploration_id is not None
+                if node.exploration_id is None:
+                    raise Exception(
+                        'Error: No exploration_id found with the node_id: %s'
+                        % node.id
+                    )
                 topic_exp_ids.append(node.exploration_id)
         in_review_suggestions, _ = (
             suggestion_services
@@ -982,17 +985,20 @@ def _get_client_side_stats(
                 months of format: "%b %Y", e.g. "Jan 2021".
         Unnecessary keys topic_id, contribution_dates, contributor_user_id
         are consequently deleted.
+
+    Raises:
+        Exception. Error: No topic_id associated with stats object.
     """
     stats_dicts = [
         stats.to_dict() for stats in backend_stats
     ]
     topic_ids = []
-    for stats_dict in stats_dicts:
-        # Here 'topic_id' can never be None because stats_dict is a dictionary
-        # representation of stats object that is fetched from datastore and
-        # before storing stats object in the datastore 'topic_id' is already
-        # assigned.
-        assert stats_dict['topic_id'] is not None
+    for index, stats_dict in enumerate(stats_dicts):
+        if stats_dict['topic_id'] is None:
+            raise Exception(
+                'Error: No topic_id associated with stats: %s.' %
+                type(backend_stats[index]).__name__
+            )
         topic_ids.append(stats_dict['topic_id'])
     topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
     topic_name_by_topic_id = {
@@ -1000,13 +1006,14 @@ def _get_client_side_stats(
         for topic_summary in topic_summaries if topic_summary is not None
     }
     for stats_dict in stats_dicts:
-        # Here 'topic_id' can never be None because stats_dict is a dictionary
-        # representation of stats object that is fetched from datastore and
-        # before storing stats object in the datastore 'topic_id' is already
-        # assigned.
+        # Here we are asserting that 'stats_dict['topic_id']' will never be None
+        # because above we are already handling the case of None 'topic_id' by
+        # raising an exception. 
         assert stats_dict['topic_id'] is not None
-        # Here we use MyPy ignore because 'stats_dicts' is of union type
-        # and indexing on Union type is not allowed by MyPy.
+        # Here we use MyPy ignore because 'stats_dict' is of union type
+        # and MyPy is unable to infer on which TypedDict 'topic_name' key
+        # is added. So, due to this MyPy throws an error. Thus, to avoid
+        # the error, we use ignore here.
         stats_dict['topic_name'] = topic_name_by_topic_id.get(  # type: ignore[index]
             stats_dict['topic_id'], 'UNKNOWN')
 
@@ -1046,12 +1053,16 @@ def _get_client_side_stats(
             last_contribution_date = review_and_translation_dicts[
                 'last_contribution_date'
             ]
-        # Here we use MyPy ignore because 'stats_dicts' is of union type
-        # and indexing on Union type is not allowed by MyPy.
+        # Here we use MyPy ignore because 'stats_dict' is of
+        # union type and MyPy is unable to infer on which TypedDict
+        # 'first_contribution_date' key is added. So, due to this MyPy
+        # throws an error. Thus, to avoid the error, we use ignore here.
         stats_dict['first_contribution_date'] = (  # type: ignore[index]
             first_contribution_date.strftime('%b %Y'))
-        # Here we use MyPy ignore because 'stats_dicts' is of union type
-        # and indexing on Union type is not allowed by MyPy.
+        # Here we use MyPy ignore because 'stats_dict' is of
+        # union type and MyPy is unable to infer which on TypedDict
+        # 'last_contribution_date' key is added. So, due to this MyPy
+        # throws an error. Thus, to avoid the error, we use ignore here.
         stats_dict['last_contribution_date'] = (  # type: ignore[index]
             last_contribution_date.strftime('%b %Y'))
 
