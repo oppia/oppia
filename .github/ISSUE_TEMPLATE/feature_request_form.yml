@@ -1,4 +1,4 @@
-name: Simplified Feature request form
+name: Feature request
 description: Suggest an idea for this project
 title: "[Feature Request]: "
 labels: ["triage needed", "enhancement"]
@@ -7,35 +7,29 @@ body:
     attributes:
       value: |
         Thanks for taking the time to report a bug in the Oppia project.
-  - type: checkboxes
+  - type: markdown
     attributes:
-      label: Is there an existing issue for this?
-      description: Before filing a new issue, please do a quick search to check that it hasn't already been filed on the [issue tracker](https://github.com/oppia/oppia/issues).
-      options:
-      - label: I have searched the existing issues
-        required: true
+      value: |
+        Before filing a new issue, **please do a quick search** to check that it hasn't already been filed on the issue tracker. You can do this by going to [this link](https://github.com/oppia/oppia/issues) and typing some words related to the issue in the search box next to the "New issue" button.
   - type: textarea
     id: problem
     attributes:
       label: A clear and concise description of what you want to happen.
-      description: A clear and concise description of what the problem is.
-      placeholder: I'm always frustrated when ...
+      description: A clear and concise description of what the problem is. **Example:** "I'm always frustrated when [...]"
     validations:
       required: true
   - type: textarea
     id: solution
     attributes:
       label: Describe the solution you'd like
-      description: A clear and concise description of what you want to happen.
-      placeholder: I want ...
+      description: A clear and concise description of what you want to happen. **Example:** "I would like to have [...]"
     validations:
       required: true
   - type: textarea
     id: alternatives
     attributes:
       label: Describe alternatives you've considered
-      description: A clear and concise description of any alternative solutions or features you've considered.
-      placeholder: I have also considered ...
+      description: A clear and concise description of any alternative solutions or features you've considered. **Example:** "I have considered [...]"
     validations:
       required: false
   - type: textarea
