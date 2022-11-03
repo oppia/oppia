@@ -156,11 +156,10 @@ class TrainedClassifierHandler(
         state_name = self.normalized_request['state_name']
 
         try:
-            if self.normalized_request.get('exploration_version') is None:
-                raise Exception(
-                    'Error: No exploration version is provided.'
-                )
-            exp_version = int(self.normalized_request['exploration_version'])
+            exp_version = (
+                int(self.normalized_request.get('exploration_version'))
+                if self.normalized_request.get('exploration_version') else None
+            )
             exploration = exp_fetchers.get_exploration_by_id(
                 exploration_id, version=exp_version)
             interaction_id = exploration.states[state_name].interaction.id

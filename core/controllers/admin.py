@@ -308,15 +308,15 @@ class AdminHandler(
 
                 self._generate_dummy_explorations(
                     num_dummy_exps_to_generate, num_dummy_exps_to_publish)
-            elif action and action == 'clear_search_index':
+            elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
                 search_services.clear_blog_post_summaries_search_index()
-            elif action and action == 'generate_dummy_new_structures_data':
+            elif action == 'generate_dummy_new_structures_data':
                 self._load_dummy_new_structures_data()
-            elif action and action == 'generate_dummy_new_skill_data':
+            elif action == 'generate_dummy_new_skill_data':
                 self._generate_dummy_skill_and_questions()
-            elif action and action == 'generate_dummy_classroom':
+            elif action == 'generate_dummy_classroom':
                 self._generate_dummy_classroom()
             elif action == 'save_config_properties':
                 new_config_property_values = self.normalized_payload.get(
