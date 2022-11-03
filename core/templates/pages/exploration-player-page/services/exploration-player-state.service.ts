@@ -329,14 +329,12 @@ export class ExplorationPlayerStateService {
 
   initializeDiagnosticPlayer(
       diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel,
-      successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
-      errorCallback?: () => void
+      successCallback: (initialCard: StateCard, nextFocusLabel: string) => void
   ): void {
     this.setDiagnosticTestPlayerMode();
     this.diagnosticTestPlayerEngineService.init(
       diagnosticTestTopicTrackerModel,
-      successCallback,
-      errorCallback
+      successCallback
     );
   }
 
