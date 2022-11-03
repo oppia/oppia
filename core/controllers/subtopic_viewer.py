@@ -59,21 +59,27 @@ class SubtopicPageDataHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
+    
+    URL_PATH_ARGS_SCHEMAS = {
         'GET': {
             'topic_name': {
                 'schema': {
                     'type': 'basestring'
-                }
-            },
+                },
+                'default_value': None
+            }, 
             'subtopic_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
                 }
             }
         }
     }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_subtopic_viewer_page
     def get(self, topic_name, subtopic_id):
