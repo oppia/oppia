@@ -73,9 +73,9 @@ it('should show concept card icon at the right time', fakeAsync(() => {
 
     ccms.reset();
 
-    // For releaseHint.
+    // Time delay before concept card is released.
     tick(WAIT_FOR_CONCEPT_CARD_MSEC);
-    // For showTooltip (called only in the first call of releaseConceptCard).
+    // Time delay before tooltip for the concept card is shown.
     tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
 
     expect(ccms.isConceptCardTooltipOpen()).toBe(true);
@@ -94,9 +94,9 @@ it('should not show concept card when hints exist', fakeAsync(() => {
 
     ccms.reset();
 
-    // For releaseHint.
+    // Time delay before concept card is released.
     tick(WAIT_FOR_CONCEPT_CARD_MSEC);
-    // For showTooltip (called only in the first call of releaseConceptCard).
+    // Time delay before tooltip for the concept card is shown.
     tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
 
     expect(ccms.isConceptCardTooltipOpen()).toBe(false);
@@ -167,9 +167,9 @@ it('should return if concept card for the state exists', fakeAsync(() => {
     ccms.hintsAvailable = 0;
     ccms.reset();
 
-    // For releaseHint.
+    // Time delay before concept card is released.
     tick(WAIT_FOR_CONCEPT_CARD_MSEC);
-    // For showTooltip (called only in the first call of releaseConceptCard).
+    // Time delay before tooltip for the concept card is shown.
     tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
 
     expect(ccms.isConceptCardTooltipOpen()).toBe(true);
@@ -268,9 +268,9 @@ it('should record the wrong answer twice', fakeAsync(() => {
     expect(ccms.isConceptCardTooltipOpen()).toBe(false);
     expect(ccms.isConceptCardViewable()).toBe(false);
 
-    // For releaseHint.
+    // Time delay before concept card is released.
     tick(WAIT_FOR_CONCEPT_CARD_MSEC);
-    // For showTooltip (called only in the first call of releaseConceptCard).
+    // Time delay before tooltip for the concept card is shown.
     tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
 
     expect(ccms.isConceptCardTooltipOpen()).toBe(true);

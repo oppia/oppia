@@ -141,7 +141,6 @@ export class ConceptCardManagerService {
   conceptCardForStateExists(): boolean {
     let state = this.explorationEngineService.getState();
     return state.linkedSkillId !== null;
-    // return true;
   }
 
   isConceptCardTooltipOpen(): boolean {
