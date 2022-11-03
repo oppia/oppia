@@ -16,17 +16,10 @@
 
 """Provides an Apache Beam API for operating on GCS."""
 
-from apache_beam.io.gcp.gcsio import GcsIO
-from apache_beam import pvalue
+from apache_beam.io.gcp import gcsio
 from core.platform import models
-# from google.cloud import storage
-from apache_beam.internal.gcp import auth
-from apache_beam.io.gcp.internal.clients import storage
-
-from typing import List
 
 import apache_beam as beam
-import httplib2
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -36,11 +29,11 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class ReadFile(beam.PTransform):
+    """Reads files form the GCS."""
 
-    def _create_client(self):
-        return storage.StorageV1(
-          get_credentials=False,
-          url="http://localhost:9023")
+    @classmethod
+    def get_client(cls):
+        return None
 
     def expand(
        self, filenames: beam.PCollection
@@ -48,15 +41,10 @@ class ReadFile(beam.PTransform):
         """Returns PCollection with file data."""
         return (
             filenames
-            | 'Read the file' >> beam.Map(lambda file: self._read_file(file))
+            | 'Read the file' >> beam.Map(self._read_file)
         )
 
-    def _read_file(self, filename):
+    def _read_file(self, filename: str) -> bytes:
         """Helper function to read the contents of a file."""
-        print("***********************")
-        print("file - ", filename)
-        client = self._create_client()
-        gcs = GcsIO(client)
-        print("********************************")
-        print("GCS bucket - ", gcs.get_bucket('test-bucket'))
+        gcs = gcsio.GcsIO(self.get_client())
         return gcs.open(filename, mode='r').read()

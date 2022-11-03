@@ -20,86 +20,52 @@ from __future__ import annotations
 
 from core.jobs import job_test_utils
 from core.jobs.io import gcs_io
-from core.platform import models
+from apache_beam.io.gcp import gcsio_test
+from apache_beam.io.gcp import gcsio
+
 import os
-
-from google.cloud import storage
-from gcp_storage_emulator.server import create_server
-
 import apache_beam as beam
-
-MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
-
-(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
-
-datastore_services = models.Registry.import_datastore_services()
+import types
 
 
-def gcs_emulator():
-    """"""
-    HOST = "localhost"
-    PORT = 9023
-    BUCKET = "test-bucket"
-
-    # default_bucket parameter creates the bucket automatically
-    server = create_server(HOST, PORT, in_memory=True, default_bucket=BUCKET)
-    server.start()
-
-    os.environ["STORAGE_EMULATOR_HOST"] = f"http://{HOST}:{PORT}"
-    client = storage.Client()
-
-    bucket = client.bucket(BUCKET)
-    blob = bucket.blob("blob1")
-    blob.upload_from_string("test1")
-    blob = bucket.blob("blob2")
-    blob.upload_from_string("test2")
-    for blob in bucket.list_blobs():
-        content = blob.download_as_bytes()
-        print("**************************************")
-        print(f"Blob [{blob.name}]: {content}")
-    print("**************************************")
-    print(bucket.name)
-
-    return server
+def insert_random_file(
+    client,
+    path,
+    content,
+    generation=1,
+    crc32c=None,
+    last_updated=None,
+    fail_when_getting_metadata=False,
+    fail_when_reading=False
+):
+    bucket, name = gcsio.parse_gcs_path(path)
+    f = gcsio_test.FakeFile(
+        bucket,
+        name,
+        content,
+        generation,
+        crc32c=crc32c,
+        last_updated=last_updated)
+    client.objects.add_file(f, fail_when_getting_metadata, fail_when_reading)
+    return f
 
 
 class ReadFileTest(job_test_utils.PipelinedTestBase):
-    """"""
+    """Tests to check gcs_io.ReadFile."""
+
     def test_read_from_gcs(self):
-        # server = gcs_emulator()
-        os.environ["STORAGE_EMULATOR_HOST"] = "http://localhost:9023"
-        client = storage.Client()
-
-        bucket = client.get_bucket('test-bucket')
-        bucket.delete_blobs(["blob1", "blob2"])
-        bucket.delete()
-
-        bucket = client.create_bucket('test-bucket')
-        blob = bucket.blob("blob1")
-        print("**********************************")
-        print(blob.name)
-        blob.upload_from_string("test1")
-        blob = bucket.blob("blob2")
-        blob.upload_from_string("test2")
-        for blob in bucket.list_blobs():
-            content = blob.download_as_bytes()
-            print("**************************************")
-            print(f"Blob [{blob.name}]: {content}")
-        print("**************************************")
-        print(bucket.name)
-        filenames = ['gs://test-bucket/blob1', 'gs://test-bucket/blob2']
-        filename_p_collec = (
-            self.pipeline | beam.Create(filenames)
-        )
-        model_pcoll = (
-            filename_p_collec | gcs_io.ReadFile()
-        )
-        pcoll = (
-            self.pipeline
-            | 'create result' >> beam.Create(["test1", "test2"])
-        )
-        self.assert_pcoll_equal(model_pcoll, pcoll)
-        # server.stop()
+        client = gcsio_test.FakeGcsClient()
+        file_name = 'gs://gcsio-test/dummy_file'
+        random_comtent = os.urandom(1234)
+        insert_random_file(client, file_name, random_comtent)
+        filenames = [file_name]
+        with self.swap(gcs_io.ReadFile, 'get_client', types.MethodType(lambda _: client, gcs_io.ReadFile)):
+            print("***********************")
+            print(gcs_io.ReadFile.get_client())
+            print(abc)
+            # filename_p_collec = (
+            #     self.pipeline
+            #     |'Create pcoll of filenames' >> beam.Create(filenames)
+            #     | 'Read file from GCS' >> gcs_io.ReadFile(client)
+            # )
+        # self.assert_pcoll_equal(filename_p_collec, [random_comtent])
