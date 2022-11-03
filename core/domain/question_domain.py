@@ -1633,7 +1633,7 @@ class Question(translation_domain.BaseTranslatableObject):
         # The version 53 only fixes the data for `Exploration` and make
         # no changes in the `Question` that is why we are simply returning.
         return question_state_dict
-    
+
     @classmethod
     def _convert_state_v53_dict_to_v54_dict(
         cls, question_state_dict: state_domain.StateDict

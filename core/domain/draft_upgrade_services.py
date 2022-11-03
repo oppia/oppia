@@ -330,7 +330,7 @@ class DraftUpgradeUtil:
             list(ExplorationChange). The converted draft_change_list.
         """
         return draft_change_list
-    
+
     @classmethod
     def _convert_states_v52_dict_to_v53_dict(
         cls, draft_change_list: List[exp_domain.ExplorationChange]

@@ -3211,7 +3211,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         states_dict = cls._update_state_rte(states_dict)
 
         return states_dict
-    
+
     @classmethod
     def _convert_states_v53_dict_to_v54_dict(
         cls, states_dict: Dict[str, state_domain.StateDict]
@@ -5334,7 +5334,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration_dict['states_schema_version'] = 53
 
         return exploration_dict
-    
+
     @classmethod
     def _convert_v58_dict_to_v59_dict(
         cls, exploration_dict: VersionedExplorationDict
@@ -5459,7 +5459,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v57_dict_to_v58_dict(
                 exploration_dict)
             exploration_schema_version = 58
-        
+
         if exploration_schema_version == 58:
             exploration_dict = cls._convert_v58_dict_to_v59_dict(
                 exploration_dict)
