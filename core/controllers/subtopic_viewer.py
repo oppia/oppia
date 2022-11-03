@@ -58,8 +58,7 @@ class SubtopicPageDataHandler(base.BaseHandler):
     subtopic page.
     """
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON    
     URL_PATH_ARGS_SCHEMAS = {
         'GET': {
             'topic_name': {
@@ -67,7 +66,7 @@ class SubtopicPageDataHandler(base.BaseHandler):
                     'type': 'basestring'
                 },
                 'default_value': None
-            }, 
+            },
             'subtopic_id': {
                 'schema': {
                     'type': 'basestring',
