@@ -19,6 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 
 
@@ -32,6 +33,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
   ) {}
 

@@ -1,6 +1,6 @@
 <div class="diagnostic-test-container">
   <div class="oppia-diagnostic-test-session">Learner Diagnostic Test</div>
-  <mat-card class="introductory-card" *ngIf="!diagnosticTestStarted">
+  <mat-card class="introductory-card">
     <div class="oppia-introductory-container">
       <div class="oppia-image">
         <img class="oppia-otter-image" [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
@@ -14,10 +14,12 @@
         </p>
       </div>
     </div>
-    <button class="btn oppia-diagnostic-test-button start-test-button"
-            disabled="true"
-            translate="I18N_DIAGNOSTIC_TEST_START_BUTTON">
-    </button>
+    <div>
+      <button class="btn oppia-diagnostic-test-button start-test-button"
+              disabled="true"
+              translate="I18N_DIAGNOSTIC_TEST_START_BUTTON">
+      </button>
+    </div>
   </mat-card>
 </div>
 
