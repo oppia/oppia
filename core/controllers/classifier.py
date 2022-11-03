@@ -81,9 +81,13 @@ class TrainedClassifierHandler(
             },
             'exploration_version': {
                 'schema': {
-                    'type': 'int'
-                },
-                'default_value': None
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        # Version must be greater than zero.
+                        'min_value': 1
+                    }]
+                }
             },
             'state_name': {
                 'schema': {
@@ -156,10 +160,7 @@ class TrainedClassifierHandler(
         state_name = self.normalized_request['state_name']
 
         try:
-            exp_version = (
-                int(self.normalized_request.get('exploration_version'))
-                if self.normalized_request.get('exploration_version') else None
-            )
+            exp_version = int(self.normalized_request['exploration_version'])
             exploration = exp_fetchers.get_exploration_by_id(
                 exploration_id, version=exp_version)
             interaction_id = exploration.states[state_name].interaction.id
