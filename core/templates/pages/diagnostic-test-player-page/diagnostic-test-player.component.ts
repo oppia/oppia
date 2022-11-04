@@ -19,13 +19,12 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { DiagnosticTestTopicTrackerModel } from './diagnostic-test-topic-tracker.model';
 import { Subscription } from 'rxjs';
 import { DiagnosticTestPlayerStatusService } from './diagnostic-test-player-status.service';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 
 
 @Component({
@@ -34,20 +33,20 @@ import { DiagnosticTestPlayerStatusService } from './diagnostic-test-player-stat
 })
 export class DiagnosticTestPlayerComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL: string = '';
-  diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel;
-  diagnosticTestStarted = false;
-  testFinished = false;
+  diagnosticTestTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
+  diagnosticTestIsStarted: boolean = false;
+  diagnosticTestIsFinished = false;
+  classroomUrlFragment: string = 'math';
+  classroomId: string = 's6LoU9vosD9i';
+  recommendedTopicSummaries!: CreatorTopicSummary[];
+  recommendedTopicIds: string[] = ['dyeMiEAvJOIU', 'N8yf4a0YUJqD'];
 
   componentSubscription = new Subscription();
 
-
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private classroomBackendApiService: ClassroomBackendApiService,
-    private topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService,
     private diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService
   ) {}
 
@@ -59,24 +58,40 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
     this.componentSubscription.add(
       this.diagnosticTestPlayerStatusService
-        .onDiagnosticTestSessionCompleted.subscribe((result) => {
-          this.testFinished = true;
-        })
-    );
+        .onDiagnosticTestSessionCompleted.subscribe(
+          (recommendedTopicIds: string[]) => {
+            recommendedTopicIds.shift();
+            this.getRecommendedTopicSummaries(recommendedTopicIds);
+          }
+        ));
   }
+
   startDiagnosticTest(): void {
-    // fetch the math topic ID.
-    const classroomId = 'B8xre7uqNwoL';
-
-    this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
-      response => {
-        this.diagnosticTestTopicTrackerModel = new DiagnosticTestTopicTrackerModel(
-          response.classroomDict.topicIdToPrerequisiteTopicIds);
-        this.diagnosticTestStarted = true
-      }
-    );
+    this.classroomBackendApiService.getClassroomDataAsync(
+      this.classroomId).then(response => {
+      this.diagnosticTestTopicTrackerModel = (
+        new DiagnosticTestTopicTrackerModel(
+          response.classroomDict.topicIdToPrerequisiteTopicIds));
+      this.diagnosticTestIsStarted = true;
+    });
   }
 
+  getRecommendedTopicSummaries(recommendedTopicIds: string[]): void {
+    this.classroomBackendApiService.fetchClassroomDataAsync(
+      this.classroomUrlFragment).then((classroomData) => {
+      let topicSummaries: CreatorTopicSummary[] = (
+        classroomData.getTopicSummaries());
+      this.recommendedTopicSummaries = topicSummaries.filter(
+        (topicSummary) => {
+          return recommendedTopicIds.indexOf(topicSummary.getId()) !== -1;
+        });
+      this.diagnosticTestIsFinished = true;
+    });
+  }
+
+  getTopicButtonText(topicName: string): string {
+    return 'Start ' + topicName;
+  }
 }
 
 angular.module('oppia').directive(

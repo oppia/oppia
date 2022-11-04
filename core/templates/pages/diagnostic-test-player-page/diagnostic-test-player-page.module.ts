@@ -40,6 +40,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { DiagnosticTestPlayerComponent } from './diagnostic-test-player.component';
 import { InteractiveTextInputComponent } from '../../../../extensions/interactions/TextInput/directives/oppia-interactive-text-input.component';
 import { ResponseTextInputComponent } from '../../../../extensions/interactions/TextInput/directives/oppia-response-text-input.component';
+import { TopicSummaryTileComponent } from 'components/summary-tile/topic-summary-tile.component';
 
 declare var angular: ng.IAngularStatic;
 
@@ -62,12 +63,14 @@ declare var angular: ng.IAngularStatic;
   declarations: [
     DiagnosticTestPlayerComponent,
     InteractiveTextInputComponent,
-    ResponseTextInputComponent
+    ResponseTextInputComponent,
+    TopicSummaryTileComponent
   ],
   entryComponents: [
     DiagnosticTestPlayerComponent,
     InteractiveTextInputComponent,
-    ResponseTextInputComponent
+    ResponseTextInputComponent,
+    TopicSummaryTileComponent
   ],
   providers: [
     {

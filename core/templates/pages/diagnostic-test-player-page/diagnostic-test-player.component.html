@@ -1,6 +1,6 @@
 <div class="diagnostic-test-container">
   <div class="oppia-diagnostic-test-session">Learner Diagnostic Test</div>
-  <mat-card class="introductory-card" *ngIf="!diagnosticTestStarted">
+  <mat-card class="introductory-card" *ngIf="!diagnosticTestIsStarted">
     <div class="oppia-introductory-container">
       <div class="oppia-image">
         <img class="oppia-otter-image" [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
@@ -15,29 +15,139 @@
       </div>
     </div>
     <button class="btn oppia-diagnostic-test-button start-test-button"
-          (click)="startDiagnosticTest()"
-          translate="I18N_DIAGNOSTIC_TEST_START_BUTTON">
+            (click)="startDiagnosticTest()"
+            translate="I18N_DIAGNOSTIC_TEST_START_BUTTON">
     </button>
   </mat-card>
-  <div *ngIf="diagnosticTestStarted && !testFinished">
+  <div *ngIf="diagnosticTestIsStarted && !diagnosticTestIsFinished">
     <oppia-conversation-skin [diagnosticTestTopicTrackerModel]="diagnosticTestTopicTrackerModel">
     </oppia-conversation-skin>
   </div>
-  <div *ngIf="testFinished">
-    <mat-card>
-      <h1>Test Finished</h1>
-      <div class="oppia-image">
-        <img class="oppia-otter-image" [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
+
+  <div *ngIf="diagnosticTestIsFinished" class="result-page-container">
+    <mat-card class="recommendation-card">
+      <div *ngIf="recommendedTopicSummaries.length > 0">
+        <h3 class="recommendation-card-heading">Test complete. Well done!</h3>
+        <p *ngIf="recommendedTopicSummaries.length === 1" class="recommendation-card-text">
+          {{'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_FOR_ONE_TOPIC' | translate}}
+        </p>
+        <p *ngIf="recommendedTopicSummaries.length === 2" class="recommendation-card-text">
+          {{'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_FOR_TWO_TOPICS' | translate}}
+        </p>
+
+        <div class="oppia-topic-recommendation-container">
+          <div *ngFor="let topicSummary of recommendedTopicSummaries"
+               class="oppia-topic-summary-tile">
+            <oppia-topic-summary-tile [topicSummary]="topicSummary"
+                                      [classroomUrlFragment]="classroomUrlFragment"
+                                      [isPublished]="topicSummary.isTopicPublished()">
+            </oppia-topic-summary-tile>
+            <div class="start-button">
+              <button class="btn start-topic-button">
+                {{getTopicButtonText(topicSummary.getName())}}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="recommendedTopicSummaries.length === 0">
+        <div class="oppia-no-recommendation-header">
+          <div class="oppia-result-page-image">
+            <img class="oppia-otter-image" [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
+          </div>
+          <h3 class="oppia-no-recommendation-header-text">
+            Test complete. Well done!
+          </h3>
+        </div>
+        <p class="recommendation-card-text">
+          {{'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_1_FOR_NO_TOPIC' | translate}}
+        </p>
+        <p class="recommendation-card-text">
+          {{'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_2_FOR_NO_TOPIC' | translate}}
+        </p>
+        <div class="classroom-button-container">
+          <button class="btn oppia-goto-classroom-button">
+            Go to classroom
+          </button>
+        </div>
       </div>
     </mat-card>
   </div>
 </div>
 
 <style>
+  .oppia-goto-classroom-button {
+    background-color: #00645c;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  .classroom-button-container {
+    float: right;
+    margin-right: 5%;
+  }
+  .oppia-no-recommendation-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+    margin: 0 5%;
+  }
+  .oppia-no-recommendation-header-text {
+    color: #00645c;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 1.5em;
+  }
+  .recommendation-card {
+    overflow: hidden;
+    padding: 5%;
+  }
+  .recommendation-card-heading {
+    color: #00645c;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 1.5em;
+    text-align: center;
+  }
+  .recommendation-card-text {
+    font-size: 1.3em;
+    margin: 5%;
+  }
+  .start-button {
+    margin: 20px 0;
+    text-align: center;
+  }
+  .oppia-topic-recommendation-container {
+    display: flex;
+    justify-content: space-evenly;
+  }
+  .oppia-topic-summary-tile {
+    width: 180px;
+  }
+  .recommended-topics-container {
+    display: flex;
+  }
+  .recommended-topic {
+    width: 200px;
+  }
+  .start-topic-button {
+    background-color: #00645c;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    width: 180px;
+  }
+  .result-page-container {
+    margin: auto;
+    width: 600px;
+  }
   .oppia-image {
     align-items: center;
     display: flex;
     margin-right: 60px;
+  }
+  .oppia-result-page-image {
+    align-items: center;
+    display: flex;
   }
   .oppia-introductory-container {
     display: flex;
