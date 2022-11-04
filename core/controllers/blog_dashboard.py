@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
@@ -80,12 +81,20 @@ class BlogDashboardDataHandler(base.BaseHandler):
             'displayed_author_name': {
                 'schema': {
                     'type': 'basestring',
-                }
+                },
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_AUTHOR_NAME_LENGTH
+                }]
             },
             'author_bio': {
                 'schema': {
                     'type': 'basestring',
-                }
+                },
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_AUTHOR_BIO
+                }]
             },
         },
     }
@@ -266,7 +275,7 @@ class BlogPostHandler(base.BaseHandler):
         thumbnail_filename = self.normalized_payload.get('thumbnail_filename')
         try:
             file_format = image_validation_services.validate_image_and_filename(
-                raw_image, thumbnail_filename)
+                raw_image, thumbnail_filename, feconf.ENTITY_TYPE_BLOG_POST)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 

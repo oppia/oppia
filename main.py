@@ -110,7 +110,9 @@ if not constants.EMULATOR_MODE:
 logging.getLogger(name='chardet.charsetprober').setLevel(logging.INFO)
 
 
-class InternetConnectivityHandler(base.BaseHandler):
+class InternetConnectivityHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles the get request to the server from the
     frontend to check for internet connection."""
 
@@ -122,45 +124,51 @@ class InternetConnectivityHandler(base.BaseHandler):
     # from core.controllers.base.BaseModel.
     HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests."""
         self.render_json({'is_internet_connected': True})
 
 
-class FrontendErrorHandler(base.BaseHandler):
+class FrontendErrorHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles errors arising from the frontend."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "post" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access
     def post(self) -> None:
         """Records errors reported by the frontend."""
         logging.error('Frontend error: %s' % self.payload.get('error'))
         self.render_json(self.values)
 
 
-class WarmupPage(base.BaseHandler):
+class WarmupPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles warmup requests."""
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET warmup requests."""
         pass
 
 
-class SplashRedirectPage(base.BaseHandler):
+class SplashRedirectPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access  # type: ignore[misc]
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
     def get(self) -> None:
         self.redirect('/')
 
@@ -169,7 +177,7 @@ class SplashRedirectPage(base.BaseHandler):
 # backend. Should be changed in future as per the requirements.
 def get_redirect_route(
         regex_route: str,
-        handler: Type[base.BaseHandler],
+        handler: Type[webapp2.RequestHandler],
         defaults: Optional[Dict[str, str]] = None
 ) -> routes.RedirectRoute:
     """Returns a route that redirects /foo/ to /foo.
@@ -179,7 +187,7 @@ def get_redirect_route(
 
     Args:
         regex_route: unicode. A raw string representing a route.
-        handler: BaseHandler. A callable to handle the route.
+        handler: RequestHandler. A callable to handle the route.
         defaults: dict. Optional defaults parameter to be passed
             into the RedirectRoute object.
 

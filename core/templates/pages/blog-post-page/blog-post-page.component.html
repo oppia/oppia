@@ -52,9 +52,11 @@
           </div>
         </mat-menu>
       </mat-card-header>
-      <mat-card-content class="mt-4 blog-card-content">
+      <mat-card-content class="blog-card-content"
+                        [ngClass]="{'mt-4': !isSmallScreenViewActive(), 'mt-2': isSmallScreenViewActive()}">
         <oppia-rte-output-display [rteString]="this.blogPost.content"
-                                  class="d-block">
+                                  class="d-block"
+                                  [ngClass]="{'pt-3': !isSmallScreenViewActive(), 'pt-1': isSmallScreenViewActive()}">
         </oppia-rte-output-display>
       </mat-card-content>
     </div>

@@ -25,6 +25,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { BlogPostPageConstants } from './blog-post-page.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { BlogPostPageService } from './services/blog-post-page.service';
 import dayjs from 'dayjs';
 
 import './blog-post-page.component.css';
@@ -54,6 +55,7 @@ export class BlogPostPageComponent implements OnInit {
     private urlService: UrlService,
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
+    private blogPostPageService: BlogPostPageService,
   ) {}
 
   ngOnInit(): void {
@@ -62,6 +64,7 @@ export class BlogPostPageComponent implements OnInit {
     this.blogPostUrlFragment = this.urlService.getBlogPostUrlFromUrl();
     this.authorUsername = this.blogPostPageData.authorUsername;
     this.blogPost = this.blogPostPageData.blogPostDict;
+    this.blogPostPageService.blogPostId = this.blogPostPageData.blogPostDict.id;
     this.postsToRecommend = this.blogPostPageData.summaryDicts;
     this.decodeAuthorProfilePicUrl(
       this.blogPostPageData.profilePictureDataUrl

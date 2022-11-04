@@ -189,6 +189,7 @@ describe('Blog Dashboard Page Component', () => {
     };
     spyOn(urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue(defaultImageUrl);
+    spyOn(component, 'showAuthorDetailsEditor');
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(blogDashboardBackendApiService, 'fetchBlogDashboardDataAsync')
@@ -206,6 +207,7 @@ describe('Blog Dashboard Page Component', () => {
     expect(blogDashboardBackendApiService.fetchBlogDashboardDataAsync)
       .toHaveBeenCalled();
     expect(component.authorProfilePictureUrl).toEqual('sample_url');
+    expect(component.showAuthorDetailsEditor).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
     expect(component.windowIsNarrow).toBe(true);

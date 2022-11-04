@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import datetime
+import html
 import logging
 
 from core import feconf
@@ -635,8 +636,8 @@ def generate_url_fragment(title: str, blog_post_id: str) -> str:
     Returns:
         str. The url fragment of the blog post.
     """
-    lower_title = title.lower()
-    hyphenated_title = lower_title.replace(' ', '-')
+    lower_title = title.lower().replace(':', '')
+    hyphenated_title = lower_title.replace('  ', ' ').replace(' ', '-')
     lower_id = blog_post_id.lower()
     return hyphenated_title + '-' + lower_id
 
@@ -654,7 +655,7 @@ def generate_summary_of_blog_post(content: str) -> str:
     raw_text = html_cleaner.strip_html_tags(content)
     max_chars_in_summary = constants.MAX_CHARS_IN_BLOG_POST_SUMMARY - 3
     if len(raw_text) > max_chars_in_summary:
-        summary = raw_text[:max_chars_in_summary] + '...'
+        summary = html.unescape(raw_text)[:max_chars_in_summary] + '...'
         return summary
     return raw_text
 
@@ -983,9 +984,7 @@ def create_blog_author_details_model(user_id: str) -> None:
         )
 
 
-def get_blog_author_details(user_id: str) -> Optional[
-    blog_domain.BlogAuthorDetails
-]:
+def get_blog_author_details(user_id: str) -> blog_domain.BlogAuthorDetails:
     """Returns the blog author details for the given user id. If
     blogAuthorDetailsModel is not present, a new model with default values is
     created.
@@ -994,7 +993,10 @@ def get_blog_author_details(user_id: str) -> Optional[
         user_id: str. The user id of the blog author.
 
     Returns:
-        BlogAuthorDetails. The blog author details for the given user id.
+        BlogAuthorDetails. The blog author details for the given user ID.
+
+    Raises:
+        Exception. Unable to fetch blog author details for the given user ID.
     """
     author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
 
@@ -1002,7 +1004,10 @@ def get_blog_author_details(user_id: str) -> Optional[
         create_blog_author_details_model(user_id)
         author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
 
-    return None if not author_model else blog_domain.BlogAuthorDetails(
+    if author_model is None:
+        raise Exception('Unable to fetch author details for the given user.')
+
+    return blog_domain.BlogAuthorDetails(
         author_model.id,
         author_model.author_id,
         author_model.displayed_author_name,

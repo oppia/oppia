@@ -37,6 +37,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post.model';
 import { SharingLinksComponent } from 'components/common-layout-directives/common-elements/sharing-links.component';
+import { BlogPostPageService } from './services/blog-post-page.service';
 
 @Pipe({name: 'truncate'})
 class MockTruncatePipe {
@@ -69,6 +70,7 @@ describe('Blog home page component', () => {
   let urlService: UrlService;
   let loaderService: LoaderService;
   let urlInterpolationService: UrlInterpolationService;
+  let blogPostPageService: BlogPostPageService;
   let component: BlogPostPageComponent;
   let mockWindowRef: MockWindowRef;
   let fixture: ComponentFixture<BlogPostPageComponent>;
@@ -99,7 +101,8 @@ describe('Blog home page component', () => {
           provide: WindowDimensionsService,
           useClass: MockWindowDimensionsService
         },
-        LoaderService
+        LoaderService,
+        BlogPostPageService
       ],
     }).compileComponents();
   }));
@@ -109,6 +112,7 @@ describe('Blog home page component', () => {
     component = fixture.componentInstance;
     urlService = TestBed.inject(UrlService);
     loaderService = TestBed.inject(LoaderService);
+    blogPostPageService = TestBed.inject(BlogPostPageService);
     mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
@@ -196,6 +200,7 @@ describe('Blog home page component', () => {
     expect(component.blogPost).toEqual(blogPostData);
     expect(component.postsToRecommend.length).toBe(0);
     expect(component.publishedDateString).toBe('November 21, 2014');
+    expect(blogPostPageService.blogPostId).toBe(sampleBlogPostBackendDict.id);
   });
 
   it('should navigate to author profile page', () => {

@@ -96,6 +96,9 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
           // eslint-disable-next-line max-len
           dashboardData.profilePictureDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
         this.loaderService.hideLoadingScreen();
+        if (this.authorBio.length === 0) {
+          this.showAuthorDetailsEditor();
+        }
       }, (errorResponse) => {
         if (
           AppConstants.FATAL_ERROR_CODES.indexOf(
@@ -153,6 +156,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     });
     modelRef.componentInstance.authorName = this.authorName;
     modelRef.componentInstance.authorBio = this.authorBio;
+    modelRef.componentInstance.prevAuthorBio = this.authorBio;
     modelRef.result.then((authorDetails) => {
       this.authorName = authorDetails.authorName;
       this.authorBio = authorDetails.authorBio;

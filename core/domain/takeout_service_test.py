@@ -942,7 +942,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         blog_models.BlogAuthorDetailsModel.create(
             author_id=self.USER_ID_1,
-            displayed_author_name='genral name',
+            displayed_author_name='general name',
             author_bio='general blog author'
         )
 

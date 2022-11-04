@@ -765,6 +765,25 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         self.assertEqual(author_details.displayed_author_name, self.user_name)
         self.assertEqual(author_details.author_bio, self.user_bio)
 
+    def test_get_blog_author_details_model_raises_exception(self) -> None:
+        def _mock_get_author_details_by_author(unused_user_id: str) -> None:
+            return None
+
+        get_author_details_swap = self.swap(
+            blog_models.BlogAuthorDetailsModel,
+            'get_by_author',
+            _mock_get_author_details_by_author
+            )
+
+        with get_author_details_swap:
+            with self.assertRaisesRegex(
+                Exception,
+                (
+                    'Unable to fetch author details for the given user.'
+                )
+            ):
+                blog_services.get_blog_author_details(self.user_id)
+
     def test_update_blog_author_details(self) -> None:
         new_author_name = 'new author name'
         new_author_bio = 'new blog author bio'
