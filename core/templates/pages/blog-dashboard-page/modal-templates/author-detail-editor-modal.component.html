@@ -1,9 +1,9 @@
-<div class="mt-5 mb-1 mx-3">
+<div class="mt-5 mb-1 mx-3 e2e-test-blog-author-details-modal">
   <h3>{{ 'I18N_BLOG_DASHBOARD_AUTHOR_DETAILS_EDITOR_HEADING' | translate }}: </h3>
 </div>
 <span class="my-2 ml-2 d-flex">
   <h4 class="my-auto mr-1">{{ 'I18N_BLOG_DASHBOARD_AUTHOR_NAME_HEADING' | translate }} :</h4>
-  <input class="w-auto form-control required general-text-format oppia-autofocus blog-author-editor"
+  <input class="w-auto form-control required general-text-format oppia-autofocus blog-author-editor e2e-test-blog-author-name-field"
          [(ngModel)]="authorName"
          maxlength="MAX_AUTHOR_NAME_LENGTH"
          aria-label="Author Name of the user">
@@ -13,7 +13,7 @@
     <span class="blog-author-bio">
       <h4 class="mr-1">{{ 'I18N_BLOG_DASHBOARD_AUTHOR_BIO_HEADING' | translate }}: </h4>
     </span>
-    <textarea class="oppia-bio-border oppia-autofocus w-100 mr-1"
+    <textarea class="oppia-bio-border oppia-autofocus w-100 mr-1 e2e-test-blog-author-bio-field"
               [(ngModel)]="authorBio"
               [attr.value]="authorBio"
               rows="5"
@@ -35,7 +35,7 @@
         [matTooltipDisabled]="false"
         aria-label="List that shows issues preventing to save author details"
         class="w-100">
-    <button class="btn btn-success"
+    <button class="btn btn-success e2e-test-save-author-details-button"
             aria-label="Save Author Details."
             (click)="save()"
             [disabled]="validateAuthorDetails().length !== 0">
