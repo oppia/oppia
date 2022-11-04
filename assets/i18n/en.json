@@ -147,7 +147,7 @@
     "I18N_BLOG_POST_EDITOR_TITLE_MAX_LENGTH_ERROR": "Blog Post title should have at most <[maxChars]> characters.",
     "I18N_BLOG_POST_EDITOR_TITLE_MIN_LENGTH_ERROR": "Blog Post title should have at least <[minChars]> characters.",
     "I18N_BLOG_POST_PAGE_RECOMMENDATION_SECTON_HEADING": "Suggested For You.",
-    "I18N_BLOG_POST_PAGE_TAGS_HEADING": "Tags",
+    "I18N_BLOG_POST_PAGE_TAGS_HEADING": "Tags:",
     "I18N_BLOG_POST_PAGE_TITLE": "<[blogPostTitle]> | Blog | Oppia",
     "I18N_BLOG_POST_THUMBNAIL_ALLOWED_EXTENSIONS_PREFIX": "Allowed image extensions: ",
     "I18N_BLOG_POST_THUMBNAIL_ALLOWED_MAX_FILE_SIZE": "The maximum allowed image size is <[imageSize]> KB. Note that, sometimes, cropping might increase the image size.",
