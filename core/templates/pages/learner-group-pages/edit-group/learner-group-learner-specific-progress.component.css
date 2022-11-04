@@ -327,6 +327,16 @@
   font-size: 14px;
 }
 
+.oppia-learner-group-learner-specific-progress .drop-icon svg {
+  transform: rotate(0deg);
+  transition: transform 0.3s ease-in-out;
+}
+
+.oppia-learner-group-learner-specific-progress .mat-expanded .drop-icon svg {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease-in-out;
+}
+
 @media screen and (max-width: 940px) {
   .oppia-learner-group-learner-specific-progress {
     width: 90%;
