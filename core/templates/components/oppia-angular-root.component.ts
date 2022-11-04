@@ -93,7 +93,7 @@ import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 import { I18nService } from 'i18n/i18n.service';
-let a = 0;
+
 const componentMap = {
   Collapsible: {
     component_class: NoninteractiveCollapsible,

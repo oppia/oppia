@@ -688,7 +688,9 @@ class BaseHandler(
 
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
-        self.response.write(load_template(filepath, template_is_aot_compiled))
+        self.response.write(load_template(
+            filepath, template_is_aot_compiled=template_is_aot_compiled
+        ))
 
     def _render_exception_json_or_html(
         self, return_type: str, values: ResponseValueDict
