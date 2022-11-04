@@ -10941,6 +10941,28 @@ states:
           rule_type: IsEqualToOrdering
         tagged_skill_misconception_id: null
         training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_27
+            y: 4
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x:
+            - - ca_choices_29
+            - - ca_choices_28
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         allowMultipleItemsInSamePosition:
@@ -11071,6 +11093,23 @@ states:
             - - ca_choices_27
             - - ca_choices_26
           rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_27
+            y: 4
+          rule_type: HasElementXAtPositionY
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
