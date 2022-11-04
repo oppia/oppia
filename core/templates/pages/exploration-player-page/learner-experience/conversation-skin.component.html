@@ -21,7 +21,10 @@
                         [inStoryMode]="inStoryMode"
                         [nextLessonLink]="getExplorationLink()"
                         [completedChaptersCount]="completedChaptersCount"
-                        [milestoneMessageIsToBeDisplayed]="chapterIsCompletedForTheFirstTime">
+                        [milestoneMessageIsToBeDisplayed]="chapterIsCompletedForTheFirstTime"
+                        [enableFeedback]="enableFeedback"
+                        [allowOnlySingleAttemptForAnswering]="allowOnlySingleAttemptForAnswering"
+                        [showOnlyLastInputPairResponse]="showOnlyLastInputPairResponse">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
@@ -38,6 +41,7 @@
                             [isLearnAgainButton]="isLearnAgainButton()"
                             [displayedCard]="displayedCard"
                             [submitButtonIsShown]="!answerIsBeingProcessed"
+                            [enableNavigationThroughCardHistory]="enableNavigationThroughCardHistory"
                             (clickContinueButton)="showUpcomingCard()"
                             (changeCard)="changeCard($event)">
         </oppia-progress-nav>

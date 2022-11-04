@@ -27,12 +27,12 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 })
 export class DiagnosticTestPlayerStatusService {
   private _diagnosticTestPlayerCompletedEventEmitter = (
-    new EventEmitter<boolean>());
+    new EventEmitter<string[]>());
 
   private _diagnosticTestPlayerProgressChangeEventEmitter = (
     new EventEmitter<number>());
 
-  get onDiagnosticTestSessionCompleted(): EventEmitter<boolean> {
+  get onDiagnosticTestSessionCompleted(): EventEmitter<string[]> {
     return this._diagnosticTestPlayerCompletedEventEmitter;
   }
 

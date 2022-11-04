@@ -57,6 +57,7 @@ export class ProgressNavComponent {
   @Input() isLearnAgainButton: boolean;
   @Input() displayedCard: StateCard;
   @Input() submitButtonIsShown: boolean;
+  @Input() enableNavigationThroughCardHistory: boolean;
   @Output() submit: EventEmitter<void> = (
     new EventEmitter());
 

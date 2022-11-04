@@ -159,6 +159,13 @@ export class ConversationSkinComponent {
   pidInUrl: string;
   submitButtonIsDisabled = true;
 
+  // The fields are used to customize the component for the diagnostic player,
+  // question player, and exploration player page.
+  enableFeedback!: boolean;
+  allowOnlySingleAttemptForAnswering!: boolean;
+  showOnlyLastInputPairResponse!: boolean;
+  enableNavigationThroughCardHistory!: boolean;
+
   constructor(
     private windowRef: WindowRef,
     private alertsService: AlertsService,
@@ -412,6 +419,18 @@ export class ConversationSkinComponent {
             }
           );
         this.visitedStateNames.push(firstStateName);
+      }
+
+      if (this.diagnosticTestTopicTrackerModel) {
+        this.enableFeedback = false;
+        this.allowOnlySingleAttemptForAnswering = true;
+        this.showOnlyLastInputPairResponse = true;
+        this.enableNavigationThroughCardHistory = false;
+      } else {
+        this.enableFeedback = true;
+        this.allowOnlySingleAttemptForAnswering = false;
+        this.showOnlyLastInputPairResponse = false;
+        this.enableNavigationThroughCardHistory = true;
       }
     });
   }

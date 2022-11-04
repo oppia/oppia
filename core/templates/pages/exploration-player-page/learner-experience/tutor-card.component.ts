@@ -114,6 +114,9 @@ export class TutorCardComponent {
   // Until the response is received, it remains undefined.
   @Input() completedChaptersCount: number | undefined;
   @Input() milestoneMessageIsToBeDisplayed!: boolean;
+  @Input() enableFeedback: boolean;
+  @Input() allowOnlySingleAttemptForAnswering: boolean;
+  @Input() showOnlyLastInputPairResponse: boolean;
   directiveSubscriptions = new Subscription();
   private _editorPreviewMode: boolean;
   arePreviousResponsesShown: boolean = false;

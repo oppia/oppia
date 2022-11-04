@@ -852,23 +852,23 @@ class AdminHandler(
             question_3 = self._create_dummy_question(
                 question_id_3, 'Question 3', [skill_id_2])
             question_4 = self._create_dummy_question(
-                question_id_3, 'Question 4', [skill_id_2])
+                question_id_4, 'Question 4', [skill_id_2])
             question_5 = self._create_dummy_question(
-                question_id_3, 'Question 5', [skill_id_3])
+                question_id_5, 'Question 5', [skill_id_3])
             question_6 = self._create_dummy_question(
-                question_id_3, 'Question 6', [skill_id_3])
+                question_id_6, 'Question 6', [skill_id_3])
             question_7 = self._create_dummy_question(
-                question_id_3, 'Question 7', [skill_id_4])
+                question_id_7, 'Question 7', [skill_id_4])
             question_8 = self._create_dummy_question(
-                question_id_3, 'Question 8', [skill_id_4])
+                question_id_8, 'Question 8', [skill_id_4])
             question_9 = self._create_dummy_question(
-                question_id_3, 'Question 9', [skill_id_5])
+                question_id_9, 'Question 9', [skill_id_5])
             question_10 = self._create_dummy_question(
-                question_id_3, 'Question 10', [skill_id_5])
+                question_id_10, 'Question 10', [skill_id_5])
             question_11 = self._create_dummy_question(
-                question_id_3, 'Question 11', [skill_id_6])
+                question_id_11, 'Question 11', [skill_id_6])
             question_12 = self._create_dummy_question(
-                question_id_3, 'Question 12', [skill_id_6])
+                question_id_12, 'Question 12', [skill_id_6])
 
             topic_1 = topic_domain.Topic.create_default_topic(
                 topic_id_1, 'Topic1', 'topic-one', 'description', 'fragm')
@@ -920,6 +920,7 @@ class AdminHandler(
             question_services.add_question(self.user_id, question_11)
             question_services.add_question(self.user_id, question_12)
 
+
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)
             skill_services.save_new_skill(self.user_id, skill_3)
@@ -940,6 +941,43 @@ class AdminHandler(
             topic_services.save_new_topic(self.user_id, topic_4)
             topic_services.save_new_topic(self.user_id, topic_5)
             topic_services.save_new_topic(self.user_id, topic_6)
+            print('question_id_1', question_id_1)
+            print('question_id_2', question_id_2)
+            print('question_id_3', question_id_3)
+            print('question_id_4', question_id_4)
+            print('question_id_5', question_id_5)
+            print('question_id_6', question_id_6)
+            print('question_id_7', question_id_7)
+            print('question_id_8', question_id_8)
+            print('question_id_9', question_id_9)
+            print('question_id_10', question_id_10)
+            print('question_id_11', question_id_11)
+            print('question_id_12', question_id_12)
+
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_1, skill_id_1, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_2, skill_id_1, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_3, skill_id_2, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_4, skill_id_2, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_5, skill_id_3, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_6, skill_id_3, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_7, skill_id_4, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_8, skill_id_4, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_9, skill_id_5, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_10, skill_id_5, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_11, skill_id_6, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_12, skill_id_6, 0.5)
 
             classroom_id_1 = classroom_config_services.get_new_classroom_id()
             classroom_id_2 = classroom_config_services.get_new_classroom_id()

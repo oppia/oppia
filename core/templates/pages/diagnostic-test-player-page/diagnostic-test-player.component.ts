@@ -36,6 +36,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL: string = '';
   diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel;
   diagnosticTestStarted = false;
+  testFinished = false;
 
   componentSubscription = new Subscription();
 
@@ -59,12 +60,13 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     this.componentSubscription.add(
       this.diagnosticTestPlayerStatusService
         .onDiagnosticTestSessionCompleted.subscribe((result) => {
+          this.testFinished = true;
         })
     );
   }
   startDiagnosticTest(): void {
     // fetch the math topic ID.
-    const classroomId = 'K1HyTL5Gvqtn';
+    const classroomId = 'B8xre7uqNwoL';
 
     this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
       response => {

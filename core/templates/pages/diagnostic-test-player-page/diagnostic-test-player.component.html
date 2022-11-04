@@ -19,9 +19,17 @@
           translate="I18N_DIAGNOSTIC_TEST_START_BUTTON">
     </button>
   </mat-card>
-  <div *ngIf="diagnosticTestStarted">
+  <div *ngIf="diagnosticTestStarted && !testFinished">
     <oppia-conversation-skin [diagnosticTestTopicTrackerModel]="diagnosticTestTopicTrackerModel">
     </oppia-conversation-skin>
+  </div>
+  <div *ngIf="testFinished">
+    <mat-card>
+      <h1>Test Finished</h1>
+      <div class="oppia-image">
+        <img class="oppia-otter-image" [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
+      </div>
+    </mat-card>
   </div>
 </div>
 

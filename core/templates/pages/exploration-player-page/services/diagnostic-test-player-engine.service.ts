@@ -114,9 +114,10 @@ export class DiagnosticTestPlayerEngineService {
       this.answerClassificationService.getMatchingClassificationResult(
         null, oldState.interaction, answer,
         interactionRulesService));
-    const answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
+    let answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
 
     this.numberOfAttemptedQuestions += 1;
+    answerIsCorrect = false;
 
     if (answerIsCorrect) {
       this.diagnosticTestCurrentTopicStatusModel.recordCorrectAttempt(
@@ -143,7 +144,8 @@ export class DiagnosticTestPlayerEngineService {
 
       if (this.isDiagnosticTestFinished()) {
         this.diagnosticTestPlayerStatusService
-          .onDiagnosticTestSessionCompleted.emit(true);
+          .onDiagnosticTestSessionCompleted.emit(
+            this.diagnosticTestTopicTrackerModel.getFailedTopicIds());
         return;
       }
 
