@@ -19,7 +19,7 @@
           <div *ngIf="learnerProgress" class="all-subtopics-progress">
             <div *ngFor="let topicName of topicNames" class="progress-dropdown">
               <mat-accordion>
-                <mat-expansion-panel hideToggle>
+                <mat-expansion-panel hideToggle expanded>
                   <mat-expansion-panel-header>
                     <mat-panel-title>
                       <div class="story-info-summary-container">
@@ -43,7 +43,7 @@
                         </div>
                         <div class="subtopic-progress-info">
                           <div class="subtopic-title">{{subtopicProgress.subtopicTitle}}</div>
-                          <div class="subtopic-progress">
+                          <div class="subtopic-progress" [ngClass]="{'no-progress': !subtopicProgress.subtopicMastery}">
                             <div *ngIf="!subtopicProgress.subtopicMastery">
                               &#8212; {{'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET' | translate}} &#8212;
                             </div>
@@ -72,7 +72,7 @@
         <div *ngIf="learnerProgress" class="all-stories-progress">
           <div *ngFor="let storyProgress of learnerProgress.storiesProgress; let storyIndex = index" class="progress-dropdown story-progress-dropdown">
             <mat-accordion>
-              <mat-expansion-panel hideToggle>
+              <mat-expansion-panel hideToggle expanded>
                 <mat-expansion-panel-header>
                   <mat-panel-title>
                     <div class="story-info-summary-container">

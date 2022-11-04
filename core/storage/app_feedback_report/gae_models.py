@@ -23,8 +23,8 @@ from core import feconf
 from core import utils
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, TypeVar
-from typing_extensions import Final, Literal, TypedDict
+from typing import (
+    Dict, Final, List, Literal, Optional, Sequence, TypedDict, TypeVar)
 
 SELF_REPORT_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_REPORT_MODEL', bound='AppFeedbackReportModel'
