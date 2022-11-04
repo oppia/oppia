@@ -1910,46 +1910,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             prev_started_state
         )
 
-    def test_create_user_contributions_with_bot_user_id_returns_none(
-        self
-    ) -> None:
-        user_id = feconf.MIGRATION_BOT_USER_ID
-        created_exp_ids = ['exp1', 'exp2', 'exp3']
-        edited_exp_ids = ['exp2', 'exp3', 'exp4']
-
-        user_contrib = user_services.compute_user_contributions(
-            user_id,
-            created_exp_ids,
-            edited_exp_ids)
-
-        self.assertIsNone(user_contrib)
-
-    def test_create_user_contributions_already_existing_raises_error(
-        self
-    ) -> None:
-        auth_id = 'someUser'
-        user_email = 'user@example.com'
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        contributions = user_services.get_user_contributions(
-            user_id, strict=True
-        )
-        # Check that the user contributions for this user ID already exist.
-        # (Note that user contributions are created automatically when a new
-        # user is created.)
-        self.assertIsNotNone(contributions)
-        self.assertIsInstance(contributions, user_domain.UserContributions)
-
-        with self.assertRaisesRegex(
-            Exception,
-            'User contributions model for user %s already exists.'
-            % user_id
-        ):
-            user_services.compute_user_contributions(
-                user_id,
-                ['expectedId1', 'expectedId2', 'expectedId3'],
-                ['expectedId2', 'expectedId3', 'expectedId4'])
-
-    def test_compute_user_contributions(self) -> None:
+    def test_create_user_contributions(self) -> None:
         auth_id = 'someUser'
         user_email = 'user@example.com'
         created_exp_ids = ['exp1', 'exp2', 'exp3']

@@ -1925,43 +1925,6 @@ def get_user_contributions(
     return result
 
 
-def compute_user_contributions(
-    user_id: str,
-    created_exploration_ids: List[str],
-    edited_exploration_ids: List[str]
-) -> Optional[user_models.UserContributionsModel]:
-    """Computes new UserContributionsModel and returns it. It does not perform
-    a put operation. The caller of this method must perform the put operation.
-    Note: This does not create a contributions model if the user is
-    OppiaMigrationBot.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        created_exploration_ids: list(str). IDs of explorations that this
-            user has created.
-        edited_exploration_ids: list(str). IDs of explorations that this
-            user has edited.
-
-    Returns:
-        UserContributionsModel|None. The newly-created UserContributionsModel.
-        If the user id is for oppia migration bot, None is returned.
-
-    Raises:
-        Exception. The UserContributionsModel for the given user_id already
-            exists.
-    """
-    if user_id == feconf.MIGRATION_BOT_USER_ID:
-        return None
-    user_contributions = get_user_contributions(user_id, strict=False)
-    if user_contributions:
-        raise Exception(
-            'User contributions model for user %s already exists.' % user_id)
-
-    user_contributions = user_domain.UserContributions(
-        user_id, created_exploration_ids, edited_exploration_ids)
-    return get_validated_user_contributions_model(user_contributions)
-
-
 def get_or_create_new_user_contributions(
     user_id: str
 ) -> user_domain.UserContributions:

@@ -1698,10 +1698,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_update_exploration_by_migration_bot_not_updates_contribution_model(
         self
     ) -> None:
-        user_contributions = user_services.compute_user_contributions(
-            feconf.MIGRATION_BOT_USER_ID, [], []
-        )
-        self.assertIsNone(user_contributions)
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='end')
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)

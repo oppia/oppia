@@ -569,13 +569,6 @@ class UserContributionsTests(test_utils.GenericTestBase):
             'to be a string'):
             self.user_contributions.validate()
 
-    def test_cannot_create_user_contributions_with_migration_bot(
-        self
-    ) -> None:
-        self.assertIsNone(
-            user_services.compute_user_contributions(
-                feconf.MIGRATION_BOT_USER_ID, [], []))
-
     def test_save_user_contributions(self) -> None:
         user_services.update_user_contributions(self.owner_id, ['e1'], ['e2'])
         contributions = user_services.get_user_contributions(
@@ -603,15 +596,6 @@ class UserContributionsTests(test_utils.GenericTestBase):
             updated_contributions.edited_exploration_ids,
             ['e2', 'e4']
         )
-
-    def test_cannot_create_user_contributions_with_existing_user_id(
-        self
-    ) -> None:
-        with self.assertRaisesRegex(
-            Exception,
-            'User contributions model for user %s already exists.'
-            % self.owner_id):
-            user_services.compute_user_contributions(self.owner_id, [], [])
 
     def test_cannot_update_user_contributions_with_invalid_user_id(
         self
