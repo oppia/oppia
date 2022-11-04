@@ -201,10 +201,6 @@ export class OutcomeEditorComponent implements OnInit {
     if (this.isEditable) {
       this.destinationIfStuckEditorIsOpen = true;
     }
-    let activeStateName = this.stateEditorService.getActiveStateName();
-    if (!this.savedOutcome.destIfReallyStuck) {
-      this.outcome.destIfReallyStuck = activeStateName;
-    }
   }
 
   saveThisFeedback(fromClickSaveFeedbackButton: boolean): void {
