@@ -1776,9 +1776,18 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         for ele in ele_x_at_y_rules:
                             ele_position = ele['position']
                             ele_element = ele['element']
+
+                            if ele_position > len(rule_spec.inputs['x']):
+                                raise utils.ValidationError(
+                                    f'Rule - {rule_spec_index} of '
+                                    f'answer group {ans_group_index} '
+                                    f'does not have the enough position '
+                                    f'to match for the '
+                                    f'HasElementXAtPositionY rule above.'
+                                )
+
                             rule_choice = rule_spec.inputs['x'][
                                 ele_position - 1]
-
                             for choice in rule_choice:
                                 if choice == ele_element:
                                     raise utils.ValidationError(
@@ -2037,6 +2046,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # and as inside the interaction the code is very declarative we need
         # to figure out a way to put these validations following the
         # same format.
+        # TODO(#16490): Move the validations with strict mode together in every
+        # interaction.
         interaction_id_to_strict_validation_func = {
             'NumericInput': self._validate_numeric_input,
             'FractionInput': self._validate_fraction_input,

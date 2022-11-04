@@ -2197,6 +2197,26 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
             'rule_specs': [
                 {
+                    'rule_type': 'HasElementXAtPositionY',
+                    'inputs': {
+                        'x': 'ca_choices_0',
+                        'y': 4
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_0', 'ca_choices_1', 'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
                     'rule_type': (
                         'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
                     'inputs': {
@@ -2381,6 +2401,21 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
             state_domain.SubtitledHtml('ca_choices_2', '<p>3</p>')
         ]
+
+        self.state.interaction.customization_args[
+            'allowMultipleItemsInSamePosition'].value = True
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - 1 of answer group 0 '
+            'does not have the enough position to match for the '
+            'HasElementXAtPositionY rule above.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+
+        self.state.interaction.customization_args[
+            'allowMultipleItemsInSamePosition'].value = False
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'The rule \'0\' of answer group \'0\' '
