@@ -766,7 +766,7 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         self.assertEqual(author_details.author_bio, self.user_bio)
 
     def test_get_blog_author_details_model_raises_exception(self) -> None:
-        def _mock_get_author_details_by_author() -> None:
+        def _mock_get_author_details_by_author(unused_user_id: str) -> None:
             return None
 
         get_author_details_swap = self.swap(
