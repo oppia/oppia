@@ -28,12 +28,13 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
+def get_client():
+    """"""
+    return None
+
+
 class ReadFile(beam.PTransform):
     """Reads files form the GCS."""
-
-    @classmethod
-    def get_client(cls):
-        return None
 
     def expand(
        self, filenames: beam.PCollection
@@ -46,5 +47,8 @@ class ReadFile(beam.PTransform):
 
     def _read_file(self, filename: str) -> bytes:
         """Helper function to read the contents of a file."""
-        gcs = gcsio.GcsIO(self.get_client())
+        print("******************************")
+        print(get_client())
+        print(abc)
+        gcs = gcsio.GcsIO(storage_client = get_client())
         return gcs.open(filename, mode='r').read()

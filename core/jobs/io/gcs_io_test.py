@@ -59,13 +59,13 @@ class ReadFileTest(job_test_utils.PipelinedTestBase):
         random_comtent = os.urandom(1234)
         insert_random_file(client, file_name, random_comtent)
         filenames = [file_name]
-        with self.swap(gcs_io.ReadFile, 'get_client', types.MethodType(lambda _: client, gcs_io.ReadFile)):
+        with self.swap(gcs_io, 'get_client', types.MethodType(lambda _: client, gcs_io)):
             print("***********************")
-            print(gcs_io.ReadFile.get_client())
-            print(abc)
-            # filename_p_collec = (
-            #     self.pipeline
-            #     |'Create pcoll of filenames' >> beam.Create(filenames)
-            #     | 'Read file from GCS' >> gcs_io.ReadFile(client)
-            # )
-        # self.assert_pcoll_equal(filename_p_collec, [random_comtent])
+            print(gcs_io.get_client())
+
+            filename_p_collec = (
+                self.pipeline
+                |'Create pcoll of filenames' >> beam.Create(filenames)
+                | 'Read file from GCS' >> gcs_io.ReadFile(client)
+            )
+            self.assert_pcoll_equal(filename_p_collec, [random_comtent])
