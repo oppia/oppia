@@ -54,6 +54,9 @@ describe('Blog Pages functionality', function() {
   it('should only show published blog post on blog page, navigate to blog ' +
   'post page and show no recommendations', async function() {
     await blogPages.getBlogDashboardPage();
+    await blogDashboardPage.updateAuthorDetails(
+      'secondUser', 'Oppia Blog Author');
+
     await blogPages.saveBlogPostAsDraftFromBlogDashboard(
       'Draft blog post Title',
       'Hi there, I’m Oppia! I’m an online personal tutor for everybody!',
@@ -89,6 +92,8 @@ describe('Blog Pages functionality', function() {
     async function() {
       // Publishing 7 blog posts by user with username 'blog'.
       await blogPages.getBlogDashboardPage();
+      await blogDashboardPage.updateAuthorDetails(
+        'blog', 'Oppia Blog Author with name blog');
       await blogPages.publishNewBlogPostFromBlogDashboard(
         'Blog post Title Two',
         'Hi there, I’m Oppia! I’m an online personal tutor for everybody!' +
