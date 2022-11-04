@@ -619,9 +619,9 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
         # Use an accepted audio extension in mismatched_filename
         # that differs from the uploaded file's audio type.
-        mismatched_filename = 'test.flac'
+        mismatched_filename = 'test.mp3'
         with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
+            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_FLAC),
             'rb', encoding=None
         ) as f:
             raw_audio = f.read()
