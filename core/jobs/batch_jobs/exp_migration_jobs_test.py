@@ -255,14 +255,11 @@ class MigrateExplorationJobTests(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 53)
 
         with swap_states_schema_48, swap_exp_schema_53:
-            exploration = self.save_new_valid_exploration(
-                self.NEW_EXP_ID,
-                owner_id=feconf.SYSTEM_COMMITTER_ID,
-                title=self.EXP_TITLE,
-                category='Algorithms',
-                correctness_feedback_enabled=True,
-                end_state_name='End'
-            )
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
+            exploration.states['Introduction'].update_interaction_id(None)
+            exp_services.save_new_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exploration)
 
             owner_action = user_services.get_user_actions_info(
                 feconf.SYSTEM_COMMITTER_ID)
@@ -310,7 +307,7 @@ class MigrateExplorationJobTests(
             'topic_name': 'topic',
             'chapter_title': 'Title 1',
             'story_title': 'A story title',
-            'content_count': 2,
+            'content_count': 1,
             'translation_counts': {},
             'translation_in_review_counts': {}}
 
