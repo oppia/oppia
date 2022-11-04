@@ -16,6 +16,7 @@
 
 """Jobs for UserSettingsModel profile picture."""
 
+from core.domain import user_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -40,16 +41,17 @@ class AuditInvalidProfilePictureJob(base_jobs.JobBase):
     def _get_invalid_image(self, picture_str):
         """"""
         invalid_image = []
-        if picture_str is None or picture_str.strip() == '':
-            invalid_image.append('image empty or None')
-
-        imgdata = base64.b64decode(picture_str)
-        image = Image.open(io.BytesIO(imgdata))
-        width, height = image.size
-        if width != 150 and height != 150:
+        try:
+            imgdata = base64.b64decode(picture_str)
+            image = Image.open(io.BytesIO(imgdata))
+            width, height = image.size
+            if width != 150 and height != 150:
+                invalid_image.append(
+                    'wrong dimensions - height = %s and width = %s' %(
+                        height, width))
+        except Exception:
             invalid_image.append(
-                'wrong dimensions - height = %s and width = %s' %(
-                    height, width))
+                f'Image is not base64 having value - {picture_str}')
 
         if len(invalid_image) != 0:
             return invalid_image
@@ -96,4 +98,37 @@ class AuditInvalidProfilePictureJob(base_jobs.JobBase):
 class FixInvalidProfilePictureJob(base_jobs.JobBase):
     """"""
 
-    
+    def _fix_invalid_images(self, user_model):
+        """"""
+        profile_picture_data = user_model.profile_picture_data_url
+
+        try:
+            imgdata = base64.b64decode(profile_picture_data)
+            Image.open(io.BytesIO(imgdata))
+        except Exception:
+            user_model.profile_picture_data_url = (
+                user_services.get_gravatar_url(user_model.email))
+
+        return user_model
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        fixed_user_profile_picture = (
+            self.pipeline
+            | 'Get all non-deleted UserSettingsModel' >> ndb_io.GetModels(
+                user_models.UserSettingsModel.get_all(include_deleted=False))
+            | 'Get invalid images' >> beam.Map(self._fix_invalid_images)
+        )
+
+        count_user_models_iterated = (
+            fixed_user_profile_picture
+            | 'Total count for user models' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'USER MODELS ITERATED'))
+        )
+
+        unused_put_results = (
+            fixed_user_profile_picture
+            | 'Put models into the datastore' >> ndb_io.PutModels()
+        )
+
+        return count_user_models_iterated
