@@ -22,11 +22,12 @@ from __future__ import annotations
 
 from core import schema_utils
 
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 
-# Here Dict[str, Any] is used for arg_schema because the value field of the
-# schema is itself a dict that can further contain several nested dicts.
+# Here we use type Any because the sub-classes of BaseHandler can contain
+# different schemas with different types of values, like str, complex Dicts
+# and etc.
 def get_schema_type(arg_schema: Dict[str, Any]) -> str:
     """Returns the schema type for an argument.
 
@@ -36,11 +37,13 @@ def get_schema_type(arg_schema: Dict[str, Any]) -> str:
     Returns:
         str. Returns schema type by extracting it from schema.
     """
-    return arg_schema['schema']['type']
+    schema_type: str = arg_schema['schema']['type']
+    return schema_type
 
 
-# Here Dict[str, Any] is used for arg_schema because the value field of the
-# schema is itself a dict that can further contain several nested dicts.
+# Here we use type Any because the sub-classes of BaseHandler can contain
+# different schemas with different types of values, like str, complex Dicts
+# and etc.
 def get_corresponding_key_for_object(arg_schema: Dict[str, Any]) -> str:
     """Returns the new key for an argument from its schema.
 
@@ -50,15 +53,19 @@ def get_corresponding_key_for_object(arg_schema: Dict[str, Any]) -> str:
     Returns:
         str. The new argument name.
     """
-    return arg_schema['schema']['new_key_for_argument']
+    new_key_for_argument: str = arg_schema['schema']['new_key_for_argument']
+    return new_key_for_argument
 
 
-# This function recursively uses the schema dictionary and handler_args, and
-# passes their values to itself as arguments, so their type is Any.
-# See: https://github.com/python/mypy/issues/731
+# Here we use type Any because the argument 'handler_args' is a dictionary
+# representation of arguments that needs to be validated and these arguments
+# can be of any type, and argument 'handler_args_schemas' is annotated with
+# Any type because this argument can contain schemas of the handler and those
+# schemas can be of different kinds of dictionaries. The return type also used
+# Any because this method returns normalized values of arguments.
 def validate_arguments_against_schema(
-    handler_args: Any,
-    handler_args_schemas: Any,
+    handler_args: Dict[str, Any],
+    handler_args_schemas: Dict[str, Any],
     allowed_extra_args: bool,
     allow_string_to_bool_conversion: bool = False
 ) -> Tuple[Dict[str, Any], List[str]]:
@@ -70,7 +77,7 @@ def validate_arguments_against_schema(
         handler_args_schemas: dict. Schema for args.
         allowed_extra_args: bool. Whether extra args are allowed in handler.
         allow_string_to_bool_conversion: bool. Whether to allow string to
-            boolean coversion.
+            boolean conversion.
 
     Returns:
         *. A two tuple, where the first element represents the normalized value
@@ -125,7 +132,7 @@ def validate_arguments_against_schema(
     return normalized_values, errors
 
 
-def convert_string_to_bool(param: str) -> Optional[Union[bool, str]]:
+def convert_string_to_bool(param: str) -> Union[bool, str]:
     """Converts a request param of type string into expected bool type.
 
     Args:
