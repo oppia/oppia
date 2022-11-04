@@ -188,7 +188,7 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
             result_after_migrations. list(dict). Result containing the info
             of missing content id and the translation before and after
             migration.
-        """ 
+        """
         info_for_missing_content_id = []
         info_for_content_updation = []
         result_after_migrations: (
