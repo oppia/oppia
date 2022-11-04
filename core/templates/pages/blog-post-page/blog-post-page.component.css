@@ -99,6 +99,26 @@ oppia-blog-post-page mat-card-content.blog-card-content p {
   text-align: left;
 }
 
+oppia-blog-post-page mat-card-content.blog-card-content ol {
+  color: #333;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 300;
+  letter-spacing: 0;
+  line-height: 30px;
+  text-align: left;
+}
+
+oppia-blog-post-page mat-card-content.blog-card-content strong {
+  font-weight: 600;
+}
+
+oppia-blog-post-page mat-card-content.blog-card-content blockquote {
+  box-shadow: inset 3px 0 0 0 rgb(41 41 41);
+  margin-left: -20px;
+  padding-left: 23px;
+}
+
 oppia-blog-post-page .blog-card-header-content .mat-card-avatar {
   cursor: pointer;
   height: 64px;
@@ -171,6 +191,16 @@ oppia-blog-post-page .post-to-recommend-section-heading {
     line-height: 20px;
   }
 
+  oppia-blog-post-page mat-card-content.blog-card-content ol {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 20px;
+  }
+
+  oppia-blog-post-page mat-card-content.blog-card-content strong {
+    font-weight: 600;
+  }
+
   oppia-blog-post-page mat-card-content.blog-card-content h1 {
     font-size: 18px;
     line-height: 26px;
@@ -228,6 +258,16 @@ oppia-blog-post-page .post-to-recommend-section-heading {
     font-weight: 300;
     line-height: 18px;
     margin-bottom: 12px;
+  }
+
+  oppia-blog-post-page mat-card-content.blog-card-content ol {
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 18px;
+  }
+
+  oppia-blog-post-page mat-card-content.blog-card-content strong {
+    font-weight: 600;
   }
 
   oppia-blog-post-page mat-card-content.blog-card-content h1 {
