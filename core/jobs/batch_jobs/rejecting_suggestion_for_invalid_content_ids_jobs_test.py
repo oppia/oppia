@@ -446,7 +446,7 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJobTests(
             job_run_result.JobRunResult(
                 stdout='GROUP OF SUGGESTION PER EXP SUCCESS: 1'
             ),
-            job_run_result.JobRunResult.as_stdout(
+            job_run_result.JobRunResult.as_stderr(
                 f'Results are - {errored_value}'
             )
         ])
