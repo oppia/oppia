@@ -22,6 +22,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import exp_domain
+from core.domain import html_cleaner
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -80,9 +81,20 @@ class RejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
             if not suggestion_change['content_id'] in total_content_ids:
                 suggestion.status = suggestion_models.STATUS_REJECTED
 
-            suggestion_change['translation_html'] = (
-                exp_domain.Exploration.fix_content(
-                    suggestion_change['translation_html']))
+            translation_html = suggestion_change['translation_html']
+            resulting_translation = []
+            if isinstance(translation_html, list):
+                for translation in translation_html:
+                    resulting_translation.append(
+                        exp_domain.Exploration.fix_content(translation)
+                    )
+                suggestion_change['translation_html'] = (
+                    [data for data in resulting_translation
+                    if not html_cleaner.is_html_empty(data)])
+
+            else:
+                suggestion_change['translation_html'] = (
+                    exp_domain.Exploration.fix_content(translation_html))
 
         return suggestions
 
@@ -162,7 +174,7 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
     def _report_errors_from_suggestion_models(
         suggestions: List[suggestion_models.GeneralSuggestionModel],
         exp_model: exp_models.ExplorationModel
-    ) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
+    ) -> List[Dict[str, Union[str, List[Dict[str, Union[List[str], str]]]]]]:
         """Audits the translation suggestion. Reports the following
         - The info related to suggestion in case the content id is missing
         - Before and after content of the translation_html.
@@ -180,7 +192,8 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
         info_for_missing_content_id = []
         info_for_content_updation = []
         result_after_migrations: (
-            List[Dict[str, Union[str, List[Dict[str, str]]]]]) = []
+            List[Dict[str, Union[str, List[Dict[str,
+            Union[List[str], str]]]]]]) = []
         total_content_ids = []
 
         for state in exp_model.states.values():
@@ -199,8 +212,31 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
                     }
                 )
 
-            html_before = suggestion_change['translation_html']
-            html_after = exp_domain.Exploration.fix_content(html_before)
+            html_before: Union[List[str], str] = suggestion_change[
+                'translation_html']
+            if isinstance(html_before, list):
+                # Ruling out the possibility of different types for
+                # mypy type checking.
+                assert isinstance(html_before, list)
+                html_after: Union[List[str], str] = []
+                assert isinstance(html_after, list)
+                for translation in html_before:
+                    html_after.append(
+                        exp_domain.Exploration.fix_content(translation)
+                    )
+
+                html_after = (
+                    [data for data in html_after
+                    if not html_cleaner.is_html_empty(data)])
+
+            else:
+                # Ruling out the possibility of different types for mypy
+                # type checking.
+                assert isinstance(html_before, str)
+                html_after = exp_domain.Exploration.fix_content(
+                    html_before)
+                assert isinstance(html_after, str)
+
             info_for_content_updation.append(
                 {
                     'content_before': html_before,
