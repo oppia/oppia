@@ -28,7 +28,7 @@ export function camelCaseFromHyphen(str: string): string {
 export function checkEditDistance(
   inputString: string,
   matchString: string,
-  reqdEditDistance: number
+  requiredEditDistance: number
 ): boolean {
   if (inputString === matchString) {
     return true;
@@ -51,5 +51,6 @@ export function checkEditDistance(
       }
     }
   }
-  return editDistance[inputString.length][matchString.length] <= reqdEditDistance;
+  return (editDistance[inputString.length][matchString.length] <=
+    requiredEditDistance);
 };
