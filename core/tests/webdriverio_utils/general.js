@@ -258,7 +258,7 @@ var openProfileDropdown = async function() {
 var openAboutDropdown = async function() {
   var aboutDropdown = $('.e2e-test-about-oppia-list-item');
   await action.click(
-    'About dropdown taking too long to be clickable.',
+    'About dropdown',
     aboutDropdown);
 };
 

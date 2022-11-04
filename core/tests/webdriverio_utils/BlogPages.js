@@ -26,7 +26,7 @@ var forms = require('../webdriverio_utils/forms.js');
 
 var BlogPages = function() {
   var blogDashboardPage = null;
-  var noResultsFoundShown = $('.e2e-test-no-results-shown');
+  var noResultsFoundContainer = $('.e2e-test-no-results-shown');
   var oppiaBlogHomePageCardContainer = $('.e2e-test-oppia-blog-home-page-card');
   var oppiaAuthorProfilePageCardContainer = $(
     '.e2e-test-oppia-author-profile-page-card');
@@ -42,7 +42,7 @@ var BlogPages = function() {
   var navigateToBlogHomePageButton = $('.e2e-test-back-button');
   var paginationNextButton = $('.e2e-test-pagination-next-button');
   var paginationPrevButton = $('.e2e-test-pagination-prev-button');
-  var pagination = $('.e2e-test-pagination');
+  var paginationContainer = $('.e2e-test-pagination');
   var searchInput = $('.e2e-test-search-input');
   var blogPostTilesSelector = function() {
     return $$('.e2e-test-blog-post-tile-item');
@@ -53,8 +53,6 @@ var BlogPages = function() {
 
   this.submitSearchQuery = async function(searchQuery) {
     await waitFor.pageToFullyLoad();
-    await waitFor.visibilityOf(
-      searchInput, 'Search input takes too long to appear');
     await action.clear('Search input', searchInput);
     await action.setValue('Search input', searchInput, searchQuery);
   };
@@ -72,11 +70,15 @@ var BlogPages = function() {
 
   this.expectNoResultsFoundShown = async function() {
     await this.waitForVisibilityOfBlogHomePageContainer();
-    expect(await noResultsFoundShown.isDisplayed()).toBe(true);
+    await waitFor.visibilityOf(
+      noResultsFoundContainer,
+      'No results found container taking too long to display');
   };
 
   this.expectBlogHomePageWelcomeHeadingToBeVisible = async function() {
-    expect(await blogHomepageWelcomeHeading.isDisplayed()).toBe(true);
+    await waitFor.visibilityOf(
+      blogHomepageWelcomeHeading,
+      'Blog Home Page Heading taking too long to display');
   };
 
   this.expectOppiaAvatarImageToBeVisible = async function() {
@@ -204,7 +206,9 @@ var BlogPages = function() {
 
   this.navigateToBlogHomePageWithBackButton = async function() {
     await action.click(
-      'Navigate back to blog home page', navigateToBlogHomePageButton);
+      'button to navigate back to blog home page',
+      navigateToBlogHomePageButton
+    );
     await waitFor.pageToFullyLoad();
     await this.waitForVisibilityOfBlogHomePageContainer();
   };
@@ -242,7 +246,9 @@ var BlogPages = function() {
       blogPostRecommendationTiles.map(async function(blogPostTile) {
         var blogPostTitle = await blogPostTile.$(
           '.e2e-test-blog-post-tile-title');
-        return blogPostTitle.getText();
+        var blogPostTitleText = await action.getText(
+          'Blog Post Tile Title', blogPostTitle);
+        return blogPostTitleText;
       })
     );
     expect(titleList).toContain(title);
@@ -284,7 +290,7 @@ var BlogPages = function() {
 
   this.moveToNextPage = async function() {
     await waitFor.visibilityOf(
-      pagination,
+      paginationContainer,
       'Pagination taking to long to display.'
     );
     await action.click('pagination next button', paginationNextButton);
@@ -292,7 +298,7 @@ var BlogPages = function() {
 
   this.moveToPrevPage = async function() {
     await waitFor.visibilityOf(
-      pagination,
+      paginationContainer,
       'Pagination taking to long to display.'
     );
     await action.click('pagination prev button', paginationPrevButton);
