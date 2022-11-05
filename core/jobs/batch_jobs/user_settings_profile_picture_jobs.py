@@ -16,17 +16,22 @@
 
 """Jobs for UserSettingsModel profile picture."""
 
+from __future__ import annotations
+
+import base64
+import io
+import logging
+
 from core.domain import user_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
-from PIL import Image
 
+from PIL import Image
 import apache_beam as beam
-import base64
-import io
+from typing import List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -36,20 +41,34 @@ if MYPY:  # pragma: no cover
 
 
 class AuditInvalidProfilePictureJob(base_jobs.JobBase):
-    """"""
+    """Audit job to fetch invalid images from UserSettingsModel."""
 
-    def _get_invalid_image(self, picture_str):
-        """"""
+    def _get_invalid_image(
+        self, picture_str: Optional[str]
+    ) -> Optional[List[str]]:
+        """Helper function to filter the invalid profile pictures.
+
+        Args:
+            picture_str: Optional[str]. The profile picture data.
+
+        Returns:
+            Optional[List[str]]. None, if the image is valid otherwise
+            the invalid image data.
+        """
         invalid_image = []
         try:
+            # Ruling out the possibility of different types for
+            # mypy type checking.
+            assert isinstance(picture_str, str)
             imgdata = base64.b64decode(picture_str)
             image = Image.open(io.BytesIO(imgdata))
             width, height = image.size
             if width != 150 and height != 150:
                 invalid_image.append(
-                    'wrong dimensions - height = %s and width = %s' %(
-                        height, width))
+                    f'wrong dimensions - height = {height} and width = %{width}'
+                )
         except Exception:
+            logging.exception('ERRORED EXCEPTION AUDIT')
             invalid_image.append(
                 f'Image is not base64 having value - {picture_str}')
 
@@ -62,6 +81,8 @@ class AuditInvalidProfilePictureJob(base_jobs.JobBase):
             self.pipeline
             | 'Get all non-deleted UserSettingsModel' >> ndb_io.GetModels(
                 user_models.UserSettingsModel.get_all(include_deleted=False))
+            | 'Filter valid users with not None username' >> beam.Filter(
+                lambda model: model.username is not None)
             | 'Get invalid images' >> beam.Map(
                 lambda model: (model.username, self._get_invalid_image(
                     model.profile_picture_data_url)))
@@ -96,18 +117,29 @@ class AuditInvalidProfilePictureJob(base_jobs.JobBase):
 
 
 class FixInvalidProfilePictureJob(base_jobs.JobBase):
-    """"""
+    """Fix invalid profile pictures insidr UserSettingsModel."""
 
-    def _fix_invalid_images(self, user_model):
-        """"""
+    def _fix_invalid_images(
+        self, user_model: user_models.UserSettingsModel
+    ) -> user_models.UserSettingsModel:
+        """Helper function to fix the invalid images.
+
+        Args:
+            user_model: user_models.UserSettingsModel. The UserSettingsModel.
+
+        Returns:
+            user_model: user_models.UserSettingsModel. The updated
+            UserSettingsModel.
+        """
         profile_picture_data = user_model.profile_picture_data_url
 
         try:
             imgdata = base64.b64decode(profile_picture_data)
             Image.open(io.BytesIO(imgdata))
         except Exception:
+            logging.exception('ERRORED EXCEPTION MIGRATION')
             user_model.profile_picture_data_url = (
-                user_services.get_gravatar_url(user_model.email))
+                user_services.fetch_gravatar(user_model.email))
 
         return user_model
 
@@ -116,6 +148,8 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
             self.pipeline
             | 'Get all non-deleted UserSettingsModel' >> ndb_io.GetModels(
                 user_models.UserSettingsModel.get_all(include_deleted=False))
+            | 'Filter user with valid usernames' >> beam.Filter(
+                lambda model: model.username is not None)
             | 'Get invalid images' >> beam.Map(self._fix_invalid_images)
         )
 
