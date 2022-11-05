@@ -186,6 +186,7 @@ export class AddAnswerGroupModalComponent
        AppConstants.COMPONENT_NAME_FEEDBACK);
      this.tmpOutcome = this.outcomeObjectFactory.createNew(
        this.questionModeEnabled ? null : this.stateName,
+       this.questionModeEnabled ? null : this.stateName,
        feedbackContentId, '', []);
    }
 
