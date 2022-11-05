@@ -56,8 +56,8 @@ def check_python_env_is_suitable() -> None:
         # https://docs.github.com/en/actions/learn-github-actions/environment-variables.
         return
     if os.environ.get('IS_DOCKER_CONTAINER', '') == 'True':
-        # The IS_DOCKER_CONTAINER environment variable indicates we are running in
-        # a Docker container.
+        # The IS_DOCKER_CONTAINER environment variable indicates we
+        # are running in a Docker container.
         return
     # There are two signals that a virtual environment is active:
     # * When sys.prefix != sys.base_prefix

@@ -183,11 +183,12 @@ class SetupTests(test_utils.GenericTestBase):
             'version_info', ['major', 'minor', 'micro'])
         version_swap = self.swap(
             sys, 'version_info', version_info(major=3, minor=4, micro=12))
-        with print_swap, uname_swap, version_swap, self.docker_container_swap, self.assertRaisesRegex(
-            Exception, 'No suitable python version found.'):
-            setup.test_python_version()
+        with print_swap, uname_swap, version_swap, self.docker_container_swap:
+            with self.assertRaisesRegex(
+                Exception, 'No suitable python version found.'):
+                setup.test_python_version()
         self.assertEqual(print_arr, [])
-    
+
     def test_python_version_testing_with_incorrect_version_and_docker_container(
         self
     ) -> None:
@@ -206,7 +207,8 @@ class SetupTests(test_utils.GenericTestBase):
         with print_swap, version_swap, docker_swap, self.assertRaisesRegex(
             Exception, 'No suitable python version found.'):
             setup.test_python_version()
-        self.assertEqual(print_arr, ['Please re-run `docker build -t oppia -f ubuntu_dockerfile .`'])
+        self.assertEqual(print_arr, [
+            'Please re-run `docker build -t oppia -f ubuntu_dockerfile .`'])
 
     def test_python_version_testing_with_incorrect_version_and_windows_os(
         self
@@ -243,9 +245,10 @@ class SetupTests(test_utils.GenericTestBase):
     def test_python_version_testing_with_python2_wrong_code(self) -> None:
         check_call_swap = self.swap_to_always_return(subprocess, 'call', 1)
 
-        with self.python2_print_swap, self.version_info_py38_swap, self.docker_container_swap:
-            with check_call_swap, self.assertRaisesRegex(SystemExit, '1'):
-                setup.test_python_version()
+        with self.python2_print_swap, self.version_info_py38_swap:
+            with self.docker_container_swap:
+                with check_call_swap, self.assertRaisesRegex(SystemExit, '1'):
+                    setup.test_python_version()
 
     def test_download_and_install_package(self) -> None:
         check_function_calls = {
