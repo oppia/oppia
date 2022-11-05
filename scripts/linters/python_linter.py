@@ -139,7 +139,7 @@ class ThirdPartyPythonLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, errors_found, error_messages, full_error_messages)
 
-    def check_import_order(self) -> TaskResult:
+    def check_import_order(self) -> concurrent_task_utils.TaskResult:
         """This function is used to check that each file
         has imports placed in alphabetical order.
 
@@ -166,7 +166,9 @@ class ThirdPartyPythonLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def perform_all_lint_checks(self) -> List[TaskResult]:
+    def perform_all_lint_checks(
+        self
+    ) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
