@@ -664,7 +664,7 @@ def generate_summary_of_blog_post(content: str) -> str:
     max_chars_in_summary = constants.MAX_CHARS_IN_BLOG_POST_SUMMARY - 3
     if len(raw_text) > max_chars_in_summary:
         summary = html.unescape(raw_text)[:max_chars_in_summary] + '...'
-        return summary
+        return summary.strip()
     return raw_text
 
 
