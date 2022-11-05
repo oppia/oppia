@@ -1395,6 +1395,28 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
+    def test_validate_translation_html_rte_tags(self) -> None:
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'], False, self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.change.translation_html = (
+            '<oppia-noninteractive-image></oppia-noninteractive-image>')
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Image tag does not have \'alt-with-value\' attribute.'
+        ):
+            suggestion.validate()
+
     def test_validate_language_code_fails_when_language_codes_do_not_match(
         self
     ) -> None:

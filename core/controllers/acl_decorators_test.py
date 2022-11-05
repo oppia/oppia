@@ -3486,12 +3486,13 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         'new_value': ''
     }
     CHANGE_DICT_2: Final = {
-        'cmd': 'add_translation',
+        'cmd': 'add_written_translation',
         'state_name': 'Introduction',
         'language_code': constants.DEFAULT_LANGUAGE_CODE,
         'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
         'content_html': '',
-        'translation_html': ''
+        'translation_html': '',
+        'data_format': 'html'
     }
 
     class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
