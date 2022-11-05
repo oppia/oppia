@@ -140,7 +140,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       12: {
-        text: '    dest_if_really_stuck: null',
+        text: '    dest_if_really_stuck: first',
         highlighted: false
       },
       13: {
@@ -291,7 +291,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       14: {
-        text: '        dest_if_really_stuck: null',
+        text: '        dest_if_really_stuck: first',
         highlighted: true
       },
       15: {
@@ -355,7 +355,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       30: {
-        text: '    dest_if_really_stuck: null',
+        text: '    dest_if_really_stuck: first',
         highlighted: false
       },
       31: {
