@@ -115,7 +115,7 @@ oppia-blog-post-page mat-card-content.blog-card-content strong {
 
 oppia-blog-post-page mat-card-content.blog-card-content blockquote {
   box-shadow: inset 3px 0 0 0 rgb(41 41 41);
-  margin-left: -20px;
+  margin-left: 20px;
   padding-left: 23px;
 }
 
