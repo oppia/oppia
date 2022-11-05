@@ -77,8 +77,9 @@
                   <mat-panel-title>
                     <div class="story-info-summary-container">
                       <div class="story-info-summary">
-                        <div class="story-title">{{ storyProgress.getTitle() }}</div>
-                        <div class="chapters-count-pill">{{ storyProgress.getNodeTitles().length }} {{ 'I18N_LEARNER_GROUP_SYLLABUS_LESSONS' | translate }}</div>
+                        <div class="story-title">
+                          {{ storyProgress.getTitle() }} | {{ storyProgress.getNodeTitles().length }} {{ 'I18N_LEARNER_GROUP_SYLLABUS_LESSONS' | translate }}
+                        </div>
                       </div>
                       <div class="drop-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
