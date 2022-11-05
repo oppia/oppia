@@ -86,7 +86,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             unused_path: str,
             unused_files: List[str],
             unused_shard: str,
-            unused_namespace: Optional[multiprocessing.managers.Namespace]
+            namespace: Optional[multiprocessing.managers.Namespace]  # pylint: disable=unused-argument
         ) -> List[str]:
             return []
 
@@ -125,7 +125,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
 
         def mock_get_filepaths_from_path(
             path: str,
-            _: Optional[multiprocessing.managers.Namespace]
+            namespace: Optional[multiprocessing.managers.Namespace] # pylint: disable=unused-argument
         ) -> List[str]:
             if path == mock_shards['1'][0]:
                 return [VALID_PY_FILEPATH]
@@ -150,7 +150,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
     def test_main_with_invalid_shards(self) -> None:
         def mock_get_filepaths_from_path(
             unused_path: str,
-            unused_namespace: Optional[multiprocessing.managers.Namespace]
+            namespace: Optional[multiprocessing.managers.Namespace] # pylint: disable=unused-argument
         ) -> List[str]:
             return ['mock_file', 'mock_file']
 
@@ -188,7 +188,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
     def test_main_with_other_shard(self) -> None:
         def mock_get_filepaths_from_path(
             path: str,
-            unused_namespace: Optional[multiprocessing.managers.Namespace]
+            namespace: Optional[multiprocessing.managers.Namespace] # pylint: disable=unused-argument
         ) -> List[str]:
             if os.path.abspath(path) == os.getcwd():
                 return [VALID_PY_FILEPATH, 'nonexistent_file']
