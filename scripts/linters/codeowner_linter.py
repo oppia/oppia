@@ -219,7 +219,7 @@ class CodeownerLintChecksManager:
         important_rules_in_critical_section = []
         file_patterns = []
         ignored_dir_patterns = []
-        for line_num, line in enumerate(self.file_cache.readlines(  # type: ignore[no-untyped-call]
+        for line_num, line in enumerate(self.file_cache.readlines(
                 CODEOWNER_FILEPATH)):
             stripped_line = line.strip()
             if '# Critical files' in line:

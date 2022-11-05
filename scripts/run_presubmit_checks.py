@@ -60,7 +60,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
     # Run Javascript and Python linters.
     print('Linting files since the last commit')
-    pre_commit_linter.main(args=[])  # type: ignore[no-untyped-call]
+    pre_commit_linter.main(args=[])
     print('Linting passed.')
     print('')
 

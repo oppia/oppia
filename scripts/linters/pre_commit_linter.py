@@ -176,7 +176,8 @@ class FileCache:
             tuple(str). The tuple containing data line by line as read from the
             file.
         """
-        return self._get_data(filepath, mode)[1]
+        _, line_by_line_content = self._get_data(filepath, mode)
+        return line_by_line_content
 
     def _get_data(
         self,
@@ -673,8 +674,8 @@ def main(args: Optional[List[str]] = None) -> None:
         multiprocessing.cpu_count(), third_party_max_concurrent_runs)
     third_party_semaphore = threading.Semaphore(third_party_concurrent_count)
 
-    custom_linters = []
-    third_party_linters = []
+    custom_linters: List[CustomLinterType] = []
+    third_party_linters: List[ThirdPartyLinterType] = []
     for file_extension_type in file_extension_types:
         if file_extension_type in ('js', 'ts'):
             if len(files['.js'] + files['.ts']) == 0:
@@ -691,17 +692,17 @@ def main(args: Optional[List[str]] = None) -> None:
     tasks_custom = []
     tasks_third_party = []
 
-    for linter in custom_linters:
-        name = _get_space_separated_linter_name(type(linter).__name__)
+    for _linter in custom_linters:
+        name = _get_space_separated_linter_name(type(_linter).__name__)
         task_custom = concurrent_task_utils.create_task(
-            linter.perform_all_lint_checks, verbose_mode_enabled,
+            _linter.perform_all_lint_checks, verbose_mode_enabled,
             custom_semaphore, name=name)
         tasks_custom.append(task_custom)
 
-    for linter in third_party_linters:
-        name = _get_space_separated_linter_name(type(linter).__name__)
+    for _third_party_linter in third_party_linters:
+        name = _get_space_separated_linter_name(type(_third_party_linter).__name__)
         task_third_party = concurrent_task_utils.create_task(
-            linter.perform_all_lint_checks, verbose_mode_enabled,
+            _third_party_linter.perform_all_lint_checks, verbose_mode_enabled,
             third_party_semaphore, name=name)
         tasks_third_party.append(task_third_party)
 

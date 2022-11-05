@@ -45,14 +45,14 @@ class CustomHTMLParser(html.parser.HTMLParser):
     def __init__(
         self,
         filepath: str,
-        file_lines: List[str],
+        file_lines: Tuple[str, ...],
         failed: bool = False
     ) -> None:
         """Define various variables to parse HTML.
 
         Args:
             filepath: str. Path of the file.
-            file_lines: list(str). List of the lines in the file.
+            file_lines: tuple(str). List of the lines in the file.
             failed: bool. True if the HTML indentation check fails.
         """
         html.parser.HTMLParser.__init__(self)
@@ -329,8 +329,8 @@ class HTMLLintChecksManager:
         name = 'HTML tag and attribute'
 
         for filepath in html_files_to_lint:
-            file_content = self.file_cache.read(filepath)  # type: ignore[no-untyped-call]
-            file_lines = self.file_cache.readlines(filepath)  # type: ignore[no-untyped-call]
+            file_content = self.file_cache.read(filepath)
+            file_lines = self.file_cache.readlines(filepath)
             parser = CustomHTMLParser(filepath, file_lines)
             parser.feed(file_content)
 
