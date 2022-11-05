@@ -63,6 +63,8 @@ import subprocess
 import sys
 import threading
 
+from typing import Tuple, List, Dict, Optional, Union
+
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
@@ -82,6 +84,22 @@ from . import python_linter  # isort:skip
 from .. import concurrent_task_utils  # isort:skip
 from .. import install_third_party_libs  # isort:skip
 
+CustomLinterType = Union[
+    general_purpose_linter.GeneralPurposeLinter,
+    js_ts_linter.JsTsLintChecksManager,
+    html_linter.HTMLLintChecksManager,
+    codeowner_linter.CodeownerLintChecksManager,
+    other_files_linter.CustomLintChecksManager
+]
+
+
+ThirdPartyLinterType = Union[
+    js_ts_linter.ThirdPartyJsTsLintChecksManager,
+    html_linter.ThirdPartyHTMLLintChecksManager,
+    css_linter.ThirdPartyCSSLintChecksManager,
+    python_linter.ThirdPartyPythonLintChecksManager
+]
+
 OTHER_SHARD_NAME = 'other'
 
 # Shards are specified by a mapping from shard name to a list of the
@@ -90,8 +108,8 @@ OTHER_SHARD_NAME = 'other'
 # shard name matching OTHER_SHARD_NAME includes all files not under
 # another shard.  Currently we are not sharding the lint checks, so the
 # only shard is the `other` shard that contains all files.
-SHARDS = {
-    'other': None,
+SHARDS: Dict[str, List[str]] = {
+    'other': [],
 }
 
 _PARSER = argparse.ArgumentParser()
@@ -127,10 +145,11 @@ for path in common.DIRS_TO_ADD_TO_SYS_PATH:
 class FileCache:
     """Provides thread-safe access to cached file content."""
 
-    def __init__(self):
-        self._CACHE_DATA_DICT = {}
+    def __init__(self) -> None:
+        self._CACHE_DATA_DICT: Dict[
+            Tuple[str, utils.TextModeTypes], Tuple[str, Tuple[str, ...]]] = {}
 
-    def read(self, filepath, mode='r'):
+    def read(self, filepath: str, mode: utils.TextModeTypes = 'r') -> str:
         """Returns the data read from the file in unicode form.
 
         Args:
@@ -142,7 +161,10 @@ class FileCache:
         """
         return self._get_data(filepath, mode)[0]
 
-    def readlines(self, filepath, mode='r'):
+    def readlines(
+        self, filepath: str,
+        mode: utils.TextModeTypes = 'r'
+    ) -> Tuple[str, ...]:
         """Returns the tuple containing data line by line as read from the
         file in unicode form.
 
@@ -156,7 +178,11 @@ class FileCache:
         """
         return self._get_data(filepath, mode)[1]
 
-    def _get_data(self, filepath, mode):
+    def _get_data(
+        self,
+        filepath: str,
+        mode: utils.TextModeTypes
+    ) -> Tuple[str, Tuple[str, ...]]:
         """Returns the collected data from the file corresponding to the given
         filepath.
 
@@ -177,7 +203,11 @@ class FileCache:
         return self._CACHE_DATA_DICT[key]
 
 
-def _get_linters_for_file_extension(file_extension_to_lint, namespace, files):
+def _get_linters_for_file_extension(
+    file_extension_to_lint: str,
+    namespace: multiprocessing.managers.Namespace,
+    files: Dict[str, List[str]]
+) -> Tuple[List[CustomLinterType], List[ThirdPartyLinterType]]:
     """Return linters for the given file extension type.
 
     Args:
@@ -192,8 +222,8 @@ def _get_linters_for_file_extension(file_extension_to_lint, namespace, files):
     """
     namespace.files = FileCache()
     file_cache = namespace.files
-    custom_linters = []
-    third_party_linters = []
+    custom_linters: List[CustomLinterType] = []
+    third_party_linters: List[ThirdPartyLinterType] = []
 
     file_extension_type_js_ts = file_extension_to_lint in ('js', 'ts')
 
@@ -204,46 +234,46 @@ def _get_linters_for_file_extension(file_extension_to_lint, namespace, files):
     else:
         general_files_to_lint = files['.%s' % file_extension_to_lint]
 
-    custom_linter, third_party_linter = general_purpose_linter.get_linters(
+    custom_linter, _ = general_purpose_linter.get_linters(
         general_files_to_lint, file_cache)
     custom_linters.append(custom_linter)
 
     if file_extension_type_js_ts:
-        custom_linter, third_party_linter = js_ts_linter.get_linters(
+        js_ts_lint_check_manager, third_party_js_ts_linter = js_ts_linter.get_linters(
             files['.js'], files['.ts'], file_cache)
-        custom_linters.append(custom_linter)
-        third_party_linters.append(third_party_linter)
+        custom_linters.append(js_ts_lint_check_manager)
+        third_party_linters.append(third_party_js_ts_linter)
 
     elif file_extension_to_lint == 'html':
-        custom_linter, third_party_linter = html_linter.get_linters(
+        html_lint_check_manager, third_party_html_linter = html_linter.get_linters(
             files['.html'], file_cache)
-        custom_linters.append(custom_linter)
-        third_party_linters.append(third_party_linter)
+        custom_linters.append(html_lint_check_manager)
+        third_party_linters.append(third_party_html_linter)
 
-        custom_linter, third_party_linter = (
+        _, third_party_css_linter = (
             css_linter.get_linters(files['.html']))
-        third_party_linters.append(third_party_linter)
+        third_party_linters.append(third_party_css_linter)
 
     elif file_extension_to_lint == 'css':
-        custom_linter, third_party_linter = (
+        _, third_party_css_linter = (
             css_linter.get_linters(files['.css']))
-        third_party_linters.append(third_party_linter)
+        third_party_linters.append(third_party_css_linter)
 
     elif file_extension_to_lint == 'py':
-        _, third_party_linter = python_linter.get_linters(files['.py'])
-        third_party_linters.append(third_party_linter)
+        _, third_party_python_linter = python_linter.get_linters(files['.py'])
+        third_party_linters.append(third_party_python_linter)
 
     elif file_extension_to_lint == 'other':
-        custom_linter, _ = codeowner_linter.get_linters(file_cache)
-        custom_linters.append(custom_linter)
+        code_owner_linter, _ = codeowner_linter.get_linters(file_cache)
+        custom_linters.append(code_owner_linter)
 
-        custom_linter, _ = other_files_linter.get_linters(file_cache)
-        custom_linters.append(custom_linter)
+        custom_lint_check_manager, _ = other_files_linter.get_linters(file_cache)
+        custom_linters.append(custom_lint_check_manager)
 
     return custom_linters, third_party_linters
 
 
-def _get_changed_filepaths():
+def _get_changed_filepaths() -> List[str]:
     """Returns a list of modified files (both staged and unstaged)
 
     Returns:
@@ -259,7 +289,10 @@ def _get_changed_filepaths():
     return [filepath.decode('utf-8') for filepath in all_changed_filepaths]
 
 
-def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
+def _get_all_files_in_directory(
+    dir_path: str,
+    excluded_glob_patterns: List[str]
+) -> List[str]:
     """Recursively collects all files in directory and
     subdirectories of specified path.
 
@@ -284,7 +317,7 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
-def _get_file_extensions(file_extensions_to_lint):
+def _get_file_extensions(file_extensions_to_lint: List[str]) -> List[str]:
     """This function is used to return the file extensions which need to be
     linted and checked.
 
@@ -311,12 +344,15 @@ def _get_file_extensions(file_extensions_to_lint):
             print('Exiting...')
             sys.exit(1)
 
-        return set(file_extensions_to_lint)
+        return list(set(file_extensions_to_lint))
 
     return all_file_extensions_type
 
 
-def _get_filepaths_from_path(input_path, namespace=None):
+def _get_filepaths_from_path(
+    input_path: str,
+    namespace: Optional[multiprocessing.managers.Namespace] = None
+) -> List[str]:
     """Get paths to all lintable files recursively under a path.
 
     This function applies some ignore rules (from .eslintignore) but not
@@ -330,6 +366,8 @@ def _get_filepaths_from_path(input_path, namespace=None):
     Returns:
         list. Paths to lintable files.
     """
+    if not namespace:
+        return []
     namespace.files = FileCache()
     file_cache = namespace.files
     input_path = os.path.join(os.getcwd(), input_path)
@@ -347,7 +385,10 @@ def _get_filepaths_from_path(input_path, namespace=None):
             input_path, excluded_glob_patterns)
 
 
-def _get_filepaths_from_non_other_shard(shard, namespace=None):
+def _get_filepaths_from_non_other_shard(
+    shard: str,
+    namespace: Optional[multiprocessing.managers.Namespace] = None
+) -> List[str]:
     """Get paths to lintable files in a shard besides the other shard.
 
     This function applies some ignore rules (from .eslintignore) but not
@@ -385,7 +426,9 @@ def _get_filepaths_from_non_other_shard(shard, namespace=None):
     return filepaths
 
 
-def _get_filepaths_from_other_shard(namespace=None):
+def _get_filepaths_from_other_shard(
+    namespace: Optional[multiprocessing.managers.Namespace] = None
+) -> List[str]:
     """Get paths to lintable files in the other shard.
 
     This function applies some ignore rules (from .eslintignore) but not
@@ -406,7 +449,11 @@ def _get_filepaths_from_other_shard(namespace=None):
 
 
 def _get_all_filepaths(
-        input_path, input_filenames, input_shard, namespace=None):
+    input_path: str,
+    input_filenames: List[str],
+    input_shard: str,
+    namespace: Optional[multiprocessing.managers.Namespace] = None
+) -> List[str]:
     """This function is used to return the filepaths which needs to be linted
     and checked.
 
@@ -460,10 +507,15 @@ def _get_all_filepaths(
     return all_matching_filepaths
 
 
-def read_files(file_paths, namespace=None):
+def read_files(
+    file_paths: List[str],
+    namespace: Optional[multiprocessing.managers.Namespace] = None
+) -> None:
     """Read all files to be checked and cache them. This will spin off multiple
     threads to increase the efficiency.
     """
+    if namespace is None:
+        return
     namespace.files = FileCache()
     file_cache = namespace.files
     threads = []
@@ -476,7 +528,7 @@ def read_files(file_paths, namespace=None):
         thread.join()
 
 
-def categorize_files(file_paths, files):
+def categorize_files(file_paths: List[str], files: Dict[str, List[str]]) -> None:
     """Categorize all the files and store them in shared variable files.
 
     Args:
@@ -486,7 +538,8 @@ def categorize_files(file_paths, files):
             '.js', '.css') or 'other'. Values are lists of files with that file
             extension.
     """
-    all_filepaths_dict = {
+    #TODO: FIX ME
+    all_filepaths_dict: Dict[str, List[str]] = {
         '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], '.css': []
     }
     for file_path in file_paths:
@@ -498,28 +551,28 @@ def categorize_files(file_paths, files):
     files.update(all_filepaths_dict)
 
 
-def _print_summary_of_error_messages(lint_messages):
+def _print_summary_of_error_messages(lint_messages: List[str]) -> None:
     """Print summary of linter error messages.
 
     Args:
         lint_messages: list(str). List of linter error messages.
     """
-    if lint_messages != '':
-        error_message_lines = [
-            '----------------------------------------',
-            'Please fix the errors below:',
-            '----------------------------------------',
-            ] + lint_messages
-        linter_utils.print_failure_message('\n'.join(error_message_lines))
+
+    error_message_lines = [
+        '----------------------------------------',
+        'Please fix the errors below:',
+        '----------------------------------------',
+        ] + lint_messages
+    linter_utils.print_failure_message('\n'.join(error_message_lines))
 
 
-def _get_task_output(lint_messages, failed, task):
+def _get_task_output(lint_messages: List[str], failed: bool, task: concurrent_task_utils.TaskThread) -> bool:
     """Returns output of running tasks.
 
     Args:
         lint_messages: list(str). List of summary messages of linter output.
         failed: bool. The boolean to check if lint checks fail or not.
-        task: object(TestingTaskSpec). The task object to get output of linter.
+        task: object(TaskThread). The task object to get output of linter.
 
     Returns:
         bool. The boolean to check if the lint checks fail or not.
@@ -532,11 +585,11 @@ def _get_task_output(lint_messages, failed, task):
     return failed
 
 
-def _print_errors_stacktrace(errors_stacktrace):
+def _print_errors_stacktrace(errors_stacktrace: List[Optional[str]]) -> None:
     """Print errors stacktrace caught during linter execution.
 
     Args:
-        errors_stacktrace: list(str). List of error stacktrace of lint
+        errors_stacktrace: list(str|none). List of error stacktrace of lint
             execution failure.
     """
     print('')
@@ -554,7 +607,7 @@ def _print_errors_stacktrace(errors_stacktrace):
         ' above errors gets fixed')
 
 
-def _get_space_separated_linter_name(linter_name):
+def _get_space_separated_linter_name(linter_name: str) -> str:
     """Returns the space separated name of the linter class.
 
     Args:
@@ -568,7 +621,7 @@ def _get_space_separated_linter_name(linter_name):
         r' \1', linter_name)
 
 
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> None:
     """Main method for pre commit linter script that lints Python, JavaScript,
     HTML, and CSS files.
     """
@@ -602,7 +655,7 @@ def main(args=None):
         return
 
     read_files(all_filepaths, namespace=namespace)
-    files = multiprocessing.Manager().dict()
+    files: Dict[str, List[str]] = multiprocessing.Manager().dict()
     categorize_files(all_filepaths, files)
 
     # Prepare custom tasks.
@@ -663,7 +716,7 @@ def main(args=None):
     concurrent_task_utils.execute_tasks(
         tasks_third_party, third_party_semaphore)
 
-    lint_messages = []
+    lint_messages: List[str] = []
     failed = False
 
     for task in tasks_custom:
