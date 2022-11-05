@@ -5746,6 +5746,8 @@ export default {
     "LIST": "list"
   },
 
+  "EMAIL_REGEX": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+",
+
   "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
     "name": "Commonly Used",
     "interaction_ids": [
