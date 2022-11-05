@@ -148,6 +148,41 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
         self.render_json({})
 
 
+class AndroidListSubscriptionHandler(base.BaseHandler):
+    """Adds user to Android mailing list."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'email': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.EMAIL_REGEX
+                    }]
+                }
+            },
+            'name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_nonempty'
+                    }]
+                }
+            }
+        }
+    }
+
+    @acl_decorators.open_access
+    def put(self):
+        """Handles PUT request."""
+        email = self.normalized_payload.get('email')
+        name = self.normalized_payload.get('name')
+        status = user_services.add_user_to_android_list(email, name)
+        self.render_json({'status': status})
+
+
 class PreferencesHandler(base.BaseHandler):
     """Provides data for the preferences page."""
 

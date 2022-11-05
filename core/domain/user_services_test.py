@@ -42,7 +42,7 @@ from core.tests import test_utils
 
 import requests_mock
 
-from typing import Final, List
+from typing import Dict, Final, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -648,6 +648,28 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_email_prefs.can_receive_subscription_email,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
+    def test_add_user_to_android_list(self) -> None:
+        def _mock_add_or_update_user_status(
+            unused_email: str,
+            merge_fields: Dict[str, str],
+            unused_tag: str,
+            *,
+            can_receive_email_updates: bool
+        ) -> bool:
+            """Mocks bulk_email_services.add_or_update_user_status()."""
+            self.assertDictEqual(merge_fields, {
+                'NAME': 'Name'
+            })
+            return can_receive_email_updates
+
+        fn_swap = self.swap(
+            bulk_email_services, 'add_or_update_user_status',
+            _mock_add_or_update_user_status)
+        with fn_swap:
+            self.assertTrue(
+                user_services.add_user_to_android_list(
+                    'email@example.com', 'Name'))
+
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'
         username = 'username'
@@ -689,10 +711,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
              'API, since this is a dev environment.' % user_email])
 
         def _mock_add_or_update_user_status(
-            _email: str, _can_receive_updates: bool
+            unused_email: str,
+            unused_merge_fields: Dict[str, str],
+            unused_tag: str,
+            *,
+            can_receive_email_updates: bool
         ) -> bool:
             """Mocks bulk_email_services.add_or_update_user_status()."""
-            return False
+            return not can_receive_email_updates
 
         send_mail_swap = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         bulk_email_swap = self.swap(

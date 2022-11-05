@@ -1695,6 +1695,24 @@ def record_user_created_an_exploration(user_id: str) -> None:
         _save_user_settings(user_settings)
 
 
+def add_user_to_android_list(email: str, name: str) -> bool:
+    """Adds user to the bulk email provider with the 'Android' tag and required
+    merge fields.
+
+    Args:
+        email: str. Email of the user.
+        name: str. Name of the user.
+
+    Returns:
+        bool. Whether the operation was successful or not.
+    """
+    merge_fields = {
+        'NAME': name
+    }
+    return bulk_email_services.add_or_update_user_status(
+        email, merge_fields, 'Android', can_receive_email_updates=True)
+
+
 def update_email_preferences(
     user_id: str,
     can_receive_email_updates: bool,
@@ -1745,7 +1763,8 @@ def update_email_preferences(
     if not bulk_email_db_already_updated and feconf.CAN_SEND_EMAILS:
         user_creation_successful = (
             bulk_email_services.add_or_update_user_status(
-                email, can_receive_email_updates))
+                email, {}, 'Web',
+                can_receive_email_updates=can_receive_email_updates))
         if not user_creation_successful:
             email_preferences_model.site_updates = False
             email_preferences_model.update_timestamps()
