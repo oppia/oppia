@@ -63,8 +63,7 @@ import subprocess
 import sys
 import threading
 
-from typing import Tuple, List, Dict, Optional, Union
-
+from typing import Dict, List, Optional, Tuple, Union
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
@@ -240,14 +239,16 @@ def _get_linters_for_file_extension(
     custom_linters.append(custom_linter)
 
     if file_extension_type_js_ts:
-        js_ts_lint_check_manager, third_party_js_ts_linter = js_ts_linter.get_linters(
-            files['.js'], files['.ts'], file_cache)
+        js_ts_lint_check_manager, third_party_js_ts_linter = (
+            js_ts_linter.get_linters(files['.js'], files['.ts'], file_cache)
+        )
         custom_linters.append(js_ts_lint_check_manager)
         third_party_linters.append(third_party_js_ts_linter)
 
     elif file_extension_to_lint == 'html':
-        html_lint_check_manager, third_party_html_linter = html_linter.get_linters(
-            files['.html'], file_cache)
+        html_lint_check_manager, third_party_html_linter = (
+            html_linter.get_linters(files['.html'], file_cache)
+        )
         custom_linters.append(html_lint_check_manager)
         third_party_linters.append(third_party_html_linter)
 
@@ -268,7 +269,9 @@ def _get_linters_for_file_extension(
         code_owner_linter, _ = codeowner_linter.get_linters(file_cache)
         custom_linters.append(code_owner_linter)
 
-        custom_lint_check_manager, _ = other_files_linter.get_linters(file_cache)
+        custom_lint_check_manager, _ = other_files_linter.get_linters(
+            file_cache
+        )
         custom_linters.append(custom_lint_check_manager)
 
     return custom_linters, third_party_linters
@@ -542,7 +545,6 @@ def categorize_files(
             '.js', '.css') or 'other'. Values are lists of files with that file
             extension.
     """
-    #TODO: FIX ME
     all_filepaths_dict: Dict[str, List[str]] = {
         '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], '.css': []
     }
@@ -570,7 +572,11 @@ def _print_summary_of_error_messages(lint_messages: List[str]) -> None:
     linter_utils.print_failure_message('\n'.join(error_message_lines))
 
 
-def _get_task_output(lint_messages: List[str], failed: bool, task: concurrent_task_utils.TaskThread) -> bool:
+def _get_task_output(
+    lint_messages: List[str],
+    failed: bool,
+    task: concurrent_task_utils.TaskThread
+) -> bool:
     """Returns output of running tasks.
 
     Args:
@@ -700,7 +706,9 @@ def main(args: Optional[List[str]] = None) -> None:
         tasks_custom.append(task_custom)
 
     for _third_party_linter in third_party_linters:
-        name = _get_space_separated_linter_name(type(_third_party_linter).__name__)
+        name = _get_space_separated_linter_name(
+            type(_third_party_linter).__name__
+        )
         task_third_party = concurrent_task_utils.create_task(
             _third_party_linter.perform_all_lint_checks, verbose_mode_enabled,
             third_party_semaphore, name=name)

@@ -21,16 +21,16 @@ from __future__ import annotations
 import io
 import os
 import re
-from typing import Tuple, List
 
 import isort.api
 import pycodestyle
 from pylint import lint
 from pylint.reporters import text
+from typing import List, Tuple
+
 
 from . import linter_utils
 from .. import concurrent_task_utils
-from ..concurrent_task_utils import TaskResult
 
 
 class ThirdPartyPythonLintChecksManager:
@@ -74,7 +74,7 @@ class ThirdPartyPythonLintChecksManager:
 
         return trimmed_lint_message
 
-    def lint_py_files(self) -> TaskResult:
+    def lint_py_files(self) -> concurrent_task_utils.TaskResult:
         """Prints a list of lint errors in the given list of Python files.
 
         Returns:

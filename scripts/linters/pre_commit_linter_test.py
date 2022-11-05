@@ -22,9 +22,9 @@ import multiprocessing
 import os
 import subprocess
 import sys
-from typing import List, Optional
 
 from core.tests import test_utils
+from typing import List, Optional
 
 from . import pre_commit_linter
 from .. import concurrent_task_utils

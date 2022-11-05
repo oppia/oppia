@@ -20,9 +20,9 @@ from __future__ import annotations
 
 import multiprocessing
 import os
-from typing import Dict, List
 
 from core.tests import test_utils
+from typing import Dict, List
 
 from . import pre_commit_linter
 from . import python_linter
