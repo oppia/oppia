@@ -120,6 +120,7 @@ class SetupTests(test_utils.GenericTestBase):
         self.version_info_py38_swap = self.swap(
             sys, 'version_info', version_info(major=3, minor=8, micro=12)
         )
+        self.docker_container_swap = common.swap_env('IS_DOCKER_CONTAINER', '')
         self.python2_print_swap = self.swap_with_checks(
             builtins,
             'print',
@@ -161,7 +162,7 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertFalse(check_function_calls['makedirs_is_called'])
 
     def test_python_version_testing_with_correct_version(self) -> None:
-        with self.version_info_py38_swap:
+        with self.version_info_py38_swap, self.docker_container_swap:
             setup.test_python_version()
 
     def test_python_version_testing_with_incorrect_version_and_linux_os(
@@ -182,10 +183,30 @@ class SetupTests(test_utils.GenericTestBase):
             'version_info', ['major', 'minor', 'micro'])
         version_swap = self.swap(
             sys, 'version_info', version_info(major=3, minor=4, micro=12))
-        with print_swap, uname_swap, version_swap, self.assertRaisesRegex(
+        with print_swap, uname_swap, version_swap, self.docker_container_swap, self.assertRaisesRegex(
             Exception, 'No suitable python version found.'):
             setup.test_python_version()
         self.assertEqual(print_arr, [])
+    
+    def test_python_version_testing_with_incorrect_version_and_docker_container(
+        self
+    ) -> None:
+        print_arr: List[str] = []
+
+        def mock_print(msg_list: List[str]) -> None:
+            print_arr.extend(msg_list)
+
+        print_swap = self.swap(
+            common, 'print_each_string_after_two_new_lines', mock_print)
+        docker_swap = common.swap_env('IS_DOCKER_CONTAINER', 'True')
+        version_info = collections.namedtuple(
+            'version_info', ['major', 'minor', 'micro'])
+        version_swap = self.swap(
+            sys, 'version_info', version_info(major=3, minor=4, micro=12))
+        with print_swap, version_swap, docker_swap, self.assertRaisesRegex(
+            Exception, 'No suitable python version found.'):
+            setup.test_python_version()
+        self.assertEqual(print_arr, ['Please re-run `docker build -t oppia -f ubuntu_dockerfile .`'])
 
     def test_python_version_testing_with_incorrect_version_and_windows_os(
         self
@@ -202,7 +223,7 @@ class SetupTests(test_utils.GenericTestBase):
             'version_info', ['major', 'minor', 'micro'])
         version_swap = self.swap(
             sys, 'version_info', version_info(major=3, minor=4, micro=12))
-        with print_swap, os_name_swap, version_swap:
+        with print_swap, os_name_swap, version_swap, self.docker_container_swap:
             with self.assertRaisesRegex(
                 Exception, 'No suitable python version found.'):
                 setup.test_python_version()
@@ -222,7 +243,7 @@ class SetupTests(test_utils.GenericTestBase):
     def test_python_version_testing_with_python2_wrong_code(self) -> None:
         check_call_swap = self.swap_to_always_return(subprocess, 'call', 1)
 
-        with self.python2_print_swap, self.version_info_py38_swap:
+        with self.python2_print_swap, self.version_info_py38_swap, self.docker_container_swap:
             with check_call_swap, self.assertRaisesRegex(SystemExit, '1'):
                 setup.test_python_version()
 

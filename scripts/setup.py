@@ -49,8 +49,14 @@ def create_directory(directory_path: str) -> None:
 # It checks this input for a specific version of python and returns false
 # if it does not match the expected prefix.
 def test_python_version() -> None:
-    running_python_version = '{0[0]}.{0[1]}'.format(sys.version_info)
-    if running_python_version != '3.8':
+    running_python_version = '{0[0]}.{0[1]}.{0[2]}'.format(sys.version_info)
+    if os.environ.get('IS_DOCKER_CONTAINER', '') == 'True' and running_python_version != '3.8.15':
+            # The IS_DOCKER_CONTAINER environment variable indicates we are running in
+            # a Docker container.
+            common.print_each_string_after_two_new_lines([
+                'Please re-run `docker build -t oppia -f ubuntu_dockerfile .`'])
+            raise Exception('No suitable python version found.')
+    elif os.environ.get('IS_DOCKER_CONTAINER', '') == '' and running_python_version != '3.8.12':
         print('Please use Python 3.8.12. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
