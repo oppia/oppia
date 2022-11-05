@@ -727,16 +727,21 @@ def get_user_ids_by_role(role: str) -> List[str]:
     return [user.id for user in user_settings]
 
 
-def get_user_actions_info(user_id: str) -> user_domain.UserActionsInfo:
+def get_user_actions_info(
+    user_id: Optional[str]
+) -> user_domain.UserActionsInfo:
     """Gets user actions info for a user.
 
     Args:
-        user_id: str|None. The user ID of the user we want to get actions for.
+        user_id: str|None. The user ID of the user we want to get actions for,
+            or None if the user is not logged in.
 
     Returns:
         UserActionsInfo. User object with system committer user id.
     """
-    roles = get_user_roles_from_id(user_id)
+    roles = (
+        get_user_roles_from_id(user_id) if user_id else [feconf.ROLE_ID_GUEST]
+    )
     actions = role_services.get_all_actions(roles)
     return user_domain.UserActionsInfo(user_id, roles, actions)
 
