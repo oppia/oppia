@@ -55,6 +55,7 @@ from typing import Dict, Final, List, Optional, Sequence, Tuple, Type, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import feedback_models
     from mypy_imports import opportunity_models
@@ -79,6 +80,7 @@ if MYPY:  # pragma: no cover
 ])
 
 search_services = models.Registry.import_search_services()
+datastore_services = models.Registry.import_datastore_services()
 
 # TODO(msl): Test ExpSummaryModel changes if explorations are updated,
 # reverted, deleted, created, rights changed.
@@ -6763,14 +6765,24 @@ title: Old Title
         self
     ) -> None:
         self.save_new_valid_exploration('exp_id', 'user_id')
-
         exploration_model = exp_models.ExplorationModel.get('exp_id')
-        exploration_model.version = 0
+        exploration = exp_fetchers.get_exploration_from_model(exploration_model)
+        exploration.version = 2
 
-        with self.assertRaisesRegex(
+        def _mock_apply_change_list(
+            *args: str, **kwargs: str
+        ) -> None:
+            """Mocks exp_fetchers.get_exploration_by_id()."""
+            return exploration
+
+        fetch_swap = self.swap(
+            exp_services, 'apply_change_list',
+            _mock_apply_change_list)
+
+        with fetch_swap, self.assertRaisesRegex(
             Exception,
-            'Unexpected error: trying to update version 0 of exploration '
-            'from version 1. Please reload the page and try again.'):
+            'Unexpected error: trying to update version 1 of exploration '
+            'from version 2. Please reload the page and try again.'):
             exp_services.update_exploration(
                 'user_id', 'exp_id', [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
