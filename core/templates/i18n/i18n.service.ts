@@ -107,7 +107,10 @@ export class I18nService {
           }
         } else {
           const parser = new URL(this.windowRef.nativeWindow.location.href);
-          const urlParamDir = parser.searchParams.get('dir');
+          let urlParamDir = parser.searchParams.get('dir');
+          if (urlParamDir === null) {
+            urlParamDir = 'ltr';
+          }
           if (urlParamDir === langDirection) {
             return;
           }
