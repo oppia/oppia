@@ -47,11 +47,18 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 
 from typing import Dict, Final, List, TypedDict, Union, cast
 import webapp2
 import webtest
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class OpenAccessDecoratorTests(test_utils.GenericTestBase):
@@ -6868,7 +6875,16 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(self.old_content))
         exploration.states['State 3'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
-        exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
+        exp_models = (
+            exp_services._compute_models_for_updating_exploration( # pylint: disable=protected-access
+                self.author_id,
+                exploration,
+                '',
+                []
+            )
+        )
+        datastore_services.update_timestamps_multi(exp_models)
+        datastore_services.put_multi(exp_models)
 
         rights_manager.publish_exploration(self.author, self.exploration_id)
 

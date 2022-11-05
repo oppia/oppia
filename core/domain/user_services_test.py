@@ -50,6 +50,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import auth_models
     from mypy_imports import user_models
 
+datastore_services = models.Registry.import_datastore_services()
 (auth_models, user_models, audit_models) = (models.Registry.import_models([
     models.Names.AUTH,
     models.Names.USER,
@@ -1935,45 +1936,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             prev_started_state
         )
 
-    def test_create_user_contributions_with_bot_user_id_returns_none(
-        self
-    ) -> None:
-        user_id = feconf.MIGRATION_BOT_USER_ID
-        created_exp_ids = ['exp1', 'exp2', 'exp3']
-        edited_exp_ids = ['exp2', 'exp3', 'exp4']
-
-        user_contrib = user_services.create_user_contributions(
-            user_id,
-            created_exp_ids,
-            edited_exp_ids)
-
-        self.assertIsNone(user_contrib)
-
-    def test_create_user_contributions_already_existing_raises_error(
-        self
-    ) -> None:
-        auth_id = 'someUser'
-        user_email = 'user@example.com'
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        contributions = user_services.get_user_contributions(
-            user_id, strict=True
-        )
-        # Check that the user contributions for this user ID already exist.
-        # (Note that user contributions are created automatically when a new
-        # user is created.)
-        self.assertIsNotNone(contributions)
-        self.assertIsInstance(contributions, user_domain.UserContributions)
-
-        with self.assertRaisesRegex(
-            Exception,
-            'User contributions model for user %s already exists.'
-            % user_id
-        ):
-            user_services.create_user_contributions(
-                user_id,
-                ['expectedId1', 'expectedId2', 'expectedId3'],
-                ['expectedId2', 'expectedId3', 'expectedId4'])
-
     def test_create_user_contributions(self) -> None:
         auth_id = 'someUser'
         user_email = 'user@example.com'
@@ -1995,9 +1957,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             pre_add_contributions.edited_exploration_ids)
 
         for created_exp_id in created_exp_ids:
-            user_services.add_created_exploration_id(user_id, created_exp_id)
+            pre_add_contributions.add_created_exploration_id(
+                created_exp_id
+            )
         for edited_exp_id in edited_exp_ids:
-            user_services.add_edited_exploration_id(user_id, edited_exp_id)
+            pre_add_contributions.add_edited_exploration_id(
+                edited_exp_id
+            )
+        user_services.save_user_contributions(pre_add_contributions)
 
         contributions = user_services.get_user_contributions(
             user_id, strict=True
@@ -2065,26 +2032,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertNotIn('exp1', contributions.created_exploration_ids)
 
-        user_services.add_created_exploration_id(user_id, 'exp1')
+        contributions.add_created_exploration_id('exp1')
+        user_services.save_user_contributions(contributions)
         contributions = user_services.get_user_contributions(
             user_id, strict=True
         )
-        self.assertIn('exp1', contributions.created_exploration_ids)
-
-    def test_add_created_exploration_id_creates_user_contribution(self) -> None:
-        user_id = 'id_x'
-
-        pre_add_contributions = user_services.get_user_contributions(
-            user_id, strict=False
-        )
-        self.assertIsNone(pre_add_contributions)
-
-        user_services.add_created_exploration_id(user_id, 'exp1')
-        contributions = user_services.get_user_contributions(
-            user_id, strict=True
-        )
-
-        self.assertIsInstance(contributions, user_domain.UserContributions)
         self.assertIn('exp1', contributions.created_exploration_ids)
 
     def test_add_edited_exploration_id(self) -> None:
@@ -2097,27 +2049,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertNotIn('exp1', contributions.edited_exploration_ids)
 
-        user_services.add_edited_exploration_id(user_id, 'exp1')
+        contributions.add_edited_exploration_id('exp1')
+        user_services.save_user_contributions(contributions)
         contributions = user_services.get_user_contributions(
             user_id, strict=True
         )
         self.assertIn('exp1', contributions.edited_exploration_ids)
-
-    def test_add_edited_exploration_id_creates_user_contribution(self) -> None:
-        user_id = 'id_x'
-
-        pre_add_contributions = user_services.get_user_contributions(user_id)
-        self.assertIsNone(pre_add_contributions)
-
-        user_services.add_edited_exploration_id(user_id, 'exp1')
-        contributions = user_services.get_user_contributions(
-            user_id, strict=True
-        )
-
-        self.assertIsInstance(contributions, user_domain.UserContributions)
-        self.assertEqual(
-            ['exp1'],
-            contributions.edited_exploration_ids)
 
     def test_is_moderator(self) -> None:
         auth_id = 'someUser'
@@ -3272,7 +3209,8 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
             user_settings.last_edited_an_exploration -
             datetime.timedelta(hours=13))
         with self.mock_datetime_utcnow(mocked_datetime_utcnow):
-            user_services.record_user_edited_an_exploration(self.editor_id)
+            user_settings.record_user_edited_an_exploration()
+            user_services.save_user_settings(user_settings)
 
         editor_settings = user_services.get_user_settings(self.editor_id)
         previous_last_edited_an_exploration = (
