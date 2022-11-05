@@ -1,10 +1,10 @@
 from .mailchimpclient import MailChimpClient as MailChimpClient
 
-from typing import Any, Dict, List, Optional, Sequence, TypedDict
+from typing import Any, Dict, List, Optional, TypedDict
 
 
 class ListsDataDict(TypedDict):
-    members: List[Dict[str, str]]
+    members: List[Dict[str, Any]]
     update_existing: bool
 
 
@@ -26,7 +26,7 @@ class ListMembers:
     def create(
             self,
             list_id: Optional[str],
-            data: Dict[str, Sequence[str]]
+            data: Dict[str, Any]
     ) -> Dict[str, Any]: ...
 
     def get(

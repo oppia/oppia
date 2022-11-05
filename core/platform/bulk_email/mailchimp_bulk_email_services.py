@@ -27,7 +27,7 @@ from core import feconf
 import mailchimp3
 from mailchimp3 import mailchimpclient
 
-from typing import Dict, Optional, Sequence
+from typing import Any, Dict, Optional
 
 
 def _get_subscriber_hash(email: str) -> str:
@@ -78,7 +78,9 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
 
 def _create_user_in_mailchimp_db(
     client: mailchimp3.MailChimp,
-    subscribed_mailchimp_data: Dict[str, Sequence[str]]
+    # Here we use type Any because the value can be a list (for Tags) or dict
+    # (for merge_fields).
+    subscribed_mailchimp_data: Dict[str, Any]
 ) -> bool:
     """Creates a new user in the mailchimp database and handles the case where
     the user was permanently deleted from the database.
@@ -207,13 +209,18 @@ def add_or_update_user_status(
     if invalid_keys:
         raise Exception('Invalid Merge Fields: %s' % invalid_keys)
 
-    new_user_mailchimp_data = {
+    # Here we use type Any because the value can be a list (for Tags) or dict
+    # (for merge_fields), which will be added later depending on Android update
+    # or not.
+    new_user_mailchimp_data: Dict[str, Any] = {
         'email_address': user_email,
         'status': 'subscribed',
         'tags': [tag]
     }
 
-    subscribed_mailchimp_data = {
+    # Here we use type Any because the value can be dict (for merge_fields),
+    # which will be added later depending on Android update or not.
+    subscribed_mailchimp_data: Dict[str, Any] = {
         'email_address': user_email,
         'status': 'subscribed'
     }
