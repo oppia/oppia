@@ -111,7 +111,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         })
 
     @classmethod
-    def _generate_id(cls, exp_id: str) -> str:
+    def generate_id(cls, exp_id: str) -> str:
         """Generates a unique id for the training job of the form
         '[exp_id].[random hash of 16 chars]'.
 
@@ -177,7 +177,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             Exception. A model with the same ID already exists.
         """
 
-        instance_id = cls._generate_id(exp_id)
+        instance_id = cls.generate_id(exp_id)
         training_job_instance = cls(
             id=instance_id, algorithm_id=algorithm_id,
             interaction_id=interaction_id,
@@ -244,7 +244,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         job_models = []
         job_ids = []
         for job_dict in job_dicts_list:
-            instance_id = cls._generate_id(job_dict['exp_id'])
+            instance_id = cls.generate_id(job_dict['exp_id'])
             training_job_instance = cls(
                 id=instance_id, algorithm_id=job_dict['algorithm_id'],
                 interaction_id=job_dict['interaction_id'],
@@ -305,7 +305,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         })
 
     @classmethod
-    def _generate_id(
+    def get_entity_id(
         cls,
         exp_id: str,
         exp_version: int,
@@ -346,7 +346,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         """
         mapping_ids = []
         for state_name in state_names:
-            mapping_id = cls._generate_id(exp_id, exp_version, state_name)
+            mapping_id = cls.get_entity_id(exp_id, exp_version, state_name)
             mapping_ids.append(mapping_id)
         mapping_instances = cls.get_multi(mapping_ids)
         return mapping_instances
@@ -370,7 +370,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
             for the classifier exploration mapping. It returns None if the no
             entry for given <exp_id, exp_version, state_name> is found.
         """
-        mapping_id = cls._generate_id(exp_id, exp_version, state_name)
+        mapping_id = cls.get_entity_id(exp_id, exp_version, state_name)
         model = cls.get_by_id(mapping_id)
         return model
 
@@ -401,7 +401,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
             Exception. A model with the same ID already exists.
         """
 
-        instance_id = cls._generate_id(exp_id, exp_version, state_name)
+        instance_id = cls.get_entity_id(exp_id, exp_version, state_name)
         if not cls.get_by_id(instance_id):
             mapping_instance = cls(
                 id=instance_id, exp_id=exp_id, exp_version=exp_version,
@@ -432,7 +432,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         mapping_models = []
         mapping_ids = []
         for state_training_job_mapping in state_training_jobs_mappings:
-            instance_id = cls._generate_id(
+            instance_id = cls.get_entity_id(
                 state_training_job_mapping.exp_id,
                 state_training_job_mapping.exp_version,
                 state_training_job_mapping.state_name)

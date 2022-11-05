@@ -635,6 +635,25 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.num_completions_v2, 0)
         self.assertEqual(model.state_stats_mapping, {})
 
+    def test_create_analytics_model(self) -> None:
+        model_id = stats_models.ExplorationStatsModel.create(
+            'exp_id1', 1, 0, 0, 0, 0, 0, 0, {})
+        fetched_model = stats_models.ExplorationStatsModel.get_model(
+            'exp_id1', 1)
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert fetched_model is not None
+        self.assertEqual(fetched_model.id, model_id)
+        self.assertEqual(fetched_model.exp_id, 'exp_id1')
+        self.assertEqual(fetched_model.exp_version, 1)
+        self.assertEqual(fetched_model.num_starts_v1, 0)
+        self.assertEqual(fetched_model.num_actual_starts_v1, 0)
+        self.assertEqual(fetched_model.num_completions_v1, 0)
+        self.assertEqual(fetched_model.num_starts_v2, 0)
+        self.assertEqual(fetched_model.num_actual_starts_v2, 0)
+        self.assertEqual(fetched_model.num_completions_v2, 0)
+        self.assertEqual(fetched_model.state_stats_mapping, {})
+
     def test_get_multi_stats_models(self) -> None:
         stats_models.ExplorationStatsModel.create(
             'exp_id1', 1, 0, 0, 0, 0, 0, 0, {})

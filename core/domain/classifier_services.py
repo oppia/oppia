@@ -31,7 +31,7 @@ from core.domain import fs_services
 from core.domain import state_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, TypedDict
+from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -110,14 +110,22 @@ def verify_signature(
     return True
 
 
-def handle_trainable_states(
+def get_new_job_models_for_trainable_states(
     exploration: exp_domain.Exploration,
     state_names: List[str]
-) -> None:
+) -> List[
+        Union[
+            classifier_models.StateTrainingJobsMappingModel,
+            classifier_models.ClassifierTrainingJobModel
+        ]
+]:
     """Creates ClassifierTrainingJobModel instances for all the state names
     passed into the function. If this function is called with version number 1,
     we are creating jobs for all trainable states in the exploration. Otherwise,
     a new job is being created for the states where retraining is required.
+    Note that this does not actually create models in the datastore. It just
+    creates instances of the models and returns them. The caller of this method
+    is responsible for the put operation.
 
     Args:
         exploration: Exploration. The Exploration domain object.
@@ -125,7 +133,17 @@ def handle_trainable_states(
 
     Raises:
         Exception. No classifier algorithm found for the given interaction id.
+
+    Returns:
+        list(ClassifierTrainingJobModel|StateTrainingJobsMappingModel). The list
+        of job models corresponding to trainable states in the exploration.
     """
+    models_to_put: List[
+        Union[
+            classifier_models.ClassifierTrainingJobModel,
+            classifier_models.StateTrainingJobsMappingModel
+        ]
+    ] = []
     job_dicts_list: List[JobInfoDict] = []
     exp_id = exploration.id
     exp_version = exploration.version
@@ -164,9 +182,28 @@ def handle_trainable_states(
         })
 
     # Create all the classifier training jobs.
-    job_ids = classifier_models.ClassifierTrainingJobModel.create_multi(
-        job_dicts_list)
+    job_models = []
+    job_ids = []
+    for job_dict in job_dicts_list:
+        instance_id = (
+            classifier_models.ClassifierTrainingJobModel.generate_id(
+                job_dict['exp_id']
+            )
+        )
+        training_job_instance = classifier_models.ClassifierTrainingJobModel(
+            id=instance_id, algorithm_id=job_dict['algorithm_id'],
+            interaction_id=job_dict['interaction_id'],
+            exp_id=job_dict['exp_id'],
+            exp_version=job_dict['exp_version'],
+            next_scheduled_check_time=job_dict['next_scheduled_check_time'],
+            state_name=job_dict['state_name'], status=job_dict['status'],
+            training_data=job_dict['training_data'],
+            algorithm_version=job_dict['algorithm_version'])
 
+        job_models.append(training_job_instance)
+        job_ids.append(instance_id)
+
+    models_to_put.extend(job_models)
     # Create mapping for each job. For StateTrainingJobsMapping, we can
     # append domain objects to send to the state_training_jobs_mappings dict
     # because we know all the attributes required for creating the Domain
@@ -182,16 +219,34 @@ def handle_trainable_states(
         state_training_jobs_mapping.validate()
         state_training_jobs_mappings.append(state_training_jobs_mapping)
 
-    classifier_models.StateTrainingJobsMappingModel.create_multi(
-        state_training_jobs_mappings)
+    mapping_models = []
+    for state_training_job_mapping in state_training_jobs_mappings:
+        instance_id = (
+            classifier_models.StateTrainingJobsMappingModel.get_entity_id(
+                state_training_job_mapping.exp_id,
+                state_training_job_mapping.exp_version,
+                state_training_job_mapping.state_name
+            )
+        )
+        mapping_model = classifier_models.StateTrainingJobsMappingModel(
+            id=instance_id, exp_id=state_training_job_mapping.exp_id,
+            exp_version=state_training_job_mapping.exp_version,
+            state_name=state_training_job_mapping.state_name,
+            algorithm_ids_to_job_ids=(
+                state_training_job_mapping.algorithm_ids_to_job_ids
+            ))
+
+        mapping_models.append(mapping_model)
+    models_to_put.extend(mapping_models)
+    return models_to_put
 
 
-def handle_non_retrainable_states(
+def get_new_job_models_for_non_trainable_states(
     exploration: exp_domain.Exploration,
     state_names: List[str],
     exp_versions_diff: exp_domain.ExplorationVersionsDiff
-) -> List[str]:
-    """Creates new StateTrainingJobsMappingModel instances for all the
+) -> Tuple[List[str], List[classifier_models.StateTrainingJobsMappingModel]]:
+    """Returns list of StateTrainingJobsMappingModels for all the
     state names passed into the function. The mapping is created from the
     state in the new version of the exploration to the ClassifierTrainingJob of
     the state in the older version of the exploration. If there's been a change
@@ -202,6 +257,9 @@ def handle_non_retrainable_states(
     In this method, the current_state_name refers to the name of the state in
     the current version of the exploration whereas the old_state_name refers to
     the name of the state in the previous version of the exploration.
+    Note that this does not actually create models in the datastore. It just
+    creates instances of the models and returns them. The caller of this method
+    is responsible for the put operation.
 
     Args:
         exploration: Exploration. The Exploration domain object.
@@ -214,8 +272,12 @@ def handle_non_retrainable_states(
             number 1.
 
     Returns:
-        list(str). State names which don't have classifier model for previous
-        version of exploration.
+        tuple(list(str), list(StateTrainingJobsMappingModel)). A 2-tuple
+        whose elements are as follows:
+        - list(str). State names which don't have classifier model for previous
+            version of exploration.
+        - list(StateTrainingJobsMappingModel). StateTrainingJobsMappingModels
+            for all the state names passed into the function.
     """
     exp_id = exploration.id
     current_exp_version = exploration.version
@@ -256,10 +318,26 @@ def handle_non_retrainable_states(
         state_training_jobs_mapping.validate()
         state_training_jobs_mappings.append(state_training_jobs_mapping)
 
-    classifier_models.StateTrainingJobsMappingModel.create_multi(
-        state_training_jobs_mappings)
+    mapping_models = []
+    for state_training_job_mapping in state_training_jobs_mappings:
+        instance_id = (
+            classifier_models.StateTrainingJobsMappingModel.get_entity_id(
+                state_training_job_mapping.exp_id,
+                state_training_job_mapping.exp_version,
+                state_training_job_mapping.state_name
+            )
+        )
+        mapping_model = classifier_models.StateTrainingJobsMappingModel(
+            id=instance_id, exp_id=state_training_job_mapping.exp_id,
+            exp_version=state_training_job_mapping.exp_version,
+            state_name=state_training_job_mapping.state_name,
+            algorithm_ids_to_job_ids=(
+                state_training_job_mapping.algorithm_ids_to_job_ids
+            ))
 
-    return state_names_without_classifier
+        mapping_models.append(mapping_model)
+
+    return (state_names_without_classifier, mapping_models)
 
 
 def get_classifier_training_job_from_model(

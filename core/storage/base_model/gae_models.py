@@ -1259,6 +1259,51 @@ class VersionedModel(BaseModel):
             'The put() method is missing from the '
             'derived class. It should be implemented in the derived class.')
 
+    def get_models_to_put_values(
+        self,
+        committer_id: str,
+        commit_message: Optional[str],
+        commit_cmds: Sequence[
+            Mapping[str, change_domain.AcceptableChangeDictTypes]
+        ]
+    ) -> List[BaseModel]:
+        """Returns the models which should be put.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the change.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, should give sufficient information to
+                reconstruct the commit. Dict always contains:
+                    cmd: str. Unique command.
+                And then additional arguments for that command. For example:
+
+                {'cmd': 'AUTO_revert_version_number'
+                 'version_number': 4}
+
+        Returns:
+            list(BaseModel). The models which should be put.
+        """
+        commit_type = (
+            feconf.COMMIT_TYPE_CREATE
+            if self.version == 0
+            else feconf.COMMIT_TYPE_EDIT
+        )
+
+        models_to_put = self.compute_models_to_commit(
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            self._prepare_additional_models()
+        ).values()
+        models_to_put_values = []
+        for model_to_put in models_to_put:
+            # Here, we are narrowing down the type from object to BaseModel.
+            assert isinstance(model_to_put, BaseModel)
+            models_to_put_values.append(model_to_put)
+        return models_to_put_values
+
     def commit(
         self,
         committer_id: str,
@@ -1299,26 +1344,13 @@ class VersionedModel(BaseModel):
                 raise Exception(
                     'Invalid change list command: %s' % commit_cmd['cmd'])
 
-        commit_type = (
-            feconf.COMMIT_TYPE_CREATE
-            if self.version == 0
-            else feconf.COMMIT_TYPE_EDIT
+        models_to_put = self.get_models_to_put_values(
+            committer_id,
+            commit_message,
+            commit_cmds
         )
-
-        models_to_put = self.compute_models_to_commit(
-                committer_id,
-                commit_type,
-                commit_message,
-                commit_cmds,
-                self._prepare_additional_models()
-            )
-        models_to_put_values = []
-        for model_to_put in models_to_put.values():
-            # Here, we are narrowing down the type from object to BaseModel.
-            assert isinstance(model_to_put, BaseModel)
-            models_to_put_values.append(model_to_put)
-        BaseModel.update_timestamps_multi(models_to_put_values)
-        BaseModel.put_multi_transactional(models_to_put_values)
+        BaseModel.update_timestamps_multi(models_to_put)
+        BaseModel.put_multi_transactional(models_to_put)
 
     @classmethod
     def revert(

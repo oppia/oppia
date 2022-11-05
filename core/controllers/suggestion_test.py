@@ -45,6 +45,11 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
+
+datastore_services = models.Registry.import_datastore_services()
 (suggestion_models, feedback_models) = models.Registry.import_models([
     models.Names.SUGGESTION, models.Names.FEEDBACK])
 
@@ -102,7 +107,16 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(self.old_content))
         self.exploration.states['State 3'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
-        exp_services._save_exploration(self.editor_id, self.exploration, '', [])  # pylint: disable=protected-access
+        exp_models = (
+            exp_services._compute_models_for_updating_exploration( # pylint: disable=protected-access
+                self.editor_id,
+                self.exploration,
+                '',
+                []
+            )
+        )
+        datastore_services.update_timestamps_multi(exp_models)
+        datastore_services.put_multi(exp_models)
 
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         rights_manager.assign_role_for_exploration(

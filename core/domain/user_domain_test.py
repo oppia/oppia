@@ -569,31 +569,33 @@ class UserContributionsTests(test_utils.GenericTestBase):
             'to be a string'):
             self.user_contributions.validate()
 
-    def test_cannot_create_user_contributions_with_migration_bot(
-        self
-    ) -> None:
-        self.assertIsNone(
-            user_services.create_user_contributions(
-                feconf.MIGRATION_BOT_USER_ID, [], []))
-
-    def test_update_user_contributions(self) -> None:
+    def test_save_user_contributions(self) -> None:
         user_services.update_user_contributions(self.owner_id, ['e1'], ['e2'])
-
         contributions = user_services.get_user_contributions(
             self.owner_id, strict=True
         )
+
         self.assertEqual(contributions.user_id, self.owner_id)
         self.assertEqual(contributions.created_exploration_ids, ['e1'])
         self.assertEqual(contributions.edited_exploration_ids, ['e2'])
 
-    def test_cannot_create_user_contributions_with_existing_user_id(
-        self
-    ) -> None:
-        with self.assertRaisesRegex(
-            Exception,
-            'User contributions model for user %s already exists.'
-            % self.owner_id):
-            user_services.create_user_contributions(self.owner_id, [], [])
+        contributions.add_created_exploration_id('e3')
+        contributions.add_edited_exploration_id('e4')
+        user_services.save_user_contributions(contributions)
+
+        updated_contributions = user_services.get_user_contributions(
+            self.owner_id, strict=True
+        )
+
+        self.assertEqual(updated_contributions.user_id, self.owner_id)
+        self.assertEqual(
+            updated_contributions.created_exploration_ids,
+            ['e1', 'e3']
+        )
+        self.assertEqual(
+            updated_contributions.edited_exploration_ids,
+            ['e2', 'e4']
+        )
 
     def test_cannot_update_user_contributions_with_invalid_user_id(
         self
