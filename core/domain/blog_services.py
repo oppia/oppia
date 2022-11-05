@@ -657,7 +657,7 @@ def generate_summary_of_blog_post(content: str) -> str:
     raw_html = re.sub(
         '<strong>?(.*?)</strong>',
         '',
-        re.sub('<h1>?(.*?)</h1>', '', content,  flags=re.DOTALL),
+        re.sub('<h1>?(.*?)</h1>', '', content, flags=re.DOTALL),
         flags=re.DOTALL
     )
     raw_text = html_cleaner.strip_html_tags(raw_html)

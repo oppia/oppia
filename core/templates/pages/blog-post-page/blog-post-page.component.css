@@ -86,7 +86,6 @@ oppia-blog-post-page mat-card-content.blog-card-content h1 {
   line-height: 30px;
   margin-bottom: 2rem;
   margin-top: 3rem;
-  text-align: left;
 }
 
 oppia-blog-post-page mat-card-content.blog-card-content p {
@@ -96,7 +95,6 @@ oppia-blog-post-page mat-card-content.blog-card-content p {
   font-weight: 300;
   letter-spacing: 0;
   line-height: 30px;
-  text-align: left;
 }
 
 oppia-blog-post-page mat-card-content.blog-card-content ol {
@@ -106,7 +104,6 @@ oppia-blog-post-page mat-card-content.blog-card-content ol {
   font-weight: 300;
   letter-spacing: 0;
   line-height: 30px;
-  text-align: left;
 }
 
 oppia-blog-post-page mat-card-content.blog-card-content strong {
