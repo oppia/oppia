@@ -58,7 +58,7 @@ describe('Blog Card Preview Modal Component', () => {
     id: 'sampleBlogId',
     author_name: 'test_user',
     title: 'sample_title',
-    content: '<p>hello</p>',
+    content: '<p>hello</p><strong>HEllo</strong>',
     thumbnail_filename: 'image.png',
     tags: ['learners', 'news'],
     url_fragment: 'sample#url',
