@@ -105,6 +105,15 @@ CHANGE_DICT = {
     'translation_html': ERRORED_TRANSLATION_VALUE
 }
 
+CHANGE_DICT_WITH_LIST_TRANSLATION = {
+    'cmd': 'add_translation',
+    'content_id': 'invalid_content_id',
+    'language_code': 'hi',
+    'content_html': 'Content',
+    'state_name': 'Introduction',
+    'translation_html': [ERRORED_TRANSLATION_VALUE, '']
+}
+
 
 class RejectSuggestionWithMissingContentIdMigrationJobTests(
     job_test_utils.JobTestBase
@@ -219,6 +228,49 @@ class RejectSuggestionWithMissingContentIdMigrationJobTests(
         self.assertEqual(
             migrated_suggestion_2_model.change_cmd['translation_html'],
             '<p>Translation for content.</p>')
+
+    def test_invalid_suggestion_with_list_translation_is_migrated(self) -> None:
+        CHANGE_DICT_WITH_LIST_TRANSLATION['translation_html'] = [
+            ERRORED_TRANSLATION_VALUE, '']
+        CHANGE_DICT_WITH_LIST_TRANSLATION['content_id'] = 'invalid_content_id'
+        suggestion_3_invalid_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id='user1',
+            change_cmd=CHANGE_DICT_WITH_LIST_TRANSLATION,
+            score_category='irrelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type='exploration',
+            target_id=self.TARGET_ID,
+            target_version_at_submission=0,
+            language_code='bn'
+        )
+        suggestion_3_invalid_model.update_timestamps()
+        suggestion_models.GeneralSuggestionModel.put_multi([
+            suggestion_3_invalid_model])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='SUGGESTION ITERATED SUCCESS: 1'
+            )
+        ])
+
+        migrated_suggestion_invalid_model = (
+            suggestion_models.GeneralSuggestionModel.get(
+                suggestion_3_invalid_model.id)
+        )
+        self.assertEqual(
+            migrated_suggestion_invalid_model.status,
+            suggestion_models.STATUS_REJECTED
+        )
+        self.assertEqual(
+            migrated_suggestion_invalid_model.change_cmd['translation_html'], [
+                '<p><oppia-noninteractive-image alt-with-value="&amp;quot;'
+                '&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" '
+                'filepath-with-value="&amp;quot;img.svg&amp;quot;">'
+                '</oppia-noninteractive-image></p>'
+            ]
+        )
 
 
 class AuditRejectSuggestionWithMissingContentIdMigrationJobTests(
@@ -354,3 +406,58 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJobTests(
         self.assertEqual(
             migrated_suggestion_2_model.change_cmd['translation_html'],
             '<p>Translation for content.</p>')
+
+    def test_invalid_suggestion_list_type_is_reported_with_expected_data(
+        self
+    ) -> None:
+        CHANGE_DICT_WITH_LIST_TRANSLATION['content_id'] = 'invalid_id'
+        CHANGE_DICT_WITH_LIST_TRANSLATION[
+            'translation_html'] = [ERRORED_TRANSLATION_VALUE, '']
+        suggestion_3_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id='user1',
+            change_cmd=CHANGE_DICT_WITH_LIST_TRANSLATION,
+            score_category='irrelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type='exploration',
+            target_id=self.TARGET_ID,
+            target_version_at_submission=0,
+            language_code='bn'
+        )
+        suggestion_3_model.update_timestamps()
+        suggestion_models.GeneralSuggestionModel.put_multi([
+            suggestion_3_model])
+
+        errored_value = (
+            '{\'exp_id\': \'exp2\', \'missing_content_ids\': '
+            '[{\'content_id\': \'invalid_id\', \'state_name\': '
+            '\'Introduction\'}], \'content_translation\': '
+            '[{\'content_before\': [\'<p><oppia-noninteractive-image '
+            'filepath-with-value=\"&amp;quot;img.svg&amp;quot;\">'
+            '</oppia-noninteractive-image></p>\', \'\'], \'content_after\': '
+            '[\'<p><oppia-noninteractive-image alt-with-value=\"&amp;quot;&amp;'
+            'quot;\" caption-with-value=\"&amp;quot;&amp;quot;\" '
+            'filepath-with-value=\"&amp;quot;img.svg&amp;quot;\">'
+            '</oppia-noninteractive-image></p>\']}]}'
+        )
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='GROUP OF SUGGESTION PER EXP SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stderr(
+                f'Results are - {errored_value}'
+            )
+        ])
+
+        migrated_suggestion_3_model = (
+            suggestion_models.GeneralSuggestionModel.get(suggestion_3_model.id)
+        )
+        self.assertEqual(
+            migrated_suggestion_3_model.status,
+            suggestion_models.STATUS_IN_REVIEW
+        )
+        self.assertEqual(
+            migrated_suggestion_3_model.change_cmd['translation_html'],
+            [ERRORED_TRANSLATION_VALUE, ''])

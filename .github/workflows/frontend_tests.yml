@@ -39,7 +39,7 @@ jobs:
         num_runs: ${{ fromJson(needs.generate-job-strategy-matrix.outputs.job-strategy-matrix) }}
       fail-fast: false
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Describe filesystem
         run: |
           pwd
@@ -47,13 +47,13 @@ jobs:
           ls /home/runner/work/oppia
           ls /home/runner/work/oppia/oppia
           echo $GITHUB_WORKSPACE
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v3
         with:
           python-version: '3.8.12'
           architecture: 'x64'
       - uses: ./.github/actions/merge
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
@@ -70,7 +70,7 @@ jobs:
         run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
       - name: Uploading fronted coverage reports as an artifact
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: frontend-coverage-${{ matrix.num_runs }}
           path: /home/runner/work/oppia/karma_coverage_reports
@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-22.04
     if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Report failure if failed on oppia/oppia develop branch
         uses: ./.github/actions/send-webhook-notification
         with:
