@@ -151,7 +151,7 @@ describe('MultipleChoiceInputValidationService', () => {
       currentState, customizationArguments, [], goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.CRITICAL,
-      message: 'Please enter at least two choices.'
+      message: 'Please enter at least 2 choices.'
     }]);
   });
 

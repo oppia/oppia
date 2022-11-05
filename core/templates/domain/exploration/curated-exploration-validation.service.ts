@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { AppConstants } from 'app.constants';
 import { ExplorationSummaryBackendApiService, ExplorationSummaryBackendDict } from
   'domain/summary/exploration-summary-backend-api.service';
 import { ReadOnlyExplorationBackendApiService, FetchExplorationBackendResponse } from
@@ -92,22 +93,21 @@ export class CuratedExplorationValidationService {
   ***************************************** */
 
   // Interactions are restricted to a whitelist.
-  ALLOWED_INTERACTIONS = [
-    'Continue', 'EndExploration', 'MultipleChoiceInput', 'ItemSelectionInput',
-    'FractionInput', 'NumericInput', 'TextInput', 'DragAndDropSortInput',
-    'ImageClickInput', 'RatioExpressionInput', 'NumericExpressionInput',
-    'AlgebraicExpressionInput', 'MathEquationInput'];
-
   async getStatesWithRestrictedInteractions(
       explorationId: string): Promise<string[]> {
+    let allowedInteractionIds: string[] = [];
+    for (const category of (
+      AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES)) {
+      allowedInteractionIds.push(...category.interaction_ids);
+    }
     return this.readOnlyExplorationBackendApiService
       .fetchExplorationAsync(explorationId, null).then(
         (response: FetchExplorationBackendResponse) => {
           let invalidStateNames = [];
           for (const [stateName, stateDict] of Object.entries(
             response.exploration.states)) {
-            const interactionId = stateDict.interaction.id;
-            if (!this.ALLOWED_INTERACTIONS.includes(interactionId)) {
+            const interactionId = stateDict.interaction.id as string;
+            if (!allowedInteractionIds.includes(interactionId)) {
               invalidStateNames.push(stateName);
             }
           }
@@ -128,7 +128,9 @@ export class CuratedExplorationValidationService {
               const args = (
                 stateDict.interaction.customization_args as
                 MultipleChoiceInputCustomizationArgsBackendDict);
-              if (args.choices.value.length < 4) {
+              if (args.choices.value.length < (
+                AppConstants.MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_CURATED_EXP)
+              ) {
                 invalidStateNames.push(stateName);
               }
             }
