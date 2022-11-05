@@ -6771,7 +6771,7 @@ title: Old Title
 
         def _mock_apply_change_list(
             *args: str, **kwargs: str
-        ) -> None:
+        ) -> exp_domain.Exploration:
             """Mocks exp_fetchers.get_exploration_by_id()."""
             return exploration
 
