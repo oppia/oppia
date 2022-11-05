@@ -187,7 +187,9 @@ class ThirdPartyPythonLintChecksManager:
         return linter_stdout
 
 
-def get_linters(files_to_lint: List[str]) -> Tuple[None, ThirdPartyPythonLintChecksManager]:
+def get_linters(
+    files_to_lint: List[str]
+) -> Tuple[None, ThirdPartyPythonLintChecksManager]:
     """Creates ThirdPartyPythonLintChecksManager and returns it.
 
     Args:

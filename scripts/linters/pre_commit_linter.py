@@ -528,7 +528,10 @@ def read_files(
         thread.join()
 
 
-def categorize_files(file_paths: List[str], files: Dict[str, List[str]]) -> None:
+def categorize_files(
+    file_paths: List[str],
+    files: Dict[str, List[str]]
+) -> None:
     """Categorize all the files and store them in shared variable files.
 
     Args:
