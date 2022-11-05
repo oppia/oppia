@@ -634,10 +634,11 @@ describe('Question backend Api service', () => {
       questionBackendDict2);
 
     questionBackendApiService.fetchDiagnosticTestQuestionsAsync(
-      topicId).then(successHandler, failHandler);
+      topicId, ['questionId']).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/diagnostic_test_questions_handler_url/topicID1'
+      '/diagnostic_test_questions_handler_url/topicID1' +
+      '?exclude_question_ids=questionId'
     );
     expect(req.request.method).toEqual('GET');
 
@@ -672,10 +673,11 @@ describe('Question backend Api service', () => {
     let topicId = 'topicID1';
 
     questionBackendApiService.fetchDiagnosticTestQuestionsAsync(
-      topicId).then(successHandler, failHandler);
+      topicId, ['questionId']).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/diagnostic_test_questions_handler_url/topicID1'
+      '/diagnostic_test_questions_handler_url/topicID1' +
+      '?exclude_question_ids=questionId'
     );
     expect(req.request.method).toEqual('GET');
 

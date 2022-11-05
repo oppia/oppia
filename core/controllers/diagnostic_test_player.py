@@ -43,6 +43,21 @@ class DiagnosticTestPlayerPage(
         self.render_template('diagnostic-test-player-page.mainpage.html')
 
 
+def normalize_comma_separated_ids(comma_separated_ids: str) -> List[str]:
+    """Normalizes a string of comma-separated question IDs into a list of
+    question IDs.
+
+    Args:
+        comma_separated_ids: str. Comma separated topic IDs.
+
+    Returns:
+        list(str). A list of topic IDs.
+    """
+    if not comma_separated_ids:
+        return list([])
+    return list(comma_separated_ids.split(','))
+
+
 class DiagnosticTestQuestionsHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -63,12 +78,24 @@ class DiagnosticTestQuestionsHandler(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'exclude_question_ids': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': normalize_comma_separated_ids
+                }
+            }
+        }
     }
 
     @acl_decorators.open_access
     def get(self, topic_id: str) -> None:
+        # The list of question IDs that were already presented in the
+        # diagnostic test. The questions corresponding to these IDs should not
+        # be repeated.
+        exclude_question_ids: List[str] = self.normalized_request.get(
+            'exclude_question_ids', [])
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
@@ -77,37 +104,52 @@ class DiagnosticTestQuestionsHandler(
 
         diagnostic_test_skill_ids = topic.skill_ids_for_diagnostic_test
 
-        # From each skill, two questions were fetched. The first question
-        # (main question) will be presented to the learner initially and if the
-        # learner attempted incorrectly, then another question from the same
-        # skill (backup question) will be presented otherwise not. Hence the
-        # number of questions is twice the length of skill IDs.
-        question_count = len(diagnostic_test_skill_ids) * 2
+        skill_id_to_all_questions_fetchable_at_one_time = (
+            collections.defaultdict(list))
+        question_ids_for_fetched_skills = []
 
+        for skill_id in diagnostic_test_skill_ids:
+            questions = question_services.get_questions_by_skill_ids(
+                feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME,
+                [skill_id],
+                require_medium_difficulty=True
+            )
+            skill_id_to_all_questions_fetchable_at_one_time[skill_id] = (
+                questions)
+
+            question_ids_for_fetched_skills.extend(
+                [question.id for question in questions])
+
+        # A dict with skill ID as key and a list with a maximum of two
+        # questions as value. Among the two questions, one question should be
+        # considered as the main and the other should be considered as
+        # the backup.
         skill_id_to_questions_map: Dict[
-            str, List[question_domain.QuestionDict]] = (
+            str, List[question_domain.Question]] = (
                 collections.defaultdict(list))
 
-        questions = question_services.get_questions_by_skill_ids(
-            question_count,
-            diagnostic_test_skill_ids,
-            require_medium_difficulty=True
-        )
-        question_dicts = []
-        for question in questions:
-            question_dict = question.to_dict()
-            if question_dict not in question_dicts:
-                question_dicts.append(question_dict)
+        for skill_id, questions in (
+            skill_id_to_all_questions_fetchable_at_one_time.items()):
+            question_ids_for_other_diagnostic_test_skills = list(
+                set(question_ids_for_fetched_skills) -
+                set(question.id for question in questions)
+            )
+            # A list of question IDs, where each ID belongs to the questions
+            # that are already presented in the test or that belong to other
+            # skills. These IDs should not be considered in order to avoid the
+            # repetition of questions in the diagnostic test.
+            question_ids_to_exclude = (
+                question_ids_for_other_diagnostic_test_skills +
+                exclude_question_ids
+            )
+            for question in questions:
+                if question.id in question_ids_to_exclude:
+                    continue
 
-        for question_dict in question_dicts:
-            diagnostic_test_skill_id = list(
-                set(question_dict['linked_skill_ids']) &
-                set(diagnostic_test_skill_ids)
-            )[0]
-
-            if len(skill_id_to_questions_map[diagnostic_test_skill_id]) < 2:
-                skill_id_to_questions_map[diagnostic_test_skill_id].append(
-                    question_dict)
+                if len(skill_id_to_questions_map[skill_id]) < 2:
+                    skill_id_to_questions_map[skill_id].append(question)
+                else:
+                    break
 
         # A dict with skill ID as key and a nested dict as value. The nested
         # dict contains main_question and backup_question as keys and the
@@ -130,10 +172,10 @@ class DiagnosticTestQuestionsHandler(
             # considered the backup question.
             skill_id_to_questions_dict[skill_id][
                 feconf.DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN] = (
-                    linked_questions[0])
+                    linked_questions[0].to_dict())
             skill_id_to_questions_dict[skill_id][
                 feconf.DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP] = (
-                    linked_questions[1])
+                    linked_questions[1].to_dict())
 
         self.render_json(
             {'skill_id_to_questions_dict': skill_id_to_questions_dict}
