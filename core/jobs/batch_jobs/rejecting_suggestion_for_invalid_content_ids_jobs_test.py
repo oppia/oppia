@@ -344,7 +344,7 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJobTests(
             job_run_result.JobRunResult(
                 stdout='GROUP OF SUGGESTION PER EXP SUCCESS: 1'
             ),
-            job_run_result.JobRunResult.as_stderr(
+            job_run_result.JobRunResult.as_stdout(
                 f'Results are - {errored_value}'
             )
         ])
@@ -390,7 +390,7 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJobTests(
             job_run_result.JobRunResult(
                 stdout='GROUP OF SUGGESTION PER EXP SUCCESS: 1'
             ),
-            job_run_result.JobRunResult.as_stderr(
+            job_run_result.JobRunResult.as_stdout(
                 f'Results are - {errored_value}'
             )
         ])
@@ -446,7 +446,7 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJobTests(
             job_run_result.JobRunResult(
                 stdout='GROUP OF SUGGESTION PER EXP SUCCESS: 1'
             ),
-            job_run_result.JobRunResult.as_stderr(
+            job_run_result.JobRunResult.as_stdout(
                 f'Results are - {errored_value}'
             )
         ])

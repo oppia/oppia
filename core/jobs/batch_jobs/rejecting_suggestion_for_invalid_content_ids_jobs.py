@@ -313,7 +313,7 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJob(base_jobs.JobBase):
             suggestion_results
             | 'Report the suggestions data' >> beam.Map(
                 lambda result: (
-                    job_run_result.JobRunResult.as_stderr(
+                    job_run_result.JobRunResult.as_stdout(
                         f'Results are - {result}'
                     )
                 )
