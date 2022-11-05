@@ -431,7 +431,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
         check_status, error_messages = (
             general_purpose_linter.check_bad_pattern_in_file(
                 os.path.join(LINTER_TESTS_DIR, 'some_file.py'),
-                'unused_variable = 5 \n',
+                ('unused_variable = 5 \n',),
                 bad_pattern_regexp
             )
         )
