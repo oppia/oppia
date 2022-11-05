@@ -695,9 +695,7 @@ class SuggestionTranslateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.change.language_code)
 
-        if self.change.data_format == (
-            state_domain.WrittenTranslation.DATA_FORMAT_HTML
-        ):
+        if isinstance(self.change.translation_html, str):
             html_cleaner.validate_rte_tags(self.change.translation_html)
 
         if self.language_code is None:
