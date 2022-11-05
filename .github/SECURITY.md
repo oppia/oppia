@@ -126,4 +126,4 @@ If you wish to add more context or information, we recommend adding it after the
 
 ## References
 
-This document was developed with the help of the [OSS Vulnerability Guide](https://github.com/ossf/oss-vulnerability-guide) iand the [Secure Software Development Fundamentals course](https://github.com/ossf/secure-sw-dev-fundamentals/blob/main/secure_software_development_fundamentals.md) by the [Open Source Security Foundation](https://openssf.org/).
+This document was developed with the help of the [OSS Vulnerability Guide](https://github.com/ossf/oss-vulnerability-guide) and the [Secure Software Development Fundamentals course](https://github.com/ossf/secure-sw-dev-fundamentals/blob/main/secure_software_development_fundamentals.md) by the [Open Source Security Foundation](https://openssf.org/).
