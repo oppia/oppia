@@ -55,6 +55,7 @@ import { StateSolicitAnswerDetailsService } from 'components/state-editor/state-
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
+import { AndroidUpdatesBackendApiService } from 'domain/android-updates/android-updates-backend-api.service';
 import { BlogAdminBackendApiService } from 'domain/blog-admin/blog-admin-backend-api.service';
 import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
 import { BlogHomePageBackendApiService } from 'domain/blog/blog-homepage-backend-api.service';
@@ -431,8 +432,11 @@ import { ExplorationSaveService } from 'pages/exploration-editor-page/services/e
 import { ExplorationAutomaticTextToSpeechService } from 'pages/exploration-editor-page/services/exploration-automatic-text-to-speech.service';
 import { TeachOppiaModalBackendApiService } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal-backend-api.service';
 import { CompareVersionsService } from 'pages/exploration-editor-page/history-tab/services/compare-versions.service';
+import { ContributionAndReviewStatsBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-and-review-stats-backend-api.service';
+import { ContributionAndReviewStatsService } from 'pages/contributor-dashboard-page/services/contribution-and-review-stats.service';
 import { EntityCreationService } from 'pages/topic-editor-page/services/entity-creation.service';
 import { ClassroomAdminDataService } from 'pages/classroom-admin-page/services/classroom-admin-data.service';
+import { VoiceoverRecordingService } from 'pages/exploration-editor-page/translation-tab/services/voiceover-recording.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -445,6 +449,7 @@ export const angularServices: [string, Type<{}>][] = [
     AlgebraicExpressionInputRulesService],
   ['AlgebraicExpressionInputValidationService',
     AlgebraicExpressionInputValidationService],
+  ['AndroidUpdatesBackendApiService', AndroidUpdatesBackendApiService],
   ['AngularNameService', AngularNameService],
   ['AnswerClassificationService', AnswerClassificationService],
   ['AnswerGroupObjectFactory', AnswerGroupObjectFactory],
@@ -501,6 +506,9 @@ export const angularServices: [string, Type<{}>][] = [
   ['ContributionAndReviewService', ContributionAndReviewService],
   ['ContributionAndReviewBackendApiService',
     ContributionAndReviewBackendApiService],
+  ['ContributionAndReviewStatsService', ContributionAndReviewStatsService],
+  ['ContributionAndReviewStatsBackendApiService',
+    ContributionAndReviewStatsBackendApiService],
   ['ContributionOpportunitiesService', ContributionOpportunitiesService],
   ['ContributionOpportunitiesBackendApiService',
     ContributionOpportunitiesBackendApiService],
@@ -898,5 +906,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['TeachOppiaModalBackendApiService', TeachOppiaModalBackendApiService],
   ['CompareVersionsService', CompareVersionsService],
   ['EntityCreationService', EntityCreationService],
-  ['ClassroomAdminDataService', ClassroomAdminDataService]
+  ['ClassroomAdminDataService', ClassroomAdminDataService],
+  ['VoiceoverRecordingService', VoiceoverRecordingService]
 ];

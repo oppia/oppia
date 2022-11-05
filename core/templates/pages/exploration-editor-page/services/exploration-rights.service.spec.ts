@@ -26,7 +26,6 @@ import { ExplorationRightsService } from './exploration-rights.service';
 import { ExplorationRightsBackendApiService } from './exploration-rights-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 
-
 describe('Exploration rights service', () => {
   let ers: ExplorationRightsService = null;
   let als: AlertsService = null;
@@ -36,6 +35,7 @@ describe('Exploration rights service', () => {
   let clearWarningsSpy = null;
   let successHandler = null;
   let failHandler = null;
+  let alertsService: AlertsService;
   let serviceData = {
     rights: {
       owner_names: ['abc'],
@@ -53,6 +53,7 @@ describe('Exploration rights service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
+        AlertsService,
         {
           provide: ExplorationDataService,
           useValue: {
@@ -81,6 +82,7 @@ describe('Exploration rights service', () => {
     clearWarningsSpy = spyOn(als, 'clearWarnings').and.callThrough();
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
+    alertsService = TestBed.inject(AlertsService);
   });
 
   afterEach(() => {
@@ -271,6 +273,26 @@ describe('Exploration rights service', () => {
     tick();
 
     expect(ers.voiceArtistNames).toEqual(['voiceArtist']);
+  }));
+
+  it('should reject handler when saving a voice artist fails', fakeAsync(() => {
+    spyOn(
+      explorationRightsBackendApiService,
+      'assignVoiceArtistRoleAsyncPostData').and.returnValue(
+      Promise.reject());
+    spyOn(alertsService, 'addWarning').and.callThrough();
+
+    ers.assignVoiceArtistRoleAsync('voiceArtist').then(
+      successHandler, failHandler);
+    tick();
+
+    expect(
+      explorationRightsBackendApiService
+        .assignVoiceArtistRoleAsyncPostData
+    ).toHaveBeenCalled();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Could not assign voice artist to private activity.'
+    );
   }));
 
   it('should remove existing voice artist', fakeAsync(() => {

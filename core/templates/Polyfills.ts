@@ -18,6 +18,7 @@
 
 import 'globalthis/auto';
 import 'proxy-polyfill';
+import '@webcomponents/custom-elements';
 
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {
@@ -157,5 +158,19 @@ if (navigator.mediaDevices.getUserMedia === undefined) {
     return new Promise(function(resolve, reject) {
       getUserMedia.call(navigator, constraints, resolve, reject);
     });
+  };
+}
+
+// Object.entries() polyfill for Chrome 53 and below.
+if (!Object.entries) {
+  Object.entries = (obj: Object) => {
+    let objectProperties = Object.keys(obj);
+    let i = objectProperties.length;
+    let objectEntriesArray = new Array(i); // Preallocate the array.
+
+    while (i--) {
+      objectEntriesArray[i] = [objectProperties[i], obj[objectProperties[i]]];
+      return objectEntriesArray;
+    }
   };
 }

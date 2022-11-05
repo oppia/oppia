@@ -39,8 +39,8 @@ from core.platform import models
 
 import requests
 
-from typing import Dict, List, Optional, Sequence, overload
-from typing_extensions import Final, Literal, TypedDict
+from typing import (
+    Dict, Final, List, Literal, Optional, Sequence, TypedDict, overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -727,16 +727,21 @@ def get_user_ids_by_role(role: str) -> List[str]:
     return [user.id for user in user_settings]
 
 
-def get_user_actions_info(user_id: str) -> user_domain.UserActionsInfo:
+def get_user_actions_info(
+    user_id: Optional[str]
+) -> user_domain.UserActionsInfo:
     """Gets user actions info for a user.
 
     Args:
-        user_id: str|None. The user ID of the user we want to get actions for.
+        user_id: str|None. The user ID of the user we want to get actions for,
+            or None if the user is not logged in.
 
     Returns:
         UserActionsInfo. User object with system committer user id.
     """
-    roles = get_user_roles_from_id(user_id)
+    roles = (
+        get_user_roles_from_id(user_id) if user_id else [feconf.ROLE_ID_GUEST]
+    )
     actions = role_services.get_all_actions(roles)
     return user_domain.UserActionsInfo(user_id, roles, actions)
 
@@ -1690,6 +1695,24 @@ def record_user_created_an_exploration(user_id: str) -> None:
         _save_user_settings(user_settings)
 
 
+def add_user_to_android_list(email: str, name: str) -> bool:
+    """Adds user to the bulk email provider with the 'Android' tag and required
+    merge fields.
+
+    Args:
+        email: str. Email of the user.
+        name: str. Name of the user.
+
+    Returns:
+        bool. Whether the operation was successful or not.
+    """
+    merge_fields = {
+        'NAME': name
+    }
+    return bulk_email_services.add_or_update_user_status(
+        email, merge_fields, 'Android', can_receive_email_updates=True)
+
+
 def update_email_preferences(
     user_id: str,
     can_receive_email_updates: bool,
@@ -1740,7 +1763,8 @@ def update_email_preferences(
     if not bulk_email_db_already_updated and feconf.CAN_SEND_EMAILS:
         user_creation_successful = (
             bulk_email_services.add_or_update_user_status(
-                email, can_receive_email_updates))
+                email, {}, 'Web',
+                can_receive_email_updates=can_receive_email_updates))
         if not user_creation_successful:
             email_preferences_model.site_updates = False
             email_preferences_model.update_timestamps()
@@ -2292,33 +2316,6 @@ def can_review_translation_suggestions(
     user_contribution_rights = get_user_contribution_rights(user_id)
     reviewable_language_codes = (
         user_contribution_rights.can_review_translation_for_language_codes)
-    if language_code is not None:
-        return language_code in reviewable_language_codes
-    else:
-        return bool(reviewable_language_codes)
-
-
-def can_review_voiceover_applications(
-    user_id: str, language_code: Optional[str] = None
-) -> bool:
-    """Returns whether the user can review voiceover applications in any
-    language or in the given language.
-
-    NOTE: If the language_code is provided then this method will check whether
-    the user can review voiceover in the given language code else it will
-    check whether the user can review in any language.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        language_code: str. The code of the language.
-
-    Returns:
-        bool. Whether the user can review voiceover applications in any language
-        or in the given language.
-    """
-    user_contribution_rights = get_user_contribution_rights(user_id)
-    reviewable_language_codes = (
-        user_contribution_rights.can_review_voiceover_for_language_codes)
     if language_code is not None:
         return language_code in reviewable_language_codes
     else:

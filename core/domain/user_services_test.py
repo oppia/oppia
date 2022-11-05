@@ -42,8 +42,7 @@ from core.tests import test_utils
 
 import requests_mock
 
-from typing import List
-from typing_extensions import Final
+from typing import Dict, Final, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -649,6 +648,28 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_email_prefs.can_receive_subscription_email,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
+    def test_add_user_to_android_list(self) -> None:
+        def _mock_add_or_update_user_status(
+            unused_email: str,
+            merge_fields: Dict[str, str],
+            unused_tag: str,
+            *,
+            can_receive_email_updates: bool
+        ) -> bool:
+            """Mocks bulk_email_services.add_or_update_user_status()."""
+            self.assertDictEqual(merge_fields, {
+                'NAME': 'Name'
+            })
+            return can_receive_email_updates
+
+        fn_swap = self.swap(
+            bulk_email_services, 'add_or_update_user_status',
+            _mock_add_or_update_user_status)
+        with fn_swap:
+            self.assertTrue(
+                user_services.add_user_to_android_list(
+                    'email@example.com', 'Name'))
+
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'
         username = 'username'
@@ -690,10 +711,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
              'API, since this is a dev environment.' % user_email])
 
         def _mock_add_or_update_user_status(
-            _email: str, _can_receive_updates: bool
+            unused_email: str,
+            unused_merge_fields: Dict[str, str],
+            unused_tag: str,
+            *,
+            can_receive_email_updates: bool
         ) -> bool:
             """Mocks bulk_email_services.add_or_update_user_status()."""
-            return False
+            return not can_receive_email_updates
 
         send_mail_swap = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         bulk_email_swap = self.swap(
@@ -948,9 +973,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'ACCESS_CREATOR_DASHBOARD', 'EDIT_ANY_TOPIC',
             'ACCEPT_ANY_SUGGESTION', 'PUBLISH_OWNED_ACTIVITY',
             'PLAY_ANY_PUBLIC_ACTIVITY',
-            'ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION',
             'EDIT_ANY_SUBTOPIC_PAGE', 'VISIT_ANY_QUESTION_EDITOR_PAGE',
-            'ACCESS_LEARNER_DASHBOARD', 'ACTION_SUBMIT_VOICEOVER_APPLICATION',
+            'ACCESS_LEARNER_DASHBOARD',
             'EDIT_ANY_ACTIVITY', 'VISIT_ANY_TOPIC_EDITOR_PAGE',
             'SUGGEST_CHANGES', 'DELETE_OWNED_PRIVATE_ACTIVITY',
             'EDIT_OWNED_ACTIVITY', 'EDIT_SKILL_DESCRIPTION',
@@ -3777,18 +3801,6 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_contribution_rights.can_review_translation_for_language_codes,
             ['en', 'hi'])
 
-    def test_assign_user_review_voiceover_application_in_language(self) -> None:
-        self.assertFalse(
-            user_services.can_review_voiceover_applications(
-                self.voice_artist_id))
-
-        user_services.allow_user_to_review_voiceover_in_language(
-            self.voice_artist_id, 'hi')
-
-        self.assertTrue(
-            user_services.can_review_voiceover_applications(
-                self.voice_artist_id, language_code='hi'))
-
     def test_voiceover_review_assignement_adds_language_in_sorted_order(
         self
     ) -> None:
@@ -3973,19 +3985,6 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.can_review_translation_suggestions(
                 self.translator_id, language_code='hi'))
 
-    def test_remove_voiceover_review_rights_in_language(self) -> None:
-        user_services.allow_user_to_review_voiceover_in_language(
-            self.voice_artist_id, 'hi')
-        self.assertTrue(
-            user_services.can_review_voiceover_applications(
-                self.voice_artist_id, language_code='hi'))
-        user_services.remove_voiceover_review_rights_in_language(
-            self.voice_artist_id, 'hi')
-
-        self.assertFalse(
-            user_services.can_review_voiceover_applications(
-                self.voice_artist_id, language_code='hi'))
-
     def test_remove_question_review_rights(self) -> None:
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         self.assertTrue(
@@ -3996,34 +3995,6 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.assertFalse(
             user_services.can_review_question_suggestions(
                 self.question_reviewer_id))
-
-    def test_remove_contribution_reviewer(self) -> None:
-        user_services.allow_user_to_review_translation_in_language(
-            self.translator_id, 'hi')
-        user_services.allow_user_to_review_voiceover_in_language(
-            self.translator_id, 'hi')
-        user_services.allow_user_to_review_question(self.translator_id)
-        self.assertTrue(
-            user_services.can_review_translation_suggestions(
-                self.translator_id, language_code='hi'))
-        self.assertTrue(
-            user_services.can_review_voiceover_applications(
-                self.translator_id, language_code='hi'))
-        self.assertTrue(
-            user_services.can_review_question_suggestions(
-                self.translator_id))
-
-        user_services.remove_contribution_reviewer(self.translator_id)
-
-        self.assertFalse(
-            user_services.can_review_translation_suggestions(
-                self.translator_id, language_code='hi'))
-        self.assertFalse(
-            user_services.can_review_voiceover_applications(
-                self.translator_id, language_code='hi'))
-        self.assertFalse(
-            user_services.can_review_question_suggestions(
-                self.translator_id))
 
     def test_removal_of_all_review_rights_deletes_model(self) -> None:
         user_services.allow_user_to_review_translation_in_language(
