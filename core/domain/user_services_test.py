@@ -650,27 +650,25 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_add_user_to_android_list(self) -> None:
         def _mock_add_or_update_user_status(
-            email: str,
+            unused_email: str,
             merge_fields: Dict[str, str],
-            tag: str,
+            unused_tag: str,
             *,
             can_receive_email_updates: bool
         ) -> bool:
             """Mocks bulk_email_services.add_or_update_user_status()."""
-            return [email, merge_fields, tag, can_receive_email_updates]
+            self.assertDictEqual(merge_fields, {
+                'NAME': 'Name'
+            })
+            return can_receive_email_updates
 
         fn_swap = self.swap(
             bulk_email_services, 'add_or_update_user_status',
             _mock_add_or_update_user_status)
         with fn_swap:
-            return_value = user_services.add_user_to_android_list(
-                'email@example.com', 'Name')
-            self.assertEqual(return_value[0], 'email@example.com')
-            self.assertDictEqual(return_value[1], {
-                'NAME': 'Name'
-            })
-            self.assertEqual(return_value[2], 'Android')
-            self.assertEqual(return_value[3], True)
+            self.assertTrue(
+                user_services.add_user_to_android_list(
+                    'email@example.com', 'Name'))
 
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'
