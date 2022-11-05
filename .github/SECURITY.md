@@ -45,7 +45,7 @@ The tech lead will designate one VRT member as the VRT lead responsible for driv
 
 * **High-severity vulnerability**: The report identifies an exploitable security vulnerability that, if exploited, could result in any of the following:
 
-  * (Confidentiality) Unauthorized access to personal user data.
+  * (Confidentiality) Unauthorized access to any sensitive data that shouldn't be made public. Here, "sensitive data" generally refers to both private user data, as well as information that could be used to gain access to private user data; if in doubt, consult the data owners.
   * (Integrity) Unauthorized edits to any data.
   * (Availability) Degraded system performance of the platform for users.
 
@@ -72,13 +72,13 @@ A CVE should be requested for all security vulnerabilities. Since we create a Gi
 
 ### Develop a Patch
 
-Regardless of which approach we take, the VRT will prioritize developing a patch to fix the vulnerability. If the vulnerability is easily exploitable, remediation will take priority over all other work. Remediation should be completed within 7 days of the report being classified as a high-severity vulnerability.
+Regardless of which approach we take, the VRT will prioritize developing a patch to fix (or at least mitigate) the vulnerability. If the vulnerability is easily exploitable, mitigation will take priority over all other work. Mitigation should be completed within 7 days of the report being classified as a high-severity vulnerability. Once mitigated, additional remediation steps can be handled through our usual bug-fixing process.
 
 ## Disclose
 
 We generally follow a 90-day disclosure timeframe, meaning that we ask that reporters give us 90 days to fix vulnerabilities before publicly disclosing them. 90 days should be viewed as an upper bound, and we aim to remediate vulnerabilities as quickly as possible. In all cases, the disclosure timeline will be explicitly coordinated with the reporter, and we prefer to publicly disclose the vulnerability simultaneously with the reporter. Our disclosure will include credit for the reporter if they so wish.
 
-In rare cases, it may be appropriate to delay public disclosure even after the patch has been published and deployed. However, since our source code is public, we must assume that attackers will quickly reverse-engineer the vulnerability from our patch and so err on the side of disclosing early.
+In rare cases, it may be appropriate to delay public disclosure even after the patch has been published and deployed. However, since our source code is public, we must assume that attackers will quickly reverse-engineer the vulnerability from our patch, so we will err on the side of disclosing early.
 
 Our public disclosure should take the form of a published GitHub Security Advisory. Here is a template:
 
@@ -126,4 +126,4 @@ If you wish to add more context or information, we recommend adding it after the
 
 ## References
 
-This document was developed with the help of the [OSS Vulnerability Guide](https://github.com/ossf/oss-vulnerability-guide) by the [Open Source Security Foundation](https://openssf.org/).
+This document was developed with the help of the [OSS Vulnerability Guide](https://github.com/ossf/oss-vulnerability-guide) iand the [Secure Software Development Fundamentals course](https://github.com/ossf/secure-sw-dev-fundamentals/blob/main/secure_software_development_fundamentals.md) by the [Open Source Security Foundation](https://openssf.org/).
