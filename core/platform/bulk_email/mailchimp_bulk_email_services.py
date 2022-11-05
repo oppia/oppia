@@ -236,12 +236,16 @@ def add_or_update_user_status(
             'email_address': user_email,
             'status': 'subscribed',
             'tags': [tag],
-            'NAME': merge_fields['NAME']
+            'merge_fields': {
+                'NAME': merge_fields['NAME']
+            }
         }
         subscribed_mailchimp_data = {
             'email_address': user_email,
             'status': 'subscribed',
-            'NAME': merge_fields['NAME']
+            'merge_fields': {
+                'NAME': merge_fields['NAME']
+            }
         }
 
     try:
