@@ -93,6 +93,7 @@ export class I18nService {
             I18nLanguageCodeService.prevLangCode
           ) ? 'rtl' : 'ltr');
         this.translateService.use(code);
+        this.documentAttributeCustomizationService.addAttribute('lang', code);
         if (!!cookieSetDateMsecs &&
           +cookieSetDateMsecs > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
         ) {
@@ -101,7 +102,6 @@ export class I18nService {
             langDirection
           );
           this.cookieService.put('lang', code);
-          this.documentAttributeCustomizationService.addAttribute('lang', code);
           if (prevLangDirection !== langDirection) {
             this.windowRef.nativeWindow.location.reload();
           }
