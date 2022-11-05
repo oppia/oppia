@@ -95,14 +95,11 @@
                       <span>Lesson {{idx+1}}: {{chapterName}}</span>
                     </div>
                     <div class="chapter-progress-container" *ngIf="storiesChaptersProgress">
-                      <div class="chapter-progress" *ngIf="getVisitedCheckpointsCount(storyIndex, idx) > 0">
-                        <div class="chapter-progress-bar"></div>
-                        <div class="completed-progress-bar" [style.width.%]="getCompletedProgressBarWidth(storyIndex, idx)"></div>
-                        <div *ngFor="let checkpoint of getAllCheckpointsProgressOfChapter(storyIndex, idx); let checkpointIdx = index;" class="checkpoints-progress-node-container">
-                          <div class="checkpoints-progress-node" *ngIf="checkpoint == 0" title="Checkpoint Not Started">{{checkpointIdx + 1}}</div>
-                          <div class="checkpoints-progress-node completed-checkpoint" *ngIf="checkpoint == 1" title="Checkpoint Completed"></div>
-                          <div class="checkpoints-progress-node in-progress-checkpoint" *ngIf="checkpoint == 2" title="Checkpoint In Progress">{{checkpointIdx + 1}}</div>
-                        </div>
+                      <span *ngIf="getVisitedCheckpointsCount(storyIndex, idx) > 0" class="chapter-progress-percentage">
+                        {{getCompletedProgressBarWidth(storyIndex, idx)}}% complete &nbsp;
+                      </span>
+                      <div *ngIf="getVisitedCheckpointsCount(storyIndex, idx) > 0" class="chapter-progress-bar">
+                        <div class="chapter-progress-bar-fill" [style.width.%]="getCompletedProgressBarWidth(storyIndex, idx)"></div>
                       </div>
                       <div *ngIf="getVisitedCheckpointsCount(storyIndex, idx) === 0" class="chapter-not-started">
                         &#8212; {{'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET' | translate}} &#8212;
