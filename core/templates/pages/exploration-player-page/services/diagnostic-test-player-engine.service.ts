@@ -53,6 +53,7 @@ export class DiagnosticTestPlayerEngineService {
   private currentSkillId!: string;
   private numberOfAttemptedQuestions!: number;
   private focusLabel!: string;
+  private encounteredQuestionIds: string[] = [];
 
   constructor(
     private alertsService: AlertsService,
@@ -76,7 +77,7 @@ export class DiagnosticTestPlayerEngineService {
       this.diagnosticTestTopicTrackerModel.selectNextTopicIdToTest());
 
     this.questionBackendApiService.fetchDiagnosticTestQuestionsAsync(
-      this.currentTopicId).then((response) => {
+      this.currentTopicId, this.encounteredQuestionIds).then((response) => {
       this.diagnosticTestCurrentTopicStatusModel = (
         new DiagnosticTestCurrentTopicStatusModel(response));
 
@@ -160,7 +161,7 @@ export class DiagnosticTestPlayerEngineService {
         this.diagnosticTestTopicTrackerModel.selectNextTopicIdToTest());
 
       this.questionBackendApiService.fetchDiagnosticTestQuestionsAsync(
-        this.currentTopicId
+        this.currentTopicId, this.encounteredQuestionIds
       ).then((response) => {
         this.diagnosticTestCurrentTopicStatusModel = (
           new DiagnosticTestCurrentTopicStatusModel(response));
@@ -204,12 +205,6 @@ export class DiagnosticTestPlayerEngineService {
     );
   }
 
-  makeQuestion(
-      newState: State, envs: Record<string, string>[]): string {
-    return this.expressionInterpolationService.processHtml(
-      newState.content.html, envs);
-  }
-
   createCard(): StateCard {
     if (!this.diagnosticTestCurrentTopicStatusModel.isLifelineConsumeed()) {
       this.currentSkillId = (
@@ -218,8 +213,13 @@ export class DiagnosticTestPlayerEngineService {
     this.currentQuestion = (
       this.diagnosticTestCurrentTopicStatusModel.getNextQuestion(
         this.currentSkillId));
+
+    this.encounteredQuestionIds.push(this.currentQuestion.getId());
+
     const stateData: State = this.currentQuestion.getStateData();
-    const questionHtml: string = this.makeQuestion(stateData, []);
+    const questionHtml: string = (
+      this.expressionInterpolationService.processHtml(
+        stateData.content.html, []));
 
     if (questionHtml === '') {
       this.alertsService.addWarning('Question name should not be empty.');
@@ -251,21 +251,20 @@ export class DiagnosticTestPlayerEngineService {
   }
 
   isDiagnosticTestFinished(): boolean {
-    const lengthOfEligibleTopicIds = (
+    const pendingTopicIdsToTest = (
       this.diagnosticTestTopicTrackerModel.getEligibleTopicIds().length
     );
 
-    if (lengthOfEligibleTopicIds === 0) {
+    if (pendingTopicIdsToTest === 0) {
       return true;
     }
     if (
-      lengthOfEligibleTopicIds > 0 &&
+      pendingTopicIdsToTest > 0 &&
         this.numberOfAttemptedQuestions >= DiagnosticTestPlayerEngineService
           .MAX_ALLOWED_QUESTIONS_IN_THE_DIAGNOSTIC_TEST
     ) {
       return true;
     }
-
     return false;
   }
 

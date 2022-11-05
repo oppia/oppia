@@ -30,6 +30,7 @@ import { AnswerClassificationResult } from 'domain/classifier/answer-classificat
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { AnswerClassificationService, InteractionRulesService } from './answer-classification.service';
 import { AlertsService } from 'services/alerts.service';
+import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 
 
 describe('Diagnostic test engine service', () => {
@@ -43,6 +44,7 @@ describe('Diagnostic test engine service', () => {
   let answerClassificationService: AnswerClassificationService;
   let alertsService: AlertsService;
   let questionObjectFactory: QuestionObjectFactory;
+  let expressionInterpolationService: ExpressionInterpolationService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -58,6 +60,8 @@ describe('Diagnostic test engine service', () => {
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     alertsService = TestBed.inject(AlertsService);
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
+    expressionInterpolationService = (
+      TestBed.inject(ExpressionInterpolationService));
 
     let questionBackendDict1: QuestionBackendDict = {
       id: '',
@@ -217,7 +221,7 @@ describe('Diagnostic test engine service', () => {
         question1);
     }));
 
-  it('should thorw warning when question html is empty', fakeAsync(() => {
+  it('should throw warning when question html is empty', fakeAsync(() => {
     let initSuccessCb = jasmine.createSpy('success');
 
     // A linear graph with 3 nodes.
@@ -242,7 +246,7 @@ describe('Diagnostic test engine service', () => {
     spyOn(
       alertsService, 'addWarning').and.callThrough();
 
-    spyOn(diagnosticTestPlayerEngineService, 'makeQuestion').and.returnValue(
+    spyOn(expressionInterpolationService, 'processHtml').and.returnValue(
       '');
 
     // Initially, the current question should be undefined since the engine
