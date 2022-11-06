@@ -25,10 +25,14 @@ following Python types: bool, dict, float, int, list, unicode.
 """
 
 from __future__ import annotations
+import io
 
 import numbers
 import re
 import urllib
+
+import mutagen
+from mutagen import mp3
 
 from core import feconf
 from core import utils
@@ -790,4 +794,38 @@ class _Validators:
             if choice['html'] in seen_choices:
                 return False
             seen_choices.append(choice['html'])
+        return True
+
+
+    @staticmethod
+    def has_matching_audio_extension(obj: str) -> bool:
+        if not obj:
+            raise Exception('No audio supplied')
+        tempbuffer = io.BytesIO()
+        tempbuffer.write(obj)
+        tempbuffer.seek(0)
+
+        # .mp3 is the only allowed extension
+        extension = 'mp3'
+        try:
+            audio = mp3.MP3(tempbuffer)
+        except mutagen.MutagenError as e:
+            raise Exception(
+                'Audio not recognized as a %s file' % extension
+            ) from e
+
+        if audio is None:
+            raise Exception(
+                'Audio not recognized as a %s file' % extension)
+        if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
+            raise Exception(
+                'Audio files must be under %s seconds in length. The uploaded '
+                'file is %.2f seconds long.' % (
+                    feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length))
+        if len(set(audio.mime).intersection(
+                set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
+            raise Exception(
+                'Although the filename extension indicates the file '
+                'is a %s file, it was not recognized as one. '
+                'Found mime types: %s' % (extension, audio.mime))
         return True

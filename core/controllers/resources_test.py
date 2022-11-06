@@ -601,15 +601,21 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.assertFalse(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC))
 
         with self.accepted_audio_extensions_swap:
-            self.post_json(
+            response_dict = self.post_json(
                 '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
                 {'filename': self.TEST_AUDIO_FILE_FLAC},
                 csrf_token=csrf_token,
+                expected_status_int=400,
                 upload_files=[
                     ('raw_audio_file', self.TEST_AUDIO_FILE_FLAC, raw_audio)]
             )
-
-        self.assertTrue(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC))
+        error_msg = (
+            'Schema validation for \'raw_audio_file\' failed: '
+            'Audio not recognized as a mp3 file\n'
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object cafe.flac')
+        self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
 
@@ -635,12 +641,11 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
                 upload_files=[
                     ('raw_audio_file', mismatched_filename, raw_audio)]
             )
-
         self.logout()
-        self.assertIn(
-            'Although the filename extension indicates the file is a flac '
-            'file, it was not recognized as one. Found mime types:',
-            response_dict['error'])
+        error_msg = (
+            'Schema validation for \'raw_audio_file\' failed: '
+            'Audio not recognized as a mp3 file')
+        self.assertEqual(response_dict['error'], error_msg)
 
     def test_detect_non_audio_file(self):
         """Test that filenames with extensions that don't match the audio are
@@ -667,6 +672,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
 
         error_msg = (
+            'Schema validation for \'raw_audio_file\' failed: '
+            'Audio not recognized as a mp3 file\n'
             'Schema validation for \'filename\' failed: Validation failed: '
             'is_regex_matched ({\'regex_pattern\': '
             '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object cafe.flac')
@@ -736,7 +743,9 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(response_dict['error'], 'No audio supplied')
+        self.assertEqual(
+            response_dict['error'], 'Schema validation for '
+            '\'raw_audio_file\' failed: No audio supplied')
 
     def test_upload_bad_audio(self):
         """Test upload of malformed audio."""
@@ -754,7 +763,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
-            response_dict['error'], 'Audio not recognized as a mp3 file')
+            response_dict['error'], 'Schema validation for \'raw_audio_file\''
+            ' failed: Audio not recognized as a mp3 file')
 
     def test_missing_extensions_are_detected(self):
         """Test upload of filenames with no extensions are caught."""
@@ -835,7 +845,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
-            response_dict['error'], 'Audio not recognized as a mp3 file')
+            response_dict['error'], 'Schema validation for \'raw_audio_file\' '
+            'failed: Audio not recognized as a mp3 file')
 
     def test_upload_check_for_duration_sec_as_response(self):
         """Tests the file upload and trying to confirm the
