@@ -47,7 +47,8 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         super().tearDown()
 
     def test_cannot_get_issues_that_do_not_inherit_base_exploration_issue_spec(
-            self) -> None:
+        self
+    ) -> None:
         class FakeAction: # pylint: disable=missing-docstring
             some_property: int
         swap_getattr = self.swap(

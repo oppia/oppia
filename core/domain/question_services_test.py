@@ -491,6 +491,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_model = question_models.QuestionModel.get_by_id(
             self.question_id)
         self.assertEqual(question_model, None)
+
+        # Re-deleting the question has no effect.
+        question_services.delete_question(
+            self.editor_id, self.question_id, force_deletion=True)
         self.assertEqual(
             question_models.QuestionSummaryModel.get(
                 self.question_id, strict=False), None)
