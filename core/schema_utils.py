@@ -799,6 +799,17 @@ class _Validators:
 
     @staticmethod
     def has_matching_audio_extension(obj: str) -> bool:
+        """Checks if given audio file is a valid audio file.
+
+        Args:
+            obj: str. The raw audio file to validate.
+
+        Returns:
+            bool. Returns True if obj is a valid audio file.
+
+        Raises:
+            Exception. obj is not a valid audio file.
+        """
         if not obj:
             raise Exception('No audio supplied')
         tempbuffer = io.BytesIO()
