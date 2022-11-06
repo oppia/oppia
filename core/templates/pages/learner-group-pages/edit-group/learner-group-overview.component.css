@@ -120,6 +120,7 @@
 
 @media screen and (max-width: 768px) {
   .oppia-learner-group-overview {
+    margin-top: 0;
     width: 100%;
   }
 
@@ -132,8 +133,16 @@
     font-size: 16px;
   }
 
-  .oppia-learner-group-overview .overview-tab-sections,
   .oppia-learner-group-overview .learner-group-summary-card {
+    margin-top: 0;
     padding: 20px;
+  }
+
+  .oppia-learner-group-overview .overview-tab-sections {
+    padding: 20px;
+  }
+
+  .oppia-learner-group-overview .oppia-learner-group-learners-progress-overview {
+    margin-top: 0;
   }
 }

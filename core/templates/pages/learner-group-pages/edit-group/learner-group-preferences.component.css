@@ -215,6 +215,7 @@
 @media screen and (max-width: 768px) {
   .oppia-learner-group-preferences {
     background: #fff;
+    margin-top: 0;
     padding: 20px;
     width: 100%;
   }

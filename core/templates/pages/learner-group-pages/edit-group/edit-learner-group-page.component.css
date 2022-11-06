@@ -96,8 +96,12 @@
     height: unset;
   }
 
-  .oppia-dashboard-view-content-container,
   .oppia-dashboard-view-tabs-container {
+    border-bottom: solid 1px #eee;
+    width: 100%;
+  }
+
+  .oppia-dashboard-view-content-container {
     width: 100%;
   }
 
