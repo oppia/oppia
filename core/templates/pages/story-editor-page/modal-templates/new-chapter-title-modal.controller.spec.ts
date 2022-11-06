@@ -24,8 +24,8 @@ import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-import { ExplorationIdValidationService } from
-  'domain/exploration/exploration-id-validation.service';
+import { CuratedExplorationValidationService } from
+  'domain/exploration/curated-exploration-validation.service';
 import { ExplorationSummaryBackendApiService } from
   'domain/summary/exploration-summary-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
@@ -37,7 +37,7 @@ describe('Create New Chapter Modal Controller', function() {
   var StoryEditorStateService = null;
   var StoryUpdateService = null;
   var storyObjectFactory = null;
-  var explorationIdValidationService = null;
+  var curatedExplorationValidationService = null;
   var nodeTitles = ['title 1', 'title 2', 'title 3'];
   var editableStoryBackendApiService = null;
 
@@ -51,8 +51,8 @@ describe('Create New Chapter Modal Controller', function() {
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'ExplorationIdValidationService',
-      TestBed.get(ExplorationIdValidationService));
+      'CuratedExplorationValidationService',
+      TestBed.get(CuratedExplorationValidationService));
     $provide.value(
       'ExplorationSummaryBackendApiService',
       TestBed.get(ExplorationSummaryBackendApiService));
@@ -75,8 +75,8 @@ describe('Create New Chapter Modal Controller', function() {
     StoryEditorStateService = $injector.get('StoryEditorStateService');
     editableStoryBackendApiService = $injector.get(
       'EditableStoryBackendApiService');
-    explorationIdValidationService = $injector.get(
-      'ExplorationIdValidationService');
+    curatedExplorationValidationService = $injector.get(
+      'CuratedExplorationValidationService');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
@@ -128,7 +128,7 @@ describe('Create New Chapter Modal Controller', function() {
       nodeTitles: nodeTitles,
       StoryUpdateService: StoryUpdateService,
       StoryEditorStateService: StoryEditorStateService,
-      explorationIdValidationService: explorationIdValidationService
+      curatedExplorationValidationService: curatedExplorationValidationService
     });
     $scope.init();
   }));
@@ -195,12 +195,18 @@ describe('Create New Chapter Modal Controller', function() {
   it('should show warning message when exploration cannot be curated',
     fakeAsync(() => {
       spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
-      spyOn(explorationIdValidationService, 'isExpPublishedAsync')
+      spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
         .and.resolveTo(true);
-      spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
+      spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
         .and.resolveTo(true);
-      spyOn(explorationIdValidationService, 'isDefaultCategoryAsync')
+      spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
         .and.resolveTo(true);
+      spyOn(
+        curatedExplorationValidationService,
+        'getStatesWithRestrictedInteractions').and.resolveTo([]);
+      spyOn(
+        curatedExplorationValidationService,
+        'getStatesWithInvalidMultipleChoices').and.resolveTo([]);
       spyOn(
         editableStoryBackendApiService, 'validateExplorationsAsync'
       ).and.resolveTo([
@@ -225,7 +231,7 @@ describe('Create New Chapter Modal Controller', function() {
   it('should warn that the exploration is not published when trying to save' +
     ' a chapter with an invalid exploration id', fakeAsync(function() {
     spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
-    spyOn(explorationIdValidationService, 'isExpPublishedAsync')
+    spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
       .and.resolveTo(false);
     spyOn(
       editableStoryBackendApiService, 'validateExplorationsAsync'
@@ -276,12 +282,12 @@ describe('Create New Chapter Modal Controller', function() {
     spyOn(
       editableStoryBackendApiService, 'validateExplorationsAsync'
     ).and.resolveTo([]);
-    spyOn(explorationIdValidationService, 'isExpPublishedAsync')
+    spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
       .and.returnValue(false);
-    const correctnessFeedbackSpy =
-      spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled');
-    const categorySpy =
-      spyOn(explorationIdValidationService, 'isDefaultCategoryAsync');
+    const correctnessFeedbackSpy = spyOn(
+      curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled');
+    const categorySpy = spyOn(
+      curatedExplorationValidationService, 'isDefaultCategoryAsync');
     $scope.saveAsync();
     flushMicrotasks();
     $rootScope.$apply();
@@ -297,9 +303,9 @@ describe('Create New Chapter Modal Controller', function() {
     spyOn(
       editableStoryBackendApiService, 'validateExplorationsAsync'
     ).and.resolveTo([]);
-    spyOn(explorationIdValidationService, 'isExpPublishedAsync')
+    spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
       .and.resolveTo(true);
-    spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
+    spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
       .and.resolveTo(false);
     $scope.saveAsync();
     flushMicrotasks();
@@ -315,11 +321,11 @@ describe('Create New Chapter Modal Controller', function() {
     spyOn(
       editableStoryBackendApiService, 'validateExplorationsAsync'
     ).and.resolveTo([]);
-    spyOn(explorationIdValidationService, 'isExpPublishedAsync')
+    spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
       .and.resolveTo(true);
-    spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
+    spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
       .and.resolveTo(true);
-    spyOn(explorationIdValidationService, 'isDefaultCategoryAsync')
+    spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
       .and.resolveTo(false);
 
     $scope.saveAsync();
@@ -330,18 +336,80 @@ describe('Create New Chapter Modal Controller', function() {
     expect($uibModalInstance.close).not.toHaveBeenCalled();
   }));
 
+  it('should prevent exploration from being added if it contains restricted ' +
+  'interaction types', fakeAsync(function() {
+    $scope.title = 'dummy_title';
+    const invalidStates = ['some_invalid_state'];
+
+    spyOn(
+      editableStoryBackendApiService, 'validateExplorationsAsync'
+    ).and.resolveTo([]);
+    spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
+      .and.resolveTo(true);
+    spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
+      .and.resolveTo(true);
+    spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
+      .and.resolveTo(true);
+    spyOn(
+      curatedExplorationValidationService,
+      'getStatesWithRestrictedInteractions').and.resolveTo(invalidStates);
+
+    $scope.saveAsync();
+    flushMicrotasks();
+    $rootScope.$apply();
+
+    expect($scope.statesWithRestrictedInteractions).toBe(invalidStates);
+    expect($uibModalInstance.close).not.toHaveBeenCalled();
+  }));
+
+  it('should prevent exploration from being added if it contains an invalid ' +
+  'multiple choice input', fakeAsync(function() {
+    $scope.title = 'dummy_title';
+    const invalidStates = ['some_invalid_state'];
+
+    spyOn(
+      editableStoryBackendApiService, 'validateExplorationsAsync'
+    ).and.resolveTo([]);
+    spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
+      .and.resolveTo(true);
+    spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
+      .and.resolveTo(true);
+    spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
+      .and.resolveTo(true);
+    spyOn(
+      curatedExplorationValidationService,
+      'getStatesWithRestrictedInteractions').and.resolveTo([]);
+    spyOn(
+      curatedExplorationValidationService,
+      'getStatesWithInvalidMultipleChoices').and.resolveTo(invalidStates);
+
+    $scope.saveAsync();
+    flushMicrotasks();
+    $rootScope.$apply();
+
+    expect($scope.statesWithTooFewMultipleChoiceOptions).toBe(invalidStates);
+    expect($uibModalInstance.close).not.toHaveBeenCalled();
+  }));
+
   it('should attempt to save exploration when all validation checks pass',
     fakeAsync(function() {
       $scope.title = 'dummy_title';
       spyOn(
         editableStoryBackendApiService, 'validateExplorationsAsync'
       ).and.resolveTo([]);
-      spyOn(explorationIdValidationService, 'isExpPublishedAsync')
+      spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
         .and.resolveTo(true);
-      spyOn(explorationIdValidationService, 'isCorrectnessFeedbackEnabled')
+      spyOn(
+        curatedExplorationValidationService,
+        'isCorrectnessFeedbackEnabled').and.resolveTo(true);
+      spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
         .and.resolveTo(true);
-      spyOn(explorationIdValidationService, 'isDefaultCategoryAsync')
-        .and.resolveTo(true);
+      spyOn(
+        curatedExplorationValidationService,
+        'getStatesWithRestrictedInteractions').and.resolveTo([]);
+      spyOn(
+        curatedExplorationValidationService,
+        'getStatesWithInvalidMultipleChoices').and.resolveTo([]);
       const updateExplorationIdSpy = spyOn($scope, 'updateExplorationId');
       const updateTitleSpy = spyOn($scope, 'updateTitle');
       $scope.saveAsync();

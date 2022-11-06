@@ -51,7 +51,7 @@ describe('Story node editor directive', function() {
   var story = null;
   var WindowDimensionsService = null;
   var storyUpdateService: StoryUpdateService = null;
-  var ExplorationIdValidationService = null;
+  var CuratedExplorationValidationService = null;
   var AlertsService = null;
   var StoryEditorStateService = null;
   var StoryObjectFactory = null;
@@ -62,8 +62,8 @@ describe('Story node editor directive', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     WindowDimensionsService = $injector.get('WindowDimensionsService');
-    ExplorationIdValidationService = $injector.get(
-      'ExplorationIdValidationService');
+    CuratedExplorationValidationService = $injector.get(
+      'CuratedExplorationValidationService');
     AlertsService = $injector.get('AlertsService');
     storyUpdateService = $injector.get('StoryUpdateService');
     StoryObjectFactory = $injector.get('StoryObjectFactory');
@@ -432,15 +432,15 @@ describe('Story node editor directive', function() {
     expect($scope.chapterOutlineButtonsAreShown).toEqual(false);
   });
 
-  it('should call StoryUpdateService and ExplorationIdValidationService' +
+  it('should call StoryUpdateService and CuratedExplorationValidationService' +
       ' to set node exploration id if story is published',
   function() {
     spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
     var deferred = $q.defer();
     deferred.resolve(true);
     var expSpy = spyOn(
-      ExplorationIdValidationService, 'isExpPublishedAsync').and.returnValue(
-      deferred.promise);
+      CuratedExplorationValidationService, 'isExpPublishedAsync'
+    ).and.returnValue(deferred.promise);
     var storyUpdateSpy = spyOn(storyUpdateService, 'setStoryNodeExplorationId');
 
     $scope.updateExplorationId('exp10');
@@ -457,8 +457,8 @@ describe('Story node editor directive', function() {
     var deferred = $q.defer();
     deferred.resolve(false);
     var expSpy = spyOn(
-      ExplorationIdValidationService, 'isExpPublishedAsync').and.returnValue(
-      deferred.promise);
+      CuratedExplorationValidationService, 'isExpPublishedAsync'
+    ).and.returnValue(deferred.promise);
     var storyUpdateSpy = spyOn(
       storyUpdateService, 'setStoryNodeExplorationId');
 

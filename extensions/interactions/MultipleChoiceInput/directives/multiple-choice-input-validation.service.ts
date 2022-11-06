@@ -50,10 +50,12 @@ export class MultipleChoiceInputValidationService {
     var seenChoices = [];
     var numChoices = customizationArgs.choices.value.length;
 
-    if (numChoices < 4) {
+    const minChoices = (
+      AppConstants.MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_REGULAR_EXP);
+    if (numChoices < minChoices) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'Please enter at least four choices.'
+        message: `Please enter at least ${minChoices} choices.`
       });
     }
 
