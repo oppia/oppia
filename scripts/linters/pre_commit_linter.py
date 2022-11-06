@@ -355,7 +355,7 @@ def _get_file_extensions(file_extensions_to_lint: List[str]) -> List[str]:
 
 def _get_filepaths_from_path(
     input_path: str,
-    namespace: Optional[multiprocessing.managers.Namespace] = None
+    namespace: multiprocessing.managers.Namespace
 ) -> List[str]:
     """Get paths to all lintable files recursively under a path.
 
@@ -370,8 +370,6 @@ def _get_filepaths_from_path(
     Returns:
         list. Paths to lintable files.
     """
-    if not namespace:
-        return []
     namespace.files = FileCache()
     file_cache = namespace.files
     input_path = os.path.join(os.getcwd(), input_path)
@@ -391,7 +389,7 @@ def _get_filepaths_from_path(
 
 def _get_filepaths_from_non_other_shard(
     shard: str,
-    namespace: Optional[multiprocessing.managers.Namespace] = None
+    namespace: multiprocessing.managers.Namespace
 ) -> List[str]:
     """Get paths to lintable files in a shard besides the other shard.
 
@@ -431,7 +429,7 @@ def _get_filepaths_from_non_other_shard(
 
 
 def _get_filepaths_from_other_shard(
-    namespace: Optional[multiprocessing.managers.Namespace] = None
+    namespace: multiprocessing.managers.Namespace
 ) -> List[str]:
     """Get paths to lintable files in the other shard.
 
@@ -456,7 +454,7 @@ def _get_all_filepaths(
     input_path: str,
     input_filenames: List[str],
     input_shard: str,
-    namespace: Optional[multiprocessing.managers.Namespace] = None
+    namespace: multiprocessing.managers.Namespace
 ) -> List[str]:
     """This function is used to return the filepaths which needs to be linted
     and checked.
@@ -513,13 +511,11 @@ def _get_all_filepaths(
 
 def read_files(
     file_paths: List[str],
-    namespace: Optional[multiprocessing.managers.Namespace] = None
+    namespace: multiprocessing.managers.Namespace
 ) -> None:
     """Read all files to be checked and cache them. This will spin off multiple
     threads to increase the efficiency.
     """
-    if namespace is None:
-        return
     namespace.files = FileCache()
     file_cache = namespace.files
     threads = []
