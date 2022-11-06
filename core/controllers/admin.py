@@ -843,7 +843,6 @@ class AdminHandler(
             question_id_10 = question_services.get_new_question_id()
             question_id_11 = question_services.get_new_question_id()
             question_id_12 = question_services.get_new_question_id()
-            question_id_13 = question_services.get_new_question_id()
 
             question_1 = self._create_dummy_question(
                 question_id_1, 'Question 1', [skill_id_1])
@@ -920,7 +919,6 @@ class AdminHandler(
             question_services.add_question(self.user_id, question_11)
             question_services.add_question(self.user_id, question_12)
 
-
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)
             skill_services.save_new_skill(self.user_id, skill_3)
@@ -941,18 +939,6 @@ class AdminHandler(
             topic_services.save_new_topic(self.user_id, topic_4)
             topic_services.save_new_topic(self.user_id, topic_5)
             topic_services.save_new_topic(self.user_id, topic_6)
-            print('question_id_1', question_id_1)
-            print('question_id_2', question_id_2)
-            print('question_id_3', question_id_3)
-            print('question_id_4', question_id_4)
-            print('question_id_5', question_id_5)
-            print('question_id_6', question_id_6)
-            print('question_id_7', question_id_7)
-            print('question_id_8', question_id_8)
-            print('question_id_9', question_id_9)
-            print('question_id_10', question_id_10)
-            print('question_id_11', question_id_11)
-            print('question_id_12', question_id_12)
 
             question_services.create_new_question_skill_link(
                 self.user_id, question_id_1, skill_id_1, 0.5)
@@ -980,6 +966,7 @@ class AdminHandler(
                 self.user_id, question_id_12, skill_id_6, 0.5)
 
             classroom_id_1 = classroom_config_services.get_new_classroom_id()
+            print(classroom_id_1)
             classroom_id_2 = classroom_config_services.get_new_classroom_id()
 
             classroom_name_1 = 'Dummy Classroom with 5 topics'

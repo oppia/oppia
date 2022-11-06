@@ -20,6 +20,14 @@
     </button>
   </mat-card>
   <div *ngIf="diagnosticTestIsStarted && !diagnosticTestIsFinished">
+    <div class="oppia-question-player-card">
+      <div class="oppia-question-player-progress">
+        <div class="current-progress" [ngStyle]="{'width': progressPercentage + '%'}"></div>
+      </div>
+      <div class="progress-percentage-container">
+        <span><i>Current progress: {{progressPercentage}}%</i></span>
+      </div>
+    </div>
     <oppia-conversation-skin [diagnosticTestTopicTrackerModel]="diagnosticTestTopicTrackerModel">
     </oppia-conversation-skin>
   </div>
@@ -77,11 +85,36 @@
 </div>
 
 <style>
+  .oppia-question-player-card {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    height: 100px;
+    margin: auto;
+    padding: 20px;
+    width: 60%;
+  }
+  .progress-percentage-container {
+    float: right;
+    margin-right: 10px;
+  }
+  .oppia-question-player-progress {
+    background: #fff;
+    border: 2px solid #0d48a1;
+    border-radius: 10px;
+    box-sizing: border-box;
+    height: 20px;
+    margin: 10px;
+  }
   .oppia-goto-classroom-button {
     background-color: #00645c;
     color: #fff;
     font-weight: bold;
     text-transform: uppercase;
+  }
+  .current-progress {
+    background: #0d48a1;
+    height: 16px;
   }
   .classroom-button-container {
     float: right;

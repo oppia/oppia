@@ -37,9 +37,10 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   diagnosticTestIsStarted: boolean = false;
   diagnosticTestIsFinished = false;
   classroomUrlFragment: string = 'math';
-  classroomId: string = 's6LoU9vosD9i';
+  classroomId: string = 'bQLCpXYaCCPc';
   recommendedTopicSummaries!: CreatorTopicSummary[];
   recommendedTopicIds: string[] = ['dyeMiEAvJOIU', 'N8yf4a0YUJqD'];
+  progressPercentage: number = 0;
 
   componentSubscription = new Subscription();
 
@@ -60,8 +61,15 @@ export class DiagnosticTestPlayerComponent implements OnInit {
       this.diagnosticTestPlayerStatusService
         .onDiagnosticTestSessionCompleted.subscribe(
           (recommendedTopicIds: string[]) => {
-            recommendedTopicIds.shift();
             this.getRecommendedTopicSummaries(recommendedTopicIds);
+          }
+        ));
+
+    this.componentSubscription.add(
+      this.diagnosticTestPlayerStatusService
+        .onDiagnosticTestSessionProgressChange.subscribe(
+          (progressPercentage: number) => {
+            this.progressPercentage = progressPercentage;
           }
         ));
   }
