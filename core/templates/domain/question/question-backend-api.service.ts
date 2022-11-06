@@ -222,13 +222,15 @@ export class QuestionBackendApiService {
   }
 
   async fetchDiagnosticTestQuestionsAsync(
-      topicId: string
+      topicId: string, excludeQuestionIds: string[]
   ): Promise<SkillIdToQuestionsResponse> {
     return new Promise((resolve, reject) => {
       const diagnosticTestQuestionsURL = (
         this.urlInterpolationService.interpolateUrl(
-          '/diagnostic_test_questions_handler_url/<topic_id>', {
-            topic_id: topicId
+          '/diagnostic_test_questions_handler_url/<topic_id>' +
+          '?exclude_question_ids=<exclude_question_ids>', {
+            topic_id: topicId,
+            exclude_question_ids: excludeQuestionIds.join(',')
           }));
 
       this.http.get<SkillIdToQuestionsBackendResponse>(

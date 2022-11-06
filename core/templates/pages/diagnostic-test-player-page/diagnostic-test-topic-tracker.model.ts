@@ -89,6 +89,9 @@ export class DiagnosticTestTopicTrackerModel {
     return this._topicIdToSuccessorTopicIds;
   }
 
+  getTopicIdToPrerequisiteTopicIds(): TopicIdToRelatedTopicIds {
+    return this._topicIdToPrerequisiteTopicIds;
+  }
 
   generateTopicIdToAncestorTopicIds(): void {
     // The method generates a dict with topic ID as the key and all of its

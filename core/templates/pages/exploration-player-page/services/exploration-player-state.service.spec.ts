@@ -584,7 +584,6 @@ describe('Exploration Player State Service', () => {
   it('should intialize diagnostic test player', () => {
     spyOn(diagnosticTestPlayerEngineService, 'init');
     let successCallback = () => {};
-    let errorCallback = () => {};
     let topicIdToPrerequisiteTopicIds = {
       topicId1: [],
       topicId2: ['topicId1'],
@@ -595,7 +594,7 @@ describe('Exploration Player State Service', () => {
       topicIdToPrerequisiteTopicIds);
 
     explorationPlayerStateService.initializeDiagnosticPlayer(
-      diagnosticTestTopicTrackerModel, successCallback, errorCallback);
+      diagnosticTestTopicTrackerModel, successCallback);
 
     expect(diagnosticTestPlayerEngineService.init).toHaveBeenCalled();
   });

@@ -18,6 +18,7 @@
 
 import { Injectable } from '@angular/core';
 
+import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { Question } from 'domain/question/QuestionObjectFactory';
@@ -36,6 +37,7 @@ import { DiagnosticTestCurrentTopicStatusModel } from 'pages/diagnostic-test-pla
 import { DiagnosticTestTopicTrackerModel } from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
+import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 
 
 @Injectable({
@@ -44,6 +46,7 @@ import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-
 export class DiagnosticTestPlayerEngineService {
   private answerIsBeingProcessed: boolean = false;
   private diagnosticTestTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
+  private initialCopyOfTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
   private diagnosticTestCurrentTopicStatusModel!:
     DiagnosticTestCurrentTopicStatusModel;
 
@@ -52,6 +55,7 @@ export class DiagnosticTestPlayerEngineService {
   private currentSkillId!: string;
   private numberOfAttemptedQuestions!: number;
   private focusLabel!: string;
+  private encounteredQuestionIds: string[] = [];
 
   constructor(
     private alertsService: AlertsService,
@@ -68,25 +72,22 @@ export class DiagnosticTestPlayerEngineService {
 
   init(
       diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel,
-      successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
-      errorCallback?: () => void
+      successCallback: (initialCard: StateCard, nextFocusLabel: string) => void
   ): void {
     this.diagnosticTestTopicTrackerModel = diagnosticTestTopicTrackerModel;
+    this.initialCopyOfTopicTrackerModel = cloneDeep(
+      diagnosticTestTopicTrackerModel);
+
     this.currentTopicId = (
       this.diagnosticTestTopicTrackerModel.selectNextTopicIdToTest());
 
     this.questionBackendApiService.fetchDiagnosticTestQuestionsAsync(
-      this.currentTopicId).then((response) => {
+      this.currentTopicId, this.encounteredQuestionIds).then((response) => {
       this.diagnosticTestCurrentTopicStatusModel = (
         new DiagnosticTestCurrentTopicStatusModel(response));
 
       const stateCard = this.createCard();
       this.numberOfAttemptedQuestions = 0;
-
-      let questionHtml = stateCard.getContentHtml();
-      if (questionHtml === null) {
-        errorCallback();
-      }
 
       successCallback(stateCard, this.focusLabel);
     });
@@ -107,14 +108,28 @@ export class DiagnosticTestPlayerEngineService {
         wasOldStateInitial: boolean,
         isFirstHit: boolean,
         isFinalQuestion: boolean,
-        focusLabel: string) => void
-  ): boolean {
-    const oldState = this.currentQuestion.getStateData();
-    const classificationResult = (
+        focusLabel: string
+      ) => void
+  ): boolean|undefined {
+    const oldState: State = this.currentQuestion.getStateData();
+    const classificationResult: AnswerClassificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(
-        null, oldState.interaction, answer,
+        oldState.name as string, oldState.interaction, answer,
         interactionRulesService));
     let answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
+
+    let stateCard: StateCard;
+    let refreshInteraction: boolean = false;
+    let feedbackHtml: string = '';
+    let feedbackAudioTranslations: BindableVoiceovers = {};
+    let refresherExplorationId: string = '';
+    let missingPrerequisiteSkillId: string = '';
+    let remainOnCurrentCard: boolean = false;
+    let taggedSkillMisconceptionId: string = '';
+    let wasOldStateInitial: boolean = false;
+    let isFirstHit: boolean = true;
+    let isFinalQuestion: boolean = false;
+    let focusLabel: string;
 
     this.numberOfAttemptedQuestions += 1;
     answerIsCorrect = false;
@@ -143,9 +158,9 @@ export class DiagnosticTestPlayerEngineService {
       }
 
       if (this.isDiagnosticTestFinished()) {
+        let recommendedTopicIds: string[] = [];
         this.diagnosticTestPlayerStatusService
-          .onDiagnosticTestSessionCompleted.emit(
-            this.diagnosticTestTopicTrackerModel.getFailedTopicIds());
+          .onDiagnosticTestSessionCompleted.emit(recommendedTopicIds);
         return;
       }
 
@@ -153,28 +168,142 @@ export class DiagnosticTestPlayerEngineService {
         this.diagnosticTestTopicTrackerModel.selectNextTopicIdToTest());
 
       this.questionBackendApiService.fetchDiagnosticTestQuestionsAsync(
-        this.currentTopicId
+        this.currentTopicId, this.encounteredQuestionIds
       ).then((response) => {
         this.diagnosticTestCurrentTopicStatusModel = (
           new DiagnosticTestCurrentTopicStatusModel(response));
 
-        let stateCard = this.createCard();
+        stateCard = this.createCard();
+        focusLabel = this.focusLabel;
+
         successCallback(
-          stateCard, false, null,
-          null, null, null, false, null,
-          null, null, false, this.focusLabel
+          stateCard, refreshInteraction, feedbackHtml,
+          feedbackAudioTranslations, refresherExplorationId,
+          missingPrerequisiteSkillId, remainOnCurrentCard,
+          taggedSkillMisconceptionId, wasOldStateInitial, isFirstHit,
+          isFinalQuestion, focusLabel
         );
+        this.diagnosticTestPlayerStatusService
+          .onDiagnosticTestSessionProgressChange.emit(
+            this.computeProgressPercentage());
         return answerIsCorrect;
       });
     } else {
-      let stateCard = this.createCard();
+      stateCard = this.createCard();
+      focusLabel = this.focusLabel;
+
       successCallback(
-        stateCard, false, null,
-        null, null, null, false, null,
-        null, null, false, this.focusLabel
+        stateCard, refreshInteraction, feedbackHtml,
+        feedbackAudioTranslations, refresherExplorationId,
+        missingPrerequisiteSkillId, remainOnCurrentCard,
+        taggedSkillMisconceptionId, wasOldStateInitial, isFirstHit,
+        isFinalQuestion, focusLabel
       );
+      this.diagnosticTestPlayerStatusService
+        .onDiagnosticTestSessionProgressChange.emit(
+          this.computeProgressPercentage());
       return answerIsCorrect;
     }
+  }
+
+  getRecommendedTopicIds(): string[] {
+    let recommendedTopicIds: string[] = [];
+
+    let failedTopicIds: string[] = this.getFailedTopicIds();
+
+    let rootTopicIds: string[] = this._getRootTopicIds();
+
+    let failedRootTopicIds: string[] = rootTopicIds.filter(
+      topicId => failedTopicIds.indexOf(topicId) !== -1
+    );
+
+    if (failedRootTopicIds.length >= 2) {
+      recommendedTopicIds.push(failedRootTopicIds[0]);
+      recommendedTopicIds.push(failedRootTopicIds[1]);
+    } else if (failedRootTopicIds.length === 1) {
+      recommendedTopicIds.push(failedRootTopicIds[0]);
+    } else {
+      let sortedTopicIds = this._getSortedTopicIds();
+      for (let topicId of sortedTopicIds) {
+        if (failedTopicIds.indexOf(topicId) !== -1) {
+          recommendedTopicIds.push(topicId);
+          break;
+        }
+      }
+    }
+    return recommendedTopicIds;
+  }
+
+  _getRootTopicIds(): string[] {
+    let topicIdToPrerequisiteTopicId = (
+      this.initialCopyOfTopicTrackerModel.getTopicIdToPrerequisiteTopicIds());
+    let rootTopicIds: string[] = [];
+
+    for (let topicId in topicIdToPrerequisiteTopicId) {
+      if (topicIdToPrerequisiteTopicId[topicId].length === 0) {
+        rootTopicIds.push(topicId);
+      }
+    }
+    return rootTopicIds;
+  }
+
+  _getSortedTopicIds(): string[] {
+    let visitedTopicIds: string[] = [];
+    let topicIdToPrerequisiteTopicId = (
+      this.initialCopyOfTopicTrackerModel.getTopicIdToPrerequisiteTopicIds());
+
+    for (let currentTopicId in topicIdToPrerequisiteTopicId) {
+      if (visitedTopicIds.indexOf(currentTopicId) !== -1) {
+        continue;
+      }
+
+      let tempStack = [];
+      tempStack.push(currentTopicId);
+
+      while (tempStack.length > 0) {
+        // '.shift()' here can return an undefined value, but we're already
+        // checking for length > 0, so this is safe.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        let topicId: string = tempStack.shift()!;
+        let prerequisites: string[] = topicIdToPrerequisiteTopicId[topicId];
+
+        let nonVisitedPrerequisites: string[] = prerequisites.filter(
+          (prerequisiteTopicId: string) => {
+            return visitedTopicIds.indexOf(prerequisiteTopicId) === -1;
+          }
+        );
+
+        if (nonVisitedPrerequisites.length > 0) {
+          tempStack.unshift(topicId);
+          tempStack = nonVisitedPrerequisites.concat(tempStack);
+        } else {
+          visitedTopicIds.push(topicId);
+        }
+      }
+    }
+    return visitedTopicIds;
+  }
+
+  computeProgressPercentage(): number {
+    let numberOfAttemptedQuestionsInCurrentTopic = (
+      this.diagnosticTestCurrentTopicStatusModel.numberOfAttemptedQuestions);
+
+    let initialTopicIdsList = (
+      this.initialCopyOfTopicTrackerModel.getEligibleTopicIds());
+
+    let pendingTopicIdsToTest = (
+      this.diagnosticTestTopicTrackerModel.getEligibleTopicIds());
+
+    // Each topic can contain a maximum of 3 diagnostic test skills and at most
+    // 2 questions [main question & backup question] can be presented from each
+    // skill. Thus the maximum number of questions that can be asked from a
+    // topic is 6.
+    let completionMetric = (((
+      initialTopicIdsList.length - pendingTopicIdsToTest.length) * 6 +
+        numberOfAttemptedQuestionsInCurrentTopic) / (
+      initialTopicIdsList.length * 6));
+
+    return Math.round(completionMetric * 100);
   }
 
   getLanguageCode(): string {
@@ -185,14 +314,8 @@ export class DiagnosticTestPlayerEngineService {
 
   recordNewCardAdded(): void {
     this.contextService.setCustomEntityContext(
-      AppConstants.ENTITY_TYPE.QUESTION, this.currentQuestion.getId()
+      AppConstants.ENTITY_TYPE.QUESTION, this.currentQuestion.getId() as string
     );
-  }
-
-  makeQuestion(
-      newState: State, envs: Record<string, string>[]): string {
-    return this.expressionInterpolationService.processHtml(
-      newState.content.html, envs);
   }
 
   createCard(): StateCard {
@@ -203,17 +326,22 @@ export class DiagnosticTestPlayerEngineService {
     this.currentQuestion = (
       this.diagnosticTestCurrentTopicStatusModel.getNextQuestion(
         this.currentSkillId));
-    const stateData = this.currentQuestion.getStateData();
-    const questionHtml = this.makeQuestion(stateData, []);
 
-    if (questionHtml === null) {
+    this.encounteredQuestionIds.push(this.currentQuestion.getId() as string);
+
+    const stateData: State = this.currentQuestion.getStateData();
+    const questionHtml: string = (
+      this.expressionInterpolationService.processHtml(
+        stateData.content.html, []));
+
+    if (questionHtml === '') {
       this.alertsService.addWarning('Question name should not be empty.');
     }
 
     this.focusLabel = this.focusManagerService.generateFocusLabel();
     const interaction = stateData.interaction;
     const interactionId = interaction.id;
-    let interactionHtml = null;
+    let interactionHtml: string = '';
 
     if (interactionId) {
       interactionHtml = (
@@ -224,9 +352,10 @@ export class DiagnosticTestPlayerEngineService {
     }
 
     return StateCard.createNewCard(
-      null, questionHtml, interactionHtml, interaction,
-      stateData.recordedVoiceovers, stateData.writtenTranslations,
-      stateData.content.contentId, this.audioTranslationLanguageService
+      stateData.name as string, questionHtml, interactionHtml as string,
+      interaction, stateData.recordedVoiceovers, stateData.writtenTranslations,
+      stateData.content.contentId as string,
+      this.audioTranslationLanguageService
     );
   }
 
@@ -235,21 +364,20 @@ export class DiagnosticTestPlayerEngineService {
   }
 
   isDiagnosticTestFinished(): boolean {
-    const lengthOfEligibleTopicIds = (
+    const pendingTopicIdsToTest = (
       this.diagnosticTestTopicTrackerModel.getEligibleTopicIds().length
     );
 
-    if (lengthOfEligibleTopicIds === 0) {
+    if (pendingTopicIdsToTest === 0) {
       return true;
     }
     if (
-      lengthOfEligibleTopicIds > 0 &&
+      pendingTopicIdsToTest > 0 &&
         this.numberOfAttemptedQuestions >= DiagnosticTestPlayerEngineService
           .MAX_ALLOWED_QUESTIONS_IN_THE_DIAGNOSTIC_TEST
     ) {
       return true;
     }
-
     return false;
   }
 
