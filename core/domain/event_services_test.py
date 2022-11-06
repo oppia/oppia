@@ -445,19 +445,22 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
         exp_id = 'eid1'
         self.save_new_valid_exploration(exp_id, self.OWNER_EMAIL)
         exp_services.update_exploration(
-            self.OWNER_EMAIL, exp_id, [exp_domain.ExplorationChange({
-            'new_value': {
-                'content_id': 'content',
-                'html': 'content 1'
-            },
-            'state_name': 'Introduction',
-            'old_value': {
-                'content_id': 'content',
-                'html': ''
-            },
-            'cmd': 'edit_state_property',
-            'property_name': 'content'
-            })], 'Update 1')
+            self.OWNER_EMAIL, exp_id, 
+            [
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
+            ], 'Update 1')
 
         event_services.StatsEventsHandler.record(
             exp_id, 1, {

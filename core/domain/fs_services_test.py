@@ -298,7 +298,8 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
     ) -> None:
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-            encoding=None) as f:
+            encoding=None
+        ) as f:
             original_image_content = f.read()
 
         def mock_isfile(

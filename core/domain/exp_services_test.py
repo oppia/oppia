@@ -1243,11 +1243,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             ['TextInput'], category='Algebra',
             correctness_feedback_enabled=True)
         class MockExplorationChange:
-            cmd: str = ''
-            property_name: str = ''
-            state_name: str = ''
-            new_value: str = ''
-
             def __init__(
                 self, cmd: str, property_name: str, state_name: str,
                 new_value: str
@@ -1287,11 +1282,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             ['TextInput'], category='Algebra',
             correctness_feedback_enabled=True)
         class MockExplorationChange:
-            cmd: str = ''
-            property_name: str = ''
-            state_name: str = ''
-            new_value: str = ''
-
             def __init__(
                 self, cmd: str, property_name: str, state_name: str,
                 new_value: str

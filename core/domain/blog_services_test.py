@@ -347,7 +347,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because dictionary of type BlogPostChangeDict
         # should contain 'title', 'content', 'tags' and 'thumbnail_filename'
         # keys but for testing purpose here we are only providing the 'title'
-        # key, which causes MyPy to throw error. Thus to silent the error, we
+        # key, which causes MyPy to throw an error. Thus to silent the error, we
         # used ignore here.
         change_dict: blog_services.BlogPostChangeDict = {  # type: ignore[typeddict-item]
             'title': 'Sample Title'

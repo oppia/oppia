@@ -1059,40 +1059,43 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id), [])
 
     def test_remove_collection_from_completed_list(self) -> None:
-        self.assertEqual(self._get_all_completed_collection_ids(
-            self.user_id), [])
+        self.assertEqual(
+            self._get_all_completed_collection_ids(self.user_id), [])
 
         # Cannot remove a collection from non exisitng CompletedActivitiesModel.
         learner_progress_services.remove_collection_from_completed_list(
             self.user_id, self.COL_ID_0)
-        self.assertEqual(self._get_all_completed_collection_ids(
-            self.user_id), [])
+        self.assertEqual(
+            self._get_all_completed_collection_ids(self.user_id), [])
 
         # Add two collections to the completed list.
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_1)
-        self.assertEqual(self._get_all_completed_collection_ids(
-            self.user_id), [self.COL_ID_0, self.COL_ID_1])
+        self.assertEqual(
+            self._get_all_completed_collection_ids(self.user_id),
+            [self.COL_ID_0, self.COL_ID_1])
 
         # Remove one collection.
         learner_progress_services.remove_collection_from_completed_list(
             self.user_id, self.COL_ID_0)
-        self.assertEqual(self._get_all_completed_collection_ids(
-            self.user_id), [self.COL_ID_1])
+        self.assertEqual(
+            self._get_all_completed_collection_ids(self.user_id),
+            [self.COL_ID_1])
 
         # Removing the same collection again has no effect.
         learner_progress_services.remove_collection_from_completed_list(
             self.user_id, self.COL_ID_0)
-        self.assertEqual(self._get_all_completed_collection_ids(
-            self.user_id), [self.COL_ID_1])
+        self.assertEqual(
+            self._get_all_completed_collection_ids(self.user_id),
+            [self.COL_ID_1])
 
         # Removing another collection.
         learner_progress_services.remove_collection_from_completed_list(
             self.user_id, self.COL_ID_1)
-        self.assertEqual(self._get_all_completed_collection_ids(
-            self.user_id), [])
+        self.assertEqual(
+            self._get_all_completed_collection_ids(self.user_id), [])
 
     def test_get_all_completed_exp_ids(self) -> None:
         self.assertEqual(learner_progress_services.get_all_completed_exp_ids(

@@ -1563,7 +1563,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION)
 
-    def test_suggestion_emails_are_not_sent_if_user_cannot_recieve_email(
+    def test_suggestion_emails_are_not_sent_if_user_cannot_receive_email(
         self
     ) -> None:
         expected_email_html_body = (
@@ -1596,12 +1596,11 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
 
         user_services.update_email_preferences(
             self.new_user_id, False, False, False, False)
-        new_recipient_list = self.recipient_list
-        new_recipient_list.append(self.new_user_id)
+        self.recipient_list.append(self.new_user_id)
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             email_manager.send_suggestion_email(
                 self.exploration.title, self.exploration.id, self.new_user_id,
-                new_recipient_list)
+                self.recipient_list)
 
             # Make sure correct email is sent to editor.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -1821,7 +1820,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION)
 
-    def test_feedback_message_emails_are_not_sent_if_user_cannot_recieve_email(
+    def test_feedback_message_emails_are_not_sent_if_user_cannot_receive_email(
         self
     ) -> None:
         user_services.update_email_preferences(
@@ -2032,7 +2031,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
 
-    def test_reviewer_onboard_emails_are_not_sent_if_user_cannot_recieve_email(
+    def test_reviewer_onboard_emails_are_not_sent_if_user_cannot_receive_email(
         self
     ) -> None:
         user_services.update_email_preferences(
@@ -2114,7 +2113,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS)
 
-    def test_review_notifications_are_not_sent_if_user_cannot_recieve_email(
+    def test_review_notifications_are_not_sent_if_user_cannot_receive_email(
         self
     ) -> None:
         user_services.update_email_preferences(
@@ -2160,7 +2159,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
         self.assertEqual(len(messages), 0)
 
-    def test_achievements_emails_are_not_sent_if_user_cannot_recieve_email(
+    def test_achievements_emails_are_not_sent_if_user_cannot_receive_email(
         self
     ) -> None:
         user_services.update_email_preferences(
@@ -6220,7 +6219,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             self.TRANSLATION_REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
-    def test_emails_are_not_sent_if_user_cannot_recieve_email(self) -> None:
+    def test_emails_are_not_sent_if_user_cannot_receive_email(self) -> None:
         user_services.update_email_preferences(
             self.translation_reviewer_id, False, False, False, False)
         with self.can_send_emails_ctx:
