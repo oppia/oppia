@@ -1161,6 +1161,7 @@ export class ConversationSkinComponent {
           });
 
           if (remainOnCurrentCard) {
+            console.log("\nRemains on same card.\n");
             // Stay on the same card.
             let oldStateCard: StateCard = this.playerTranscriptService.getLastCard();
             let oldInteractionId = oldStateCard.getInteractionId();
@@ -1236,6 +1237,7 @@ export class ConversationSkinComponent {
             // immediately. Otherwise, give the learner a chance to read
             // the feedback, and display a 'Continue' button.
             this.pendingCardWasSeenBefore = false;
+            console.log("new card seen");
             this.displayedCard.markAsCompleted();
             if (isFinalQuestion) {
               if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {

@@ -437,6 +437,7 @@ export class ExplorationEngineService {
     if (this.answerIsBeingProcessed) {
       return;
     }
+    console.log("\nSubmit answer triggered.\n");
     this.answerIsBeingProcessed = true;
     let oldStateName: string = this.playerTranscriptService.getLastStateName();
     let oldState: State = this.exploration.getState(oldStateName);

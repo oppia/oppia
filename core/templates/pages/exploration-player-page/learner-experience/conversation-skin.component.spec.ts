@@ -54,7 +54,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
-import { InteractionRulesService } from '../services/answer-classification.service';
+import { AnswerClassificationService, InteractionRulesService } from '../services/answer-classification.service';
 import { ContentTranslationLanguageService } from '../services/content-translation-language.service';
 import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 import { CurrentInteractionService } from '../services/current-interaction.service';
@@ -106,7 +106,7 @@ class MockPlatformFeatureService {
   }
 }
 
-fdescribe('Conversation skin component', () => {
+describe('Conversation skin component', () => {
   let fixture: ComponentFixture<ConversationSkinComponent>;
   let componentInstance: ConversationSkinComponent;
   let alertsService: AlertsService;
@@ -145,6 +145,7 @@ fdescribe('Conversation skin component', () => {
   let playerTranscriptService: PlayerTranscriptService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let questionPlayerStateService: QuestionPlayerStateService;
+  let answerClassificationService: AnswerClassificationService;
   let readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService;
   let refresherExplorationConfirmationModalService:
     RefresherExplorationConfirmationModalService;
@@ -577,6 +578,7 @@ fdescribe('Conversation skin component', () => {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
+    answerClassificationService = TestBed.inject(AnswerClassificationService);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     translateService = TestBed.inject(TranslateService);
     learnerDashboardBackendApiService = TestBed.inject(
@@ -1875,6 +1877,7 @@ fdescribe('Conversation skin component', () => {
         '', true, false, false, '');
       return false;
     };
+    spyOn(answerClassificationService, 'isAnswerOnlyMisspelled').and.returnValue(true);
     spyOn(explorationEngineService, 'submitAnswer').and.callFake(callback);
     spyOn(playerPositionService, 'getCurrentStateName')
       .and.returnValue('oldState');
@@ -1978,6 +1981,14 @@ fdescribe('Conversation skin component', () => {
       componentInstance.isHackyExpTitleTranslationDisplayed(expId);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
   });
+
+  it('should get feedback when answer is misspelled', () => {
+    spyOn(Math, 'random').and.returnValue(0.45);
+    spyOn(translateService, 'instant').and.callThrough();
+    expect(
+      componentInstance.getFeedbackHtmlWhenAnswerMisspelled())
+      .toEqual('I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_1');
+  })
 
   it('should check if current card was completed in a previous session',
     () => {
