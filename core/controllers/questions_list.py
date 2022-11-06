@@ -25,8 +25,10 @@ from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 
+from typing import Dict, List, TypedDict
 
-def _require_valid_skill_ids(skill_ids):
+
+def _require_valid_skill_ids(skill_ids: List[str]) -> None:
     """Checks whether the given skill ids are valid.
 
     Args:
@@ -36,7 +38,20 @@ def _require_valid_skill_ids(skill_ids):
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
 
-class QuestionsListHandler(base.BaseHandler):
+class QuestionsListHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of QuestionsListHandler's
+    normalized_payload dictionary.
+    """
+
+    offset: int
+
+
+class QuestionsListHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        QuestionsListHandlerNormalizedRequestDict
+    ]
+):
     """Manages receiving of all question summaries for display in topic editor
     and skill editor page.
     """
@@ -54,17 +69,16 @@ class QuestionsListHandler(base.BaseHandler):
             'offset': {
                 'schema': {
                     'type': 'int'
-                },
-                'default_none': None
+                }
             }
         }
     }
 
     @acl_decorators.open_access
-    def get(self, comma_separated_skill_ids):
+    def get(self, comma_separated_skill_ids: str) -> None:
         """Handles GET requests."""
-
-        offset = self.normalized_request.get('offset')
+        assert self.normalized_request is not None
+        offset = self.normalized_request['offset']
 
         skill_ids = comma_separated_skill_ids.split(',')
         skill_ids = list(set(skill_ids))
@@ -127,15 +141,25 @@ class QuestionsListHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class QuestionCountDataHandler(base.BaseHandler):
+class QuestionCountDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Provides data regarding the number of questions assigned to the given
     skill ids.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'comma_separated_skill_ids': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, comma_separated_skill_ids):
+    def get(self, comma_separated_skill_ids: str) -> None:
         """Handles GET requests."""
         skill_ids = comma_separated_skill_ids.split(',')
         skill_ids = list(set(skill_ids))
