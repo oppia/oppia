@@ -2068,6 +2068,12 @@ def update_exploration(
     datastore_services.update_timestamps_multi(models_to_put)
     datastore_services.put_multi(models_to_put)
     index_explorations_given_ids([exploration_id])
+    # Explicitly clear the cache for explorations after putting the new
+    # version.
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+        [exploration_id]
+    )
 
 
 def compute_models_to_put_when_saving_new_exp_version(
@@ -2138,6 +2144,11 @@ def compute_models_to_put_when_saving_new_exp_version(
             'Commit messages for non-suggestions may not start with \'%s\'' %
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION,
+        None,
+        [exploration_id]
+    )
     updated_exploration = apply_change_list(exploration_id, change_list)
     if get_story_id_linked_to_exploration(exploration_id) is not None:
         validate_exploration_for_story(updated_exploration, True)
