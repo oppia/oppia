@@ -445,7 +445,7 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
         exp_id = 'eid1'
         self.save_new_valid_exploration(exp_id, self.OWNER_EMAIL)
         exp_services.update_exploration(
-            self.OWNER_EMAIL, exp_id, 
+            self.OWNER_EMAIL, exp_id,
             [
                 exp_domain.ExplorationChange({
                     'new_value': {
