@@ -298,6 +298,19 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
 
+    def test_raises_error_if_guest_user_try_to_publish_the_exploration(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'To publish explorations and update users\' profiles, '
+            'user must be logged in and have admin access.'
+        ):
+            exp_services.publish_exploration_and_update_user_profiles(
+                guest_user, 'exp_id'
+            )
+
     def test_get_exploration_titles_and_categories(self) -> None:
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories([]), {})
@@ -1685,8 +1698,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_update_exploration_by_migration_bot_not_updates_contribution_model(
         self
     ) -> None:
-        user_services.create_user_contributions(
-            feconf.MIGRATION_BOT_USER_ID, [], [])
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='end')
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
@@ -7839,7 +7850,15 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(updated_exp)
 
     def test_draft_discarded(self) -> None:
-        exp_services.discard_draft(self.EXP_ID1, self.USER_ID,)
+        user_data_model = (
+            exp_services.get_exp_user_data_model_with_draft_discarded(
+                self.EXP_ID1,
+                self.USER_ID
+            )
+        )
+        assert user_data_model is not None
+        user_data_model.update_timestamps()
+        user_data_model.put()
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID1))
         self.assertIsNone(exp_user_data.draft_change_list)
