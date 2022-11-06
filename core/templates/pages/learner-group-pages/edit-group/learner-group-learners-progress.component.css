@@ -143,6 +143,7 @@
   .oppia-learner-group-learners-progress,
   .learner-specific-progress-view-selectors {
     background: #fff;
+    margin-top: 0;
     padding: 20px;
     width: 100%;
   }
@@ -153,6 +154,7 @@
     display: grid;
     grid-gap: 20px;
     justify-content: unset;
+    margin: 0;
     padding: 20px;
     width: 100%;
   }
