@@ -291,7 +291,7 @@ describe('HintsAndSolutionManager service', () => {
     hasms.releaseSolution();
     expect(hasms.solutionReleased).toEqual(true);
   });
-  
+
   it('should send the solution viewed event emitter', () => {
     let mockSolutionViewedEventEmitter = new EventEmitter();
     expect(hasms.onSolutionViewedEventEmitter).toEqual(

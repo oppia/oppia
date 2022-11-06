@@ -47,7 +47,6 @@ import './exploration-footer.component.css';
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 import { ConceptCardManagerService } from '../services/concept-card-manager.service';
 import { StateCard } from 'domain/state_card/state-card.model';
-import { AppConstants } from 'app.constants';
 
 
 @Component({

@@ -18,7 +18,7 @@
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ExplorationFooterComponent } from './exploration-footer.component';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -279,7 +279,7 @@ describe('ExplorationFooterComponent', () => {
       Promise.resolve(new UserInfo(
         [], false, false,
         false, false, false, '', '', '', true)));
-    
+
     // A StateCard which supports hints.
     let newCard = StateCard.createNewCard(
       'State 2', '<p>Content</p>', '<interaction></interaction>',
@@ -504,7 +504,7 @@ describe('ExplorationFooterComponent', () => {
   }));
 
   it('should show \'Need help? Take a look at the concept' +
-    '  card for refreshing your concepts.\' tooltip', () => {
+    ' card for refreshing your concepts.\' tooltip', () => {
     spyOn(conceptCardManagerService, 'isConceptCardTooltipOpen')
       .and.returnValues(true, false);
 
@@ -928,16 +928,13 @@ describe('ExplorationFooterComponent', () => {
   }));
 
   it('should open concept card when user clicks on the icon', () => {
-
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return (
           { componentInstance: MockNgbModalRef,
             result: Promise.resolve()
           }) as NgbModalRef;
     });
-
     component.openConceptCardModal();
-
     expect(modalSpy).toHaveBeenCalled();
   });
 
@@ -973,7 +970,7 @@ describe('ExplorationFooterComponent', () => {
       param_changes: [],
       next_content_id_index: 0,
       card_is_checkpoint: false,
-      linked_skill_id: "Id",
+      linked_skill_id: 'Id',
       content: {
         content_id: 'content',
         html: 'Congratulations, you have finished!'
@@ -982,13 +979,12 @@ describe('ExplorationFooterComponent', () => {
     spyOn(explorationEngineService, 'getState')
       .and.returnValue(
         stateObjectFactory.createFromBackendDict('End', endState));
-    
+
     component.showConceptCard();
-    
-    expect(component.linkedSkillId).toEqual("Id");
+
+    expect(component.linkedSkillId).toEqual('Id');
     expect(component.openConceptCardModal).toHaveBeenCalled();
-    
-  }))
+  }));
 
   it('should display lesson information card', fakeAsync(() => {
     component.explorationId = 'exp1';

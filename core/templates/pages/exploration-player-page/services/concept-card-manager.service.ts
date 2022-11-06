@@ -39,7 +39,7 @@ export class ConceptCardManagerService {
 
   // Emitter to show that the learner is really stuck.
   _learnerReallyStuckEventEmitter = new EventEmitter();
-  
+
   private _timeoutElapsedEventEmitter = new EventEmitter();
   onTimeoutElapsed$ = this._timeoutElapsedEventEmitter.asObservable();
 
@@ -60,14 +60,14 @@ export class ConceptCardManagerService {
     private playerPositionService: PlayerPositionService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
     private explorationEngineService: ExplorationEngineService
-    ) {
+  ) {
     // TODO(#10904): Refactor to move subscriptions into components.
 
     playerPositionService.onNewCardOpened.subscribe(
       (displayedCard: StateCard) => {
         this.hintsAvailable = displayedCard.getHints().length;
       }
-    )
+    );
   }
 
   // This replaces any timeouts that are already queued.
@@ -86,11 +86,11 @@ export class ConceptCardManagerService {
   }
 
   releaseConceptCard(): void {
-      this.conceptCardReleased = true;
-      if (!this.conceptCardDiscovered && !this.tooltipTimeout) {
-        this.tooltipTimeout = setTimeout(
-          this.showTooltip.bind(this), this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
-      }
+    this.conceptCardReleased = true;
+    if (!this.conceptCardDiscovered && !this.tooltipTimeout) {
+      this.tooltipTimeout = setTimeout(
+        this.showTooltip.bind(this), this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+    }
     this._timeoutElapsedEventEmitter.emit();
   }
 
@@ -110,9 +110,9 @@ export class ConceptCardManagerService {
     }
     this.conceptCardConsumed = true;
     this.wrongAnswersSinceConceptCardConsumed = 0;
-      this.enqueueTimeout(
-        this.emitLearnerStuckedness,
-        ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
+    this.enqueueTimeout(
+      this.emitLearnerStuckedness,
+      ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
   }
 
   reset(): void {
@@ -162,8 +162,8 @@ export class ConceptCardManagerService {
     if (this.wrongAnswersSinceConceptCardConsumed >
     ExplorationPlayerConstants.
       MAX_INCORRECT_ANSWERS_BEFORE_REALLY_STUCK) {
-        // Learner is really stuck.
-        this.emitLearnerStuckedness();
+      // Learner is really stuck.
+      this.emitLearnerStuckedness();
     }
   }
 

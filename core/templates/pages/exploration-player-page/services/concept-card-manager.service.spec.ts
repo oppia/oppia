@@ -30,41 +30,41 @@ import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTran
 import { AudioTranslationLanguageService } from './audio-translation-language.service';
 
 describe('HintsAndSolutionManager service', () => {
-let ccms: ConceptCardManagerService;
-let pps: PlayerPositionService;
-let ees: ExplorationEngineService;
-let stateObjectFactory: StateObjectFactory;
-let mockNewCardOpenedEmitter = new EventEmitter<StateCard>();
-let mockNewCardAvailableEmitter = new EventEmitter();
-let interactionObjectFactory: InteractionObjectFactory;
-let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
-let audioTranslationLanguageService: AudioTranslationLanguageService;
+  let ccms: ConceptCardManagerService;
+  let pps: PlayerPositionService;
+  let ees: ExplorationEngineService;
+  let stateObjectFactory: StateObjectFactory;
+  let mockNewCardOpenedEmitter = new EventEmitter<StateCard>();
+  let mockNewCardAvailableEmitter = new EventEmitter();
+  let interactionObjectFactory: InteractionObjectFactory;
+  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
+  let audioTranslationLanguageService: AudioTranslationLanguageService;
 
-const WAIT_BEFORE_REALLY_STUCK_MSEC: number = 12000;
-const WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 2000;
-const WAIT_FOR_CONCEPT_CARD_MSEC: number = 6000;
+  const WAIT_BEFORE_REALLY_STUCK_MSEC: number = 12000;
+  const WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 2000;
+  const WAIT_FOR_CONCEPT_CARD_MSEC: number = 6000;
 
-beforeEach(fakeAsync(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule]
     });
     pps = TestBed.inject(PlayerPositionService);
     ees = TestBed.inject(ExplorationEngineService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     spyOn(pps, 'onNewCardAvailable').and.returnValue(
-        mockNewCardAvailableEmitter);
+      mockNewCardAvailableEmitter);
     spyOn(pps, 'onNewCardOpened').and.returnValue(
-        mockNewCardOpenedEmitter);
+      mockNewCardOpenedEmitter);
     ccms = TestBed.inject(ConceptCardManagerService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     writtenTranslationsObjectFactory = TestBed.inject(
-        WrittenTranslationsObjectFactory);
+      WrittenTranslationsObjectFactory);
     audioTranslationLanguageService = TestBed.inject(
-        AudioTranslationLanguageService);
-}));
+      AudioTranslationLanguageService);
+  }));
 
-it('should show concept card icon at the right time', fakeAsync(() => {
-    // Case when no hints exist
+  it('should show concept card icon at the right time', fakeAsync(() => {
+    // Case when no hints exist.
     spyOn(ccms, 'conceptCardForStateExists').and.returnValue(true);
     ccms.hintsAvailable = 0;
     expect(ccms.isConceptCardTooltipOpen()).toBe(false);
@@ -81,11 +81,10 @@ it('should show concept card icon at the right time', fakeAsync(() => {
     expect(ccms.isConceptCardTooltipOpen()).toBe(true);
     expect(ccms.isConceptCardViewable()).toBe(true);
     expect(ccms.isConceptCardConsumed()).toBe(false);
+  }));
 
-}));
-
-it('should not show concept card when hints exist', fakeAsync(() => {
-    // Case when hints exist
+  it('should not show concept card when hints exist', fakeAsync(() => {
+    // Case when hints exist.
     ccms.hintsAvailable = 1;
     spyOn(ccms, 'conceptCardForStateExists').and.returnValue(true);
     expect(ccms.isConceptCardTooltipOpen()).toBe(false);
@@ -102,10 +101,9 @@ it('should not show concept card when hints exist', fakeAsync(() => {
     expect(ccms.isConceptCardTooltipOpen()).toBe(false);
     expect(ccms.isConceptCardViewable()).toBe(false);
     expect(ccms.isConceptCardConsumed()).toBe(false);
+  }));
 
-}));
-
-it('should reset the service when timeouts was called before',
+  it('should reset the service when timeouts was called before',
     fakeAsync(() => {
       // Initialize the service with two hints and a solution.
       spyOn(ccms, 'conceptCardForStateExists').and.returnValue(true);
@@ -124,46 +122,46 @@ it('should reset the service when timeouts was called before',
       expect(flush()).toBe(6000);
     }));
 
-it('should return if concept card for the state exists', fakeAsync(() => {
+  it('should return if concept card for the state exists', fakeAsync(() => {
     const endState = {
-        classifier_model_id: null,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {}
-          }
-        },
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {}
-          }
-        },
-        interaction: {
-          solution: null,
-          confirmed_unclassified_answers: [],
-          id: 'EndExploration',
-          hints: [],
-          customization_args: {
-            recommendedExplorationIds: {
-              value: ['recommendedExplorationId']
-            }
-          },
-          answer_groups: [],
-          default_outcome: null
-        },
-        param_changes: [],
-        next_content_id_index: 0,
-        card_is_checkpoint: false,
-        linked_skill_id: "Id",
-        content: {
-          content_id: 'content',
-          html: 'Congratulations, you have finished!'
+      classifier_model_id: null,
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {}
         }
+      },
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {}
+        }
+      },
+      interaction: {
+        solution: null,
+        confirmed_unclassified_answers: [],
+        id: 'EndExploration',
+        hints: [],
+        customization_args: {
+          recommendedExplorationIds: {
+            value: ['recommendedExplorationId']
+          }
+        },
+        answer_groups: [],
+        default_outcome: null
+      },
+      param_changes: [],
+      next_content_id_index: 0,
+      card_is_checkpoint: false,
+      linked_skill_id: 'Id',
+      content: {
+        content_id: 'content',
+        html: 'Congratulations, you have finished!'
+      }
     };
     spyOn(ees, 'getState')
       .and.returnValue(
         stateObjectFactory.createFromBackendDict('End', endState));
-    
+
     ccms.hintsAvailable = 0;
     ccms.reset();
 
@@ -175,80 +173,80 @@ it('should return if concept card for the state exists', fakeAsync(() => {
     expect(ccms.isConceptCardTooltipOpen()).toBe(true);
     expect(ccms.isConceptCardViewable()).toBe(true);
     expect(ccms.isConceptCardConsumed()).toBe(false);
-}))
+  }));
 
-it('', fakeAsync(() => {
+  it('should set the number of hints available', fakeAsync(() => {
     spyOn(pps.onNewCardOpened, 'subscribe');
     // A StateCard which supports hints.
     let newCard = StateCard.createNewCard(
-        'State 2', '<p>Content</p>', '<interaction></interaction>',
-        interactionObjectFactory.createFromBackendDict({
-          id: 'TextInput',
-          answer_groups: [
-            {
-              outcome: {
-                dest: 'State',
-                dest_if_really_stuck: null,
-                feedback: {
-                  html: '',
-                  content_id: 'This is a new feedback text',
-                },
-                refresher_exploration_id: 'test',
-                missing_prerequisite_skill_id: 'test_skill_id',
-                labelled_as_correct: true,
-                param_changes: [],
+      'State 2', '<p>Content</p>', '<interaction></interaction>',
+      interactionObjectFactory.createFromBackendDict({
+        id: 'TextInput',
+        answer_groups: [
+          {
+            outcome: {
+              dest: 'State',
+              dest_if_really_stuck: null,
+              feedback: {
+                html: '',
+                content_id: 'This is a new feedback text',
               },
-              rule_specs: [],
-              training_data: [],
-              tagged_skill_misconception_id: '',
+              refresher_exploration_id: 'test',
+              missing_prerequisite_skill_id: 'test_skill_id',
+              labelled_as_correct: true,
+              param_changes: [],
             },
-          ],
-          default_outcome: {
-            dest: 'Hola',
-            dest_if_really_stuck: null,
-            feedback: {
-              content_id: '',
-              html: '',
-            },
-            labelled_as_correct: true,
-            param_changes: [],
-            refresher_exploration_id: 'test',
-            missing_prerequisite_skill_id: 'test_skill_id',
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: '',
           },
-          confirmed_unclassified_answers: [],
-          customization_args: {
-            rows: {
-              value: true,
-            },
-            placeholder: {
-              value: 1,
-            }
+        ],
+        default_outcome: {
+          dest: 'Hola',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: '',
+            html: '',
           },
-          hints: [],
-          solution: {
-            answer_is_exclusive: true,
-            correct_answer: 'test_answer',
-            explanation: {
-              content_id: '2',
-              html: 'test_explanation1',
-            },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: 'test',
+          missing_prerequisite_skill_id: 'test_skill_id',
+        },
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: true,
+          },
+          placeholder: {
+            value: 1,
           }
-        }),
-        RecordedVoiceovers.createEmpty(),
-        writtenTranslationsObjectFactory.createEmpty(),
-        'content', audioTranslationLanguageService);
-    
-        pps.onNewCardOpened.emit(newCard);
-        expect(ccms.hintsAvailable).toEqual(0);
-}))
+        },
+        hints: [],
+        solution: {
+          answer_is_exclusive: true,
+          correct_answer: 'test_answer',
+          explanation: {
+            content_id: '2',
+            html: 'test_explanation1',
+          },
+        }
+      }),
+      RecordedVoiceovers.createEmpty(),
+      writtenTranslationsObjectFactory.createEmpty(),
+      'content', audioTranslationLanguageService);
 
-it('should emit learner stuckness', fakeAsync(() => {
+    pps.onNewCardOpened.emit(newCard);
+    expect(ccms.hintsAvailable).toEqual(0);
+  }));
+
+  it('should emit learner stuckness', fakeAsync(() => {
     ccms.learnerIsReallyStuck = false;
     ccms.emitLearnerStuckedness();
     expect(ccms.learnerIsReallyStuck).toEqual(true);
-}));
+  }));
 
-it('should correctly consume concept card', fakeAsync(() => {
+  it('should correctly consume concept card', fakeAsync(() => {
     ccms.learnerIsReallyStuck = false;
     ccms.consumeConceptCard();
 
@@ -258,9 +256,9 @@ it('should correctly consume concept card', fakeAsync(() => {
     expect(ccms.wrongAnswersSinceConceptCardConsumed).toEqual(0);
     tick(WAIT_BEFORE_REALLY_STUCK_MSEC);
     expect(ccms.learnerIsReallyStuck).toEqual(true);
-}));
+  }));
 
-it('should record the wrong answer twice', fakeAsync(() => {
+  it('should record the wrong answer twice', fakeAsync(() => {
     // Initialize the service with two hints and a solution.
     spyOn(ccms, 'conceptCardForStateExists').and.returnValue(true);
     ccms.reset();
@@ -284,10 +282,10 @@ it('should record the wrong answer twice', fakeAsync(() => {
 
     expect(ccms.learnerIsReallyStuck).toEqual(true);
     flush();
-}));
+  }));
 
-it('should fetch EventEmitter for consumption of hint', () => {
+  it('should fetch EventEmitter for consumption of hint', () => {
     let mockOnLearnerGetsReallyStuck = new EventEmitter();
     expect(ccms.onLearnerGetsReallyStuck).toEqual(mockOnLearnerGetsReallyStuck);
-});
+  });
 });
