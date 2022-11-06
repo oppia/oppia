@@ -25,29 +25,29 @@ from apache_beam.io.gcp import gcsio
 
 import os
 import apache_beam as beam
-import types
 
 
 def insert_random_file(
-    client,
-    path,
-    content,
-    generation=1,
-    crc32c=None,
-    last_updated=None,
-    fail_when_getting_metadata=False,
-    fail_when_reading=False
+    client: gcsio_test.FakeGcsClient,
+    path: str,
+    content: bytes,
+    generation=1
 ):
+    """Insert random file into FakeGcsClient.
+
+    Args:
+        client: FakeGcsClient. The fake GCS client for testing purpose.
+        path: str. The file path to where store the content.
+        content: bytes: The content to store.
+        generation: int. The file generation.
+
+    Returns:
+        file: FakeFile. The FakeFile that is stored to FakeGcs.
+    """
     bucket, name = gcsio.parse_gcs_path(path)
-    f = gcsio_test.FakeFile(
-        bucket,
-        name,
-        content,
-        generation,
-        crc32c=crc32c,
-        last_updated=last_updated)
-    client.objects.add_file(f, fail_when_getting_metadata, fail_when_reading)
-    return f
+    file = gcsio_test.FakeFile(bucket, name, content, generation)
+    client.objects.add_file(file)
+    return file
 
 
 class ReadFileTest(job_test_utils.PipelinedTestBase):
@@ -56,16 +56,12 @@ class ReadFileTest(job_test_utils.PipelinedTestBase):
     def test_read_from_gcs(self):
         client = gcsio_test.FakeGcsClient()
         file_name = 'gs://gcsio-test/dummy_file'
-        random_comtent = os.urandom(1234)
-        insert_random_file(client, file_name, random_comtent)
+        random_content = os.urandom(1234)
+        insert_random_file(client, file_name, random_content)
         filenames = [file_name]
-        with self.swap(gcs_io, 'get_client', types.MethodType(lambda _: client, gcs_io)):
-            print("***********************")
-            print(gcs_io.get_client())
-
-            filename_p_collec = (
-                self.pipeline
-                |'Create pcoll of filenames' >> beam.Create(filenames)
-                | 'Read file from GCS' >> gcs_io.ReadFile(client)
-            )
-            self.assert_pcoll_equal(filename_p_collec, [random_comtent])
+        filename_p_collec = (
+            self.pipeline
+            |'Create pcoll of filenames' >> beam.Create(filenames)
+            | 'Read file from GCS' >> gcs_io.ReadFile(client)
+        )
+        self.assert_pcoll_equal(filename_p_collec, [random_content])

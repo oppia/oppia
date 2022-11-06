@@ -16,12 +16,17 @@
 
 """Tests the functionality of gcs_io."""
 
+from __future__ import annotations
+
+from apache_beam.io.gcp import gcsio_test
 from core.jobs import base_jobs
 from core.jobs.io import gcs_io
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
+
+from typing import Optional
 
 import apache_beam as beam
 
@@ -38,7 +43,15 @@ app_identity_services = models.Registry.import_app_identity_services()
 
 class TestGCSIoJob(base_jobs.JobBase):
     """Read exploration files stored on GCS."""
-    
+
+    def __init__(
+        self,
+        pipeline: beam.Pipeline,
+        client: Optional[gcsio_test.FakeGcsClient] = None
+    ) -> None:
+        super.__init__()
+        self.client = client
+        self.pipeline = pipeline
 
     def _map_with_filename(self, exp_id: str) -> str:
         """Returns the filename with which the exp image is stored.
@@ -60,7 +73,7 @@ class TestGCSIoJob(base_jobs.JobBase):
             | 'Map with id' >> beam.Map(lambda exp: exp.id)
             | 'Map with filename present on GCS' >> beam.Map(
                 self._map_with_filename)
-            | 'Read file from the GCS' >> gcs_io.ReadFile()
+            | 'Read file from the GCS' >> gcs_io.ReadFile(self.client)
         )
 
         total_files_read = (

@@ -25,7 +25,6 @@ from core.domain import state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import test_gcs_io_job
 from core.jobs.io import gcs_io_test
-from core.jobs.types import job_run_result
 from core.platform import models
 
 import os
@@ -38,7 +37,7 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 app_identity_services = models.Registry.import_app_identity_services()
 
-exp_models = models.Registry.import_models([models.Names.EXPLORATION])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 class TestGCSIoJobTests(job_test_utils.JobTestBase):
@@ -46,6 +45,8 @@ class TestGCSIoJobTests(job_test_utils.JobTestBase):
     JOB_CLASS = test_gcs_io_job.TestGCSIoJob
 
     EXPLORATION_ID_1 = '1'
+    EXP_1_STATE_1 = state_domain.State.create_default_state(
+        'EXP_1_STATE_1', is_initial_state=True).to_dict()
 
     def setUp(self):
         super().setUp()
@@ -69,16 +70,15 @@ class TestGCSIoJobTests(job_test_utils.JobTestBase):
         )
 
         self.client = gcsio_test.FakeGcsClient()
+        self.job = self.JOB_CLASS(self.pipeline, self.client)
 
     def test_run_with_no_models(self) -> None:
         self.assert_job_output_is([])
 
     def test_to_fetch_exp_filename(self) -> None:
-        self.job = self.JOB_CLASS(self.pipeline, client)
         bucket_name = app_identity_services.get_gcs_resource_bucket_name()
         filename = (
             f'gs://{bucket_name}/exploration/{self.EXPLORATION_ID_1}/'
             'some_image.png')
-        random_comtent = os.urandom(1234)
-        gcs_io_test.insert_random_file(self.client, filename, random_comtent)
-        
+        random_content = os.urandom(1234)
+        gcs_io_test.insert_random_file(self.client, filename, random_content)
