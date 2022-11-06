@@ -52,6 +52,7 @@ StringProperty = ndb.StringProperty
 TextProperty = ndb.TextProperty
 
 TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model) # pylint: disable=invalid-name
+MAX_GET_RETRIES = 3
 
 CLIENT = ndb.Client()
 
@@ -86,7 +87,13 @@ def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
         list(datastore_services.Model | None). List whose items are either a
         Model instance or None if the corresponding key wasn't found.
     """
-    return ndb.get_multi(keys)
+    for unused_i in range(0, MAX_GET_RETRIES):
+        try:
+            result = ndb.get_multi(keys)
+            return result
+        except Exception as unused_e:
+            continue
+    return None
 
 
 def update_timestamps_multi(
