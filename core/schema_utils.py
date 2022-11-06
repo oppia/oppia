@@ -25,14 +25,12 @@ following Python types: bool, dict, float, int, list, unicode.
 """
 
 from __future__ import annotations
-import io
 
+import io
 import numbers
 import re
 import urllib
 
-import mutagen
-from mutagen import mp3
 
 from core import feconf
 from core import utils
@@ -41,6 +39,9 @@ from core.domain import expression_parser
 from core.domain import html_cleaner
 from core.domain import user_domain
 from extensions.objects.models import objects
+
+import mutagen
+from mutagen import mp3
 
 from typing import Any, Callable, Dict, List, Optional, cast
 
@@ -796,9 +797,8 @@ class _Validators:
             seen_choices.append(choice['html'])
         return True
 
-
     @staticmethod
-    def has_matching_audio_extension(obj: str) -> bool:
+    def is_valid_audio_file(obj: bytes) -> bool:
         """Checks if given audio file is a valid audio file.
 
         Args:
@@ -808,7 +808,7 @@ class _Validators:
             bool. Returns True if obj is a valid audio file.
 
         Raises:
-            Exception. obj is not a valid audio file.
+            Exception. The obj is not a valid audio file.
         """
         if not obj:
             raise Exception('No audio supplied')
@@ -816,7 +816,7 @@ class _Validators:
         tempbuffer.write(obj)
         tempbuffer.seek(0)
 
-        # .mp3 is the only allowed extension
+        # .mp3 is the only allowed extension.
         extension = 'mp3'
         try:
             audio = mp3.MP3(tempbuffer)

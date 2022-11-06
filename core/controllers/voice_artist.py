@@ -56,7 +56,7 @@ class AudioUploadHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
-                        'id': 'has_matching_audio_extension'
+                        'id': 'is_valid_audio_file'
                     }]
                 }
             },
