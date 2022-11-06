@@ -1135,7 +1135,7 @@ class ExplorationVersionsDiff:
             It doesn't include the name changes of added/deleted states.
     """
 
-    def __init__(self, change_list: List[ExplorationChange]) -> None:
+    def __init__(self, change_list: Sequence[ExplorationChange]) -> None:
         """Constructs an ExplorationVersionsDiff domain object.
 
         Args:
@@ -1658,7 +1658,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state.validate(
                 self.param_specs,
                 allow_null_interaction=not strict,
-                tagged_skill_misconception_id_required=False)
+                tagged_skill_misconception_id_required=False,
+                strict=strict)
             # The checks below perform validation on the Outcome domain object
             # that is specific to answer groups in explorations, but not
             # questions. This logic is here because the validation checks in
@@ -4355,6 +4356,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             ele_position = ele_x_at_y_rule['position']
                             ele_element = ele_x_at_y_rule['element']
                             assert isinstance(ele_position, int)
+                            if ele_position > len(rule_spec_val_x):
+                                invalid_rules.append(rule_spec)
+                                continue
                             rule_choice = rule_spec_val_x[ele_position - 1]
 
                             if len(rule_choice) == 0:
