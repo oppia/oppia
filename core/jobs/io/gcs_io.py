@@ -34,15 +34,20 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class ReadFile(beam.PTransform):
+# TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
+class ReadFile(beam.PTransform): # type: ignore[misc]
     """Read files form the GCS."""
 
     def __init__(
         self,
         client: Optional[gcsio_test.FakeGcsClient] = None,
-        mode: str = 'r'
+        mode: str = 'r',
+        label: Optional[str] = None
     ) -> None:
-        super.__init__()
+        super.__init__(label=label)
         self.client = client
         self.mode = mode
 
@@ -61,7 +66,11 @@ class ReadFile(beam.PTransform):
         return gcs.open(filename, mode=self.mode).read()
 
 
-class WriteFile(beam.PTransform):
+# TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
+class WriteFile(beam.PTransform): # type: ignore[misc]
     """Write files to GCS."""
 
     def __init__(
@@ -69,9 +78,10 @@ class WriteFile(beam.PTransform):
         data: io.ReadableBuffer,
         client: Optional[gcsio_test.FakeGcsClient] = None,
         mode: str = 'w',
-        mime_type: str = 'application/octet-stream'
+        mime_type: str = 'application/octet-stream',
+        label: Optional[str] = None
     ):
-        super.__init__()
+        super.__init__(label=label)
         self.client = client
         self.mode = mode
         self.mime_type = mime_type

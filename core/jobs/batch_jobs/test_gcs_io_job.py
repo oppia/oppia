@@ -49,7 +49,7 @@ class TestGCSIoJob(base_jobs.JobBase):
         pipeline: beam.Pipeline,
         client: Optional[gcsio_test.FakeGcsClient] = None
     ) -> None:
-        super.__init__()
+        super.__init__(pipeline=pipeline)
         self.client = client
         self.pipeline = pipeline
 

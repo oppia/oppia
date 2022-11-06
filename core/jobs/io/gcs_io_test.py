@@ -31,8 +31,8 @@ def insert_random_file(
     client: gcsio_test.FakeGcsClient,
     path: str,
     content: bytes,
-    generation=1
-):
+    generation: int = 1
+) -> gcsio_test.FakeFile:
     """Insert random file into FakeGcsClient.
 
     Args:
@@ -53,7 +53,7 @@ def insert_random_file(
 class ReadFileTest(job_test_utils.PipelinedTestBase):
     """Tests to check gcs_io.ReadFile."""
 
-    def test_read_from_gcs(self):
+    def test_read_from_gcs(self) -> None:
         client = gcsio_test.FakeGcsClient()
         file_name = 'gs://gcsio-test/dummy_file'
         random_content = os.urandom(1234)

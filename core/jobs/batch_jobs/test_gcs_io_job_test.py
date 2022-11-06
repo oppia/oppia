@@ -48,7 +48,7 @@ class TestGCSIoJobTests(job_test_utils.JobTestBase):
     EXP_1_STATE_1 = state_domain.State.create_default_state(
         'EXP_1_STATE_1', is_initial_state=True).to_dict()
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.exp = self.create_model(
             exp_models.ExplorationModel,
