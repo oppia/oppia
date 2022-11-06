@@ -139,7 +139,7 @@ class StartTests(test_utils.GenericTestBase):
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
                 with self.swap_firebase_auth_emulator, self.swap_dev_appserver:
                     with self.swap_extend_index_yaml, swap_build:
-                        with self.swap_print, self.swap_ng_build:
+                        with self.swap_print:
                             start.main(args=['--prod_env'])
 
         self.assertIn(
@@ -161,7 +161,7 @@ class StartTests(test_utils.GenericTestBase):
             expected_kwargs=[{
                 'args': ['--maintenance_mode']
             }])
-        with self.swap_cloud_datastore_emulator, swap_build:
+        with self.swap_cloud_datastore_emulator, swap_build, self.swap_ng_build:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
                 with self.swap_create_server, self.swap_webpack_compiler:
                     with self.swap_extend_index_yaml, self.swap_dev_appserver:
