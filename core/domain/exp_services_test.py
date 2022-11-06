@@ -55,7 +55,6 @@ from typing import Dict, Final, List, Optional, Sequence, Tuple, Type, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import feedback_models
     from mypy_imports import opportunity_models
@@ -80,7 +79,6 @@ if MYPY:  # pragma: no cover
 ])
 
 search_services = models.Registry.import_search_services()
-datastore_services = models.Registry.import_datastore_services()
 
 # TODO(msl): Test ExpSummaryModel changes if explorations are updated,
 # reverted, deleted, created, rights changed.
@@ -6770,7 +6768,7 @@ title: Old Title
         exploration.version = 2
 
         def _mock_apply_change_list(
-            *args: str, **kwargs: str
+            *unused_args: str, **unused_kwargs: str
         ) -> exp_domain.Exploration:
             """Mocks exp_fetchers.get_exploration_by_id()."""
             return exploration
