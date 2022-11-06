@@ -638,7 +638,7 @@ describe('Question backend Api service', () => {
 
     let req = httpTestingController.expectOne(
       '/diagnostic_test_questions_handler_url/topicID1' +
-      '?exclude_question_ids=questionId'
+      '?excluded_question_ids=questionId'
     );
     expect(req.request.method).toEqual('GET');
 
@@ -677,7 +677,7 @@ describe('Question backend Api service', () => {
 
     let req = httpTestingController.expectOne(
       '/diagnostic_test_questions_handler_url/topicID1' +
-      '?exclude_question_ids=questionId'
+      '?excluded_question_ids=questionId'
     );
     expect(req.request.method).toEqual('GET');
 

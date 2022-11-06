@@ -26,7 +26,7 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.domain import topic_fetchers
 
-from typing import Dict, List
+from typing import Dict, List, TypedDict, cast
 
 
 class DiagnosticTestPlayerPage(
@@ -58,8 +58,19 @@ def normalize_comma_separated_ids(comma_separated_ids: str) -> List[str]:
     return list(comma_separated_ids.split(','))
 
 
+class DiagnosticTestQuestionsHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of DiagnosticTestQuestionsHandler's
+    normalized_request dictionary.
+    """
+
+    excluded_question_ids: List[str]
+
+
 class DiagnosticTestQuestionsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
+    base.BaseHandler[
+        Dict[str, str],
+        DiagnosticTestQuestionsHandlerNormalizedRequestDict
+    ]
 ):
     """Handler class to fetch the questions from the diagnostic test skills of
     the given topic ID.
@@ -80,7 +91,7 @@ class DiagnosticTestQuestionsHandler(
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'exclude_question_ids': {
+            'excluded_question_ids': {
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': normalize_comma_separated_ids
@@ -91,11 +102,19 @@ class DiagnosticTestQuestionsHandler(
 
     @acl_decorators.open_access
     def get(self, topic_id: str) -> None:
+        # Here we use cast because we are narrowing down the type of
+        # 'normalized_request' from Union of request TypedDicts to a
+        # particular TypedDict that was defined according to the schemas.
+        # So that the type of fetched values is not considered as Any type.
+        request_data = cast(
+            DiagnosticTestQuestionsHandlerNormalizedRequestDict,
+            self.normalized_request
+        )
+
         # The list of question IDs that were already presented in the
         # diagnostic test. The questions corresponding to these IDs should not
         # be repeated.
-        exclude_question_ids: List[str] = self.normalized_request.get(
-            'exclude_question_ids', [])
+        excluded_question_ids: List[str] = request_data['excluded_question_ids']
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
@@ -104,9 +123,12 @@ class DiagnosticTestQuestionsHandler(
 
         diagnostic_test_skill_ids = topic.skill_ids_for_diagnostic_test
 
-        skill_id_to_all_questions_fetchable_at_one_time = (
-            collections.defaultdict(list))
-        question_ids_for_fetched_skills = []
+        # A dict with skill ID as key and a list with two questions as value.
+        # Among the two questions, one question should be considered as the
+        # main and the other should be considered as the backup.
+        skill_id_to_questions_map: Dict[
+            str, List[question_domain.Question]] = (
+                collections.defaultdict(list))
 
         for skill_id in diagnostic_test_skill_ids:
             questions = question_services.get_questions_by_skill_ids(
@@ -114,40 +136,14 @@ class DiagnosticTestQuestionsHandler(
                 [skill_id],
                 require_medium_difficulty=True
             )
-            skill_id_to_all_questions_fetchable_at_one_time[skill_id] = (
-                questions)
 
-            question_ids_for_fetched_skills.extend(
-                [question.id for question in questions])
-
-        # A dict with skill ID as key and a list with a maximum of two
-        # questions as value. Among the two questions, one question should be
-        # considered as the main and the other should be considered as
-        # the backup.
-        skill_id_to_questions_map: Dict[
-            str, List[question_domain.Question]] = (
-                collections.defaultdict(list))
-
-        for skill_id, questions in (
-            skill_id_to_all_questions_fetchable_at_one_time.items()):
-            question_ids_for_other_diagnostic_test_skills = list(
-                set(question_ids_for_fetched_skills) -
-                set(question.id for question in questions)
-            )
-            # A list of question IDs, where each ID belongs to the questions
-            # that are already presented in the test or that belong to other
-            # skills. These IDs should not be considered in order to avoid the
-            # repetition of questions in the diagnostic test.
-            question_ids_to_exclude = (
-                question_ids_for_other_diagnostic_test_skills +
-                exclude_question_ids
-            )
             for question in questions:
-                if question.id in question_ids_to_exclude:
+                if question.id in excluded_question_ids:
                     continue
 
                 if len(skill_id_to_questions_map[skill_id]) < 2:
                     skill_id_to_questions_map[skill_id].append(question)
+                    excluded_question_ids.append(question.id)
                 else:
                     break
 
