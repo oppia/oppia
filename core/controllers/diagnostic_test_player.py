@@ -48,10 +48,10 @@ def normalize_comma_separated_ids(comma_separated_ids: str) -> List[str]:
     question IDs.
 
     Args:
-        comma_separated_ids: str. Comma separated topic IDs.
+        comma_separated_ids: str. Comma separated question IDs.
 
     Returns:
-        list(str). A list of topic IDs.
+        list(str). A list of question IDs.
     """
     if not comma_separated_ids:
         return list([])
