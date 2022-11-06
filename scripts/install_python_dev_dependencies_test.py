@@ -108,8 +108,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         environ_swap = self.swap(os, 'environ', {'GITHUB_ACTION': '1'})
         with prefix_swap, base_prefix_swap, real_prefix_manager, environ_swap:
             install_python_dev_dependencies.check_python_env_is_suitable()
-    
-    def test_check_python_env_is_suitable_passes_when_in_docker_container(self) -> None:
+
+    def test_check_python_env_is_suitable_passes_when_in_docker(self) -> None:
         real_prefix_manager = self.sys_real_prefix_context('')
         environ_swap = self.swap(os, 'environ', {'IS_DOCKER_CONTAINER': 'True'})
         with real_prefix_manager, environ_swap:
