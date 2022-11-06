@@ -638,4 +638,265 @@ describe('Diagnostic test engine service', () => {
     expect(diagnosticTestPlayerEngineService.getCurrentTopicId()).toEqual(
       'topicId3');
   }));
+
+  it('should be able to sort the dependency sample graph 1', fakeAsync(() => {
+    let initSuccessCb = jasmine.createSpy('success');
+    // A linear graph with 3 nodes.
+    const topicIdToPrerequisiteTopicIds = {
+      topicId1: [],
+      topicId2: ['topicId1'],
+      topicId3: ['topicId2']
+    };
+
+    const diagnosticTestCurrentTopicStatusModel = {
+      skillId1: new DiagnosticTestQuestionsModel(question1, question2),
+      skillId2: new DiagnosticTestQuestionsModel(question3, question4)
+    };
+
+    const diagnosticTestTopicTrackerModel = (
+      new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds));
+
+    spyOn(
+      questionBackendApiService,
+      'fetchDiagnosticTestQuestionsAsync').and.returnValue(
+      Promise.resolve(diagnosticTestCurrentTopicStatusModel));
+
+    // Initially, the current question should be undefined since the engine
+    // is not initialized.
+    expect(diagnosticTestPlayerEngineService.getCurrentQuestion()).toEqual(
+      undefined);
+
+    diagnosticTestPlayerEngineService.init(
+      diagnosticTestTopicTrackerModel, initSuccessCb);
+    tick();
+
+    let sortedTopicIds: string[] = (
+      diagnosticTestPlayerEngineService._getSortedTopicIds());
+
+    expect(sortedTopicIds).toEqual(['topicId1', 'topicId2', 'topicId3']);
+  }));
+
+  it('should be able to sort the dependency sample graph 2', fakeAsync(() => {
+    let initSuccessCb = jasmine.createSpy('success');
+    const topicIdToPrerequisiteTopicIds = {
+      topicId5: ['topicId2', 'topicId3', 'topicId4'],
+      topicId4: ['topicId1'],
+      topicId3: ['topicId2'],
+      topicId2: ['topicId1'],
+      topicId1: []
+    };
+
+    const diagnosticTestCurrentTopicStatusModel = {
+      skillId1: new DiagnosticTestQuestionsModel(question1, question2),
+      skillId2: new DiagnosticTestQuestionsModel(question3, question4)
+    };
+
+    const diagnosticTestTopicTrackerModel = (
+      new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds));
+
+    spyOn(
+      questionBackendApiService,
+      'fetchDiagnosticTestQuestionsAsync').and.returnValue(
+      Promise.resolve(diagnosticTestCurrentTopicStatusModel));
+
+    // Initially, the current question should be undefined since the engine
+    // is not initialized.
+    expect(diagnosticTestPlayerEngineService.getCurrentQuestion()).toEqual(
+      undefined);
+
+    diagnosticTestPlayerEngineService.init(
+      diagnosticTestTopicTrackerModel, initSuccessCb);
+    tick();
+
+    // The list of topic IDs is converted into CSV because the topological sort
+    // of the topics prerequisite contains multiple solutions. And comparing a
+    // string in comparison to a list is easy, hence the list is converted into
+    // a string.
+    let sortedTopicIds: string = (
+      diagnosticTestPlayerEngineService._getSortedTopicIds()).join(',');
+
+    let possibleSortedAnswers = [
+      ['topicId1', 'topicId2', 'topicId3', 'topicId4', 'topicId5'].join(','),
+      ['topicId1', 'topicId4', 'topicId5', 'topicId2', 'topicId3'].join(',')
+    ];
+
+    expect(possibleSortedAnswers).toContain(sortedTopicIds);
+  }));
+
+  it('should be able to get the root topic IDs', fakeAsync(() => {
+    let initSuccessCb = jasmine.createSpy('success');
+
+    // A linear graph with 3 nodes.
+    const topicIdToPrerequisiteTopicIds = {
+      topicId1: [],
+      topicId2: ['topicId1'],
+      topicId3: ['topicId2']
+    };
+
+    const diagnosticTestCurrentTopicStatusModel = {
+      skillId1: new DiagnosticTestQuestionsModel(question1, question2),
+      skillId2: new DiagnosticTestQuestionsModel(question3, question4)
+    };
+
+    const diagnosticTestTopicTrackerModel = (
+      new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds));
+
+    spyOn(
+      questionBackendApiService,
+      'fetchDiagnosticTestQuestionsAsync').and.returnValue(
+      Promise.resolve(diagnosticTestCurrentTopicStatusModel));
+
+    diagnosticTestPlayerEngineService.init(
+      diagnosticTestTopicTrackerModel, initSuccessCb);
+    tick();
+
+    expect(diagnosticTestPlayerEngineService._getRootTopicIds()).toEqual(
+      ['topicId1']);
+  }));
+
+  it('should be able to recommend two root topic IDs', fakeAsync(() => {
+    spyOn(diagnosticTestPlayerEngineService, '_getRootTopicIds')
+      .and.returnValue(['topicId1', 'topicId2', 'topicId3']);
+
+    spyOn(diagnosticTestPlayerEngineService, 'getFailedTopicIds')
+      .and.returnValue(['topicId1', 'topicId2']);
+
+    let recommendedTopicIds = (
+      diagnosticTestPlayerEngineService.getRecommendedTopicIds());
+
+    expect(recommendedTopicIds).toEqual(['topicId1', 'topicId2']);
+  }));
+
+  it('should be able to recomemnd one root topic ID', fakeAsync(() => {
+    spyOn(diagnosticTestPlayerEngineService, '_getRootTopicIds')
+      .and.returnValue(['topicId1', 'topicId2', 'topicId3']);
+
+    spyOn(diagnosticTestPlayerEngineService, 'getFailedTopicIds')
+      .and.returnValue(['topicId2']);
+
+    let recommendedTopicIds = (
+      diagnosticTestPlayerEngineService.getRecommendedTopicIds());
+
+    expect(recommendedTopicIds).toEqual(['topicId2']);
+  }));
+
+  it(
+    'should be able to recommend one topic ID from the sorted list',
+    fakeAsync(() => {
+      spyOn(diagnosticTestPlayerEngineService, '_getRootTopicIds')
+        .and.returnValue(['topicId1']);
+
+      spyOn(diagnosticTestPlayerEngineService, 'getFailedTopicIds')
+        .and.returnValue(['topicId2', 'topicId3']);
+
+      spyOn(diagnosticTestPlayerEngineService, '_getSortedTopicIds')
+        .and.returnValue(
+          ['topicId1', 'topicId2', 'topicId3', 'topicId4', 'topicId5']);
+
+      let recommendedTopicIds = (
+        diagnosticTestPlayerEngineService.getRecommendedTopicIds());
+
+      expect(recommendedTopicIds).toEqual(['topicId2']);
+    }));
+
+  it(
+    'should be able to recommend zero topic IDs if the learner is not ' +
+    'failed in any topic', fakeAsync(() => {
+      spyOn(diagnosticTestPlayerEngineService, '_getRootTopicIds')
+        .and.returnValue(['topicId1']);
+
+      spyOn(diagnosticTestPlayerEngineService, 'getFailedTopicIds')
+        .and.returnValue([]);
+
+      spyOn(diagnosticTestPlayerEngineService, '_getSortedTopicIds')
+        .and.returnValue(
+          ['topicId1', 'topicId2', 'topicId3', 'topicId4', 'topicId5']);
+
+      let recommendedTopicIds = (
+        diagnosticTestPlayerEngineService.getRecommendedTopicIds());
+
+      expect(recommendedTopicIds).toEqual([]);
+    }));
+
+  it('should be able to compute test completion percentage', fakeAsync(() => {
+    let submitAnswerSuccessCb = jasmine.createSpy('success');
+    let initSuccessCb = jasmine.createSpy('success');
+
+    const topicIdToPrerequisiteTopicIds = {
+      topicId1: [],
+      topicId2: [],
+      topicId3: [],
+      topicId4: [],
+      topicId5: []
+    };
+
+    const diagnosticTestCurrentTopicStatusModel = {
+      skillId1: new DiagnosticTestQuestionsModel(question1, question2),
+      skillId2: new DiagnosticTestQuestionsModel(question3, question4)
+    };
+
+    const diagnosticTestTopicTrackerModel = (
+      new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds));
+
+    spyOn(
+      questionBackendApiService,
+      'fetchDiagnosticTestQuestionsAsync').and.returnValue(
+      Promise.resolve(diagnosticTestCurrentTopicStatusModel));
+
+    diagnosticTestPlayerEngineService.init(
+      diagnosticTestTopicTrackerModel, initSuccessCb);
+    tick();
+
+    expect(diagnosticTestPlayerEngineService.getCurrentTopicId())
+      .toEqual('topicId1');
+    expect(diagnosticTestPlayerEngineService.getCurrentSkillId()).toEqual(
+      'skillId1');
+    // Getting the main question from the current skill.
+    expect(diagnosticTestPlayerEngineService.getCurrentQuestion()).toEqual(
+      question1);
+
+    let answer = 'answer';
+    let answerClassificationResult = new AnswerClassificationResult(
+      outcomeObjectFactory
+        .createNew('default', '', '', []), 1, 0, 'default_outcome'
+    );
+    answerClassificationResult.outcome.labelledAsCorrect = false;
+
+    spyOn(answerClassificationService, 'getMatchingClassificationResult')
+      .and.returnValue(answerClassificationResult);
+
+    // Submitting incorrect answer.
+    diagnosticTestPlayerEngineService.submitAnswer(
+      answer, textInputService, submitAnswerSuccessCb);
+    tick();
+
+    expect(diagnosticTestPlayerEngineService.computeProgressPercentage())
+      .toEqual(3);
+
+    expect(diagnosticTestPlayerEngineService.getCurrentTopicId())
+      .toEqual('topicId1');
+
+    // An incorrect attempt does not change the skill, instead, the engine
+    // presents the backup question of the same skill.
+    expect(diagnosticTestPlayerEngineService.getCurrentSkillId()).toEqual(
+      'skillId1');
+
+    // Getting the backup question i.e., question2.
+    expect(diagnosticTestPlayerEngineService.getCurrentQuestion()).toEqual(
+      question2);
+
+    // Submitting incorrect answer.
+    diagnosticTestPlayerEngineService.submitAnswer(
+      answer, textInputService, submitAnswerSuccessCb);
+    tick();
+
+    // Topic 1 is marked as failed.
+    expect(diagnosticTestPlayerEngineService.getFailedTopicIds()).toEqual(
+      ['topicId1']);
+
+    // Out of the five topics, one topic is tested. So the test completion
+    // percentage should be 20%.
+    expect(diagnosticTestPlayerEngineService.computeProgressPercentage())
+      .toEqual(20);
+  }));
 });

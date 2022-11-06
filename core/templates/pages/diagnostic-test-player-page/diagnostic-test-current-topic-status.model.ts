@@ -57,6 +57,8 @@ export class DiagnosticTestCurrentTopicStatusModel {
   // not yet passed.
   _skillIdToTestStatus: {[skillId: string]: boolean} = {};
 
+  numberOfAttemptedQuestions: number;
+
   constructor(skillIdToQuestionsDict: SkillIdToQuestionsDict) {
     this._pendingSkillIdsToTest = Object.keys(skillIdToQuestionsDict);
     this._skillIdToQuestionsDict = skillIdToQuestionsDict;
@@ -65,10 +67,12 @@ export class DiagnosticTestCurrentTopicStatusModel {
     for (let skillId of this._pendingSkillIdsToTest) {
       this._skillIdToTestStatus[skillId] = false;
     }
+    this.numberOfAttemptedQuestions = 0;
   }
 
   recordCorrectAttempt(skillId: string): void {
     this._skillIdToTestStatus[skillId] = true;
+    this.numberOfAttemptedQuestions += 1;
   }
 
   recordIncorrectAttempt(skillId: string): void {
@@ -80,6 +84,7 @@ export class DiagnosticTestCurrentTopicStatusModel {
     } else {
       this._lifelineIsConsumed = true;
     }
+    this.numberOfAttemptedQuestions += 1;
   }
 
   getNextSkill(): string {
