@@ -1151,20 +1151,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'attribute.')
 
         self.state.content.html = (
-            '<oppia-noninteractive-image alt-with-value="&quot;&quot;">'
-            '</oppia-noninteractive-image>')
-        self._assert_validation_error(
-            self.new_exploration, 'The length of the image tag \'alt-with'
-            '-value\' attribute value should be at least 5 characters.')
-
-        self.state.content.html = (
-            '<oppia-noninteractive-image alt-with-value="">'
-            '</oppia-noninteractive-image>')
-        self._assert_validation_error(
-            self.new_exploration, 'The length of the image tag \'alt-with'
-            '-value\' attribute value should be at least 5 characters.')
-
-        self.state.content.html = (
             '<oppia-noninteractive-image alt-with-value="&quot;Image&quot;" '
             'caption-with-value=\"&amp;quot;aaaaaaaaaaaaaaaaaaaaaaaaaa'
             'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
@@ -1352,6 +1338,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.new_exploration, 'Link tag \'url-with-value\' attribute '
             'should not be empty.')
+
+        self.state.content.html = (
+          '<oppia-noninteractive-link text-with-value="&amp;quot;Google'
+          '&amp;quot;" url-with-value="&amp;quot;http://www.google.com&amp;'
+          'quot;"></oppia-noninteractive-link>'
+        )
+        self._assert_validation_error(
+          self.new_exploration, (
+            'Link should be prefix with acceptable schemas '
+            'which are \\[\'https\', \'\']')
+        )
 
     def test_math_rte_tag(self) -> None:
         """Validate Math tag."""
@@ -1563,6 +1560,29 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             content_id_of_continue_button_text]['en'].translation = (
             'valid value')
 
+    def test_continue_interaction(self) -> None:
+        """Tests Continue interaction."""
+        self.set_interaction_for_state(self.state, 'Continue')
+        self.state.interaction.customization_args[
+          'buttonText'].value.unicode_str = 'Continueeeeeeeeeeeeeeeeee'
+        self._assert_validation_error(
+          self.new_exploration, (
+            'The `continue` interaction text length should be atmost '
+            '20 characters.')
+        )
+
+    def test_end_interaction(self) -> None:
+        """Tests End interaction."""
+        self.set_interaction_for_state(self.state, 'EndExploration')
+        self.state.interaction.customization_args[
+          'recommendedExplorationIds'].value = ['id1', 'id2', 'id3', 'id4']
+        self.state.update_interaction_default_outcome(None)
+        self._assert_validation_error(
+          self.new_exploration, (
+            'The total number of recommended explorations inside End '
+            'interaction should be atmost 3.')
+          )
+
     def test_numeric_interaction(self) -> None:
         """Tests Numeric interaction."""
         self.set_interaction_for_state(self.state, 'NumericInput')
@@ -1633,9 +1653,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ]
         self.state.interaction.answer_groups = (
             test_ans_group_for_numeric_interaction)
-        self._assert_validation_error(
-            self.new_exploration, 'Rule \'1\' from answer group \'0\' will '
-            'never be matched because it is made redundant by the above rules')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule \'1\' from answer group \'0\' will '
+            'never be matched because it is made redundant by the above rules'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs = self.state.interaction.answer_groups[0].rule_specs
         rule_specs.remove(rule_specs[1])
 
@@ -1645,20 +1667,26 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'equal to zero in NumericInput interaction.')
         rule_specs.remove(rule_specs[1])
 
-        self._assert_validation_error(
-            self.new_exploration, 'The rule \'1\' of answer group \'0\' having '
-            'rule type \'IsInclusivelyBetween\' have `a` value greater than `b`'
-            ' value in NumericInput interaction.')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' '
+            'having rule type \'IsInclusivelyBetween\' have `a` value greater '
+            'than `b` value in NumericInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[1])
 
-        self._assert_validation_error(
-            self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
-            'NumericInput interaction is already present.')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' of '
+            'NumericInput interaction is already present.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[1])
 
-        self._assert_validation_error(
-            self.new_exploration, 'Rule \'2\' from answer group \'0\' will '
-            'never be matched because it is made redundant by the above rules')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule \'2\' from answer group \'0\' will '
+            'never be matched because it is made redundant by the above rules'
+        ):
+            self.new_exploration.validate(strict=True)
 
         self.state.recorded_voiceovers.add_content_id_for_voiceover(
             'feedback_0')
@@ -1826,40 +1854,52 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'requireSimplestForm'].value = True
         rule_specs = state.interaction.answer_groups[0].rule_specs
 
-        self._assert_validation_error(
-            self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
-            'FractionInput interaction is already present.')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' of '
+            'FractionInput interaction is already present.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[1])
 
-        self._assert_validation_error(
-            self.new_exploration, 'The rule \'1\' of answer group \'0\' do '
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' do '
             'not have value in simple form '
-            'in FractionInput interaction.')
+            'in FractionInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[1])
 
-        self._assert_validation_error(
-            self.new_exploration, 'The rule \'1\' of answer group \'0\' do '
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' do '
             'not have value in proper fraction '
-            'in FractionInput interaction.')
+            'in FractionInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[1])
 
-        self._assert_validation_error(
-            self.new_exploration, 'The rule \'1\' of answer group \'0\' do '
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' do '
             'not have value in proper fraction '
-            'in FractionInput interaction.')
+            'in FractionInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[1])
 
         state.interaction.customization_args[
             'allowImproperFraction'].value = True
-        self._assert_validation_error(
-            self.new_exploration, 'The rule \'1\' of answer group \'0\' has '
-            'non zero integer part in FractionInput interaction.')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' has '
+            'non zero integer part in FractionInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[1])
 
-        self._assert_validation_error(
-            self.new_exploration, 'Rule \'2\' from answer group \'0\' of '
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule \'2\' from answer group \'0\' of '
             'FractionInput interaction will never be matched because it is '
-            'made redundant by the above rules')
+            'made redundant by the above rules'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[1])
 
         self._assert_validation_error(
@@ -1870,10 +1910,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_specs.remove(rule_specs[1])
         rule_specs.remove(rule_specs[1])
 
-        self._assert_validation_error(
-            self.new_exploration, 'Rule \'3\' from answer group \'0\' of '
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule \'3\' from answer group \'0\' of '
             'FractionInput interaction will never be matched because it is '
-            'made redundant by the above rules')
+            'made redundant by the above rules'
+        ):
+            self.new_exploration.validate(strict=True)
 
         state.recorded_voiceovers.add_content_id_for_voiceover('feedback_0')
         state.written_translations.add_content_id_for_translation('feedback_0')
@@ -1982,17 +2024,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state.update_interaction_answer_groups(
             test_ans_group_for_number_with_units_interaction)
         rule_specs = self.state.interaction.answer_groups[0].rule_specs
-        self._assert_validation_error(
-            self.new_exploration, 'The rule \'1\' of answer group \'0\' has '
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' has '
             'rule type equal is coming after rule type equivalent having '
             'same value in FractionInput interaction.'
-        )
+        ):
+            self.new_exploration.validate(strict=True)
 
         rule_specs.remove(rule_specs[1])
-        self._assert_validation_error(
-            self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' of '
             'NumberWithUnitsInput interaction is already present.'
-        )
+        ):
+            self.new_exploration.validate(strict=True)
 
     def test_multiple_choice_interaction(self) -> None:
         """Tests MultipleChoice interaction."""
@@ -2038,10 +2082,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml('ca_choices_2', '<p>3</p>')
         ]
 
-        self._assert_validation_error(
-            self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' of '
             'MultipleChoiceInput interaction is already present.'
-        )
+        ):
+            self.new_exploration.validate(strict=True)
 
         rule_specs.remove(rule_specs[1])
         self.state.interaction.customization_args[
@@ -2117,21 +2162,23 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'minAllowableSelectionCount'].value = 1
         self.state.interaction.customization_args[
             'maxAllowableSelectionCount'].value = 3
-        self._assert_validation_error(
-            self.new_exploration, 'The rule 1 of answer group 0 of '
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule 1 of answer group 0 of '
             'ItemSelectionInput interaction is already present.'
-        )
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[1])
 
         self.state.interaction.customization_args[
             'minAllowableSelectionCount'].value = 1
         self.state.interaction.customization_args[
             'maxAllowableSelectionCount'].value = 2
-        self._assert_validation_error(
-            self.new_exploration, 'Selected choices of rule \'0\' of answer '
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Selected choices of rule \'0\' of answer '
             'group \'0\' either less than min_selection_value or greater than '
             'max_selection_value in ItemSelectionInput interaction.'
-        )
+        ):
+            self.new_exploration.validate(strict=True)
 
         self.state.interaction.customization_args[
             'minAllowableSelectionCount'].value = 1
@@ -2149,6 +2196,26 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         test_ans_group_for_drag_and_drop_interaction = [
             state_domain.AnswerGroup.from_dict({
             'rule_specs': [
+                {
+                    'rule_type': 'HasElementXAtPositionY',
+                    'inputs': {
+                        'x': 'ca_choices_0',
+                        'y': 4
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_0', 'ca_choices_1', 'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
                 {
                     'rule_type': (
                         'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
@@ -2290,28 +2357,91 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state.interaction.answer_groups = (
             test_ans_group_for_drag_and_drop_interaction)
         rule_specs = self.state.interaction.answer_groups[0].rule_specs
+
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>')
+        ]
+        self._assert_validation_error(
+            self.new_exploration, (
+              'There should be atleast 2 values inside DragAndDrop '
+              'interaction.')
+        )
+
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p> </p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '')
+        ]
         self.state.interaction.customization_args[
             'allowMultipleItemsInSamePosition'].value = False
 
         self._assert_validation_error(
-            self.new_exploration, 'The rule \'0\' of answer group \'0\' '
-            'having rule type - IsEqualToOrderingWithOneItemAtIncorrectPosition'
-            ' should not be there when the multiple items in same position '
-            'setting is turned off in DragAndDropSortInput interaction.')
-        rule_specs.remove(rule_specs[0])
+            self.new_exploration, 'Choices should be non empty.'
+        )
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '')
+        ]
 
         self._assert_validation_error(
-            self.new_exploration, 'The rule \'0\' of answer group \'0\' '
-            'have multiple items at same place when multiple items in same '
-            'position settings is turned off in DragAndDropSortInput '
-            'interaction.')
+            self.new_exploration, 'Choices should be non empty.'
+        )
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p>2</p>')
+        ]
+
+        self._assert_validation_error(
+            self.new_exploration, 'Choices should be unique.'
+        )
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p>3</p>')
+        ]
 
         self.state.interaction.customization_args[
             'allowMultipleItemsInSamePosition'].value = True
-        self._assert_validation_error(
-            self.new_exploration, 'The rule \'1\' of answer group \'0\', '
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - 1 of answer group 0 '
+            'does not have the enough position to match for the '
+            'HasElementXAtPositionY rule above.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+
+        self.state.interaction.customization_args[
+            'allowMultipleItemsInSamePosition'].value = False
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'0\' of answer group \'0\' '
+            'having rule type - IsEqualToOrderingWithOneItemAtIncorrectPosition'
+            ' should not be there when the multiple items in same position '
+            'setting is turned off in DragAndDropSortInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[0])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'0\' of answer group \'0\' '
+            'have multiple items at same place when multiple items in same '
+            'position settings is turned off in DragAndDropSortInput '
+            'interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
+
+        self.state.interaction.customization_args[
+            'allowMultipleItemsInSamePosition'].value = True
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\', '
             'the value 1 and value 2 cannot be same when rule type is '
-            'HasElementXBeforeElementY of DragAndDropSortInput interaction.')
+            'HasElementXBeforeElementY of DragAndDropSortInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[1])
 
         self._assert_validation_error(
@@ -2319,22 +2449,28 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'having rule type IsEqualToOrdering should not have empty values.')
         rule_specs.remove(rule_specs[1])
 
-        self._assert_validation_error(
-            self.new_exploration, 'The rule \'2\' of answer group \'0\' of '
-            'DragAndDropInput interaction is already present.')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'2\' of answer group \'0\' of '
+            'DragAndDropInput interaction is already present.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[0])
 
-        self._assert_validation_error(
-            self.new_exploration, 'Rule - 1 of answer group 0 '
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - 1 of answer group 0 '
             'will never be match because it is made redundant by the '
-            'HasElementXAtPositionY rule above.')
+            'HasElementXAtPositionY rule above.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[0])
         rule_specs.remove(rule_specs[0])
 
-        self._assert_validation_error(
-            self.new_exploration, 'Rule - 1 of answer group 0 will never '
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - 1 of answer group 0 will never '
             'be match because it is made redundant by the '
-            'IsEqualToOrderingWithOneItemAtIncorrectPosition rule above.')
+            'IsEqualToOrderingWithOneItemAtIncorrectPosition rule above.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[1])
 
     def test_text_interaction(self) -> None:
@@ -2507,44 +2643,63 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             test_ans_group_for_text_interaction)
         rule_specs = self.state.interaction.answer_groups[0].rule_specs
 
+        self.state.interaction.customization_args['rows'].value = 15
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rows value in Text interaction should '
+            'be between 1 and 10.'
+        ):
+            self.new_exploration.validate()
+
         self.state.interaction.customization_args['rows'].value = 5
-        self._assert_validation_error(
-            self.new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
-            'rule type \'Contains\' will never be matched because it '
-            'is made redundant by the above \'contains\' rule.')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' '
+            'having rule type \'Contains\' will never be matched because it '
+            'is made redundant by the above \'contains\' rule.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[0])
         rule_specs.remove(rule_specs[0])
 
-        self._assert_validation_error(
-            self.new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
-            'rule type \'StartsWith\' will never be matched because it '
-            'is made redundant by the above \'StartsWith\' rule.')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' '
+            'having rule type \'StartsWith\' will never be matched because it '
+            'is made redundant by the above \'StartsWith\' rule.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[0])
         rule_specs.remove(rule_specs[0])
 
-        self._assert_validation_error(
-            self.new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
-            'rule type \'StartsWith\' will never be matched because it '
-            'is made redundant by the above \'contains\' rule.')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' '
+            'having rule type \'StartsWith\' will never be matched because it '
+            'is made redundant by the above \'contains\' rule.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[0])
         rule_specs.remove(rule_specs[0])
 
-        self._assert_validation_error(
-            self.new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
-            'rule type \'Equals\' will never be matched because it '
-            'is made redundant by the above \'contains\' rule.')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' '
+            'having rule type \'Equals\' will never be matched because it '
+            'is made redundant by the above \'contains\' rule.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[0])
         rule_specs.remove(rule_specs[0])
 
-        self._assert_validation_error(
-            self.new_exploration, 'Rule - \'1\' of answer group - \'0\' having '
-            'rule type \'Equals\' will never be matched because it '
-            'is made redundant by the above \'StartsWith\' rule.')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' '
+            'having rule type \'Equals\' will never be matched because it '
+            'is made redundant by the above \'StartsWith\' rule.'
+        ):
+            self.new_exploration.validate(strict=True)
         rule_specs.remove(rule_specs[0])
 
-        self._assert_validation_error(
-            self.new_exploration, 'The rule \'1\' of answer group \'0\' of '
-            'TextInput interaction is already present.')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' of '
+            'TextInput interaction is already present.'
+        ):
+            self.new_exploration.validate(strict=True)
 
     # TODO(bhenning): The validation tests below should be split into separate
     # unit tests. Also, all validation errors should be covered in the tests.
@@ -3195,15 +3350,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.tags = ['abc', 'abc']
         self._assert_validation_error(
             exploration, 'Some tags duplicate each other')
-
-        exploration.tags = ['randomtextwhichisprobablygreaterthanthirty']
-        self._assert_validation_error(
-            exploration, 'Tag text length should not be more than 30.')
-
-        exploration.tags = [
-            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
-        self._assert_validation_error(
-            exploration, 'Total number of tags should be less than 10.')
 
         exploration.tags = ['computer science', 'analysis', 'a b c']
         exploration.validate()
@@ -6583,7 +6729,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 57
+schema_version: 58
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -6621,7 +6767,7 @@ states:
           - content_id: ca_choices_3
             html: <p>Choice 2</p>
         maxAllowableSelectionCount:
-          value: 2
+          value: 3
         minAllowableSelectionCount:
           value: 1
       default_outcome:
@@ -6689,10 +6835,11 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 52
+states_schema_version: 53
 tags: []
 title: Title
 """)
+
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
@@ -6842,7 +6989,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 57
+schema_version: 58
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -6958,7 +7105,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 52
+states_schema_version: 53
 tags: []
 title: Title
 """)
@@ -7073,7 +7220,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 57
+schema_version: 58
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7146,13 +7293,5288 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 52
+states_schema_version: 53
 tags: []
 title: Title
 """)
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
+
+    def test_fixing_invalid_labeled_as_correct_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests if the answer group's destination is state itself then
+        `labelled_as_correct` should be false. Migrates the invalid data.
+        """
+
+        sample_yaml_content_for_lab_as_correct: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: <p>fdfdf</p>
+          labelled_as_correct: true
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 7
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_2: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content:
+          hi:
+            data_format: html
+            translation:
+            - <p>choicewa</p>
+            needs_update: false
+        default_outcome: {}
+        feedback_2: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_lab_as_correct: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: <p>fdfdf</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 7
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_2: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content:
+          hi:
+            data_format: html
+            needs_update: false
+            translation:
+            - <p>choicewa</p>
+        default_outcome: {}
+        feedback_2: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_lab_as_correct)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_lab_as_correct)
+
+    def test_fixing_of_rte_content_by_migrating_to_v_58(
+        self
+    ) -> None:
+        """Tests the fixing of RTE content data from version less than 58."""
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+        sample_yaml_content_for_rte: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: '<p>Content of RTE</p>
+
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-link text-with-value="&amp;quotLink;&amp;quot;" url-with-value="&amp;quot;mailto:example@example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;Google&amp;quot;" url-with-value="&amp;quot;http://www.google.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link url-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;Link value&amp;quot;" url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-math></oppia-noninteractive-math>
+        <oppia-noninteractive-math math_content-with-value=""></oppia-noninteractive-math>
+        <oppia-noninteractive-math math_content-with-value="{&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math>
+        <oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math>
+        <oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math>
+        <oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;skill id&amp;quot;" text-with-value="&amp;quot;concept card&amp;quot;"></oppia-noninteractive-skillreview>
+        <oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;&amp;quot;" text-with-value="&amp;quot;concept card&amp;quot;"></oppia-noninteractive-skillreview>
+        <oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;&amp;quot;" text-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-skillreview>
+        <oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-skillreview>
+        <oppia-noninteractive-skillreview text-with-value="&amp;quot;concept card&amp;quot;"></oppia-noninteractive-skillreview>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0" start-with-value="0" video_id-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0" start-with-value="0"></oppia-noninteractive-video>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="5" start-with-value="10" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0" start-with-value="0" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-video autoplay-with-value="&amp;quot;&amp;quot;" end-with-value="&amp;quot;&amp;quot;" start-with-value="&amp;quot;&amp;quot;" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-video video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\" heading-with-value=\\"&amp;quot;&amp;quot;\\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;oppia-noninteractive-tabs&amp;gt;&amp;lt;/oppia-noninteractive-tabs&amp;gt;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-tabs tab_contents-with-value=\"[{&amp;quot;title&amp;quot;:&amp;quot;Title1&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;Content1&amp;lt;/p&amp;gt;&amp;quot;},{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;Content2&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-image filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]\"></oppia-noninteractive-tabs>
+        <oppia-noninteractive-tabs tab_contents-with-value=\"[{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;oppia-noninteractive-image filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]\"></oppia-noninteractive-tabs>
+        <oppia-noninteractive-tabs></oppia-noninteractive-tabs>
+        <oppia-noninteractive-tabs tab_contents-with-value=\"[{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;oppia-noninteractive-collapsible&amp;gt;&amp;lt;/oppia-noninteractive-collapsible&amp;gt;&amp;quot;}]\"></oppia-noninteractive-tabs>
+        <oppia-noninteractive-tabs tab_contents-with-value=\"[]\"></oppia-noninteractive-tabs>
+        <oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+        &amp;quot;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint introduction&amp;quot;},
+        {&amp;quot;content&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;title&amp;quot;: &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;:
+        &amp;quot;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint
+        #2&amp;quot;}]"></oppia-noninteractive-tabs>'
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continueeeeeeeeeeeeeeeeeeeeeee
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0:
+          hi:
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            file_size_bytes: 37198
+            needs_update: false
+            duration_secs: 2.324875
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0:
+          hi:
+            data_format: html
+            translation: '<p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image></p>'
+            needs_update: false
+        content: {}
+        default_outcome: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value:
+          - id1
+          - id2
+          - id3
+          - id4
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+# pylint: disable=anomalous-backslash-in-string
+        latest_sample_yaml_content_for_rte: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: '<p>Content of RTE</p>
+
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
+        filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
+        filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
+        filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-link text-with-value="&amp;quot;Google&amp;quot;" url-with-value="&amp;quot;https://www.google.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;Link value&amp;quot;"
+        url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;https://www.example.com&amp;quot;"
+        url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;https://www.example.com&amp;quot;"
+        url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math>
+        <oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;skill id&amp;quot;"
+        text-with-value="&amp;quot;concept card&amp;quot;"></oppia-noninteractive-skillreview>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0"
+        start-with-value="0" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0"
+        start-with-value="0" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0"
+        start-with-value="0" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0"
+        start-with-value="0" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>   <oppia-noninteractive-collapsible
+        content-with-value="&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible
+        block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\&amp;quot;\&amp;quot;
+        autoplay-with-value=\&amp;quot;true\&amp;quot; end-with-value=\&amp;quot;0\&amp;quot;
+        ng-version=\&amp;quot;11.2.14\&amp;quot; start-with-value=\&amp;quot;0\&amp;quot;
+        video_id-with-value=\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;"
+        heading-with-value="&amp;quot;heading&amp;quot;"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value="&amp;quot;&amp;lt;p&amp;gt;You
+        have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;heading&amp;quot;"></oppia-noninteractive-collapsible>     <oppia-noninteractive-tabs
+        tab_contents-with-value="[{&amp;quot;title&amp;quot;: &amp;quot;Title1&amp;quot;,
+        &amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;Content1&amp;lt;/p&amp;gt;&amp;quot;},
+        {&amp;quot;title&amp;quot;: &amp;quot;Title2&amp;quot;, &amp;quot;content&amp;quot;:
+        &amp;quot;&amp;lt;p&amp;gt;Content2&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-image
+        alt-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
+        caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
+        filepath-with-value=\&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]"></oppia-noninteractive-tabs>     '
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0:
+          hi:
+            duration_secs: 2.324875
+            file_size_bytes: 37198
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            needs_update: true
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0:
+          hi:
+            data_format: html
+            needs_update: true
+            translation: <p><oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;"
+              caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image></p>
+        content: {}
+        default_outcome: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value:
+          - id1
+          - id2
+          - id3
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_rte)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_rte)
+
+    def test_fixing_invalid_continue_and_end_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests the migration of invalid continue and end exploration data
+        from version less than 58.
+        """
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+        sample_yaml_content_for_cont_and_end_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Continue and End interaction validation</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continueeeeeeeeeeeeeeeeeeeeeee
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint introduction&amp;quot;},
+            {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;A noun is a person,
+            place, or thing.  A noun can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;,
+            &amp;quot;title&amp;quot;: &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;lt;p&amp;gt;One of these words is an animal.  Which word
+            is the noun?&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint
+            #2&amp;quot;}]"></oppia-noninteractive-tabs>'
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0:
+          hi:
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            file_size_bytes: 37198
+            needs_update: false
+            duration_secs: 2.324875
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0:
+          hi:
+            data_format: html
+            translation: <p>choicewa</p>
+            needs_update: false
+        content: {}
+        default_outcome: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value:
+          - id1
+          - id2
+          - id3
+          - id4
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+        latest_sample_yaml_content_for_cont_and_end_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Continue and End interaction validation</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;lt;p&amp;gt;A noun is a person, place, or thing.  A noun
+            can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;:
+            &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;One
+            of these words is an animal.  Which word is the noun?&amp;lt;/p&amp;gt;&amp;quot;,
+            &amp;quot;title&amp;quot;: &amp;quot;Hint #2&amp;quot;}]"></oppia-noninteractive-tabs>'
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0:
+          hi:
+            duration_secs: 2.324875
+            file_size_bytes: 37198
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            needs_update: true
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0:
+          hi:
+            data_format: html
+            needs_update: true
+            translation: <p>choicewa</p>
+        content: {}
+        default_outcome: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value:
+          - id1
+          - id2
+          - id3
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_cont_and_end_interac_1)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_cont_and_end_interac_1)
+
+        sample_yaml_content_for_cont_and_end_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: hi
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Continue and End interaction validation</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continueeeeeeeeeeeeeeeeeeeeeee
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value:
+          - id1
+          - id2
+          - id3
+          - id4
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_cont_and_end_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: hi
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Continue and End interaction validation</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continue
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value:
+          - id1
+          - id2
+          - id3
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_cont_and_end_interac_2)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_cont_and_end_interac_2)
+
+    def test_fixing_invalid_numeric_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests the migration of invalid NumericInput interaction exploration
+        data from version less than 58.
+        """
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+        sample_yaml_content_for_numeric_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_1
+            html: <p>fdfdf</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint introduction&amp;quot;},
+            {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;A noun is a person,
+            place, or thing.  A noun can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;,
+            &amp;quot;title&amp;quot;: &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;lt;p&amp;gt;One of these words is an animal.  Which word
+            is the noun?&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint
+            #2&amp;quot;}]"></oppia-noninteractive-tabs>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            a: 18.0
+            b: 18.0
+          rule_type: IsInclusivelyBetween
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        - inputs:
+            tol: -5.0
+            x: 5.0
+          rule_type: IsWithinTolerance
+        - inputs:
+            a: 30.0
+            b: 39.0
+          rule_type: IsInclusivelyBetween
+        - inputs:
+            a: 17.0
+            b: 15.0
+          rule_type: IsInclusivelyBetween
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 25.0
+          rule_type: IsLessThanOrEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_4
+            html: <p>cc</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 15.0
+          rule_type: IsLessThanOrEqualTo
+        - inputs:
+            x: 10.0
+          rule_type: Equals
+        - inputs:
+            x: 5.0
+          rule_type: IsLessThan
+        - inputs:
+            a: 9.0
+            b: 5.0
+          rule_type: IsInclusivelyBetween
+        - inputs:
+            tol: 2.0
+            x: 5.0
+          rule_type: IsWithinTolerance
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_5
+            html: <p>cv</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 40.0
+          rule_type: IsGreaterThanOrEqualTo
+        - inputs:
+            x: 50.0
+          rule_type: Equals
+        - inputs:
+            x: 40.0
+          rule_type: IsGreaterThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_6
+            html: <p>vb</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: string
+          rule_type: IsLessThanOrEqualTo
+        - inputs:
+            x: string
+          rule_type: Equals
+        - inputs:
+            x: string
+          rule_type: IsLessThan
+        - inputs:
+            a: string
+            b: 9.0
+          rule_type: IsInclusivelyBetween
+        - inputs:
+            tol: string
+            x: 5.0
+          rule_type: IsWithinTolerance
+        - inputs:
+            x: string
+          rule_type: IsGreaterThanOrEqualTo
+        - inputs:
+            x: string
+          rule_type: IsGreaterThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_7
+            html: <p>vb</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            tol: string
+            x: 60.0
+          rule_type: IsWithinTolerance
+        - inputs:
+            a: string
+            b: 10.0
+          rule_type: IsInclusivelyBetween
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+        - hint_content:
+            content_id: hint
+            html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+              &amp;quot;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint introduction&amp;quot;},
+              {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;A noun is a person,
+              place, or thing.  A noun can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;,
+              &amp;quot;title&amp;quot;: &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;:
+              &amp;quot;&amp;lt;p&amp;gt;One of these words is an animal.  Which word
+              is the noun?&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint
+              #2&amp;quot;}]"></oppia-noninteractive-tabs>'
+        - hint_content:
+            content_id: hint_2
+            html: '<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;"
+              caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 7
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        hint: {}
+        hint_2: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        hint: {}
+        hint_2: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+        latest_sample_yaml_content_for_numeric_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+              &amp;quot;&amp;lt;p&amp;gt;A noun is a person, place, or thing.  A noun
+              can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;:
+              &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;One
+              of these words is an animal.  Which word is the noun?&amp;lt;/p&amp;gt;&amp;quot;,
+              &amp;quot;title&amp;quot;: &amp;quot;Hint #2&amp;quot;}]"></oppia-noninteractive-tabs>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 18.0
+          rule_type: Equals
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        - inputs:
+            tol: 5.0
+            x: 5.0
+          rule_type: IsWithinTolerance
+        - inputs:
+            a: 30.0
+            b: 39.0
+          rule_type: IsInclusivelyBetween
+        - inputs:
+            a: 15.0
+            b: 17.0
+          rule_type: IsInclusivelyBetween
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 25.0
+          rule_type: IsLessThanOrEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_5
+            html: <p>cv</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 40.0
+          rule_type: IsGreaterThanOrEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          content_id: hint
+          html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;lt;p&amp;gt;A noun is a person, place, or thing.  A noun
+            can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;:
+            &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;One
+            of these words is an animal.  Which word is the noun?&amp;lt;/p&amp;gt;&amp;quot;,
+            &amp;quot;title&amp;quot;: &amp;quot;Hint #2&amp;quot;}]"></oppia-noninteractive-tabs>'
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 7
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_5: {}
+        hint: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_5: {}
+        hint: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_numeric_interac)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_numeric_interac)
+
+    def test_fixing_invalid_fraction_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests the migration of invalid FractionInput interaction exploration
+        data from version less than 58.
+        """
+
+        sample_yaml_content_for_fraction_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_8
+            html: <p>jj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_9
+            html: <p>dfd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_10
+            html: <p>hj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 11
+              wholeNumber: 0
+          rule_type: IsGreaterThan
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 14
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_11
+            html: <p>hj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 11
+              wholeNumber: 0
+          rule_type: IsLessThan
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 7
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_12
+            html: <p>ll</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: HasDenominatorEqualTo
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 11
+              wholeNumber: 0
+          rule_type: HasFractionalPartExactlyEqualTo
+        - inputs:
+            x: string
+          rule_type: HasDenominatorEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_13
+            html: <p>hj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 19
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowImproperFraction:
+          value: true
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
+          value:
+            content_id: ca_customPlaceholder_7
+            unicode_str: ''
+        requireSimplestForm:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: FractionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 14
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_13: {}
+        feedback_8: {}
+        feedback_9: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_13: {}
+        feedback_8: {}
+        feedback_9: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_fraction_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_8
+            html: <p>jj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_10
+            html: <p>hj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 11
+              wholeNumber: 0
+          rule_type: IsGreaterThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_11
+            html: <p>hj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 11
+              wholeNumber: 0
+          rule_type: IsLessThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_12
+            html: <p>ll</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: HasDenominatorEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowImproperFraction:
+          value: true
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
+          value:
+            content_id: ca_customPlaceholder_7
+            unicode_str: ''
+        requireSimplestForm:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: FractionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 14
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_8: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_8: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_fraction_interac)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_fraction_interac)
+
+        sample_yaml_content_for_fraction_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_8
+            html: <p>jj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        - inputs:
+            f:
+              denominator: 17
+              isNegative: false
+              numerator: 3
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowImproperFraction:
+          value: false
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
+          value:
+            content_id: ca_customPlaceholder_7
+            unicode_str: ''
+        requireSimplestForm:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: FractionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 14
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_8: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_8: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_fraction_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_8
+            html: <p>jj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 17
+              isNegative: false
+              numerator: 3
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowImproperFraction:
+          value: false
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
+          value:
+            content_id: ca_customPlaceholder_7
+            unicode_str: ''
+        requireSimplestForm:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: FractionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 14
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_8: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_8: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_fraction_interac_2)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_fraction_interac_2)
+
+    def test_fixing_invalid_multiple_choice_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests the migration of invalid MultipleChoice interaction exploration
+        data from version less than 58.
+        """
+
+        sample_yaml_content_for_multiple_choice_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_17
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_18
+            html: <p>a</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_19
+            html: <p>aa</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_13
+            html: ''
+          - content_id: ca_choices_14
+            html: ''
+          - content_id: ca_choices_15
+            html: <p>1</p>
+          - content_id: ca_choices_16
+            html: <p>1</p>
+          - content_id: ca_choices_17
+            html: <p>Choice 2</p>
+        showChoicesInShuffledOrder:
+          value: true
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 20
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_13:
+          hi:
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            file_size_bytes: 37198
+            needs_update: false
+            duration_secs: 2.324875
+        ca_choices_14: {}
+        ca_choices_15: {}
+        ca_choices_16: {}
+        ca_choices_17: {}
+        content: {}
+        default_outcome: {}
+        feedback_17: {}
+        feedback_18: {}
+        feedback_19: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_13:
+          hi:
+            data_format: html
+            translation: <p>choicewa</p>
+            needs_update: false
+        ca_choices_14: {}
+        ca_choices_15: {}
+        ca_choices_16: {}
+        ca_choices_17: {}
+        content: {}
+        default_outcome: {}
+        feedback_17: {}
+        feedback_18: {}
+        feedback_19: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_multiple_choice_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_17
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_18
+            html: <p>a</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_13
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_15
+            html: <p>1</p>
+          - content_id: ca_choices_17
+            html: <p>Choice 2</p>
+        showChoicesInShuffledOrder:
+          value: true
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 20
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_13:
+          hi:
+            duration_secs: 2.324875
+            file_size_bytes: 37198
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            needs_update: true
+        ca_choices_15: {}
+        ca_choices_17: {}
+        content: {}
+        default_outcome: {}
+        feedback_17: {}
+        feedback_18: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_13:
+          hi:
+            data_format: html
+            needs_update: true
+            translation: <p>choicewa</p>
+        ca_choices_15: {}
+        ca_choices_17: {}
+        content: {}
+        default_outcome: {}
+        feedback_17: {}
+        feedback_18: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_multiple_choice_interac)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_multiple_choice_interac)
+
+    def test_fixing_invalid_item_selec_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests the migration of invalid ItemSelection interaction exploration
+        data from version less than 58.
+        """
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+        sample_yaml_content_for_item_selection_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_24
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+            - ca_choices_21
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_22
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: ContainsAtLeastOneOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_25
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_20
+            - ca_choices_21
+            - ca_choices_22
+            - ca_choices_23
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>
+          - content_id: ca_choices_21
+            html: <p>2<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image></p>
+          - content_id: ca_choices_22
+            html: <p>3</p>
+          - content_id: ca_choices_23
+            html: <p>4</p>
+        maxAllowableSelectionCount:
+          value: 2
+        minAllowableSelectionCount:
+          value: 3
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+          - <p>1</p>
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    next_content_id_index: 26
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        solution: {}
+        feedback_24: {}
+        feedback_25: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        solution: {}
+        feedback_24: {}
+        feedback_25: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+        latest_sample_yaml_content_for_item_selection_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_24
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+            - ca_choices_21
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: ContainsAtLeastOneOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_25
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_20
+            - ca_choices_21
+            - ca_choices_22
+            - ca_choices_23
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1</p>
+          - content_id: ca_choices_21
+            html: <p>2<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;"
+              caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image></p>
+          - content_id: ca_choices_22
+            html: <p>3</p>
+          - content_id: ca_choices_23
+            html: <p>4</p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - <p>1</p>
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    next_content_id_index: 26
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+        feedback_25: {}
+        solution: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+        feedback_25: {}
+        solution: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_item_selection_interac_1)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_item_selection_interac_1)
+
+        sample_yaml_content_for_item_selection_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_24
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_22
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_25
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_22
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_21
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_26
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_22
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_27
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_23
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1</p>
+          - content_id: ca_choices_21
+            html: <p>2</p>
+          - content_id: ca_choices_22
+            html: <p>3</p>
+          - content_id: ca_choices_23
+            html: <p>  </p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 2
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+          - <p>  </p>
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    next_content_id_index: 28
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        solution: {}
+        feedback_24: {}
+        feedback_25: {}
+        feedback_26: {}
+        feedback_27: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        solution: {}
+        feedback_24: {}
+        feedback_25: {}
+        feedback_26: {}
+        feedback_27: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_item_selection_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_25
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_22
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_21
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1</p>
+          - content_id: ca_choices_21
+            html: <p>2</p>
+          - content_id: ca_choices_22
+            html: <p>3</p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 28
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        content: {}
+        default_outcome: {}
+        feedback_25: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        content: {}
+        default_outcome: {}
+        feedback_25: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_item_selection_interac_2)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_item_selection_interac_2)
+
+        sample_yaml_content_for_item_selection_interac_3: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_24
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_23
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_25
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+            - ca_choices_21
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1</p>
+          - content_id: ca_choices_21
+            html: <p>2</p>
+          - content_id: ca_choices_22
+            html: <p>3</p>
+          - content_id: ca_choices_23
+            html: <p>4</p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 2
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 26
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+        feedback_25: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+        feedback_25: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_item_selection_interac_3: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_25
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+            - ca_choices_21
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1</p>
+          - content_id: ca_choices_21
+            html: <p>2</p>
+          - content_id: ca_choices_22
+            html: <p>3</p>
+          - content_id: ca_choices_23
+            html: <p>4</p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 2
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 26
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        feedback_25: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        feedback_25: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_item_selection_interac_3)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_item_selection_interac_3)
+
+        sample_yaml_content_for_item_selection_interac_4: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_24
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1</p>
+          - content_id: ca_choices_21
+            html: <p>2</p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 3
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 26
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_item_selection_interac_4: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_24
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1</p>
+          - content_id: ca_choices_21
+            html: <p>2</p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 26
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_item_selection_interac_4)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_item_selection_interac_4)
+
+    def test_fixing_invalid_drag_and_drop_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests the migration of invalid DragAndDrop interaction exploration
+        data from version less than 58.
+        """
+
+        sample_yaml_content_for_drag_and_drop_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_30
+            html: <p>as</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_26
+              - ca_choices_27
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x:
+            - - ca_choices_26
+              - ca_choices_27
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_31
+            html: <p>ff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_26
+            y: ca_choices_26
+          rule_type: HasElementXBeforeElementY
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_32
+            html: <p>a</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: []
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_27
+            y: 2
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x:
+            - - ca_choices_26
+            - - ca_choices_27
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x:
+            - - ca_choices_26
+            - []
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x:
+            - - ca_choices_29
+            - - ca_choices_28
+            - - ca_choices_27
+            - - ca_choices_26
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_27
+            y: 4
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x:
+            - - ca_choices_29
+            - - ca_choices_28
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: false
+        choices:
+          value:
+          - content_id: ca_choices_26
+            html: <p>1</p>
+          - content_id: ca_choices_27
+            html: <p>2</p>
+          - content_id: ca_choices_28
+            html: <p>3</p>
+          - content_id: ca_choices_29
+            html: <p>4</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 34
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_30: {}
+        feedback_31: {}
+        feedback_32: {}
+        feedback_33: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_30: {}
+        feedback_31: {}
+        feedback_32: {}
+        feedback_33: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_drag_and_drop_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_27
+            y: 2
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x:
+            - - ca_choices_29
+            - - ca_choices_28
+            - - ca_choices_27
+            - - ca_choices_26
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_27
+            y: 4
+          rule_type: HasElementXAtPositionY
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: false
+        choices:
+          value:
+          - content_id: ca_choices_26
+            html: <p>1</p>
+          - content_id: ca_choices_27
+            html: <p>2</p>
+          - content_id: ca_choices_28
+            html: <p>3</p>
+          - content_id: ca_choices_29
+            html: <p>4</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 34
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_33: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_33: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_drag_and_drop_interac_1)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_drag_and_drop_interac_1)
+
+        sample_yaml_content_for_drag_and_drop_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_29
+              - ca_choices_28
+            - - ca_choices_27
+            - - ca_choices_26
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x:
+            - - ca_choices_26
+            - - ca_choices_27
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x:
+            - - ca_choices_29
+            - - ca_choices_27
+              - ca_choices_28
+            - - ca_choices_26
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_26
+            html: <p>1</p>
+          - content_id: ca_choices_27
+            html: <p>2</p>
+          - content_id: ca_choices_28
+            html: <p>3</p>
+          - content_id: ca_choices_29
+            html: <p>4</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 34
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_33: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_33: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_drag_and_drop_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_29
+              - ca_choices_28
+            - - ca_choices_27
+            - - ca_choices_26
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x:
+            - - ca_choices_26
+            - - ca_choices_27
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_26
+            html: <p>1</p>
+          - content_id: ca_choices_27
+            html: <p>2</p>
+          - content_id: ca_choices_28
+            html: <p>3</p>
+          - content_id: ca_choices_29
+            html: <p>4</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 34
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_33: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_33: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_drag_and_drop_interac_2)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_drag_and_drop_interac_2)
+
+        sample_yaml_content_for_drag_and_drop_interac_3: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_26
+            - - ca_choices_27
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x:
+            - - ca_choices_29
+            - - ca_choices_27
+              - ca_choices_28
+            - - ca_choices_26
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x: ca_choices_28
+            y: ca_choices_26
+          rule_type: HasElementXBeforeElementY
+        - inputs:
+            x: ca_choices_26
+            y: ca_choices_28
+          rule_type: HasElementXBeforeElementY
+        - inputs:
+            x: ca_choices_27
+            y: 2
+          rule_type: HasElementXAtPositionY
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_26
+            html: <p></p>
+          - content_id: ca_choices_27
+            html: <p>  </p>
+          - content_id: ca_choices_28
+            html: <p>1</p>
+          - content_id: ca_choices_29
+            html: <p>2</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - - ca_choices_29
+        - - ca_choices_27
+          - ca_choices_28
+        - - ca_choices_26
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    next_content_id_index: 34
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        solution: {}
+        default_outcome: {}
+        feedback_33: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        solution: {}
+        default_outcome: {}
+        feedback_33: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_drag_and_drop_interac_3: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x:
+            - - ca_choices_29
+            - - ca_choices_28
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_28
+            html: <p>1</p>
+          - content_id: ca_choices_29
+            html: <p>2</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - - ca_choices_29
+        - - ca_choices_28
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    next_content_id_index: 34
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_33: {}
+        solution: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_33: {}
+        solution: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_drag_and_drop_interac_3)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_drag_and_drop_interac_3)
+
+    def test_fixing_invalid_text_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests the migration of invalid TextInput interaction exploration
+        data from version less than 58.
+        """
+
+        sample_yaml_content_for_text_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 53
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_35
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_36
+              normalizedStrSet:
+              - and
+              - drop
+          rule_type: Contains
+        - inputs:
+            x:
+              contentId: rule_input_37
+              normalizedStrSet:
+              - Draganddrop
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_38
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_39
+              normalizedStrSet:
+              - ze
+          rule_type: StartsWith
+        - inputs:
+            x:
+              contentId: rule_input_40
+              normalizedStrSet:
+              - zebra
+          rule_type: StartsWith
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_41
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_42
+              normalizedStrSet:
+              - he
+          rule_type: Contains
+        - inputs:
+            x:
+              contentId: rule_input_43
+              normalizedStrSet:
+              - hello
+          rule_type: StartsWith
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_44
+            html: <p>ssd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_45
+              normalizedStrSet:
+              - abc
+          rule_type: Contains
+        - inputs:
+            x:
+              contentId: rule_input_46
+              normalizedStrSet:
+              - abcd
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_47
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_48
+              normalizedStrSet:
+              - dog
+          rule_type: StartsWith
+        - inputs:
+            x:
+              contentId: rule_input_49
+              normalizedStrSet:
+              - dogs
+          rule_type: Equals
+        - inputs:
+            x:
+              contentId: rule_input_50
+              normalizedStrSet:
+              - beautiful
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_48
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_51
+              normalizedStrSet:
+              - doggies
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_34
+            unicode_str: ''
+        rows:
+          value: 15
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 50
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_34: {}
+        content: {}
+        default_outcome: {}
+        feedback_35: {}
+        feedback_38: {}
+        feedback_41: {}
+        feedback_44: {}
+        feedback_47: {}
+        feedback_48: {}
+        rule_input_36: {}
+        rule_input_37: {}
+        rule_input_39: {}
+        rule_input_40: {}
+        rule_input_42: {}
+        rule_input_43: {}
+        rule_input_45: {}
+        rule_input_46: {}
+        rule_input_48: {}
+        rule_input_49: {}
+        rule_input_50: {}
+        rule_input_51: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_34: {}
+        content: {}
+        default_outcome: {}
+        feedback_35: {}
+        feedback_38: {}
+        feedback_41: {}
+        feedback_44: {}
+        feedback_47: {}
+        feedback_48: {}
+        rule_input_36: {}
+        rule_input_37: {}
+        rule_input_39: {}
+        rule_input_40: {}
+        rule_input_42: {}
+        rule_input_43: {}
+        rule_input_45: {}
+        rule_input_46: {}
+        rule_input_48: {}
+        rule_input_49: {}
+        rule_input_50: {}
+        rule_input_51: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_text_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_35
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_36
+              normalizedStrSet:
+              - and
+              - drop
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_38
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_39
+              normalizedStrSet:
+              - ze
+          rule_type: StartsWith
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_41
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_42
+              normalizedStrSet:
+              - he
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_44
+            html: <p>ssd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_45
+              normalizedStrSet:
+              - abc
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_47
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_48
+              normalizedStrSet:
+              - dog
+          rule_type: StartsWith
+        - inputs:
+            x:
+              contentId: rule_input_50
+              normalizedStrSet:
+              - beautiful
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_34
+            unicode_str: ''
+        rows:
+          value: 10
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 50
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_34: {}
+        content: {}
+        default_outcome: {}
+        feedback_35: {}
+        feedback_38: {}
+        feedback_41: {}
+        feedback_44: {}
+        feedback_47: {}
+        rule_input_36: {}
+        rule_input_39: {}
+        rule_input_42: {}
+        rule_input_45: {}
+        rule_input_48: {}
+        rule_input_50: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_34: {}
+        content: {}
+        default_outcome: {}
+        feedback_35: {}
+        feedback_38: {}
+        feedback_41: {}
+        feedback_44: {}
+        feedback_47: {}
+        rule_input_36: {}
+        rule_input_39: {}
+        rule_input_42: {}
+        rule_input_45: {}
+        rule_input_48: {}
+        rule_input_50: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_text_interac_1)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_text_interac_1)
+
+        sample_yaml_content_for_text_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 53
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_35
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_36
+              normalizedStrSet:
+              - and
+              - drop
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_34
+            unicode_str: ''
+        rows:
+          value: 0
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 50
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_34: {}
+        content: {}
+        default_outcome: {}
+        feedback_35: {}
+        rule_input_36: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_34: {}
+        content: {}
+        default_outcome: {}
+        feedback_35: {}
+        rule_input_36: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_text_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_35
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_36
+              normalizedStrSet:
+              - and
+              - drop
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_34
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 50
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_34: {}
+        content: {}
+        default_outcome: {}
+        feedback_35: {}
+        rule_input_36: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_34: {}
+        content: {}
+        default_outcome: {}
+        feedback_35: {}
+        rule_input_36: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 53
+tags: []
+title: ''
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_text_interac_2)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_text_interac_2)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):

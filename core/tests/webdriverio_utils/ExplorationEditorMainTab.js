@@ -36,6 +36,7 @@ var ExplorationEditorMainTab = function() {
   var addResponseDetails = $('.e2e-test-add-response-details');
   var addResponseHeader = $('.e2e-test-add-response-modal-header');
   var answerDescription = $('.e2e-test-answer-description');
+  var answerDescriptionElement = $('.e2e-test-answer-description-fragment');
   var answerTab = $('.e2e-test-answer-tab');
   var ckEditorElement = $('.e2e-test-ck-editor');
   var defaultResponseTab = $('.e2e-test-default-response-tab');
@@ -74,7 +75,7 @@ var ExplorationEditorMainTab = function() {
   var nodeLabelLocator = '.e2e-test-node-label';
   var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
   var openOutcomeFeedBackEditor = $('.e2e-test-open-outcome-feedback-editor');
-  var postTutorialPopover = $('.ng-joyride .popover-content');
+  var postTutorialPopover = $('.joyride .popover-content');
   var responseBody = function(responseNum) {
     return $(`.e2e-test-response-body-${responseNum}`);
   };
@@ -736,6 +737,9 @@ var ExplorationEditorMainTab = function() {
     }
     var parameterTypes = _getRuleParameterTypes(interactionId, ruleName);
     expect(parameterValues.length).toEqual(parameterTypes.length);
+    await waitFor.visibilityOf(
+      answerDescriptionElement,
+      'Answer description fragement is not visible');
     var answerDescriptionFragment = await $$(
       '.e2e-test-answer-description-fragment');
     for (var i = 0; i < parameterValues.length; i++) {

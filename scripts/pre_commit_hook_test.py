@@ -64,8 +64,33 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         with islink_swap, exists_swap, subprocess_swap, self.print_swap:
             pre_commit_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
-        self.assertTrue(
-            'pre-commit hook file is now executable!' in self.print_arr)
+        self.assertIn(
+            'pre-commit hook file is now executable!', self.print_arr)
+
+    def test_install_hook_with_existing_symlink_in_windows_os(self) -> None:
+        oppia_dir = os.getcwd()
+        hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
+        pre_commit_file = os.path.join(hooks_dir, 'pre-commit')
+        def mock_islink(unused_file: str) -> bool:
+            return True
+        def mock_exists(unused_file: str) -> bool:
+            return True
+        def mock_is_windows() -> bool:
+            return True
+
+        islink_swap = self.swap_with_checks(
+            os.path, 'islink', mock_islink,
+            expected_args=((pre_commit_file,),))
+        exists_swap = self.swap_with_checks(
+            os.path, 'exists', mock_exists,
+            expected_args=((pre_commit_file,),))
+        is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
+
+        with islink_swap, exists_swap, self.print_swap, is_windows_swap:
+            pre_commit_hook.install_hook()
+        self.assertTrue('Symlink already exists' in self.print_arr)
+        self.assertNotIn(
+            'pre-commit hook file is now executable!', self.print_arr)
 
     def test_install_hook_with_error_in_making_pre_push_executable(
         self

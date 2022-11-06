@@ -40,6 +40,7 @@ from core.controllers import contributor_dashboard_admin
 from core.controllers import creator_dashboard
 from core.controllers import cron
 from core.controllers import custom_landing_pages
+from core.controllers import diagnostic_test_player
 from core.controllers import editor
 from core.controllers import email_dashboard
 from core.controllers import features
@@ -109,7 +110,9 @@ if not constants.EMULATOR_MODE:
 logging.getLogger(name='chardet.charsetprober').setLevel(logging.INFO)
 
 
-class InternetConnectivityHandler(base.BaseHandler):
+class InternetConnectivityHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles the get request to the server from the
     frontend to check for internet connection."""
 
@@ -121,45 +124,51 @@ class InternetConnectivityHandler(base.BaseHandler):
     # from core.controllers.base.BaseModel.
     HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests."""
         self.render_json({'is_internet_connected': True})
 
 
-class FrontendErrorHandler(base.BaseHandler):
+class FrontendErrorHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles errors arising from the frontend."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "post" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access
     def post(self) -> None:
         """Records errors reported by the frontend."""
         logging.error('Frontend error: %s' % self.payload.get('error'))
         self.render_json(self.values)
 
 
-class WarmupPage(base.BaseHandler):
+class WarmupPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles warmup requests."""
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET warmup requests."""
         pass
 
 
-class SplashRedirectPage(base.BaseHandler):
+class SplashRedirectPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access  # type: ignore[misc]
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
     def get(self) -> None:
         self.redirect('/')
 
@@ -168,7 +177,7 @@ class SplashRedirectPage(base.BaseHandler):
 # backend. Should be changed in future as per the requirements.
 def get_redirect_route(
         regex_route: str,
-        handler: Type[base.BaseHandler],
+        handler: Type[webapp2.RequestHandler],
         defaults: Optional[Dict[str, str]] = None
 ) -> routes.RedirectRoute:
     """Returns a route that redirects /foo/ to /foo.
@@ -178,7 +187,7 @@ def get_redirect_route(
 
     Args:
         regex_route: unicode. A raw string representing a route.
-        handler: BaseHandler. A callable to handle the route.
+        handler: RequestHandler. A callable to handle the route.
         defaults: dict. Optional defaults parameter to be passed
             into the RedirectRoute object.
 
@@ -213,6 +222,16 @@ URLS = [
         access_validators.ClassroomAccessValidationHandler),
 
     get_redirect_route(
+        r'%s/can_access_blog_home_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.BlogHomePageAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_blog_post_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.BlogPostPageAccessValidationHandler),
+
+    get_redirect_route(
         r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ManageOwnAccountValidationHandler),
 
@@ -226,6 +245,11 @@ URLS = [
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ReleaseCoordinatorAccessValidationHandler
     ),
+
+    get_redirect_route(
+        r'%s/does_learner_group_exist/<learner_group_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ViewLearnerGroupPageAccessValidationHandler),
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
@@ -366,6 +390,10 @@ URLS = [
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
+        r'%s' % feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
+        diagnostic_test_player.DiagnosticTestPlayerPage
+    ),
+    get_redirect_route(
         r'%s' % feconf.CLASSROOM_ADMIN_PAGE_URL,
         classroom.ClassroomAdminPage),
     get_redirect_route(
@@ -475,12 +503,12 @@ URLS = [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'%s/<author_username>' %
-        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,
-        blog_homepage.AuthorsPageHandler),
+        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_DATA_URL,
+        blog_homepage.BlogPostDataHandler),
     get_redirect_route(
-        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
-        blog_homepage.BlogPostHandler),
+        r'%s/<author_username>' %
+        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX,
+        blog_homepage.AuthorsPageHandler),
     get_redirect_route(
         r'%s' % feconf.BLOG_HOMEPAGE_DATA_URL,
         blog_homepage.BlogHomepageDataHandler),
@@ -517,6 +545,9 @@ URLS = [
 
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
+    get_redirect_route(
+        r'/androidlistsubscriptionhandler',
+        profile.AndroidListSubscriptionHandler),
     get_redirect_route(
         r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
         profile.BulkEmailWebhookEndpoint),
@@ -993,8 +1024,11 @@ URLS = [
         r'%s' % feconf.FACILITATOR_DASHBOARD_HANDLER,
         learner_group.FacilitatorDashboardHandler),
     get_redirect_route(
-        r'/facilitator_view_of_learner_group_handler/<learner_group_id>',
-        learner_group.FacilitatorLearnerGroupViewHandler),
+        r'%s' % feconf.LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER,
+        learner_group.LearnerDashboardLearnerGroupsHandler),
+    get_redirect_route(
+        r'/view_learner_group_info_handler/<learner_group_id>',
+        learner_group.ViewLearnerGroupInfoHandler),
     get_redirect_route(
         r'/learner_group_search_syllabus_handler',
         learner_group.LearnerGroupSearchSyllabusHandler),
@@ -1004,6 +1038,10 @@ URLS = [
     get_redirect_route(
         r'/learner_group_user_progress_handler/<learner_group_id>',
         learner_group.LearnerGroupLearnerProgressHandler),
+    get_redirect_route(
+        r'/learner_group_learner_specific_progress_handler/<learner_group_id>',
+        learner_group.LearnerGroupLearnerSpecificProgressHandler
+    ),
     get_redirect_route(
         r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
         learner_group.FacilitatorDashboardPage),
@@ -1020,10 +1058,19 @@ URLS = [
         r'/learner_group_learner_invitation_handler/<learner_group_id>',
         learner_group.LearnerGroupLearnerInvitationHandler),
     get_redirect_route(
+        r'/learner_group_progress_sharing_permission_handler/<learner_group_id>', # pylint: disable=line-too-long
+        learner_group.LearnerGroupProgressSharingPermissionHandler),
+    get_redirect_route(
+        r'/exit_learner_group_handler/<learner_group_id>',
+        learner_group.ExitLearnerGroupHandler),
+    get_redirect_route(
         r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage),
     get_redirect_route(
         r'/user_progress_in_stories_chapters_handler/<username>',
-        learner_group.LearnerStoriesChaptersProgressHandler)
+        learner_group.LearnerStoriesChaptersProgressHandler),
+    get_redirect_route(
+        '/learner_groups_feature_status_handler',
+        learner_group.LearnerGroupsFeatureStatusHandler)
 ]
 
 # Adding redirects for topic landing pages.
@@ -1070,6 +1117,10 @@ URLS.extend((
     get_redirect_route(
         r'/learn/<classroom_url_fragment>',
         oppia_root.OppiaLightweightRootPage
+    ),
+    get_redirect_route(
+        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
+        oppia_root.OppiaRootPage
     ),
 ))
 
