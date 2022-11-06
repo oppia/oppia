@@ -32,6 +32,7 @@ var ExplorationEditorHistoryTab = function() {
   var toastSuccessElement = $('.toast-success');
   var firstVersionDropdown = $('.e2e-test-history-version-dropdown-first');
   var secondVersionDropdown = $('.e2e-test-history-version-dropdown-second');
+  var historyTableMessage = $('.e2e-test-history-table-message');
   var stateNodeBackground = function(nodeElement) {
     return nodeElement.$('.e2e-test-node-background');
   };
@@ -284,6 +285,15 @@ var ExplorationEditorHistoryTab = function() {
       'Revert version button', revertVersionButton);
     await action.click(
       'Confirm revert button', confirmRevertVersionButton);
+  };
+
+  this.expectRevertToVersion = async function(version) {
+    await waitFor.numberOfElementsToBe(
+      '.e2e-test-history-table-message', 'History Table message', 4);
+    await waitFor.textToBePresentInElement(
+      historyTableMessage,
+      'Reverted exploration to version ' + version,
+      'Revert message takes too long to appear');
   };
 };
 
