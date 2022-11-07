@@ -9,13 +9,9 @@ puppeteer
     args: ["--start-fullscreen", "--use-fake-ui-for-media-stream"], // giving microphone and other browser permissions
   })
   .then(async (browser) => {
-    //browser new page
     const page = await browser.newPage();
     await page.setViewport({ width: 0, height: 0 }); // for maximizing page height-width
-
     await login();
-    console.log("working");
-
     await page.goto("http://localhost:8181/", {waitUntil: "networkidle0"});
     // await page.goto("http://localhost:8181/creator-dashboard", {waitUntil: "networkidle0"});
     // selector = "button.e2e-test-create-new-exploration-button";
