@@ -458,10 +458,25 @@ describe('Outcome Editor Component', () => {
     component.destinationIfStuckEditorIsOpen = false;
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('first');
     component.isEditable = true;
-    component.savedOutcome.destIfReallyStuck = null;
-
+    component.savedOutcome = new Outcome(
+      'Introduction',
+      null,
+      new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
+      false,
+      [],
+      'ExpId',
+      'SkillId',
+    );
+    component.outcome = new Outcome(
+      'Introduction',
+      null,
+      new SubtitledHtml('<p>Outcome</p>', 'Id'),
+      true,
+      [],
+      '',
+      '',
+    );
     component.openDestinationIfStuckEditor();
-
     expect(component.destinationIfStuckEditorIsOpen).toBeTrue();
     expect(component.outcome.destIfReallyStuck).toBe('first');
   });

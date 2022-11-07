@@ -200,10 +200,10 @@ export class OutcomeEditorComponent implements OnInit {
   openDestinationIfStuckEditor(): void {
     if (this.isEditable) {
       this.destinationIfStuckEditorIsOpen = true;
-    }
-    let activeStateName = this.stateEditorService.getActiveStateName();
-    if (!this.savedOutcome.destIfReallyStuck) {
-      this.outcome.destIfReallyStuck = activeStateName;
+      let activeStateName = this.stateEditorService.getActiveStateName();
+      if (!this.savedOutcome.destIfReallyStuck) {
+        this.outcome.destIfReallyStuck = activeStateName;
+      }
     }
   }
 
