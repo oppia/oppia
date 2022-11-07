@@ -34,7 +34,14 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
+
+datastore_services = models.Registry.import_datastore_services()
 
 CAN_EDIT_STR = 'can_edit'
 
@@ -138,8 +145,16 @@ class LibraryPageTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'A', self.admin_id, title='Title A', category='Category A',
             objective='Objective A')
-        exp_services._save_exploration(  # pylint: disable=protected-access
-            self.admin_id, exploration, 'Exploration A', [])
+        exp_models = (
+            exp_services._compute_models_for_updating_exploration( # pylint: disable=protected-access
+                self.admin_id,
+                exploration,
+                'Exploration A',
+                []
+            )
+        )
+        datastore_services.update_timestamps_multi(exp_models)
+        datastore_services.put_multi(exp_models)
 
         # Test that the private exploration isn't displayed.
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
@@ -149,8 +164,16 @@ class LibraryPageTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'B', self.admin_id, title='Title B', category='Category B',
             objective='Objective B')
-        exp_services._save_exploration(  # pylint: disable=protected-access
-            self.admin_id, exploration, 'Exploration B', [])
+        exp_models = (
+            exp_services._compute_models_for_updating_exploration( # pylint: disable=protected-access
+                self.admin_id,
+                exploration,
+                'Exploration B',
+                []
+            )
+        )
+        datastore_services.update_timestamps_multi(exp_models)
+        datastore_services.put_multi(exp_models)
         rights_manager.publish_exploration(self.admin, 'B')
 
         # Publish exploration A.
