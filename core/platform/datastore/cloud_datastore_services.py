@@ -94,7 +94,7 @@ def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
             return result
         except Exception as unused_e:
             continue
-    return None
+    return result
 
 
 def update_timestamps_multi(
