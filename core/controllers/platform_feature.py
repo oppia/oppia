@@ -53,7 +53,8 @@ class PlatformFeaturesEvaluationHandler(
             'platform_type': {
                 'schema': {
                     'type': 'basestring'
-                }
+                },
+                'default_value': None
             },
             'browser_type': {
                 'schema': {
@@ -86,7 +87,7 @@ class PlatformFeaturesEvaluationHandler(
         """
         assert self.normalized_request is not None
         context_dict: platform_parameter_domain.ClientSideContextDict = {
-            'platform_type': self.normalized_request['platform_type'],
+            'platform_type': self.normalized_request.get('platform_type'),
             'browser_type': self.normalized_request.get('browser_type'),
             'app_version': self.normalized_request.get('app_version'),
         }
