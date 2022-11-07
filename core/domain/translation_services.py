@@ -28,7 +28,7 @@ from core.domain import translation_domain
 from core.domain import translation_fetchers
 from core.platform import models
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -127,14 +127,14 @@ def add_new_translation(
     model.put()
 
 
-def update_translation_related_change(
+def compute_translation_related_change(
     exploration_id: str,
     exploration_version: int,
     content_ids_corresponding_translations_to_remove: List[str],
     content_ids_corresponding_translations_to_mark_needs_update: List[str],
-    content_count: int
-) -> None:
-    """Updates the translation related changes in the EntityTranslation models.
+) -> Tuple[List[translation_models.EntityTranslationsModel], Dict[str, int]]:
+    """Cretase new EntityTranslation models corresponding to translation related
+    changes.
 
     Args:
         exploration_id: str. The ID of the exploration.
@@ -143,7 +143,6 @@ def update_translation_related_change(
             content Ids for translation removal.
         content_ids_corresponding_translations_to_mark_needs_update: List[str].
             The list of content Ids to mark translation needs update.
-        content_count: int. The number of content present in the exploration.
     """
     old_translations = (
         translation_fetchers.get_all_entity_translations_for_entity(
@@ -174,12 +173,7 @@ def update_translation_related_change(
             )
         )
 
-    translation_models.EntityTranslationsModel.put_multi(
-        new_translation_models)
-    if opportunity_services.is_exploration_available_for_contribution(
-            exploration_id):
-        opportunity_services.update_opportunity_with_updated_exploration(
-            exploration_id, content_count, translation_counts)
+    return new_translation_models, translation_counts
 
 
 def get_languages_with_complete_translation(

@@ -3406,13 +3406,18 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'New title'
-            })
-        ], 'A commit message.')
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID,
+                [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })
+            ],
+            'A commit message.'
+        )
 
     def test_raises_error_when_version_history_does_not_exist(self):
         self.login(self.OWNER_EMAIL)

@@ -455,13 +455,9 @@ class MigrateExplorationJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='CACHE DELETION SUCCESS: 1', stderr=''),
-            job_run_result.JobRunResult(
                 stdout='EXP MIGRATED SUCCESS: 1', stderr=''),
             job_run_result.JobRunResult(
                 stdout='TRANSLATION MODELS GENERATED SUCCESS: 1'),
-            job_run_result.JobRunResult(
-                stdout='EXP PROCESSED SUCCESS: 1', stderr='')
         ])
 
         updated_opp_model = (

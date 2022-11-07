@@ -22,7 +22,7 @@ require(
 
 require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
-require('domain/exploration/exploration-id-validation.service.ts');
+require('domain/exploration/curated-exploration-validation.service.ts');
 require('domain/story/editable-story-backend-api.service.ts');
 
 import newChapterConstants from 'assets/constants';
@@ -30,13 +30,13 @@ import newChapterConstants from 'assets/constants';
 angular.module('oppia').controller('CreateNewChapterModalController', [
   '$controller', '$scope', '$uibModalInstance',
   'EditableStoryBackendApiService',
-  'ExplorationIdValidationService', 'StoryEditorStateService',
+  'CuratedExplorationValidationService', 'StoryEditorStateService',
   'StoryUpdateService', 'ValidatorsService', 'nodeTitles',
   'MAX_CHARS_IN_EXPLORATION_TITLE',
   function(
       $controller, $scope, $uibModalInstance,
       EditableStoryBackendApiService,
-      ExplorationIdValidationService, StoryEditorStateService,
+      CuratedExplorationValidationService, StoryEditorStateService,
       StoryUpdateService, ValidatorsService, nodeTitles,
       MAX_CHARS_IN_EXPLORATION_TITLE) {
     $controller('ConfirmOrCancelModalController', {
@@ -64,6 +64,8 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       StoryUpdateService.addStoryNode($scope.story, $scope.title);
       $scope.correctnessFeedbackDisabled = false;
       $scope.categoryIsDefault = true;
+      $scope.statesWithRestrictedInteractions = [];
+      $scope.statesWithTooFewMultipleChoiceOptions = [];
     };
 
     $scope.init();
@@ -135,7 +137,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       }
 
       const expIsPublished = (
-        await ExplorationIdValidationService.isExpPublishedAsync(
+        await CuratedExplorationValidationService.isExpPublishedAsync(
           $scope.explorationId));
       if (!expIsPublished) {
         $scope.invalidExpErrorStrings = [
@@ -148,7 +150,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
 
       $scope.invalidExpId = false;
       const correctnessFeedbackIsEnabled = (
-        await ExplorationIdValidationService.isCorrectnessFeedbackEnabled(
+        await CuratedExplorationValidationService.isCorrectnessFeedbackEnabled(
           $scope.explorationId));
       if (!correctnessFeedbackIsEnabled) {
         $scope.correctnessFeedbackDisabled = true;
@@ -158,7 +160,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       $scope.correctnessFeedbackDisabled = false;
 
       const categoryIsDefault = (
-        await ExplorationIdValidationService.isDefaultCategoryAsync(
+        await CuratedExplorationValidationService.isDefaultCategoryAsync(
           $scope.explorationId));
       if (!categoryIsDefault) {
         $scope.categoryIsDefault = false;
@@ -166,6 +168,22 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
         return;
       }
       $scope.categoryIsDefault = true;
+
+      $scope.statesWithRestrictedInteractions = (
+        await CuratedExplorationValidationService
+          .getStatesWithRestrictedInteractions($scope.explorationId));
+      if ($scope.statesWithRestrictedInteractions.length > 0) {
+        $scope.$applyAsync();
+        return;
+      }
+
+      $scope.statesWithTooFewMultipleChoiceOptions = (
+        await CuratedExplorationValidationService
+          .getStatesWithInvalidMultipleChoices($scope.explorationId));
+      if ($scope.statesWithTooFewMultipleChoiceOptions.length > 0) {
+        $scope.$applyAsync();
+        return;
+      }
 
       const validationErrorMessages = (
         await EditableStoryBackendApiService.validateExplorationsAsync(

@@ -114,8 +114,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
             exp_change = exp_domain.ExplorationChange({
                 'cmd': (
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION),
-                'from_version': exp_states_version,
-                'to_version': feconf.CURRENT_STATE_SCHEMA_VERSION
+                'from_version': str(exp_states_version),
+                'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
             })
             yield (exp_id, exp_change)
 
@@ -133,49 +133,10 @@ class MigrateExplorationJob(base_jobs.JobBase):
             Result(str, Exception). The ID of the skill when the deletion was
             successful or Exception when the deletion failed.
         """
-        try:
-            caching_services.delete_multi(
-                caching_services.CACHE_NAMESPACE_EXPLORATION,
-                None, [exploration.id])
-            return result.Ok(exploration.id)
-        except Exception as e:
-            return result.Err(e)
-
-    @staticmethod
-    def _update_exp_summary(
-        migrated_exp: exp_domain.Exploration,
-        exp_summary_model: exp_models.ExpSummaryModel,
-        exp_rights_model: exp_models.ExplorationRightsModel
-    ) -> exp_models.ExpSummaryModel:
-        """Generates a newly updated exploration summary model.
-
-        Args:
-            migrated_exp: Exploration. The migrated exploration domain object.
-            exp_summary_model: ExpSummaryModel. The exploration summary model
-                to update.
-            exp_rights_model: ExplorationRightsModel. The exploration rights
-                model used to update the exploration summary.
-
-        Returns:
-            ExpSummaryModel. The updated exploration summary model to put into
-            the datastore.
-        """
-        exp_rights = rights_manager.get_activity_rights_from_model(
-            exp_rights_model, constants.ACTIVITY_TYPE_EXPLORATION)
-        exp_summary = exp_services.update_exploration_summary(
-            migrated_exp,
-            exp_rights,
-            exp_fetchers.get_exploration_summary_from_model(exp_summary_model),
-            skip_exploration_model_last_updated=True
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION,
+            None, [exploration.id]
         )
-        exp_summary.version += 1
-        updated_exp_summary_model: exp_models.ExpSummaryModel = (
-            exp_services.populate_exp_summary_model_fields(
-                exp_summary_model, exp_summary
-            )
-        )
-
-        return updated_exp_summary_model
 
     @staticmethod
     def _extract_required_translation_model(
@@ -231,7 +192,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
     @staticmethod
     def _update_exploration(
         exp_model: exp_models.ExplorationModel,
-        exp_rights_model: exp_models.ExplorationRightsModel,
         migrated_exp: exp_domain.Exploration,
         exp_changes: Sequence[exp_domain.ExplorationChange]
     ) -> Sequence[base_models.BaseModel]:
@@ -240,8 +200,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
         Args:
             exp_model: ExplorationModel. The exploration which should be
                 updated.
-            exp_rights_model: ExplorationRightsModel. The exploration rights
-                model which is to be updated.
             migrated_exp: Exploration. The migrated exploration domain
                 object.
             exp_changes: Sequence(ExplorationChange). The exploration changes
@@ -260,20 +218,16 @@ class MigrateExplorationJob(base_jobs.JobBase):
         ) % (
             feconf.CURRENT_STATE_SCHEMA_VERSION
         )
-        change_dicts = [change.to_dict() for change in exp_changes]
+        models_to_put_values = []
         with datastore_services.get_ndb_context():
-            models_to_put = updated_exp_model.compute_models_to_commit(
-                feconf.MIGRATION_BOT_USERNAME,
-                feconf.COMMIT_TYPE_EDIT,
-                commit_message,
-                change_dicts,
-                additional_models={'rights_model': exp_rights_model}
+            models_to_put_values = (
+                exp_services.compute_models_to_put_when_saving_new_exp_version(
+                    feconf.MIGRATION_BOT_USERNAME,
+                    updated_exp_model.id,
+                    exp_changes,
+                    commit_message,
+                )
             )
-            models_to_put_values = []
-            for model in models_to_put.values():
-                # Here, we are narrowing down the type from object to BaseModel.
-                assert isinstance(model, base_models.BaseModel)
-                models_to_put_values.append(model)
         datastore_services.update_timestamps_multi(list(models_to_put_values))
 
         return models_to_put_values
@@ -309,14 +263,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
             | 'Remove exp rights for broken explorations' >> beam.Filter(
                 lambda exp_rights_model: exp_rights_model[0] not in (
                     'umPkwp0L1M0-', '670bU6d9JGBh'))
-        )
-
-        exp_summary_models = (
-            self.pipeline
-            | 'Get all non-deleted exploration summary models' >> (
-                ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))
-            | 'Add exploration summary ID' >> beam.WithKeys(# pylint: disable=no-value-for-parameter
-                lambda exp_summary_model: exp_summary_model.id)
         )
 
         exp_publication_status = (
@@ -374,8 +320,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
         exp_objects_list = (
             {
                 'exp_model': unmigrated_exploration_models,
-                'exp_summary_model': exp_summary_models,
-                'exp_rights_model': exp_rights_models,
                 'exploration': migrated_exp,
                 'exp_changes': exp_changes,
                 'exp_translation_models': exp_translation_models
@@ -394,8 +338,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
             | 'Reorganize the exploration objects' >> beam.Map(lambda objects: {
                 'exp_model': objects['exp_model'][0],
                 'exploration': objects['exploration'][0],
-                'exp_rights_model': objects['exp_rights_model'][0],
-                'exp_summary_model': objects['exp_summary_model'][0],
                 'exp_changes': objects['exp_changes'],
                 'exp_translation_models': (
                     self._extract_required_translation_model(
@@ -424,33 +366,21 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     'EXP PREVIOUSLY MIGRATED'))
         )
 
-        cache_deletion_job_run_results = (
+        unused_cache_deletion_job_run_results = (
             transformed_exp_objects_list
             | 'Delete exploration from cache' >> beam.Map(
                 lambda exp_object: self._delete_exploration_from_cache(
                     exp_object['exploration']))
-            | 'Generate results for cache deletion' >> (
-                job_result_transforms.ResultsToJobRunResults('CACHE DELETION'))
         )
 
-        exp_models_to_put = (
+        exp_related_models_to_put = (
             transformed_exp_objects_list
             | 'Generate exploration models to put' >> beam.FlatMap(
-                lambda exp_objects: self._update_exploration(
+                lambda exp_objects: self.
+                _update_exploration(
                     exp_objects['exp_model'],
-                    exp_objects['exp_rights_model'],
                     exp_objects['exploration'],
                     exp_objects['exp_changes'],
-                ))
-        )
-
-        exp_summary_models_to_put = (
-            transformed_exp_objects_list
-            | 'Generate exp summary models to put' >> beam.Map(
-                lambda exp_objects: self._update_exp_summary(
-                    exp_objects['exploration'],
-                    exp_objects['exp_summary_model'],
-                    exp_objects['exp_rights_model']
                 ))
         )
 
@@ -469,21 +399,19 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     'TRANSLATION MODELS GENERATED'))
         )
 
-        unused_put_results = (
-            (
-                exp_models_to_put,
-                exp_summary_models_to_put,
-                translation_models_to_put
+        with datastore_services.get_ndb_context():
+            unused_put_results = (
+                (
+                    exp_related_models_to_put,
+                    translation_models_to_put
+                )
+                | 'Filter None models' >> beam.Filter(
+                    lambda x: x is not None)
+                | 'Put models into datastore' >> ndb_io.PutModels()
             )
-            | 'Merge models' >> beam.Flatten()
-            | 'Filter None models' >> beam.Filter(
-                lambda x: x is not None)
-            | 'Put models into datastore' >> ndb_io.PutModels()
-        )
 
         return (
             (
-                cache_deletion_job_run_results,
                 migrated_exp_job_run_results,
                 exp_objects_list_job_run_results,
                 already_migrated_job_run_results,
@@ -556,8 +484,8 @@ class AuditExplorationMigrationJob(base_jobs.JobBase):
             exp_change = exp_domain.ExplorationChange({
                 'cmd': (
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION),
-                'from_version': exp_states_version,
-                'to_version': feconf.CURRENT_STATE_SCHEMA_VERSION
+                'from_version': str(exp_states_version),
+                'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
             })
             yield (exp_id, exp_change)
 

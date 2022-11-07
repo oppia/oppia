@@ -37,9 +37,11 @@ from typing import Dict, Final, List, Optional, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from mypy_imports import datastore_services
     from mypy_imports import stats_models
 
 (stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class StatisticsServicesTests(test_utils.GenericTestBase):
@@ -469,7 +471,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 list(exploration.states.keys())
             )
         )
-        stats_services.create_stats_model(exploration_stats_for_new_exploration)
+        stats_services.create_stats_model(
+            exploration_stats_for_new_exploration
+        )
 
         newly_created_exploration_stats = (
             stats_services.get_exploration_stats_by_id(
@@ -599,7 +603,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             Exception,
             'ExplorationVersionsDiff cannot be None when the change'
         ):
-            stats_services.update_exp_issues_for_new_exp_version(
+            stats_services.get_updated_exp_issues_models_for_new_exp_version(
                 exploration, None, None
             )
 
@@ -941,7 +945,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 5
             )
         )
-        stats_services.create_stats_model(exploration_stats_for_new_exp_version)
+        stats_services.create_stats_model(
+            exploration_stats_for_new_exp_version
+        )
 
         newly_created_exploration_stats = (
             stats_services.get_exploration_stats_by_id(
@@ -1091,7 +1097,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         })
 
     def test_create_stats_model(self) -> None:
-        """Test the create_stats_model method."""
+        """Test the create method."""
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
         # Ruling out the possibility of None for mypy type checking.
@@ -1212,7 +1218,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exp_stats_list[1].exp_id, 'exp_id_2')
         self.assertEqual(exp_stats_list[1].exp_version, 2)
 
-    def test_update_exp_issues_for_new_exp_version(self) -> None:
+    def test_get_updated_exp_issues_models_for_new_exp_version(self) -> None:
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         exp = self.save_new_valid_exploration('exp_id', admin_id)
@@ -1224,8 +1230,13 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 '%s.%s' % ('exp_id', 1), strict=False))
 
         exp.version += 1
-        stats_services.update_exp_issues_for_new_exp_version(
-            exp, exp_domain.ExplorationVersionsDiff([]), None)
+        models_to_put = (
+            stats_services.get_updated_exp_issues_models_for_new_exp_version(
+                exp, exp_domain.ExplorationVersionsDiff([]), None
+            )
+        )
+        datastore_services.update_timestamps_multi(models_to_put)
+        datastore_services.put_multi(models_to_put)
 
         exploration_issues_model = (
             stats_models.ExplorationIssuesModel.get('%s.%s' % ('exp_id', 1)))
@@ -1475,7 +1486,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         exp_issues = stats_domain.ExplorationIssues(
             self.exp.id, stats_models.CURRENT_ISSUE_SCHEMA_VERSION, [])
 
-        stats_services.create_exp_issues_model(exp_issues)
+        stats_services.get_exp_issues_model_from_domain_object(exp_issues)
 
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             self.exp.id, self.exp.version)
@@ -1538,10 +1549,15 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     ['A', 'B', 'A'])
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange(
-                {'cmd': 'delete_state', 'state_name': 'B'})
-        ], 'change')
+        exp_services.update_exploration(
+            self.owner_id,
+            self.exp.id,
+            [
+                exp_domain.ExplorationChange(
+                    {'cmd': 'delete_state', 'state_name': 'B'})
+            ],
+            'change'
+        )
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -1556,13 +1572,18 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     ['A', 'B', 'A'])
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange({
-                'cmd': 'rename_state',
-                'old_state_name': 'A',
-                'new_state_name': 'Z',
-            })
-        ], 'change')
+        exp_services.update_exploration(
+            self.owner_id,
+            self.exp.id,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': 'rename_state',
+                    'old_state_name': 'A',
+                    'new_state_name': 'Z',
+                })
+            ],
+            'change'
+        )
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -1603,10 +1624,15 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_eq_playthrough('B')], 'B')
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange(
-                {'cmd': 'delete_state', 'state_name': 'B'})
-        ], 'change')
+        exp_services.update_exploration(
+            self.owner_id,
+            self.exp.id,
+            [
+                exp_domain.ExplorationChange(
+                    {'cmd': 'delete_state', 'state_name': 'B'})
+            ],
+            'change'
+        )
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -1620,13 +1646,18 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_eq_playthrough('A')], 'A')
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange({
-                'cmd': 'rename_state',
-                'old_state_name': 'A',
-                'new_state_name': 'Z',
-            })
-        ], 'change')
+        exp_services.update_exploration(
+            self.owner_id,
+            self.exp.id,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': 'rename_state',
+                    'old_state_name': 'A',
+                    'new_state_name': 'Z',
+                })
+            ],
+            'change'
+        )
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -1657,10 +1688,15 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_mis_playthrough('B', 2)], 'B', 2)
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange(
-                {'cmd': 'delete_state', 'state_name': 'B'}),
-        ], 'Delete B')
+        exp_services.update_exploration(
+            self.owner_id,
+            self.exp.id,
+            [
+                exp_domain.ExplorationChange(
+                    {'cmd': 'delete_state', 'state_name': 'B'}),
+            ],
+            'Delete B'
+        )
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -1674,13 +1710,18 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_mis_playthrough('A', 2)], 'A', 2)
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange({
-                'cmd': 'rename_state',
-                'old_state_name': 'A',
-                'new_state_name': 'Z',
-            })
-        ], 'change')
+        exp_services.update_exploration(
+            self.owner_id,
+            self.exp.id,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': 'rename_state',
+                    'old_state_name': 'A',
+                    'new_state_name': 'Z',
+                })
+            ],
+            'change'
+        )
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
@@ -1720,10 +1761,15 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_mis_playthrough('B', 3)], 'B', 3),
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [
-            exp_domain.ExplorationChange(
-                {'cmd': 'delete_state', 'state_name': 'B'}),
-        ], 'commit')
+        exp_services.update_exploration(
+            self.owner_id,
+            self.exp.id,
+            [
+                exp_domain.ExplorationChange(
+                    {'cmd': 'delete_state', 'state_name': 'B'}),
+            ],
+            'commit'
+        )
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))

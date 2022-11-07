@@ -190,7 +190,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ['content_5', 'default_outcome_2']
         )
 
-    def test_update_translation_related_change_removes_translations(
+    def test_compute_translation_related_change_removes_translations(
         self
     ) -> None:
         translation_services.add_new_translation(
@@ -220,15 +220,12 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ['content_5', 'content_6']
         )
 
-        translation_services.update_translation_related_change(
-            'exp1', 5, ['content_5'], [], 10)
+        entity_translations, _ = (
+            translation_services.compute_translation_related_change(
+                'exp1', 5, ['content_5'], [], 10
+            )
+        )
 
-        entity_translations = (
-            translation_fetchers.get_all_entity_translations_for_entity(
-                feconf.TranslatableEntityType.EXPLORATION,
-                'exp1',
-                6
-            ))
         self.assertEqual(len(entity_translations), 1)
         entity_translation = entity_translations[0]
         self.assertEqual(
@@ -236,7 +233,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ['content_6']
         )
 
-    def test_update_translation_related_change_mark_translation_needs_update(
+    def test_compute_translation_related_change_mark_translation_needs_update(
         self
     ) -> None:
         translation_services.add_new_translation(
@@ -267,44 +264,16 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             for t in entity_translation_model.translations.values()
         ], [False, False])
 
-        translation_services.update_translation_related_change(
-            'exp1', 5, [], ['content_6'], 10)
-
-        entity_translations = (
-            translation_fetchers.get_all_entity_translations_for_entity(
-                feconf.TranslatableEntityType.EXPLORATION,
-                'exp1',
-                6
-            ))
+        entity_translations, _ = (
+            translation_services.compute_translation_related_change(
+                'exp1', 5, [], ['content_6'], 10)
+        )
         self.assertEqual(len(entity_translations), 1)
         entity_translation = entity_translations[0]
         self.assertEqual(
             [t.needs_update for t in entity_translation.translations.values()],
             [False, True]
         )
-
-    def test_update_translation_related_change_updates_opportunity(
-        self
-    ) -> None:
-        update_opportunity_with_updated_exploration_swap = (
-            self.swap_with_call_counter(
-                opportunity_services,
-                'update_opportunity_with_updated_exploration'
-            )
-        )
-        is_exploration_available_for_contribution_swap = (
-            self.swap_to_always_return(
-                opportunity_services,
-                'is_exploration_available_for_contribution',
-                True
-            )
-        )
-
-        with is_exploration_available_for_contribution_swap:
-            with update_opportunity_with_updated_exploration_swap as counter:
-                translation_services.update_translation_related_change(
-                    'exp1', 5, [], ['content_6'], 10)
-        self.assertEqual(counter.times_called, 1)
 
     def test_get_displayable_translation_languages_returns_correct_items(
         self
