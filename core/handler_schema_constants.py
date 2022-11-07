@@ -52,8 +52,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'ProfilePage',
     'QuestionCreationHandler',
     'ResubmitSuggestionHandler',
-    'SkillDataHandler',
-    'SkillDescriptionHandler',
     'StartedTranslationTutorialEventHandler',
     'SubtopicPageDataHandler',
     'SuggestionListHandler',

@@ -99,8 +99,6 @@ NOT_FULLY_COVERED_FILES: Final = [
     'core/controllers/oppia_root_test.py',
     'core/controllers/pages.py',
     'core/controllers/pages_test.py',
-    'core/controllers/skill_editor.py',
-    'core/controllers/skill_editor_test.py',
     'core/controllers/skill_mastery.py',
     'core/controllers/skill_mastery_test.py',
     'core/controllers/story_editor.py',
