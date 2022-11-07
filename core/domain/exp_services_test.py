@@ -1698,8 +1698,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_update_exploration_by_migration_bot_not_updates_contribution_model(
         self
     ) -> None:
-        user_services.create_user_contributions(
-            feconf.MIGRATION_BOT_USER_ID, [], [])
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='end')
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
@@ -6795,14 +6793,24 @@ title: Old Title
         self
     ) -> None:
         self.save_new_valid_exploration('exp_id', 'user_id')
-
         exploration_model = exp_models.ExplorationModel.get('exp_id')
-        exploration_model.version = 0
+        exploration = exp_fetchers.get_exploration_from_model(exploration_model)
+        exploration.version = 2
 
-        with self.assertRaisesRegex(
+        def _mock_apply_change_list(
+            *unused_args: str, **unused_kwargs: str
+        ) -> exp_domain.Exploration:
+            """Mocks exp_fetchers.get_exploration_by_id()."""
+            return exploration
+
+        fetch_swap = self.swap(
+            exp_services, 'apply_change_list',
+            _mock_apply_change_list)
+
+        with fetch_swap, self.assertRaisesRegex(
             Exception,
-            'Unexpected error: trying to update version 0 of exploration '
-            'from version 1. Please reload the page and try again.'):
+            'Unexpected error: trying to update version 1 of exploration '
+            'from version 2. Please reload the page and try again.'):
             exp_services.update_exploration(
                 'user_id', 'exp_id', [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -7882,7 +7890,15 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(updated_exp)
 
     def test_draft_discarded(self) -> None:
-        exp_services.discard_draft(self.EXP_ID1, self.USER_ID,)
+        user_data_model = (
+            exp_services.get_exp_user_data_model_with_draft_discarded(
+                self.EXP_ID1,
+                self.USER_ID
+            )
+        )
+        assert user_data_model is not None
+        user_data_model.update_timestamps()
+        user_data_model.put()
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID1))
         self.assertIsNone(exp_user_data.draft_change_list)

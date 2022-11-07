@@ -16,13 +16,16 @@
  * @fileoverview Unit tests for Android page.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, EventEmitter, ElementRef } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick, flushMicrotasks } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
+import { AndroidUpdatesBackendApiService } from 'domain/android-updates/android-updates-backend-api.service';
 
 import { AndroidPageComponent } from './android-page.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { PageTitleService } from 'services/page-title.service';
+import { AlertsService } from 'services/alerts.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 
@@ -58,10 +61,16 @@ class MockTranslateService {
 describe('Android page', () => {
   let translateService: TranslateService;
   let pageTitleService: PageTitleService;
+  let androidUpdatesBackendApiService: AndroidUpdatesBackendApiService;
+  let alertsService: AlertsService;
+
   beforeEach(async() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [AndroidPageComponent, MockTranslatePipe],
       providers: [
+        AlertsService,
+        AndroidUpdatesBackendApiService,
         UrlInterpolationService,
         PageTitleService,
         {
@@ -79,6 +88,9 @@ describe('Android page', () => {
     const androidPageComponent = TestBed.createComponent(
       AndroidPageComponent);
     component = androidPageComponent.componentInstance;
+    alertsService = TestBed.inject(AlertsService);
+    androidUpdatesBackendApiService = TestBed.inject(
+      AndroidUpdatesBackendApiService);
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
   });
@@ -138,6 +150,70 @@ describe('Android page', () => {
 
     expect(component.featuresShown).toBe(3);
   });
+
+  it('should validate email address correctly', () => {
+    component.emailAddress = 'invalidEmail';
+    expect(component.validateEmailAddress()).toBeFalse();
+
+    component.emailAddress = 'validEmail@example.com';
+    expect(component.validateEmailAddress()).toBeTrue();
+  });
+
+  it('should add user to android mailing list and return status',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addInfoMessage');
+      component.ngOnInit();
+      tick();
+      component.emailAddress = 'validEmail@example.com';
+      component.name = 'validName';
+      spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
+        .and.returnValue(Promise.resolve(true));
+
+      component.subscribeToAndroidList();
+
+      flushMicrotasks();
+
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        'Done!', 1000);
+    }));
+
+  it('should fail to add user to android mailing list and return status',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addInfoMessage');
+      component.ngOnInit();
+      tick();
+      component.emailAddress = 'validEmail@example.com';
+      component.name = 'validName';
+      spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
+        .and.returnValue(Promise.resolve(false));
+
+      component.subscribeToAndroidList();
+
+      flushMicrotasks();
+
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
+        'to be added to the mailing list.', 10000);
+    }));
+
+  it('should reject request to the android mailing list correctly',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addInfoMessage');
+      component.ngOnInit();
+      tick();
+      component.emailAddress = 'validEmail@example.com';
+      component.name = 'validName';
+      spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
+        .and.returnValue(Promise.reject(false));
+
+      component.subscribeToAndroidList();
+
+      flushMicrotasks();
+
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
+        'to be added to the mailing list.', 10000);
+    }));
 
   it('should attach intersection observers', () => {
     // eslint-disable-next-line
