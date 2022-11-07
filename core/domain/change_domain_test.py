@@ -18,9 +18,26 @@
 
 from __future__ import annotations
 
-from core import feconf
+import copy
+from xml.dom import ValidationErr
+
+from core import feconf, utils
 from core.domain import change_domain
 from core.tests import test_utils
+from core.feconf import ALLOWED_ACTIVITY_ROLES, CMD_CHANGE_ROLE
+
+
+"""
+SUCCESS   core.domain.change_domain_test: 1 tests (0.9 secs)
+INCOMPLETE COVERAGE (65.0%): core.domain.change_domain_test
+Name                           Stmts   Miss Branch BrPart  Cover   Missing
+--------------------------------------------------------------------------
+core/domain/change_domain.py      87     22     46     16    65%   119, 124, 129, 133-135, 143-146, 205->212, 206->205, 213, 233, 243->248, 244->243, 249, 253, 272->279, 273->272, 280-281, 299, 312, 326-329
+--------------------------------------------------------------------------
+TOTAL                             87     22     46     16    65%
+
+"""
+
 
 
 # TODO (#14219): Update these tests to fully cover file change_domain.py.
@@ -32,5 +49,91 @@ class ChangeDomainTests(test_utils.GenericTestBase):
         })
         expected_change_object_dict = {
             'cmd': feconf.CMD_DELETE_COMMIT
+        }
+        self.assertEqual(change_object.to_dict(), expected_change_object_dict)
+
+    def test_that_error_appenden_when_extra_attributes_added(self) -> None:
+        change_object = change_domain.BaseChange({
+            'cmd': feconf.CMD_DELETE_COMMIT
+        })
+        with self.assertRaisesRegex(utils.ValidationError, (
+            'The following extra attributes are present: required_attribute_names')):
+            change_dict = change_object.to_dict()
+            change_dict['required_attribute_names'] = ['assignee_id']
+            change_object.validate_dict(change_dict)
+
+    def test_that_error_appenden_when_attribute_missing(self) -> None:
+        valid_cmd_dict = {
+            'name': "AUTO",
+            'required_attribute_names': ["key1"],
+            'optional_attribute_names': ["key 2"],
+            'user_id_attribute_names': ["name"],
+            'deprecated_values': {
+                'name1': ['name1']
+            }
+        }
+        actual_cmd_attributes = {"name": "name", "key3": "val"}
+        with self.assertRaisesRegex(utils.ValidationError, (
+            'The following required attributes are missing: key1, The following extra attributes are present: key3, name')):
+
+            change_domain.validate_cmd(feconf.CMD_DELETE_COMMIT, valid_cmd_dict, actual_cmd_attributes)
+
+    def test_that_error_appenden_when_value_deprecated(self) -> None:
+        valid_cmd_dict = {
+            'name': "AUTO",
+            'required_attribute_names': ["name"],
+            'optional_attribute_names': ["name"],
+            'user_id_attribute_names': ["name"],
+            'deprecated_values': {
+                'name': ['name']
+            }
+        }
+        actual_cmd_attributes = {"name": "name"}
+        with self.assertRaisesRegex(utils.DeprecatedCommandError, (
+            'Value for name in cmd AUTO_mark_deleted: name is deprecated')):
+
+            change_domain.validate_cmd(feconf.CMD_DELETE_COMMIT, valid_cmd_dict, actual_cmd_attributes)
+
+    def test_that_error_appenden_when_value_not_allowed(self) -> None:
+        valid_cmd_dict = {
+                'name': "AUTO",
+                'required_attribute_names': ["key"],
+                'optional_attribute_names': ["id", "name"],
+                'user_id_attribute_names': ["name"],
+                'deprecated_values': {
+                },
+                'allowed_values': {
+                   "name": ["name"],
+                   "id": ["id"]
+                }
+            }
+        actual_cmd_attributes = {"id": "id1", "key": "key1", "name": "name1"}
+        with self.assertRaisesRegex(utils.ValidationError, (
+            'Value for name in cmd AUTO_mark_deleted: name1 is not allowed')):
+
+            change_domain.validate_cmd(feconf.CMD_DELETE_COMMIT, valid_cmd_dict, actual_cmd_attributes)
+
+    def test_that_required_and_optional_attributes_set(self) -> None:
+
+        change_domain.BaseChange.COMMON_ALLOWED_COMMANDS = [{
+                'name': feconf.CMD_DELETE_COMMIT,
+                'required_attribute_names': ["name"],
+                'optional_attribute_names': [feconf.CMD_DELETE_COMMIT],
+                'user_id_attribute_names': [],
+                'deprecated_values': {
+                },
+                'allowed_values': {
+                   "name": [feconf.CMD_DELETE_COMMIT]
+                }
+            }]
+        change_object = change_domain.BaseChange({
+            'cmd': feconf.CMD_DELETE_COMMIT,
+            'name': feconf.CMD_DELETE_COMMIT
+        })
+
+        expected_change_object_dict = {
+            'cmd': feconf.CMD_DELETE_COMMIT,
+            'name': feconf.CMD_DELETE_COMMIT,
+            feconf.CMD_DELETE_COMMIT: None
         }
         self.assertEqual(change_object.to_dict(), expected_change_object_dict)
