@@ -240,50 +240,6 @@ describe('Customize Interaction Modal Component', () => {
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
-  it('should enable Save Interaction button when no recommendation IDs' +
-  ' are provided', () => {
-    spyOn(component, 'getTitle').and.returnValue(
-      AppConstants.INTERACTION_NAMES.END_EXPLORATION);
-
-    let className = 'oppia-exploration-id-input';
-
-    spyOn(
-      document, 'getElementsByClassName'
-    ).withArgs(className).and.returnValue(undefined);
-
-    expect(component.isSaveInteractionButtonEnabled()).toBe(true);
-  });
-
-  it('should enable Save Interaction button when exploration IDs' +
-  ' are provided', () => {
-    spyOn(component, 'getTitle').and
-      .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
-
-    let inputField = document.createElement('input');
-    let inputValue = angular.element(inputField);
-    let className = 'oppia-exploration-id-input';
-
-    spyOn(
-      document, 'getElementsByClassName'
-    ).withArgs(className).and.returnValue(inputValue as any);
-
-    expect(component.isSaveInteractionButtonEnabled()).toBe(true);
-  });
-
-  it('should enable Save Interaction button when no exploration ID' +
-  ' is provided', () => {
-    spyOn(component, 'getTitle').and
-      .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
-
-    let className = 'oppia-exploration-id-input';
-
-    spyOn(
-      document, 'getElementsByClassName'
-    ).withArgs(className).and.returnValue(undefined);
-
-    expect(component.isSaveInteractionButtonEnabled()).toBe(true);
-  });
-
   it('should open intreaction when user click on it', () => {
     spyOn(interactionDetailsCacheService, 'contains').and
       .returnValue(true);

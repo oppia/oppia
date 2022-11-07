@@ -253,37 +253,11 @@ export class CustomizeInteractionModalComponent
     this.isinteractionOpen = true;
   }
 
-  buttonEnabledOnEndExploration(): boolean {
-    /*
-      For the EndExploration interaction, we check whether the last input field
-      is empty or not.
-      Since checking recommended exploration ID's validity is an
-      expensive operation, it is only checked in the interaction validations
-      and not here in real-time.
-    */
-    let inputField = document.
-      getElementsByClassName('oppia-exploration-id-input');
-    if (inputField === undefined) {
-      return true;
-    }
-    let inputValue = angular.element(
-      inputField[inputField.length - 1]).attr('ng-reflect-model');
-    if (inputValue === undefined || inputValue.length > 0) {
-      return true;
-    }
-  }
-
   isSaveInteractionButtonEnabled(): boolean {
-    let explorationTitle = this.getTitle(
-      this.stateInteractionIdService.displayed);
-    if (explorationTitle === AppConstants.INTERACTION_NAMES.END_EXPLORATION) {
-      return this.buttonEnabledOnEndExploration();
-    }
     return !!(
       this.hasCustomizationArgs &&
       this.stateInteractionIdService.displayed &&
-      this.getCustomizationArgsWarningsList().length === 0
-    );
+      (this.getCustomizationArgsWarningsList().length === 0));
   }
 
   getSaveInteractionButtonTooltip(): string {
