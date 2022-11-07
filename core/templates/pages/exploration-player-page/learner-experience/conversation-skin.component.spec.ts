@@ -975,7 +975,13 @@ describe('Conversation skin component', () => {
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
       spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
         'collection_id');
+      spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+        .and.returnValue(Promise.resolve(new Collection(
+          '', '', '', '', [], null, '', 6, 8, [])));
+      spyOn(explorationEngineService, 'getExplorationId').and
+        .returnValue('expId');
       spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+      spyOn(urlService, 'isIframed').and.returnValue(false);
       spyOn(localStorageService, 'getUniqueProgressIdOfLoggedOutLearner')
         .and.returnValue(null);
       spyOn(collectionPlayerBackendApiService, 'fetchCollectionSummariesAsync')
@@ -987,6 +993,7 @@ describe('Conversation skin component', () => {
 
       expect(contextService.isInExplorationEditorPage).toHaveBeenCalled();
       expect(urlService.getCollectionIdFromExplorationUrl).toHaveBeenCalled();
+      expect(componentInstance.collectionId).toBe('collection_id');
       expect(collectionPlayerBackendApiService.fetchCollectionSummariesAsync)
         .toHaveBeenCalled();
       expect(alertsService.addWarning).toHaveBeenCalledWith(
