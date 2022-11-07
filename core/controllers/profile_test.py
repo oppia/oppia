@@ -301,8 +301,11 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         # Update the first_contribution_msec to the current time in
         # milliseconds.
         first_time_in_msecs = utils.get_current_time_in_millisecs()
-        user_services.update_first_contribution_msec_if_not_set(
-            user_id, first_time_in_msecs)
+        user_settings_to_update = user_services.get_user_settings(user_id)
+        user_settings_to_update.update_first_contribution_msec(
+            first_time_in_msecs
+        )
+        user_services.save_user_settings(user_settings_to_update)
 
         # Test the contribution date correctly changes to current_time_in_msecs.
         response_dict = self.get_json(
@@ -314,8 +317,11 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         # Test that the contribution date is not changed after the first time it
         # is set.
         second_time_in_msecs = utils.get_current_time_in_millisecs()
-        user_services.update_first_contribution_msec_if_not_set(
-            user_id, second_time_in_msecs)
+        user_settings_to_update = user_services.get_user_settings(user_id)
+        user_settings_to_update.update_first_contribution_msec(
+            second_time_in_msecs
+        )
+        user_services.save_user_settings(user_settings_to_update)
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME)
         self.assertEqual(
@@ -962,6 +968,69 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
     def test_get_delete_account_page(self):
         response = self.get_html_response('/delete-account')
         self.assertIn(b'<oppia-root></oppia-root>', response.body)
+
+
+class AndroidListSubscriptionHandlerTests(test_utils.GenericTestBase):
+
+    def test_put_function(self):
+        swap_add_fn = self.swap(
+            user_services, 'add_user_to_android_list', lambda *args: True)
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+        with swap_add_fn:
+            json_response = self.put_json(
+                '/androidlistsubscriptionhandler', {
+                    'email': 'email@example.com',
+                    'name': 'Name'
+                }, csrf_token=csrf_token)
+            self.assertEqual(json_response, {'status': True})
+
+        self.logout()
+
+    def test_email_provider_error(self):
+        def raise_exception():
+            raise Exception('Backend error')
+        swap_add_fn = self.swap(
+            user_services, 'add_user_to_android_list', raise_exception)
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+        with swap_add_fn:
+            self.put_json(
+                '/androidlistsubscriptionhandler', {
+                    'email': 'email@example.com',
+                    'name': 'Name'
+                }, csrf_token=csrf_token, expected_status_int=500)
+
+        self.logout()
+
+    def test_invalid_inputs(self):
+        swap_add_fn = self.swap(
+            user_services, 'add_user_to_android_list', lambda *args: True)
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+        with swap_add_fn:
+            self.put_json(
+                '/androidlistsubscriptionhandler', {
+                    'email': 'invalidemail.com',
+                    'name': 'Name'
+                }, csrf_token=csrf_token, expected_status_int=400)
+
+            self.put_json(
+                '/androidlistsubscriptionhandler', {
+                    'email': 'email@example.com',
+                    'name': ''
+                }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.logout()
 
 
 class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
