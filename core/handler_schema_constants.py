@@ -29,7 +29,6 @@ import from this location.
 from __future__ import annotations
 
 HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
-    'AssetDevHandler',
     'AudioUploadHandler',
     'DeferredTasksHandler',
     'DeleteAccountPage',
@@ -67,7 +66,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'UpdateQuestionSuggestionHandler',
     'UpdateTranslationSuggestionHandler',
     'ValidateExplorationsHandler',
-    'ValueGeneratorHandler',
     'VoiceArtistManagementHandler',
     'OppiaMLVMHandler',
     'CsrfTokenHandler',
