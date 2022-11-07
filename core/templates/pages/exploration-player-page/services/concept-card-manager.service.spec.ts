@@ -40,7 +40,7 @@ describe('HintsAndSolutionManager service', () => {
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
 
-  const WAIT_BEFORE_REALLY_STUCK_MSEC: number = 12000;
+  const WAIT_BEFORE_REALLY_STUCK_MSEC: number = 29000;
   const WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 2000;
   const WAIT_FOR_CONCEPT_CARD_MSEC: number = 6000;
 
