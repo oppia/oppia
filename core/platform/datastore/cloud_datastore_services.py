@@ -87,6 +87,7 @@ def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
         list(datastore_services.Model | None). List whose items are either a
         Model instance or None if the corresponding key wasn't found.
     """
+    result = []
     for unused_i in range(0, MAX_GET_RETRIES):
         try:
             result = ndb.get_multi(keys)
