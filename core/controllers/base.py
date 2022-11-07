@@ -41,7 +41,8 @@ from core.domain import config_services
 from core.domain import user_services
 
 from typing import (
-    Any, Dict, Final, Generic, Mapping, Optional, TypedDict, TypeVar, Union
+    Any, Dict, Final, Generic, Mapping, Optional, Sequence, TypedDict, TypeVar,
+    Union
 )
 
 import webapp2
@@ -596,7 +597,9 @@ class BaseHandler(
 
     # Here we use type Any because the argument 'values' can accept various
     # kinds of dictionaries that needs to be sent as a JSON response.
-    def render_json(self, values: Union[str, Mapping[str, Any]]) -> None:
+    def render_json(
+        self, values: Union[str, Sequence[Mapping[str, Any]], Mapping[str, Any]]
+    ) -> None:
         """Prepares JSON response to be sent to the client.
 
         Args:

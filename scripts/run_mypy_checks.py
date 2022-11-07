@@ -87,8 +87,6 @@ NOT_FULLY_COVERED_FILES: Final = [
     'core/controllers/learner_dashboard_test.py',
     'core/controllers/learner_goals.py',
     'core/controllers/learner_goals_test.py',
-    'core/controllers/learner_group.py',
-    'core/controllers/learner_group_test.py',
     'core/controllers/learner_playlist.py',
     'core/controllers/learner_playlist_test.py',
     'core/controllers/library.py',

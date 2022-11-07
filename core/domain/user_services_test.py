@@ -435,6 +435,17 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_multi_user_ids_from_usernames([]), []
         )
 
+        with self.assertRaisesRegex(
+            Exception,
+            'No user_id found for the username: fakeusername1'
+        ):
+            user_services.get_multi_user_ids_from_usernames(
+                ['fakeUsername1', 'USERNAME1', 'fakeUsername3',
+                'fakeUsername4', 'fakeUsername5', 'fakeUsername6',
+                'fakeUsername7', username2, 'fakeUsername9'],
+                strict=True
+            )
+
     def test_get_user_settings_from_username_returns_user_settings(
         self
     ) -> None:
