@@ -21,7 +21,6 @@ from __future__ import annotations
 from apache_beam.io.gcp import gcsio_test
 from core.jobs import base_jobs
 from core.jobs.io import gcs_io
-from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
@@ -30,15 +29,7 @@ from typing import Optional
 
 import apache_beam as beam
 
-MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import app_identity_services
-    from mypy_imports import exp_models
-
 datastore_services = models.Registry.import_datastore_services()
-app_identity_services = models.Registry.import_app_identity_services()
-
-(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 class TestGCSIoJob(base_jobs.JobBase):
@@ -49,31 +40,42 @@ class TestGCSIoJob(base_jobs.JobBase):
         pipeline: beam.Pipeline,
         client: Optional[gcsio_test.FakeGcsClient] = None
     ) -> None:
-        super.__init__(pipeline=pipeline)
+        super().__init__(pipeline=pipeline)
         self.client = client
         self.pipeline = pipeline
 
-    def _map_with_filename(self, exp_id: str) -> str:
-        """Returns the filename with which the exp image is stored.
-
-        Args:
-            exp_id: str. The id of the Exploration.
-
-        Returns:
-            str. The filename with which the Exploration file is stored on GCS.
-        """
-        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
-        return f'gs://{bucket_name}/exploration/{exp_id}/some_image.png'
-
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+
+        write_files_to_gcs = (
+            self.pipeline
+            | 'Create PCollection having test bucket and test files' >> (
+                beam.Create(
+                    [
+                        {'file': 'gs://test-bucket/dummy_file_1', 'data': b'testing_1'},
+                        {'file': 'gs://test-bucket/dummy_file_2', 'data': b'testing_2'}
+                    ]
+                ))
+            | 'Write files to GCS' >> gcs_io.WriteFile(self.client)
+            | 'print' >> beam.Map(self._print)
+        )
+
+        total_files_write = (
+            write_files_to_gcs
+            | 'Total number of files write to GCS' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL FILES WRITTEN'))
+        )
+
         read_exp_file_from_gcs = (
             self.pipeline
-            | 'Get all non-deleted ExplorationModels' >> ndb_io.GetModels(
-                exp_models.ExplorationModel.get_all(include_deleted=False))
-            | 'Map with id' >> beam.Map(lambda exp: exp.id)
-            | 'Map with filename present on GCS' >> beam.Map(
-                self._map_with_filename)
-            | 'Read file from the GCS' >> gcs_io.ReadFile(self.client)
+            | 'Create PCollection of files that needs to be fetched' >> (
+                beam.Create(
+                    [
+                        'gs://test-bucket/dummy_file_1',
+                        'gs://test-bucket/dummy_file_2'
+                    ]
+                ))
+            | 'Read files from the GCS' >> gcs_io.ReadFile(self.client)
         )
 
         total_files_read = (
@@ -92,6 +94,7 @@ class TestGCSIoJob(base_jobs.JobBase):
 
         return (
             (
+                total_files_write,
                 total_files_read,
                 output_files
             )

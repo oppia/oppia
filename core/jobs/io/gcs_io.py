@@ -47,7 +47,7 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         mode: str = 'r',
         label: Optional[str] = None
     ) -> None:
-        super.__init__(label=label)
+        super().__init__(label=label)
         self.client = client
         self.mode = mode
 
@@ -75,17 +75,15 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
 
     def __init__(
         self,
-        data: io.ReadableBuffer,
         client: Optional[gcsio_test.FakeGcsClient] = None,
         mode: str = 'w',
         mime_type: str = 'application/octet-stream',
         label: Optional[str] = None
     ):
-        super.__init__(label=label)
+        super().__init__(label=label)
         self.client = client
         self.mode = mode
         self.mime_type = mime_type
-        self.data = data
 
     def expand(
         self, filenames: beam.PCollection
@@ -100,5 +98,6 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
         """Helper function to write file to the GCS."""
         gcs = gcsio.GcsIO(self.client)
         return gcs.open(
-            filename=filename, mode=self.mode, mime_type=self.mime_type).write(
-                data=self.data)
+            filename=filename['file'],
+            mode=self.mode,
+            mime_type=self.mime_type).write(filename['data'])
