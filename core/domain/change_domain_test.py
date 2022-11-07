@@ -24,9 +24,8 @@ from core import utils
 from core.domain import change_domain
 from core.tests import test_utils
 
-# TODO (#14219): Update these tests to fully cover file change_domain.py.
-class ChangeDomainTests(test_utils.GenericTestBase):
 
+class ChangeDomainTests(test_utils.GenericTestBase):
 
     def test_that_domain_object_is_created_correctly(self) -> None:
         change_object = change_domain.BaseChange({
@@ -43,7 +42,7 @@ class ChangeDomainTests(test_utils.GenericTestBase):
         })
         with self.assertRaisesRegex(utils.ValidationError, (
             'The following extra attributes are present:'
-            + 'required_attribute_names')):
+            'required_attribute_names')):
             change_dict = change_object.to_dict()
             change_dict['required_attribute_names'] = ['assignee_id']
             change_object.validate_dict(change_dict)
@@ -61,9 +60,10 @@ class ChangeDomainTests(test_utils.GenericTestBase):
         actual_cmd_attributes = {'name': 'name', 'key3': 'val'}
         with self.assertRaisesRegex(utils.ValidationError, (
             'The following required attributes are missing:'
-            + 'key1, The following extra attributes are present: key3, name')):
+            'key1, The following extra attributes are present: key3, name')):
 
-            change_domain.validate_cmd(feconf.CMD_DELETE_COMMIT,
+            change_domain.validate_cmd(
+            feconf.CMD_DELETE_COMMIT,
             valid_cmd_dict, actual_cmd_attributes)
 
     def test_that_error_appenden_when_value_deprecated(self) -> None:
@@ -80,7 +80,8 @@ class ChangeDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(utils.DeprecatedCommandError, (
             'Value for name in cmd AUTO_mark_deleted: name is deprecated')):
 
-            change_domain.validate_cmd(feconf.CMD_DELETE_COMMIT,
+            change_domain.validate_cmd(
+            feconf.CMD_DELETE_COMMIT,
             valid_cmd_dict, actual_cmd_attributes)
 
     def test_that_error_appenden_when_value_not_allowed(self) -> None:
@@ -100,7 +101,8 @@ class ChangeDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(utils.ValidationError, (
             'Value for name in cmd AUTO_mark_deleted: name1 is not allowed')):
 
-            change_domain.validate_cmd(feconf.CMD_DELETE_COMMIT,
+            change_domain.validate_cmd(
+            feconf.CMD_DELETE_COMMIT,
             valid_cmd_dict, actual_cmd_attributes)
 
     def test_that_required_and_optional_attributes_set(self) -> None:
