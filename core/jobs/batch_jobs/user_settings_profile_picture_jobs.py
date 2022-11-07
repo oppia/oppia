@@ -22,6 +22,7 @@ import base64
 import io
 import logging
 
+from core import utils
 from core.domain import user_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -60,7 +61,7 @@ class AuditInvalidProfilePictureJob(base_jobs.JobBase):
             # Ruling out the possibility of different types for
             # mypy type checking.
             assert isinstance(picture_str, str)
-            imgdata = base64.b64decode(picture_str)
+            imgdata = utils.convert_png_data_url_to_binary(picture_str)
             image = Image.open(io.BytesIO(imgdata))
             width, height = image.size
             if width != 150 and height != 150:
@@ -134,7 +135,7 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
         profile_picture_data = user_model.profile_picture_data_url
 
         try:
-            imgdata = base64.b64decode(profile_picture_data)
+            imgdata = utils.convert_png_data_url_to_binary(profile_picture_data)
             Image.open(io.BytesIO(imgdata))
         except Exception:
             logging.exception('ERRORED EXCEPTION MIGRATION')

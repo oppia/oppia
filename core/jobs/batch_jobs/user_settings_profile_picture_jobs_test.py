@@ -34,30 +34,6 @@ datastore_services = models.Registry.import_datastore_services()
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
 
-BASE64_STR = (
-    'iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAIAAADTED8xAAADMElEQVR4nOz'
-    'VwQnAIBQFQYXff81RUkQCOyDj1YOPnbXWPmeTRef+/3O/OyBjzh3CD95Bfq'
-    'ICMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CM'
-    'K0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0C'
-    'MK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0'
-    'CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK'
-    '0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CM'
-    'K0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0C'
-    'MK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0'
-    'CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK'
-    '0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CM'
-    'K0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0C'
-    'MK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0'
-    'CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK'
-    '0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CM'
-    'K0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0C'
-    'MK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0'
-    'CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK'
-    '0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CM'
-    'K0CMK0CMO0TAAD//2Anhf4QtqobAAAAAElFTkSuQmCC'
-)
-
-
 class AuditInvalidProfilePictureJobTests(job_test_utils.JobTestBase):
     """Fetch invalid profile pictures data."""
 
@@ -72,7 +48,7 @@ class AuditInvalidProfilePictureJobTests(job_test_utils.JobTestBase):
             email='test_1@example.com',
             username='test_1',
             roles=[feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
-            profile_picture_data_url=BASE64_STR
+            profile_picture_data_url=user_services.DEFAULT_IDENTICON_DATA_URL
         )
 
         self.user_2 = self.create_model(
@@ -135,7 +111,7 @@ class FixInvalidProfilePictureJobTests(job_test_utils.JobTestBase):
             email='test_3@example.com',
             username='test_3',
             roles=[feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
-            profile_picture_data_url=BASE64_STR
+            profile_picture_data_url=user_services.DEFAULT_IDENTICON_DATA_URL
         )
 
         self.user_4 = self.create_model(
@@ -163,7 +139,7 @@ class FixInvalidProfilePictureJobTests(job_test_utils.JobTestBase):
 
         self.assertEqual(
             migrated_user_model_1.profile_picture_data_url,
-            BASE64_STR
+            user_services.DEFAULT_IDENTICON_DATA_URL
         )
 
     def test_update_user_model_with_invalid_profile_picture(self) -> None:
