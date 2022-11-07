@@ -26,7 +26,6 @@ from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import rights_manager
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -35,19 +34,17 @@ from core.platform import models
 
 import apache_beam as beam
 import result
-from typing import Iterable, List, Sequence, Tuple
+from typing import Iterable, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
-    from mypy_imports import translation_models
 
-(base_models, exp_models, translation_models) = (
+(base_models, exp_models) = (
     models.Registry.import_models(
-        [models.Names.BASE_MODEL, models.Names.EXPLORATION,
-         models.Names.TRANSLATION]))
+        [models.Names.BASE_MODEL, models.Names.EXPLORATION]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -86,6 +83,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                         exp_model.id) is not None:
                     exp_services.validate_exploration_for_story(
                         exploration, True)
+
         except Exception as e:
             logging.exception(e)
             return result.Err((exp_model.id, e))
@@ -137,57 +135,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
             caching_services.CACHE_NAMESPACE_EXPLORATION,
             None, [exploration.id]
         )
-
-    @staticmethod
-    def _extract_required_translation_model(
-        exp_translation_models: List[
-            translation_models.EntityTranslationsModel],
-        exp_version: int
-    ) -> List[translation_models.EntityTranslationsModel]:
-        """Extracts all the latest translation models from the given list of
-        translation models.
-
-        Args:
-            exp_translation_models: list(EntityTranslationsModel). The list of
-                given entity translation models.
-            exp_version: int. The latest version number of the exploration.
-
-        Returns:
-            list(EntityTranslationsModel). The latest translation models from
-            the given list of translation models.
-        """
-        return [
-            translation_model
-            for translation_model in list(exp_translation_models)
-            if translation_model.entity_version == exp_version
-        ]
-
-    @staticmethod
-    def _generate_new_translation_model(
-        exp_translation_model: translation_models.EntityTranslationsModel
-    ) -> translation_models.EntityTranslationsModel:
-        """Generates new translation models for the given exploration
-        model.
-
-        Args:
-            exp_translation_model: EntityTranslationsModel. The old translation
-                model for generating new model.
-
-        Returns:
-            EntityTranslationsModel. The new translation model with updated
-            version number.
-        """
-        with datastore_services.get_ndb_context():
-            new_model = translation_models.EntityTranslationsModel.create_new(
-                exp_translation_model.entity_type,
-                exp_translation_model.entity_id,
-                exp_translation_model.entity_version + 1,
-                exp_translation_model.language_code,
-                exp_translation_model.translations
-            )
-            datastore_services.update_timestamps_multi([new_model])
-
-        return new_model
 
     @staticmethod
     def _update_exploration(
@@ -250,6 +197,11 @@ class MigrateExplorationJob(base_jobs.JobBase):
             # detect that the value is passed through the pipe.
             | 'Add exploration keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
                 lambda exp_model: exp_model.id)
+            # TODO(#15871): This filter should be removed after the explorations
+            # are fixed and it is possible to migrate them.
+            | 'Remove broken exploration' >> beam.Filter(
+                lambda id_and_exp: id_and_exp[0] not in (
+                    'umPkwp0L1M0-', '670bU6d9JGBh'))
         )
 
         exp_rights_models = (
@@ -273,15 +225,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
                     exp_rights.status == constants.ACTIVITY_STATUS_PUBLIC
                 )
             )
-        )
-
-        exp_translation_models = (
-            self.pipeline
-            | 'Get all translation models' >> (ndb_io.GetModels(
-                translation_models.EntityTranslationsModel.get_all()))
-            | 'Add entity ID from translation model' >> beam.WithKeys(# pylint: disable=no-value-for-parameter
-                lambda translation_model: translation_model.entity_id)
-            | 'Group all translation of exploration' >> beam.GroupByKey()
         )
 
         migrated_exp_results = (
@@ -321,8 +264,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             {
                 'exp_model': unmigrated_exploration_models,
                 'exploration': migrated_exp,
-                'exp_changes': exp_changes,
-                'exp_translation_models': exp_translation_models
+                'exp_changes': exp_changes
             }
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
@@ -338,13 +280,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             | 'Reorganize the exploration objects' >> beam.Map(lambda objects: {
                 'exp_model': objects['exp_model'][0],
                 'exploration': objects['exploration'][0],
-                'exp_changes': objects['exp_changes'],
-                'exp_translation_models': (
-                    self._extract_required_translation_model(
-                        objects['exp_translation_models'][0],
-                        objects['exp_model'][0].version
-                    ) if len(objects['exp_translation_models']) > 0 else []
-                )
+                'exp_changes': objects['exp_changes']
             })
         )
 
@@ -384,26 +320,10 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 ))
         )
 
-        translation_models_to_put = (
-            transformed_exp_objects_list
-            | 'Fetch translation models' >> beam.FlatMap(
-                lambda x: x['exp_translation_models'])
-            | 'Generate new translation models to put' >> beam.Map(
-                self._generate_new_translation_model)
-        )
-
-        translation_models_job_run_results = (
-            translation_models_to_put
-            | 'Generate results for new translation models' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'TRANSLATION MODELS GENERATED'))
-        )
-
         with datastore_services.get_ndb_context():
             unused_put_results = (
                 (
-                    exp_related_models_to_put,
-                    translation_models_to_put
+                    exp_related_models_to_put
                 )
                 | 'Filter None models' >> beam.Filter(
                     lambda x: x is not None)
@@ -414,8 +334,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             (
                 migrated_exp_job_run_results,
                 exp_objects_list_job_run_results,
-                already_migrated_job_run_results,
-                translation_models_job_run_results
+                already_migrated_job_run_results
             )
             | beam.Flatten()
         )

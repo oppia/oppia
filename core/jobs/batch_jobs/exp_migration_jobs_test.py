@@ -218,69 +218,6 @@ class MigrateExplorationJobTests(
         exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
         self.assertEqual(exp_model.version, 1)
 
-    def test_broken_cache_is_reported(self) -> None:
-        cache_swap = self.swap_to_always_raise(
-            caching_services, 'delete_multi', Exception('cache deletion error')
-        )
-
-        exp_model = exp_models.ExplorationModel(
-            id=self.NEW_EXP_ID,
-            category=EXP_V46_DICT['category'],
-            title=EXP_V46_DICT['title'],
-            objective=EXP_V46_DICT['objective'],
-            language_code=EXP_V46_DICT['language_code'],
-            tags=EXP_V46_DICT['tags'],
-            blurb=EXP_V46_DICT['blurb'],
-            author_notes=EXP_V46_DICT['author_notes'],
-            states_schema_version=EXP_V46_DICT['states_schema_version'],
-            init_state_name=EXP_V46_DICT['init_state_name'],
-            states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
-        )
-        rights_manager.create_new_exploration_rights(
-            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
-        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
-        exp_summary_model = exp_models.ExpSummaryModel(**{
-            'id': self.NEW_EXP_ID,
-            'title': exp_model.title,
-            'category': exp_model.category,
-            'objective': exp_model.objective,
-            'language_code': exp_model.language_code,
-            'tags': exp_model.tags,
-            'ratings': None,
-            'scaled_average_rating': 4.0,
-            'exploration_model_last_updated': exp_model.last_updated,
-            'exploration_model_created_on': exp_model.created_on,
-            'first_published_msec': None,
-            'status': constants.ACTIVITY_STATUS_PRIVATE,
-            'community_owned': False,
-            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
-            'editor_ids': [],
-            'voice_artist_ids': [],
-            'viewer_ids': [],
-            'contributor_ids': [],
-            'contributors_summary': {},
-            'version': exp_model.version
-        })
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
-
-        with cache_swap:
-            self.assert_job_output_is([
-                job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
-                job_run_result.JobRunResult(
-                    stderr='CACHE DELETION ERROR: "cache deletion error": 1'),
-                job_run_result.JobRunResult(
-                    stdout='EXP MIGRATED SUCCESS: 1', stderr='')
-            ])
-
-        migrated_exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
-        self.assertEqual(
-            migrated_exp_model.states_schema_version,
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
-
     def test_broken_exp_is_not_migrated(self) -> None:
         exploration_rights = rights_domain.ActivityRights(
             self.NEW_EXP_ID, [feconf.SYSTEM_COMMITTER_ID],
@@ -415,12 +352,12 @@ class MigrateExplorationJobTests(
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
-        for i in range(2):
+        for lang_code in ['hi', 'bn']:
             translation_models.EntityTranslationsModel.create_new(
                 feconf.TranslatableEntityType.EXPLORATION.value,
                 exp_model.id,
-                exp_model.version - i,
-                'hi',
+                exp_model.version,
+                lang_code,
                 {}
             ).put()
 
@@ -454,10 +391,8 @@ class MigrateExplorationJobTests(
         self.assertEqual(exp_model.states_schema_version, 41)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='EXP MIGRATED SUCCESS: 1', stderr=''),
-            job_run_result.JobRunResult(
-                stdout='TRANSLATION MODELS GENERATED SUCCESS: 1'),
+            job_run_result.JobRunResult(stdout='EXP MIGRATED SUCCESS: 1'),
+            job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1')
         ])
 
         updated_opp_model = (
@@ -475,7 +410,8 @@ class MigrateExplorationJobTests(
             'story_title': 'A story title',
             'content_count': 4,
             'translation_counts': {
-                'hi': 0
+                'hi': 0,
+                'bn': 0
             },
             'translation_in_review_counts': {}}
 
@@ -485,9 +421,9 @@ class MigrateExplorationJobTests(
         all_translation_models = (
             translation_models.EntityTranslationsModel.get_all().fetch())
 
-        self.assertEqual(len(all_translation_models), 3)
-        self.assertEqual(
-            [m.entity_version for m in all_translation_models], [0, 1, 2])
+        self.assertEqual(len(all_translation_models), 4)
+        self.assertItemsEqual(
+            [m.entity_version for m in all_translation_models], [1, 1, 2, 2])
 
     def test_unmigrated_invalid_published_exp_raise_error(self) -> None:
         exp_model = exp_models.ExplorationModel(
@@ -1091,17 +1027,51 @@ class ExpSnapshotsMigrationAuditJobTests(
         """Test that the audit job runs correctly on snapshots that use a
         previous state schema.
         """
-        swap_states_schema_version = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_version = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 48)
-        with swap_states_schema_version, swap_exp_schema_version:
-            exploration = exp_domain.Exploration.create_default_exploration(
-                self.VALID_EXP_ID, title='title', category='category')
-            exp_services.save_new_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exploration)
+        exp_model = exp_models.ExplorationModel(
+            id=self.VALID_EXP_ID,
+            category=EXP_V46_DICT['category'],
+            title=EXP_V46_DICT['title'],
+            objective=EXP_V46_DICT['objective'],
+            language_code=EXP_V46_DICT['language_code'],
+            tags=EXP_V46_DICT['tags'],
+            blurb=EXP_V46_DICT['blurb'],
+            author_notes=EXP_V46_DICT['author_notes'],
+            states_schema_version=EXP_V46_DICT['states_schema_version'],
+            init_state_name=EXP_V46_DICT['init_state_name'],
+            states=EXP_V46_DICT['states'],
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+            correctness_feedback_enabled=EXP_V46_DICT[
+                'correctness_feedback_enabled']
+        )
+        rights_manager.create_new_exploration_rights(
+            self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_summary_model = exp_models.ExpSummaryModel(**{
+            'id': self.VALID_EXP_ID,
+            'title': exp_model.title,
+            'category': exp_model.category,
+            'objective': exp_model.objective,
+            'language_code': exp_model.language_code,
+            'tags': exp_model.tags,
+            'ratings': None,
+            'scaled_average_rating': 4.0,
+            'exploration_model_last_updated': exp_model.last_updated,
+            'exploration_model_created_on': exp_model.created_on,
+            'first_published_msec': None,
+            'status': constants.ACTIVITY_STATUS_PRIVATE,
+            'community_owned': False,
+            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
+            'editor_ids': [],
+            'voice_artist_ids': [],
+            'viewer_ids': [],
+            'contributor_ids': [],
+            'contributors_summary': {},
+            'version': exp_model.version
+        })
+        exp_summary_model.update_timestamps()
+        exp_summary_model.put()
         self.assertLess(
-            exploration.states_schema_version,
+            exp_model.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         # Bring the main exploration to the latest schema.
@@ -1112,7 +1082,7 @@ class ExpSnapshotsMigrationAuditJobTests(
         migration_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': '42',
+                'from_version': '46',
                 'to_version': latest_schema_version
             })
         ]
@@ -1146,15 +1116,49 @@ class ExpSnapshotsMigrationAuditJobTests(
         """Test that the audit job catches any errors that would otherwise
         occur during the migration.
         """
-        swap_states_schema_41 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
-        swap_exp_schema_46 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
-        with swap_states_schema_41, swap_exp_schema_46:
-            exploration = exp_domain.Exploration.create_default_exploration(
-                self.VALID_EXP_ID, title='title', category='category')
-            exp_services.save_new_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exploration)
+        exp_model = exp_models.ExplorationModel(
+            id=self.VALID_EXP_ID,
+            category=EXP_V46_DICT['category'],
+            title=EXP_V46_DICT['title'],
+            objective=EXP_V46_DICT['objective'],
+            language_code=EXP_V46_DICT['language_code'],
+            tags=EXP_V46_DICT['tags'],
+            blurb=EXP_V46_DICT['blurb'],
+            author_notes=EXP_V46_DICT['author_notes'],
+            states_schema_version=EXP_V46_DICT['states_schema_version'],
+            init_state_name=EXP_V46_DICT['init_state_name'],
+            states=EXP_V46_DICT['states'],
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+            correctness_feedback_enabled=EXP_V46_DICT[
+                'correctness_feedback_enabled']
+        )
+        rights_manager.create_new_exploration_rights(
+            self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_summary_model = exp_models.ExpSummaryModel(**{
+            'id': self.VALID_EXP_ID,
+            'title': exp_model.title,
+            'category': exp_model.category,
+            'objective': exp_model.objective,
+            'language_code': exp_model.language_code,
+            'tags': exp_model.tags,
+            'ratings': None,
+            'scaled_average_rating': 4.0,
+            'exploration_model_last_updated': exp_model.last_updated,
+            'exploration_model_created_on': exp_model.created_on,
+            'first_published_msec': None,
+            'status': constants.ACTIVITY_STATUS_PRIVATE,
+            'community_owned': False,
+            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
+            'editor_ids': [],
+            'voice_artist_ids': [],
+            'viewer_ids': [],
+            'contributor_ids': [],
+            'contributors_summary': {},
+            'version': exp_model.version
+        })
+        exp_summary_model.update_timestamps()
+        exp_summary_model.put()
 
         # Bring the main exploration to the latest schema.
         caching_services.delete_multi(
@@ -1185,7 +1189,7 @@ class ExpSnapshotsMigrationAuditJobTests(
             lambda cls, exploration_dict: exploration_dict['property_that_dne'])
 
         with self.swap(
-            exp_domain.Exploration, '_convert_states_v41_dict_to_v42_dict',
+            exp_domain.Exploration, '_convert_states_v46_dict_to_v47_dict',
             mock_conversion
         ):
             self.assert_job_output_is([
@@ -1194,7 +1198,7 @@ class ExpSnapshotsMigrationAuditJobTests(
                     stderr=(
                         'EXP PROCESSED ERROR: "(\'exp_id0\', Exception("'
                         'Exploration snapshot exp_id0 failed migration to '
-                        'states v42: \'property_that_dne\'"))": 1'
+                        'states v47: \'property_that_dne\'"))": 1'
                     )
                 ),
                 job_run_result.JobRunResult(
@@ -1375,18 +1379,49 @@ class ExpSnapshotsMigrationJobTests(
         ])
 
     def test_migration_job_succeeds_on_default_exploration(self) -> None:
-        swap_states_schema_version = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_version = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 48)
-        with swap_states_schema_version, swap_exp_schema_version:
-            exploration = exp_domain.Exploration.create_default_exploration(
-                self.VALID_EXP_ID, title='title', category='category')
-            exp_services.save_new_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exploration)
-        self.assertLess(
-            exploration.states_schema_version,
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        exp_model = exp_models.ExplorationModel(
+            id=self.VALID_EXP_ID,
+            category=EXP_V46_DICT['category'],
+            title=EXP_V46_DICT['title'],
+            objective=EXP_V46_DICT['objective'],
+            language_code=EXP_V46_DICT['language_code'],
+            tags=EXP_V46_DICT['tags'],
+            blurb=EXP_V46_DICT['blurb'],
+            author_notes=EXP_V46_DICT['author_notes'],
+            states_schema_version=EXP_V46_DICT['states_schema_version'],
+            init_state_name=EXP_V46_DICT['init_state_name'],
+            states=EXP_V46_DICT['states'],
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+            correctness_feedback_enabled=EXP_V46_DICT[
+                'correctness_feedback_enabled']
+        )
+        rights_manager.create_new_exploration_rights(
+            self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_summary_model = exp_models.ExpSummaryModel(**{
+            'id': self.VALID_EXP_ID,
+            'title': exp_model.title,
+            'category': exp_model.category,
+            'objective': exp_model.objective,
+            'language_code': exp_model.language_code,
+            'tags': exp_model.tags,
+            'ratings': None,
+            'scaled_average_rating': 4.0,
+            'exploration_model_last_updated': exp_model.last_updated,
+            'exploration_model_created_on': exp_model.created_on,
+            'first_published_msec': None,
+            'status': constants.ACTIVITY_STATUS_PRIVATE,
+            'community_owned': False,
+            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
+            'editor_ids': [],
+            'voice_artist_ids': [],
+            'viewer_ids': [],
+            'contributor_ids': [],
+            'contributors_summary': {},
+            'version': exp_model.version
+        })
+        exp_summary_model.update_timestamps()
+        exp_summary_model.put()
 
         # Bring the main exploration to the latest schema.
         caching_services.delete_multi(
@@ -1396,7 +1431,7 @@ class ExpSnapshotsMigrationJobTests(
         migration_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': '42',
+                'from_version': '46',
                 'to_version': latest_schema_version
             })
         ]
@@ -1527,15 +1562,49 @@ class ExpSnapshotsMigrationJobTests(
             ])
 
     def test_migration_job_audit_failure(self) -> None:
-        swap_states_schema_41 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
-        swap_exp_schema_46 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
-        with swap_states_schema_41, swap_exp_schema_46:
-            exploration = exp_domain.Exploration.create_default_exploration(
-                self.VALID_EXP_ID, title='title', category='category')
-            exp_services.save_new_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exploration)
+        exp_model = exp_models.ExplorationModel(
+            id=self.VALID_EXP_ID,
+            category=EXP_V46_DICT['category'],
+            title=EXP_V46_DICT['title'],
+            objective=EXP_V46_DICT['objective'],
+            language_code=EXP_V46_DICT['language_code'],
+            tags=EXP_V46_DICT['tags'],
+            blurb=EXP_V46_DICT['blurb'],
+            author_notes=EXP_V46_DICT['author_notes'],
+            states_schema_version=EXP_V46_DICT['states_schema_version'],
+            init_state_name=EXP_V46_DICT['init_state_name'],
+            states=EXP_V46_DICT['states'],
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+            correctness_feedback_enabled=EXP_V46_DICT[
+                'correctness_feedback_enabled']
+        )
+        rights_manager.create_new_exploration_rights(
+            self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_summary_model = exp_models.ExpSummaryModel(**{
+            'id': self.VALID_EXP_ID,
+            'title': exp_model.title,
+            'category': exp_model.category,
+            'objective': exp_model.objective,
+            'language_code': exp_model.language_code,
+            'tags': exp_model.tags,
+            'ratings': None,
+            'scaled_average_rating': 4.0,
+            'exploration_model_last_updated': exp_model.last_updated,
+            'exploration_model_created_on': exp_model.created_on,
+            'first_published_msec': None,
+            'status': constants.ACTIVITY_STATUS_PRIVATE,
+            'community_owned': False,
+            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
+            'editor_ids': [],
+            'voice_artist_ids': [],
+            'viewer_ids': [],
+            'contributor_ids': [],
+            'contributors_summary': {},
+            'version': exp_model.version
+        })
+        exp_summary_model.update_timestamps()
+        exp_summary_model.put()
 
         # Bring the main exploration to the latest schema.
         caching_services.delete_multi(
@@ -1545,7 +1614,7 @@ class ExpSnapshotsMigrationJobTests(
         migration_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': '42',
+                'from_version': '46',
                 'to_version': latest_schema_version
             })
         ]
@@ -1566,7 +1635,7 @@ class ExpSnapshotsMigrationJobTests(
             lambda cls, exploration_dict: exploration_dict['property_that_dne'])
 
         with self.swap(
-            exp_domain.Exploration, '_convert_states_v41_dict_to_v42_dict',
+            exp_domain.Exploration, '_convert_states_v46_dict_to_v47_dict',
             mock_conversion
         ):
             self.assert_job_output_is([
@@ -1575,7 +1644,7 @@ class ExpSnapshotsMigrationJobTests(
                     stderr=(
                         'EXP PROCESSED ERROR: "(\'exp_id0\', Exception("'
                         'Exploration snapshot exp_id0 failed migration to '
-                        'states v42: \'property_that_dne\'"))": 1'
+                        'states v47: \'property_that_dne\'"))": 1'
                     )
                 ),
                 job_run_result.JobRunResult(

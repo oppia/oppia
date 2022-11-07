@@ -66,82 +66,6 @@ if MYPY:  # pragma: no cover
 )
 
 
-class BaseSuggestionServicesTest(test_utils.GenericTestBase):
-    """Base class for the suggestion services test."""
-
-    def _publish_valid_topic(
-        self, topic: topic_domain.Topic,
-        uncategorized_skill_ids: List[str]) -> None:
-        """Saves and publishes a valid topic with linked skills and subtopic.
-
-        Args:
-            topic: Topic. The topic to be saved and published.
-            uncategorized_skill_ids: list(str). List of uncategorized skills IDs
-                to add to the supplied topic.
-        """
-        topic.thumbnail_filename = 'thumbnail.svg'
-        topic.thumbnail_bg_color = '#C6DCDA'
-        subtopic_id = 1
-        subtopic_skill_id = 'subtopic_skill_id' + topic.id
-        topic.subtopics = [
-            topic_domain.Subtopic(
-                subtopic_id, 'Title', [subtopic_skill_id], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                'dummy-subtopic')]
-        topic.next_subtopic_id = 2
-        topic.skill_ids_for_diagnostic_test = [subtopic_skill_id]
-        subtopic_page = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                subtopic_id, topic.id))
-        subtopic_page_services.save_subtopic_page(
-            self.owner_id, subtopic_page, 'Added subtopic',
-            [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': 1,
-                'title': 'Sample',
-                'url_fragment': 'sample-fragment'
-            })]
-        )
-        topic_services.save_new_topic(self.owner_id, topic)
-        topic_services.publish_topic(topic.id, self.admin_id)
-
-        for skill_id in uncategorized_skill_ids:
-            self.save_new_skill(
-                skill_id, self.admin_id, description='skill_description')
-            topic_services.add_uncategorized_skill(
-                self.admin_id, topic.id, skill_id)
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        explorations = [self.save_new_valid_exploration(
-            '%s' % i,
-            self.owner_id,
-            title='title %d' % i,
-            category=constants.ALL_CATEGORIES[i],
-            end_state_name='End State',
-            correctness_feedback_enabled=True
-        ) for i in range(2)]
-
-        for exp in explorations:
-            self.publish_exploration(self.owner_id, exp.id)
-
-        self.topic_id = '0'
-        topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'topic', 'abbrev', 'description', 'fragm')
-        self.skill_id_0 = 'skill_id_0'
-        self.skill_id_1 = 'skill_id_1'
-        self._publish_valid_topic(topic, [self.skill_id_0, self.skill_id_1])
-
-        self.create_story_for_translation_opportunity(
-            self.owner_id, self.admin_id, 'story_id_0', self.topic_id, '0')
-
-
 class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     """Test the functions in suggestion_services."""
 
@@ -4202,14 +4126,15 @@ class ReviewableSuggestionEmailInfoUnitTests(
 
 
 class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
-        BaseSuggestionServicesTest):
+        test_utils.GenericTestBase):
     """Test the ability of the
     get_suggestions_waitng_for_review_info_to_notify_reviewers method
     in suggestion services, which is used to retrieve the information required
     to notify reviewers that there are suggestions that need review.
     """
 
-    target_id: str = '0'
+    target_id: str = 'exp1'
+    skill_id: str = 'skill_123456'
     language_code: str = 'en'
     AUTHOR_EMAIL: Final = 'author1@example.com'
     REVIEWER_1_EMAIL: Final = 'reviewer1@community.org'
@@ -4335,18 +4260,21 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.author_id = self.get_user_id_from_email(
+            self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
         self.reviewer_1_id = self.get_user_id_from_email(
             self.REVIEWER_1_EMAIL)
         self.signup(self.REVIEWER_2_EMAIL, 'reviewer2')
         self.reviewer_2_id = self.get_user_id_from_email(
             self.REVIEWER_2_EMAIL)
-
+        exploration = self.save_new_valid_exploration(
+            self.target_id, self.author_id,
+        correctness_feedback_enabled=True)
         audio_language_codes = set(
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
         model = opportunity_models.ExplorationOpportunitySummaryModel(
-            id=self.target_id,
+            id=exploration.id,
             topic_id='topic_id',
             topic_name='topic_name',
             story_id='story_id',
@@ -4361,6 +4289,8 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         )
         model.update_timestamps()
         model.put()
+
+        self.save_new_skill(self.skill_id, self.author_id)
 
     def test_get_returns_empty_for_reviewers_who_authored_the_suggestions(
         self
@@ -4850,7 +4780,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             expected_reviewable_suggestion_email_infos)
 
 
-class CommunityContributionStatsUnitTests(BaseSuggestionServicesTest):
+class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     """Test the functionality related to updating the community contribution
     stats.
 
@@ -4861,7 +4791,7 @@ class CommunityContributionStatsUnitTests(BaseSuggestionServicesTest):
     to be added then this can be removed. See issue #10957 for more context.
     """
 
-    target_id: str = '0'
+    target_id: str = 'exp1'
     skill_id: str = 'skill_123456'
     language_code: str = 'en'
     AUTHOR_EMAIL: Final = 'author@example.com'
@@ -4985,7 +4915,8 @@ class CommunityContributionStatsUnitTests(BaseSuggestionServicesTest):
         self.reviewer_id = self.get_user_id_from_email(
             self.REVIEWER_EMAIL)
         exploration = self.save_new_valid_exploration(
-            self.target_id, self.author_id)
+            self.target_id, self.author_id,
+        correctness_feedback_enabled=True)
         audio_language_codes = set(
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
         model = opportunity_models.ExplorationOpportunitySummaryModel(

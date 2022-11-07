@@ -1141,15 +1141,12 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         self.save_new_default_exploration('exp_1', owner_id)
-        opportunity_services.update_opportunity_with_updated_exploration(
-            'exp_1', 2, {'hi': 2})
-
         opportunity = (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                ['exp_1']
+            opportunity_services
+            .compute_opportunity_models_with_updated_exploration(
+                'exp_1', 2, {'hi': 2}
             )
-        )
-        assert opportunity['exp_1'] is not None
+        )[0]
 
         self.assertFalse(
-            'hi' in opportunity['exp_1'].incomplete_translation_language_codes)
+            'hi' in opportunity.incomplete_translation_language_codes)

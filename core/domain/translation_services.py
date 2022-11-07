@@ -23,7 +23,6 @@ import logging
 
 from core import feconf
 from core.domain import exp_domain
-from core.domain import opportunity_services
 from core.domain import translation_domain
 from core.domain import translation_fetchers
 from core.platform import models
@@ -143,6 +142,11 @@ def compute_translation_related_change(
             content Ids for translation removal.
         content_ids_corresponding_translations_to_mark_needs_update: List[str].
             The list of content Ids to mark translation needs update.
+
+    Returns:
+        Tuple(list(EntityTranslationsModel), dict(str, int)). A tuple containing
+        list of new EntityTranslationsModel and a dict with count of translated
+        contents as value and the languages as key.
     """
     old_translations = (
         translation_fetchers.get_all_entity_translations_for_entity(

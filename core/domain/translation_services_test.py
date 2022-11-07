@@ -20,7 +20,6 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import exp_domain
-from core.domain import opportunity_services
 from core.domain import translation_domain
 from core.domain import translation_fetchers
 from core.domain import translation_services
@@ -222,7 +221,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
 
         entity_translations, _ = (
             translation_services.compute_translation_related_change(
-                'exp1', 5, ['content_5'], [], 10
+                'exp1', 5, ['content_5'], []
             )
         )
 
@@ -266,7 +265,8 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
 
         entity_translations, _ = (
             translation_services.compute_translation_related_change(
-                'exp1', 5, [], ['content_6'], 10)
+                'exp1', 5, [], ['content_6']
+            )
         )
         self.assertEqual(len(entity_translations), 1)
         entity_translation = entity_translations[0]

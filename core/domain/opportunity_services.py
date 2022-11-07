@@ -305,7 +305,7 @@ def compute_opportunity_models_with_updated_exploration(
     exp_id: str,
     content_count: int,
     translation_counts: Dict[str, int]
-) -> None:
+) -> List[opportunity_models.ExplorationOpportunitySummaryModel]:
     """Updates the opportunities models with the changes made in the
     exploration.
 
@@ -315,6 +315,10 @@ def compute_opportunity_models_with_updated_exploration(
         content_count: int. The number of contents available in the exploration.
         translation_counts: dict(str, int). The number of translations available
             for the exploration in different languages.
+
+    Returns:
+        list(ExplorationOpportunitySummaryModel). A list of opportunity models
+        which are updated.
     """
     updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
