@@ -198,9 +198,55 @@ class BulkEmailWebhookEndpoint(
         self.render_json({})
 
 
-class PreferencesHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class AndroidListSubscriptionHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of AndroidListSubscriptionHandler's
+    normalized_request dictionary.
+    """
+
+    email: str
+    name: str
+
+
+class AndroidListSubscriptionHandler(
+    base.BaseHandler[
+        AndroidListSubscriptionHandlerNormalizedPayloadDict, Dict[str, str]
+    ]):
+    """Adds user to Android mailing list."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'email': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.EMAIL_REGEX
+                    }]
+                }
+            },
+            'name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_nonempty'
+                    }]
+                }
+            }
+        }
+    }
+
+    @acl_decorators.open_access
+    def put(self) -> None:
+        """Handles PUT request."""
+        assert self.normalized_payload is not None
+        email = self.normalized_payload['email']
+        name = self.normalized_payload['name']
+        status = user_services.add_user_to_android_list(email, name)
+        self.render_json({'status': status})
+
+
+class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides data for the preferences page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

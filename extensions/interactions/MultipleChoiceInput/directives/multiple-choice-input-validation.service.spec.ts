@@ -142,7 +142,7 @@ describe('MultipleChoiceInputValidationService', () => {
       'Expected customization arguments to have property: choices');
   });
 
-  it('should expect at least four choices', () => {
+  it('should expect at least two choices', () => {
     customizationArguments.choices.value = [
       new SubtitledHtml('1', '')
     ];
@@ -151,7 +151,7 @@ describe('MultipleChoiceInputValidationService', () => {
       currentState, customizationArguments, [], goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.CRITICAL,
-      message: 'Please enter at least four choices.'
+      message: 'Please enter at least 2 choices.'
     }]);
   });
 
