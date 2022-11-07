@@ -40,6 +40,7 @@ from core.domain import state_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
+import bs4
 from typing import (
     Callable, Dict, Final, List, Literal, Mapping, Optional, Sequence, Set,
     Tuple, TypedDict, Union, cast, overload)
@@ -1134,7 +1135,7 @@ class ExplorationVersionsDiff:
             It doesn't include the name changes of added/deleted states.
     """
 
-    def __init__(self, change_list: List[ExplorationChange]) -> None:
+    def __init__(self, change_list: Sequence[ExplorationChange]) -> None:
         """Constructs an ExplorationVersionsDiff domain object.
 
         Args:
@@ -1255,6 +1256,29 @@ class SerializableExplorationDict(ExplorationDict):
     version: int
     created_on: str
     last_updated: str
+
+
+class RangeVariableDict(TypedDict):
+    """Dictionary representing the range variable for the NumericInput
+    interaction.
+    """
+
+    ans_group_index: int
+    rule_spec_index: int
+    lower_bound: Optional[float]
+    upper_bound: Optional[float]
+    lb_inclusive: bool
+    ub_inclusive: bool
+
+
+class MatchedDenominatorDict(TypedDict):
+    """Dictionary representing the matched denominator variable for the
+    FractionInput interaction.
+    """
+
+    ans_group_index: int
+    rule_spec_index: int
+    denominator: int
 
 
 class Exploration(translation_domain.BaseTranslatableObject):
@@ -1612,14 +1636,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'Adjacent whitespace in tags should be collapsed, '
                     'received \'%s\'' % tag)
 
-            if len(tag) > 30:
-                raise utils.ValidationError(
-                    'Tag text length should not be more than 30.')
         if len(set(self.tags)) != len(self.tags):
             raise utils.ValidationError('Some tags duplicate each other')
-        if len(self.tags) > 10:
-            raise utils.ValidationError(
-                'Total number of tags should be less than 10.')
 
         if not isinstance(self.blurb, str):
             raise utils.ValidationError(
@@ -1640,7 +1658,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state.validate(
                 self.param_specs,
                 allow_null_interaction=not strict,
-                tagged_skill_misconception_id_required=False)
+                tagged_skill_misconception_id_required=False,
+                strict=strict)
             # The checks below perform validation on the Outcome domain object
             # that is specific to answer groups in explorations, but not
             # questions. This logic is here because the validation checks in
@@ -3048,6 +3067,95 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _remove_unwanted_content_ids_from_translations_and_voiceovers_from_state_v51_or_v52( # pylint: disable=line-too-long
+        cls, state_dict: state_domain.StateDict, state_schema: int
+    ) -> None:
+        """Helper function to remove the content IDs from the translations
+        and voiceovers which are deleted from the state.
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary.
+            state_schema: int. The state schema from which we are using
+                this functionality.
+        """
+        interaction = state_dict['interaction']
+        content_id_list = [state_dict['content']['content_id']]
+
+        for answer_group in interaction['answer_groups']:
+            content_id_list.append(
+                answer_group['outcome']['feedback']['content_id']
+            )
+
+            for rule_spec in answer_group['rule_specs']:
+                for param_name, value in rule_spec['inputs'].items():
+                    interaction_id = interaction['id']
+                    param_type = (
+                        interaction_registry.Registry.get_interaction_by_id(
+                            interaction_id
+                        ).get_rule_param_type(
+                            rule_spec['rule_type'], param_name
+                        )
+                    )
+
+                    if issubclass(
+                        param_type, objects.BaseTranslatableObject
+                    ):
+                        # We can assume that the value will be a dict,
+                        # as the param_type is BaseTranslatableObject.
+                        assert isinstance(value, dict)
+                        content_id = value['contentId']
+                        # We can assume the contentId will be str,
+                        # as the param_type is BaseTranslatableObject.
+                        assert isinstance(content_id, str)
+                        content_id_list.append(content_id)
+
+        default_outcome = interaction['default_outcome']
+        if default_outcome:
+            content_id_list.append(
+                default_outcome['feedback']['content_id'])
+
+        for hint in interaction['hints']:
+            content_id_list.append(hint['hint_content']['content_id'])
+
+        interaction_solution = interaction['solution']
+        if interaction_solution:
+            content_id_list.append(
+                interaction_solution['explanation']['content_id'])
+
+        if interaction['id'] is not None:
+            customisation_args = (
+                state_domain.InteractionInstance
+                .convert_customization_args_dict_to_customization_args(
+                    interaction['id'],
+                    interaction['customization_args'],
+                    state_schema_version=state_schema
+                )
+            )
+            for ca_name in customisation_args:
+                content_id_list.extend(
+                    customisation_args[ca_name].get_content_ids()
+                )
+
+        translations_mapping = (
+            state_dict['written_translations']['translations_mapping'])
+        new_translations_mapping = {
+             content_id: translation_item for
+             content_id, translation_item in translations_mapping.items()
+             if content_id in content_id_list
+        }
+        state_dict['written_translations']['translations_mapping'] = (
+            new_translations_mapping)
+
+        voiceovers_mapping = (
+            state_dict['recorded_voiceovers']['voiceovers_mapping'])
+        new_voiceovers_mapping = {}
+        for content_id, voiceover_item in voiceovers_mapping.items():
+            if content_id in content_id_list:
+                new_voiceovers_mapping[content_id] = voiceover_item
+        state_dict['recorded_voiceovers']['voiceovers_mapping'] = (
+            new_voiceovers_mapping)
+
+    @classmethod
     def _convert_states_v51_dict_to_v52_dict(
         cls, states_dict: Dict[str, state_domain.StateDict]
     ) -> Dict[str, state_domain.StateDict]:
@@ -3066,81 +3174,1798 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
-            interaction = state_dict['interaction']
-            content_id_list = [state_dict['content']['content_id']]
+            cls._remove_unwanted_content_ids_from_translations_and_voiceovers_from_state_v51_or_v52( # pylint: disable=line-too-long
+                state_dict, state_schema=51)
 
-            for answer_group in interaction['answer_groups']:
-                content_id_list.append(
-                    answer_group['outcome']['feedback']['content_id']
+        return states_dict
+
+    @classmethod
+    def _convert_states_v52_dict_to_v53_dict(
+        cls,
+        states_dict: Dict[str, state_domain.StateDict],
+        language_code: str
+    ) -> Dict[str, state_domain.StateDict]:
+        """Converts from version 52 to 53. Version 53 fixes all the backend
+        validation checks for explorations errored data which are
+        categorized as:
+            - Exploration states
+            - Exploration interaction
+            - Exploration RTE
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+            language_code: str. The language code of the exploration.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        states_dict = cls._fix_labelled_as_correct_value_in_state_dict(
+            states_dict)
+
+        # Update state interaction validations.
+        states_dict = cls._update_state_interaction(
+            states_dict, language_code)
+
+        # Update state RTE validations.
+        states_dict = cls._update_state_rte(states_dict)
+
+        return states_dict
+
+    @classmethod
+    def _fix_labelled_as_correct_value_in_state_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
+        """If destination is `try again` and the value of labelled_as_correct
+            is True, replaces it with False
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_name, state_dict in states_dict.items():
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                # labelled_as_correct should not be True if dest is try again.
+                if answer_group['outcome']['dest'] == state_name:
+                    answer_group['outcome']['labelled_as_correct'] = False
+
+            state_dict['interaction']['answer_groups'] = answer_groups
+
+        return states_dict
+
+    # ########################################################.
+    # Fix validation errors for exploration state interaction.
+    # ########################################################.
+    @classmethod
+    def _choices_should_be_unique_and_non_empty(
+        cls,
+        choices: List[state_domain.SubtitledHtmlDict],
+        answer_groups: List[state_domain.AnswerGroupDict],
+        state_dict: state_domain.StateDict,
+        *,
+        is_item_selection_interaction: bool = False
+    ) -> None:
+        """Handles choices present in the ItemSelectionInput or
+        in MultipleChoiceInput interactions, implements the following:
+            - If only one choice is empty then simply removes it
+            - If multiple choices are empty replace them with `Choice 1` ,
+            `Choice 2` etc
+            - If choices are duplicate, removes the later choice
+            - Remove the rules whose choices has been deleted
+
+        Args:
+            choices: List[state_domain.SubtitledHtmlDict]. A list of choices.
+            answer_groups: List[state_domain.AnswerGroupDict]. The list of
+                answer groups.
+            state_dict: state_domain.StateDict. The exploration state.
+            is_item_selection_interaction: bool. If the answer group belongs
+                to ItemSelectionInput interaction or not.
+        """
+        empty_choices: List[state_domain.SubtitledHtmlDict] = []
+        seen_choices: List[str] = []
+        choices_to_remove: List[state_domain.SubtitledHtmlDict] = []
+        invalid_choices_index = []
+        invalid_choices_content_ids = []
+        content_ids_of_choices_to_update = []
+        choices_content = []
+        for choice in choices:
+            choices_content.append(choice['html'])
+            if html_cleaner.is_html_empty(choice['html']):
+                empty_choices.append(choice)
+
+        if len(empty_choices) == 1:
+            invalid_choices_index.append(choices.index(empty_choices[0]))
+            invalid_choices_content_ids.append(empty_choices[0]['content_id'])
+            choices_to_remove.append(empty_choices[0])
+        else:
+            for idx, empty_choice in enumerate(empty_choices):
+                valid_choice = (
+                    '<p>' + 'Choice ' + str(idx + 1) + '</p>'
                 )
+                if valid_choice in choices_content:
+                    choices_to_remove.append(empty_choice)
+                else:
+                    empty_choice['html'] = valid_choice
+                    content_ids_of_choices_to_update.append(
+                        empty_choice['content_id'])
 
-                for rule_spec in answer_group['rule_specs']:
-                    for param_name, value in rule_spec['inputs'].items():
-                        interaction_id = interaction['id']
-                        param_type = (
-                            interaction_registry.Registry.get_interaction_by_id(
-                                interaction_id
-                            ).get_rule_param_type(
-                                rule_spec['rule_type'], param_name
-                            )
-                        )
+        # Duplicate choices.
+        for choice in choices:
+            if choice['html'] not in seen_choices:
+                seen_choices.append(choice['html'])
+            else:
+                choices_to_remove.append(choice)
+                invalid_choices_index.append(choices.index(choice))
+                invalid_choices_content_ids.append(choice['content_id'])
 
-                        if issubclass(
-                            param_type, objects.BaseTranslatableObject
+        # Remove rules whose choice has been deleted.
+        empty_ans_groups = []
+        for answer_group in answer_groups:
+            invalid_rules = []
+            for rule_spec in answer_group['rule_specs']:
+                if rule_spec['rule_type'] == 'Equals':
+                    if rule_spec['inputs']['x'] in invalid_choices_index:
+                        invalid_rules.append(rule_spec)
+                    if is_item_selection_interaction:
+                        rule_inputs = rule_spec['inputs']
+                        assert isinstance(rule_inputs, dict)
+                        rule_values = rule_inputs['x']
+                        assert isinstance(rule_values, list)
+                        if any(
+                            item in rule_values for item in
+                            invalid_choices_content_ids
                         ):
-                            # We can assume that the value will be a dict,
-                            # as the param_type is BaseTranslatableObject.
-                            assert isinstance(value, dict)
-                            content_id = value['contentId']
-                            # We can assume the contentId will be str,
-                            # as the param_type is BaseTranslatableObject.
-                            assert isinstance(content_id, str)
-                            content_id_list.append(content_id)
+                            invalid_rules.append(rule_spec)
 
-            default_outcome = interaction['default_outcome']
-            if default_outcome:
-                content_id_list.append(
-                    default_outcome['feedback']['content_id'])
+            for invalid_rule in invalid_rules:
+                answer_group['rule_specs'].remove(invalid_rule)
+            if (
+                len(answer_group['rule_specs']) == 0 and
+                answer_group not in empty_ans_groups
+            ):
+                empty_ans_groups.append(answer_group)
 
-            for hint in interaction['hints']:
-                content_id_list.append(hint['hint_content']['content_id'])
+        for empty_ans_group in empty_ans_groups:
+            answer_groups.remove(empty_ans_group)
 
-            interaction_solution = interaction['solution']
-            if interaction_solution:
-                content_id_list.append(
-                    interaction_solution['explanation']['content_id'])
+        # Remove solution if invalid choice is present.
+        if state_dict['interaction']['solution'] is not None:
+            solution = state_dict['interaction']['solution']['correct_answer']
+            if isinstance(solution, list) and any(
+                invalid_choice['html'] in solution for invalid_choice in
+                choices_to_remove
+            ):
+                state_dict['interaction']['solution'] = None
 
-            if interaction['id'] is not None:
-                customisation_args = (
-                    state_domain.InteractionInstance
-                    .convert_customization_args_dict_to_customization_args(
-                        interaction['id'],
-                        interaction['customization_args'],
-                        state_schema_version=51
+        for choice_to_remove in choices_to_remove:
+            choices.remove(choice_to_remove)
+
+        # Marking the content ids that needs update.
+        for content_id in content_ids_of_choices_to_update:
+            choice_translations = state_dict['written_translations'][
+                'translations_mapping'][content_id]
+            for translation in choice_translations.values():
+                translation['needs_update'] = True
+
+            choice_voiceovers = state_dict['recorded_voiceovers'][
+                'voiceovers_mapping'][content_id]
+            for choice_voiceover in choice_voiceovers.values():
+                choice_voiceover['needs_update'] = True
+
+        # Fix RTE content present inside the choices.
+        for choice in choices:
+            choice_html = choice['html']
+            choice['html'] = cls.fix_content(choice_html)
+
+    @classmethod
+    def _set_lower_and_upper_bounds(
+        cls,
+        range_var: RangeVariableDict,
+        lower_bound: Optional[float],
+        upper_bound: Optional[float],
+        *,
+        lb_inclusive: bool,
+        ub_inclusive: bool
+    ) -> None:
+        """Sets the lower and upper bounds for the range_var.
+
+        Args:
+            range_var: dict[str, Any]. Variable used to keep track of each
+                range.
+            lower_bound: Optional[float]. The lower bound.
+            upper_bound: Optional[float]. The upper bound.
+            lb_inclusive: bool. If lower bound is inclusive.
+            ub_inclusive: bool. If upper bound is inclusive.
+        """
+        range_var['lower_bound'] = lower_bound
+        range_var['upper_bound'] = upper_bound
+        range_var['lb_inclusive'] = lb_inclusive
+        range_var['ub_inclusive'] = ub_inclusive
+
+    @classmethod
+    def _is_enclosed_by(
+        cls,
+        test_range: RangeVariableDict,
+        base_range: RangeVariableDict
+    ) -> bool:
+        """Checks whether the ranges of rules enclosed or not
+
+        Args:
+            test_range: RangeVariableDict. It represents the variable for
+                which we have to check the range.
+            base_range: RangeVariableDict. It is the variable to which
+                the range is compared.
+
+        Returns:
+            bool. Returns True if both rule's ranges are enclosed.
+        """
+        if (
+            base_range['lower_bound'] is None or
+            test_range['lower_bound'] is None or
+            base_range['upper_bound'] is None or
+            test_range['upper_bound'] is None
+        ):
+            return False
+
+        lb_satisfied = (
+            base_range['lower_bound'] < test_range['lower_bound'] or
+            (
+                base_range['lower_bound'] == test_range['lower_bound'] and
+                (not test_range['lb_inclusive'] or base_range['lb_inclusive'])
+            )
+        )
+        ub_satisfied = (
+            base_range['upper_bound'] > test_range['upper_bound'] or
+            (
+                base_range['upper_bound'] == test_range['upper_bound'] and
+                (not test_range['ub_inclusive'] or base_range['ub_inclusive'])
+            )
+        )
+        return lb_satisfied and ub_satisfied
+
+    @classmethod
+    def _should_check_range_criteria(
+        cls,
+        earlier_rule: state_domain.RuleSpecDict,
+        later_rule: state_domain.RuleSpecDict
+    ) -> bool:
+        """Checks the range criteria between two rules by comparing their
+        rule type
+
+        Args:
+            earlier_rule: state_domain.RuleSpecDict. Previous rule.
+            later_rule: state_domain.RuleSpecDict. Current rule.
+
+        Returns:
+            bool. Returns True if the rules passes the range criteria check.
+        """
+        if earlier_rule['rule_type'] in (
+            'HasDenominatorEqualTo', 'IsEquivalentTo', 'IsLessThan',
+            'IsEquivalentToAndInSimplestForm', 'IsGreaterThan'
+        ):
+            return True
+        return later_rule['rule_type'] in (
+            'HasDenominatorEqualTo', 'IsLessThan', 'IsGreaterThan'
+        )
+
+    @classmethod
+    def _get_rule_value_of_fraction_interaction(
+        cls, rule_spec: state_domain.RuleSpecDict
+    ) -> float:
+        """Returns rule value of the rule_spec of FractionInput interaction so
+        that we can keep track of rule's range
+
+        Args:
+            rule_spec: state_domain.RuleSpecDict. Rule spec of an answer group.
+
+        Returns:
+            value: float. The value of the rule spec.
+        """
+        rule_input = rule_spec['inputs']
+        assert isinstance(rule_input, dict)
+        rule_value_f = rule_input['f']
+        assert isinstance(rule_value_f, dict)
+        value: float = (
+            rule_value_f['wholeNumber'] +
+            float(rule_value_f['numerator']) / rule_value_f['denominator']
+        )
+        return value
+
+    @classmethod
+    def _remove_duplicate_rules_inside_answer_groups(
+        cls,
+        answer_groups: List[state_domain.AnswerGroupDict],
+        state_name: str
+    ) -> None:
+        """Removes the duplicate rules present inside the answer groups. This
+        will simply removes the rule which do not point to another state
+        to avoid state disconnection. If both of them do not point to different
+        state we will simply remove the later one
+
+        Args:
+            answer_groups: List[state_domain.AnswerGroupDict]. The answer groups
+                present inside the state.
+            state_name: str. The state name.
+        """
+        rules_to_remove_with_diff_dest_node = []
+        rules_to_remove_with_try_again_dest_node = []
+        seen_rules_with_try_again_dest_node = []
+        seen_rules_with_diff_dest_node = []
+        for answer_group in answer_groups:
+            for rule_spec in answer_group['rule_specs']:
+                if rule_spec in seen_rules_with_try_again_dest_node:
+                    if (
+                        answer_group['outcome']['dest'] != state_name and
+                        rule_spec not in seen_rules_with_diff_dest_node
+                    ):
+                        seen_rules_with_diff_dest_node.append(rule_spec)
+                        rules_to_remove_with_try_again_dest_node.append(
+                            rule_spec)
+                    elif (
+                        answer_group['outcome']['dest'] != state_name and
+                        rule_spec in seen_rules_with_diff_dest_node
+                    ):
+                        rules_to_remove_with_diff_dest_node.append(rule_spec)
+                    else:
+                        rules_to_remove_with_try_again_dest_node.append(
+                            rule_spec)
+
+                elif rule_spec in seen_rules_with_diff_dest_node:
+                    if answer_group['outcome']['dest'] != state_name:
+                        rules_to_remove_with_diff_dest_node.append(rule_spec)
+                    else:
+                        rules_to_remove_with_try_again_dest_node.append(
+                            rule_spec)
+
+                else:
+                    if (
+                        rule_spec not in seen_rules_with_try_again_dest_node and
+                        answer_group['outcome']['dest'] == state_name
+                    ):
+                        seen_rules_with_try_again_dest_node.append(rule_spec)
+                    if (
+                        rule_spec not in seen_rules_with_diff_dest_node and
+                        answer_group['outcome']['dest'] != state_name
+                    ):
+                        seen_rules_with_diff_dest_node.append(rule_spec)
+
+        empty_ans_groups = []
+        for rule_to_remove in rules_to_remove_with_try_again_dest_node:
+            removed_try_again_rule = False
+            for answer_group in reversed(answer_groups):
+                for rule_spec in reversed(answer_group['rule_specs']):
+                    if (
+                        rule_spec == rule_to_remove and
+                        answer_group['outcome']['dest'] == state_name
+                    ):
+                        removed_try_again_rule = True
+                        answer_group['rule_specs'].remove(rule_to_remove)
+                        break
+
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
+                    empty_ans_groups.append(answer_group)
+
+                if removed_try_again_rule:
+                    break
+
+        for rule_to_remove in rules_to_remove_with_diff_dest_node:
+            removed_dest_rule = False
+            for answer_group in reversed(answer_groups):
+                for rule_spec in reversed(answer_group['rule_specs']):
+                    if (
+                        rule_spec == rule_to_remove and
+                        answer_group['outcome']['dest'] != state_name
+                    ):
+                        removed_dest_rule = True
+                        answer_group['rule_specs'].remove(rule_to_remove)
+                        break
+
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
+                    empty_ans_groups.append(answer_group)
+
+                if removed_dest_rule:
+                    break
+
+        for empty_ans_group in empty_ans_groups:
+            answer_groups.remove(empty_ans_group)
+
+    @classmethod
+    def _fix_continue_interaction(
+        cls, state_dict: state_domain.StateDict, language_code: str
+    ) -> None:
+        """Fixes Continue interaction where the length of the text value
+        is more than 20. We simply replace them with the word `Continue`
+        according to the language code
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary.
+            language_code: str. The language code of the exploration.
+        """
+        text_value = state_dict['interaction'][
+            'customization_args']['buttonText']['value']['unicode_str']
+        content_id = state_dict['interaction'][
+            'customization_args']['buttonText']['value']['content_id']
+        lang_code_to_unicode_str_dict = {
+            'en': 'Continue',
+            'es': 'Continuar',
+            'nl': 'Doorgaan',
+            'ru': 'Продолжить',
+            'fr': 'Continuer',
+            'ca': 'Continua',
+            'hu': 'Folytatás',
+            'zh': '继续',
+            'it': 'Continua',
+            'fi': 'Jatka',
+            'pt': 'Continuar',
+            'de': 'Fortfahren',
+            'ar': 'استمرار',
+            'tr': 'İlerle'
+        }
+        if len(text_value) > 20:
+            if language_code in lang_code_to_unicode_str_dict:
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = (
+                        lang_code_to_unicode_str_dict[language_code])
+            else:
+                state_dict['interaction']['customization_args'][
+                    'buttonText']['value']['unicode_str'] = 'Continue'
+
+            continue_button_translations = state_dict['written_translations'][
+                'translations_mapping'][content_id]
+            for translation in continue_button_translations.values():
+                translation['needs_update'] = True
+
+            choice_voiceovers = state_dict['recorded_voiceovers'][
+                'voiceovers_mapping'][content_id]
+            for choice_voiceover in choice_voiceovers.values():
+                choice_voiceover['needs_update'] = True
+
+    @classmethod
+    def _fix_end_interaction(cls, state_dict: state_domain.StateDict) -> None:
+        """Fixes the End exploration interaction where the recommended
+        explorations are more than 3. We simply slice them till the
+        length 3
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary.
+        """
+        # Should be at most 3 recommended explorations.
+        recc_exp_ids = state_dict['interaction'][
+            'customization_args']['recommendedExplorationIds']['value']
+        state_dict['interaction']['customization_args'][
+            'recommendedExplorationIds']['value'] = recc_exp_ids[:3]
+
+    @classmethod
+    def _fix_numeric_input_interaction(
+        cls, state_dict: state_domain.StateDict, state_name: str
+    ) -> None:
+        """Fixes NumericInput interaction for the following cases:
+        - The rules should not be duplicate else the one with not pointing to
+        different state will be deleted
+        - The rule should not match previous rules solution means it should
+        not be in the range of previous rules solution otherwise the later
+        answer group will be redundant and will never be matched. Simply the
+        invalid rule will be removed and if only one rule is present then the
+        complete answer group is removed
+        - As this interaction is only for the numeric values, all string values
+        will be considered as invalid and will be removed
+        - `tol` value in `IsWithinTolerance` rule must be positive else will be
+        converted to positive value
+        - `a` should not be greater than `b` in `IsInclusivelyBetween` rule else
+        we will simply swap them
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary that needs
+                to be fixed.
+            state_name: str. The name of the state.
+        """
+        answer_groups = state_dict['interaction']['answer_groups']
+        lower_infinity = float('-inf')
+        upper_infinity = float('inf')
+        invalid_rules = []
+        ranges: List[RangeVariableDict] = []
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
+        # All rules should have solutions that do not match
+        # previous rules' solutions.
+        for ans_group_index, answer_group in enumerate(answer_groups):
+            for rule_spec_index, rule_spec in enumerate(
+                answer_group['rule_specs']
+            ):
+                range_var: RangeVariableDict = {
+                    'ans_group_index': int(ans_group_index),
+                    'rule_spec_index': int(rule_spec_index),
+                    'lower_bound': None,
+                    'upper_bound': None,
+                    'lb_inclusive': False,
+                    'ub_inclusive': False
+                }
+                rule_inputs = rule_spec['inputs']
+                assert isinstance(rule_inputs, dict)
+                if rule_spec['rule_type'] == 'IsLessThanOrEqualTo':
+                    try:
+                        assert isinstance(rule_inputs['x'], float)
+                        rule_value = float(rule_inputs['x'])
+                        cls._set_lower_and_upper_bounds(
+                            range_var,
+                            lower_infinity,
+                            rule_value,
+                            lb_inclusive=False,
+                            ub_inclusive=True
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                if rule_spec['rule_type'] == 'IsGreaterThanOrEqualTo':
+                    try:
+                        assert isinstance(rule_inputs['x'], float)
+                        rule_value = float(rule_inputs['x'])
+                        cls._set_lower_and_upper_bounds(
+                            range_var,
+                            rule_value,
+                            upper_infinity,
+                            lb_inclusive=True,
+                            ub_inclusive=False
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                if rule_spec['rule_type'] == 'Equals':
+                    try:
+                        assert isinstance(rule_inputs['x'], float)
+                        rule_value = float(rule_inputs['x'])
+                        cls._set_lower_and_upper_bounds(
+                            range_var,
+                            rule_value,
+                            rule_value,
+                            lb_inclusive=True,
+                            ub_inclusive=True
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                if rule_spec['rule_type'] == 'IsLessThan':
+                    try:
+                        assert isinstance(rule_inputs['x'], float)
+                        rule_value = float(rule_inputs['x'])
+                        cls._set_lower_and_upper_bounds(
+                            range_var,
+                            lower_infinity,
+                            rule_value,
+                            lb_inclusive=False,
+                            ub_inclusive=False
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                if rule_spec['rule_type'] == 'IsWithinTolerance':
+                    try:
+                        rule_value_x = rule_inputs['x']
+                        assert isinstance(rule_value_x, float)
+                        rule_value_tol = rule_inputs['tol']
+                        assert isinstance(rule_value_tol, float)
+                        # The `tolerance` value needs to be a positive value.
+                        if rule_value_tol <= 0:
+                            rule_spec['inputs']['tol'] = abs(rule_value_tol)
+                        rule_value_x = float(rule_value_x)
+                        rule_value_tol = float(rule_value_tol)
+                        cls._set_lower_and_upper_bounds(
+                            range_var,
+                            rule_value_x - rule_value_tol,
+                            rule_value_x + rule_value_tol,
+                            lb_inclusive=True,
+                            ub_inclusive=True
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                if rule_spec['rule_type'] == 'IsGreaterThan':
+                    try:
+                        assert isinstance(rule_inputs['x'], float)
+                        rule_value = float(rule_inputs['x'])
+                        cls._set_lower_and_upper_bounds(
+                            range_var,
+                            rule_value,
+                            upper_infinity,
+                            lb_inclusive=False,
+                            ub_inclusive=False
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                if rule_spec['rule_type'] == 'IsInclusivelyBetween':
+                    try:
+                        value_a = rule_inputs['a']
+                        assert isinstance(value_a, float)
+                        value_b = rule_inputs['b']
+                        assert isinstance(value_b, float)
+                        # For x in [a, b], a must not be greater than b.
+                        if value_a > value_b:
+                            rule_spec['inputs']['a'] = value_b
+                            rule_spec['inputs']['b'] = value_a
+                        elif value_a == value_b:
+                            rule_spec['rule_type'] = 'Equals'
+                            rule_spec['inputs'] = {'x': value_a}
+                            assert isinstance(rule_spec['inputs']['x'], float)
+                            rule_value = float(rule_spec['inputs']['x'])
+                            cls._set_lower_and_upper_bounds(
+                                range_var,
+                                rule_value,
+                                rule_value,
+                                lb_inclusive=True,
+                                ub_inclusive=True
+                            )
+                            continue
+                        rule_value_a = float(value_a)
+                        rule_value_b = float(value_b)
+                        cls._set_lower_and_upper_bounds(
+                            range_var,
+                            rule_value_a,
+                            rule_value_b,
+                            lb_inclusive=True,
+                            ub_inclusive=True
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                for range_ele in ranges:
+                    if cls._is_enclosed_by(range_var, range_ele):
+                        invalid_rules.append(rule_spec)
+                ranges.append(range_var)
+
+        # Removing all the invalid rules.
+        empty_ans_groups = []
+        for invalid_rule in invalid_rules:
+            for answer_group in answer_groups:
+                for rule_spec in answer_group['rule_specs']:
+                    if rule_spec == invalid_rule:
+                        answer_group['rule_specs'].remove(rule_spec)
+
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
+                    empty_ans_groups.append(answer_group)
+
+        for empty_ans_group in empty_ans_groups:
+            answer_groups.remove(empty_ans_group)
+
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
+
+        state_dict['interaction']['answer_groups'] = answer_groups
+
+    @classmethod
+    def _fix_fraction_input_interaction(
+        cls, state_dict: state_domain.StateDict, state_name: str
+    ) -> None:
+        """Fixes FractionInput interaction for the following cases:
+        - The rules should not be duplicate else the one with not pointing to
+        different state will be deleted
+        - The rule should not match previous rules solution means it should
+        not be in the range of previous rules solution. Invalid rules will
+        be removed.
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary that needs
+                to be fixed.
+            state_name: str. The name of the state.
+        """
+        # All rules should have solutions that do not match
+        # previous rules' solutions.
+        answer_groups = state_dict['interaction']['answer_groups']
+        lower_infinity = float('-inf')
+        upper_infinity = float('inf')
+        ranges: List[RangeVariableDict] = []
+        invalid_rules = []
+        matched_denominator_list: List[MatchedDenominatorDict] = []
+        rules_that_can_have_improper_fractions = [
+            'IsExactlyEqualTo',
+            'HasFractionalPartExactlyEqualTo'
+        ]
+        allow_imp_frac = state_dict['interaction']['customization_args'][
+            'allowImproperFraction']['value']
+
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
+        for ans_group_index, answer_group in enumerate(answer_groups):
+            for rule_spec_index, rule_spec in enumerate(
+                answer_group['rule_specs']
+            ):
+                range_var: RangeVariableDict = {
+                    'ans_group_index': int(ans_group_index),
+                    'rule_spec_index': int(rule_spec_index),
+                    'lower_bound': None,
+                    'upper_bound': None,
+                    'lb_inclusive': False,
+                    'ub_inclusive': False
+                }
+                matched_denominator: MatchedDenominatorDict = {
+                    'ans_group_index': int(ans_group_index),
+                    'rule_spec_index': int(rule_spec_index),
+                    'denominator': 0
+                }
+
+                if (
+                    rule_spec['rule_type'] in
+                    rules_that_can_have_improper_fractions
+                ):
+                    inputs = rule_spec['inputs']
+                    assert isinstance(inputs, dict)
+                    value_f = inputs['f']
+                    assert isinstance(value_f, dict)
+                    num = value_f['numerator']
+                    assert isinstance(num, int)
+                    deno = value_f['denominator']
+                    assert isinstance(deno, int)
+                    if not allow_imp_frac and deno <= num:
+                        invalid_rules.append(rule_spec)
+                        continue
+
+                if rule_spec['rule_type'] in (
+                    'IsEquivalentTo', 'IsExactlyEqualTo',
+                    'IsEquivalentToAndInSimplestForm'
+                ):
+                    rule_value_equal: float = (
+                        cls._get_rule_value_of_fraction_interaction(rule_spec))
+                    cls._set_lower_and_upper_bounds(
+                        range_var,
+                        rule_value_equal,
+                        rule_value_equal,
+                        lb_inclusive=True,
+                        ub_inclusive=True
                     )
+
+                elif rule_spec['rule_type'] == 'IsGreaterThan':
+                    rule_value_greater: float = (
+                        cls._get_rule_value_of_fraction_interaction(rule_spec))
+
+                    cls._set_lower_and_upper_bounds(
+                        range_var,
+                        rule_value_greater,
+                        upper_infinity,
+                        lb_inclusive=False,
+                        ub_inclusive=False
+                    )
+
+                elif rule_spec['rule_type'] == 'IsLessThan':
+                    rule_value_less_than: float = (
+                        cls._get_rule_value_of_fraction_interaction(rule_spec))
+
+                    cls._set_lower_and_upper_bounds(
+                        range_var,
+                        lower_infinity,
+                        rule_value_less_than,
+                        lb_inclusive=False,
+                        ub_inclusive=False
+                    )
+
+                elif rule_spec['rule_type'] == 'HasDenominatorEqualTo':
+                    try:
+                        rule_inputs = rule_spec['inputs']
+                        assert isinstance(rule_inputs, dict)
+                        assert isinstance(rule_inputs['x'], int)
+                        rule_value_x = int(rule_inputs['x'])
+                        matched_denominator['denominator'] = rule_value_x
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                for range_ele in ranges:
+                    earlier_rule = answer_groups[range_ele[
+                        'ans_group_index']]['rule_specs'][
+                            range_ele['rule_spec_index']]
+                    if (
+                        cls._should_check_range_criteria(
+                            earlier_rule, rule_spec
+                        ) and cls._is_enclosed_by(range_var, range_ele)
+                    ):
+                        invalid_rules.append(rule_spec)
+
+                for den in matched_denominator_list:
+                    if (
+                        rule_spec['rule_type'] ==
+                        'HasFractionalPartExactlyEqualTo'
+                    ):
+                        rule_spec_f = rule_spec['inputs']['f']
+                        assert isinstance(rule_spec_f, dict)
+                        if den['denominator'] == rule_spec_f['denominator']:
+                            invalid_rules.append(rule_spec)
+
+                ranges.append(range_var)
+                matched_denominator_list.append(matched_denominator)
+
+        empty_ans_groups = []
+        for invalid_rule in invalid_rules:
+            for answer_group in answer_groups:
+                for rule_spec in answer_group['rule_specs']:
+                    if rule_spec == invalid_rule:
+                        answer_group['rule_specs'].remove(rule_spec)
+
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
+                    empty_ans_groups.append(answer_group)
+
+        for empty_ans_group in empty_ans_groups:
+            answer_groups.remove(empty_ans_group)
+
+        state_dict['interaction']['answer_groups'] = answer_groups
+
+    @classmethod
+    def _fix_multiple_choice_input_interaction(
+        cls, state_dict: state_domain.StateDict, state_name: str
+    ) -> None:
+        """Fixes MultipleChoiceInput interaction for the following cases:
+        - The rules should not be duplicate else the one with not pointing to
+        different state will be deleted
+        - No answer choice should appear in more than one rule else the
+        latter rule will be removed
+        - Answer choices should be non-empty and unique else will be fixed
+        accordingly
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary that needs
+                to be fixed.
+            state_name: str. The name of the state.
+        """
+        answer_groups = state_dict['interaction']['answer_groups']
+
+        choices: List[state_domain.SubtitledHtmlDict] = (
+            state_dict['interaction']['customization_args'][
+                'choices']['value']
+        )
+        cls._choices_should_be_unique_and_non_empty(
+            choices,
+            answer_groups,
+            state_dict,
+            is_item_selection_interaction=False)
+
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
+
+        state_dict['interaction']['customization_args']['choices'][
+            'value'] = choices
+        state_dict['interaction']['answer_groups'] = answer_groups
+
+    @classmethod
+    def _fix_item_selection_input_interaction(
+        cls, state_dict: state_domain.StateDict, state_name: str
+    ) -> None:
+        """Fixes ItemSelectionInput interaction for the following cases:
+        - The rules should not be duplicate else the one with not pointing to
+        different state will be deleted
+        - `Equals` rule should have value between min and max number
+        of selections else the rule will be removed
+        - Minimum number of selections should be no greater than
+        maximum number of selections else we will simply swap the values
+        - There should be enough choices to have minimum number of selections
+        else the minimum value will be set to 1
+        - All choices should be unique and non-empty else will be handled
+        accordingly
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary that needs
+                to be fixed.
+            state_name: str. The name of the state.
+        """
+        min_value = (
+            state_dict['interaction']['customization_args']
+            ['minAllowableSelectionCount']['value']
+        )
+        max_value = (
+            state_dict['interaction']['customization_args']
+            ['maxAllowableSelectionCount']['value']
+        )
+        choices: List[state_domain.SubtitledHtmlDict] = (
+            state_dict['interaction']['customization_args'][
+                'choices']['value']
+        )
+        answer_groups = state_dict['interaction']['answer_groups']
+
+        # Rules should not be duplicate.
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
+
+        # Minimum number of selections should be no greater than maximum
+        # number of selections.
+        if min_value > max_value:
+            min_value, max_value = max_value, min_value
+
+        # There should be enough choices to have minimum number
+        # of selections.
+        if len(choices) < min_value:
+            min_value = 1
+
+        # All choices should be unique and non-empty.
+        cls._choices_should_be_unique_and_non_empty(
+            choices,
+            answer_groups,
+            state_dict,
+            is_item_selection_interaction=True)
+
+        empty_ans_groups = []
+        for answer_group in answer_groups:
+            invalid_rules = []
+            for rule_spec in answer_group['rule_specs']:
+                # `Equals` should have between min and max number of selections.
+                if rule_spec['rule_type'] == 'Equals':
+                    rule_value = rule_spec['inputs']['x']
+                    assert isinstance(rule_value, list)
+                    if (
+                        len(rule_value) < min_value or
+                        len(rule_value) > max_value
+                    ):
+                        if (
+                            answer_group['outcome']['dest'] == state_name or
+                            len(rule_value) == 0
+                        ):
+                            invalid_rules.append(rule_spec)
+                        else:
+                            min_value = min(min_value, len(rule_value))
+                            max_value = max(max_value, len(rule_value))
+
+            for invalid_rule in invalid_rules:
+                answer_group['rule_specs'].remove(invalid_rule)
+
+            if (
+                len(answer_group['rule_specs']) == 0 and
+                answer_group not in empty_ans_groups
+            ):
+                empty_ans_groups.append(answer_group)
+
+        for empty_ans_group in empty_ans_groups:
+            answer_groups.remove(empty_ans_group)
+
+        state_dict['interaction']['customization_args'][
+            'minAllowableSelectionCount']['value'] = min_value
+        state_dict['interaction']['customization_args'][
+            'maxAllowableSelectionCount']['value'] = max_value
+        state_dict['interaction']['customization_args']['choices'][
+            'value'] = choices
+        state_dict['interaction']['answer_groups'] = answer_groups
+
+    @classmethod
+    def _update_rule_value_having_empty_choices(
+        cls,
+        empty_choices: List[state_domain.SubtitledHtmlDict],
+        rule_value_x: List[List[str]],
+        solution: Optional[List[List[str]]]
+    ) -> None:
+        """Removing empty choice from the rule values.
+
+        Args:
+            empty_choices: List[state_domain.SubtitledHtmlDict]. The list of
+                empty choices.
+            rule_value_x: List[List[str]]. The rule spec value.
+            solution: Optional[List[List[str]]]. The solution of the state.
+        """
+        for empty_choice in empty_choices:
+            for rule_value in rule_value_x:
+                for choice in rule_value:
+                    if choice == empty_choice['content_id']:
+                        rule_value.remove(choice)
+                        break
+                if len(rule_value) == 0:
+                    rule_value_x.remove(rule_value)
+                    break
+
+            if solution is not None and isinstance(solution, list):
+                for choice_list in solution:
+                    for choice in choice_list:
+                        if choice == empty_choice['content_id']:
+                            choice_list.remove(choice)
+                            break
+                    if len(choice_list) == 0:
+                        solution.remove(choice_list)
+                        break
+
+    @classmethod
+    def _is_empty_choice_in_rule_value(
+        cls,
+        empty_choices: List[state_domain.SubtitledHtmlDict],
+        value: str
+    ) -> bool:
+        """Returns True if the empty choice is present inside the value.
+
+        Args:
+            empty_choices: List[state_domain.SubtitledHtmlDict]. The list of
+                choices.
+            value: str. The value which needs to be checked.
+
+        Returns:
+            bool. Returns True if the empty choice is equal to the given value.
+        """
+        for empty_choice in empty_choices:
+            if value == empty_choice['content_id']:
+                return True
+
+        return False
+
+    @classmethod
+    def _fix_drag_and_drop_input_interaction(
+        cls, state_dict: state_domain.StateDict, state_name: str
+    ) -> None:
+        """Fixes the DragAndDropInput interaction with following checks:
+        - The rules should not be duplicate else the one with not pointing to
+        different state will be deleted
+        - Multiple items cannot be in the same place iff the setting is
+        turned off. Rule will simply be removed
+        - `IsEqualToOrderingWithOneItemAtIncorrectPosition` rule should
+        not be present when `multiple items at same place` setting
+        is turned off. Rule will simply be removed
+        - In `HasElementXBeforeElementY` rule, `X` value should not be
+        equal to `Y` value. Rule will simply be removed
+        - Rule `IsEqualToOrdering` having empty values is removed
+        - The `Equals` rule should always come before `HasElementXAtPositionY`
+        where the element `X` is present at position `Y` inside `Equals`
+        rule otherwise the rule will never going to match. We will simply remove
+        the `Equals` rule as it will never going to match
+        - The `Equals` rule should always come before
+        `IsEqualToOrderingWithOneItemAtIncorrectPosition` otherwise the
+        rule will never going to match. We will simply remove
+        the `Equals` rule as it will never going to match
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary that needs
+                to be fixed.
+            state_name: str. The name of the state.
+        """
+        answer_groups = state_dict['interaction']['answer_groups']
+        multi_item_value = (
+            state_dict['interaction']['customization_args']
+            ['allowMultipleItemsInSamePosition']['value']
+        )
+        invalid_rules = []
+        ele_x_at_y_rules: List[Dict[str, Union[str, int]]] = []
+        off_by_one_rules: List[List[List[str]]] = []
+        choices_drag_drop: List[state_domain.SubtitledHtmlDict] = (
+            state_dict['interaction']['customization_args'][
+                'choices']['value']
+        )
+
+        if state_dict['interaction']['solution'] is not None:
+            solution = state_dict['interaction']['solution']['correct_answer']
+        else:
+            solution = None
+
+        # Here we use cast because we are certain with the type
+        # of the solution and to avoid the mypy type check failure.
+        state_sol = cast(Optional[List[List[str]]], solution)
+
+        # Check for empty choices.
+        empty_choices = []
+        for choice_drag in choices_drag_drop:
+            if html_cleaner.is_html_empty(choice_drag['html']):
+                empty_choices.append(choice_drag)
+
+        if len(empty_choices) > 0:
+            for empty_choice in empty_choices:
+                choices_drag_drop.remove(empty_choice)
+
+        # Fix content.
+        for choice_drag in choices_drag_drop:
+            choice_html = choice_drag['html']
+            choice_drag['html'] = cls.fix_content(choice_html)
+
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
+        for answer_group in answer_groups:
+            for rule_spec in answer_group['rule_specs']:
+                rule_inputs = rule_spec['inputs']
+                assert isinstance(rule_inputs, dict)
+                rule_spec_x = rule_inputs['x']
+
+                if (
+                    rule_spec['rule_type'] ==
+                    'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                ):
+                    # Here we use cast because we are certain with the type
+                    # of the rule spec and to avoid the mypy type check failure.
+                    rule_spec_val = cast(List[List[str]], rule_spec_x)
+                    if len(empty_choices) > 0:
+                        cls._update_rule_value_having_empty_choices(
+                            empty_choices, rule_spec_val, state_sol)
+                    # `IsEqualToOrderingWithOneItemAtIncorrectPosition`
+                    # rule should not be present when `multiple items at same
+                    # place` setting is turned off.
+                    if not multi_item_value:
+                        invalid_rules.append(rule_spec)
+                    else:
+                        off_by_one_rules.append(rule_spec_val)
+
+                # In `HasElementXBeforeElementY` rule, `X` value
+                # should not be equal to `Y` value.
+                elif rule_spec['rule_type'] == 'HasElementXBeforeElementY':
+                    value_x = rule_spec['inputs']['x']
+                    value_y = rule_spec['inputs']['y']
+                    assert isinstance(value_x, str)
+                    assert isinstance(value_y, str)
+                    if value_x == value_y:
+                        invalid_rules.append(rule_spec)
+
+                    if len(empty_choices) > 0:
+                        if cls._is_empty_choice_in_rule_value(
+                            empty_choices, value_x
+                        ):
+                            invalid_rules.append(rule_spec)
+                            continue
+
+                        if cls._is_empty_choice_in_rule_value(
+                            empty_choices, value_y
+                        ):
+                            invalid_rules.append(rule_spec)
+                            continue
+
+                elif rule_spec['rule_type'] == 'HasElementXAtPositionY':
+                    element = rule_spec['inputs']['x']
+                    assert isinstance(element, str)
+                    position = rule_spec['inputs']['y']
+                    assert isinstance(position, int)
+
+                    if len(empty_choices) > 0:
+                        if cls._is_empty_choice_in_rule_value(
+                            empty_choices, element
+                        ):
+                            invalid_rules.append(rule_spec)
+                            continue
+
+                    ele_x_at_y_rules.append(
+                        {'element': element, 'position': position}
+                    )
+
+                elif rule_spec['rule_type'] == 'IsEqualToOrdering':
+                    # Here we use cast because we are certain with the type
+                    # of the rule spec and to avoid the mypy type check failure.
+                    rule_spec_val_x = cast(List[List[str]], rule_spec_x)
+                    if len(empty_choices) > 0:
+                        cls._update_rule_value_having_empty_choices(
+                            empty_choices, rule_spec_val_x, state_sol)
+
+                    # Multiple items cannot be in the same place iff the
+                    # setting is turned off.
+                    for ele in rule_spec_val_x:
+                        if not multi_item_value and len(ele) > 1:
+                            invalid_rules.append(rule_spec)
+
+                    # `IsEqualToOrdering` rule should not have empty values.
+                    if len(rule_spec_val_x) <= 0:
+                        invalid_rules.append(rule_spec)
+                    else:
+                        # `IsEqualToOrdering` rule should always come before
+                        # `HasElementXAtPositionY` where element `X` is present
+                        # at position `Y` in `IsEqualToOrdering` rule.
+                        for ele_x_at_y_rule in ele_x_at_y_rules:
+                            assert isinstance(ele_x_at_y_rule, dict)
+                            ele_position = ele_x_at_y_rule['position']
+                            ele_element = ele_x_at_y_rule['element']
+                            assert isinstance(ele_position, int)
+                            if ele_position > len(rule_spec_val_x):
+                                invalid_rules.append(rule_spec)
+                                continue
+                            rule_choice = rule_spec_val_x[ele_position - 1]
+
+                            if len(rule_choice) == 0:
+                                invalid_rules.append(rule_spec)
+                            else:
+                                for choice in rule_choice:
+                                    if choice == ele_element:
+                                        invalid_rules.append(rule_spec)
+
+                        # `IsEqualToOrdering` should always come before
+                        # `IsEqualToOrderingWithOneItemAtIncorrectPosition` when
+                        # they are off by one value.
+                        item_to_layer_idx = {}
+                        for layer_idx, layer in enumerate(rule_spec_val_x):
+                            for item in layer:
+                                item_to_layer_idx[item] = layer_idx
+
+                        for off_by_one_rule in off_by_one_rules:
+                            assert isinstance(off_by_one_rule, list)
+                            wrong_positions = 0
+                            for layer_idx, layer in enumerate(off_by_one_rule):
+                                for item in layer:
+                                    if layer_idx != item_to_layer_idx[item]:
+                                        wrong_positions += 1
+                            if wrong_positions <= 1:
+                                invalid_rules.append(rule_spec)
+
+        empty_ans_groups = []
+        for invalid_rule in invalid_rules:
+            for answer_group in answer_groups:
+                for rule_spec in answer_group['rule_specs']:
+                    if rule_spec == invalid_rule:
+                        answer_group['rule_specs'].remove(rule_spec)
+
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
+                    empty_ans_groups.append(answer_group)
+
+        for empty_ans_group in empty_ans_groups:
+            answer_groups.remove(empty_ans_group)
+
+        state_dict['interaction']['answer_groups'] = answer_groups
+
+    @classmethod
+    def _fix_text_input_interaction(
+        cls, state_dict: state_domain.StateDict, state_name: str
+    ) -> None:
+        """Fixes the TextInput interaction with following checks:
+        - The rules should not be duplicate else the one with not pointing to
+        different state will be deleted
+        - Text input height shoule be >= 1 and <= 10 else we will replace with
+        10
+        - `Contains` should always come after another `Contains` rule where
+        the first contains rule strings is a substring of the other contains
+        rule strings
+        - `StartsWith` rule should always come after another `StartsWith` rule
+        where the first starts-with string is the prefix of the other
+        starts-with string
+        - `Contains` should always come after `StartsWith` rule where the
+        contains rule strings is a substring of the `StartsWith` rule string
+        - `Contains` should always come after `Equals` rule where the contains
+        rule strings is a substring of the `Equals` rule string
+        - `Contains` should always come after `Equals` rule where the contains
+        rule strings is a substring of the `Equals` rule string
+        - `Startswith` should always come after the `Equals` rule where a
+        `starts-with` string is a prefix of the `Equals` rule's string.
+
+        Args:
+            state_dict: state_domain.StateDict. The state dictionary that needs
+                to be fixed.
+            state_name: str. The name of the state.
+        """
+        answer_groups = state_dict['interaction']['answer_groups']
+        seen_strings_contains: List[List[str]] = []
+        seen_strings_startswith: List[List[str]] = []
+        invalid_rules = []
+
+        cls._remove_duplicate_rules_inside_answer_groups(
+            answer_groups, state_name)
+        # Text input height shoule be >= 1 and <= 10.
+        rows_value = int(
+            state_dict['interaction']['customization_args'][
+                'rows']['value']
+        )
+        if rows_value < 1:
+            state_dict['interaction']['customization_args'][
+                'rows']['value'] = 1
+        if rows_value > 10:
+            state_dict['interaction']['customization_args'][
+                'rows']['value'] = 10
+        for answer_group in answer_groups:
+            assert isinstance(answer_group['rule_specs'], list)
+            for rule_spec in answer_group['rule_specs']:
+                rule_spec_text = rule_spec['inputs']['x']
+                assert isinstance(rule_spec_text, dict)
+                rule_values = rule_spec_text['normalizedStrSet']
+                assert isinstance(rule_values, list)
+                if rule_spec['rule_type'] == 'Contains':
+                    # `Contains` should always come after another
+                    # `Contains` rule where the first contains rule
+                    # strings is a substring of the other contains
+                    # rule strings.
+                    for contain_rule_ele in seen_strings_contains:
+                        for contain_rule_string in contain_rule_ele:
+                            for rule_value in rule_values:
+                                if contain_rule_string in rule_value:
+                                    invalid_rules.append(rule_spec)
+                    seen_strings_contains.append(rule_values)
+                elif rule_spec['rule_type'] == 'StartsWith':
+                    # `StartsWith` rule should always come after another
+                    # `StartsWith` rule where the first starts-with string
+                    # is the prefix of the other starts-with string.
+                    for start_with_rule_ele in seen_strings_startswith:
+                        for start_with_rule_string in start_with_rule_ele:
+                            for rule_value in rule_values:
+                                if rule_value.startswith(
+                                    start_with_rule_string
+                                ):
+                                    invalid_rules.append(rule_spec)
+                    # `Contains` should always come after `StartsWith` rule
+                    # where the contains rule strings is a substring
+                    # of the `StartsWith` rule string.
+                    for contain_rule_ele in seen_strings_contains:
+                        for contain_rule_string in contain_rule_ele:
+                            for rule_value in rule_values:
+                                if contain_rule_string in rule_value:
+                                    invalid_rules.append(rule_spec)
+                    seen_strings_startswith.append(rule_values)
+                elif rule_spec['rule_type'] == 'Equals':
+                    # `Contains` should always come after `Equals` rule
+                    # where the contains rule strings is a substring
+                    # of the `Equals` rule string.
+                    for contain_rule_ele in seen_strings_contains:
+                        for contain_rule_string in contain_rule_ele:
+                            for rule_value in rule_values:
+                                if contain_rule_string in rule_value:
+                                    invalid_rules.append(rule_spec)
+                    # `Startswith` should always come after the `Equals`
+                    # rule where a `starts-with` string is a prefix of the
+                    # `Equals` rule's string.
+                    for start_with_rule_ele in seen_strings_startswith:
+                        for start_with_rule_string in start_with_rule_ele:
+                            for rule_value in rule_values:
+                                if rule_value.startswith(
+                                    start_with_rule_string
+                                ):
+                                    invalid_rules.append(rule_spec)
+
+        empty_ans_groups = []
+        for invalid_rule in invalid_rules:
+            for answer_group in answer_groups:
+                for rule_spec in answer_group['rule_specs']:
+                    if rule_spec == invalid_rule:
+                        answer_group['rule_specs'].remove(rule_spec)
+
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
+                    empty_ans_groups.append(answer_group)
+
+        for empty_ans_group in empty_ans_groups:
+            answer_groups.remove(empty_ans_group)
+
+        state_dict['interaction']['answer_groups'] = answer_groups
+
+    @classmethod
+    def _update_state_interaction(
+        cls,
+        states_dict: Dict[str, state_domain.StateDict],
+        language_code: str
+    ) -> Dict[str, state_domain.StateDict]:
+        """Handles all the invalid general state interactions
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+            language_code: str. The language code of the exploration.
+
+        Returns:
+            states_dict: Dict[str, state_domain.StateDict]. The converted
+            state dictionary.
+        """
+        for state_name, state_dict in states_dict.items():
+            interaction_id_to_fix_func: Dict[str, Callable[..., None]] = {
+                'Continue': cls._fix_continue_interaction,
+                'EndExploration': cls._fix_end_interaction,
+                'NumericInput': cls._fix_numeric_input_interaction,
+                'FractionInput': cls._fix_fraction_input_interaction,
+                'MultipleChoiceInput': (
+                    cls._fix_multiple_choice_input_interaction),
+                'ItemSelectionInput': cls._fix_item_selection_input_interaction,
+                'DragAndDropSortInput': (
+                    cls._fix_drag_and_drop_input_interaction),
+                'TextInput': cls._fix_text_input_interaction
+            }
+            interaction_id = state_dict['interaction']['id']
+            if interaction_id in interaction_id_to_fix_func:
+                if interaction_id == 'Continue':
+                    interaction_id_to_fix_func[interaction_id](
+                        state_dict, language_code)
+                elif interaction_id == 'EndExploration':
+                    interaction_id_to_fix_func[interaction_id](state_dict)
+                else:
+                    interaction_id_to_fix_func[interaction_id](
+                        state_dict, state_name)
+
+            # Update translations and voiceovers.
+            cls._remove_unwanted_content_ids_from_translations_and_voiceovers_from_state_v51_or_v52( # pylint: disable=line-too-long
+                state_dict, state_schema=52)
+
+        return states_dict
+
+    # ################################################.
+    # Fix validation errors for exploration state RTE.
+    # ################################################.
+
+    @classmethod
+    def _is_tag_removed_with_invalid_attributes(
+        cls, tag: bs4.BeautifulSoup, attr: str
+    ) -> bool:
+        """Returns True when the tag is removed due to invalid attribute.
+
+        Args:
+            tag: bs4.BeautifulSoup. The RTE tag.
+            attr: str. The attribute that needs to be checked.
+
+        Returns:
+            bool. Returns True when the tag has been deleted.
+        """
+        if not tag.has_attr(attr):
+            tag.decompose()
+            return True
+
+        if html_cleaner.is_html_empty(tag[attr]):
+            tag.decompose()
+            return True
+
+        return False
+
+    @classmethod
+    def _fix_rte_tags(
+        cls, html: str,
+        *,
+        is_tags_nested_inside_tabs_or_collapsible: bool = False
+    ) -> str:
+        """Handles all the invalid RTE tags, performs the following:
+            - `oppia-noninteractive-image`
+                - If `alt-with-value` attribute not in the image tag,
+                introduces the attribute and assign empty value
+                - If `filepath-with-value` attribute not in image tag,
+                removes the tag
+                - If `filepath-with-value` attribute empty then removes
+                the tag
+                - If `caption-with-value` attribute not in the image tag,
+                introduces the attribute and assign empty value
+            - `oppia-noninteractive-skillreview`
+                - If `text-with-value` attribute is not present or empty or
+                None, removes the tag
+                - If `skill_id-with-value` attribute is not present or empty or
+                None, removes the tag
+            - `oppia-noninteractive-math`
+                - If `math_content-with-value` attribute not in math tag,
+                removes the tag
+                - If `raw_latex` is not present or empty or None, removes
+                the tag
+            - `oppia-noninteractive-video`
+                - If `start-with-value` or `end-with-value` is not present,
+                introduce them to the tag and assign 0 to them
+                - If `autoplay-with-value` is not present or is not boolean,
+                introduce it to the tag and assign `false` to them
+                - If `video_id-with-value` is not present or empty, removes
+                the tag
+                - If `start-with-value` > `end-with-value`, set both to '0'
+            - `oppia-noninteractive-link`
+                - If `text-with-value` or `url-with-value` is not present,
+                or is empty simply removes the tag
+            - `oppia-noninteractive-tabs` and `oppia-noninteractive-collapsible`
+                - If these tags are nested inside tabs and collapsible tag, we
+                will simply remove the tag
+
+        Args:
+            html: str. The RTE tags.
+            is_tags_nested_inside_tabs_or_collapsible: bool. If the tag is
+                present inside the tabs or collapsible tag.
+
+        Returns:
+            str. Returns the updated html value.
+        """
+        soup = bs4.BeautifulSoup(html, 'html.parser')
+
+        for tag in soup.find_all('oppia-noninteractive-image'):
+            if not tag.has_attr('alt-with-value'):
+                tag['alt-with-value'] = '&quot;&quot;'
+
+            if cls._is_tag_removed_with_invalid_attributes(
+                tag, 'filepath-with-value'):
+                continue
+
+            if not tag.has_attr('caption-with-value'):
+                tag['caption-with-value'] = '&quot;&quot;'
+
+        for tag in soup.find_all('oppia-noninteractive-skillreview'):
+            if cls._is_tag_removed_with_invalid_attributes(
+                tag, 'text-with-value'):
+                continue
+
+            if cls._is_tag_removed_with_invalid_attributes(
+                tag, 'skill_id-with-value'):
+                continue
+
+        for tag in soup.find_all('oppia-noninteractive-video'):
+            if not tag.has_attr('start-with-value'):
+                tag['start-with-value'] = '0'
+            else:
+                if not tag['start-with-value'].isdigit():
+                    tag['start-with-value'] = '0'
+
+            if not tag.has_attr('end-with-value'):
+                tag['end-with-value'] = '0'
+            else:
+                if not tag['end-with-value'].isdigit():
+                    tag['end-with-value'] = '0'
+
+            if not tag.has_attr('autoplay-with-value'):
+                tag['autoplay-with-value'] = 'false'
+            else:
+                if tag['autoplay-with-value'].strip() not in (
+                    'true', 'false', '\'true\'', '\'false\'',
+                    '\"true\"', '\"false\"', True, False
+                ):
+                    tag['autoplay-with-value'] = 'false'
+
+            if cls._is_tag_removed_with_invalid_attributes(
+                tag, 'video_id-with-value'):
+                continue
+
+            start_value = float(tag['start-with-value'])
+            end_value = float(tag['end-with-value'])
+            if (
+                start_value > end_value and
+                start_value != 0 and
+                end_value != 0
+            ):
+                tag['end-with-value'] = '0'
+                tag['start-with-value'] = '0'
+
+        for tag in soup.find_all('oppia-noninteractive-link'):
+            if cls._is_tag_removed_with_invalid_attributes(
+                tag, 'url-with-value'
+            ):
+                continue
+
+            url = tag['url-with-value'].replace(
+                '&quot;', '').replace(' ', '')
+            if utils.get_url_scheme(url) == 'http':
+                url = url.replace('http', 'https')
+
+            if (
+                utils.get_url_scheme(url) not in
+                constants.ACCEPTABLE_SCHEMES
+            ):
+                tag.decompose()
+                continue
+
+            tag['url-with-value'] = '&quot;' + url + '&quot;'
+
+            if not tag.has_attr('text-with-value'):
+                tag['text-with-value'] = tag['url-with-value']
+            else:
+                if html_cleaner.is_html_empty(tag['text-with-value']):
+                    tag['text-with-value'] = tag['url-with-value']
+
+        for tag in soup.find_all('oppia-noninteractive-math'):
+            if cls._is_tag_removed_with_invalid_attributes(
+                tag, 'math_content-with-value'):
+                continue
+
+            math_content_json = utils.unescape_html(
+                tag['math_content-with-value'])
+            math_content_list = json.loads(math_content_json)
+            if 'raw_latex' not in math_content_list:
+                tag.decompose()
+                continue
+            if html_cleaner.is_html_empty(math_content_list['raw_latex']):
+                tag.decompose()
+                continue
+
+        if is_tags_nested_inside_tabs_or_collapsible:
+            tabs_tags = soup.find_all('oppia-noninteractive-tabs')
+            if len(tabs_tags) > 0:
+                for tabs_tag in tabs_tags:
+                    tabs_tag.decompose()
+                    continue
+            collapsible_tags = soup.find_all('oppia-noninteractive-collapsible')
+            if len(collapsible_tags) > 0:
+                for collapsible_tag in collapsible_tags:
+                    collapsible_tag.decompose()
+                    continue
+
+        return str(soup).replace('<br/>', '<br>')
+
+    @classmethod
+    def _is_tag_removed_with_empty_content(
+        cls,
+        tag: bs4.BeautifulSoup,
+        content: Union[str, List[str]],
+        *,
+        is_collapsible: bool = False
+    ) -> bool:
+        """Returns True when the tag is removed for having empty content.
+
+        Args:
+            tag: bs4.BeautifulSoup. The RTE tag.
+            content: Union[str, List[str]]. The content that needs to be
+                checked.
+            is_collapsible: bool. True if the tag is collapsible tag.
+
+        Returns:
+            bool. Returns True when the tag has been deleted.
+        """
+        if is_collapsible:
+            assert isinstance(content, str)
+            if html_cleaner.is_html_empty(content):
+                tag.decompose()
+                return True
+        else:
+            if len(content) == 0:
+                tag.decompose()
+                return True
+
+        return False
+
+    @classmethod
+    def _fix_tabs_and_collapsible_tags(cls, html: str) -> str:
+        """Fixes all tabs and collapsible tags, performs the following:
+        - `oppia-noninteractive-tabs`
+            - If no `tab_contents-with-value` attribute, tag will be removed
+            - If `tab_contents-with-value` is empty then the tag will be removed
+        - `oppia-noninteractive-collapsible`
+            - If no `content-with-value` attribute, tag will be removed
+            - If `content-with-value` is empty then the tag will be removed
+            - If no `heading-with-value` attribute, tag will be removed
+            - If `heading-with-value` is empty then the tag will be removed
+
+        Args:
+            html: str. The RTE tags.
+
+        Returns:
+            str. Returns the updated html value.
+        """
+        soup = bs4.BeautifulSoup(html, 'html.parser')
+        tabs_tags = soup.find_all('oppia-noninteractive-tabs')
+        for tag in tabs_tags:
+            if tag.has_attr('tab_contents-with-value'):
+                tab_content_json = utils.unescape_html(
+                    tag['tab_contents-with-value'])
+                tab_content_list = json.loads(tab_content_json)
+                if cls._is_tag_removed_with_empty_content(
+                    tag, tab_content_list, is_collapsible=False):
+                    continue
+
+                empty_tab_contents = []
+                for tab_content in tab_content_list:
+                    tab_content['content'] = cls._fix_rte_tags(
+                        tab_content['content'],
+                        is_tags_nested_inside_tabs_or_collapsible=True
+                    )
+                    if html_cleaner.is_html_empty(tab_content['content']):
+                        empty_tab_contents.append(tab_content)
+
+                # Remove empty tab content from the tag.
+                for empty_content in empty_tab_contents:
+                    tab_content_list.remove(empty_content)
+
+                if cls._is_tag_removed_with_empty_content(
+                    tag, tab_content_list, is_collapsible=False):
+                    continue
+
+                tab_content_json = json.dumps(tab_content_list)
+                tag['tab_contents-with-value'] = utils.escape_html(
+                    tab_content_json)
+            else:
+                tag.decompose()
+                continue
+
+        collapsibles_tags = soup.find_all(
+            'oppia-noninteractive-collapsible')
+        for tag in collapsibles_tags:
+            if tag.has_attr('content-with-value'):
+                collapsible_content_json = (
+                    utils.unescape_html(tag['content-with-value'])
                 )
-                for ca_name in customisation_args:
-                    content_id_list.extend(
-                        customisation_args[ca_name].get_content_ids()
-                    )
+                collapsible_content = json.loads(
+                    collapsible_content_json)
+                if cls._is_tag_removed_with_empty_content(
+                    tag, collapsible_content, is_collapsible=True):
+                    continue
 
-            translations_mapping = (
-                state_dict['written_translations']['translations_mapping'])
-            new_translations_mapping = {}
-            for content_id, translation_item in translations_mapping.items():
-                if content_id in content_id_list:
-                    new_translations_mapping[content_id] = translation_item
-            state_dict['written_translations']['translations_mapping'] = (
-                new_translations_mapping)
+                collapsible_content = cls._fix_rte_tags(
+                    collapsible_content,
+                    is_tags_nested_inside_tabs_or_collapsible=True
+                )
+                if cls._is_tag_removed_with_empty_content(
+                    tag, collapsible_content, is_collapsible=True):
+                    continue
 
-            voiceovers_mapping = (
-                state_dict['recorded_voiceovers']['voiceovers_mapping'])
-            new_voiceovers_mapping = {}
-            for content_id, voiceover_item in voiceovers_mapping.items():
-                if content_id in content_id_list:
-                    new_voiceovers_mapping[content_id] = voiceover_item
-            state_dict['recorded_voiceovers']['voiceovers_mapping'] = (
-                new_voiceovers_mapping)
+                collapsible_content_json = json.dumps(collapsible_content)
+                tag['content-with-value'] = utils.escape_html(
+                    collapsible_content_json)
+            else:
+                tag.decompose()
+                continue
+
+            if cls._is_tag_removed_with_invalid_attributes(
+                tag, 'heading-with-value'):
+                continue
+
+        return str(soup).replace('<br/>', '<br>')
+
+    @classmethod
+    def fix_content(cls, html: str) -> str:
+        """Helper function to fix the html.
+
+        Args:
+            html: str. The html data to fix.
+
+        Returns:
+            html: str. The fixed html data.
+        """
+        html = cls._fix_rte_tags(
+            html, is_tags_nested_inside_tabs_or_collapsible=False)
+        html = cls._fix_tabs_and_collapsible_tags(html)
+        return html
+
+    @classmethod
+    def _update_state_rte(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
+        """Update the state RTE content and translations
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state in states_dict.values():
+            # Fix tags for state content.
+            html = state['content']['html']
+            state['content']['html'] = cls.fix_content(html)
+
+            # Fix tags for written translations.
+            written_translations = (
+                state['written_translations']['translations_mapping'])
+            for translation_item in written_translations.values():
+                for translation in translation_item.values():
+                    if isinstance(translation['translation'], list):
+                        translated_element_list = []
+                        for element in translation['translation']:
+                            translated_element_list.append(
+                                cls.fix_content(element))
+                        translation['translation'] = translated_element_list
+                    else:
+                        html = translation['translation']
+                        translation['translation'] = cls.fix_content(html)
+
+            # Fix RTE content present inside the answer group's feedback.
+            for answer_group in state['interaction']['answer_groups']:
+                feedback = answer_group['outcome']['feedback']['html']
+                if not html_cleaner.is_html_empty(feedback):
+                    answer_group['outcome']['feedback']['html'] = (
+                        cls.fix_content(feedback))
+
+            # Fix RTE content present inside the default outcome.
+            if state['interaction']['default_outcome'] is not None:
+                default_feedback = state['interaction']['default_outcome'][
+                    'feedback']['html']
+                if not html_cleaner.is_html_empty(default_feedback):
+                    state['interaction']['default_outcome']['feedback'][
+                        'html'] = cls.fix_content(default_feedback)
+
+            # Fix RTE content present inside the Solution.
+            if state['interaction']['solution'] is not None:
+                solution = state['interaction']['solution']['explanation'][
+                    'html']
+                state['interaction']['solution']['explanation']['html'] = (
+                    cls.fix_content(solution))
+
+            # Fix RTE content present inside the Hint.
+            empty_hints = []
+            hints = state['interaction']['hints']
+            assert isinstance(hints, list)
+            for hint in hints:
+                hint_content = hint['hint_content']['html']
+                hint['hint_content']['html'] = cls.fix_content(hint_content)
+                if html_cleaner.is_html_empty(hint['hint_content']['html']):
+                    empty_hints.append(hint)
+
+            for empty_hint in empty_hints:
+                hints.remove(empty_hint)
+            state['interaction']['hints'] = hints
+
+            # Update translations and voiceovers.
+            cls._remove_unwanted_content_ids_from_translations_and_voiceovers_from_state_v51_or_v52( # pylint: disable=line-too-long
+                state, state_schema=52)
 
         return states_dict
 
@@ -3149,7 +4974,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls,
         versioned_exploration_states: VersionedExplorationStatesDict,
         current_states_schema_version: int,
-        init_state_name: str
+        init_state_name: str,
+        language_code: str
     ) -> None:
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
@@ -3167,6 +4993,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             current_states_schema_version: int. The current states
                 schema version.
             init_state_name: str. Name of initial state.
+            language_code: str. The language code of the exploration.
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
@@ -3176,6 +5003,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if current_states_schema_version == 43:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'], init_state_name)
+        elif current_states_schema_version == 52:
+            versioned_exploration_states['states'] = conversion_fn(
+                versioned_exploration_states['states'], language_code)
         else:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'])
@@ -3184,7 +5014,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 57
+    CURRENT_EXP_SCHEMA_VERSION = 58
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -3458,6 +5288,31 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v57_dict_to_v58_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
+        """Converts a v57 exploration dict into a v58 exploration dict.
+        Version 58 corrects exploration validation errors which are categorized
+        as General State Validation, General Interaction Validation
+        and General RTE Validation.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v56.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v57.
+        """
+        exploration_dict['schema_version'] = 58
+
+        exploration_dict['states'] = cls._convert_states_v52_dict_to_v53_dict(
+            exploration_dict['states'], exploration_dict['language_code'])
+        exploration_dict['states_schema_version'] = 53
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
         cls, yaml_content: str
     ) -> VersionedExplorationDict:
@@ -3553,6 +5408,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v56_dict_to_v57_dict(
                 exploration_dict)
             exploration_schema_version = 57
+
+        if exploration_schema_version == 57:
+            exploration_dict = cls._convert_v57_dict_to_v58_dict(
+                exploration_dict)
+            exploration_schema_version = 58
 
         return exploration_dict
 

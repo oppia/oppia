@@ -161,6 +161,44 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         self.feedback_thread_model.update_timestamps()
         self.feedback_thread_model.put()
 
+    def test_get_threads(self) -> None:
+        self.assertEqual(
+            feedback_models.GeneralFeedbackThreadModel.get_threads(
+                self.ENTITY_TYPE, self.ENTITY_ID),
+            [self.feedback_thread_model])
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_type': base_models.EXPORT_POLICY.EXPORTED,
+            'entity_id': base_models.EXPORT_POLICY.EXPORTED,
+            'original_author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.EXPORTED,
+            'subject': base_models.EXPORT_POLICY.EXPORTED,
+            'summary': base_models.EXPORT_POLICY.EXPORTED,
+            'has_suggestion': base_models.EXPORT_POLICY.EXPORTED,
+            'message_count': base_models.EXPORT_POLICY.EXPORTED,
+            'last_nonempty_message_text':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_nonempty_message_author_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.EXPORTED
+        }
+        model = feedback_models.GeneralFeedbackThreadModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = feedback_models.GeneralFeedbackThreadModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+
+    def test_get_field_names_for_takeout(self) -> None:
+        expected_dict = {'last_updated': 'last_updated_msec'}
+        model = feedback_models.GeneralFeedbackThreadModel
+        self.assertEqual(model.get_field_names_for_takeout(), expected_dict)
+
 
 class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackMessageModel class."""
@@ -312,6 +350,63 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         }
 
         self.assertEqual(test_data, user_data)
+
+    def test_get_all_messages_in_a_thread_correctly(self) -> None:
+        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+            id='thread_id',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='exp_id_2',
+            original_author_id='user_1',
+            status='open',
+            subject='dummy_subject',
+            has_suggestion=True,
+            summary='This is a great summary.',
+            message_count=0
+        )
+        feedback_thread_model.update_timestamps()
+        feedback_thread_model.put()
+        self.assertEqual(
+            feedback_models.GeneralFeedbackMessageModel.get_message_count(
+                'thread_id'),
+            0)
+        self.assertEqual(
+            feedback_models.GeneralFeedbackMessageModel.get_messages(
+                'thread_id'),
+            [])
+        feedback_message_model = feedback_models.GeneralFeedbackMessageModel(
+            id='id',
+            thread_id='thread_id',
+            message_id=1,
+            author_id='user_id',
+            received_via_email=False
+        )
+        feedback_message_model.put()
+        self.assertEqual(
+            feedback_models.GeneralFeedbackMessageModel.get_messages(
+                'thread_id'),
+            [feedback_message_model])
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thread_id': base_models.EXPORT_POLICY.EXPORTED,
+            'message_id': base_models.EXPORT_POLICY.EXPORTED,
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'updated_status': base_models.EXPORT_POLICY.EXPORTED,
+            'updated_subject': base_models.EXPORT_POLICY.EXPORTED,
+            'text': base_models.EXPORT_POLICY.EXPORTED,
+            'received_via_email': base_models.EXPORT_POLICY.EXPORTED
+        }
+        model = feedback_models.GeneralFeedbackMessageModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = feedback_models.GeneralFeedbackMessageModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
 
 
 class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
@@ -490,6 +585,39 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             self.USER_ID_B)
         self.assertEqual({}, user_data)
 
+    def test_delete_model_instance_of_user_by_applying_deletion_policy(
+            self) -> None:
+        feedback_models.GeneralFeedbackThreadUserModel.create(
+            'user_id', 'exploration.exp_id.thread_id')
+        self.assertIsNotNone(
+            feedback_models.GeneralFeedbackThreadUserModel.get(
+                'user_id', 'exploration.exp_id.thread_id'))
+        feedback_models.GeneralFeedbackThreadUserModel.apply_deletion_policy(
+            'user_id')
+        self.assertIsNone(
+            feedback_models.GeneralFeedbackThreadUserModel.get(
+                'user_id', 'exploration.exp_id.thread_id'))
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thread_id':
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
+            'message_ids_read_by_user':
+                base_models.EXPORT_POLICY.EXPORTED
+        }
+        model = feedback_models.GeneralFeedbackThreadUserModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = feedback_models.GeneralFeedbackThreadUserModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+
 
 class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
     """Tests for the FeedbackAnalyticsModelTests class."""
@@ -498,6 +626,23 @@ class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             feedback_models.FeedbackAnalyticsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_open_threads': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_total_threads': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        model = feedback_models.FeedbackAnalyticsModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = feedback_models.FeedbackAnalyticsModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
@@ -554,3 +699,21 @@ class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
             retrieved_instance.feedback_message_references,
             [message_reference_dict])
         self.assertEqual(retrieved_instance.retries, 0)
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'feedback_message_references':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'retries': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        model = feedback_models.UnsentFeedbackEmailModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = feedback_models.UnsentFeedbackEmailModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)

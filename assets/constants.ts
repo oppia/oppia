@@ -22,6 +22,9 @@ export default {
   // in the URL for topics that are not yet attached to a classroom.
   "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
 
+  // Acceptable URL schemes for links.
+  "ACCEPTABLE_SCHEMES": ["https", ""],
+
   // The default classroom URL fragment to use when the provided classroom URL
   // fragment in the controller is invalid.
   "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",
@@ -5738,6 +5741,8 @@ export default {
     "LIST": "list"
   },
 
+  "EMAIL_REGEX": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+",
+
   "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
     "name": "Commonly Used",
     "interaction_ids": [
@@ -5827,6 +5832,9 @@ export default {
       "InteractiveMap"
     ]
   }],
+
+  "MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_CURATED_EXP": 4,
+  "MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_REGULAR_EXP": 2,
 
   "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION": "translation",
   "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER": "voiceover",
