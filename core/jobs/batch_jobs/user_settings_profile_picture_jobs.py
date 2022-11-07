@@ -65,7 +65,7 @@ class AuditInvalidProfilePictureJob(base_jobs.JobBase):
             width, height = image.size
             if width != 150 and height != 150:
                 invalid_image.append(
-                    f'wrong dimensions - height = {height} and width = %{width}'
+                    f'wrong dimensions - height = {height} and width = {width}'
                 )
         except Exception:
             logging.exception('ERRORED EXCEPTION AUDIT')
