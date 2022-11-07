@@ -1165,7 +1165,9 @@ export class ConversationSkinComponent {
             // Stay on the same card.
             let oldStateCard: StateCard = this.playerTranscriptService.getLastCard();
             let oldInteractionId = oldStateCard.getInteractionId();
-            if (oldInteractionId === AppConstants.INTERACTION_NAMES.TEXT_INPUT) {
+            let oldInteractionArgs = oldStateCard.getInteractionCustomizationArgs();
+            if (oldInteractionId === AppConstants.INTERACTION_NAMES.TEXT_INPUT
+              && oldInteractionArgs.catchMisspellings) {
               let answerIsOnlyMisspelled = this.answerClassificationService.
                 isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
               if (answerIsOnlyMisspelled) {
