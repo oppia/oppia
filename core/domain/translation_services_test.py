@@ -263,16 +263,18 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             for t in entity_translation_model.translations.values()
         ], [False, False])
 
-        entity_translations, _ = (
+        entity_translation_models, _ = (
             translation_services.compute_translation_related_change(
                 'exp1', 5, [], ['content_6']
             )
         )
-        self.assertEqual(len(entity_translations), 1)
-        entity_translation = entity_translations[0]
-        self.assertEqual(
-            [t.needs_update for t in entity_translation.translations.values()],
-            [False, True]
+        self.assertEqual(len(entity_translation_models), 1)
+        entity_translation = entity_translation_models[0]
+        self.assertItemsEqual(
+            [
+                t['needs_update']
+                for t in entity_translation.translations.values()
+            ], [False, True]
         )
 
     def test_get_displayable_translation_languages_returns_correct_items(

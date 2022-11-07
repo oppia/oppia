@@ -10828,7 +10828,7 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
-next_content_id_index: 8
+next_content_id_index: 9
 objective: ''
 param_changes: []
 param_specs: {}
@@ -10854,15 +10854,15 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: ca_choices_4
+            x: ca_choices_5
             y: 2
           rule_type: HasElementXAtPositionY
         - inputs:
             x:
+            - - ca_choices_7
             - - ca_choices_6
             - - ca_choices_5
             - - ca_choices_4
-            - - ca_choices_3
           rule_type: IsEqualToOrdering
         tagged_skill_misconception_id: null
         training_data: []
@@ -10870,7 +10870,7 @@ states:
           dest: end
           dest_if_really_stuck: null
           feedback:
-            content_id: feedback_33
+            content_id: feedback_3
             html: ''
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -10878,7 +10878,7 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: ca_choices_27
+            x: ca_choices_5
             y: 4
           rule_type: HasElementXAtPositionY
         tagged_skill_misconception_id: null
@@ -10889,13 +10889,13 @@ states:
           value: false
         choices:
           value:
-          - content_id: ca_choices_3
-            html: <p>1</p>
           - content_id: ca_choices_4
-            html: <p>2</p>
+            html: <p>1</p>
           - content_id: ca_choices_5
-            html: <p>3</p>
+            html: <p>2</p>
           - content_id: ca_choices_6
+            html: <p>3</p>
+          - content_id: ca_choices_7
             html: <p>4</p>
       default_outcome:
         dest: end
@@ -10914,19 +10914,20 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_3: {}
         ca_choices_4: {}
         ca_choices_5: {}
         ca_choices_6: {}
+        ca_choices_7: {}
         content_0: {}
         default_outcome_1: {}
         feedback_2: {}
+        feedback_3: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_7
+      content_id: content_8
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -10942,13 +10943,12 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content_7: {}
+        content_8: {}
     solicit_answer_details: false
 states_schema_version: 54
 tags: []
 title: ''
 """)
-
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_drag_and_drop_interac_1)
         self.assertEqual(
