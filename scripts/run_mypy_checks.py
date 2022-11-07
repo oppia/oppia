@@ -99,8 +99,6 @@ NOT_FULLY_COVERED_FILES: Final = [
     'core/controllers/oppia_root_test.py',
     'core/controllers/pages.py',
     'core/controllers/pages_test.py',
-    'core/controllers/reader.py',
-    'core/controllers/reader_test.py',
     'core/controllers/recent_commits.py',
     'core/controllers/recent_commits_test.py',
     'core/controllers/release_coordinator.py',

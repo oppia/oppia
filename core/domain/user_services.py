@@ -2830,8 +2830,26 @@ def clear_learner_checkpoint_progress(
         exp_user_model.put()
 
 
+@overload
 def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
     user_id: str, exploration_id: str
+) -> Optional[user_domain.ExplorationUserData]: ...
+
+
+@overload
+def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
+    user_id: str, exploration_id: str, *, strict: Literal[True]
+) -> user_domain.ExplorationUserData: ...
+
+
+@overload
+def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
+    user_id: str, exploration_id: str, *, strict: Literal[False]
+) -> Optional[user_domain.ExplorationUserData]: ...
+
+
+def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
+    user_id: str, exploration_id: str, strict: bool = False
 ) -> Optional[user_domain.ExplorationUserData]:
     """Synchronizes the most recently reached checkpoint and the furthest
     reached checkpoint with the latest exploration.
@@ -2839,15 +2857,26 @@ def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
     Args:
         user_id: str. The Id of the user.
         exploration_id: str. The Id of the exploration.
+        strict: bool. Whether to fail noisily if no ExplorationUserDataModel
+            with the given user_id exists in the datastore.
 
     Returns:
         ExplorationUserData. The domain object corresponding to the given user
         and exploration.
+
+    Raises:
+        Exception. No ExplorationUserDataModel found for the given user and
+            exploration ids.
     """
     exp_user_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
 
     if exp_user_model is None:
+        if strict:
+            raise Exception(
+                'No ExplorationUserDataModel found for the given user and '
+                'exploration ids: %s, %s' % (user_id, exploration_id)
+            )
         return None
 
     latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)

@@ -2229,6 +2229,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ):
             user_services.get_checkpoints_in_order('Introduction', states)
 
+    def test_raises_error_if_sync_logged_in_learner_checkpoint_with_invalid_id(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No ExplorationUserDataModel found for the given user and '
+            'exploration ids: invalid_user_id, exp_1'
+        ):
+            user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version(   # pylint: disable=line-too-long
+                'invalid_user_id', 'exp_1', strict=True
+            )
+
 
 class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
     """Tests whether user checkpoint progress is updated correctly"""
