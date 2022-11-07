@@ -18,27 +18,11 @@
 
 from __future__ import annotations
 
-import copy
-from xml.dom import ValidationErr
 
-from core import feconf, utils
+from core import feconf
+from core import utils
 from core.domain import change_domain
 from core.tests import test_utils
-from core.feconf import ALLOWED_ACTIVITY_ROLES, CMD_CHANGE_ROLE
-
-
-"""
-SUCCESS   core.domain.change_domain_test: 1 tests (0.9 secs)
-INCOMPLETE COVERAGE (65.0%): core.domain.change_domain_test
-Name                           Stmts   Miss Branch BrPart  Cover   Missing
---------------------------------------------------------------------------
-core/domain/change_domain.py      87     22     46     16    65%   119, 124, 129, 133-135, 143-146, 205->212, 206->205, 213, 233, 243->248, 244->243, 249, 253, 272->279, 273->272, 280-281, 299, 312, 326-329
---------------------------------------------------------------------------
-TOTAL                             87     22     46     16    65%
-
-"""
-
-
 
 # TODO (#14219): Update these tests to fully cover file change_domain.py.
 class ChangeDomainTests(test_utils.GenericTestBase):
