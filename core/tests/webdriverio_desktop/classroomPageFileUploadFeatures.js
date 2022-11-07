@@ -92,6 +92,7 @@ describe('Classroom page functionality', function() {
       // topic’s diagnostic test.
       await workflow.createQuestion();
       await workflow.createQuestion();
+      await workflow.createQuestion();
 
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();

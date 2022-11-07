@@ -131,6 +131,7 @@ describe('Checkpoints functionality', function() {
     // topic’s diagnostic test.
     await workflow.createQuestion();
     await workflow.createQuestion();
+    await workflow.createQuestion();
 
     await general.closeCurrentTabAndSwitchTo(handle);
     await topicsAndSkillsDashboardPage.get();
