@@ -283,7 +283,7 @@ export default {
   },
 
   "ALLOWED_IMAGE_FORMATS": ["svg", "png", "jpeg", "jpg", "gif"],
-  "MAX_ALLOWED_IMAGE_SIZE_IN_KB": 100,
+  "MAX_ALLOWED_IMAGE_SIZE_IN_KB_FOR_BLOG": 1024,
 
   "TASK_TYPE_HIGH_BOUNCE_RATE": "high_bounce_rate",
   "TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP": "ineffective_feedback_loop",
@@ -5741,6 +5741,8 @@ export default {
     "LIST": "list"
   },
 
+  "EMAIL_REGEX": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+",
+
   "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
     "name": "Commonly Used",
     "interaction_ids": [
@@ -5830,6 +5832,9 @@ export default {
       "InteractiveMap"
     ]
   }],
+
+  "MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_CURATED_EXP": 4,
+  "MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_REGULAR_EXP": 2,
 
   "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION": "translation",
   "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER": "voiceover",
@@ -5945,7 +5950,7 @@ export default {
   "MAX_CHARS_IN_EXPLORATION_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
-  "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
+  "MAX_CHARS_IN_BLOG_POST_TITLE": 65,
   "MIN_CHARS_IN_BLOG_POST_TITLE": 5,
   "MAX_CHARS_IN_BLOG_POST_SUMMARY": 300,
   "STORY_ID_LENGTH": 12,
@@ -6051,7 +6056,8 @@ export default {
   "LEARNER_GROUP_ID_REGEX": "^[a-zA-Z]{1,12}$",
 
   // A regular expression for allowed characters in Title field for Blog Post.
-  "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
+  // eslint-disable-next-line max-len
+  "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+([-:][ a-zA-Z0-9]+)*$",
 
   // A regular expression for allowed characters in URL fragment for Blog Post.
   "VALID_URL_BLOG_FRAGMENT_REGEX": "^[a-z0-9]+(-[a-z0-9]+)*$",
@@ -6063,6 +6069,9 @@ export default {
   // A regular expression for valid skill misconception id.
   "VALID_SKILL_MISCONCEPTION_ID_REGEX": "[A-Za-z0-9]{12}-[0-9]+",
 
+  // A regular expression for allowed characters in author name field for Author
+  // details Model.
+  "VALID_AUTHOR_NAME_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
   // Invalid names for parameters used in expressions.
   "INVALID_PARAMETER_NAMES": [
     "answer", "choices", "abs", "all", "and", "any", "else",
@@ -6195,6 +6204,12 @@ export default {
 
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
+
+  // Maximum allowed length of a blog post author's name.
+  "MAX_AUTHOR_NAME_LENGTH": 35,
+
+  // Maximum allowed characters in a blog post author's bio.
+  "MAX_CHARS_IN_AUTHOR_BIO": 250,
 
   // Maximum allowed length of a state name.
   "MAX_STATE_NAME_LENGTH": 50,
@@ -6737,6 +6752,25 @@ export default {
     "BLOG_HOMEPAGE_SEARCH": {
       "ROUTE": "blog/search/find",
       "TITLE": "I18N_BLOG_HOME_PAGE_TITLE",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        }
+      ]
+    },
+    "BLOG_AUTHOR_PROFILE_PAGE": {
+      "ROUTE": "blog/author/:author_username",
+      "TITLE": "I18N_BLOG_AUTHOR_PROFILE_PAGE_TITLE",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
