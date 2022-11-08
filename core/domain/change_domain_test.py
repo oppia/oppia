@@ -58,7 +58,7 @@ class ChangeDomainTests(test_utils.GenericTestBase):
                 'name1': ['name1']
             })
 
-        actual_cmd_attributes = {} # Type: Dict[<str>, <str>] = ...
+        actual_cmd_attributes = {}
 
         with self.assertRaisesRegex(utils.ValidationError, (
             'The following required attributes are missing: '
