@@ -181,7 +181,7 @@
   </div>
 </div>
 
-<div *ngIf="!destinationIfStuckEditorIsOpen && !isInQuestionMode() && outcome && !outcome.labelledAsCorrect"
+<div *ngIf="!destinationIfStuckEditorIsOpen && !isInQuestionMode() && outcome"
      class="h-100"
      title="{{ isEditable ? 'Change the if stuck destination card' : '' }}">
   <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-dest-if-stuck-button"
