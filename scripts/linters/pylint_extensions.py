@@ -1992,7 +1992,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
             'prohibited-type-ignore-used',
             'Only a limited number of type ignores are allowed in the codebase.'
         ),
-        'C0051':(
+        'C0051': (
             'Usage of generic MyPy type ignores is prohibited. '
             'MyPy type ignores can only be used with specific '
             'error codes: type: ignore[<error-code>]',
