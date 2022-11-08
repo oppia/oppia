@@ -64,7 +64,6 @@ var BlogPages = function() {
     await waitFor.pageToFullyLoad();
     await general.openAboutDropdown();
     await action.click('Blog link', blogLink);
-    await waitFor.pageToFullyLoad();
     await waitFor.newTabToBeCreated('http://localhost:9001/blog');
     handles = await browser.getWindowHandles();
     var newHandle = null;
