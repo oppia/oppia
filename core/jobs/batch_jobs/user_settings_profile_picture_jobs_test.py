@@ -133,6 +133,15 @@ class FixInvalidProfilePictureJobTests(job_test_utils.JobTestBase):
             roles=[feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
         )
 
+        self.user_5 = self.create_model(
+            user_models.UserSettingsModel,
+            id='test_id_5',
+            email='test_5@example.com',
+            username='test_5',
+            roles=[feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
+            profile_picture_data_url=user_services.DEFAULT_IDENTICON_DATA_URL
+        )
+
     def test_run_with_no_models(self) -> None:
         self.assert_job_output_is([])
 
@@ -168,3 +177,14 @@ class FixInvalidProfilePictureJobTests(job_test_utils.JobTestBase):
             migrated_user_model_2.profile_picture_data_url,
             user_services.fetch_gravatar(migrated_user_model_2.email)
         )
+
+    def test_default_profile_picture(self) -> None:
+        self.put_multi([self.user_5])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='USER MODELS ITERATED SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult(
+                stdout='DEFAULT PROFILE PICTURE SUCCESS: 1'
+            )
+        ])

@@ -31,7 +31,7 @@ from core.platform import models
 
 from PIL import Image
 import apache_beam as beam
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -133,14 +133,14 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
 
     def _fix_invalid_images(
         self, user_model: user_models.UserSettingsModel
-    ) -> user_models.UserSettingsModel:
+    ) -> Tuple[user_models.UserSettingsModel, bool]:
         """Helper function to fix the invalid images.
 
         Args:
             user_model: user_models.UserSettingsModel. The UserSettingsModel.
 
         Returns:
-            user_model: user_models.UserSettingsModel. The updated
+            user_model: Tuple[user_models.UserSettingsModel, bool]. The updated
             UserSettingsModel.
         """
         profile_picture_data = user_model.profile_picture_data_url
@@ -153,7 +153,13 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
             user_model.profile_picture_data_url = (
                 user_services.fetch_gravatar(user_model.email))
 
-        return user_model
+        if (
+            user_model.profile_picture_data_url ==
+            user_services.DEFAULT_IDENTICON_DATA_URL
+        ):
+            return (user_model, False)
+
+        return (user_model, True)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         fixed_user_profile_picture = (
@@ -165,6 +171,15 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
             | 'Get invalid images' >> beam.Map(self._fix_invalid_images)
         )
 
+        default_profile_picture = (
+            fixed_user_profile_picture
+            | 'Filter default profile pictures' >> beam.Filter(
+                lambda value: value[1] is False)
+            | 'Total count for user models having default profile picture' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'DEFAULT PROFILE PICTURE'))
+        )
+
         count_user_models_iterated = (
             fixed_user_profile_picture
             | 'Total count for user models' >> (
@@ -174,7 +189,14 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
 
         unused_put_results = (
             fixed_user_profile_picture
+            | 'Map with only models' >> beam.Map(lambda value: value[0])
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
-        return count_user_models_iterated
+        return (
+            (
+                count_user_models_iterated,
+                default_profile_picture
+            )
+            | 'Combine results' >> beam.Flatten()
+        )
