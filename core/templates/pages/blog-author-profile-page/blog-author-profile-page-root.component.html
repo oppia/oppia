@@ -1,0 +1,25 @@
+<oppia-angular-root *ngIf="pageIsShown">
+  <oppia-base-content>
+    <navbar-pre-logo-action>
+      <a href="/blog" class="oppia-author-page-back-button e2e-test-back-button">
+        <span class="fas fa-arrow-left oppia-navbar-back-button"></span>
+      </a>
+    </navbar-pre-logo-action>
+    <navbar-breadcrumb class="blog-author-page-breadcrumb">
+      <div class="nav navbar-nav oppia-navbar-breadcrumb">
+        <span class="mx-3 oppia-navbar-breadcrumb-separator"></span>
+        <div class="d-flex flex-column pt-2">
+          <p class="oppia-blog-author-profile-page-title">
+            {{ 'I18N_BLOG_AUTHOR_PROFILE_PAGE_BREADCRUMB' | translate }}
+          </p>
+          <p class="oppia-blog-author-name pt-1">{{ authorUsername }}</p>
+        </div>
+      </div>
+    </navbar-breadcrumb>
+    <content class="mb-5">
+      <oppia-blog-author-page></oppia-blog-author-page>
+    </content>
+  </oppia-base-content>
+</oppia-angular-root>
+
+<oppia-error-page-root *ngIf="errorPageIsShown"></oppia-error-page-root>

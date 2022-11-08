@@ -56,7 +56,7 @@ class MockWindowRef {
       href: '',
       toString() {
         return 'http://localhost/test_path';
-      }
+      },
     },
     history: {
       pushState(data: object, title: string, url?: string | null) {}
@@ -89,7 +89,8 @@ describe('Blog home page component', () => {
 
   let blogPostSummary: BlogPostSummaryBackendDict = {
     id: 'sampleBlogId',
-    author_name: 'test_user',
+    author_username: 'test_username',
+    displayed_author_name: 'test_user',
     title: 'sample_title',
     summary: 'hello',
     thumbnail_filename: 'image',

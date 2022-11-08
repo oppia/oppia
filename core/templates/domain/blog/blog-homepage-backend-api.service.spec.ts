@@ -21,11 +21,13 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import {
   BlogHomePageBackendApiService, BlogHomePageData, BlogPostPageData,
   BlogPostPageBackendResponse, BlogHomePageBackendResponse, SearchResponseData,
-  SearchResponseBackendDict
+  SearchResponseBackendDict, BlogAuthorProfilePageBackendResponse,
+  BlogAuthorProfilePageData
 } from 'domain/blog/blog-homepage-backend-api.service';
 import { BlogPostSummary, BlogPostSummaryBackendDict } from 'domain/blog/blog-post-summary.model';
 import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post.model';
 import { BlogHomePageConstants } from 'pages/blog-home-page/blog-home-page.constants';
+import { BlogAuthorDetailsBackendDict } from './blog-dashboard-backend-api.service';
 
 describe('Blog home page backend api service', () => {
   let bhpbas: BlogHomePageBackendApiService;
@@ -35,7 +37,8 @@ describe('Blog home page backend api service', () => {
   let blogHomePageBackendResponse: BlogHomePageBackendResponse;
   let blogPostSummary: BlogPostSummaryBackendDict = {
     id: 'sampleBlogId',
-    author_name: 'test_user',
+    author_username: 'test_username',
+    displayed_author_name: 'test_user',
     title: 'sample_title',
     summary: 'hello',
     thumbnail_filename: 'image',
@@ -47,7 +50,7 @@ describe('Blog home page backend api service', () => {
   };
   let blogPost: BlogPostBackendDict = {
     id: 'sampleBlogId',
-    author_name: 'test_user',
+    displayed_author_name: 'test_user',
     title: 'sample_title',
     content: 'hello Blog Post',
     thumbnail_filename: 'image',
@@ -63,7 +66,13 @@ describe('Blog home page backend api service', () => {
   let blogPostPageDataObject: BlogPostPageData;
   let blogPostObject: BlogPostData;
   let blogPostPageBackendResponse: BlogPostPageBackendResponse;
+  let blogAuthorProfileBackendResponse: BlogAuthorProfilePageBackendResponse;
+  let blogAuthorProfileDataObject: BlogAuthorProfilePageData;
   let urlSearchQuery: string;
+  let blogAuthorBackendDetails: BlogAuthorDetailsBackendDict = {
+    displayed_author_name: 'new_displayed_author_name',
+    author_bio: 'general bio'
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -100,13 +109,28 @@ describe('Blog home page backend api service', () => {
     };
     blogPostObject = BlogPostData.createFromBackendDict(blogPost);
     blogPostPageBackendResponse = {
+      author_username: 'test_username',
       blog_post_dict: blogPost,
       summary_dicts: [] as BlogPostSummaryBackendDict[],
       profile_picture_data_url: 'imageUrl'
     };
     blogPostPageDataObject = {
+      authorUsername: 'test_username',
       blogPostDict: blogPostObject,
       summaryDicts: [],
+      profilePictureDataUrl: 'imageUrl',
+    };
+    blogAuthorProfileBackendResponse = {
+      author_details: blogAuthorBackendDetails,
+      no_of_blog_post_summaries: 0,
+      summary_dicts: [] as BlogPostSummaryBackendDict[],
+      profile_picture_data_url: 'imageUrl',
+    };
+    blogAuthorProfileDataObject = {
+      numOfBlogPostSummaries: 0,
+      blogPostSummaries: [],
+      displayedAuthorName: 'new_displayed_author_name',
+      authorBio: 'general bio',
       profilePictureDataUrl: 'imageUrl',
     };
   });
@@ -268,6 +292,62 @@ describe('Blog home page backend api service', () => {
 
     let req = httpTestingController.expectOne(
       BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '/sample-url');
+    expect(req.request.method).toEqual('GET');
+
+    req.flush({
+      error: 'Some error in the backend.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
+
+  it('should successfully fetch the author profile page data.', fakeAsync(
+    () => {
+      bhpbas.fetchBlogAuthorProfilePageDataAsync('test_username', '0').then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/blog/author/data/test_username?offset=0');
+      expect(req.request.method).toEqual('GET');
+
+      req.flush(blogAuthorProfileBackendResponse);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(blogAuthorProfileDataObject);
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it('should fetch the blog author profile page data with blog post summary' +
+  'data', fakeAsync(() => {
+    blogAuthorProfileBackendResponse.summary_dicts = [
+      blogPostSummary];
+    blogAuthorProfileDataObject.blogPostSummaries = [
+      blogPostSummaryObject];
+    bhpbas.fetchBlogAuthorProfilePageDataAsync('test_username', '0').then(
+      successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/blog/author/data/test_username?offset=0');
+    expect(req.request.method).toEqual('GET');
+
+    req.flush(blogAuthorProfileBackendResponse);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(blogAuthorProfileDataObject);
+    expect(failHandler).not.toHaveBeenCalled();
+  })
+  );
+
+  it('should use the rejection handler if the backend request fails to fetch' +
+    'blog home page data', fakeAsync(() => {
+    bhpbas.fetchBlogAuthorProfilePageDataAsync('test_username', '0').then(
+      successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/blog/author/data/test_username?offset=0');
     expect(req.request.method).toEqual('GET');
 
     req.flush({

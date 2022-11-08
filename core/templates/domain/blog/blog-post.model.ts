@@ -20,7 +20,7 @@
 import { AppConstants } from 'app.constants';
 export interface BlogPostBackendDict {
   'id': string ;
-  'author_name': string;
+  'displayed_author_name': string;
   'title': string;
   'content': string;
   'thumbnail_filename': string | null;
@@ -31,7 +31,7 @@ export interface BlogPostBackendDict {
 }
 export class BlogPostData {
   _id: string;
-  _authorName: string;
+  _displayedAuthorName: string;
   _title: string;
   _content: string;
   _tags: string[];
@@ -41,7 +41,7 @@ export class BlogPostData {
   _publishedOn?: string;
   constructor(
       id: string,
-      authorUsername: string,
+      displayedAuthorName: string,
       title: string,
       content: string,
       tags: string[],
@@ -50,7 +50,7 @@ export class BlogPostData {
       lastUpdated?: string,
       publishedOn?: string) {
     this._id = id;
-    this._authorName = authorUsername;
+    this._displayedAuthorName = displayedAuthorName;
     this._title = title;
     this._content = content;
     this._tags = tags;
@@ -64,8 +64,8 @@ export class BlogPostData {
     return this._id;
   }
 
-  get authorUsername(): string {
-    return this._authorName;
+  get displayedAuthorName(): string {
+    return this._displayedAuthorName;
   }
 
   get lastUpdated(): string | undefined {
@@ -178,7 +178,7 @@ export class BlogPostData {
       blogPostBackendDict: BlogPostBackendDict): BlogPostData {
     return new BlogPostData (
       blogPostBackendDict.id,
-      blogPostBackendDict.author_name,
+      blogPostBackendDict.displayed_author_name,
       blogPostBackendDict.title,
       blogPostBackendDict.content,
       blogPostBackendDict.tags,

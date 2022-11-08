@@ -1,0 +1,82 @@
+<div class="oppia-blog-author-page justify-content-center">
+  <mat-card class="oppia-blog-author-page-card oppia-page-card py-5 mb-5">
+    <mat-card-header class="blog-author-page-header mr-0" [ngClass]="{'d-flex flex-column align-items-center': isSmallScreenViewActive()}">
+      <img mat-card-avatar
+           [src]="authorProfilePicUrl"
+           alt="Profile image of the author"
+           class="authorProfilePic">
+      <mat-card-title class="w-100 d-flex flex-column" [ngClass]="{'align-items-center mt-2': isSmallScreenViewActive()}">
+        <span class="blog-author-name">
+          {{ authorName }}
+        </span>
+        <span class="total-blog-post-number-display"
+              [innerHTML]="'I18N_BLOG_AUTHOR_PROFILE_PAGE_TOTAL_POSTS_DISPLAY' | translate: {totalNumber: totalBlogPosts}">
+        </span>
+      </mat-card-title>
+      <mat-card-subtitle class="mt-3 blog-author-bio"  [ngClass]="{'text-center': isSmallScreenViewActive()}">
+          {{ authorBio }}
+      </mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+  <mat-card class="oppia-blog-author-page-card oppia-page-card py-5">
+    <div *ngIf="!noResultsFound && !showBlogPostCardsLoadingScreen"
+         class="oppia-blog-post-card-container">
+      <div class="d-flex align-items-baseline">
+        <ngb-pagination [collectionSize]="totalBlogPosts"
+                        [(page)]="page"
+                        [maxSize]="2"
+                        [pageSize]="MAX_NUM_CARD_TO_DISPLAY_ON_PAGE"
+                        [rotate]="true"
+                        (pageChange)="onPageChange()"
+                        class="ml-auto">
+          <ng-template ngbPaginationPrevious>
+            <i class="fa fa-angle-left text-center w-100" aria-hidden="true" (click)="onPageChange()"></i>
+          </ng-template>
+          <ng-template ngbPaginationNumber let-p>
+            <button disabled class="pagination-button">{{ p }}</button>
+          </ng-template>
+          <ng-template ngbPaginationNext>
+            <i class="fa fa-angle-right text-center w-100" aria-hidden="true" (click)="onPageChange()"></i>
+          </ng-template>
+        </ngb-pagination>
+      </div>
+      <div *ngFor="let blogPostSummary of blogPostSummariesToShow" class="blog-post-card">
+        <oppia-blog-card class="d-flex justify-content-center"
+                         [blogPostSummary]="blogPostSummary"
+                         [authorProfilePicDataUrl]="blogPostSummary.authorProfilePicUrl"
+                         [shownOnblogPostPage]="false">
+        </oppia-blog-card>
+      </div>
+    </div>
+    <div *ngIf="noResultsFound && !showBlogPostCardsLoadingScreen" class="posts-display-heading text-center">
+      <picture>
+        <source type="image/webp" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.png')">
+        <img [src]="getStaticImageUrl('/general/no_explorations_found.png')">
+      </picture>
+      {{ 'I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND' | translate }}
+    </div>
+    <div *ngIf="showBlogPostCardsLoadingScreen" class="my-auto">
+      <mat-spinner class="mx-auto"></mat-spinner>
+    </div>
+    <div *ngIf="!noResultsFound && !showBlogPostCardsLoadingScreen" class="d-flex">
+      <ngb-pagination [collectionSize]="totalBlogPosts"
+                      [(page)]="page"
+                      [maxSize]="2"
+                      [pageSize]="MAX_NUM_CARD_TO_DISPLAY_ON_PAGE"
+                      [rotate]="true"
+                      (pageChange)="onPageChange()"
+                      class="ml-auto">
+        <ng-template ngbPaginationPrevious >
+          <i class="fa fa-angle-left text-center w-100" aria-hidden="true" (click)="onPageChange()"></i>
+        </ng-template>
+        <ng-template ngbPaginationNumber let-p>
+          <button disabled class="pagination-button">{{ p }}</button>
+        </ng-template>
+        <ng-template ngbPaginationNext>
+          <i class="fa fa-angle-right text-center w-100" aria-hidden="true" (click)="onPageChange()"></i>
+        </ng-template>
+      </ngb-pagination>
+    </div>
+  </mat-card>
+</div>

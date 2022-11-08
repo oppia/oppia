@@ -126,3 +126,14 @@ class ModelMutatedDuringJobErrorForPublishedOn(
             'published_on=%r is later than the audit job\'s start time' % (
                 model.published_on))
         super().__init__(message, model)
+
+
+class DuplicateBlogAuthorModelError(base_validation_errors.BaseAuditError):
+    """Error class for blog author detail models with duplicate author ids."""
+
+    def __init__(
+        self,
+        model: blog_models.BlogAuthorDetailsModel
+    ) -> None:
+        message = 'author id=%s is not unique' % utils.quoted(model.author_id)
+        super().__init__(message, model)

@@ -185,7 +185,7 @@ class BlogHomePageAccessValidationHandler(
         'GET': {}
     }
 
-    @acl_decorators.can_access_blog_dashboard
+    @acl_decorators.open_access
     def get(self) -> None:
         """Validates access to blog home page."""
         pass
@@ -219,7 +219,7 @@ class BlogPostPageAccessValidationHandler(
         }
     }
 
-    @acl_decorators.can_access_blog_dashboard
+    @acl_decorators.open_access
     def get(self) -> None:
         assert self.normalized_request is not None
         blog_post_url_fragment = self.normalized_request[
@@ -229,3 +229,41 @@ class BlogPostPageAccessValidationHandler(
 
         if not blog_post:
             raise self.PageNotFoundException
+
+
+class BlogAuthorProfilePageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to blog author profile page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'author_username': {
+            'schema': {
+                'type': 'basestring'
+            },
+            'validators': [{
+                'id': 'has_length_at_most',
+                'max_value': constants.MAX_AUTHOR_NAME_LENGTH
+            }]
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self, author_username: str) -> None:
+        author_settings = (
+            user_services.get_user_settings_from_username(author_username))
+
+        if author_settings is None:
+            raise self.PageNotFoundException(
+                'User with given username does not exist'
+            )
+
+        if not user_services.is_user_blog_post_author(author_settings.user_id):
+            raise self.PageNotFoundException(
+                'User with given username is not a blog post author.'
+            )

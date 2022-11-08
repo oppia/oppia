@@ -1,0 +1,58 @@
+<div class="mt-5 mb-1 mx-3 e2e-test-blog-author-details-modal">
+  <h3>{{ 'I18N_BLOG_DASHBOARD_AUTHOR_DETAILS_EDITOR_HEADING' | translate }}: </h3>
+</div>
+<span class="my-2 ml-2 d-flex">
+  <h4 class="my-auto mr-1">{{ 'I18N_BLOG_DASHBOARD_AUTHOR_NAME_HEADING' | translate }} :</h4>
+  <input class="w-auto form-control required general-text-format oppia-autofocus blog-author-editor e2e-test-blog-author-name-field"
+         [(ngModel)]="authorName"
+         maxlength="MAX_AUTHOR_NAME_LENGTH"
+         aria-label="Author Name of the user">
+</span>
+<div class="my-4 ml-2">
+  <span class="d-flex blog-author-editor">
+    <span class="blog-author-bio">
+      <h4 class="mr-1">{{ 'I18N_BLOG_DASHBOARD_AUTHOR_BIO_HEADING' | translate }}: </h4>
+    </span>
+    <textarea class="oppia-bio-border oppia-autofocus w-100 mr-1 e2e-test-blog-author-bio-field"
+              [(ngModel)]="authorBio"
+              [attr.value]="authorBio"
+              rows="5"
+              [maxlength]="250"
+              [minlength]="5"
+              placeholder="{{ 'I18N_BLOG_DASHBOARD_AUTHOR_BIO_EXPLAIN_TEXT' | translate }}">
+    </textarea>
+  </span>
+</div>
+<div class="modal-footer">
+  <button *ngIf="prevAuthorBio.length !== 0"
+          class="btn btn-secondary"
+          (click)="cancel()"
+          [disabled]="prevAuthorBio.length === 0">
+          {{ 'I18N_BLOG_POST_EDITOR_CANCEL_BUTTON_TEXT' | translate }}
+  </button>
+  <span [matTooltip]="(validateAuthorDetails()).join('\n')"
+        matTooltipClass="oppia-mat-tooltip-list"
+        [matTooltipDisabled]="false"
+        aria-label="List that shows issues preventing to save author details"
+        class="w-100">
+    <button class="btn btn-success e2e-test-save-author-details-button"
+            aria-label="Save Author Details."
+            (click)="save()"
+            [disabled]="validateAuthorDetails().length !== 0">
+            {{ 'I18N_BLOG_DASHBOARD_PAGE_SAVE_BUTTON' | translate }}
+    </button>
+  </span>
+</div>
+<style>
+  oppia-blog-author-details-editor {
+    padding: 3.5rem;
+  }
+
+  .blog-author-editor {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    line-height: 20px;
+    text-align: left;
+  }
+</style>

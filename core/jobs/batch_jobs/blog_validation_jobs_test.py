@@ -221,3 +221,50 @@ class FindDuplicateBlogPostSummaryUrlsJobTests(job_test_utils.JobTestBase):
                     blog_post_summary_model_2
                 ),
             ])
+
+
+class FindDuplicateBlogAuthorDetailsModelForAuthorJobTests(
+    job_test_utils.JobTestBase
+):
+
+    JOB_CLASS: Type[
+        blog_validation_jobs.FindDuplicateBlogAuthorDetailsModelForAuthorJob
+    ] = blog_validation_jobs.FindDuplicateBlogAuthorDetailsModelForAuthorJob
+
+    def test_run_with_same_author_id_for_blog_posts(self) -> None:
+        author_details_model_1 = self.create_model(
+            blog_models.BlogAuthorDetailsModel,
+            id='validblogid1',
+            displayed_author_name='user one',
+            author_id='user',
+            author_bio='')
+        author_details_model_2 = self.create_model(
+            blog_models.BlogAuthorDetailsModel,
+            id='validblogid2',
+            displayed_author_name='user two',
+            author_id='user',
+            author_bio='author general bio')
+        author_details_model_3 = self.create_model(
+            blog_models.BlogAuthorDetailsModel,
+            id='validblogid3',
+            displayed_author_name='user name',
+            author_id='diffUserId',
+            author_bio='some author bio')
+
+        self.put_multi(
+            [
+                author_details_model_1,
+                author_details_model_2,
+                author_details_model_3,
+            ]
+        )
+
+        self.assert_job_output_is(
+            [
+                blog_validation_errors.DuplicateBlogAuthorModelError(
+                    author_details_model_1
+                ),
+                blog_validation_errors.DuplicateBlogAuthorModelError(
+                    author_details_model_2
+                ),
+            ])

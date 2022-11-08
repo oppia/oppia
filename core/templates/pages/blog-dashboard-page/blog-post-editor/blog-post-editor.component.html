@@ -37,7 +37,7 @@
                  [src]="authorProfilePictureUrl || DEFAULT_PROFILE_PICTURE_URL"
                  alt="Profile image of the author of the blog post.">
             <span class="author-username text-center general-text-format ml-4 my-auto">
-              {{ authorUsername }}
+              {{ authorName }}
             </span>
           </div>
           <div class="mat-card-header-text mx-0 mt-3">
@@ -160,7 +160,7 @@
              [src]="authorProfilePictureUrl || DEFAULT_PROFILE_PICTURE_URL"
              alt="Profile image of the author of the blog post.">
         <span class="author-username text-center general-text-format e2e-test-username-visible">
-          {{ authorUsername }}
+          {{ authorName }}
         </span>
       </div>
       <div class="mat-card-header-text d-block mx-0 mt-3">
@@ -177,7 +177,7 @@
         <span [matTooltip]="(blogPostData.validate()).join('\n')"
               matTooltipClass="oppia-mat-tooltip-list"
               [matTooltipDisabled]="false"
-              aria-label="List that showns issues preventing to save blog post as draft"
+              aria-label="List that shows issues preventing to save blog post as draft"
               class="w-100">
           <button mat-button class="w-100 mx-auto my-2 e2e-test-save-as-draft-button"
                   [disabled]="(blogPostData.validate().length > 0) || !newChangesAreMade"

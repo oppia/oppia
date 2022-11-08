@@ -21,5 +21,6 @@
 export const BlogPostPageConstants = {
   BLOG_POST_PAGE_URL_TEMPLATE: '/blog/<blog_post_url>',
   BLOG_POST_PAGE_DATA_URL_TEMPLATE: '/blogdatahandler/data/<blog_post_url>',
+  BLOG_AUTHOR_PROFILE_PAGE_URL_TEMPLATE: '/blog/author/<author_username>',
   MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST: 2,
 } as const;

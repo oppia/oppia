@@ -113,6 +113,27 @@ class FindDuplicateBlogPostSummaryUrlsJob(base_jobs.JobBase):
         )
 
 
+class FindDuplicateBlogAuthorDetailsModelForAuthorJob(base_jobs.JobBase):
+    """Validates that only one Blog Author Detail Models exists corresponding to
+    given author id.
+    """
+
+    def run(
+        self
+    ) -> beam.PCollection[blog_validation_errors.DuplicateBlogAuthorModelError]:
+        return (
+            self.pipeline
+            | 'Get every Blog Author Details Model' >> (
+                ndb_io.GetModels(blog_models.BlogAuthorDetailsModel.query()))
+            | GetModelsWithDuplicatePropertyValues('author_id')
+            | 'Flatten models into a list of errors' >> beam.FlatMap(
+                lambda models: [
+                    blog_validation_errors.DuplicateBlogAuthorModelError(model)
+                    for model in models
+                ])
+        )
+
+
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error
@@ -126,8 +147,16 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[mis
         self.property_name = property_name
 
     def expand(
-        self, blog_model_pcoll: beam.PCollection[blog_models.BlogPostModel]
-    ) -> beam.PCollection[blog_models.BlogPostModel]:
+        self, blog_model_pcoll: beam.PCollection[Union[
+            blog_models.BlogPostModel,
+            blog_models.BlogPostSummaryModel,
+            blog_models.BlogAuthorDetailsModel
+        ]]
+    ) -> beam.PCollection[Union[
+        blog_models.BlogPostModel,
+        blog_models.BlogPostSummaryModel,
+        blog_models.BlogAuthorDetailsModel
+    ]]:
         return (
             blog_model_pcoll
             | 'Discard models with empty property value' >> (

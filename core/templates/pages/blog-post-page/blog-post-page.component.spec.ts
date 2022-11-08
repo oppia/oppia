@@ -37,6 +37,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post.model';
 import { SharingLinksComponent } from 'components/common-layout-directives/common-elements/sharing-links.component';
+import { BlogPostPageService } from './services/blog-post-page.service';
 
 @Pipe({name: 'truncate'})
 class MockTruncatePipe {
@@ -52,10 +53,8 @@ class MockWindowRef {
       href: 'http://localhost/blog/blog-test',
       toString() {
         return 'http://localhost/test_path';
-      }
-    },
-    history: {
-      pushState(data: object, title: string, url?: string | null) {}
+      },
+      reload: () => { }
     }
   };
 }
@@ -71,7 +70,9 @@ describe('Blog home page component', () => {
   let urlService: UrlService;
   let loaderService: LoaderService;
   let urlInterpolationService: UrlInterpolationService;
+  let blogPostPageService: BlogPostPageService;
   let component: BlogPostPageComponent;
+  let mockWindowRef: MockWindowRef;
   let fixture: ComponentFixture<BlogPostPageComponent>;
 
   beforeEach(waitForAsync(() => {
@@ -100,7 +101,8 @@ describe('Blog home page component', () => {
           provide: WindowDimensionsService,
           useClass: MockWindowDimensionsService
         },
-        LoaderService
+        LoaderService,
+        BlogPostPageService
       ],
     }).compileComponents();
   }));
@@ -110,6 +112,8 @@ describe('Blog home page component', () => {
     component = fixture.componentInstance;
     urlService = TestBed.inject(UrlService);
     loaderService = TestBed.inject(LoaderService);
+    blogPostPageService = TestBed.inject(BlogPostPageService);
+    mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     spyOn(loaderService, 'showLoadingScreen');
@@ -165,7 +169,7 @@ describe('Blog home page component', () => {
   it('should initialize correctly', () => {
     let sampleBlogPostBackendDict: BlogPostBackendDict = {
       id: 'sampleBlogId',
-      author_name: 'test_user',
+      displayed_author_name: 'test_user',
       title: 'sample_title',
       content: '<p>hello</p>',
       thumbnail_filename: 'image.png',
@@ -177,6 +181,7 @@ describe('Blog home page component', () => {
     let blogPostData = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
     component.blogPostPageData = {
+      authorUsername: 'test_username',
       blogPostDict: blogPostData,
       profilePictureDataUrl: 'sample-url',
       summaryDicts: [],
@@ -195,5 +200,17 @@ describe('Blog home page component', () => {
     expect(component.blogPost).toEqual(blogPostData);
     expect(component.postsToRecommend.length).toBe(0);
     expect(component.publishedDateString).toBe('November 21, 2014');
+    expect(blogPostPageService.blogPostId).toBe(sampleBlogPostBackendDict.id);
+  });
+
+  it('should navigate to author profile page', () => {
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/blog/author/test-username');
+    component.authorUsername = 'test-username';
+
+    component.navigateToAuthorProfilePage();
+
+    expect(mockWindowRef.nativeWindow.location.href).toEqual(
+      '/blog/author/test-username');
   });
 });
