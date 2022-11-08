@@ -5741,6 +5741,8 @@ export default {
     "LIST": "list"
   },
 
+  "EMAIL_REGEX": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+",
+
   "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
     "name": "Commonly Used",
     "interaction_ids": [
@@ -5830,6 +5832,9 @@ export default {
       "InteractiveMap"
     ]
   }],
+
+  "MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_CURATED_EXP": 4,
+  "MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_REGULAR_EXP": 2,
 
   "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION": "translation",
   "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER": "voiceover",

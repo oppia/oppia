@@ -96,36 +96,6 @@ class MigrateExplorationJobTests(
         exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
         self.assertEqual(exp_model.version, 1)
 
-    def test_broken_cache_is_reported(self) -> None:
-        cache_swap = self.swap_to_always_raise(
-            caching_services, 'delete_multi', Exception('cache deletion error')
-        )
-
-        swap_states_schema_48 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 48)
-        swap_exp_schema_55 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 55)
-
-        with swap_states_schema_48, swap_exp_schema_55:
-            exploration = exp_domain.Exploration.create_default_exploration(
-                self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
-            exp_services.save_new_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exploration)
-
-            self.assertEqual(exploration.states_schema_version, 48)
-
-        with cache_swap:
-            self.assert_job_output_is([
-                job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
-                job_run_result.JobRunResult(
-                    stderr='CACHE DELETION ERROR: "cache deletion error": 1'),
-                job_run_result.JobRunResult(
-                    stdout='EXP MIGRATED SUCCESS: 1', stderr='')
-            ])
-
-        migrated_exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
-        self.assertEqual(migrated_exp_model.states_schema_version, 53)
-
     def test_broken_exp_is_not_migrated(self) -> None:
         exploration_rights = rights_domain.ActivityRights(
             self.NEW_EXP_ID, [feconf.SYSTEM_COMMITTER_ID],
@@ -255,8 +225,6 @@ class MigrateExplorationJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
             job_run_result.JobRunResult(
-                stdout='CACHE DELETION SUCCESS: 1', stderr=''),
-            job_run_result.JobRunResult(
                 stdout='EXP MIGRATED SUCCESS: 1', stderr='')
         ])
 
@@ -289,6 +257,7 @@ class MigrateExplorationJobTests(
         with swap_states_schema_48, swap_exp_schema_53:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
+            exploration.states['Introduction'].update_interaction_id(None)
             exp_services.save_new_exploration(
                 feconf.SYSTEM_COMMITTER_ID, exploration)
 
