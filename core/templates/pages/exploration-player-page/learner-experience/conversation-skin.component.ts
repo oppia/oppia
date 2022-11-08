@@ -93,7 +93,6 @@ const TIME_NUM_CARDS_CHANGE_MSEC = 500;
 })
 export class ConversationSkinComponent {
   @Input() questionPlayerConfig;
-  @Input() diagnosticTestTopicTrackerModel;
   directiveSubscriptions = new Subscription();
   // The minimum width, in pixels, needed to be able to show two cards
   // side-by-side.
@@ -1043,11 +1042,6 @@ export class ConversationSkinComponent {
         this.questionPlayerConfig,
         this._initializeDirectiveComponents.bind(this),
         this.showQuestionAreNotAvailable);
-    } else if (this.diagnosticTestTopicTrackerModel) {
-      this.explorationPlayerStateService.initializeDiagnosticPlayer(
-        this.diagnosticTestTopicTrackerModel,
-        this._initializeDirectiveComponents.bind(this)
-      );
     } else {
       this.explorationPlayerStateService.initializePlayer(
         this._initializeDirectiveComponents.bind(this));
@@ -1072,12 +1066,9 @@ export class ConversationSkinComponent {
       }
     }
 
-    if (
-      !this.explorationPlayerStateService.isInQuestionMode() &&
-        !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode() &&
-        !this.isInPreviewMode &&
-        AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE
-    ) {
+    if (!this.explorationPlayerStateService.isInQuestionMode() &&
+      !this.isInPreviewMode &&
+      AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
       this.initLearnerAnswerInfoService(
         this.explorationId, this.explorationEngineService.getState(),
         answer, interactionRulesService,
@@ -1118,9 +1109,7 @@ export class ConversationSkinComponent {
           isFirstHit, isFinalQuestion, focusLabel) => {
         this.nextCard = nextCard;
         if (!this._editorPreviewMode &&
-            !this.explorationPlayerStateService.isInQuestionMode() &&
-            !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
-        ) {
+            !this.explorationPlayerStateService.isInQuestionMode()) {
           let oldStateName =
             this.playerPositionService.getCurrentStateName();
           if (!remainOnCurrentCard) {
@@ -1141,15 +1130,10 @@ export class ConversationSkinComponent {
             this.explorationActuallyStarted = true;
           }
         }
-        if (
-          !this.explorationPlayerStateService.isInQuestionMode() &&
-            !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
-        ) {
+        if (!this.explorationPlayerStateService.isInQuestionMode()) {
           this.explorationPlayerStateService.onPlayerStateChange.emit(
             nextCard.getStateName());
-        } else if (
-          !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
-        ) {
+        } else {
           this.questionPlayerStateService.answerSubmitted(
             this.questionPlayerEngineService.getCurrentQuestion(),
             !remainOnCurrentCard,
