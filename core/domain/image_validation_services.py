@@ -23,18 +23,23 @@ from core import feconf
 from core import utils
 from core.domain import html_validation_service
 
-from typing import Union
+from typing import Optional, Union
+
+HUNDRED_KB_IN_BYTES = 100 * 1024
+ONE_MB_IN_BYTES = 1 * 1024 * 1024
 
 
 def validate_image_and_filename(
     raw_image: Union[str, bytes],
-    filename: str
+    filename: str,
+    entity_type: Optional[str] = None,
 ) -> str:
     """Validates the image data and its filename.
 
     Args:
         raw_image: Union[str, bytes]. The image content.
         filename: str. The filename for the image.
+        entity_type: str. The type of the entity.
 
     Returns:
         str. The file format of the image.
@@ -43,15 +48,19 @@ def validate_image_and_filename(
         ValidationError. Image or filename supplied fails one of the
             validation checks.
     """
-    hundred_kb_in_bytes = 100 * 1024
+    if entity_type == feconf.ENTITY_TYPE_BLOG_POST:
+        max_file_size = ONE_MB_IN_BYTES
+    else:
+        max_file_size = HUNDRED_KB_IN_BYTES
 
     if not raw_image:
         raise utils.ValidationError('No image supplied')
     if isinstance(raw_image, str) and utils.is_base64_encoded(raw_image):
         raw_image = base64.decodebytes(raw_image.encode('utf-8'))
-    if len(raw_image) > hundred_kb_in_bytes:
+
+    if len(raw_image) > max_file_size:
         raise utils.ValidationError(
-            'Image exceeds file size limit of 100 KB.')
+            'Image exceeds file size limit of %i KB.' % (max_file_size / 1024))
     allowed_formats = ', '.join(
         list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
     # Ruling out the possibility of str for mypy type checking.

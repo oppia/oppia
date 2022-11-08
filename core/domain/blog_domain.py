@@ -240,8 +240,8 @@ class BlogPost:
             if not re.match(constants.VALID_BLOG_POST_TITLE_REGEX, title):
                 raise utils.ValidationError(
                     'Title field contains invalid characters. Only words'
-                    '(a-zA-Z0-9) separated by spaces are allowed. Received %s'
-                    % title)
+                    '(a-zA-Z0-9) separated by spaces, hyphens(-) and colon(:) '
+                    'are allowed. Received %s' % title)
 
     @classmethod
     def require_valid_url_fragment(cls, url_fragment: str) -> None:
