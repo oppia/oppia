@@ -78,6 +78,7 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 import './conversation-skin.component.css';
+import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
 
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
@@ -221,7 +222,10 @@ export class ConversationSkinComponent {
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,
     private platformFeatureService: PlatformFeatureService,
-    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
+    private learnerDashboardBackendApiService:
+      LearnerDashboardBackendApiService,
+    private diagnosticTestPlayerStatusService:
+      DiagnosticTestPlayerStatusService
   ) {}
 
   adjustPageHeightOnresize(): void {
@@ -1051,6 +1055,15 @@ export class ConversationSkinComponent {
     setTimeout(() => {
       this.playerPositionService.onNewCardOpened.emit(initialCard);
     });
+  }
+
+  skipCurrentQuestion(): void {
+    this.explorationPlayerStateService.skipCurrentQuestion(
+      (nextCard) => {
+        this.nextCard = nextCard;
+        this.showPendingCard();
+      }
+    );
   }
 
   initializePage(): void {

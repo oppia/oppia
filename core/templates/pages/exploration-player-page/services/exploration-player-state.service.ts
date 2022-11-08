@@ -422,6 +422,11 @@ export class ExplorationPlayerStateService {
     return this.currentEngineService.recordNewCardAdded();
   }
 
+  skipCurrentQuestion(successCallback) {
+    this.diagnosticTestPlayerEngineService
+    .getNextCardAfterSkippingCurrentQuestion(successCallback);
+  }
+
   get onTotalQuestionsReceived(): EventEmitter<number> {
     return this._totalQuestionsReceivedEventEmitter;
   }

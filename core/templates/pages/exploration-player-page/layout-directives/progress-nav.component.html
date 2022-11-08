@@ -22,6 +22,12 @@
   </div>
   <div *ngIf="!hasNext">
     <div *ngIf="submitButtonIsShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton" class="oppia-nav-button">
+      <button mat-button
+              class="oppia-learner-confirm-button oppia-skip-button"
+              *ngIf="skipButtonIsShown"
+              (click)="skipQuestionButton()">
+        Skip
+      </button>
       <!-- Special case for the 'Continue' interaction. -->
       <button mat-button
               *ngIf="interactionId === 'Continue'"

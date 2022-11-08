@@ -43,7 +43,8 @@
                             [submitButtonIsShown]="!answerIsBeingProcessed"
                             [enableNavigationThroughCardHistory]="enableNavigationThroughCardHistory"
                             (clickContinueButton)="showUpcomingCard()"
-                            (changeCard)="changeCard($event)">
+                            (changeCard)="changeCard($event)"
+                            (skipQuestion)="skipCurrentQuestion()">
         </oppia-progress-nav>
       </div>
       <div *ngIf="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && ((!isEndChapterCelebrationFeatureEnabled() && inStoryMode) || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">

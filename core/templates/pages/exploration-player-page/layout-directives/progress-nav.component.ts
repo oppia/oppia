@@ -33,6 +33,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
+import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
 
 import './progress-nav.component.css';
 
@@ -66,6 +67,8 @@ export class ProgressNavComponent {
 
   @Output() changeCard: EventEmitter<number> = new EventEmitter();
 
+  @Output() skipQuestion: EventEmitter<void> = new EventEmitter();
+
   directiveSubscriptions = new Subscription();
   transcriptLength = 0;
   interactionIsInline = true;
@@ -87,6 +90,7 @@ export class ProgressNavComponent {
   explorationId: string;
   newCardStateName: string;
   currentCardIndex: number;
+  skipButtonIsShown: boolean;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
@@ -98,7 +102,8 @@ export class ProgressNavComponent {
     private urlService: UrlService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private windowDimensionsService: WindowDimensionsService,
-    private contentTranslationManagerService: ContentTranslationManagerService
+    private contentTranslationManagerService: ContentTranslationManagerService,
+    private diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService
   ) {}
 
   ngOnChanges(): void {
@@ -110,6 +115,12 @@ export class ProgressNavComponent {
 
   ngOnInit(): void {
     this.isIframed = this.urlService.isIframed();
+
+    if (!this.enableNavigationThroughCardHistory) {
+      this.skipButtonIsShown = true;
+    } else {
+      this.skipButtonIsShown = false;
+    }
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onHelpCardAvailable.subscribe(
@@ -133,6 +144,11 @@ export class ProgressNavComponent {
       )
     );
   }
+
+  skipQuestionButton(): void {
+    this.skipQuestion.emit();
+  }
+
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
