@@ -100,12 +100,12 @@ export class OutcomeObjectFactory {
   constructor() {}
 
   createNew(
-      dest: string, feedbackTextId: string, feedbackText: string,
+      dest: string, destIfReallyStuck: string | null, feedbackTextId: string, feedbackText: string,
       paramChanges: readonly ParamChangeBackendDict[]
   ): Outcome {
     return new Outcome(
       dest,
-      null,
+      destIfReallyStuck,
       SubtitledHtml.createDefault(
         feedbackText, feedbackTextId),
       false,
