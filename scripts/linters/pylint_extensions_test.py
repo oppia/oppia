@@ -2629,7 +2629,8 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         )
         message2 = testutils.Message(
             msg_id='redundant-type-comment',
-            line=15
+            line=15,
+            node=node_function_with_extra_comment
         )
         with self.checker_test_object.assertAddsMessages(message1, message2):
             self.checker_test_object.checker.visit_module(
@@ -2835,13 +2836,93 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         )
         message2 = testutils.Message(
             msg_id='redundant-type-comment',
-            line=2
+            line=2,
+            node=node_with_ignore_and_more_than_fifteen_gap
         )
         with self.checker_test_object.assertAddsMessages(
             message1, message2
         ):
             self.checker_test_object.checker.visit_module(
                 node_with_ignore_and_more_than_fifteen_gap
+            )
+        temp_file.close()
+
+    def test_generic_type_ignore_raises_pylint_error(self):
+        node_with_generic_type_ignore = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
+                # are not available yet.
+
+                def foo(exp_id: str) -> str:  # type: ignore
+                    return 'hi' #@
+                """
+            )
+        node_with_generic_type_ignore.file = filename
+
+        message1 = testutils.Message(
+            msg_id='generic-mypy-ignore-used',
+            line=5,
+            node=node_with_generic_type_ignore
+        )
+        message2 = testutils.Message(
+            msg_id='redundant-type-comment',
+            line=2,
+            node=node_with_generic_type_ignore
+        )
+
+        with self.checker_test_object.assertAddsMessages(
+            message1, message2
+        ):
+            self.checker_test_object.checker.visit_module(
+                node_with_generic_type_ignore
+            )
+        temp_file.close()
+
+        node_with_both_generic_and_non_generic_type_ignores = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'
+            )
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
+                # are not available yet.
+                def foo(exp_id: str) -> str:  # type: ignore[arg-type]
+                    return 'hi' #@
+
+                def foo(exp_id: str) -> str:  # type: ignore
+                    return 'hi' #@
+
+                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
+                # are not available yet.
+                def foo(exp_id: str) -> str:  # type: ignore[misc]
+                    return 'hi' #@
+                """
+            )
+        node_with_both_generic_and_non_generic_type_ignores.file = filename
+
+        message1 = testutils.Message(
+            msg_id='generic-mypy-ignore-used',
+            line=7,
+            node=node_with_both_generic_and_non_generic_type_ignores
+        )
+
+        with self.checker_test_object.assertAddsMessages(message1):
+            self.checker_test_object.checker.visit_module(
+                node_with_both_generic_and_non_generic_type_ignores
             )
         temp_file.close()
 

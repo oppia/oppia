@@ -1988,9 +1988,18 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
             ' not allowed in the codebase. Instead try to fix the code'
             ' implementation so that the MyPy error is suppressed. For'
             ' more information, visit :'
-            ' https://mypy.readthedocs.io/en/latest/error_code_list.html',
+            ' https://github.com/oppia/oppia/wiki/Backend-Type-Annotations',
             'prohibited-type-ignore-used',
             'Only a limited number of type ignores are allowed in the codebase.'
+        ),
+        'C0051':(
+            'Usage of generic MyPy type ignores is prohibited. '
+            'MyPy type ignores can only be used with specific '
+            'error codes: type: ignore[<error-code>]',
+            'generic-mypy-ignore-used',
+            'Generic type ignore can be ambiguous while reading and could be '
+            'dangerous for python static typing. So, only error code specific '
+            'type ignores are allowed.'
         )
     }
 
@@ -2094,10 +2103,14 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
                         self.add_message(
                             'mypy-ignore-used', line=line_num, node=node
                         )
+                elif re.search(r'(\s*type:\s*ignore)', line):
+                    self.add_message(
+                        'generic-mypy-ignore-used', line=line_num, node=node
+                    )
 
         if type_ignore_comment_present:
             self.add_message(
-                'redundant-type-comment', line=comment_line_number)
+                'redundant-type-comment', line=comment_line_number, node=node)
 
 
 class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
