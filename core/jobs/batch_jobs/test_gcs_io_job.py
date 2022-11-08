@@ -56,7 +56,6 @@ class TestGCSIoJob(base_jobs.JobBase):
                     ]
                 ))
             | 'Write files to GCS' >> gcs_io.WriteFile(self.client)
-            | 'print' >> beam.Map(self._print)
         )
 
         total_files_write = (

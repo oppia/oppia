@@ -25,7 +25,6 @@ from core.platform import models
 from typing import Optional
 
 import apache_beam as beam
-import io
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -86,8 +85,7 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
         self.mime_type = mime_type
 
     def expand(
-        self, filenames: beam.PCollection
-    ) -> beam.PCollection[datastore_services.Model]:
+        self, filenames: beam.PCollection) -> beam.PCollection:
         """Returns the PCollection of files that have written to the GCS."""
         return (
             filenames
@@ -96,8 +94,12 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
 
     def _write_file(self, filename):
         """Helper function to write file to the GCS."""
+        print("Client before gcs - ", self.client)
         gcs = gcsio.GcsIO(self.client)
-        return gcs.open(
+        file = gcs.open(
             filename=filename['file'],
             mode=self.mode,
-            mime_type=self.mime_type).write(filename['data'])
+            mime_type=self.mime_type)
+        write_file = file.write(filename['data'])
+        file.close()
+        return write_file
