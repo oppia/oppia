@@ -99,7 +99,7 @@
         <div tabindex="0" *ngIf="!contentEditorIsActive" (click)="contentEditorIsActive=true" class="e2e-test-content-button blog-post-content-button">
           <div class="oppia-editable-section-mask">
             <oppia-rte-output-display [rteString]="this.blogPostData.content"
-                                      class="blog-post-content-display e2e-test-content-display">
+                                      class="e2e-test-content-display blog-post-content-display">
             </oppia-rte-output-display>
           </div>
         </div>
@@ -439,7 +439,7 @@
     font-size: 40px;
   }
 
- .blog-post-content-display /deep/ h1 {
+  .blog-post-content-display /deep/ h1 {
     color: #333;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 24px;

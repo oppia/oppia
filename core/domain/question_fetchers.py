@@ -136,7 +136,8 @@ def get_question_from_model(
 
     return question_domain.Question(
         question_model.id,
-        state_domain.State.from_dict(versioned_question_state['state']),
+        state_domain.State.from_dict(
+            versioned_question_state['state'], validate=False),
         versioned_question_state['state_schema_version'],
         question_model.language_code, question_model.version,
         question_model.linked_skill_ids,
