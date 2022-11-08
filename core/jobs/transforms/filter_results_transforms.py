@@ -45,6 +45,8 @@ class FilterResults(beam.PTransform):  # type: ignore[misc]
         super().__init__(label=label)
         self.prefix = '%s ' % prefix if prefix else ''
 
+    # Here we use type Any because this method can accept Result object
+    # with any type of domain object.
     @staticmethod
     def _check_migration_errors(
         unused_result: result.Result[Tuple[str, Any], Tuple[str, Exception]],
@@ -63,8 +65,7 @@ class FilterResults(beam.PTransform):  # type: ignore[misc]
         return bool(is_no_migration_error)
 
     # Here we use type Any because this method can accept any kind of
-    # Pcollection object to return the unique JobRunResult objects
-    # with count.
+    # PCollection object to return the filtered migration results.
     def expand(
         self, objects: beam.PCollection[result.Result[Tuple[str, Any], Tuple[str, Exception]]] # pylint: disable=line-too-long
     ) -> beam.PCollection[Any]:
