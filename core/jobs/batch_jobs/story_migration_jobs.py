@@ -29,6 +29,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
+from core.jobs.transforms import filter_results_transforms
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
@@ -240,22 +241,26 @@ class MigrateStoryJob(base_jobs.JobBase):
         )
         topic_id_to_topic = beam.pvalue.AsDict(topics)
 
-        migrated_story_results = (
+        all_migrated_story_results = (
             unmigrated_story_models
             | 'Transform and migrate model' >> beam.MapTuple(
                 self._migrate_story, topic_id_to_topic=topic_id_to_topic)
         )
-        migrated_stories = (
-            migrated_story_results
-            | 'Filter oks' >> beam.Filter(
-                lambda result_item: result_item.is_ok())
-            | 'Unwrap ok' >> beam.Map(
-                lambda result_item: result_item.unwrap())
-        )
         migrated_story_job_run_results = (
-            migrated_story_results
+            all_migrated_story_results
             | 'Generate results for migration' >> (
                 job_result_transforms.ResultsToJobRunResults('STORY PROCESSED'))
+        )
+        filtered_migrated_stories = (
+            all_migrated_story_results
+            | 'Filter migration results' >> (
+                filter_results_transforms.FilterResults())
+        )
+
+        migrated_stories = (
+            filtered_migrated_stories
+            | 'Unwrap ok' >> beam.Map(
+                lambda result_item: result_item.unwrap())
         )
 
         story_changes = (

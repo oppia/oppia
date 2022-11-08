@@ -27,6 +27,7 @@ from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
+from core.jobs.transforms import filter_results_transforms
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
@@ -243,22 +244,28 @@ class MigrateSkillJob(base_jobs.JobBase):
                 lambda skill_summary_model: skill_summary_model.id)
         )
 
-        migrated_skill_results = (
+        all_migrated_skill_results = (
             unmigrated_skill_models
             | 'Transform and migrate model' >> beam.MapTuple(
                 self._migrate_skill)
         )
-        migrated_skills = (
-            migrated_skill_results
-            | 'Filter oks' >> beam.Filter(
-                lambda result_item: result_item.is_ok())
-            | 'Unwrap ok' >> beam.Map(
-                lambda result_item: result_item.unwrap())
-        )
+
         migrated_skill_job_run_results = (
-            migrated_skill_results
+            all_migrated_skill_results
             | 'Generate results for migration' >> (
                 job_result_transforms.ResultsToJobRunResults('SKILL PROCESSED'))
+        )
+
+        filtered_migrated_skills = (
+            all_migrated_skill_results
+            | 'Filter migration results' >> (
+                filter_results_transforms.FilterResults())
+        )
+
+        migrated_skills = (
+            filtered_migrated_skills
+            | 'Unwrap ok' >> beam.Map(
+                lambda result_item: result_item.unwrap())
         )
 
         skill_changes = (
