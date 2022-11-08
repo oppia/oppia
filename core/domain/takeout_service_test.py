@@ -940,6 +940,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         blog_post_rights_for_post_2.update_timestamps()
         blog_post_rights_for_post_2.put()
 
+        blog_models.BlogAuthorDetailsModel.create(
+            author_id=self.USER_ID_1,
+            displayed_author_name='general name',
+            author_bio='general blog author'
+        )
+
         learner_group_model = learner_group_models.LearnerGroupModel(
             id=self.LEARNER_GROUP_ID,
             title='sample title',
@@ -1109,6 +1115,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_blog_post_rights: Dict[str, List[str]] = {
             'editable_blog_post_ids': []
         }
+        expected_blog_author_details: Dict[str, Dict[str, str]] = {}
         expected_learner_group_model_data: Dict[str, str] = {}
         expected_learner_grp_user_model_data: Dict[str, str] = {}
 
@@ -1120,6 +1127,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'app_feedback_report': app_feedback_report,
             'blog_post': expected_blog_post_data,
             'blog_post_rights': expected_blog_post_rights,
+            'blog_author_details': expected_blog_author_details,
             'user_stats': stats_data,
             'user_settings': user_settings_data,
             'user_subscriptions': subscriptions_data,
@@ -1746,6 +1754,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 self.BLOG_POST_ID_2
             ],
         }
+        expected_blog_author_details = {
+            'author_name': 'test name',
+            'author_bio': ''
+        }
         expected_learner_group_data = {
             'title': 'sample title',
             'description': 'sample description',
@@ -1907,7 +1919,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'user_auth_details': expected_user_auth_details,
             'app_feedback_report': expected_app_feedback_report,
             'blog_post': expected_blog_post_data,
-            'blog_post_rights': expected_blog_post_rights
+            'blog_post_rights': expected_blog_post_rights,
+            'blog_author_details': expected_blog_author_details
         }
 
         user_takeout_object = takeout_service.export_data_for_user(
