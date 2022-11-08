@@ -287,7 +287,7 @@ class BlogPostHandler(
         thumbnail_filename = self.normalized_payload['thumbnail_filename']
         try:
             file_format = image_validation_services.validate_image_and_filename(
-                raw_image, thumbnail_filename)
+                raw_image, thumbnail_filename, feconf.ENTITY_TYPE_BLOG_POST)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 

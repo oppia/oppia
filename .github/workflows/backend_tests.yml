@@ -18,13 +18,13 @@ jobs:
         os: [ubuntu-22.04]
         shard: [1, 2, 3, 4]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
         with:
           python-version: '3.8.12'
           architecture: 'x64'
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
@@ -53,7 +53,7 @@ jobs:
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
       - name: Upload coverage report
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ format('backend_test_coverage_shard_{0}', matrix.shard) }}
           path: .coverage
@@ -62,13 +62,13 @@ jobs:
     needs: run_tests
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
         with:
           python-version: '3.8.12'
           architecture: 'x64'
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
@@ -86,25 +86,25 @@ jobs:
         run: pip install coverage
       - name: Download coverage report for shard 1
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: backend_test_coverage_shard_1
           path: coverage/coverage_1
       - name: Download coverage report for shard 2
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: backend_test_coverage_shard_2
           path: coverage/coverage_2
       - name: Download coverage report for shard 3
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: backend_test_coverage_shard_3
           path: coverage/coverage_3
       - name: Download coverage report for shard 4
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: backend_test_coverage_shard_4
           path: coverage/coverage_4
