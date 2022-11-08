@@ -26,7 +26,6 @@ import { PretestQuestionBackendApiService }
   from 'domain/question/pretest-question-backend-api.service';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { DiagnosticTestTopicTrackerModel } from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ExplorationFeatures, ExplorationFeaturesBackendApiService }
@@ -34,7 +33,6 @@ import { ExplorationFeatures, ExplorationFeaturesBackendApiService }
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
 import { PlaythroughService } from 'services/playthrough.service';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
-import { DiagnosticTestPlayerEngineService } from './diagnostic-test-player-engine.service';
 import { ExplorationEngineService } from './exploration-engine.service';
 import { ExplorationPlayerStateService } from './exploration-player-state.service';
 import { NumberAttemptsService } from './number-attempts.service';
@@ -65,7 +63,6 @@ describe('Exploration Player State Service', () => {
   let questionObjectFactory: QuestionObjectFactory;
   let urlService: UrlService;
   let questionObject: Question;
-  let diagnosticTestPlayerEngineService: DiagnosticTestPlayerEngineService;
 
   let returnDict = {
     can_edit: true,
@@ -335,8 +332,6 @@ describe('Exploration Player State Service', () => {
       questionBackendDict);
     urlService = (TestBed.inject(UrlService) as unknown) as
       jasmine.SpyObj<UrlService>;
-    diagnosticTestPlayerEngineService = TestBed.inject(
-      DiagnosticTestPlayerEngineService);
   });
 
   it('should properly initialize player', () => {
@@ -581,24 +576,6 @@ describe('Exploration Player State Service', () => {
     }, successCallback, errorCallback);
   });
 
-  it('should intialize diagnostic test player', () => {
-    spyOn(diagnosticTestPlayerEngineService, 'init');
-    let successCallback = () => {};
-    let topicIdToPrerequisiteTopicIds = {
-      topicId1: [],
-      topicId2: ['topicId1'],
-      topicId3: ['topicId2']
-    };
-
-    let diagnosticTestTopicTrackerModel = new DiagnosticTestTopicTrackerModel(
-      topicIdToPrerequisiteTopicIds);
-
-    explorationPlayerStateService.initializeDiagnosticPlayer(
-      diagnosticTestTopicTrackerModel, successCallback);
-
-    expect(diagnosticTestPlayerEngineService.init).toHaveBeenCalled();
-  });
-
   it('should get current engine service', () => {
     explorationPlayerStateService.setExplorationMode();
     expect(explorationPlayerStateService.getCurrentEngineService())
@@ -613,12 +590,6 @@ describe('Exploration Player State Service', () => {
   it('should tell if is in question mode', () => {
     explorationPlayerStateService.setQuestionPlayerMode();
     expect(explorationPlayerStateService.isInQuestionMode()).toBeTrue();
-  });
-
-  it('should tell if is in diagnostic test player mode', () => {
-    explorationPlayerStateService.setDiagnosticTestPlayerMode();
-    expect(explorationPlayerStateService.isInDiagnosticTestPlayerMode())
-      .toBeTrue();
   });
 
   it('should tell if is in question player mode', () => {

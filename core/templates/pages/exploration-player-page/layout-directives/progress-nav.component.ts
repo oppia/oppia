@@ -145,12 +145,9 @@ export class ProgressNavComponent {
     this.hasNext = !this.playerTranscriptService.isLastCard(
       this.displayedCardIndex);
     this.explorationPlayerStateService.isInQuestionMode();
-
     this.conceptCardIsBeingShown = (
       this.displayedCard.getStateName() === null &&
-      !this.explorationPlayerStateService.isInQuestionMode() &&
-      !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode());
-
+      !this.explorationPlayerStateService.isInQuestionMode());
     if (!this.conceptCardIsBeingShown) {
       this.interactionIsInline = this.displayedCard.isInteractionInline();
       this.interactionCustomizationArgs = this.displayedCard

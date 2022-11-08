@@ -34,7 +34,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private preventPageUnloadEventService: PreventPageUnloadEventService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService
   ) {}
 
   ngOnInit(): void {
