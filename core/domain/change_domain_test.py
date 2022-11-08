@@ -48,18 +48,17 @@ class ChangeDomainTests(test_utils.GenericTestBase):
             change_object.validate_dict(change_dict)
 
     def test_that_error_appenden_when_attribute_missing(self) -> None:
-        valid_cmd_dict = {
-            'name': 'AUTO',
-            'required_attribute_names': ['key1'],
-            'optional_attribute_names': ['key 2'],
-            'user_id_attribute_names': ['name'],
-            'allowed_values': {},
-            'deprecated_values': {
-                'name1': ['name1']
-            }
-        }
 
-        actual_cmd_attributes = {}
+        valid_cmd_dict = feconf.ValidCmdDict(
+            name='AUTO', required_attribute_names=['key1'],
+            optional_attribute_names=['key 2'],
+            user_id_attribute_names=['name'],
+            allowed_values={},
+            deprecated_values={
+                'name1': ['name1']
+            })
+
+        actual_cmd_attributes = {} # Type: Dict[<str>, <str>] = ...
 
         with self.assertRaisesRegex(utils.ValidationError, (
             'The following required attributes are missing: '
