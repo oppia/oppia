@@ -17,7 +17,6 @@
 """Unit tests for change_domain.py"""
 
 from __future__ import annotations
-from typing import Dict
 
 
 from core import feconf
