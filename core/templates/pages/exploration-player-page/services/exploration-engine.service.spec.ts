@@ -594,7 +594,7 @@ describe('Exploration engine service ', () => {
         .toHaveBeenCalledWith('Feedback content should not be empty.');
     });
 
-    it('should show warning message if the parameters ' +
+    fit('should show warning message if the parameters ' +
       'are empty', () => {
       let initSuccessCb = jasmine.createSpy('success');
       let submitAnswerSuccessCb = jasmine.createSpy('success');

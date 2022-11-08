@@ -555,13 +555,23 @@ export class ExplorationEngineService {
       this.exploration.getState(this.nextStateName).content.contentId,
       this.audioTranslationLanguageService);
 
+      console.log("\n\n");
+      console.log(newStateNameIfStuck);
+      console.log("\n\n");
+
     if (newStateNameIfStuck !== null) {
       let newStateIfStuck = this.exploration.getState(newStateNameIfStuck);
-
+      console.log("\n\n");
+      console.log(newStateNameIfStuck);
+      console.log("\n\n");
       let newParamsIfStuck = (
         newStateIfStuck ? this.makeParams(
           oldParams, newStateIfStuck.paramChanges, [oldParams]) : oldParams);
+      console.log("\n\n");
+      console.log(newParamsIfStuck);
+      console.log("\n\n");
       if (newParamsIfStuck === null) {
+        console.log("\nParam stuck received.\n");
         this.answerIsBeingProcessed = false;
         this.alertsService.addWarning('Parameters should not be empty.');
         return;
@@ -571,6 +581,9 @@ export class ExplorationEngineService {
         newStateIfStuck, [newParamsIfStuck, {
           answer: 'answer'
         }]);
+      console.log("\n\n");
+      console.log(questionHtmlIfStuck);
+      console.log("\n\n");
       if (questionHtmlIfStuck === null) {
         this.answerIsBeingProcessed = false;
         // TODO(#13133): Remove all question related naming conventions.
