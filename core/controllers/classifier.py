@@ -167,12 +167,13 @@ class TrainedClassifierHandler(
         except Exception as e:
             raise self.InvalidInputException(
                 'Entity for exploration with id %s, version %s and state %s '
-                'not found.' % (
-                        exploration_id,
-                        self.normalized_request['exploration_version'],
-                        state_name
-                    )
-                ) from e
+                'not found.' %
+                (
+                    exploration_id,
+                    self.normalized_request['exploration_version'],
+                    state_name
+                )
+            ) from e
 
         if interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
             raise self.PageNotFoundException(

@@ -142,6 +142,11 @@ class ContributionRightsHandler(
         language_code = self.normalized_payload.get('language_code', None)
 
         if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
+            if language_code is None:
+                raise Exception(
+                    'The language_code cannot be None if the review category is'
+                    ' \'translation\''
+                )
             if user_services.can_review_translation_suggestions(
                     user_id, language_code=language_code):
                 raise self.InvalidInputException(
@@ -191,6 +196,11 @@ class ContributionRightsHandler(
 
         if (category ==
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
+            if language_code is None:
+                raise Exception(
+                    'The language_code cannot be None if the review category is'
+                    ' \'translation\''
+                )
             if not user_services.can_review_translation_suggestions(
                     user_id, language_code=language_code):
                 raise self.InvalidInputException(
@@ -400,8 +410,10 @@ class TranslationContributionStatsHandler(
             contributor_user_id are consequently deleted.
 
         Raises:
-            Exception. No topic associated with the
-                TranslationContributionStats.
+            Exception. There is no topic_id associated with the given
+                TranslationContributionStatsDict.
+            Exception. No language_code found for the give
+                TranslationContributionStatsDict
         """
         translation_contribution_stats_dicts = [
             stats.to_dict() for stats in translation_contribution_stats
@@ -410,7 +422,8 @@ class TranslationContributionStatsHandler(
         for stats_dict in translation_contribution_stats_dicts:
             if stats_dict['topic_id'] is None:
                 raise Exception(
-                    'No topic associated with the TranslationContributionStats.'
+                    'There is no topic_id associated with the given '
+                    'TranslationContributionStatsDict.'
                 )
             topic_ids.append(stats_dict['topic_id'])
         topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
@@ -424,11 +437,14 @@ class TranslationContributionStatsHandler(
             List[TranslationContributionStatsDict]
         ) = []
         for stats_dict in translation_contribution_stats_dicts:
+            # Here we are asserting that 'stats_dict['topic_id']' will never
+            # be None because above we are already handling the case of None
+            # 'topic_id' by raising an exception.
             assert stats_dict['topic_id'] is not None
             if stats_dict['language_code'] is None:
                 raise Exception(
-                    'No language_code exists for the give Topic having '
-                    'topic_id: %s' % stats_dict['topic_id']
+                    'No language_code found for the give '
+                    'TranslationContributionStatsDict'
                 )
 
             response_translation_contribution_stats_dicts.append({

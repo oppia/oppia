@@ -140,6 +140,38 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.assertTrue(user_services.can_review_translation_suggestions(
             self.translation_reviewer_id, language_code='hi'))
 
+    def test_cannot_add_or_remove_translation_reviewer_without_language_code(
+        self
+    ) -> None:
+        self.login(self.TRANSLATION_ADMIN_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/contributionrightshandler/translation', {
+                'username': 'translator',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=500)
+
+        self.assertEqual(
+            response['error'],
+            'The language_code cannot be None if the review '
+            'category is \'translation\''
+        )
+
+        response = self.delete_json(
+            '/contributionrightshandler/translation', params={
+                'username': 'translator'
+            },
+            expected_status_int=500
+        )
+
+        self.assertEqual(
+            response['error'],
+            'The language_code cannot be None if the review '
+            'category is \'translation\''
+        )
+
     def test_assigning_same_language_for_translation_review_raise_error(
         self
     ) -> None:
@@ -698,7 +730,8 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
                 expected_status_int=500
             )
         self.assertEqual(
-            'No topic associated with the TranslationContributionStats.',
+            'There is no topic_id associated with the given '
+            'TranslationContributionStatsDict.',
             response['error']
         )
 
@@ -726,7 +759,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
                 expected_status_int=500
             )
         self.assertEqual(
-            'No language_code exists for the give Topic having '
-            'topic_id: topic_id_1',
+            'No language_code found for the give '
+            'TranslationContributionStatsDict',
             response['error']
         )

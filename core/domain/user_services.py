@@ -2293,7 +2293,7 @@ def can_submit_question_suggestions(user_id: str) -> bool:
 
 
 def allow_user_to_review_translation_in_language(
-    user_id: str, language_code: Optional[str]
+    user_id: str, language_code: str
 ) -> None:
     """Allows the user with the given user id to review translation in the given
     language_code.
@@ -2315,7 +2315,7 @@ def allow_user_to_review_translation_in_language(
 
 
 def remove_translation_review_rights_in_language(
-    user_id: str, language_code_to_remove: Optional[str]
+    user_id: str, language_code_to_remove: str
 ) -> None:
     """Removes the user's review rights to translation suggestions in the given
     language_code.
