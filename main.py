@@ -518,7 +518,7 @@ URLS = [
 
     get_redirect_route(
         r'/assetsdevhandler/<page_context>/<page_identifier>/'
-        'assets/<asset_type:(image|audio|thumbnail)>/<encoded_filename>',
+        'assets/<asset_type>/<encoded_filename>',
         resources.AssetDevHandler),
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
