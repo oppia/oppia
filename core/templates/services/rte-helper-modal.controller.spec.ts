@@ -30,6 +30,7 @@ describe('Rte Helper Modal Controller', function() {
   importAllAngularServices();
 
   describe('when customization args has a valid youtube video', function() {
+    var ContextService = null;
     var customizationArgSpecs = [{
       name: 'heading',
       default_value: 'default value'
@@ -50,6 +51,7 @@ describe('Rte Helper Modal Controller', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $timeout = $injector.get('$timeout');
       var $rootScope = $injector.get('$rootScope');
+      ContextService = $injector.get('ContextService');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -80,6 +82,8 @@ describe('Rte Helper Modal Controller', function() {
 
     it('should save modal customization args when closing it', function() {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+      spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
+
       expect($scope.disableSaveButtonForMathRte()).toBe(false);
       $scope.save();
       expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
@@ -212,6 +216,7 @@ describe('Rte Helper Modal Controller', function() {
 
     it('should cancel the modal when math SVG exceeds 100 KB', function() {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+      spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
       $scope.tmpCustomizationArgs = [{
         name: 'math_content',
         value: {
@@ -232,9 +237,36 @@ describe('Rte Helper Modal Controller', function() {
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 
+    it('should cancel the modal when SVG exceeds 1 MB for blog post',
+      function() {
+        spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+        spyOn(ContextService, 'getEntityType').and.returnValue('blog_post');
+        $scope.tmpCustomizationArgs = [{
+          name: 'math_content',
+          value: {
+            raw_latex: 'x^2 + y^2 + x^2 + y^2 + x^2 + y^2 + x^2 + y^2 + x^2',
+            svgFile: 'Svg Data',
+            svg_filename: 'mathImage.svg'
+          }
+        }];
+        var imageFile = (
+          new Blob(
+            [new ArrayBuffer(102 * 1024 * 1024)],
+            {type: 'application/octet-stream'})
+        );
+        spyOn(
+          ImageUploadHelperService,
+          'convertImageDataToImageFile').and.returnValue(imageFile);
+        $scope.save();
+        $scope.$apply();
+        expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
+        expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
+      });
+
     it('should cancel the modal when if the rawLatex or filename field is' +
        'empty for a math expression', function() {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+      spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
       $scope.tmpCustomizationArgs = [{
         name: 'math_content',
         value: {
@@ -252,6 +284,7 @@ describe('Rte Helper Modal Controller', function() {
     it('should save modal customization args while in local storage',
       function() {
         spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+        spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
         $scope.tmpCustomizationArgs = [{
           name: 'math_content',
           value: {
@@ -280,6 +313,7 @@ describe('Rte Helper Modal Controller', function() {
   });
 
   describe('when the editor is Link editor', function() {
+    var ContextService = null;
     const customizationArgSpecs = [{
       name: 'url',
       default_value: 'google.com'
@@ -300,6 +334,7 @@ describe('Rte Helper Modal Controller', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $timeout = $injector.get('$timeout');
       var $rootScope = $injector.get('$rootScope');
+      ContextService = $injector.get('ContextService');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -374,6 +409,7 @@ describe('Rte Helper Modal Controller', function() {
 
     it('should save modal customization args when closing it', function() {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+      spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
 
       expect($scope.disableSaveButtonForLinkRte()).toBe(false);
 
@@ -389,6 +425,7 @@ describe('Rte Helper Modal Controller', function() {
 
   describe('when customization args doesn\'t have a valid youtube video',
     function() {
+      var ContextService = null;
       var customizationArgSpecs = [{
         name: 'heading',
         default_value: ''
@@ -409,6 +446,7 @@ describe('Rte Helper Modal Controller', function() {
       beforeEach(angular.mock.inject(function($injector, $controller) {
         $timeout = $injector.get('$timeout');
         var $rootScope = $injector.get('$rootScope');
+        ContextService = $injector.get('ContextService');
 
         $uibModalInstance = jasmine.createSpyObj(
           '$uibModalInstance', ['close', 'dismiss']);
@@ -439,7 +477,10 @@ describe('Rte Helper Modal Controller', function() {
 
       it('should save modal customization args when closing it', function() {
         spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+        spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
+
         $scope.save();
+
         expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
         expect($uibModalInstance.close).toHaveBeenCalledWith({
           heading: {},

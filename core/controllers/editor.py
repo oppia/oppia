@@ -1007,7 +1007,7 @@ class ImageUploadHandler(EditorHandler):
 
         try:
             file_format = image_validation_services.validate_image_and_filename(
-                raw, filename)
+                raw, filename, entity_type)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 

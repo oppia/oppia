@@ -19,7 +19,9 @@
 from __future__ import annotations
 
 import datetime
+import html
 import logging
+import re
 
 from core import feconf
 from core import utils
@@ -631,8 +633,8 @@ def generate_url_fragment(title: str, blog_post_id: str) -> str:
     Returns:
         str. The url fragment of the blog post.
     """
-    lower_title = title.lower()
-    hyphenated_title = lower_title.replace(' ', '-')
+    lower_title = title.lower().replace(':', '')
+    hyphenated_title = lower_title.replace('  ', ' ').replace(' ', '-')
     lower_id = blog_post_id.lower()
     return hyphenated_title + '-' + lower_id
 
@@ -647,12 +649,19 @@ def generate_summary_of_blog_post(content: str) -> str:
     Returns:
         str. The summary of the blog post.
     """
-    raw_text = html_cleaner.strip_html_tags(content)
+    # Stripping away headings and content within bold tags.
+    raw_html = re.sub(
+        '<strong>?(.*?)</strong>',
+        '',
+        re.sub('<h1>?(.*?)</h1>', '', content, flags=re.DOTALL),
+        flags=re.DOTALL
+    )
+    raw_text = html_cleaner.strip_html_tags(raw_html)
     max_chars_in_summary = constants.MAX_CHARS_IN_BLOG_POST_SUMMARY - 3
     if len(raw_text) > max_chars_in_summary:
-        summary = raw_text[:max_chars_in_summary] + '...'
-        return summary
-    return raw_text
+        summary = html.unescape(raw_text)[:max_chars_in_summary] + '...'
+        return summary.strip()
+    return html.unescape(raw_text)
 
 
 def compute_summary_of_blog_post(

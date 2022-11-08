@@ -158,17 +158,20 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
 
     def test_title_without_non_strict_validation(self) -> None:
         self._assert_valid_title_for_blog_post(
-            'Blog Post title should at most have 40 chars, received:'
-            ' Very long and therefore an invalid blog post title',
-            'Very long and therefore an invalid blog post title')
+            'Blog Post title should at most have 65 chars, received: '
+            'Very long title with more than sixty five chars and therefore an'
+            ' invalid blog post title',
+            'Very long title with more than sixty five chars and therefore an'
+            ' invalid blog post title')
 
     def test_title_with_strict_validation(self) -> None:
         self._assert_strict_valid_title_for_blog_post(
             'Title should not be empty', '')
         self._assert_strict_valid_title_for_blog_post(
             'Title field contains invalid characters. Only words'
-            r'\(a-zA-Z0-9\) separated by spaces are allowed. Received %s'
-            % 'ABC12& heloo', 'ABC12& heloo')
+            r'\(a-zA-Z0-9\) separated by spaces, hyphens\(-\) and colon\(:\)'
+            ' are allowed. Received %s' % 'ABC12& heloo', 'ABC12& heloo'
+        )
 
     def _assert_strict_valid_tags_for_blog_post(
         self, expected_error_substring: str, tags: List[str]
@@ -481,9 +484,11 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
 
     def test_title_validation(self) -> None:
         self._assert_valid_title_for_blog_post(
-            'blog post title should at most have 40 chars, received:'
-            ' Very long and therefore an invalid blog post title',
-            'Very long and therefore an invalid blog post title')
+            'blog post title should at most have 65 chars, received: '
+            'Very long title with more than sixty five chars and therefore an'
+            ' invalid blog post title',
+            'Very long title with more than sixty five chars and therefore an'
+            ' invalid blog post title')
         self._assert_strict_valid_title_for_blog_post(
             'Title should not be empty', '')
 

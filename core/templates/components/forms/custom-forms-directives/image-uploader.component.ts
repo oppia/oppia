@@ -20,6 +20,7 @@ import { Component, ElementRef, Input, Output, EventEmitter, ViewChild } from '@
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
+import { ContextService } from 'services/context.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { IdGenerationService } from 'services/id-generation.service';
 
@@ -53,6 +54,7 @@ export class ImageUploaderComponent {
     private blogDashboardPageService: BlogDashboardPageService,
     private idGenerationService: IdGenerationService,
     private windowRef: WindowRef,
+    private contextService: ContextService,
   ) { }
 
   ngOnInit(): void {
@@ -169,13 +171,25 @@ export class ImageUploaderComponent {
       return 'This image format is not supported';
     }
 
-    const HUNDRED_KB_IN_BYTES: number = 100 * 1024;
-    if (file.size > HUNDRED_KB_IN_BYTES) {
-      let currentSizeInKb: string = (
-        (file.size * 100 / HUNDRED_KB_IN_BYTES).toFixed(1) + ' KB'
+    let maxAllowedFileSize: number;
+    let fileSizeUnit: string;
+    if (
+      this.contextService.getEntityType() === AppConstants.ENTITY_TYPE.BLOG_POST
+    ) {
+      const ONE_MB_IN_BYTES: number = 1 * 1024 * 1024;
+      maxAllowedFileSize = ONE_MB_IN_BYTES;
+      fileSizeUnit = 'MB';
+    } else {
+      const HUNDRED_KB_IN_BYTES: number = 100 * 1024;
+      maxAllowedFileSize = HUNDRED_KB_IN_BYTES;
+      fileSizeUnit = 'KB';
+    }
+    if (file.size > maxAllowedFileSize) {
+      let currentSize: string = (
+        (file.size * 100 / maxAllowedFileSize).toFixed(1)
       );
-      return 'The maximum allowed file size is 100 KB' +
-        ' (' + currentSizeInKb + ' given).';
+      return `The maximum allowed file size is ${maxAllowedFileSize / 1024}` +
+        ` KB (${currentSize} ${fileSizeUnit} given).`;
     }
     return null;
   }

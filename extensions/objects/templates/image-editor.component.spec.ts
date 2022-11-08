@@ -2343,7 +2343,7 @@ describe('ImageEditor', () => {
     expect(component.data.mode).toBe(component.MODE_SAVED);
   });
 
-  it('should not save uploaded png when file size over 100 KB', () => {
+  it('should not save uploaded png when file size is over 100 KB', () => {
     spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
     spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
     spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
@@ -2399,7 +2399,120 @@ describe('ImageEditor', () => {
     component.saveUploadedFile();
 
     expect(component.saveImage).not.toHaveBeenCalled();
+    expect(component.processedImageIsTooLarge).toBeTrue();
     expect(component.data.mode).toBe(component.MODE_UPLOADED);
+  });
+
+  it('should not save uploaded png when file size is over 1 MB even for' +
+  'entity type beign blog post', () => {
+    spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
+    spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
+    spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
+      offsetLeft: 0,
+      offsetTop: 0,
+      offsetParent: null,
+      classList: {
+        contains: (text) => {
+          return false;
+        }
+      }
+    });
+    spyOn(document, 'createElement').and.callFake(
+      jasmine.createSpy('createElement').and.returnValue(
+        {
+          width: 0,
+          height: 0,
+          getContext: (txt) => {
+            return {
+              drawImage: (txt, x, y) => {
+                return;
+              }
+            };
+          },
+          toDataURL: (str, x) => {
+            return component.data.metadata.uploadedImageData;
+          }
+        }
+      )
+    );
+    spyOn(component, 'saveImage');
+    component.data.metadata = {
+    // This throws an error "Type '{ lastModified: number; name:
+    // string; size: number; type: string; }' is missing the following
+    // properties from type 'File': arrayBuffer, slice, stream, text"
+    // We need to suppress this error because we only need the values given
+    // below.
+    // @ts-expect-error
+      uploadedFile: {
+        lastModified: 1622307491398,
+        name: '2442125.png',
+        size: 10241024,
+        type: 'image/png'
+      },
+      uploadedImageData:
+        btoa('data:image/png;base64,' + Array(10241024).join('a')),
+      originalWidth: 360,
+      originalHeight: 360,
+      savedImageFilename: 'saved_file_name.gif',
+      savedImageUrl: 'assets/images'
+    };
+
+    component.saveUploadedFile();
+
+    expect(component.saveImage).not.toHaveBeenCalled();
+    expect(component.processedImageIsTooLarge).toBeTrue();
+    expect(component.data.mode).toBe(component.MODE_UPLOADED);
+  });
+
+  it('should save uploaded png when file size is over 100 KB but less then 1' +
+  'MB incase the entity type of image is blog post.', () => {
+    spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
+    spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
+    spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
+      offsetLeft: 0,
+      offsetTop: 0,
+      offsetParent: null,
+      classList: {
+        contains: (text) => {
+          return false;
+        }
+      }
+    });
+    spyOn(document, 'createElement').and.callFake(
+      jasmine.createSpy('createElement').and.returnValue(
+        {
+          width: 0,
+          height: 0,
+          getContext: (txt) => {
+            return {
+              drawImage: (txt, x, y) => {
+                return;
+              }
+            };
+          },
+          toDataURL: (str, x) => {
+            return component.data.metadata.uploadedImageData;
+          }
+        }
+      )
+    );
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+    spyOn(component, 'saveImage').and.callThrough();
+    // This throws an error "Type '{ lastModified: number; name:
+    // string; size: number; type: string; }' is missing the following
+    // properties from type 'File': arrayBuffer, slice, stream, text"
+    // We need to suppress this error because we only need the values given
+    // below.
+    // @ts-expect-error
+    component.data.metadata = dataPng;
+    component.entityType = AppConstants.ENTITY_TYPE.BLOG_POST;
+
+    component.saveUploadedFile();
+
+    expect(component.saveImage).toHaveBeenCalled();
+    expect(component.processedImageIsTooLarge).toBeFalse();
+    expect(component.data.mode).toBe(component.MODE_SAVED);
   });
 
   it('should alert user if resampled png file is not obtained when the user' +
