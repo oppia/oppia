@@ -152,9 +152,7 @@ var BlogDashboardPage = function() {
     await waitFor.invisibilityOfSuccessToast('Blog Post Saved Successfully.');
   };
 
-  this.updateAuthorDetails = async function(
-      authorName, authorBio
-  ) {
+  this.updateAuthorDetails = async function(authorName, authorBio) {
     await waitFor.visibilityOf(
       blogAuthorDetailsModal, 'Author Details Editor Modal not showing up'
     );

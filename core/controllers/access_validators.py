@@ -234,7 +234,7 @@ class BlogPostPageAccessValidationHandler(
 class BlogAuthorProfilePageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Validates whether request made to correct blog author page route."""
+    """Validates access to blog author profile page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
