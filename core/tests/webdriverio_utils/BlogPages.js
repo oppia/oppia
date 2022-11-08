@@ -26,6 +26,7 @@ var forms = require('../webdriverio_utils/forms.js');
 
 var BlogPages = function() {
   var blogDashboardPage = new BlogDashboardPage.BlogDashboardPage();
+  var blogLink = $('.e2e-test-blog-link');
   var noResultsFoundContainer = $('.e2e-test-no-results-found');
   var oppiaBlogHomePageCardContainer = $('.e2e-test-oppia-blog-home-page-card');
   var oppiaAuthorProfilePageCardContainer = $(
