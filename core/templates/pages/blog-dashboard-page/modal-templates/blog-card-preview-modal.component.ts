@@ -48,8 +48,10 @@ export class BlogCardPreviewModalComponent
 
   ngOnInit(): void {
     this.blogPostData = this.blogDashboardPageService.blogPostData;
+    let rawContent = this.blogPostData.content.replace(
+      /<strong>(.*?)<\/strong>/g, ' ').replace(/<h1>(.*?)<\/h1>/g, ' ');
     this.summaryContent = this.truncatePipe.transform(
-      this.blogPostData.content, 300);
+      rawContent, 300);
     this.profilePicUrl = this.blogDashboardPageService.authorPictureUrl;
     let dateString;
     if (this.blogPostData.publishedOn) {
@@ -60,7 +62,8 @@ export class BlogCardPreviewModalComponent
 
     this.blogPostSummary = new BlogPostSummary (
       this.blogPostData.id,
-      this.blogPostData.authorUsername,
+      '',
+      this.blogPostData.displayedAuthorName,
       this.blogPostData.title,
       this.summaryContent,
       this.blogPostData.tags,

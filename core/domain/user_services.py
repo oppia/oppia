@@ -1513,7 +1513,6 @@ def add_user_role(user_id: str, role: str) -> None:
         raise Exception('The role of a Mobile Learner cannot be changed.')
     if role in feconf.ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION:
         raise Exception('Adding a %s role is not allowed.' % role)
-
     user_settings.roles.append(role)
     role_services.log_role_query(
         user_id, feconf.ROLE_ACTION_ADD, role=role,
@@ -2878,3 +2877,17 @@ def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
         exp_user_model.put()
 
     return exp_fetchers.get_exploration_user_data(user_id, exploration_id)
+
+
+def is_user_blog_post_author(user_id: str) -> bool:
+    """Checks whether user can write blog posts.
+
+    Args:
+        user_id: str. The user id of the user.
+
+    Returns:
+        bool. Whether the user can author blog posts.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    author_roles = [feconf.ROLE_ID_BLOG_ADMIN, feconf.ROLE_ID_BLOG_POST_EDITOR]
+    return any(role in author_roles for role in user_settings.roles)
