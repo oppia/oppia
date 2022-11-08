@@ -25,6 +25,8 @@ import subprocess
 
 from typing import Dict, List, Optional, Tuple
 
+from . import linter_utils
+
 from .. import common
 from .. import concurrent_task_utils
 
@@ -284,7 +286,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
             self.error_messages.append(error_message)
 
 
-class HTMLLintChecksManager:
+class HTMLLintChecksManager(linter_utils.BaseLinter):
     """Manages all the HTML linting functions."""
 
     def __init__(
@@ -361,7 +363,7 @@ class HTMLLintChecksManager:
         return [self.check_html_tags_and_attributes()]
 
 
-class ThirdPartyHTMLLintChecksManager:
+class ThirdPartyHTMLLintChecksManager(linter_utils.BaseLinter):
     """Manages all the HTML linting functions."""
 
     def __init__(self, files_to_lint: List[str]) -> None:

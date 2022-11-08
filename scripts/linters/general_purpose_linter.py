@@ -24,6 +24,7 @@ import re
 from typing import Dict, Final, List, Pattern, Tuple, TypedDict
 
 from . import js_ts_linter
+from . import linter_utils
 from . import warranted_angular_security_bypasses
 
 from .. import build
@@ -369,7 +370,7 @@ def check_file_type_specific_bad_pattern(
     return failed, total_error_count, error_messages
 
 
-class GeneralPurposeLinter:
+class GeneralPurposeLinter(linter_utils.BaseLinter):
     """Manages all the common linting functions. As an abstract base class, this
     is not intended to be used directly.
     """

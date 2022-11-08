@@ -28,6 +28,8 @@ import esprima
 
 from typing import Dict, Final, List, Tuple, Union
 
+from . import linter_utils
+
 from .. import common
 from .. import concurrent_task_utils
 
@@ -151,7 +153,7 @@ def compile_all_ts_files() -> None:
         raise Exception(stderr)
 
 
-class JsTsLintChecksManager:
+class JsTsLintChecksManager(linter_utils.BaseLinter):
     """Manages all the Js and Ts linting functions."""
 
     def __init__(
@@ -463,7 +465,7 @@ class JsTsLintChecksManager:
         return linter_stdout
 
 
-class ThirdPartyJsTsLintChecksManager:
+class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
     """Manages all the third party Python linting functions."""
 
     def __init__(self, files_to_lint: List[str]) -> None:

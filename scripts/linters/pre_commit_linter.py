@@ -63,7 +63,7 @@ import subprocess
 import sys
 import threading
 
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
@@ -83,21 +83,6 @@ from . import python_linter  # isort:skip
 from .. import concurrent_task_utils  # isort:skip
 from .. import install_third_party_libs  # isort:skip
 
-CustomLinterType = Union[
-    general_purpose_linter.GeneralPurposeLinter,
-    js_ts_linter.JsTsLintChecksManager,
-    html_linter.HTMLLintChecksManager,
-    codeowner_linter.CodeownerLintChecksManager,
-    other_files_linter.CustomLintChecksManager
-]
-
-
-ThirdPartyLinterType = Union[
-    js_ts_linter.ThirdPartyJsTsLintChecksManager,
-    html_linter.ThirdPartyHTMLLintChecksManager,
-    css_linter.ThirdPartyCSSLintChecksManager,
-    python_linter.ThirdPartyPythonLintChecksManager
-]
 
 OTHER_SHARD_NAME = 'other'
 
@@ -161,7 +146,8 @@ class FileCache:
         return self._get_data(filepath, mode)[0]
 
     def readlines(
-        self, filepath: str,
+        self,
+        filepath: str,
         mode: utils.TextModeTypes = 'r'
     ) -> Tuple[str, ...]:
         """Returns the tuple containing data line by line as read from the
@@ -207,7 +193,7 @@ def _get_linters_for_file_extension(
     file_extension_to_lint: str,
     namespace: multiprocessing.managers.Namespace,
     files: Dict[str, List[str]]
-) -> Tuple[List[CustomLinterType], List[ThirdPartyLinterType]]:
+) -> Tuple[List[linter_utils.BaseLinter], List[linter_utils.BaseLinter]]:
     """Return linters for the given file extension type.
 
     Args:
@@ -222,8 +208,8 @@ def _get_linters_for_file_extension(
     """
     namespace.files = FileCache()
     file_cache = namespace.files
-    custom_linters: List[CustomLinterType] = []
-    third_party_linters: List[ThirdPartyLinterType] = []
+    custom_linters: List[linter_utils.BaseLinter] = []
+    third_party_linters: List[linter_utils.BaseLinter] = []
 
     file_extension_type_js_ts = file_extension_to_lint in ('js', 'ts')
 
@@ -560,12 +546,13 @@ def _print_summary_of_error_messages(lint_messages: List[str]) -> None:
         lint_messages: list(str). List of linter error messages.
     """
 
-    error_message_lines = [
-        '----------------------------------------',
-        'Please fix the errors below:',
-        '----------------------------------------',
+    if lint_messages:
+        error_message_lines = [
+            '----------------------------------------',
+            'Please fix the errors below:',
+            '----------------------------------------',
         ] + lint_messages
-    linter_utils.print_failure_message('\n'.join(error_message_lines))
+        linter_utils.print_failure_message('\n'.join(error_message_lines))
 
 
 def _get_task_output(
@@ -676,8 +663,8 @@ def main(args: Optional[List[str]] = None) -> None:
         multiprocessing.cpu_count(), third_party_max_concurrent_runs)
     third_party_semaphore = threading.Semaphore(third_party_concurrent_count)
 
-    custom_linters: List[CustomLinterType] = []
-    third_party_linters: List[ThirdPartyLinterType] = []
+    custom_linters: List[linter_utils.BaseLinter] = []
+    third_party_linters: List[linter_utils.BaseLinter] = []
     for file_extension_type in file_extension_types:
         if file_extension_type in ('js', 'ts'):
             if len(files['.js'] + files['.ts']) == 0:

@@ -150,8 +150,8 @@ def run_shell_cmd(
     last_stdout_bytes, last_stderr_bytes = p.communicate()
     # Standard and error output is in bytes, we need to decode them to be
     # compatible with rest of the code.
-    last_stdout_str = str(last_stdout_bytes.decode('utf-8'))
-    last_stderr_str = str(last_stderr_bytes.decode('utf-8'))
+    last_stdout_str = last_stdout_bytes.decode('utf-8')
+    last_stderr_str = last_stderr_bytes.decode('utf-8')
     last_stdout = last_stdout_str.split('\n')
 
     if LOG_LINE_PREFIX in last_stdout_str:
@@ -227,12 +227,11 @@ class TestingTaskSpec:
                 # fully covering their (nonexistent) associated code
                 # file.
                 report = ''
-                coverage = 100
+                coverage = 100.0
             messages.append(report)
             messages.append(str(coverage))
 
-        return [concurrent_task_utils.TaskResult(
-            '', False, [], messages)]
+        return [concurrent_task_utils.TaskResult('', False, [], messages)]
 
 
 def get_all_test_targets_from_path(
@@ -398,7 +397,10 @@ def check_test_results(
 
             try:
                 if not tests_failed_regex_match:
-                    raise AttributeError
+                    # There was an internal error, and the tests did not run
+                    # (The error message did not match
+                    # `tests_failed_regex_match`).
+                    raise Exception
                 test_count = int(tests_failed_regex_match.group(1))
                 errors = int(tests_failed_regex_match.group(2))
                 failures = int(tests_failed_regex_match.group(3))
@@ -406,7 +408,7 @@ def check_test_results(
                 total_failures += failures
                 print('FAILED    %s: %s errors, %s failures' % (
                     spec.test_target, errors, failures))
-            except AttributeError as e:
+            except Exception as e:
                 # There was an internal error, and the tests did not run (The
                 # error message did not match `tests_failed_regex_match`).
                 total_errors += 1
@@ -584,7 +586,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
 def check_coverage(
     combine: bool,
-    data_file: Optional[str] =None,
+    data_file: Optional[str] = None,
     include: Optional[Tuple[str, ...]] = tuple()
 ) -> Tuple[str, float]:
     """Check code coverage of backend tests.

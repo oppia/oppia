@@ -28,6 +28,8 @@ from core import utils
 from typing import Any, Dict, Final, List, Tuple, TypedDict
 import yaml
 
+from . import linter_utils
+
 from .. import concurrent_task_utils
 
 MYPY = False
@@ -102,7 +104,7 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
 ]
 
 
-class CustomLintChecksManager:
+class CustomLintChecksManager(linter_utils.BaseLinter):
     """Manages other files lint checks."""
 
     def __init__(self, file_cache: pre_commit_linter.FileCache) -> None:

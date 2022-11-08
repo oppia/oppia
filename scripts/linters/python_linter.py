@@ -33,7 +33,7 @@ from . import linter_utils
 from .. import concurrent_task_utils
 
 
-class ThirdPartyPythonLintChecksManager:
+class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
     """Manages all the third party Python linting functions."""
 
     def __init__(self, files_to_lint: List[str]) -> None:
