@@ -124,4 +124,3 @@ class BaseLinter(abc.ABC):
             list(TaskResult). A list of TaskResult objects representing the
             results of the lint checks.
         """
-        pass
