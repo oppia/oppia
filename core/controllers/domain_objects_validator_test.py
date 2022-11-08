@@ -270,8 +270,9 @@ class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
             domain_objects_validator.validate_suggestion_images(files)  # type: ignore[arg-type]
 
     def test_valid_images_do_not_raises_exception(self) -> None:
-        files = {'img.png': b'', 'test2_svg.svg': b''}
-        for filename in files:
+        file_names = ['img.png', 'test2_svg.svg']
+        files = {}
+        for filename in file_names:
             with utils.open_file(
                 os.path.join(feconf.TESTS_DATA_DIR, filename), 'rb',
                 encoding=None

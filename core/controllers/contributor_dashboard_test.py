@@ -460,16 +460,16 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.create_story_for_translation_opportunity(
             self.owner_id, self.admin_id, 'story_id_100', self.topic_id,
             exp_100.id)
-        story = story_fetchers.get_story_by_id('story_id_100')
-        story.story_contents.nodes[0].exploration_id = None
+        corrupt_story = story_fetchers.get_story_by_id('story_id_100')
+        corrupt_story.story_contents.nodes[0].exploration_id = None
         swap_with_corrupt_story = self.swap_to_always_return(
-            story_fetchers, 'get_stories_by_ids', [story]
+            story_fetchers, 'get_stories_by_ids', [corrupt_story]
         )
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.assertRaisesRegex(
             Exception,
-            'Error: No exploration_id found with the node_id: node_1'
+            'No exploration_id found for the node_id: node_1'
         ):
             with swap_with_corrupt_story:
                 self.get_json(
@@ -1755,18 +1755,22 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         user_id = user_services.get_user_id_from_username(self.OWNER_USERNAME)
         assert user_id is not None
-        stats = suggestion_services.get_all_translation_contribution_stats(
-            user_id
+        corrupt_stats = (
+            suggestion_services.get_all_translation_contribution_stats(
+                user_id
+            )
         )
-        stats[0].topic_id = None
+        corrupt_stats[0].topic_id = None
 
         swap_with_corrupt_data = self.swap_to_always_return(
-            suggestion_services, 'get_all_translation_contribution_stats', stats
+            suggestion_services,
+            'get_all_translation_contribution_stats',
+            corrupt_stats
         )
 
         with self.assertRaisesRegex(
             Exception,
-            'Error: No topic_id associated with stats: '
+            'No topic_id associated with stats: '
             'TranslationContributionStats.'
         ):
             with swap_with_corrupt_data:

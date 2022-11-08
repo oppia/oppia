@@ -37,7 +37,7 @@ from core.domain import user_services
 from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union, cast
 
 
-AllowedStatsTypes = Sequence[Union[
+ListOfContributorDashboardStatsTypes = Sequence[Union[
     suggestion_registry.TranslationContributionStats,
     suggestion_registry.TranslationReviewStats,
     suggestion_registry.QuestionContributionStats,
@@ -45,11 +45,11 @@ AllowedStatsTypes = Sequence[Union[
 ]]
 
 
-AllowedStatsDictTypes = Sequence[Union[
-    suggestion_registry.TranslationContributionStatsDict,
-    suggestion_registry.TranslationReviewStatsDict,
-    suggestion_registry.QuestionContributionStatsDict,
-    suggestion_registry.QuestionReviewStatsDict
+ListOfContributorDashboardStatsDictTypes = Sequence[Union[
+    suggestion_registry.TranslationContributionStatsFrontendDict,
+    suggestion_registry.TranslationReviewStatsFrontendDict,
+    suggestion_registry.QuestionContributionStatsFrontendDict,
+    suggestion_registry.QuestionReviewStatsFrontendDict
 ]]
 
 
@@ -343,7 +343,7 @@ class ReviewableOpportunitiesHandler(
             exploration opportunity summaries.
 
         Raises:
-            Exception. Error No exploration_id found with the node_id.
+            Exception. No exploration_id found for the node_id.
         """
         # 1. Fetch the eligible topics.
         # 2. Fetch the stories for the topics.
@@ -368,7 +368,7 @@ class ReviewableOpportunitiesHandler(
             for node in story.story_contents.get_ordered_nodes():
                 if node.exploration_id is None:
                     raise Exception(
-                        'Error: No exploration_id found with the node_id: %s'
+                        'No exploration_id found for the node_id: %s'
                         % node.id
                     )
                 topic_exp_ids.append(node.exploration_id)
@@ -711,8 +711,10 @@ class UserContributionRightsDataHandler(
         """Handles GET requests."""
         contribution_rights = None
         if self.username:
-            # Here we are sure that 'user_id' is not None because if 'username'
-            # exists then 'user_id' is also going to exists.
+            # Here we are sure that 'user_id' is not None because
+            # 'user_id' is recorded every time whenever a user claims
+            # an authentication whereas 'username' is recorded iff the
+            # user claims an authentication and successfully logged in.
             assert self.user_id is not None
             contribution_rights = user_services.get_user_contribution_rights(
                 self.user_id)
@@ -885,7 +887,7 @@ class ContributorStatsSummariesHandler(
 
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
-                stats: AllowedStatsTypes = (
+                stats: ListOfContributorDashboardStatsTypes = (
                     suggestion_services.get_all_translation_contribution_stats(
                         user_id))
                 self.values = {
@@ -969,8 +971,8 @@ class ContributorAllStatsSummariesHandler(
 
 
 def _get_client_side_stats(
-    backend_stats: AllowedStatsTypes
-) -> AllowedStatsDictTypes:
+    backend_stats: ListOfContributorDashboardStatsTypes
+) -> ListOfContributorDashboardStatsDictTypes:
     """Returns corresponding stats dicts with all the necessary
     information for the frontend.
 
@@ -988,16 +990,16 @@ def _get_client_side_stats(
         are consequently deleted.
 
     Raises:
-        Exception. Error No topic_id associated with stats object.
+        Exception. No topic_id associated with stats object.
     """
     stats_dicts = [
-        stats.to_dict() for stats in backend_stats
+        stats.to_frontend_dict() for stats in backend_stats
     ]
     topic_ids = []
     for index, stats_dict in enumerate(stats_dicts):
         if stats_dict['topic_id'] is None:
             raise Exception(
-                'Error: No topic_id associated with stats: %s.' %
+                'No topic_id associated with stats: %s.' %
                 type(backend_stats[index]).__name__
             )
         topic_ids.append(stats_dict['topic_id'])
@@ -1011,66 +1013,13 @@ def _get_client_side_stats(
         # because above we are already handling the case of None 'topic_id' by
         # raising an exception.
         assert stats_dict['topic_id'] is not None
-        # Here we use MyPy ignore because 'stats_dict' is of union type
+        # Here we use MyPy ignore because 'stats_dict' is of union TypedDicts
         # and MyPy is unable to infer on which TypedDict 'topic_name' key
         # is added. So, due to this MyPy throws an error. Thus, to avoid
         # the error, we use ignore here.
         stats_dict['topic_name'] = topic_name_by_topic_id.get(  # type: ignore[index]
             stats_dict['topic_id'], 'UNKNOWN')
-
-        # TODO(#16051): TranslationContributionStats to use
-        # first_contribution_date and last_contribution_date.
-        if 'contribution_dates' in stats_dict.keys():
-            # Here we use cast because we are narrowing down the type of
-            # 'stats_dict' from Union of various TypedDicts to a particular
-            # TypedDict type.
-            translation_contributor_stats_dict = cast(
-                suggestion_registry.TranslationContributionStatsDict,
-                stats_dict
-            )
-            sorted_contribution_dates = sorted(
-                translation_contributor_stats_dict['contribution_dates']
-            )
-            first_contribution_date = sorted_contribution_dates[0]
-            last_contribution_date = sorted_contribution_dates[-1]
-            # Here we use MyPy ignore because MyPy doesn't allow key deletion
-            # from TypedDict.
-            del translation_contributor_stats_dict['contribution_dates']  # type: ignore[misc]
-        else:
-            # Here we use cast because we are narrowing down the type of
-            # 'stats_dict' from Union of various TypedDicts to a particular
-            # set of Union of TypedDicts type.
-            review_and_translation_dicts = cast(
-                Union[
-                    suggestion_registry.TranslationReviewStatsDict,
-                    suggestion_registry.QuestionContributionStatsDict,
-                    suggestion_registry.QuestionReviewStatsDict
-                ],
-                stats_dict
-            )
-            first_contribution_date = review_and_translation_dicts[
-                'first_contribution_date'
-            ]
-            last_contribution_date = review_and_translation_dicts[
-                'last_contribution_date'
-            ]
-        # Here we use MyPy ignore because 'stats_dict' is of
-        # union type and MyPy is unable to infer on which TypedDict
-        # 'first_contribution_date' key is added. So, due to this MyPy
-        # throws an error. Thus, to avoid the error, we use ignore here.
-        stats_dict['first_contribution_date'] = (  # type: ignore[index]
-            first_contribution_date.strftime('%b %Y'))
-        # Here we use MyPy ignore because 'stats_dict' is of
-        # union type and MyPy is unable to infer which on TypedDict
-        # 'last_contribution_date' key is added. So, due to this MyPy
-        # throws an error. Thus, to avoid the error, we use ignore here.
-        stats_dict['last_contribution_date'] = (  # type: ignore[index]
-            last_contribution_date.strftime('%b %Y'))
-
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
         del stats_dict['topic_id']  # type: ignore[misc]
-        # Here we use MyPy ignore because MyPy doesn't allow key deletion
-        # from TypedDict.
-        del stats_dict['contributor_user_id']  # type: ignore[misc]
     return stats_dicts
