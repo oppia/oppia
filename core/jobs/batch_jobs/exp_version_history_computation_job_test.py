@@ -72,12 +72,16 @@ class ComputeExplorationVersionHistoryJobTests(
     ) -> None:
         assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state'
-            })
-        ], 'A commit message.')
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.')
         version_history_keys = [
             datastore_services.Key(
                 exp_models.ExplorationVersionHistoryModel,
@@ -127,21 +131,31 @@ class ComputeExplorationVersionHistoryJobTests(
     ) -> None:
         assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state'
-            })
-        ], 'A commit message.')
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
         exp_services.revert_exploration(
             self.user_1_id, self.EXP_ID_1, 2, 1
         )
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'Another new state'
-            })
-        ], 'A commit message.')
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'Another new state'
+                })
+            ],
+            'A commit message.'
+        )
         version_history_keys = [
             datastore_services.Key(
                 exp_models.ExplorationVersionHistoryModel,
@@ -203,12 +217,17 @@ class ComputeExplorationVersionHistoryJobTests(
     ) -> None:
         assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state'
-            })
-        ], 'A commit message.')
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
         exp_services.revert_exploration(
             self.user_1_id, self.EXP_ID_1, 2, 1
         )
@@ -283,12 +302,17 @@ class ComputeExplorationVersionHistoryJobTests(
         assert self.user_2_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state'
-            })
-        ], 'A commit messages.')
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
         version_history_keys = [
             datastore_services.Key(
                 exp_models.ExplorationVersionHistoryModel,
@@ -344,12 +368,17 @@ class ComputeExplorationVersionHistoryJobTests(
         assert self.user_2_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state'
-            })
-        ], 'A commit messages.')
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
         exp_services.revert_exploration(
             self.user_1_id, self.EXP_ID_1, 2, 1
         )
@@ -410,12 +439,17 @@ class ComputeExplorationVersionHistoryJobTests(
     def test_ignore_changes_in_deprecated_properties(self) -> None:
         assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state'
-            })
-        ], 'A commit messages.')
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
         snapshot_metadata_model = (
             exp_models.ExplorationSnapshotMetadataModel.get(
                 exp_models.ExplorationModel.get_snapshot_id(
@@ -448,12 +482,17 @@ class ComputeExplorationVersionHistoryJobTests(
     def test_with_invalid_change_list(self) -> None:
         assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state'
-            })
-        ], 'A commit messages.')
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
 
         # Corrupting the commit logs manually.
         snapshot_metadata_model = (
@@ -535,25 +574,40 @@ class VerifyVersionHistoryModelsJobTests(
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
         self.save_new_valid_exploration('3', self.user_2_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state'
-            })
-        ], 'A commit messages.')
-        exp_services.update_exploration(self.user_2_id, self.EXP_ID_2, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state'
-            })
-        ], 'A commit messages.')
-        exp_services.update_exploration(self.user_2_id, '3', [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'Introduction',
-                'new_state_name': 'First state'
-            })
-        ], 'A commit message.')
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
+        exp_services.update_exploration(
+            self.user_2_id,
+            self.EXP_ID_2,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
+        exp_services.update_exploration(
+            self.user_2_id,
+            '3',
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'Introduction',
+                    'new_state_name': 'First state'
+                })
+            ],
+            'A commit message.'
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout(
@@ -572,39 +626,64 @@ class VerifyVersionHistoryModelsJobTests(
         self.save_new_valid_exploration('3', self.user_2_id)
         self.save_new_valid_exploration('4', self.user_2_id)
         self.save_new_valid_exploration('5', self.user_2_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state'
-            })
-        ], 'A commit messages.')
-        exp_services.update_exploration(self.user_2_id, self.EXP_ID_2, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'Introduction',
-                'new_state_name': 'First state'
-            })
-        ], 'A commit message.')
-        exp_services.update_exploration(self.user_2_id, '3', [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'Introduction',
-                'new_state_name': 'First state'
-            })
-        ], 'A commit message.')
-        exp_services.update_exploration(self.user_1_id, '4', [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state'
-            })
-        ], 'A commit messages.')
-        exp_services.update_exploration(self.user_2_id, '5', [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'Introduction',
-                'new_state_name': 'Second state'
-            })
-        ], 'A commit message.')
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
+        exp_services.update_exploration(
+            self.user_2_id,
+            self.EXP_ID_2,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'Introduction',
+                    'new_state_name': 'First state'
+                })
+            ],
+            'A commit message.'
+        )
+        exp_services.update_exploration(
+            self.user_2_id,
+            '3',
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'Introduction',
+                    'new_state_name': 'First state'
+                })
+            ],
+            'A commit message.'
+        )
+        exp_services.update_exploration(
+            self.user_1_id,
+            '4',
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
+        exp_services.update_exploration(
+            self.user_2_id,
+            '5',
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'Introduction',
+                    'new_state_name': 'Second state'
+                })
+            ],
+            'A commit message.'
+        )
 
         # Manually corrupting the version history model.
         vh_model_1 = exp_models.ExplorationVersionHistoryModel.get(
@@ -697,12 +776,17 @@ class VerifyVersionHistoryModelsJobTests(
     def test_ignore_changes_in_deprecated_properties(self) -> None:
         assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state'
-            })
-        ], 'A commit messages.')
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
         snapshot_metadata_model = (
             exp_models.ExplorationSnapshotMetadataModel.get(
                 exp_models.ExplorationModel.get_snapshot_id(
@@ -756,12 +840,17 @@ class DeleteExplorationVersionHistoryModelsJobTest(
     def test_with_vh_models(self) -> None:
         assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state'
-            })
-        ], 'A commit messages.')
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('SUCCESS: 2')

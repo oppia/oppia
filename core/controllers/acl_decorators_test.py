@@ -54,6 +54,12 @@ from typing import Dict, Final, List, TypedDict, Union, cast
 import webapp2
 import webtest
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
+    from mypy_imports import secrets_services
+
+datastore_services = models.Registry.import_datastore_services()
 secrets_services = models.Registry.import_secrets_services()
 
 
@@ -3499,12 +3505,13 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         'new_value': ''
     }
     CHANGE_DICT_2: Final = {
-        'cmd': 'add_translation',
+        'cmd': 'add_written_translation',
         'state_name': 'Introduction',
         'language_code': constants.DEFAULT_LANGUAGE_CODE,
         'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
         'content_html': '',
-        'translation_html': ''
+        'translation_html': '',
+        'data_format': 'html'
     }
 
     class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -6880,7 +6887,16 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(self.old_content))
         exploration.states['State 3'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
-        exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
+        exp_models = (
+            exp_services._compute_models_for_updating_exploration( # pylint: disable=protected-access
+                self.author_id,
+                exploration,
+                '',
+                []
+            )
+        )
+        datastore_services.update_timestamps_multi(exp_models)
+        datastore_services.put_multi(exp_models)
 
         rights_manager.publish_exploration(self.author, self.exploration_id)
 
