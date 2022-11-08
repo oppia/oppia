@@ -45,7 +45,10 @@ class LearnerGoalsHandler(
         },
         'activity_type': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'choices': [
+                    constants.ACTIVITY_TYPE_LEARN_TOPIC
+                ]
             }
         }
     }
@@ -55,18 +58,14 @@ class LearnerGoalsHandler(
     }
 
     @acl_decorators.can_access_learner_dashboard
-    def post(self, activity_type: str, topic_id: str) -> None:
+    def post(self, activity_type: str, topic_id: str) -> None:  # pylint: disable=unused-argument
         assert self.user_id is not None
         belongs_to_learnt_list = False
         goals_limit_exceeded = False
 
-        if activity_type == constants.ACTIVITY_TYPE_LEARN_TOPIC:
-            belongs_to_learnt_list, goals_limit_exceeded = (
-                learner_progress_services.validate_and_add_topic_to_learn_goal(
-                    self.user_id, topic_id))
-        else:
-            raise self.InvalidInputException('Invalid activityType: %s' % (
-                activity_type))
+        belongs_to_learnt_list, goals_limit_exceeded = (
+            learner_progress_services.validate_and_add_topic_to_learn_goal(
+                self.user_id, topic_id))
 
         self.values.update({
             'belongs_to_learnt_list': belongs_to_learnt_list,
@@ -76,13 +75,9 @@ class LearnerGoalsHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_access_learner_dashboard
-    def delete(self, activity_type: str, topic_id: str) -> None:
+    def delete(self, activity_type: str, topic_id: str) -> None:  # pylint: disable=unused-argument
         assert self.user_id is not None
-        if activity_type == constants.ACTIVITY_TYPE_LEARN_TOPIC:
-            learner_goals_services.remove_topics_from_learn_goal(
-                self.user_id, [topic_id])
-        else:
-            raise self.InvalidInputException('Invalid activityType: %s' % (
-                activity_type))
+        learner_goals_services.remove_topics_from_learn_goal(
+            self.user_id, [topic_id])
 
         self.render_json(self.values)

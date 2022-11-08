@@ -148,8 +148,11 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
                 self.TOPIC_ID_1), {},
             csrf_token=csrf_token,
             expected_status_int=400)
-        self.assertEqual(
-            response['error'], 'Invalid activityType: InvalidActivityType')
+        self.assertIn(
+            'Received InvalidActivityType which is not in the allowed '
+            'range of choices: [\'learntopic\']',
+            response['error']
+        )
 
         # Now we begin testing of not exceeding the limit of activities in the
         # learner goals.
@@ -221,7 +224,10 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
             feconf.LEARNER_GOALS_DATA_URL,
             'InvalidActivityType',
             self.TOPIC_ID_1), expected_status_int=400)
-        self.assertEqual(
-            response['error'], 'Invalid activityType: InvalidActivityType')
+        self.assertIn(
+            'Received InvalidActivityType which is not in the allowed '
+            'range of choices: [\'learntopic\']',
+            response['error']
+        )
 
         self.logout()
