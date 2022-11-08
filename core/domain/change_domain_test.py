@@ -47,7 +47,6 @@ class ChangeDomainTests(test_utils.GenericTestBase):
             change_dict['required_attribute_names'] = ['assignee_id']
             change_object.validate_dict(change_dict)
 
-
     def test_that_error_appenden_when_attribute_missing(self) -> None:
         valid_cmd_dict = feconf.ValidCmdDict(
             name='AUTO',
@@ -67,7 +66,6 @@ class ChangeDomainTests(test_utils.GenericTestBase):
             feconf.CMD_DELETE_COMMIT,
             valid_cmd_dict, {})
 
-
     def test_that_error_appenden_when_value_deprecated(self) -> None:
         valid_cmd_dict = feconf.ValidCmdDict(
             name='AUTO',
@@ -80,7 +78,7 @@ class ChangeDomainTests(test_utils.GenericTestBase):
             }
         )
 
-        actual_cmd_attributes = {"name": "name"}
+        actual_cmd_attributes = {'name': 'name'}
 
         with self.assertRaisesRegex(utils.DeprecatedCommandError, (
             'Value for name in cmd AUTO_mark_deleted: name is deprecated')):
