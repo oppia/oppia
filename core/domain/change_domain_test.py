@@ -17,6 +17,7 @@
 """Unit tests for change_domain.py"""
 
 from __future__ import annotations
+from typing import Dict
 
 
 from core import feconf
@@ -58,12 +59,10 @@ class ChangeDomainTests(test_utils.GenericTestBase):
                 'name1': ['name1']
             })
 
-        actual_cmd_attributes = {}
-
         with self.assertRaisesRegex(utils.ValidationError, (
             'The following required attributes are missing: '
             'key1')):
 
             change_domain.validate_cmd(
             feconf.CMD_DELETE_COMMIT,
-            valid_cmd_dict, actual_cmd_attributes)
+            valid_cmd_dict, {})
