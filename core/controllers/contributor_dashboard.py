@@ -261,6 +261,9 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
             topic_name: str. A topic name for which to filter the exploration
                 opportunity summaries. If 'All' is supplied, all available
                 exploration opportunity summaries will be returned.
+            language: str. A language for which to filter the exploration
+                opportunity summaries. If it is None, all available exploration
+                opportunity summaries will be returned.
 
         Returns:
             list(ExplorationOpportunitySummary). A list of the matching
@@ -301,8 +304,9 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
             suggestion_services.get_suggestions_with_translatable_explorations(
                 [in_review_suggestion
                 for in_review_suggestion in in_review_suggestions
-                if not language or in_review_suggestion.language_code == language])
-        } 
+                if not language or
+                in_review_suggestion.language_code == language])
+        }
         exp_ids = [
             exp_id
             for exp_id in topic_exp_ids
