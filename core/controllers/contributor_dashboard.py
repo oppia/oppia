@@ -223,6 +223,12 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
                     'type': 'basestring'
                 },
                 'default_value': None
+            },
+            'language': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
             }
         }
     }
@@ -231,18 +237,19 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         topic_name = self.normalized_request.get('topic_name')
+        language = self.normalized_request.get('language')
         opportunity_dicts = [
             opp.to_dict()
             for opp in self
                 ._get_reviewable_exploration_opportunity_summaries(
-                    self.user_id, topic_name)]
+                    self.user_id, topic_name, language)]
         self.values = {
             'opportunities': opportunity_dicts,
         }
         self.render_json(self.values)
 
     def _get_reviewable_exploration_opportunity_summaries(
-        self, user_id, topic_name
+        self, user_id, topic_name, language
     ):
         """Returns exploration opportunity summaries that have translation
         suggestions that are reviewable by the supplied user. The result is
@@ -292,8 +299,10 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
             suggestion.target_id
             for suggestion in
             suggestion_services.get_suggestions_with_translatable_explorations(
-                in_review_suggestions)
-        }
+                [in_review_suggestion
+                for in_review_suggestion in in_review_suggestions
+                if not language or in_review_suggestion.language_code == language])
+        } 
         exp_ids = [
             exp_id
             for exp_id in topic_exp_ids
