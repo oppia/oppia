@@ -16,7 +16,10 @@
 
 from __future__ import annotations
 
+import datetime
+import io
 import json
+import os
 
 from core import feconf
 from core.constants import constants
@@ -785,6 +788,62 @@ class ContributorStatsSummariesHandler(base.BaseHandler):
                 }
 
         self.render_json(self.values)
+
+
+class ContributorCertificateHandler(base.BaseHandler):
+    """Returns contributor certificate."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'suggestion_type': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'language': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'from_date': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'to_date': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_fetch_all_contributor_dashboard_stats
+    def get(self, username, suggestion_type, language, from_date, to_date):
+        """Handles GET requests."""
+        from_date_object = datetime.datetime.strptime(from_date, '%Y-%m-%d')
+        to_date_object = datetime.datetime.strptime(to_date, '%Y-%m-%d')
+
+        file = suggestion_services.generate_contributor_certificate(
+            username, suggestion_type, language, from_date_object,
+            to_date_object)
+
+        with open(file, "rb") as fh:
+            buf = io.BytesIO(fh.read())
+
+            # Removes the generated file.
+            os.remove(file)
+            self.render_downloadable_file(
+                buf,
+                'certificate.png',
+                'image/png')
 
 
 class ContributorAllStatsSummariesHandler(base.BaseHandler):

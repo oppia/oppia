@@ -16,13 +16,15 @@
  * @fileoverview Component for the contribution stats view.
  */
 
-import { Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Injector, Input, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { ContributionAndReviewStatsService, QuestionContributionBackendDict, QuestionReviewBackendDict, TranslationContributionBackendDict, TranslationReviewBackendDict } from '../services/contribution-and-review-stats.service';
 import { UserService } from 'services/user.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { AppConstants } from 'app.constants';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CertificateDownloadModalComponent } from '../modal-templates/certificate-download-modal.component';
 
 interface Option {
   contributionType: string;
@@ -181,7 +183,9 @@ export class ContributorStatsComponent {
     private readonly languageUtilService: LanguageUtilService,
     private readonly contributionAndReviewStatsService:
         ContributionAndReviewStatsService,
-    private readonly userService: UserService) {
+    private readonly userService: UserService,
+    private readonly modalService: NgbModal,
+    private readonly injector: Injector) {
   }
 
   async ngOnInit(): Promise<void> {
@@ -363,6 +367,25 @@ export class ContributorStatsComponent {
 
   columnSortDirection(): number {
     return 0;
+  }
+
+  openCertificateDownloadModal(
+      suggestionType: string, languageCode?: string): void {
+    const modalRef = this.modalService.open(
+      CertificateDownloadModalComponent, {
+        size: 'lg',
+        backdrop: 'static',
+        injector: this.injector,
+        // TODO(#12768): Remove the backdropClass & windowClass once the
+        // rte-component-modal is migrated to Angular. Currently, the custom
+        // class is used for correctly stacking AngularJS modal on top of
+        // Angular modal.
+        backdropClass: 'forced-modal-stack',
+        windowClass: 'forced-modal-stack'
+      });
+    modalRef.componentInstance.suggestionType = suggestionType;
+    modalRef.componentInstance.username = this.username;
+    modalRef.componentInstance.languageCode = languageCode;
   }
 
   /**

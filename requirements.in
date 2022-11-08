@@ -47,3 +47,4 @@ webencodings==0.5.1
 # them earlier than we are able to install the libraries from this file.
 PyYAML==6.0
 certifi==2021.5.30
+html2image==2.0.1

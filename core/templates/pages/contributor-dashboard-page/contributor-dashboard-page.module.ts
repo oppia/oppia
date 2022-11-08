@@ -69,6 +69,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
+    CertificateDownloadModalComponent,
     CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
@@ -85,6 +86,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     ContributorDashboardPageComponent
   ],
   entryComponents: [
+    CertificateDownloadModalComponent,
     CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
@@ -133,6 +135,7 @@ import { downgradeModule } from '@angular/upgrade/static';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { ToastrModule } from 'ngx-toastr';
 import { ContributorStatsComponent } from './contributor-stats/contributor-stats.component';
+import { CertificateDownloadModalComponent } from './modal-templates/certificate-download-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

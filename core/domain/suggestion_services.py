@@ -22,6 +22,7 @@ import datetime
 import heapq
 import logging
 import re
+import uuid
 
 from core import feconf
 from core.constants import constants
@@ -46,6 +47,8 @@ from typing import (
     Set, Tuple, Type, Union, cast, overload
 )
 from typing_extensions import Final, Literal
+from html2image import Html2Image
+hti = Html2Image()
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -2961,3 +2964,341 @@ def enqueue_contributor_ranking_notification_email_task(
     taskqueue_services.enqueue_task(
         feconf.TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS,
         payload, 0)
+
+
+def _generate_image_from_html(template: str) -> str:
+    """Generates an image from the html string.
+    Attributes:
+        template: str. The html template to create the image.
+
+    Raises:
+        Exception. Image generation is failed.
+    """
+    image_width = 1493
+    image_height = 1313
+    filename = str(uuid.uuid4()) + '.png'
+
+    path = hti.screenshot(
+        html_str=template, save_as=filename, size=(image_width, image_height))
+
+    if len(path) == 0:
+        raise Exception('Image generation failed.')
+
+    return path[0]
+
+
+def _generate_translation_contributor_certificate(
+    language_code: str,
+    from_date: datetime.datetime,
+    to_date: datetime.datetime,
+    username: str,
+    user_id: str,
+    date: str
+) -> str:
+    """Generates a certificate for contributors' translation contributions.
+    Attributes:
+        language_code: str|None. The language which the contributions should be
+            considered.
+        suggestion_type: str. The type of the suggestions that the
+            certificate needs to be generated.
+        from_date: datetime.datetime. The first date that the contributions
+            should be considered for the certificate.
+        to_date: datetime.datetime. The last date that the contributions
+            should be considered for the certificate.
+        username: str. The username of the contributor.
+        user_id: str. The user ID of the contributor.
+        date: datetime.datetime. The current date that should be included in the
+            certificate.
+
+    Returns:
+        str. The HTML template to generate the certificate.
+
+    Raises:
+        Exception. The language that is provided is invalid.
+        Exception: The suggestion type given to generate the certificate is
+            invalid.
+    """
+    minutes_per_sentence = 5
+    signature = feconf.TRANSLATION_TEAM_LEAD
+
+    languages = list(filter(
+        lambda lang: lang['id'] == language_code,
+        constants.SUPPORTED_AUDIO_LANGUAGES))
+    if len(languages) == 0:
+        raise Exception('The language that is provided is invalid.')
+    language_description = languages[0]['description']
+
+    all_sugestions = (
+        suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_submitted_before_given_date(
+                to_date, user_id, language_code))
+    older_suggestions = (
+        suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_submitted_before_given_date(
+                from_date, user_id, language_code))
+
+    sentences_count = 0
+    for model in all_sugestions:
+        if model not in older_suggestions:
+            suggestion = get_suggestion_from_model(model)
+
+            # Retrieve the html content that is emphasized on the 
+            # Contributor Dashboard pages. This content is what stands
+            # out for each suggestion when a user views a list of
+            # suggestions.
+            get_html_representing_suggestion = (
+                SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
+                    suggestion.suggestion_type]
+            )
+            plain_text = _get_plain_text_from_html_content_string(
+                get_html_representing_suggestion(suggestion))
+
+            sentences = plain_text.split('.')
+            sentences_count += len(sentences) - 1
+    hours_contributed = round(
+        ((sentences_count * minutes_per_sentence) / 60), 2)
+
+    if sentences_count == 0:
+        raise Exception(
+            'There are no contributions for the given time range.')
+
+    translation_submitter_certificate_template = """
+        <!DOCTYPE html><html lang="en"><head> <link href=
+        "https://fonts.googleapis.com/css?family=Roboto&display=swap"
+        rel="stylesheet" />
+        <link
+        href="https://fonts.googleapis.com/css?family=Capriola&display=swap"
+        rel="stylesheet" /> <meta charset="UTF-8"> <meta
+        http-equiv="X-UA-Compatible" content="IE=edge"> <meta
+        name="viewport" content="width=device-width,
+        initial-scale=1.0"> <title>Document</title> </head> <body
+        style="margin-top:0px;margin-left:0px;"> <div> <div
+        class="container" style="width: 1493px; height: 1313px;
+        background: #D0E1F0; margin: auto; display: block;
+        margin-left: auto; margin-right: auto; position: relative;"> <div
+        class="innerBox" style="width: 1235px; height: 1086px;
+        background: #F7FDFF; position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -50%);">
+        <img
+        src="https://ih1.redbubble.net/image.452363671.9655/flat,1000x1000,075,f.jpg"
+        style="padding-top: 50px; padding-bottom: 30px;
+        height: 100px; display: block; margin-left: auto;
+        margin-right: auto;"> <div class="title"> <h3 style="
+        font-family: 'Capriola'; font-style: normal; font-weight: 400;
+        font-size: 37px; line-height: 46px; text-align: center;
+        color: #00645C;">CERTIFICATE OF APPRECIATION</h3> </div> <br><br> 
+        <div class="content"> <div class="textContent" style="width: 90%;
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -50%);"> <p style="
+        font-family: 'Capriola'; font-style: normal; font-weight: 400;
+        font-size: 30px; line-height: 38px; text-align: center;
+        color: #8F9899;">WE GRATEFULLY ACKNOWLEDGE</p> <p style=" 
+        font-family: 'Capriola'; font-style: normal; font-weight: 400; 
+        font-size: 40px; line-height: 50px; text-align: center; 
+        color: #00645C; margin: 0; ">""" + username + """</p> <p style=" 
+        font-family: 'Capriola'; font-style: normal; font-weight: 400; 
+        font-size: 26px; line-height: 32px; text-align: center; 
+        color: #8F9899;"> for your dedication and time in translating 
+        <span style="color: #00645C;">Oppia’s</span> basic maths lessons 
+        to <span style="color: #00645C;">""" + language_description + """
+        </span> which will help our """ + language_description + """
+        - speaking learners better understand the lessons.
+        <br><br> 
+        This certificate confirms that """ + username + """ has contributed 
+        """ + str(hours_contributed) + """ hours’ worth of translations
+        from """ + from_date.strftime('%m-%Y') + """ to 
+        """ + to_date.strftime('%m-%Y') + """ </p> </div> 
+        <div style="display:block; position: absolute; top: 80%; 
+        left: 50%; transform: translate(-50%, -50%); width: 100%;">
+        <div class="signature" style="width: 50%; float:left; 
+        text-align: center;"><div style="
+        font-family: Brush Script MT, Brush Script Std, cursiv;
+        font-size: 36px; line-height: 10px; margin-top: 0px;
+        color: #000000;">"""+ signature +"""</div> <center> 
+        <p class="line" style="width: 186px; height: 0px; border: 1px 
+        solid #00645C;"></p> </center> <p style="font-family: 'Roboto'; 
+        font-style: normal; font-weight: 400; font-size: 24px; 
+        line-height: 28px; margin-top: 0px; color: #8F9899;">SIGNATURE</p> 
+        </div> <div class="date" style="width: 50%; float:left; 
+        text-align: center;"><div style="font-family: 'Roboto';
+        font-size: 24px; color: #000000; line-height: 10px;">
+        """ + date + """</div><center> <p class="line" style="
+        width: 186px; height: 0px; border: 1px solid #00645C;"></p> 
+        </center> <p style="font-family: 'Roboto'; font-style: normal; 
+        font-weight: 400; font-size: 24px; line-height: 28px; 
+        margin-top: 0px; color: #8F9899;">DATE</p> </div> </div> </div>
+        </div> </div> </div> </body> </html>
+    """
+
+    return translation_submitter_certificate_template
+
+
+def _generate_question_contributor_certificate(
+    from_date: datetime.datetime,
+    to_date: datetime.datetime,
+    username: str,
+    user_id: str,
+    date: str
+) -> str:
+    """Generates a certificate for contributors' question contributions.
+    Attributes:
+        suggestion_type: str. The type of the suggestions that the
+            certificate needs to be generated.
+        from_date: datetime.datetime. The first date that the contributions
+            should be considered for the certificate.
+        to_date: datetime.datetime. The last date that the contributions
+            should be considered for the certificate.
+        username: str. The username of the contributor.
+        user_id: str. The user ID of the contributor.
+        date: datetime.datetime. The current date that should be included in the
+            certificate.
+
+    Returns:
+        str. The HTML template to generate the certificate.
+
+    Raises:
+        Exception: The suggestion type given to generate the certificate is
+            invalid.
+    """
+    signature = feconf.QUESTION_TEAM_LEAD
+
+    all_sugestions = (
+        suggestion_models.GeneralSuggestionModel
+            .get_question_suggestions_submitted_before_given_date(
+                to_date, user_id))
+    older_suggestions = (
+        suggestion_models.GeneralSuggestionModel
+            .get_question_suggestions_submitted_before_given_date(
+                from_date, user_id))
+
+    minutes_contributed = 0
+    for model in all_sugestions:
+        if model not in older_suggestions:
+            suggestion = get_suggestion_from_model(model)
+
+            content = suggestion.change.question_dict[
+                'question_state_data']['content']['html']
+
+            if 'oppia-noninteractive-image' in content:
+                minutes_contributed += 20
+            else:
+                minutes_contributed += 12
+    hours_contributed = round((minutes_contributed / 60), 2)
+
+    if minutes_contributed == 0:
+        raise Exception(
+            'There are no contributions for the given time range.')
+
+    question_submitter_certificate_template = """
+        <!DOCTYPE html><html lang="en"><head> <link href=
+        "https://fonts.googleapis.com/css?family=Roboto&display=swap"
+        rel="stylesheet" />
+        <link
+        href="https://fonts.googleapis.com/css?family=Capriola&display=swap"
+        rel="stylesheet" /> <meta charset="UTF-8"> <meta
+        http-equiv="X-UA-Compatible" content="IE=edge"> <meta
+        name="viewport" content="width=device-width,
+        initial-scale=1.0"> <title>Document</title> </head> <body
+        style="margin-top:0px;margin-left:0px;"> <div> <div
+        class="container" style="width: 1493px; height: 1313px;
+        background: #D0E1F0; margin: auto; display: block;
+        margin-left: auto; margin-right: auto; position: relative;"> <div
+        class="innerBox" style="width: 1235px; height: 1086px;
+        background: #F7FDFF; position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -50%);">
+        <img
+        src="https://ih1.redbubble.net/image.452363671.9655/flat,1000x1000,075,f.jpg"
+        style="padding-top: 50px; padding-bottom: 30px;
+        height: 100px; display: block; margin-left: auto;
+        margin-right: auto;"> <div class="title"> <h3 style="
+        font-family: 'Capriola'; font-style: normal; font-weight: 400;
+        font-size: 37px; line-height: 46px; text-align: center;
+        color: #00645C;">CERTIFICATE OF APPRECIATION</h3> </div> <br><br> 
+        <div class="content"> <div class="textContent" style="width: 90%;
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -50%);"> <p style="
+        font-family: 'Capriola'; font-style: normal; font-weight: 400;
+        font-size: 30px; line-height: 38px; text-align: center;
+        color: #8F9899;">WE GRATEFULLY ACKNOWLEDGE</p> <p style=" 
+        font-family: 'Capriola'; font-style: normal; font-weight: 400; 
+        font-size: 40px; line-height: 50px; text-align: center; 
+        color: #00645C; margin: 0; ">""" + username + """</p> <p style=" 
+        font-family: 'Capriola'; font-style: normal; font-weight: 400; 
+        font-size: 26px; line-height: 32px; text-align: center; 
+        color: #8F9899;"> has contributed practice questions to Oppia's
+        Math Classroom, which supports our mission of improving education
+        access.
+        <br><br> 
+        We confirm that  """ + username + """ has contributed 
+        """ + str(hours_contributed) + """ hours’ to Oppia
+        from """ + from_date.strftime('%m-%Y') + """ to 
+        """ + to_date.strftime('%m-%Y') + """ </p> </div> 
+        <div style="display:block; position: absolute; top: 80%; 
+        left: 50%; transform: translate(-50%, -50%); width: 100%;">
+        <div class="signature" style="width: 50%; float:left; 
+        text-align: center;"><div style="
+        font-family: Brush Script MT, Brush Script Std, cursiv;
+        font-size: 36px; line-height: 10px; margin-top: 0px;
+        color: #000000;">"""+ signature +"""</div> <center> 
+        <p class="line" style="width: 186px; height: 0px; border: 1px 
+        solid #00645C;"></p> </center> <p style="font-family: 'Roboto'; 
+        font-style: normal; font-weight: 400; font-size: 24px; 
+        line-height: 28px; margin-top: 0px; color: #8F9899;">SIGNATURE</p> 
+        </div> <div class="date" style="width: 50%; float:left; 
+        text-align: center;"><div style="font-family: 'Roboto';
+        font-size: 24px; color: #000000; line-height: 10px;">
+        """ + date + """</div><center> <p class="line" style="
+        width: 186px; height: 0px; border: 1px solid #00645C;"></p> 
+        </center> <p style="font-family: 'Roboto'; font-style: normal; 
+        font-weight: 400; font-size: 24px; line-height: 28px; 
+        margin-top: 0px; color: #8F9899;">DATE</p> </div> </div> </div>
+        </div> </div> </div> </body> </html>
+    """
+
+    return question_submitter_certificate_template
+
+
+def generate_contributor_certificate(
+    username: str,
+    suggestion_type: str,
+    language_code: Optional[str],
+    from_date: datetime.datetime,
+    to_date: datetime.datetime
+) -> str:
+    """Generates a certificate for contributors' contributions.
+    Attributes:
+        username: str. The username of the contributor.
+        language_code: str|None. The language which the contributions should be
+            considered.
+        suggestion_type: str. The type of the suggestions that the
+            certificate needs to be generated.
+        from_date: datetime.datetime. The first date that the contributions
+            should be considered for the certificate.
+        to_date: datetime.datetime. The last date that the contributions
+            should be considered for the certificate.
+
+    Returns:
+        str. The path of the generated image of the certificate.
+
+    Raises:
+        Exception. There are no contributions for the given suggestion type
+            for the given time range.
+        Exception: The suggestion type given to generate the certificate is
+            invalid.
+    """
+    user_id = user_services.get_user_id_from_username(username)
+    date = datetime.datetime.now().strftime('%Y-%m-%d')
+    template = ''
+
+    if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        template = _generate_translation_contributor_certificate(
+            language_code, from_date, to_date, username, user_id, date)
+
+    elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+        template = _generate_question_contributor_certificate(
+            from_date, to_date, username, user_id, date)
+
+    else:
+        raise Exception('Invalid contribution type to generate the certificate.')
+        
+    return _generate_image_from_html(template)

@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import datetime
+import os
 
 from core import feconf
 from core import utils
@@ -6001,3 +6002,190 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
                 'test', 'hi',
                 'Initial Contributor'
             )
+
+
+class ContributorCertificateTests(test_utils.GenericTestBase):
+    """Tests for tasks in emails taskqueue."""
+
+    AUTHOR_EMAIL: Final = 'author@example.com'
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+
+    def test_create_translation_contributor_certificate(self) -> None:     
+        score_category: str = (
+                suggestion_models.SCORE_TYPE_TRANSLATION +
+                suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        change_cmd = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', 1, suggestion_models.STATUS_IN_REVIEW, self.author_id,
+            'reviewer_1', change_cmd, score_category,
+            'exploration.exp1.thread_6', 'hi')
+        username = user_services.get_username(self.author_id)
+        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
+
+        response = suggestion_services.generate_contributor_certificate(
+            username, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT, 'hi',
+            from_date, to_date)
+
+        self.assertIsNotNone(response)
+        # Generated image file of the certificate is deleted.
+        os.remove(response)
+
+    def test_create_question_contributor_certificate(self) -> None:     
+        suggestion_change: Dict[
+            str, Union[str, float, question_domain.QuestionDict]
+        ] = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'id': 'test_id',
+                'version': 12,
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': 1,
+            'skill_difficulty': 0.3
+        }
+        suggestion_change[
+            'question_dict'][
+                'question_state_data']['content']['html'] = (
+                    '<p>No image content</p>')
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_1', 1,
+            suggestion_models.STATUS_IN_REVIEW, self.author_id,
+            'reviewer_2', suggestion_change, 'category1',
+            'thread_1', 'en')
+        username = user_services.get_username(self.author_id)
+        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
+
+        response = suggestion_services.generate_contributor_certificate(
+            username, feconf.SUGGESTION_TYPE_ADD_QUESTION, None,
+            from_date, to_date)
+
+        self.assertIsNotNone(response)
+        # Generated image file of the certificate is deleted.
+        os.remove(response)
+
+    def test_create_question_contributor_certificate_with_image_content(
+        self
+    ) -> None:     
+        suggestion_change: Dict[
+            str, Union[str, float, question_domain.QuestionDict]
+        ] = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'id': 'test_id',
+                'version': 12,
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': 1,
+            'skill_difficulty': 0.3
+        }
+        suggestion_change[
+            'question_dict'][
+                'question_state_data']['content']['html'] = (
+                    '<img src=abc>No image content</img>')
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_1', 1,
+            suggestion_models.STATUS_IN_REVIEW, self.author_id,
+            'reviewer_2', suggestion_change, 'category1',
+            'thread_1', 'en')
+        username = user_services.get_username(self.author_id)
+        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
+
+        response = suggestion_services.generate_contributor_certificate(
+            username, feconf.SUGGESTION_TYPE_ADD_QUESTION, None,
+            from_date, to_date)
+
+        self.assertIsNotNone(response)
+        # Generated image file of the certificate is deleted.
+        os.remove(response)
+
+    def test_create_contributor_certificate_raises_exception_for_no_suggestions(
+        self
+    ) -> None:
+        username = user_services.get_username(self.author_id)
+        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'There are no contributions for the given time range.'):
+            suggestion_services.generate_contributor_certificate(
+            username, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT, 'hi',
+            from_date, to_date)
+
+    def test_create_contributor_certificate_raises_exception_for_no_question_suggestions(
+        self
+    ) -> None:
+        username = user_services.get_username(self.author_id)
+        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'There are no contributions for the given time range.'):
+            suggestion_services.generate_contributor_certificate(
+            username, feconf.SUGGESTION_TYPE_ADD_QUESTION, None,
+            from_date, to_date)
+
+    def test_create_contributor_certificate_raises_exception_for_wrong_language(
+        self) -> None:
+        username = user_services.get_username(self.author_id)
+        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'The language that is provided is invalid.'):
+            suggestion_services.generate_contributor_certificate(
+            username, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT, 'test',
+            from_date, to_date)
+
+    def test_create_contributor_certificate_raises_exception_for_wrong_type(
+        self) -> None:
+        username = user_services.get_username(self.author_id)
+        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Invalid contribution type to generate the certificate.'):
+            suggestion_services.generate_contributor_certificate(
+            username, feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT, 'test',
+            from_date, to_date)
+

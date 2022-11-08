@@ -1797,3 +1797,39 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
                 self.OWNER_USERNAME))
 
         self.logout()
+
+    def test_get_contributor_certificate(self):
+        score_category: str = (
+            suggestion_models.SCORE_TYPE_TRANSLATION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        change_cmd = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', 1, suggestion_models.STATUS_IN_REVIEW, self.owner_id,
+            'reviewer_1', change_cmd, score_category,
+            'exploration.exp1.thread_6', 'hi')
+        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        from_date_str = from_date.strftime('%Y-%m-%d')
+        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
+        to_date_str = to_date.strftime('%Y-%m-%d')
+
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_custom_response(
+            '/contributorcertificate/%s/%s/%s/%s/%s' % (
+                self.OWNER_USERNAME, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi', from_date_str, to_date_str), 'image/png')
+
+        self.assertEqual(
+            response.headers['Content-Disposition'],
+            'attachment; filename=certificate.png')
+
+        self.logout()

@@ -287,6 +287,16 @@ export class ContributionAndReviewService {
         onSuccess(suggestionId);
       }, () => onFailure && onFailure(suggestionId));
   }
+
+  async downloadContributorCertificateAsync(
+      username: string, suggestionType: string,
+      languageCode: string, fromDate: string,
+      toDate: string
+  ): Promise<Blob> {
+    return this.contributionAndReviewBackendApiService
+      .downloadContributorCertificateAsync(
+        username, suggestionType, languageCode, fromDate, toDate);
+  }
 }
 
 angular.module('oppia').factory('ContributionAndReviewService',

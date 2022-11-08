@@ -29,6 +29,7 @@ describe('Contribution and review service', () => {
   let cars: ContributionAndReviewService;
   let carbas: ContributionAndReviewBackendApiService;
   let fetchSuggestionsAsyncSpy: jasmine.Spy;
+  let downloadContributorCertificateAsyncSpy: jasmine.Spy;
 
   const suggestion1 = {
     suggestion_id: 'suggestion_id_1',
@@ -106,6 +107,8 @@ describe('Contribution and review service', () => {
     cars = TestBed.inject(ContributionAndReviewService);
     carbas = TestBed.inject(ContributionAndReviewBackendApiService);
     fetchSuggestionsAsyncSpy = spyOn(carbas, 'fetchSuggestionsAsync');
+    downloadContributorCertificateAsyncSpy = spyOn(
+      carbas, 'downloadContributorCertificateAsync');
   });
 
   describe('getUserCreatedQuestionSuggestionsAsync', () => {
@@ -247,6 +250,30 @@ describe('Contribution and review service', () => {
           expect(response.more).toBeTrue();
         });
     }));
+  });
+
+  describe('downloadContributorCertificateAsync', () => {
+    it('should download the contributor certificate',
+      () => {
+        downloadContributorCertificateAsyncSpy.and.returnValue(
+          Promise.resolve({
+            size: 100,
+            type: 'image/png',
+            arrayBuffer: null,
+            stream: null,
+            slice: null,
+            text: null
+          }));
+
+        cars.downloadContributorCertificateAsync(
+          'user', 'translate_content', 'hi', '2022-01-01', '2022-01-02')
+          .then((response) => {
+            expect(response.type)
+              .toEqual('image/png');
+          });
+
+        expect(downloadContributorCertificateAsyncSpy).toHaveBeenCalled();
+      });
   });
 
   describe('getReviewableQuestionSuggestionsAsync', () => {

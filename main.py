@@ -276,6 +276,10 @@ URLS = [
         r'%s/<username>' % feconf.CONTRIBUTOR_ALL_STATS_SUMMARIES_URL,
         contributor_dashboard.ContributorAllStatsSummariesHandler),
     get_redirect_route(
+        r'%s/<username>/<suggestion_type>/<language>/<from_date>/<to_date>' % (
+            feconf.CONTRIBUTOR_CERTIFICATE_URL),
+        contributor_dashboard.ContributorCertificateHandler),
+    get_redirect_route(
         '/contributor_dashboard',
         creator_dashboard.OldContributorDashboardRedirectPage),
     get_redirect_route(

@@ -180,6 +180,14 @@
             Next<span class="material-icons">navigate_next</span>
           </button>
         </div>
+        <div class="certificate-download-button-container" *ngIf="type == 'translationContribution'">
+          <button class="btn btn-success certificate-download-button" (click)="openCertificateDownloadModal('translate_content', block.key)">
+            <span>
+              Download Certificate
+            </span>
+            <i class="fa fa-download"></i>
+          </button>
+        </div>
       </mat-card>
       <mat-card *ngIf="!statsDataAvailability[type]" layout="row" class="list-view-item oppia-contributions-required-message-container">
         <div class="oppia-contributions-required-message">
@@ -306,6 +314,14 @@
               Next<span class="material-icons">navigate_next</span>
             </button>
           </div>
+          <div class="certificate-download-button-container" *ngIf="type == 'questionContribution'">
+            <button class="btn btn-success certificate-download-button" (click)="openCertificateDownloadModal('add_question', '-')">
+              <span>
+                Download Certificate
+              </span>
+              <i class="fa fa-download"></i>
+            </button>
+          </div>
         </mat-card>
         <mat-card *ngIf="!statsDataAvailability[type]" layout="row" class="list-view-item oppia-contributions-required-message-container">
           <div class="oppia-contributions-required-message">
@@ -316,6 +332,14 @@
 </div>
 
 <style>
+  .certificate-download-button-container {
+    overflow: hidden;
+  }
+  .certificate-download-button {
+    background-color: #00645C;
+    border-color: #00645C;
+    float: right;
+  }
   .oppia-contributions-required-message-container {
     height: 300px;
   }

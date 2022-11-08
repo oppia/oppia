@@ -314,4 +314,27 @@ describe('Contribution and review backend API service', () => {
     expect(successHandler).toHaveBeenCalled();
     expect(failureHandler).not.toHaveBeenCalled();
   }));
+
+  it('should fetch contributor certificate', fakeAsync(() => {
+    spyOn(carbas, 'downloadContributorCertificateAsync').and.callThrough();
+    const successHandler = jasmine.createSpy('success');
+    const failureHandler = jasmine.createSpy('failure');
+    const url = '/contributorcertificate/user/translate_content/hi/' +
+      '2022-01-01/2022-01-02';
+    const response = new Blob();
+
+    carbas.downloadContributorCertificateAsync(
+      'user', 'translate_content', 'hi', '2022-01-01', '2022-01-02')
+      .then(successHandler, failureHandler);
+    const req = http.expectOne(url);
+    expect(req.request.method).toEqual('GET');
+    req.flush(response);
+    flushMicrotasks();
+
+    expect(carbas.downloadContributorCertificateAsync)
+      .toHaveBeenCalledWith(
+        'user', 'translate_content', 'hi', '2022-01-01', '2022-01-02');
+    expect(successHandler).toHaveBeenCalled();
+    expect(failureHandler).not.toHaveBeenCalled();
+  }));
 });

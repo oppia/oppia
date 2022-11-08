@@ -421,6 +421,53 @@ class GeneralSuggestionModel(base_models.BaseModel):
         ).fetch(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN)
 
     @classmethod
+    def get_translation_suggestions_submitted_before_given_date(
+        cls, date: datetime.datetime, user_id: str, language_code: str
+    ) -> Sequence[GeneralSuggestionModel]:
+        """Gets all suggestions which are are submitted before the given
+        date.
+
+        Args:
+            date: Date. The date that suggestions are submitted before.
+            user_id: str. The id of the user who made the submissions.
+            language_code: str. The language that the contributions should be
+                fetched.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that are submitted
+            before the given date.
+        """
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.created_on < date,
+            cls.author_id == user_id,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.language_code == language_code,
+            cls.status == STATUS_ACCEPTED
+        )).order(cls.created_on).fetch()
+
+    @classmethod
+    def get_question_suggestions_submitted_before_given_date(
+        cls, date: datetime.datetime, user_id: str
+    ) -> Sequence[GeneralSuggestionModel]:
+        """Gets all suggestions which are are submitted before the given
+        date.
+
+        Args:
+            date: Date. The date that suggestions are submitted before.
+            user_id: str. The id of the user who made the submissions.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that are submitted
+            before the given date.
+        """
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.created_on < date,
+            cls.author_id == user_id,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            cls.status == STATUS_ACCEPTED
+        )).order(cls.created_on).fetch()
+
+    @classmethod
     def get_in_review_suggestions_in_score_categories(
         cls, score_categories: List[str], user_id: str
     ) -> Sequence[GeneralSuggestionModel]:
