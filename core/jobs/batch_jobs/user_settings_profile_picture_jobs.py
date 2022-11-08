@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import base64
 import io
 import logging
 
@@ -78,12 +77,16 @@ class AuditInvalidProfilePictureJob(base_jobs.JobBase):
         return None
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        invalid_user_profile_picture = (
+        users_with_valid_username = (
             self.pipeline
             | 'Get all non-deleted UserSettingsModel' >> ndb_io.GetModels(
                 user_models.UserSettingsModel.get_all(include_deleted=False))
             | 'Filter valid users with not None username' >> beam.Filter(
                 lambda model: model.username is not None)
+        )
+
+        invalid_user_profile_picture = (
+            users_with_valid_username
             | 'Get invalid images' >> beam.Map(
                 lambda model: (model.username, self._get_invalid_image(
                     model.profile_picture_data_url)))
@@ -98,10 +101,17 @@ class AuditInvalidProfilePictureJob(base_jobs.JobBase):
                     'TOTAL INVALID IMAGES'))
         )
 
+        total_user_with_valid_username = (
+            users_with_valid_username
+            | 'Total valid users' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL USERS WITH VALID USERNAME'))
+        )
+
         report_invalid_images = (
             invalid_user_profile_picture
             | 'Report the data' >> beam.Map(lambda data: (
-                job_run_result.JobRunResult.as_stderr(
+                job_run_result.JobRunResult.as_stdout(
                     f'The username is {data[0]} and the invalid image '
                     f'details are {data[1]}.'
                 )
@@ -111,7 +121,8 @@ class AuditInvalidProfilePictureJob(base_jobs.JobBase):
         return (
             (
                 total_invalid_images,
-                report_invalid_images
+                report_invalid_images,
+                total_user_with_valid_username
             )
             | 'Combine results' >> beam.Flatten()
         )
