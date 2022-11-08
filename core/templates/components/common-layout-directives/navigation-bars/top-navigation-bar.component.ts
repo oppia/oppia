@@ -39,6 +39,8 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { I18nService } from 'i18n/i18n.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 
 import './top-navigation-bar.component.css';
 
@@ -133,12 +135,17 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     'I18N_TOPNAV_HOME'];
 
   CLASSROOM_PROMOS_ARE_ENABLED = false;
+  LEARNER_GROUPS_FEATURE_IS_ENABLED = false;
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
     '/google_signin_buttons/google_signin.svg');
 
   navElementsVisibilityStatus: Record<string, boolean> = {};
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+
+  androidPageIsEnabled: boolean = (
+    this.platformFeatureService.status.AndroidBetaLandingPage.isEnabled
+  );
 
   constructor(
     private accessValidationBackendApiService:
@@ -158,7 +165,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
     private searchService: SearchService,
     private windowRef: WindowRef,
-    private focusManagerService: FocusManagerService
+    private focusManagerService: FocusManagerService,
+    private platformFeatureService: PlatformFeatureService,
+    private learnerGroupBackendApiService: LearnerGroupBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -188,6 +197,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.KEYBOARD_EVENT_TO_KEY_CODES =
       this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
+
+    this.learnerGroupBackendApiService.isLearnerGroupFeatureEnabledAsync()
+      .then((featureIsEnabled) => {
+        this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
+      });
 
     let service = this.classroomBackendApiService;
     service.fetchClassroomPromosAreEnabledStatusAsync().then(
@@ -352,6 +366,14 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  getOppiaBlogUrl(): string {
+    if (this.platformFeatureService.status.BlogPages.isEnabled) {
+      return '/blog';
+    } else {
+      return 'https://medium.com/oppia-org';
+    }
   }
 
   changeLanguage(languageCode: string): void {

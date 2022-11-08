@@ -42,7 +42,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'InstantFeedbackMessageEmailHandler',
     'LearnerAnswerDetailsSubmissionHandler',
     'LearnerGoalsHandler',
-    'LeaveForRefresherExpEventHandler',
     'MemoryCacheAdminHandler',
     'MergeSkillHandler',
     'NewTopicHandler',
@@ -64,17 +63,13 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'SkillDataHandler',
     'SkillDescriptionHandler',
     'StartedTranslationTutorialEventHandler',
-    'StateCompleteEventHandler',
     'StateHitEventHandler',
     'SubtopicPageDataHandler',
-    'SubtopicViewerPage',
-    'SuggestionEmailHandler',
     'SuggestionListHandler',
     'SuggestionToExplorationActionHandler',
     'SuggestionToSkillActionHandler',
     'SuggestionsProviderHandler',
     'TopicPageDataHandler',
-    'TopicViewerPage',
     'TopicsAndSkillsDashboardPage',
     'UnsentFeedbackEmailHandler',
     'UpdateQuestionSuggestionHandler',
@@ -86,9 +81,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'CsrfTokenHandler',
     'Error404Handler',
     'FrontendErrorHandler',
-    'WarmupPage',
-    'HomePageRedirectPage',
-    'SplashRedirectPage'
 ]
 
 # These handlers do not require any schema validation.

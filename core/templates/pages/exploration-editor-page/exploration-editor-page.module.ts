@@ -24,7 +24,9 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
+import { JoyrideModule } from 'ngx-joyride';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatMenuModule } from '@angular/material/menu';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
@@ -34,7 +36,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
-import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { SaveVersionMismatchModalComponent } from './modal-templates/save-version-mismatch-modal.component';
@@ -81,6 +82,25 @@ import { SettingsTabComponent } from './settings-tab/settings-tab.component';
 import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answers-overview/unresolved-answers-overview.component';
 import { PreviewTabComponent } from './preview-tab/preview-tab.component';
 import { HistoryTabComponent } from './history-tab/history-tab.component';
+import { FeedbackTabComponent } from './feedback-tab/feedback-tab.component';
+import { ImprovementsTabComponent } from './improvements-tab/improvements-tab.component';
+import { NeedsGuidingResponsesTaskComponent } from './improvements-tab/needs-guiding-responses-task.component';
+import { StatisticsTabComponent } from './statistics-tab/statistics-tab.component';
+import { StateStatsModalComponent } from './statistics-tab/templates/state-stats-modal.component';
+import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
+import { ExplorationEditorTabComponent } from './editor-tab/exploration-editor-tab.component';
+import { ExplorationSaveAndPublishButtonsComponent } from './exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component';
+import { ExplorationSavePromptModalComponent } from './modal-templates/exploration-save-prompt-modal.component';
+import { AddAudioTranslationModalComponent } from './translation-tab/modal-templates/add-audio-translation-modal.component';
+import { AudioTranslationBarComponent } from './translation-tab/audio-translation-bar/audio-translation-bar.component';
+import { StateTranslationEditorComponent } from './translation-tab/state-translation-editor/state-translation-editor.component';
+import { StateTranslationComponent } from './translation-tab/state-translation/state-translation.component';
+import { TranslatorOverviewComponent } from './translation-tab/translator-overview/translator-overview.component';
+import { StateTranslationStatusGraphComponent } from './translation-tab/state-translation-status-graph/state-translation-status-graph.component';
+import { TranslationTabComponent } from './translation-tab/translation-tab.component';
+import { ValueGeneratorEditorComponent } from './param-changes-editor/value-generator-editor.component';
+import { ParamChangesEditorComponent } from './param-changes-editor/param-changes-editor.component';
+import { ExplorationEditorPageComponent } from './exploration-editor-page.component';
 
 @NgModule({
   imports: [
@@ -93,16 +113,17 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     SmartRouterModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
+    MatMenuModule,
     FormsModule,
     MatPaginatorModule,
     RouterModule.forRoot([]),
+    JoyrideModule.forRoot(),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
     DeleteStateSkillModalComponent,
-    ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     SaveVersionMismatchModalComponent,
@@ -144,7 +165,26 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     SettingsTabComponent,
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
-    HistoryTabComponent
+    HistoryTabComponent,
+    ExplorationEditorTabComponent,
+    ExplorationSaveAndPublishButtonsComponent,
+    ExplorationSavePromptModalComponent,
+    FeedbackTabComponent,
+    ImprovementsTabComponent,
+    NeedsGuidingResponsesTaskComponent,
+    PieChartComponent,
+    StateStatsModalComponent,
+    StatisticsTabComponent,
+    AddAudioTranslationModalComponent,
+    AudioTranslationBarComponent,
+    StateTranslationEditorComponent,
+    ValueGeneratorEditorComponent,
+    ParamChangesEditorComponent,
+    StateTranslationComponent,
+    TranslatorOverviewComponent,
+    StateTranslationStatusGraphComponent,
+    TranslationTabComponent,
+    ExplorationEditorPageComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -190,7 +230,26 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     SettingsTabComponent,
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
-    HistoryTabComponent
+    HistoryTabComponent,
+    ExplorationEditorTabComponent,
+    ExplorationSaveAndPublishButtonsComponent,
+    ExplorationSavePromptModalComponent,
+    FeedbackTabComponent,
+    ImprovementsTabComponent,
+    NeedsGuidingResponsesTaskComponent,
+    PieChartComponent,
+    StateStatsModalComponent,
+    StatisticsTabComponent,
+    AddAudioTranslationModalComponent,
+    AudioTranslationBarComponent,
+    StateTranslationEditorComponent,
+    ValueGeneratorEditorComponent,
+    ParamChangesEditorComponent,
+    StateTranslationComponent,
+    TranslatorOverviewComponent,
+    StateTranslationStatusGraphComponent,
+    TranslationTabComponent,
+    ExplorationEditorPageComponent
   ],
   providers: [
     {

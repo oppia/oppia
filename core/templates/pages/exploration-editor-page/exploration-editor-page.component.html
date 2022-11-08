@@ -1,141 +1,150 @@
+<ng-template #EditorTabTourPreviewTab>
+  <h3 class="e2e-test-joyride-title">Preview</h3>
+  <p>At any time, you can click the <b>preview</b> button to play through your exploration.</p>
+</ng-template>
+
 <div class="navbar-helper">
   <div class="navbar-tabs">
     <div class="navbar-text">
-      <[$ctrl.getNavbarText()]>
-      <span class="e2e-test-autosave-indicator autosave-indicator" ng-if="$ctrl.autosaveIsInProgress">
+      {{ getNavbarText() }}
+      <span class="e2e-test-autosave-indicator autosave-indicator" *ngIf="autosaveIsInProgress">
         &emsp;Auto Saving ...
       </span>
     </div>
     <div class="navbar-icons">
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.countWarnings()}" ng-click="$ctrl.selectMainTab()"
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'main', 'uib-dropdown': countWarnings()}" (click)="selectMainTab()"
           class="nav-item icon nav-list-item position-relative">
-        <a href="#" class="nav-link navbar-tab e2e-test-main-tab" uib-tooltip="Editor" tooltip-placement="<[$ctrl.countWarnings() ? 'left' : 'bottom']>">
-          <i class="fas fa-pen navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'main'}"></i>
+        <a href="#" class="nav-link navbar-tab e2e-test-main-tab" [ngbTooltip]="'Editor'" placement="{{countWarnings() ? 'left' : 'bottom'}}">
+          <i class="fas fa-pen navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'main'}"></i>
         </a>
-        <div ng-show="$ctrl.countWarnings()" class="oppia-editor-warnings-indicator"
-             ng-mouseover="$ctrl.warningsAreShown=true"
-             ng-mouseleave="$ctrl.warningsAreShown=false"
-             ng-class="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
+        <div [hidden]="!(countWarnings())" class="oppia-editor-warnings-indicator"
+             (mouseover)="isWarningsAreShown(true)"
+             (mouseleave)="isWarningsAreShown(false)"
+             [ngClass]="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
           <span class="oppia-editor-warnings-count">
-            <[$ctrl.countWarnings()]>
+            {{ countWarnings() }}
           </span>
-          <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box dropdown-menu exploration-editor-warning-box" ng-if="$ctrl.warningsAreShown">
+          <ul class="uib-dropdown-menu oppia-editor-warnings-box dropdown-menu exploration-editor-warning-box" *ngIf="warningsAreShown">
             <span class="oppia-editor-warnings-header">Warnings</span>
-            <li class="oppia-editor-warnings-text" ng-repeat="warning in $ctrl.getWarnings() track by $index">
+            <li class="oppia-editor-warnings-text" *ngFor="let warning of getWarnings(); index as index">
               <hr class="oppia-editor-warnings-separator">
-              <span ng-if="warning.type === 'critical'">
-                <strong><[warning.message]></strong>
+              <span *ngIf="warning && (warning.type === 'critical')">
+                <strong>{{ warning.message }}</strong>
               </span>
-              <span ng-if="warning.type !== 'critical'">
-                <[warning.message]>
+              <span *ngIf="warning && (warning.type !== 'critical')">
+                {{ warning.message }}
               </span>
             </li>
           </ul>
         </div>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'translation', 'oppia-disabled-tab': !$ctrl.connectedToInternet || $ctrl.EditabilityService.isLockedByAdmin()}" id="tutorialTranslationTab" class="nav-item icon nav-list-item e2e-test-translation-tab"
-          ng-click="!$ctrl.connectedToInternet || $ctrl.EditabilityService.isLockedByAdmin() || $ctrl.selectTranslationTab()" uib-tooltip="Translations does not work when offline." tooltip-placement="bottom"  tooltip-enable="!$ctrl.connectedToInternet">
-        <a class="nav-link navbar-tab" uib-tooltip="Translations" tooltip-placement="bottom" tabindex="0" tooltip-enable="$ctrl.connectedToInternet">
-          <i class="fas fa-microphone navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'translation'}"></i>
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'translation', 'oppia-disabled-tab': !connectedToInternet || editabilityService.isLockedByAdmin()}" id="tutorialTranslationTab" class="nav-item icon nav-list-item e2e-test-translation-tab"
+          (click)="!connectedToInternet || editabilityService.isLockedByAdmin() || selectTranslationTab()" [ngbTooltip]="'Translations does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <a class="nav-link navbar-tab" [ngbTooltip]="'Translations'" placement="bottom" tabindex="0" >
+          <i class="fas fa-microphone navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'translation'}"></i>
         </a>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'preview', 'oppia-disabled-tab': !$ctrl.connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab"
-          ng-click="!$ctrl.connectedToInternet || $ctrl.selectPreviewTab()" uib-tooltip="Preview does not work when offline." tooltip-placement="bottom"  tooltip-enable="!$ctrl.connectedToInternet">
-        <a class="nav-link  navbar-tab" uib-tooltip="Preview" tooltip-placement="bottom" tabindex="0" tooltip-enable="$ctrl.connectedToInternet">
-          <i class="fas fa-play navbar-tab-icon nav-bar-preview-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'preview'}"></i>
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'preview', 'oppia-disabled-tab': !connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab" joyrideStep="editorTabTourPreviewTab" [stepContent]="EditorTabTourPreviewTab"
+          (click)="!connectedToInternet || selectPreviewTab()" [ngbTooltip]="'Preview does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <a class="nav-link  navbar-tab" [ngbTooltip]="'Preview'" placement="bottom" tabindex="0" >
+          <i class="fas fa-play navbar-tab-icon nav-bar-preview-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'preview'}"></i>
         </a>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'settings', 'oppia-disabled-tab': !$ctrl.connectedToInternet}" class="nav-item icon nav-list-item e2e-test-settings-tab"
-          ng-click="!$ctrl.connectedToInternet || $ctrl.selectSettingsTab()" uib-tooltip="Settings does not work when offline." tooltip-placement="bottom"  tooltip-enable="!$ctrl.connectedToInternet">
-        <a class="nav-link  navbar-tab" uib-tooltip="Settings" tooltip-placement="bottom" tabindex="0" tooltip-enable="$ctrl.connectedToInternet">
-          <i class="fas fa-cog navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'settings'}"></i>
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'settings', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-settings-tab"
+          (click)="!connectedToInternet || selectSettingsTab()" [ngbTooltip]="'Settings does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <a class="nav-link  navbar-tab" [ngbTooltip]="'Settings'" placement="bottom" tabindex="0" >
+          <i class="fas fa-cog navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'settings'}"></i>
         </a>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'stats', 'oppia-disabled-tab': !$ctrl.connectedToInternet}" class="nav-item icon nav-list-item e2e-test-stats-tab"
-          ng-click="!$ctrl.connectedToInternet || $ctrl.selectStatsTab()" uib-tooltip="Statistics does not work when offline." tooltip-placement="bottom"  tooltip-enable="!$ctrl.connectedToInternet">
-        <a class="nav-link  navbar-tab" uib-tooltip="Statistics" tooltip-placement="bottom" tabindex="0" tooltip-enable="$ctrl.connectedToInternet">
-          <i class="fas fa-poll navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'stats'}"></i>
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'stats', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-stats-tab"
+          (click)="!connectedToInternet || selectStatsTab()" [ngbTooltip]="'Statistics does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <a class="nav-link  navbar-tab" [ngbTooltip]="'Statistics'" placement="bottom" tabindex="0" >
+          <i class="fas fa-poll navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'stats'}"></i>
         </a>
       </li>
 
-      <li ng-if="$ctrl.isImprovementsTabEnabled() && $ctrl.screenIsLarge" ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'improvements', 'oppia-disabled-tab': !$ctrl.connectedToInternet}" class="nav-item icon nav-list-item e2e-test-improvements-tab"
-          ng-click="!$ctrl.connectedToInternet || $ctrl.selectImprovementsTab()"  uib-tooltip="Improvements does not work when offline." tooltip-placement="bottom"  tooltip-enable="!$ctrl.connectedToInternet">
-        <a class="nav-link  navbar-tab" uib-tooltip="Improvements" tooltip-placement="bottom" tabindex="0" tooltip-enable="$ctrl.connectedToInternet">
-          <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'improvements'}">trending_up</i>
+      <li *ngIf="isImprovementsTabEnabled() && screenIsLarge" [ngClass]="{'navbar-tab-active': getActiveTabName() === 'improvements', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-improvements-tab"
+          (click)="!connectedToInternet || selectImprovementsTab()"  [ngbTooltip]="'Improvements does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <a class="nav-link  navbar-tab" [ngbTooltip]="'Improvements'" placement="bottom" tabindex="0" >
+          <i class="material-icons navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'improvements'}">trending_up</i>
         </a>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'history', 'oppia-disabled-tab': !$ctrl.connectedToInternet}" class="nav-item icon nav-list-item e2e-test-history-tab"
-          ng-click="!$ctrl.connectedToInternet || $ctrl.selectHistoryTab()"  uib-tooltip="History does not work when offline." tooltip-placement="bottom"  tooltip-enable="!$ctrl.connectedToInternet">
-        <a class="nav-link  navbar-tab" uib-tooltip="History" tooltip-placement="bottom" tabindex="0" tooltip-enable="$ctrl.connectedToInternet">
-          <i class="fas fa-clock navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'history'}"></i>
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'history', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-history-tab"
+          (click)="!connectedToInternet || selectHistoryTab()"  [ngbTooltip]="'History does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <a class="nav-link  navbar-tab" [ngbTooltip]="'History'" placement="bottom" tabindex="0" >
+          <i class="fas fa-clock navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'history'}"></i>
         </a>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'feedback', 'oppia-disabled-tab': !$ctrl.connectedToInternet}" class="nav-item icon nav-list-item e2e-test-feedback-tab"
-          ng-click="!$ctrl.connectedToInternet || $ctrl.selectFeedbackTab()" uib-tooltip="Feedback does not work when offline." tooltip-placement="bottom"  tooltip-enable="!$ctrl.connectedToInternet">
-        <a class="nav-link  navbar-tab" uib-tooltip="Feedback" tooltip-placement="bottom" tabindex="0" tooltip-enable="$ctrl.connectedToInternet">
-          <i class="fas fa-comment-alt navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'feedback'}"></i>
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'feedback', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-feedback-tab"
+          (click)="!connectedToInternet || selectFeedbackTab()" [ngbTooltip]="'Feedback does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
+        <a class="nav-link  navbar-tab" [ngbTooltip]="'Feedback'" placement="bottom" tabindex="0" >
+          <i class="fas fa-comment-alt navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'feedback'}"></i>
         </a>
-        <div ng-show="$ctrl.getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
+        <div [hidden]="!(getOpenThreadsCount())" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
           <span class="oppia-exploration-open-threads-count">
-              <[$ctrl.getOpenThreadsCount()]>
+              {{ getOpenThreadsCount() }}
           </span>
         </div>
       </li>
 
-      <li ng-class="{'oppia-disabled-tab': !$ctrl.connectedToInternet}" class="nav-item icon nav-list-item" ng-click="!$ctrl.connectedToInternet || $ctrl.showUserHelpModal()"
-          uib-tooltip="Help does not work when offline." tooltip-placement="bottom"  tooltip-enable="!$ctrl.connectedToInternet">
+      <li [ngClass]="{'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item" (click)="!connectedToInternet || showUserHelpModal()"
+          [ngbTooltip]="'Help does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <a href="#"
-           uib-tooltip="Help"
-           tooltip-placement="bottom"
-           tooltip-enable="$ctrl.connectedToInternet"
+           [ngbTooltip]="'Help'"
+           placement="bottom"
            class="nav-link oppia-editor-navbar-tab-anchor">
           <i class="fas fa-question-circle navbar-tab-icon"></i>
         </a>
       </li>
     </div>
   </div>
-  <div ng-if="$ctrl.explorationEditorPageHasInitialized && $ctrl.EditabilityService.isLockedByAdmin()" class="exploration-locked-for-editing-banner">This exploration is currently locked to new edits. Please contact an admin for assistance.</div>
+  <div *ngIf="explorationEditorPageHasInitialized && editabilityService.isLockedByAdmin()" class="exploration-locked-for-editing-banner">
+    This exploration is currently locked to new edits. Please contact an admin for assistance.
+  </div>
 </div>
-<div class="exploration-editor-content" ng-cloak>
+<div class="exploration-editor-content">
   <div class="container-fluid oppia-editor-page-container">
-    <div class="row" ng-if="$ctrl.ExplorationRightsService.isCloned()">
+    <div class="row" *ngIf="explorationRightsService.isCloned()">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div class="oppia-align-center uib-alert alert-warning oppia-alert-warning">
           <strong>Note:</strong> This is a private, unpublishable copy of a
-          <a ng-href="<[$ctrl.getExplorationUrl($ctrl.ExplorationRightsService.clonedFrom())]>" target="_blank" rel="noopener">public exploration</a>.
+          <a [href]="getExplorationUrl(explorationRightsService.clonedFrom())" target="_blank" rel="noopener">public exploration</a>.
         </div>
       </div>
     </div>
 
-    <exploration-editor-tab ng-show="$ctrl.getActiveTabName() === 'main'" exploration-is-linked-to-story="$ctrl.explorationIsLinkedToStory">
-    </exploration-editor-tab>
+    <oppia-exploration-editor-tab [hidden]="!(getActiveTabName() === 'main')" [explorationIsLinkedToStory]="explorationIsLinkedToStory">
+    </oppia-exploration-editor-tab>
 
-    <translation-tab ng-if="$ctrl.getActiveTabName() === 'translation'">
-    </translation-tab>
-    <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
-    <oppia-preview-tab ng-if="$ctrl.getActiveTabName() === 'preview'" class="e2e-test-preview-tab">
+    <oppia-translation-tab *ngIf="getActiveTabName() === 'translation'">
+    </oppia-translation-tab>
+    <!-- This is an *ngIf, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
+    <oppia-preview-tab *ngIf="getActiveTabName() === 'preview'" class="e2e-test-preview-tab">
     </oppia-preview-tab>
 
-    <statistics-tab ng-show="$ctrl.getActiveTabName() === 'stats'">
-    </statistics-tab>
+    <oppia-statistics-tab *ngIf="getActiveTabName() === 'stats'">
+    </oppia-statistics-tab>
 
-    <improvements-tab ng-if="$ctrl.isImprovementsTabEnabled()" ng-show="$ctrl.getActiveTabName() === 'improvements'">
-    </improvements-tab>
+    <oppia-improvements-tab *ngIf="isImprovementsTabEnabled()"
+                            [hidden]="!(getActiveTabName() === 'improvements')">
+    </oppia-improvements-tab>
 
-    <oppia-settings-tab ng-show="$ctrl.getActiveTabName() === 'settings'" [current-user-is-curriculum-admin]="$ctrl.currentUserIsCurriculumAdmin" [current-user-is-moderator]="$ctrl.currentUserIsModerator">
+    <oppia-settings-tab [hidden]="!(getActiveTabName() === 'settings')"
+                        [currentUserIsCurriculumAdmin]="currentUserIsCurriculumAdmin"
+                        [currentUserIsModerator]="currentUserIsModerator">
     </oppia-settings-tab>
 
-    <oppia-history-tab ng-show="$ctrl.getActiveTabName() === 'history'">
+    <oppia-history-tab [hidden]="!(getActiveTabName() === 'history')">
     </oppia-history-tab>
 
-    <feedback-tab ng-show="$ctrl.getActiveTabName() === 'feedback'">
-    </feedback-tab>
+    <oppia-feedback-tab [hidden]="!(getActiveTabName() === 'feedback')">
+    </oppia-feedback-tab>
   </div>
 </div>
 
@@ -164,21 +173,21 @@
 </svg>
 
 <style>
-  exploration-editor-page .autosave-indicator {
+  .autosave-indicator {
     font-size: 75%;
   }
 
-  exploration-editor-page .exploration-editor-content {
+  .exploration-editor-content {
     margin-top: 95px;
   }
 
-  exploration-editor-page .exploration-locked-for-editing-banner {
+  .exploration-locked-for-editing-banner {
     background-color: #6c757d;
     color: #fff;
     padding: 5px;
   }
 
-  exploration-editor-page .navbar-helper {
+  .navbar-helper {
     background-color: #00609c;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
     height: 70px;
@@ -189,39 +198,46 @@
     width: 100%;
     z-index: 990;
   }
-  exploration-editor-page .navbar-tabs {
+
+  .navbar-tabs {
     display: flex;
     flex-wrap: wrap;
     height: 100%;
     justify-content: space-between;
     text-align: center;
   }
-  exploration-editor-page .navbar-tab-icon {
+
+  .navbar-tab-icon {
     color: #fff;
     display: block;
     font-size: 26px;
     width: 100%;
   }
-  exploration-editor-page .navbar-tab span {
+
+  .navbar-tab span {
     color: #fff;
     font-size: 12px;
   }
-  exploration-editor-page .oppia-editor-warnings-box {
+
+  .oppia-editor-warnings-box {
     cursor: default;
     max-width: none;
   }
-  exploration-editor-page .navbar-tab-active {
+
+  .navbar-tab-active {
     background-color: #e6e6e6;
     box-shadow: 0 3px 2px 0 #e6e6e6;
   }
-  exploration-editor-page .navbar-tab-active-icon {
+
+  .navbar-tab-active-icon {
     color: #00609c;
   }
-  exploration-editor-page .exploration-editor-warning-box {
+
+  .exploration-editor-warning-box {
     display: block;
   }
 
-  exploration-editor-page .oppia-exploration-open-threads-indicator {
+  .oppia-exploration-open-threads-indicator {
     border-radius: 50%;
     bottom: 5px;
     height: 15px;
@@ -229,10 +245,12 @@
     right: 3px;
     text-align: center;
   }
-  exploration-editor-page .oppia-exploration-open-threads-color {
+
+  .oppia-exploration-open-threads-color {
     background-color: #4078c0;
   }
-  exploration-editor-page .oppia-exploration-open-threads-count {
+
+  .oppia-exploration-open-threads-count {
     background-color: #4078c0;
     border: 1px solid;
     border-radius: 10px;
@@ -246,7 +264,7 @@
     text-shadow: 0 1px rgba(0, 0, 0, 0.25);
   }
 
-  exploration-editor-page .nav-bar-preview-icon {
+  .nav-bar-preview-icon {
     font-size: 20px;
   }
 
@@ -255,7 +273,8 @@
       display: none;
     }
   }
-  exploration-editor-page .navbar-text {
+
+  .navbar-text {
     align-items: center;
     color: #fff;
     display: flex;
@@ -263,49 +282,54 @@
     font-size: 20px;
     margin-left: 3%;
   }
-  exploration-editor-page .navbar-icons {
+
+  .navbar-icons {
     display: flex;
     margin-right: 5%;
   }
-  exploration-editor-page .nav-list-item {
+
+  .nav-list-item {
     align-items: center;
     cursor: pointer;
     display: flex;
     justify-content: center;
     width: 90px;
   }
-  exploration-editor-page .navbar-icons .nav-list-item:hover {
+
+  .navbar-icons .nav-list-item:hover {
     background-color: #4eb0c0;
   }
-  exploration-editor-page .oppia-alert-warning {
+
+  .oppia-alert-warning {
     padding: 2px;
     width: 90%;
   }
-  exploration-editor-page .oppia-stop {
+
+  .oppia-stop {
     stop-color: #8fbc8f;
     stop-opacity: 1;
   }
 
-  exploration-editor-page .oppia-disabled-tab {
+  .oppia-disabled-tab {
     opacity: 0.5;
   }
 
   @media screen and (max-width: 1000px) {
-    exploration-editor-page .navbar-text {
+    .navbar-text {
       display: none;
     }
-    exploration-editor-page .navbar-icons {
+    .navbar-icons {
       margin: 0 auto;
     }
   }
   @media screen and (max-width: 800px) {
-    exploration-editor-page .navbar-helper {
+    .navbar-helper {
       position: inherit;
     }
-    exploration-editor-page .navbar-tabs {
+    .navbar-tabs {
       justify-content: center;
     }
-    exploration-editor-page .exploration-editor-content {
+    .exploration-editor-content {
       margin-top: 0;
     }
   }

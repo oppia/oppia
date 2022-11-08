@@ -17,54 +17,88 @@
  * the improvements tab.
  */
 
-// TODO(#7222): Remove usages of UpgradedServices. Used here because too many
-// indirect AngularJS dependencies are required.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-
-require(
-  'pages/exploration-editor-page/improvements-tab/' +
-  'needs-guiding-responses-task.component.ts');
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NeedsGuidingResponsesTask } from 'domain/improvements/needs-guiding-response-task.model';
+import { SupportingStateStats } from 'services/exploration-improvements-task-registry.service';
+import { RouterService } from '../services/router.service';
+import { NeedsGuidingResponsesTaskComponent } from './needs-guiding-responses-task.component';
 
 describe('NeedsGuidingResponsesTask component', function() {
-  let $ctrl, RouterService;
-
+  let component: NeedsGuidingResponsesTaskComponent;
+  let fixture: ComponentFixture<NeedsGuidingResponsesTaskComponent>;
+  let routerService: RouterService;
   const stateName = 'Introduction';
   const totalAnswersCount = 50;
-
   let task = {targetId: stateName};
-  let stats = {answerStats: [], stateStats: {totalAnswersCount}};
+  let stats = {
+    answerStats: [],
+    stateStats: {
+      totalAnswersCount,
+      usefulFeedbackCount: null,
+      totalHitCount: null,
+      firstHitCount: null,
+      numTimesSolutionViewed: null,
+      numCompletions: null
+    },
+    cstPlaythroughIssues: null,
+    eqPlaythroughIssues: null,
+    misPlaythroughIssues: null
+  } as SupportingStateStats;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
+  class MockNgbModal {
+    open() {
+      return {
+        result: Promise.resolve()
+      };
+    }
+  }
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        FormsModule,
+      ],
+      declarations: [
+        NeedsGuidingResponsesTaskComponent
+      ],
+      providers: [
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
-  importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function(
-      $componentController, _RouterService_) {
-    RouterService = _RouterService_;
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      NeedsGuidingResponsesTaskComponent);
+    component = fixture.componentInstance;
 
-    $ctrl = $componentController(
-      'needsGuidingResponsesTask', null, {task, stats});
-    $ctrl.$onInit();
-  }));
+    routerService = TestBed.inject(RouterService);
+
+    component.task = task as NeedsGuidingResponsesTask;
+    component.stats = stats as SupportingStateStats;
+    component.ngOnInit();
+  });
 
   it('should configure sorted tiles viz based on input task and stats', () => {
-    expect($ctrl.sortedTilesData).toBe(stats.answerStats);
-    expect($ctrl.sortedTilesOptions)
+    expect(component.sortedTilesData).toEqual(stats.answerStats);
+    expect(component.sortedTilesOptions)
       .toEqual({header: '', use_percentages: true});
-    expect($ctrl.sortedTilesTotalFrequency).toEqual(totalAnswersCount);
+    expect(component.sortedTilesTotalFrequency).toEqual(totalAnswersCount);
   });
 
   it('should use router service to navigate to state editor', () => {
-    const navigateSpy = spyOn(RouterService, 'navigateToMainTab');
+    const navigateSpy = spyOn(routerService, 'navigateToMainTab');
 
-    $ctrl.navigateToStateEditor();
+    component.navigateToStateEditor();
 
     expect(navigateSpy).toHaveBeenCalledWith(stateName);
   });

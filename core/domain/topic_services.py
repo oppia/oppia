@@ -1339,7 +1339,7 @@ def check_can_edit_topic(
         return True
     if role_services.ACTION_EDIT_OWNED_TOPIC not in user.actions:
         return False
-    if topic_rights.is_manager(user.user_id):
+    if user.user_id and topic_rights.is_manager(user.user_id):
         return True
 
     return False
@@ -1357,8 +1357,14 @@ def deassign_user_from_all_topics(
 
     Raises:
         Exception. The committer does not have rights to modify a role.
+        Exception. Guest users are not allowed to deassing users from
+            all topics.
     """
     topic_rights_list = topic_fetchers.get_topic_rights_with_user(user_id)
+    if committer.user_id is None:
+        raise Exception(
+            'Guest users are not allowed to deassing users from all topics.'
+        )
     for topic_rights in topic_rights_list:
         topic_rights.manager_ids.remove(user_id)
         commit_cmds = [topic_domain.TopicRightsChange({
@@ -1389,7 +1395,13 @@ def deassign_manager_role_from_topic(
 
     Raises:
         Exception. The committer does not have rights to modify a role.
+        Exception. Guest users are not allowed to deassing manager role
+            from topic.
     """
+    if committer.user_id is None:
+        raise Exception(
+            'Guest users are not allowed to deassing manager role from topic.'
+        )
     topic_rights = topic_fetchers.get_topic_rights(topic_id)
     if user_id not in topic_rights.manager_ids:
         raise Exception('User does not have manager rights in topic.')
@@ -1431,8 +1443,14 @@ def assign_role(
         Exception. The assignee is already a manager for the topic.
         Exception. The assignee doesn't have enough rights to become a manager.
         Exception. The role is invalid.
+        Exception. Guest user is not allowed to assign roles to a user.
+        Exception. The role of the Guest user cannot be changed.
     """
     committer_id = committer.user_id
+    if committer_id is None:
+        raise Exception(
+            'Guest user is not allowed to assign roles to a user.'
+        )
     topic_rights = topic_fetchers.get_topic_rights(topic_id)
     if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
             committer.actions):
@@ -1443,6 +1461,10 @@ def assign_role(
         raise Exception(
             'UnauthorizedUserException: Could not assign new role.')
 
+    if assignee.user_id is None:
+        raise Exception(
+            'Cannot change the role of the Guest user.'
+        )
     assignee_username = user_services.get_username(assignee.user_id)
     if role_services.ACTION_EDIT_OWNED_TOPIC not in assignee.actions:
         raise Exception(
@@ -1590,3 +1612,40 @@ def get_topic_id_to_diagnostic_test_skill_ids(
         )
         raise Exception(error_msg)
     return topic_id_to_diagnostic_test_skill_ids
+
+
+def get_topic_id_to_topic_name_dict(topic_ids: List[str]) -> Dict[str, str]:
+    """Returns a dict with topic ID as key and topic name as value, for all
+    given topic IDs.
+
+    Args:
+        topic_ids: List(str). A list of topic IDs.
+
+    Raises:
+        Exception. The topic models for some of the given topic IDs do not
+            exist.
+
+    Returns:
+        dict(str, str). A dict with topic ID as key and topic name as value.
+    """
+    topic_id_to_topic_name = {}
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+
+    for topic in topics:
+        if topic is None:
+            continue
+        topic_id_to_topic_name[topic.id] = topic.name
+
+    correct_topic_ids = list(topic_id_to_topic_name.keys())
+    # The topic IDs for which topic models do not exist are referred to as
+    # incorrect topic IDs.
+    incorrect_topic_ids = [
+        topic_id for topic_id in topic_ids if topic_id not in correct_topic_ids
+    ]
+    if incorrect_topic_ids:
+        error_msg = (
+            'No corresponding topic models exist for these topic IDs: %s.'
+            % (', '.join(incorrect_topic_ids))
+        )
+        raise Exception(error_msg)
+    return topic_id_to_topic_name

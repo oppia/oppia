@@ -1,104 +1,109 @@
-<ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak">
+<ng-template #EditorTabTourSaveDraft>
+  <h3 class="e2e-test-joyride-title">Save</h3>
+  <p>When you're done making changes, be sure to save your work.</p>
+</ng-template>
 
+<ul class="nav navbar-nav oppia-navbar-nav float-right">
   <!-- Start of html for large screens. -->
-  <li class="nav-item d-none d-sm-block" ng-if="explorationCanBePublished">
+  <li class="nav-item d-none d-sm-block" *ngIf="explorationCanBePublished">
     <div class="btn-group oppia-publish-button-container"
-         uib-tooltip="<[getPublishExplorationButtonTooltip()]>"
-         tooltip-placement="bottom"
-         ng-class="{'disable-publish-button': !connectedToInternet || isExplorationLockedForEditing() || countWarnings()}">
+         ngbTooltip="{{ getPublishExplorationButtonTooltip() }}"
+         placement="bottom"
+         [ngClass]="{'disable-publish-button': !connectedToInternet || isExplorationLockedForEditing() || countWarnings()}">
       <button type="button" class="btn btn-light oppia-editor-publish-button e2e-test-publish-exploration"
-              ng-class="{'btn-success': connectedToInternet && !isExplorationLockedForEditing() && !countWarnings()}"
-              ng-click="showPublishExplorationModal()"
-              ng-disabled="!connectedToInternet || isExplorationLockedForEditing() || countWarnings()">
-        <span ng-if="!publishIsInProcess">
+              [ngClass]="{'btn-success': connectedToInternet && !isExplorationLockedForEditing() && !countWarnings()}"
+              (click)="showPublishExplorationModal()"
+              [disabled]="!connectedToInternet || isExplorationLockedForEditing() || countWarnings()">
+        <span *ngIf="!publishIsInProcess">
           <i class="fas fa-cloud-upload-alt oppia-save-publish-button-icon"
              alt="Publish to Oppia Library">
           </i>
           <span class="oppia-save-publish-button-label">Publish</span>
         </span>
-        <span ng-if="publishIsInProcess">
+        <span *ngIf="publishIsInProcess">
           <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
              alt="Publish to Oppia Library">
-            <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
+            <loading-dots [hidden]="!loadingDotsAreShown"></loading-dots>
           </i>
           <span class="oppia-save-publish-button-label">
             Publishing
-            <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
+            <loading-dots [hidden]="!loadingDotsAreShown"></loading-dots>
           </span>
         </span>
       </button>
     </div>
   </li>
 
-  <li class="nav-item d-none d-sm-block" ng-if="isEditableOutsideTutorialMode()">
-    <div uib-dropdown class="btn-group oppia-publish-button-container"
-         title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !connectedToInternet || !isExplorationSaveable() || isLockedByAdmin()}">
+  <li class="nav-item d-none d-sm-block" *ngIf="isEditableOutsideTutorialMode()">
+    <div class="btn-group oppia-publish-button-container"
+         title="{{ getSaveButtonTooltip() }}" [ngClass]="{'disable-save-button': !connectedToInternet || !isExplorationSaveable() || isLockedByAdmin()}">
       <button id="tutorialSaveButton"
               class="btn btn-light oppia-save-draft-button e2e-test-save-changes"
-              ng-class="{'btn-success': connectedToInternet && isExplorationSaveable() && !isLockedByAdmin()}"
-              ng-click="saveChanges()" ng-disabled="!connectedToInternet || !isExplorationSaveable() || isLockedByAdmin()">
-        <span ng-if="!saveIsInProcess">
-          <span class="oppia-draft-label-container" ng-if="isPrivate()">
+              [ngClass]="{'btn-success': connectedToInternet && isExplorationSaveable() && !isLockedByAdmin()}"
+              (click)="saveChanges()" [disabled]="!connectedToInternet || !isExplorationSaveable() || isLockedByAdmin()">
+        <span *ngIf="!saveIsInProcess">
+          <span class="oppia-draft-label-container" *ngIf="isPrivate()">
             <i class="fas fa-save oppia-save-publish-button-icon"
                alt="Save Draft">
             </i>
-            <span class="oppia-save-draft-button-label oppia-save-publish-button-label e2e-test-save-draft-message">Save Draft</span>
-            <span class="d-none d-md-block oppia-num-changes-text" ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
+            <span class="oppia-save-draft-button-label oppia-save-publish-button-label e2e-test-save-draft-message" joyrideStep="editorTabTourSaveDraft" [stepContent]="EditorTabTourSaveDraft">Save Draft</span>
+            <span class="d-none d-md-block oppia-num-changes-text" *ngIf="getChangeListLength()">({{ getChangeListLength() }})</span>
           </span>
-          <span class="oppia-publish-label-container" ng-if="!isPrivate()" title="Publish Changes">
-            <i class="material-icons md-18 oppia-save-publish-button-icon"
+          <span class="oppia-publish-label-container" *ngIf="!isPrivate()" title="Publish Changes">
+            <i class="fas fa-cloud-upload-alt md-18 oppia-save-publish-button-icon"
                alt="Publish Changes">
-              &#xE2C3;
             </i>
             <span class="oppia-save-publish-button-label e2e-test-publish-changes-message">Publish Changes</span>
-            <span class="d-none d-md-block oppia-num-changes-count-text" ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
+            <span class="d-none d-md-block oppia-num-changes-count-text" *ngIf="getChangeListLength()">({{ getChangeListLength() }})</span>
           </span>
         </span>
-        <span ng-if="saveIsInProcess">
-          <span ng-if="isPrivate()" class="oppia-save-publish-button-label">
+        <span *ngIf="saveIsInProcess">
+          <span *ngIf="isPrivate()" class="oppia-save-publish-button-label">
             Saving
           </span>
-          <span ng-if="!isPrivate()" class="oppia-save-publish-button-label">
+          <span *ngIf="!isPrivate()" class="oppia-save-publish-button-label">
             Publishing
           </span>
-          <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
+          <loading-dots [hidden]="!loadingDotsAreShown"></loading-dots>
         </span>
       </button>
-      <button type="button" class="btn btn-light uib-dropdown-toggle oppia-discard-button e2e-test-save-discard-toggle dropdown-toggle"
-              ng-disabled="!connectedToInternet || !getChangeListLength()" uib-dropdown-toggle aria-label="Discard Draft">
+
+      <button [matMenuTriggerFor]="discardButton" type="button" class="btn btn-light oppia-discard-button e2e-test-save-discard-toggle dropdown-toggle"
+              [disabled]="!connectedToInternet || !getChangeListLength()" aria-label="Discard Draft">
       </button>
-      <ul uib-dropdown-menu ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
-        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !connectedToInternet || !getChangeListLength()}" class="dropdown-item nav-item e2e-test-discard-changes">Discard Draft</a></li>
-      </ul>
+
+      <mat-menu #discardButton="matMenu" [ngStyle]="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
+        <button mat-menu-item title="Discard all pending changes"><a (click)="discardChanges()" [ngClass]="{'oppia-disabled-link': !connectedToInternet || !getChangeListLength()}" class="dropdown-item nav-item e2e-test-discard-changes">Discard Draft</a></button>
+      </mat-menu>
     </div>
   </li>
   <!-- End of html for large screens. -->
 </ul>
 
 <style>
-  exploration-save-and-publish-buttons .disable-publish-button {
+  .disable-publish-button {
     cursor: default;
   }
-  exploration-save-and-publish-buttons .disable-save-button {
+  .disable-save-button {
     cursor: default;
   }
-  exploration-save-and-publish-buttons .oppia-draft-label-container,
-  exploration-save-and-publish-buttons .oppia-publish-label-container {
+  .oppia-draft-label-container,
+  .oppia-publish-label-container {
     display: flex;
     flex-direction: row;
   }
-  exploration-save-and-publish-buttons .oppia-publish-button-container {
+  .oppia-publish-button-container {
     margin-right: 10px;
     margin-top: 8px;
   }
-  exploration-save-and-publish-buttons .oppia-num-changes-text {
+  .oppia-num-changes-text {
     margin-left: 2px;
     opacity: 0.5;
   }
-  exploration-save-and-publish-buttons .oppia-num-changes-count-text {
+  .oppia-num-changes-count-text {
     opacity: 0.5;
   }
-  exploration-save-and-publish-buttons .oppia-discard-button {
+  .oppia-discard-button {
     height: 34px;
   }
 </style>

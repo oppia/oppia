@@ -52,6 +52,27 @@ class ClassroomPageTests(BaseClassroomControllerTests):
             '<lightweight-oppia-root></lightweight-oppia-root>', response)
 
 
+class ClassroomAdminPageTests(BaseClassroomControllerTests):
+    """Checks the access to the classroom admin page and its rendering."""
+
+    def test_classroom_admin_page_access_without_logging_in(self):
+        """Tests access to the Classroom Admin page."""
+        self.get_html_response('/classroom-admin', expected_status_int=302)
+
+    def test_classroom_admin_page_access_without_being_curriculum_admin(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.get_html_response('/classroom-admin', expected_status_int=401)
+        self.logout()
+
+    def test_classroom_admin_page_access_as_curriculum_admin(self):
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.get_html_response('/classroom-admin')
+        self.logout()
+
+
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
     def test_get(self):
@@ -62,6 +83,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         topic_id_1 = topic_fetchers.get_new_topic_id()
         topic_id_2 = topic_fetchers.get_new_topic_id()
+        topic_id_3 = topic_fetchers.get_new_topic_id()
         private_topic = topic_domain.Topic.create_default_topic(
             topic_id_1, 'private_topic_name',
             'private-topic-name', 'description', 'fragm')
@@ -86,7 +108,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         csrf_token = self.get_new_csrf_token()
         new_config_value = [{
             'name': 'math',
-            'topic_ids': [topic_id_1, topic_id_2],
+            'topic_ids': [topic_id_1, topic_id_2, topic_id_3],
             'course_details': 'Course details for classroom.',
             'topic_list_intro': 'Topics covered for classroom',
             'url_fragment': 'math',
@@ -283,4 +305,28 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
             'Classroom ID of the URL path argument must match with the ID '
             'given in the classroom payload dict.'
         )
+        self.logout()
+
+    def test_duplicate_classroom_url_fragment_should_return_true(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        # The classroom with the names ‘math’ and ‘physics’ is already created
+        # in the setUp method of the test class.
+
+        classroom_url_fragment_handler_url = '%s/%s' % (
+            feconf.CLASSROOM_URL_FRAGMENT_HANDLER, 'math')
+        json_response = self.get_json(classroom_url_fragment_handler_url)
+
+        self.assertTrue(json_response['classroom_url_fragment_exists'])
+        self.logout()
+
+    def test_non_duplicate_classroom_url_fragment_should_return_false(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        # The classroom with the names ‘math’ and ‘physics’ is already created
+        # in the setUp method of the test class.
+
+        classroom_url_fragment_handler_url = '%s/%s' % (
+            feconf.CLASSROOM_URL_FRAGMENT_HANDLER, 'chemistry')
+        json_response = self.get_json(classroom_url_fragment_handler_url)
+
+        self.assertFalse(json_response['classroom_url_fragment_exists'])
         self.logout()

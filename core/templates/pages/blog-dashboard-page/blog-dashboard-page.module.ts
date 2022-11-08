@@ -20,6 +20,7 @@ import { APP_INITIALIZER, NgModule, StaticProvider, DoBootstrap} from '@angular/
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -42,6 +43,7 @@ import { BlogPostEditorComponent } from 'pages/blog-dashboard-page/blog-post-edi
 import { UploadBlogPostThumbnailModalComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
 import { BlogCardPreviewModalComponent } from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
 import { UploadBlogPostThumbnailComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail.component';
+import { BlogAuthorDetailsEditorComponent } from './modal-templates/author-detail-editor-modal.component';
 import { BlogPostEditorNavbarPreLogoActionComponent } from 'pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
@@ -55,6 +57,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     ToastrModule.forRoot(toastrConfig),
     MatTabsModule,
     MatMenuModule,
+    MatTooltipModule,
     MatButtonToggleModule,
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
@@ -72,7 +75,8 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     UploadBlogPostThumbnailModalComponent,
     BlogCardPreviewModalComponent,
     UploadBlogPostThumbnailComponent,
-    BlogPostEditorNavbarPreLogoActionComponent
+    BlogPostEditorNavbarPreLogoActionComponent,
+    BlogAuthorDetailsEditorComponent
   ],
   entryComponents: [
     BlogDashboardNavbarBreadcrumbComponent,
@@ -84,7 +88,8 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     UploadBlogPostThumbnailModalComponent,
     BlogCardPreviewModalComponent,
     UploadBlogPostThumbnailComponent,
-    BlogPostEditorNavbarPreLogoActionComponent
+    BlogPostEditorNavbarPreLogoActionComponent,
+    BlogAuthorDetailsEditorComponent
   ],
   providers: [
     {

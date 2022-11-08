@@ -38,6 +38,19 @@ from typing import Dict, List, Union
 class UtilsTests(test_utils.GenericTestBase):
     """Test the core utility methods."""
 
+    def test_get_url_scheme(self) -> None:
+        test_cases = [
+            ('https://www.google.com', 'https'),
+            ('mailto:example@example.com', 'mailto'),
+            ('oppia.org', ''),
+            ('http://www.test.com', 'http'),
+            ('file:///usr/bin/', 'file')
+        ]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                utils.get_url_scheme(test_case[0]), test_case[1])
+
     def test_open_file(self) -> None:
         with utils.open_file(
             os.path.join('core', 'utils.py'), 'r'
@@ -975,3 +988,39 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_get_require_valid_name_with_empty_string(self) -> None:
         utils.require_valid_name('', 'the exploration title', allow_empty=True)
+
+    def test_escape_html_function(self) -> None:
+        html_data = (
+            '<oppia-noninteractive-math math_content-with-value=\''
+            '{&amp;quot;raw_latex&amp;quot;:&amp;quot;+,-,-,+&amp;'
+            'quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;'
+            'mathImg.svg&amp;quot;}\'></oppia-noninteractive-math>'
+        )
+        expected_html_data = (
+            '&lt;oppia-noninteractive-math math_content-with-value=&#39;'
+            '{&amp;amp;quot;raw_latex&amp;amp;quot;:&amp;amp;quot;+,-,-,+'
+            '&amp;amp;quot;, &amp;amp;quot;svg_filename&amp;amp;quot;: '
+            '&amp;amp;quot;mathImg.svg&amp;amp;quot;}&#39;&gt;&lt;/'
+            'oppia-noninteractive-math&gt;'
+        )
+        self.assertEqual(
+            utils.escape_html(html_data), expected_html_data
+        )
+
+    def test_unescape_html_function(self) -> None:
+        html_data = (
+            '&lt;oppia-noninteractive-math math_content-with-value=&#39;'
+            '{&amp;amp;quot;raw_latex&amp;amp;quot;:&amp;amp;quot;+,-,-,+'
+            '&amp;amp;quot;, &amp;amp;quot;svg_filename&amp;amp;quot;: '
+            '&amp;amp;quot;mathImg.svg&amp;amp;quot;}&#39;&gt;&lt;/'
+            'oppia-noninteractive-math&gt;'
+        )
+        expected_html_data = (
+            '<oppia-noninteractive-math math_content-with-value=\''
+            '{&amp;quot;raw_latex&amp;quot;:&amp;quot;+,-,-,+&amp;'
+            'quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;'
+            'mathImg.svg&amp;quot;}\'></oppia-noninteractive-math>'
+        )
+        self.assertEqual(
+            utils.unescape_html(html_data), expected_html_data
+        )

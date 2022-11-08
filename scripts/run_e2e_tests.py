@@ -22,6 +22,8 @@ import os
 import subprocess
 import sys
 
+from typing import Final, List, Optional, Tuple
+
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
@@ -33,15 +35,15 @@ from scripts import flake_checker  # isort:skip
 from scripts import install_third_party_libs  # isort:skip
 from scripts import servers  # isort:skip
 
-MAX_RETRY_COUNT = 3
-GOOGLE_APP_ENGINE_PORT = 9001
-ELASTICSEARCH_SERVER_PORT = 9200
-PORTS_USED_BY_OPPIA_PROCESSES = [
+MAX_RETRY_COUNT: Final = 3
+GOOGLE_APP_ENGINE_PORT: Final = 9001
+ELASTICSEARCH_SERVER_PORT: Final = 9200
+PORTS_USED_BY_OPPIA_PROCESSES: Final = [
     GOOGLE_APP_ENGINE_PORT,
     ELASTICSEARCH_SERVER_PORT,
 ]
 
-_PARSER = argparse.ArgumentParser(
+_PARSER: Final = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder:
    python -m scripts.run_e2e_tests
@@ -74,18 +76,18 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--suite', default='full',
     help='Performs test for different suites, here suites are the '
-         'name of the test files present in core/tests/protractor_desktop/ and '
-         'core/test/protractor/ dirs. e.g. for the file '
-         'core/tests/protractor/accessibility.js use --suite=accessibility. '
+         'name of the test files present in core/tests/webdriverio_desktop/ '
+         'and core/test/webdriverio/ dirs. e.g. for the file '
+         'core/tests/webdriverio/accessibility.js use --suite=accessibility. '
          'For performing a full test, no argument is required.')
 _PARSER.add_argument(
     '--chrome_driver_version',
     help='Uses the specified version of the chrome driver')
 _PARSER.add_argument(
     '--debug_mode',
-    help='Runs the protractor test in debugging mode. Follow the instruction '
+    help='Runs the webdriverio test in debugging mode. Follow the instruction '
          'provided in following URL to run e2e tests in debugging mode: '
-         'https://www.protractortest.org/#/debugging#disabled-control-flow',
+         'https://webdriver.io/docs/debugging/',
     action='store_true')
 _PARSER.add_argument(
     '--server_log_level',
@@ -103,58 +105,12 @@ _PARSER.add_argument(
     action='store_true')
 
 
-SUITES_MIGRATED_TO_WEBDRIVERIO = [
-    'accessibility',
-    'additionalEditorFeatures',
-    'additionalEditorFeaturesModals',
-    'additionalPlayerFeatures',
-    'adminPage',
-    'blogDashboard',
-    'checkpointFeatures',
-    'classroomPage',
-    'classroomPageFileUploadFeatures',
-    'collections',
-    'contributorDashboard',
-    'coreEditorAndPlayerFeatures',
-    'creatorDashboard',
-    'extensions',
-    'embedding',
-    'explorationFeedbackTab',
-    'explorationHistoryTab',
-    'explorationImprovementsTab',
-    'explorationStatisticsTab',
-    'explorationTranslationTab',
-    'learner',
-    'learnerDashboard',
-    'navigation',
-    'preferences',
-    'profileFeatures',
-    'profileMenu',
-    'skillEditor',
-    'subscriptions',
-    'topicsAndSkillsDashboard',
-    'topicAndStoryEditor',
-    'topicAndStoryEditorFileUploadFeatures',
-    'topicAndStoryViewer',
-    'users',
-    'wipeout',
-]
-
-SUITES_STILL_IN_PROTRACTOR = [
-    'featureGating',
-    'fileUploadFeatures',
-    'fileUploadExtensions',
-    'library',
-    'playVoiceovers',
-    'publication',
-]
-
 MOBILE_SUITES = [
     'contributorDashboard'
 ]
 
 
-def is_oppia_server_already_running():
+def is_oppia_server_already_running() -> bool:
     """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.
 
@@ -171,7 +127,7 @@ def is_oppia_server_already_running():
     return False
 
 
-def run_webpack_compilation(source_maps=False):
+def run_webpack_compilation(source_maps: bool = False) -> None:
     """Runs webpack compilation.
 
     Args:
@@ -198,7 +154,7 @@ def run_webpack_compilation(source_maps=False):
         sys.exit(1)
 
 
-def install_third_party_libraries(skip_install):
+def install_third_party_libraries(skip_install: bool) -> None:
     """Run the installation script.
 
     Args:
@@ -208,7 +164,7 @@ def install_third_party_libraries(skip_install):
         install_third_party_libs.main()
 
 
-def build_js_files(dev_mode, source_maps=False):
+def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
     """Build the javascript files.
 
     Args:
@@ -230,7 +186,7 @@ def build_js_files(dev_mode, source_maps=False):
         run_webpack_compilation(source_maps=source_maps)
 
 
-def run_tests(args):
+def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start end-to-end tests."""
     if is_oppia_server_already_running():
         sys.exit(1)
@@ -274,21 +230,7 @@ def run_tests(args):
                 )
             sys.exit(1)
 
-        if args.suite == 'full':
-            stack.enter_context(servers.managed_webdriver_server(
-                chrome_version=args.chrome_driver_version))
-
-            print('Protractor suites are starting to run')
-            proc = stack.enter_context(servers.managed_protractor_server(
-                suite_name=args.suite,
-                dev_mode=dev_mode,
-                debug_mode=args.debug_mode,
-                sharding_instances=args.sharding_instances,
-                mobile=args.mobile,
-                stdout=subprocess.PIPE))
-
-            print('WebdriverIO suites are starting to run')
-            proc = stack.enter_context(servers.managed_webdriverio_server(
+        proc = stack.enter_context(servers.managed_webdriverio_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,
                 debug_mode=args.debug_mode,
@@ -297,43 +239,10 @@ def run_tests(args):
                 mobile=args.mobile,
                 stdout=subprocess.PIPE))
 
-        elif args.suite in SUITES_MIGRATED_TO_WEBDRIVERIO:
-            proc = stack.enter_context(servers.managed_webdriverio_server(
-                suite_name=args.suite,
-                dev_mode=dev_mode,
-                debug_mode=args.debug_mode,
-                chrome_version=args.chrome_driver_version,
-                sharding_instances=args.sharding_instances,
-                mobile=args.mobile,
-                stdout=subprocess.PIPE))
-
-            print(
-                'Servers have come up.\n'
-                'Note: You can view screenshots of failed tests '
-                'in ../webdriverio-screenshots/')
-
-        elif args.suite in SUITES_STILL_IN_PROTRACTOR:
-            stack.enter_context(servers.managed_webdriver_server(
-                chrome_version=args.chrome_driver_version))
-
-            proc = stack.enter_context(servers.managed_protractor_server(
-                suite_name=args.suite,
-                dev_mode=dev_mode,
-                debug_mode=args.debug_mode,
-                sharding_instances=args.sharding_instances,
-                mobile=args.mobile,
-                stdout=subprocess.PIPE))
-
-            print(
-                'Servers have come up.\n'
-                'Note: You can view screenshots of the failed tests '
-                'in ../protractor-screenshots/')
-
-        else:
-            print(
-                'The suite requested to run does not exist'
-                'Please provide a valid suite name')
-            sys.exit(1)
+        print(
+            'Servers have come up.\n'
+            'Note: You can view screenshots of failed tests '
+            'in ../webdriverio-screenshots/')
 
         output_lines = []
         while True:
@@ -353,10 +262,11 @@ def run_tests(args):
             if proc.poll() is not None:
                 break
 
-        return output_lines, proc.returncode
+        return_value = output_lines, proc.returncode
+    return return_value
 
 
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> None:
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
     parsed_args = _PARSER.parse_args(args=args)
 
