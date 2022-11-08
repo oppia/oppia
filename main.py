@@ -399,6 +399,10 @@ URLS = [
         diagnostic_test_player.DiagnosticTestPlayerPage
     ),
     get_redirect_route(
+        r'%s/<topic_id>' % feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL,
+        diagnostic_test_player.DiagnosticTestQuestionsHandler
+    ),
+    get_redirect_route(
         r'%s' % feconf.CLASSROOM_ADMIN_PAGE_URL,
         classroom.ClassroomAdminPage),
     get_redirect_route(

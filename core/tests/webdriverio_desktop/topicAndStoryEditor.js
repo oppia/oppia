@@ -175,8 +175,9 @@ describe('Topic editor functionality', function() {
       await skillEditorPage.addRubricExplanationForDifficulty(
         'Easy', 'Second explanation for easy difficulty.');
       await skillEditorPage.saveOrPublishSkill('Edited rubrics');
-      // A minimum of two questions are required for skill to get assigned in a
-      // topic’s diagnostic test.
+      // A minimum of three questions are required for skill to get assigned in
+      // a topic’s diagnostic test.
+      await workflow.createQuestion();
       await workflow.createQuestion();
       await workflow.createQuestion();
 
