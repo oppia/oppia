@@ -34,7 +34,7 @@ from core.domain import topic_fetchers
 from core.domain import translation_services
 from core.domain import user_services
 
-from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union, cast
+from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 
 
 ListOfContributorDashboardStatsTypes = Sequence[Union[
