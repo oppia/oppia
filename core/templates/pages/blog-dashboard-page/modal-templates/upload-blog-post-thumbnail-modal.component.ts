@@ -28,7 +28,7 @@ import { AppConstants } from 'app.constants';
 export class UploadBlogPostThumbnailModalComponent
   extends ConfirmOrCancelModal {
   ALLOWED_IMAGE_EXTENSIONS = AppConstants.ALLOWED_IMAGE_FORMATS;
-  ALLOWED_IMAGE_SIZE_IN_KB = AppConstants.MAX_ALLOWED_IMAGE_SIZE_IN_KB;
+  ALLOWED_IMAGE_SIZE_IN_KB = AppConstants.MAX_ALLOWED_IMAGE_SIZE_IN_KB_FOR_BLOG;
   constructor(
       ngbActiveModal: NgbActiveModal,
   ) {
