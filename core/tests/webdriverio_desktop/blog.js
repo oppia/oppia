@@ -22,12 +22,14 @@ var general = require('../webdriverio_utils/general.js');
 
 var BlogPages = require('../webdriverio_utils/BlogPages.js');
 var BlogDashboardPage = require('../webdriverio_utils/BlogDashboardPage.js');
+var AdminPage = require('../webdriverio_utils/AdminPage.js');
 
 describe('Blog Pages functionality', function() {
   var blogPages = null;
   var blogDashboardPage = null;
 
   beforeAll(async function() {
+    adminPage = new AdminPage.AdminPage();
     blogPages = new BlogPages.BlogPages();
     blogDashboardPage = new BlogDashboardPage.BlogDashboardPage();
     await users.createUserWithRole(
@@ -39,11 +41,18 @@ describe('Blog Pages functionality', function() {
       'secondUser',
       'blog admin');
     await users.login('secondBlog@blogDashboard.com');
+    // The below lines enable the blog_pages flag in prod mode.
+    // They should be removed after the blog_pages flag is deprecated.
+    await adminPage.getFeaturesTab();
+    var blogPagesFlag = (
+      await adminPage.getBlogPagesFeatureElement());
+    await adminPage.enableFeatureForProd(blogPagesFlag);
   });
 
-  it('should check blog home page welcome message is visible homepage, with' +
+  it('should navigate to blog home page from about drop down, ' +
+  'and checks welcome message is visible on homepage, with' +
   ' no results found page as no blog post is published', async function() {
-    await blogPages.get();
+    await blogPages.getBlogFromAboutDropDown();
     await blogPages.expectNoResultsFoundShown();
     await blogPages.expectBlogHomePageWelcomeHeadingToBeVisible();
     await blogPages.expectOppiaAvatarImageToBeVisible();
@@ -235,18 +244,6 @@ describe('Blog Pages functionality', function() {
     await blogPages.applyTagFilter(['Learners']);
     await blogPages.getBlogPostSearchPage('blog&tags=("Learners")');
     await blogPages.expectNumberOfBlogPostsToBe(1);
-  });
-
-  it('should navigate to Oppia blog homepage if blog feature is enabled via' +
-  'about dropdown', async function() {
-    // The below lines enable the blog_pages flag in prod mode.
-    // They should be removed after the blog_pages flag is deprecated.
-    await adminPage.getFeaturesTab();
-    var blogPagesFlag = (
-      await adminPage.getBlogPagesFeatureElement());
-    await adminPage.enableFeatureForProd(blogPagesFlag);
-
-    await blogPages.getBlogFromAboutDropDown();
   });
 
   afterEach(async function() {

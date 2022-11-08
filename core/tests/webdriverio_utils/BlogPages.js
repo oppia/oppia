@@ -25,7 +25,7 @@ var forms = require('../webdriverio_utils/forms.js');
 
 
 var BlogPages = function() {
-  var blogDashboardPage = null;
+  var blogDashboardPage = new BlogDashboardPage.BlogDashboardPage();
   var noResultsFoundContainer = $('.e2e-test-no-results-found');
   var oppiaBlogHomePageCardContainer = $('.e2e-test-oppia-blog-home-page-card');
   var oppiaAuthorProfilePageCardContainer = $(
@@ -44,7 +44,9 @@ var BlogPages = function() {
   var paginationPrevButton = $('.e2e-test-pagination-prev-button');
   var paginationContainer = $('.e2e-test-pagination');
   var searchInput = $('.e2e-test-search-input');
-  var blogPostTilesSelector = $$('.e2e-test-blog-post-tile-item');
+  var blogPostTilesSelector = function() {
+    return $$('.e2e-test-blog-post-tile-item');
+  };
 
   this.submitSearchQuery = async function(searchQuery) {
     await action.clear('Search input', searchInput);
@@ -57,11 +59,21 @@ var BlogPages = function() {
   };
 
   this.getBlogFromAboutDropDown = async function() {
+    await browser.url('/');
     await waitFor.pageToFullyLoad();
     await general.openAboutDropdown();
     await action.click('Blog link', blogLink);
     await waitFor.pageToFullyLoad();
     await waitFor.newTabToBeCreated('http://localhost:9001/blog');
+    handles = await browser.getWindowHandles();
+    var newHandle = null;
+    for (var i = 0; i < handles.length; i++) {
+      if (initialHandles.indexOf(handles[i]) === -1) {
+        newHandle = handles[i];
+        break;
+      }
+    }
+    await browser.switchToWindow(newHandle);
   };
 
   this.getBlogPostSearchPage = async function(searchQuery) {
@@ -95,11 +107,6 @@ var BlogPages = function() {
       'Tag Filter component taking too long to display');
   };
 
-  this.getBlogDashboardPage = async function() {
-    blogDashboardPage = new BlogDashboardPage.BlogDashboardPage();
-    await blogDashboardPage.get();
-  };
-
   this.publishNewBlogPostFromBlogDashboard = async function(
       blogPostTitle, richTextContent, tagsList
   ) {
@@ -124,7 +131,7 @@ var BlogPages = function() {
   };
 
   this.expectBlogPostSearchFieldToBeVisible = async function() {
-    await waitFor.visibiltyOf(
+    await waitFor.visibilityOf(
       blogPostSearchField,
       'Search Field taking too long to display');
   };
@@ -132,7 +139,7 @@ var BlogPages = function() {
   this.expectNumberOfBlogPostsToBe = async function(number) {
     await this.waitForVisibilityOfBlogHomePageContainer();
     await this.waitForBlogPostsToLoad();
-    var blogPostTiles = await blogPostTilesSelector;
+    var blogPostTiles = await blogPostTilesSelector();
     expect(blogPostTiles.length).toBe(number);
   };
 
@@ -141,7 +148,7 @@ var BlogPages = function() {
       oppiaAuthorProfilePageCardContainer,
       'Oppia Author Profile Page Card taking too long to display');
     await this.waitForBlogPostsToLoad();
-    var blogPostTiles = await blogPostTilesSelector;
+    var blogPostTiles = await blogPostTilesSelector();
     expect(blogPostTiles.length).toBe(number);
   };
 
@@ -175,7 +182,7 @@ var BlogPages = function() {
 
   this.navigateToBlogPostPage = async function(title) {
     await this.waitForBlogPostsToLoad();
-    var blogPostTiles = await blogPostTilesSelector;
+    var blogPostTiles = await blogPostTilesSelector();
     for (i = 0; i < blogPostTiles.length; i++) {
       var blogPostTile = blogPostTiles[i];
       var blogPostTitleContainer = await blogPostTile.$(
@@ -233,7 +240,7 @@ var BlogPages = function() {
       expect(await blogPostsList.isDisplayed()).toBe(false);
     }
     var blogPostRecommendationTiles = (
-      await blogPostTilesSelector);
+      await blogPostTilesSelector());
     expect(blogPostRecommendationTiles.length).toBe(number);
   };
 
@@ -244,7 +251,7 @@ var BlogPages = function() {
       expect(await blogPostsList.isDisplayed()).toBe(false);
     }
     var blogPostRecommendationTiles = (
-      await blogPostTilesSelector);
+      await blogPostTilesSelector());
     var titleList = await Promise.all(
       blogPostRecommendationTiles.map(async function(blogPostTile) {
         var blogPostTitle = await blogPostTile.$(
@@ -259,7 +266,7 @@ var BlogPages = function() {
 
   this.navigateToBlogPostPageFromRecommendations = async function(title) {
     await this.waitForBlogPostsToLoad();
-    var blogPostTiles = await blogPostTilesSelector;
+    var blogPostTiles = await blogPostTilesSelector();
     for (i = 0; i < blogPostTiles.length; i++) {
       var blogPostTile = blogPostTiles[i];
       var blogPostTitleContainer = await blogPostTile.$(
