@@ -425,7 +425,10 @@ def check_test_results(
                     r'Ran ([0-9]+) tests? in ([0-9\.]+)s',
                     task.task_results[0].get_report()[0])
                 if not tests_run_regex_match:
-                    raise AttributeError
+                    # There was an error, and the tests did not run
+                    # (The error message did not match
+                    # `tests_run_regex_match`).
+                    raise Exception
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
                 print(
