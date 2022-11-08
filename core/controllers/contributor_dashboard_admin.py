@@ -413,7 +413,7 @@ class TranslationContributionStatsHandler(
             Exception. There is no topic_id associated with the given
                 TranslationContributionStatsDict.
             Exception. No language_code found for the give
-                TranslationContributionStatsDict
+                TranslationContributionStatsDict.
         """
         translation_contribution_stats_dicts = [
             stats.to_dict() for stats in translation_contribution_stats
