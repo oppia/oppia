@@ -21,7 +21,10 @@ import os
 from core import feconf
 from core import utils
 from core.domain import blog_services
+from core.platform import models
 from core.tests import test_utils
+
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class BlogDashboardPageTests(test_utils.GenericTestBase):
@@ -83,7 +86,10 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         json_response = self.get_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
             )
-        self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
+        self.assertEqual(
+            self.BLOG_EDITOR_USERNAME,
+            json_response['author_details']['displayed_author_name']
+        )
         self.assertEqual(json_response['published_blog_post_summary_dicts'], [])
         self.assertEqual(json_response['draft_blog_post_summary_dicts'], [])
         self.logout()
@@ -151,6 +157,72 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
             csrf_token=csrf_token, expected_status_int=401)
         self.logout()
 
+    def test_put_author_data(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'displayed_author_name': 'new user name',
+            'author_bio': 'general oppia user and blog post author'
+        }
+
+        pre_update_author_details = blog_services.get_blog_author_details(
+            self.blog_editor_id).to_dict()
+        self.assertEqual(
+            pre_update_author_details['displayed_author_name'],
+            self.BLOG_EDITOR_USERNAME
+        )
+        self.assertEqual(pre_update_author_details['author_bio'], '')
+
+        json_response = self.put_json(
+            '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
+            payload, csrf_token=csrf_token)
+
+        self.assertEqual(
+            json_response['author_details']['displayed_author_name'],
+            'new user name'
+        )
+        self.assertEqual(
+            json_response['author_details']['author_bio'],
+            'general oppia user and blog post author'
+        )
+
+        self.logout()
+
+    def test_put_author_details_with_invalid_author_name(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'displayed_author_name': 1234,
+            'author_bio': 'general oppia user and blog post author'
+        }
+        pre_update_author_details = blog_services.get_blog_author_details(
+            self.blog_editor_id).to_dict()
+        self.assertEqual(
+            pre_update_author_details['displayed_author_name'],
+            self.BLOG_EDITOR_USERNAME
+        )
+
+        self.put_json(
+            '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
+            payload, csrf_token=csrf_token,
+            expected_status_int=400)
+
+    def test_put_author_details_with_invalid_author_bio(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'displayed_author_name': 'new user',
+            'author_bio': 1234
+        }
+        pre_update_author_details = blog_services.get_blog_author_details(
+            self.blog_editor_id).to_dict()
+        self.assertEqual(pre_update_author_details['author_bio'], '')
+
+        self.put_json(
+            '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
+            payload, csrf_token=csrf_token,
+            expected_status_int=400)
+
 
 class BlogPostHandlerTests(test_utils.GenericTestBase):
 
@@ -186,7 +258,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
         expected_blog_post_dict = {
             'id': u'%s' % self.blog_post.id,
-            'author_username': self.BLOG_EDITOR_USERNAME,
+            'displayed_author_name': self.BLOG_EDITOR_USERNAME,
             'title': '',
             'content': '',
             'tags': [],
@@ -206,10 +278,11 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         json_response = self.get_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             )
-        self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
+        self.assertEqual(
+            self.BLOG_EDITOR_USERNAME, json_response['displayed_author_name'])
         expected_blog_post_dict = {
             'id': u'%s' % self.blog_post.id,
-            'author_username': self.BLOG_EDITOR_USERNAME,
+            'displayed_author_name': self.BLOG_EDITOR_USERNAME,
             'title': '',
             'content': '',
             'tags': [],
@@ -249,6 +322,41 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             expected_status_int=404)
 
+        self.logout()
+
+    def test_get_blog_post_data_with_author_account_deleted_by_blog_admin(self):
+        blog_services.create_blog_author_details_model(self.blog_editor_id)
+        blog_services.update_blog_author_details(
+            self.blog_editor_id, 'new author name', 'general user bio')
+        # Deleting user setting model.
+        blog_editor_model = (
+            user_models.UserSettingsModel.get_by_id(self.blog_editor_id))
+        blog_editor_model.deleted = True
+        blog_editor_model.update_timestamps()
+        blog_editor_model.put()
+
+        self.login(self.BLOG_ADMIN_EMAIL)
+        json_response = self.get_json(
+            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
+            )
+        self.assertEqual(
+            'new author name', json_response['displayed_author_name'])
+        self.assertIsNone(json_response['profile_picture_data_url'])
+        expected_blog_post_dict = {
+            'id': u'%s' % self.blog_post.id,
+            'displayed_author_name': 'new author name',
+            'title': '',
+            'content': '',
+            'tags': [],
+            'thumbnail_filename': None,
+            'url_fragment': '',
+            'published_on': None,
+            'last_updated': u'%s' % utils.convert_naive_datetime_to_string(
+                self.blog_post.last_updated)
+        }
+        self.assertEqual(
+            expected_blog_post_dict, json_response['blog_post_dict'])
+        self.assertEqual(10, json_response['max_no_of_tags'])
         self.logout()
 
     def test_put_blog_post_data(self):
