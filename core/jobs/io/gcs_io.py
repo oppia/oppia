@@ -94,12 +94,23 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
 
     def _write_file(self, filename):
         """Helper function to write file to the GCS."""
-        print("Client before gcs - ", self.client)
         gcs = gcsio.GcsIO(self.client)
-        file = gcs.open(
-            filename=filename['file'],
-            mode=self.mode,
-            mime_type=self.mime_type)
-        write_file = file.write(filename['data'])
-        file.close()
-        return write_file
+        bucket, _ = gcsio.parse_gcs_path(filename['file'])
+        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        print(gcs.get_bucket(bucket))
+        if gcs.get_bucket(bucket + 'abc') is None:
+            # gcs.create_bucket(bucket)
+            print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
+        if not gcs.exists(filename['file']):
+            file = gcs.open(
+                filename=filename['file'],
+                mode=self.mode,
+                mime_type=self.mime_type)
+            write_file = file.write(filename['data'])
+            file.close()
+            print("******************************")
+            print(self.client.buckets)
+            print(self.client.buckets.get_bucket('gcsio-test'))
+            print(gcs.get_bucket(bucket))
+            print(self.client.objects.files)
+            return write_file
