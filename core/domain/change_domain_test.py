@@ -47,7 +47,6 @@ class ChangeDomainTests(test_utils.GenericTestBase):
             change_dict['required_attribute_names'] = ['assignee_id']
             change_object.validate_dict(change_dict)
 
-
     def test_that_error_appenden_when_attribute_missing(self) -> None:
         valid_cmd_dict = {
             'name': 'AUTO',
