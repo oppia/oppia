@@ -228,9 +228,9 @@ export class QuestionBackendApiService {
       const diagnosticTestQuestionsURL = (
         this.urlInterpolationService.interpolateUrl(
           '/diagnostic_test_questions_handler_url/<topic_id>' +
-          '?exclude_question_ids=<exclude_question_ids>', {
+          '?excluded_question_ids=<excluded_question_ids>', {
             topic_id: topicId,
-            exclude_question_ids: excludeQuestionIds.join(',')
+            excluded_question_ids: excludeQuestionIds.join(',')
           }));
 
       this.http.get<SkillIdToQuestionsBackendResponse>(

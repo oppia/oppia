@@ -151,16 +151,16 @@ describe('Question deletion modal', () => {
 
   it(
     'should be able to remove questions when skill is assigned to ' +
-    'the diagnostic test and question count is greater than 2',
+    'the diagnostic test and question count is greater than 3',
     fakeAsync(() => {
       expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
       componentInstance.canEditQuestion = true;
-      componentInstance.numberOfQuestions = 3;
+      componentInstance.numberOfQuestions = 4;
       componentInstance.fetchTopicAssignmentsForSkill();
       tick();
       expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
 
-      componentInstance.numberOfQuestions = 4;
+      componentInstance.numberOfQuestions = 7;
       componentInstance.fetchTopicAssignmentsForSkill();
       tick();
       expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
