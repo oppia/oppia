@@ -495,9 +495,9 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         """Test that requests for invalid asset type is rejected with a 404."""
         self.login(self.EDITOR_EMAIL)
 
-        self.get_html_response(
+        self.get_json(
             '/assetsdevhandler/exploration/0/assets/unknowntype/myfile',
-            expected_status_int=404)
+            expected_status_int=400)
         self.logout()
 
     def test_get_response_with_dev_mode_disabled_returns_404_status(
