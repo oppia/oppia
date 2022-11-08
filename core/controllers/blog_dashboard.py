@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
@@ -76,13 +77,34 @@ class BlogDashboardDataHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {},
+        'PUT': {
+            'displayed_author_name': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_AUTHOR_NAME_LENGTH
+                }]
+            },
+            'author_bio': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_AUTHOR_BIO
+                }]
+            },
+        },
     }
 
     @acl_decorators.can_access_blog_dashboard
     def get(self) -> None:
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
-
+        author_details = (
+            blog_services.get_blog_author_details(self.user_id).to_dict())
         no_of_published_blog_posts = 0
         published_post_summary_dicts = []
         no_of_draft_blog_posts = 0
@@ -105,7 +127,7 @@ class BlogDashboardDataHandler(base.BaseHandler):
                 _get_blog_card_summary_dicts_for_dashboard(
                     draft_blog_post_summaries))
         self.values.update({
-            'username': user_settings.username,
+            'author_details': author_details,
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'no_of_published_blog_posts': no_of_published_blog_posts,
             'no_of_draft_blog_posts': no_of_draft_blog_posts,
@@ -120,6 +142,23 @@ class BlogDashboardDataHandler(base.BaseHandler):
         """Handles POST requests to create a new blog post draft."""
         new_blog_post = blog_services.create_new_blog_post(self.user_id)
         self.render_json({'blog_post_id': new_blog_post.id})
+
+    @acl_decorators.can_access_blog_dashboard
+    def put(self) -> None:
+        """Updates author details of the user."""
+        displayed_author_name = self.normalized_payload.get(
+            'displayed_author_name')
+        author_bio = self.normalized_payload.get('author_bio')
+        blog_services.update_blog_author_details(
+            self.user_id, displayed_author_name, author_bio
+        )
+        author_details = (
+            blog_services.get_blog_author_details(self.user_id).to_dict())
+
+        self.values.update({
+            'author_details': author_details,
+        })
+        self.render_json(self.values)
 
 
 class BlogPostHandler(base.BaseHandler):
@@ -174,10 +213,16 @@ class BlogPostHandler(base.BaseHandler):
         if blog_post is None:
             raise self.PageNotFoundException(
                 'The blog post with the given id or url doesn\'t exist.')
-        user_settings = user_services.get_users_settings(
-            [blog_post.author_id], strict=False, include_marked_deleted=True)
-        username = user_settings[0].username
 
+        user_settings = user_services.get_user_settings(
+            blog_post.author_id, strict=False)
+        if user_settings:
+            profile_picture_data_url = user_settings.profile_picture_data_url
+        else:
+            profile_picture_data_url = None
+
+        author_details = blog_services.get_blog_author_details(
+            blog_post.author_id)
         max_no_of_tags = config_domain.Registry.get_config_property(
             'max_number_of_tags_assigned_to_blog_post').value
         list_of_default_tags = config_domain.Registry.get_config_property(
@@ -185,13 +230,13 @@ class BlogPostHandler(base.BaseHandler):
 
         blog_post_dict = blog_post.to_dict()
         del blog_post_dict['author_id']
-        blog_post_dict['author_username'] = username
+        blog_post_dict['displayed_author_name'] = (
+            author_details.displayed_author_name)
 
         self.values.update({
             'blog_post_dict': blog_post_dict,
-            'username': username,
-            'profile_picture_data_url': (
-                user_settings[0].profile_picture_data_url),
+            'displayed_author_name': author_details.displayed_author_name,
+            'profile_picture_data_url': profile_picture_data_url,
             'max_no_of_tags': max_no_of_tags,
             'list_of_default_tags': list_of_default_tags
         })
