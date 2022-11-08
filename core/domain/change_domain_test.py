@@ -41,11 +41,12 @@ class ChangeDomainTests(test_utils.GenericTestBase):
             'cmd': feconf.CMD_DELETE_COMMIT
         })
         with self.assertRaisesRegex(utils.ValidationError, (
-            'The following extra attributes are present:'
+            'The following extra attributes are present: '
             'required_attribute_names')):
             change_dict = change_object.to_dict()
             change_dict['required_attribute_names'] = ['assignee_id']
             change_object.validate_dict(change_dict)
+
 
     def test_that_error_appenden_when_attribute_missing(self) -> None:
         valid_cmd_dict = {
@@ -59,61 +60,11 @@ class ChangeDomainTests(test_utils.GenericTestBase):
             }
         }
 
-        actual_cmd_attributes = change_domain.BaseChange({
-           {'name': 'name', 'key3': 'val'}
-        })
+        actual_cmd_attributes = {}
 
         with self.assertRaisesRegex(utils.ValidationError, (
-            'The following required attributes are missing:'
-            'key1, The following extra attributes are present: key3, name')):
-
-            change_domain.validate_cmd(
-            feconf.CMD_DELETE_COMMIT,
-            valid_cmd_dict, actual_cmd_attributes)
-
-    def test_that_error_appenden_when_value_deprecated(self) -> None:
-        valid_cmd_dict = change_domain.BaseChange({
-           'name': 'AUTO',
-            'required_attribute_names': ['name'],
-            'optional_attribute_names': ['name'],
-            'user_id_attribute_names': ['name'],
-            'allowed_values': {},
-            'deprecated_values': {
-                'name': ['name']
-            }
-        })
-
-        actual_cmd_attributes = change_domain.BaseChange({
-           {'name': 'name'}
-        })
-
-        with self.assertRaisesRegex(utils.DeprecatedCommandError, (
-            'Value for name in cmd AUTO_mark_deleted: name is deprecated')):
-
-            change_domain.validate_cmd(
-            feconf.CMD_DELETE_COMMIT,
-            valid_cmd_dict, actual_cmd_attributes)
-
-    def test_that_error_appenden_when_value_not_allowed(self) -> None:
-        valid_cmd_dict = change_domain.BaseChange({
-           'name': 'AUTO',
-                'required_attribute_names': ['key'],
-                'optional_attribute_names': ['id', 'name'],
-                'user_id_attribute_names': ['name'],
-                'deprecated_values': {
-                },
-                'allowed_values': {
-                   'name': ['name'],
-                   'id': ['id']
-                }
-        })
-
-        actual_cmd_attributes = change_domain.BaseChange({
-           {'id': 'id1', 'key': 'key1', 'name': 'name1'}
-        })
-
-        with self.assertRaisesRegex(utils.ValidationError, (
-            'Value for name in cmd AUTO_mark_deleted: name1 is not allowed')):
+            'The following required attributes are missing: '
+            'key1')):
 
             change_domain.validate_cmd(
             feconf.CMD_DELETE_COMMIT,
