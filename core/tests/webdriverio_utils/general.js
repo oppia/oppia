@@ -257,9 +257,7 @@ var openProfileDropdown = async function() {
 
 var openAboutDropdown = async function() {
   var aboutDropdown = $('.e2e-test-about-oppia-list-item');
-  await action.click(
-    'About dropdown',
-    aboutDropdown);
+  await action.click('About dropdown', aboutDropdown);
 };
 
 var navigateToTopicsAndSkillsDashboardPage = async function() {

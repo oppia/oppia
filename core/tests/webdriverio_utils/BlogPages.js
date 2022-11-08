@@ -26,7 +26,7 @@ var forms = require('../webdriverio_utils/forms.js');
 
 var BlogPages = function() {
   var blogDashboardPage = null;
-  var noResultsFoundContainer = $('.e2e-test-no-results-shown');
+  var noResultsFoundContainer = $('.e2e-test-no-results-found');
   var oppiaBlogHomePageCardContainer = $('.e2e-test-oppia-blog-home-page-card');
   var oppiaAuthorProfilePageCardContainer = $(
     '.e2e-test-oppia-author-profile-page-card');
@@ -44,15 +44,9 @@ var BlogPages = function() {
   var paginationPrevButton = $('.e2e-test-pagination-prev-button');
   var paginationContainer = $('.e2e-test-pagination');
   var searchInput = $('.e2e-test-search-input');
-  var blogPostTilesSelector = function() {
-    return $$('.e2e-test-blog-post-tile-item');
-  };
-  var blogPostRecommendationTilesSelector = function() {
-    return $$('.e2e-test-blog-post-tile-item');
-  };
+  var blogPostTilesSelector = $$('.e2e-test-blog-post-tile-item');
 
   this.submitSearchQuery = async function(searchQuery) {
-    await waitFor.pageToFullyLoad();
     await action.clear('Search input', searchInput);
     await action.setValue('Search input', searchInput, searchQuery);
   };
@@ -60,6 +54,14 @@ var BlogPages = function() {
   this.get = async function() {
     await browser.url(general.BLOG_PAGE_URL_SUFFIX);
     await waitFor.pageToFullyLoad();
+  };
+
+  this.getBlogFromAboutDropDown = async function() {
+    await waitFor.pageToFullyLoad();
+    await general.openAboutDropdown();
+    await action.click('Blog link', blogLink);
+    await waitFor.pageToFullyLoad();
+    await waitFor.newTabToBeCreated('http://localhost:9001/blog');
   };
 
   this.getBlogPostSearchPage = async function(searchQuery) {
@@ -84,7 +86,7 @@ var BlogPages = function() {
   this.expectOppiaAvatarImageToBeVisible = async function() {
     await waitFor.visibilityOf(
       oppiaAvatarImage,
-      'Oppia Image Avatar image taking too long to display');
+      'Oppia Avatar image taking too long to display');
   };
 
   this.expectTagFilterComponentToBeVisible = async function() {
@@ -96,7 +98,6 @@ var BlogPages = function() {
   this.getBlogDashboardPage = async function() {
     blogDashboardPage = new BlogDashboardPage.BlogDashboardPage();
     await blogDashboardPage.get();
-    await blogDashboardPage.expectCurrUserToHaveProfilePhoto();
   };
 
   this.publishNewBlogPostFromBlogDashboard = async function(
@@ -123,13 +124,15 @@ var BlogPages = function() {
   };
 
   this.expectBlogPostSearchFieldToBeVisible = async function() {
-    expect(await blogPostSearchField.isDisplayed()).toBe(true);
+    await waitFor.visibiltyOf(
+      blogPostSearchField,
+      'Search Field taking too long to display');
   };
 
   this.expectNumberOfBlogPostsToBe = async function(number) {
     await this.waitForVisibilityOfBlogHomePageContainer();
     await this.waitForBlogPostsToLoad();
-    var blogPostTiles = await blogPostTilesSelector();
+    var blogPostTiles = await blogPostTilesSelector;
     expect(blogPostTiles.length).toBe(number);
   };
 
@@ -138,7 +141,7 @@ var BlogPages = function() {
       oppiaAuthorProfilePageCardContainer,
       'Oppia Author Profile Page Card taking too long to display');
     await this.waitForBlogPostsToLoad();
-    var blogPostTiles = await blogPostTilesSelector();
+    var blogPostTiles = await blogPostTilesSelector;
     expect(blogPostTiles.length).toBe(number);
   };
 
@@ -172,7 +175,7 @@ var BlogPages = function() {
 
   this.navigateToBlogPostPage = async function(title) {
     await this.waitForBlogPostsToLoad();
-    var blogPostTiles = await blogPostTilesSelector();
+    var blogPostTiles = await blogPostTilesSelector;
     for (i = 0; i < blogPostTiles.length; i++) {
       var blogPostTile = blogPostTiles[i];
       var blogPostTitleContainer = await blogPostTile.$(
@@ -230,18 +233,18 @@ var BlogPages = function() {
       expect(await blogPostsList.isDisplayed()).toBe(false);
     }
     var blogPostRecommendationTiles = (
-      await blogPostRecommendationTilesSelector());
+      await blogPostTilesSelector);
     expect(blogPostRecommendationTiles.length).toBe(number);
   };
 
-  this.expectRecommendationToContainPostWithTitle = async function(title) {
+  this.expectRecommendationsToContainPostWithTitle = async function(title) {
     if (title) {
       await this.waitForBlogPostsToLoad();
     } else {
       expect(await blogPostsList.isDisplayed()).toBe(false);
     }
     var blogPostRecommendationTiles = (
-      await blogPostRecommendationTilesSelector());
+      await blogPostTilesSelector);
     var titleList = await Promise.all(
       blogPostRecommendationTiles.map(async function(blogPostTile) {
         var blogPostTitle = await blogPostTile.$(
@@ -256,7 +259,7 @@ var BlogPages = function() {
 
   this.navigateToBlogPostPageFromRecommendations = async function(title) {
     await this.waitForBlogPostsToLoad();
-    var blogPostTiles = await blogPostRecommendationTilesSelector();
+    var blogPostTiles = await blogPostTilesSelector;
     for (i = 0; i < blogPostTiles.length; i++) {
       var blogPostTile = blogPostTiles[i];
       var blogPostTitleContainer = await blogPostTile.$(

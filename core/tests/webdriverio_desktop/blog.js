@@ -53,7 +53,7 @@ describe('Blog Pages functionality', function() {
 
   it('should only show published blog post on blog page, navigate to blog ' +
   'post page and show no recommendations', async function() {
-    await blogPages.getBlogDashboardPage();
+    await blogDashboardPage.get();
     await blogDashboardPage.updateAuthorDetails(
       'secondUser', 'Oppia Blog Author');
 
@@ -91,7 +91,7 @@ describe('Blog Pages functionality', function() {
   it('should show published blog posts on blog page and use pagination,',
     async function() {
       // Publishing 7 blog posts by user with username 'blog'.
-      await blogPages.getBlogDashboardPage();
+      await blogDashboardPage.get();
       await blogDashboardPage.updateAuthorDetails(
         'blog', 'Oppia Blog Author with name blog');
       await blogPages.publishNewBlogPostFromBlogDashboard(
@@ -135,7 +135,7 @@ describe('Blog Pages functionality', function() {
       // Logging in with different username - 'secondUser' and publishing a
       // few more blog posts.
       await users.login('secondBlog@blogDashboard.com');
-      await blogPages.getBlogDashboardPage();
+      await blogDashboardPage.get();
       await blogPages.publishNewBlogPostFromBlogDashboard(
         'Article number Nine',
         'I’m Oppia! I’m an online personal tutor for everybody!',
@@ -170,9 +170,9 @@ describe('Blog Pages functionality', function() {
     await blogPages.expectBlogPostPageTitleToBe('Blog post Title Five');
     await blogPages.expectBlogAuthorDetailsToBeVisible('blog');
     await blogPages.expectNumberOfRecommendationPostsToBe(2);
-    await blogPages.expectRecommendationToContainPostWithTitle(
+    await blogPages.expectRecommendationsToContainPostWithTitle(
       'Eight Article by blog author');
-    await blogPages.expectRecommendationToContainPostWithTitle(
+    await blogPages.expectRecommendationsToContainPostWithTitle(
       'Seventh Bloggers Post');
 
     await blogPages.navigateToBlogPostPageFromRecommendations(
@@ -180,9 +180,9 @@ describe('Blog Pages functionality', function() {
     await blogPages.expectBlogPostPageTitleToBe('Eight Article by blog author');
     await blogPages.expectBlogAuthorDetailsToBeVisible('blog');
     await blogPages.expectNumberOfRecommendationPostsToBe(2);
-    await blogPages.expectRecommendationToContainPostWithTitle(
+    await blogPages.expectRecommendationsToContainPostWithTitle(
       'Seventh Bloggers Post');
-    await blogPages.expectRecommendationToContainPostWithTitle(
+    await blogPages.expectRecommendationsToContainPostWithTitle(
       'Sixth Blog');
 
     await blogPages.navigateToBlogAuthorPage();
@@ -197,9 +197,9 @@ describe('Blog Pages functionality', function() {
     await blogPages.expectBlogPostPageTitleToBe('Article number Nine');
     await blogPages.expectBlogAuthorDetailsToBeVisible('secondUser');
     await blogPages.expectNumberOfRecommendationPostsToBe(2);
-    await blogPages.expectRecommendationToContainPostWithTitle(
+    await blogPages.expectRecommendationsToContainPostWithTitle(
       'Seventh Bloggers Post');
-    await blogPages.expectRecommendationToContainPostWithTitle(
+    await blogPages.expectRecommendationsToContainPostWithTitle(
       'Eight Article by blog author');
 
     await blogPages.navigateToBlogAuthorPage();
@@ -209,9 +209,9 @@ describe('Blog Pages functionality', function() {
     await blogPages.navigateToBlogPostPage('Latest Published blog post');
     await blogPages.expectBlogPostPageTitleToBe('Latest Published blog post');
     await blogPages.expectNumberOfRecommendationPostsToBe(2);
-    await blogPages.expectRecommendationToContainPostWithTitle(
+    await blogPages.expectRecommendationsToContainPostWithTitle(
       'Sixth Blog');
-    await blogPages.expectRecommendationToContainPostWithTitle(
+    await blogPages.expectRecommendationsToContainPostWithTitle(
       '11th Published blog post');
     await blogPages.navigateToBlogHomePageWithBackButton();
   });
@@ -235,6 +235,18 @@ describe('Blog Pages functionality', function() {
     await blogPages.applyTagFilter(['Learners']);
     await blogPages.getBlogPostSearchPage('blog&tags=("Learners")');
     await blogPages.expectNumberOfBlogPostsToBe(1);
+  });
+
+  it('should navigate to Oppia blog homepage if blog feature is enabled via' +
+  'about dropdown', async function() {
+    // The below lines enable the blog_pages flag in prod mode.
+    // They should be removed after the blog_pages flag is deprecated.
+    await adminPage.getFeaturesTab();
+    var blogPagesFlag = (
+      await adminPage.getBlogPagesFeatureElement());
+    await adminPage.enableFeatureForProd(blogPagesFlag);
+
+    await blogPages.getBlogFromAboutDropDown();
   });
 
   afterEach(async function() {
