@@ -1573,9 +1573,6 @@ USER_ID_LENGTH = 36
 USER_ID_REGEX = r'uid_[a-z]{%s}' % USER_ID_RANDOM_PART_LENGTH
 PSEUDONYMOUS_ID_REGEX = r'pid_[a-z]{%s}' % USER_ID_RANDOM_PART_LENGTH
 
-# This email_id regex is taken from: https://emailregex.com/
-VALID_EMAIL_ID_REGEX = r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
-
 # Length of user PIN for different roles used on Android.
 FULL_USER_PIN_LENGTH = 5
 PROFILE_USER_PIN_LENGTH = 3

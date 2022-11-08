@@ -108,9 +108,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         # Here we use MyPy ignore because the 'id' of a question can only
-        # be a type string but here we are assigning it with None because
+        # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
-        # but the id is still needed to be assigned.
+        # and the id is still needed to be assigned.
         question_dict['id'] = None  # type: ignore[arg-type]
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -192,9 +192,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         # Here we use MyPy ignore because the 'id' of a question can only
-        # be a type string but here we are assigning it with None because
+        # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
-        # but the id is still needed to be assigned.
+        # and the id is still needed to be assigned.
         question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         self.post_json(
@@ -221,9 +221,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         # Here we use MyPy ignore because the 'id' of a question can only
-        # be a type string but here we are assigning it with None because
+        # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
-        # but the id is still needed to be assigned.
+        # and the id is still needed to be assigned.
         question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         self.post_json(
@@ -241,9 +241,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         # Here we use MyPy ignore because the 'id' of a question can only
-        # be a type string but here we are assigning it with None because
+        # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
-        # but the id is still needed to be assigned.
+        # and the id is still needed to be assigned.
         question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         self.post_json(
@@ -261,9 +261,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         # Here we use MyPy ignore because the 'id' of a question can only
-        # be a type string but here we are assigning it with None because
+        # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
-        # but the id is still needed to be assigned.
+        # and the id is still needed to be assigned.
         question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         self.post_json(
@@ -279,9 +279,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         # Here we use MyPy ignore because the 'id' of a question can only
-        # be a type string but here we are assigning it with None because
+        # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
-        # but the id is still needed to be assigned.
+        # and the id is still needed to be assigned.
         question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         self.post_json(
@@ -305,9 +305,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         # Here we use MyPy ignore because the 'id' of a question can only
-        # be a type string but here we are assigning it with None because
+        # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
-        # but the id is still needed to be assigned.
+        # and the id is still needed to be assigned.
         question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         self.post_json(
@@ -329,9 +329,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         # Here we use MyPy ignore because the 'id' of a question can only
-        # be a type string but here we are assigning it with None because
+        # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
-        # but the id is still needed to be assigned.
+        # and the id is still needed to be assigned.
         question_dict['id'] = None  # type: ignore[arg-type]
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally
@@ -362,9 +362,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         filename = 'img.png'
         question_dict = self.question.to_dict()
         # Here we use MyPy ignore because the 'id' of a question can only
-        # be a type string but here we are assigning it with None because
+        # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
-        # but the id is still needed to be assigned.
+        # and the id is still needed to be assigned.
         question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         content_html = (
@@ -403,9 +403,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         # Here we use MyPy ignore because the 'id' of a question can only
-        # be a type string but here we are assigning it with None because
+        # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
-        # but the id is still needed to be assigned.
+        # and the id is still needed to be assigned.
         question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         content_html = (

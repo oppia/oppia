@@ -131,7 +131,7 @@ class BulkEmailWebhookEndpoint(
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
-                        'regex_pattern': feconf.VALID_EMAIL_ID_REGEX
+                        'regex_pattern': constants.EMAIL_REGEX
                     }]
                 },
                 'default_value': None

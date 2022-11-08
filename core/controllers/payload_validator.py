@@ -59,10 +59,10 @@ def get_corresponding_key_for_object(arg_schema: Dict[str, Any]) -> str:
 
 # Here we use type Any because the argument 'handler_args' is a dictionary
 # representation of arguments that needs to be validated and these arguments
-# can be of any type, and argument 'handler_args_schemas' is annotated with
-# Any type because this argument can contain schemas of the handler and those
-# schemas can be of different kinds of dictionaries. The return type also used
-# Any because this method returns normalized values of arguments.
+# can be of any type, and the argument 'handler_args_schemas' is also annotated
+# with Any type because this argument can accept schemas of the handler and
+# those schemas can be of different kinds of dictionaries. The return type also
+# used Any because this method returns the normalized values of arguments.
 def validate_arguments_against_schema(
     handler_args: Dict[str, Any],
     handler_args_schemas: Dict[str, Any],

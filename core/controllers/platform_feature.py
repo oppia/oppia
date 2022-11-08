@@ -33,7 +33,7 @@ class PlatformFeaturesEvaluationHandlerNormalizedRequestDict(TypedDict):
     normalized_request dictionary.
     """
 
-    platform_type: str
+    platform_type: Optional[str]
     browser_type: Optional[str]
     app_version: Optional[str]
 
