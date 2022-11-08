@@ -31,6 +31,7 @@ from core.domain import html_cleaner
 from core.domain import role_services
 from core.domain import search_services
 from core.domain import user_domain
+from core.domain import user_services
 from core.platform import models
 
 from typing import (
@@ -398,7 +399,7 @@ def get_blog_post_rights(
 
 
 def get_published_blog_post_summaries_by_user_id(
-    user_id: str, max_limit: int
+    user_id: str, max_limit: int, offset: int=0
 ) -> List[blog_domain.BlogPostSummary]:
     """Retrieves the summary objects for given number of published blog posts
     for which the given user is an editor.
@@ -406,6 +407,7 @@ def get_published_blog_post_summaries_by_user_id(
     Args:
         user_id: str. ID of the user.
         max_limit: int. The number of models to be fetched.
+        offset: int. Number of query results to skip from top.
 
     Returns:
         list(BlogPostSummary). The summary objects associated with the
@@ -413,7 +415,9 @@ def get_published_blog_post_summaries_by_user_id(
     """
     blog_rights_models = (
         blog_models.BlogPostRightsModel.get_published_models_by_user(
-            user_id, max_limit))
+            user_id, offset, max_limit
+        )
+    )
     if not blog_rights_models:
         return []
     blog_post_ids = [model.id for model in blog_rights_models]
@@ -827,6 +831,18 @@ def get_total_number_of_published_blog_post_summaries() -> int:
     ).count()
 
 
+def get_total_number_of_published_blog_post_summaries_by_author(
+    author_id: str
+) -> int:
+    """Returns total number of published BlogPostSummaries by author.
+
+    Returns:
+        int. Total number of published BlogPostSummaries by author.
+    """
+    return len(blog_models.BlogPostRightsModel.get_published_models_by_user(
+        author_id))
+
+
 def update_blog_models_author_and_published_on_date(
     blog_post_id: str,
     author_id: str,
@@ -958,3 +974,74 @@ def get_blog_post_ids_matching_query(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))
     return (valid_blog_post_ids, search_offset)
+
+
+def create_blog_author_details_model(user_id: str) -> None:
+    """Creates a new blog author details model.
+
+    Args:
+        user_id: str. The user ID of the blog author.
+    """
+    user_settings = user_services.get_user_settings(user_id, strict=True)
+    # Adding an if statement for mypy type checks to pass.
+    if user_settings.username:
+        blog_models.BlogAuthorDetailsModel.create(
+            user_id,
+            user_settings.username,
+            user_settings.user_bio
+        )
+
+
+def get_blog_author_details(user_id: str) -> blog_domain.BlogAuthorDetails:
+    """Returns the blog author details for the given user id. If
+    blogAuthorDetailsModel is not present, a new model with default values is
+    created.
+
+    Args:
+        user_id: str. The user id of the blog author.
+
+    Returns:
+        BlogAuthorDetails. The blog author details for the given user ID.
+
+    Raises:
+        Exception. Unable to fetch blog author details for the given user ID.
+    """
+    author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
+
+    if author_model is None:
+        create_blog_author_details_model(user_id)
+        author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
+
+    if author_model is None:
+        raise Exception('Unable to fetch author details for the given user.')
+
+    return blog_domain.BlogAuthorDetails(
+        author_model.id,
+        author_model.author_id,
+        author_model.displayed_author_name,
+        author_model.author_bio,
+        author_model.last_updated
+        )
+
+
+def update_blog_author_details(
+    user_id: str, displayed_author_name: str, author_bio: str
+) -> None:
+    """Updates the author name and bio for the given user id.
+
+    Args:
+        user_id: str. The user id of the blog author.
+        displayed_author_name: str. The publicly viewable name of the author.
+        author_bio: str. The bio of the blog author.
+    """
+    blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
+        user_id)
+    blog_domain.BlogAuthorDetails.require_valid_displayed_author_name(
+        displayed_author_name)
+
+    # Adding an if statement for mypy type checks to pass.
+    if blog_author_model:
+        blog_author_model.displayed_author_name = displayed_author_name
+        blog_author_model.author_bio = author_bio
+        blog_author_model.update_timestamps()
+        blog_author_model.put()

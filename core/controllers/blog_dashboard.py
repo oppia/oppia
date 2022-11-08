@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
@@ -94,9 +95,29 @@ class BlogDashboardDataHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+    HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {},
+        'PUT': {
+            'displayed_author_name': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_AUTHOR_NAME_LENGTH
+                }]
+            },
+            'author_bio': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_AUTHOR_BIO
+                }]
+            },
+        },
     }
 
     @acl_decorators.can_access_blog_dashboard
@@ -104,7 +125,8 @@ class BlogDashboardDataHandler(
         """Handles GET requests."""
         assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
-
+        author_details = (
+            blog_services.get_blog_author_details(self.user_id).to_dict())
         no_of_published_blog_posts = 0
         published_post_summary_dicts = []
         no_of_draft_blog_posts = 0
@@ -127,7 +149,7 @@ class BlogDashboardDataHandler(
                 _get_blog_card_summary_dicts_for_dashboard(
                     draft_blog_post_summaries))
         self.values.update({
-            'username': user_settings.username,
+            'author_details': author_details,
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'no_of_published_blog_posts': no_of_published_blog_posts,
             'no_of_draft_blog_posts': no_of_draft_blog_posts,
@@ -143,6 +165,25 @@ class BlogDashboardDataHandler(
         assert self.user_id is not None
         new_blog_post = blog_services.create_new_blog_post(self.user_id)
         self.render_json({'blog_post_id': new_blog_post.id})
+
+    @acl_decorators.can_access_blog_dashboard
+    def put(self) -> None:
+        """Updates author details of the user."""
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        displayed_author_name = self.normalized_payload[
+            'displayed_author_name']
+        author_bio = self.normalized_payload['author_bio']
+        blog_services.update_blog_author_details(
+            self.user_id, displayed_author_name, author_bio
+        )
+        author_details = (
+            blog_services.get_blog_author_details(self.user_id).to_dict())
+
+        self.values.update({
+            'author_details': author_details,
+        })
+        self.render_json(self.values)
 
 
 class BlogPostHandlerNormalizedPayloadDict(TypedDict):
@@ -219,10 +260,16 @@ class BlogPostHandler(
         if blog_post is None:
             raise self.PageNotFoundException(
                 'The blog post with the given id or url doesn\'t exist.')
-        user_settings = user_services.get_users_settings(
-            [blog_post.author_id], strict=True, include_marked_deleted=True)
-        username = user_settings[0].username
 
+        user_settings = user_services.get_user_settings(
+            blog_post.author_id, strict=False)
+        if user_settings:
+            profile_picture_data_url = user_settings.profile_picture_data_url
+        else:
+            profile_picture_data_url = None
+
+        author_details = blog_services.get_blog_author_details(
+            blog_post.author_id)
         max_no_of_tags = config_domain.Registry.get_config_property(
             'max_number_of_tags_assigned_to_blog_post', strict=True).value
         list_of_default_tags = config_domain.Registry.get_config_property(
@@ -232,7 +279,7 @@ class BlogPostHandler(
         blog_post_dict_for_dashboard = {
             'id': blog_post_dict['id'],
             'title': blog_post_dict['title'],
-            'author_username': username,
+            'displayed_author_name': author_details.displayed_author_name,
             'content': blog_post_dict['content'],
             'url_fragment': blog_post_dict['url_fragment'],
             'tags': blog_post_dict['tags'],
@@ -240,12 +287,10 @@ class BlogPostHandler(
             'last_updated': blog_post_dict['last_updated'],
             'published_on': blog_post_dict['published_on'],
         }
-
         self.values.update({
             'blog_post_dict': blog_post_dict_for_dashboard,
-            'username': username,
-            'profile_picture_data_url': (
-                user_settings[0].profile_picture_data_url),
+            'displayed_author_name': author_details.displayed_author_name,
+            'profile_picture_data_url': profile_picture_data_url,
             'max_no_of_tags': max_no_of_tags,
             'list_of_default_tags': list_of_default_tags
         })
