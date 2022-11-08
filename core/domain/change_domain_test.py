@@ -17,6 +17,7 @@
 """Unit tests for change_domain.py"""
 
 from __future__ import annotations
+from typing import Mapping
 
 
 from core import feconf
@@ -47,10 +48,11 @@ class ChangeDomainTests(test_utils.GenericTestBase):
             change_dict['required_attribute_names'] = ['assignee_id']
             change_object.validate_dict(change_dict)
 
-    def test_that_error_appenden_when_attribute_missing(self) -> None:
 
+    def test_that_error_appenden_when_attribute_missing(self) -> None:
         valid_cmd_dict = feconf.ValidCmdDict(
-            name='AUTO', required_attribute_names=['key1'],
+            name='AUTO',
+            required_attribute_names=['key1'],
             optional_attribute_names=['key 2'],
             user_id_attribute_names=['name'],
             allowed_values={},
@@ -65,3 +67,47 @@ class ChangeDomainTests(test_utils.GenericTestBase):
             change_domain.validate_cmd(
             feconf.CMD_DELETE_COMMIT,
             valid_cmd_dict, {})
+
+
+    def test_that_error_appenden_when_value_deprecated(self) -> None:
+        valid_cmd_dict = feconf.ValidCmdDict(
+            name='AUTO',
+            required_attribute_names=['name'],
+            optional_attribute_names=['name'],
+            user_id_attribute_names=['name'],
+            allowed_values={},
+            deprecated_values={
+                'name': ['name']
+            }
+        )
+
+        actual_cmd_attributes = {"name": "name"}
+
+        with self.assertRaisesRegex(utils.DeprecatedCommandError, (
+            'Value for name in cmd AUTO_mark_deleted: name is deprecated')):
+            change_domain.validate_cmd(
+            feconf.CMD_DELETE_COMMIT,
+            valid_cmd_dict, actual_cmd_attributes)
+
+    def test_that_error_appenden_when_value_not_allowed(self) -> None:
+        valid_cmd_dict = feconf.ValidCmdDict(
+            name='AUTO',
+            required_attribute_names=['key'],
+            optional_attribute_names=['id', 'name'],
+            user_id_attribute_names=['name'],
+            deprecated_values={
+                },
+            allowed_values={
+                   'name': ['name'],
+                   'id': ['id']
+                }
+        )
+
+        actual_cmd_attributes = {'id': 'id1', 'key': 'key1', 'name': 'name1'}
+
+        with self.assertRaisesRegex(utils.ValidationError, (
+            'Value for name in cmd AUTO_mark_deleted: name1 is not allowed')):
+
+            change_domain.validate_cmd(
+            feconf.CMD_DELETE_COMMIT,
+            valid_cmd_dict, actual_cmd_attributes)
