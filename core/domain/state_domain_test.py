@@ -2978,9 +2978,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 exploration.validate()
         self.assertEqual(init_state.card_is_checkpoint, True)
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_validate_solution_answer_is_exclusive(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 

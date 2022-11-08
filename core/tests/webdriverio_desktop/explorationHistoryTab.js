@@ -579,7 +579,7 @@ describe('Exploration history', function() {
       'tags: []\n' +
       'blurb: \'\'\n' +
       'author_notes: \'\'\n' +
-      'states_schema_version: 53\n' +
+      'states_schema_version: 54\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +
@@ -597,7 +597,7 @@ describe('Exploration history', function() {
       'tags: []\n' +
       'blurb: \'\'\n' +
       'author_notes: \'\'\n' +
-      'states_schema_version: 53\n' +
+      'states_schema_version: 54\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +

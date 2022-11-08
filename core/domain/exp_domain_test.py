@@ -1239,12 +1239,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             translation_dict)
         self.new_exploration = (
             exp_domain.Exploration.create_default_exploration('test_id'))
-        content_id_generator = translation_domain.ContentIdGenerator(
+        self.content_id_generator = translation_domain.ContentIdGenerator(
             self.new_exploration.next_content_id_index
         )
         self.state = self.new_exploration.states['Introduction']
         self.set_interaction_for_state(
-            self.state, 'Continue', content_id_generator)
+            self.state, 'Continue', self.content_id_generator)
 
     def test_image_rte_tag(self) -> None:
         """Validate image tag."""
@@ -1632,6 +1632,31 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             self.new_exploration, 'Collapsible tag should not be present '
             'inside another Tabs or Collapsible tag.')
         self.state.content.html = 'Valid content'
+
+    def test_continue_interaction(self) -> None:
+        """Tests Continue interaction."""
+        self.set_interaction_for_state(
+          self.state, 'Continue', self.content_id_generator)
+        self.state.interaction.customization_args[
+          'buttonText'].value.unicode_str = 'Continueeeeeeeeeeeeeeeeee'
+        self._assert_validation_error(
+          self.new_exploration, (
+            'The `continue` interaction text length should be atmost '
+            '20 characters.')
+        )
+
+    def test_end_interaction(self) -> None:
+        """Tests End interaction."""
+        self.set_interaction_for_state(
+          self.state, 'EndExploration', self.content_id_generator)
+        self.state.interaction.customization_args[
+          'recommendedExplorationIds'].value = ['id1', 'id2', 'id3', 'id4']
+        self.state.update_interaction_default_outcome(None)
+        self._assert_validation_error(
+          self.new_exploration, (
+            'The total number of recommended explorations inside End '
+            'interaction should be atmost 3.')
+        )
 
     def test_numeric_interaction(self) -> None:
         """Tests Numeric interaction."""
