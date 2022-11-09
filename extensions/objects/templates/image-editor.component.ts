@@ -142,6 +142,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   imageContainerStyle = {};
   allowedImageFormats = AppConstants.ALLOWED_IMAGE_FORMATS;
   HUNDRED_KB_IN_BYTES: number = 100 * 1024;
+  ONE_MB_IN_BYTES: number = 1 * 1024 * 1024;
   imageResizeRatio: number;
   cropArea: { x1: number; y1: number; x2: number; y2: number };
   mousePositionWithinCropArea: null | number;
@@ -946,11 +947,17 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     const mimeType = resampledImageData.split(';')[0];
     const imageSize = atob(
       resampledImageData.replace(`${mimeType};base64,`, '')).length;
-    // The processed image can sometimes be larger than 100 KB. This is
-    // because the output of HTMLCanvasElement.toDataURL() operation in
+    // The processed image can sometimes be larger than original file size. This
+    // is because the output of HTMLCanvasElement.toDataURL() operation in
     // getResampledImageData() is browser specific and can vary in size.
     // See https://stackoverflow.com/a/9777037.
-    this.processedImageIsTooLarge = imageSize > this.HUNDRED_KB_IN_BYTES;
+    if (
+      this.entityType === AppConstants.ENTITY_TYPE.BLOG_POST
+    ) {
+      this.processedImageIsTooLarge = imageSize > this.ONE_MB_IN_BYTES;
+    } else {
+      this.processedImageIsTooLarge = imageSize > this.HUNDRED_KB_IN_BYTES;
+    }
   }
 
   saveUploadedFile(): void {

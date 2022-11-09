@@ -817,7 +817,8 @@ export class UpgradedServices {
     upgradedServices['ConceptCardObjectFactory'] = new ConceptCardObjectFactory(
       upgradedServices['WorkedExampleObjectFactory']);
     upgradedServices['ContextService'] = new ContextService(
-      upgradedServices['UrlService']);
+      upgradedServices['UrlService'],
+      upgradedServices['BlogPostPageService']);
     upgradedServices['EditorFirstTimeEventsService'] =
       new EditorFirstTimeEventsService(
         upgradedServices['SiteAnalyticsService']);
@@ -1034,7 +1035,8 @@ export class UpgradedServices {
     upgradedServices['QuestionBackendApiService'] =
       new QuestionBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['QuestionObjectFactory']);
     upgradedServices['ReadOnlyCollectionBackendApiService'] =
       new ReadOnlyCollectionBackendApiService(
         upgradedServices['HttpClient'],

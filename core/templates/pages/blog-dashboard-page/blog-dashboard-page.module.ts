@@ -59,9 +59,11 @@ import { SharedBlogComponentsModule } from 'pages/blog-dashboard-page/shared-blo
   ],
   declarations: [
     BlogDashboardPageComponent,
+    BlogAuthorDetailsEditorComponent
   ],
   entryComponents: [
-    BlogDashboardPageComponent
+    BlogDashboardPageComponent,
+    BlogAuthorDetailsEditorComponent
   ],
   providers: [
     {
@@ -92,6 +94,7 @@ class BlogDashboardPageModule implements DoBootstrap {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { BlogAuthorDetailsEditorComponent } from './modal-templates/author-detail-editor-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
