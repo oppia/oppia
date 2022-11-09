@@ -23,7 +23,7 @@ describe('Blog Post Object Factory', () => {
   beforeEach(() => {
     let sampleBlogPostBackendDict = {
       id: 'sampleId',
-      author_name: 'testUsername',
+      displayed_author_name: 'testUsername',
       title: 'sampleTitle',
       content: '<p>Hello</p>',
       thumbnail_filename: 'image',
@@ -100,7 +100,7 @@ describe('Blog Post Object Factory', () => {
     let maxTags = 1;
 
     expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
-      'Blog Post title should not exceed 40 characters.',
+      'Blog Post title should not exceed 65 characters.',
       'Blog Post should atmost have 1 tag(s) linked to it.'
     ]);
   });
