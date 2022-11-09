@@ -37,6 +37,8 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Final
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
@@ -60,6 +62,10 @@ class OldLibraryRedirectPageTest(test_utils.GenericTestBase):
 
 class LibraryPageTests(test_utils.GenericTestBase):
 
+    COL_ID_0: Final = '0_arch_bridges_in_england'
+    COL_ID_1: Final = '1_welcome_introduce_oppia'
+    COL_ID_2: Final = '2_welcome_introduce_oppia_interactions'
+
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -73,6 +79,68 @@ class LibraryPageTests(test_utils.GenericTestBase):
         """Test access to the library page."""
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
         response.mustcontain('<oppia-root></oppia-root>')
+
+    def test_library_handler_for_collection_summaries(self) -> None:
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        owner = user_services.get_user_actions_info(owner_id)
+
+        self.save_new_default_collection(
+            self.COL_ID_0, owner_id, title='Bridges in England',
+            category='Architecture')
+        self.save_new_default_collection(
+            self.COL_ID_1, owner_id, title='Introduce Oppia',
+            category='Welcome')
+        self.save_new_default_collection(
+            self.COL_ID_2, owner_id,
+            title='Introduce Interactions in Oppia', category='Welcome')
+
+        rights_manager.publish_collection(owner, self.COL_ID_0)
+        rights_manager.publish_collection(owner, self.COL_ID_1)
+        rights_manager.publish_collection(owner, self.COL_ID_2)
+
+        collection_services.index_collections_given_ids(
+            [self.COL_ID_0, self.COL_ID_1, self.COL_ID_2]
+        )
+
+        response = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
+                'q': 'Oppia'
+            }
+        )
+        expected_response_dict = {
+            'is_super_admin': False,
+            'activity_list': [
+                {
+                    'id': '1_welcome_introduce_oppia',
+                    'title': 'Introduce Oppia',
+                    'category': 'Welcome',
+                    'activity_type': 'collection',
+                    'objective': 'An objective',
+                    'language_code': 'en',
+                    'tags': [],
+                    'node_count': 0,
+                    'thumbnail_icon_url': '/subjects/Welcome.svg',
+                    'thumbnail_bg_color': '#992a2b',
+                },
+                {
+                    'id': '2_welcome_introduce_oppia_interactions',
+                    'title': 'Introduce Interactions in Oppia',
+                    'category': 'Welcome',
+                    'activity_type': 'collection',
+                    'objective': 'An objective',
+                    'language_code': 'en',
+                    'tags': [],
+                    'node_count': 0,
+                    'thumbnail_icon_url': '/subjects/Welcome.svg',
+                    'thumbnail_bg_color': '#992a2b',
+                },
+            ],
+            'search_cursor': None,
+        }
+        # Deleting 'last_updated_msec' key as this can vary every time.
+        del response['activity_list'][0]['last_updated_msec']
+        del response['activity_list'][1]['last_updated_msec']
+        self.assertEqual(response, expected_response_dict)
 
     def test_library_handler_demo_exploration(self) -> None:
         """Test the library data handler on demo explorations."""

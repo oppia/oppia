@@ -936,6 +936,8 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
     def test_handler_with_exp_id_not_for_contribution_raise_exception(
         self
     ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
         self.get_json('/gettranslatabletexthandler', params={
             'language_code': 'hi',
             'exp_id': '0'
@@ -949,6 +951,8 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'language_code': 'hi',
             'exp_id': 'not_for_contribution'
         }, expected_status_int=400)
+
+        self.logout()
 
     def test_handler_returns_correct_data(self) -> None:
         exp_services.update_exploration(

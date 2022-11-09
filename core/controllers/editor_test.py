@@ -1584,6 +1584,37 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             expected_status_int=404)
         self.logout()
 
+    def test_role_must_be_provided_for_a_new_member(self) -> None:
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        response = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'viewable_if_private': None
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'Please provide a role to a new member for exploration.'
+        )
+
     def test_that_an_editor_can_edit_the_exploration(self) -> None:
         self.signup(
             self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)

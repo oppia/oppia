@@ -880,11 +880,11 @@ class ContributorStatsSummariesHandler(
             )
 
         user_id = user_services.get_user_id_from_username(username)
-        if user_id is None:
-            raise Exception(
-                'No user_id exists for the given username: %s' %
-                username
-            )
+        # Here we are sure that user_id will never going to be a None
+        # value, because we are already handling the None case of user_id
+        # in `can_fetch_contributor_dashboard_stats` decorator by
+        # raising an exception.
+        assert user_id is not None
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
                 stats: ListOfContributorDashboardStatsTypes = (
@@ -941,11 +941,11 @@ class ContributorAllStatsSummariesHandler(
     def get(self, username: str) -> None:
         """Handles GET requests."""
         user_id = user_services.get_user_id_from_username(username)
-        if user_id is None:
-            raise Exception(
-                'No user_id exists for the given username: %s' %
-                username
-            )
+        # Here we are sure that user_id will never going to be a None
+        # value, because we are already handling the None case of user_id
+        # in `can_fetch_all_contributor_dashboard_stats` decorator by
+        # raising an exception.
+        assert user_id is not None
         stats = suggestion_services.get_all_contributor_stats(user_id)
         response = {}
 
