@@ -60,11 +60,16 @@ var BlogPages = function() {
   };
 
   this.getBlogFromAboutDropDown = async function() {
+    var initialHandles = [];
+    var handles = await browser.getWindowHandles();
+    initialHandles = handles;
+
     await browser.url('/');
     await waitFor.pageToFullyLoad();
     await general.openAboutDropdown();
     await action.click('Blog link', blogLink);
     await waitFor.newTabToBeCreated('http://localhost:9001/blog');
+
     handles = await browser.getWindowHandles();
     var newHandle = null;
     for (var i = 0; i < handles.length; i++) {
@@ -74,6 +79,7 @@ var BlogPages = function() {
       }
     }
     await browser.switchToWindow(newHandle);
+    await waitFor.pageToFullyLoad();
   };
 
   this.getBlogPostSearchPage = async function(searchQuery) {
