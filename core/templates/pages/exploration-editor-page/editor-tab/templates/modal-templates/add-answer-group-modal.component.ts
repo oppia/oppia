@@ -186,11 +186,10 @@ export class AddAnswerGroupModalComponent
        AppConstants.COMPONENT_NAME_FEEDBACK);
      this.tmpOutcome = this.outcomeObjectFactory.createNew(
        this.questionModeEnabled ? null : this.stateName,
-       this.questionModeEnabled ? null : this.stateName,
        feedbackContentId, '', []);
-    //  if (!this.questionModeEnabled) {
-    //    this.tmpOutcome.destIfReallyStuck = this.stateName;
-    //  }
+     if (!this.questionModeEnabled && this.isEditable) {
+       this.tmpOutcome.destIfReallyStuck = this.stateName;
+     }
    }
 
    updateAnswerGroupFeedback(outcome: Outcome): void {
