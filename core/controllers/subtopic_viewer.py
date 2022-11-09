@@ -82,7 +82,7 @@ class SubtopicPageDataHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {}
     }
-    
+ 
     @acl_decorators.can_access_subtopic_viewer_page
     def get(self, topic_name, subtopic_id):
         """Handles GET requests.
