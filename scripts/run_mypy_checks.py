@@ -123,8 +123,6 @@ NOT_FULLY_COVERED_FILES: Final = [
     'core/controllers/review_tests_test.py',
     'core/controllers/skill_editor.py',
     'core/controllers/skill_editor_test.py',
-    'core/controllers/skill_mastery.py',
-    'core/controllers/skill_mastery_test.py',
     'core/controllers/story_editor.py',
     'core/controllers/story_editor_test.py',
     'core/controllers/story_viewer.py',
