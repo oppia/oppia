@@ -26,7 +26,6 @@ var forms = require('../webdriverio_utils/forms.js');
 
 var BlogPages = function() {
   var blogDashboardPage = new BlogDashboardPage.BlogDashboardPage();
-  var blogLink = $('.e2e-test-blog-link');
   var noResultsFoundContainer = $('.e2e-test-no-results-found');
   var oppiaBlogHomePageCardContainer = $('.e2e-test-oppia-blog-home-page-card');
   var oppiaAuthorProfilePageCardContainer = $(
@@ -56,29 +55,6 @@ var BlogPages = function() {
 
   this.get = async function() {
     await browser.url(general.BLOG_PAGE_URL_SUFFIX);
-    await waitFor.pageToFullyLoad();
-  };
-
-  this.getBlogFromAboutDropDown = async function() {
-    var initialHandles = [];
-    var handles = await browser.getWindowHandles();
-    initialHandles = handles;
-
-    await browser.url('/');
-    await waitFor.pageToFullyLoad();
-    await general.openAboutDropdown();
-    await action.click('Blog link', blogLink);
-    await waitFor.newTabToBeCreated('http://localhost:9001/blog');
-
-    handles = await browser.getWindowHandles();
-    var newHandle = null;
-    for (var i = 0; i < handles.length; i++) {
-      if (initialHandles.indexOf(handles[i]) === -1) {
-        newHandle = handles[i];
-        break;
-      }
-    }
-    await browser.switchToWindow(newHandle);
     await waitFor.pageToFullyLoad();
   };
 
