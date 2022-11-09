@@ -79,7 +79,6 @@ import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/lear
 
 import './conversation-skin.component.css';
 import { TranslateService } from '@ngx-translate/core';
-import { cos } from 'mathjs';
 
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
@@ -1161,13 +1160,15 @@ export class ConversationSkinComponent {
           });
 
           if (remainOnCurrentCard) {
-            console.log("\nRemains on same card.\n");
             // Stay on the same card.
-            let oldStateCard: StateCard = this.playerTranscriptService.getLastCard();
+            let oldStateCard: StateCard = this.playerTranscriptService.
+              getLastCard();
             let oldInteractionId = oldStateCard.getInteractionId();
-            let oldInteractionArgs = oldStateCard.getInteractionCustomizationArgs();
-            if (oldInteractionId === AppConstants.INTERACTION_NAMES.TEXT_INPUT
-              && oldInteractionArgs.catchMisspellings) {
+            let oldInteractionArgs = oldStateCard.
+              getInteractionCustomizationArgs();
+            if (oldInteractionId === AppConstants.
+              INTERACTION_NAMES.TEXT_INPUT &&
+              oldInteractionArgs.catchMisspellings) {
               let answerIsOnlyMisspelled = this.answerClassificationService.
                 isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
               if (answerIsOnlyMisspelled) {
@@ -1239,7 +1240,6 @@ export class ConversationSkinComponent {
             // immediately. Otherwise, give the learner a chance to read
             // the feedback, and display a 'Continue' button.
             this.pendingCardWasSeenBefore = false;
-            console.log("new card seen");
             this.displayedCard.markAsCompleted();
             if (isFinalQuestion) {
               if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
@@ -1313,7 +1313,8 @@ export class ConversationSkinComponent {
       I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS.length;
     const randomKeyIndex = Math.floor(Math.random() * availableKeyCount);
     return this.translateService.instant(
-      ExplorationPlayerConstants.I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS[randomKeyIndex]
+      ExplorationPlayerConstants.
+        I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS[randomKeyIndex]
     );
   }
 

@@ -31,8 +31,9 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { State } from 'domain/state/StateObjectFactory';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { InteractionRuleInputs, TextInputRuleInputs } from 'interactions/rule-input-defs';
-import { checkEditDistance } from 'utility/string-utility';
+import { InteractionRuleInputs, TranslatableSetOfNormalizedString } from 'interactions/rule-input-defs';
+import { StringUtilityService } from 'utility/string-utility';
+
 
 export interface InteractionRulesService {
   [ruleName: string]: (
@@ -45,6 +46,7 @@ export class AnswerClassificationService {
       private alertsService: AlertsService,
       private appService: AppService,
       private interactionSpecsService: InteractionSpecsService,
+      private stringUtilityService: StringUtilityService,
       private predictionAlgorithmRegistryService:
         PredictionAlgorithmRegistryService,
       private stateClassifierMappingService: StateClassifierMappingService) {}
@@ -187,13 +189,14 @@ export class AnswerClassificationService {
   }
 
   checkForMisspellings(
-      answer: TextInputAnswer, inputs: TextInputRuleInputs
+      answer: TextInputAnswer, inputStrings: string[]
   ): boolean {
     const normalizedAnswer = answer.toLowerCase();
-    const normalizedInput = inputs.x.normalizedStrSet.map(
+    const normalizedInput = inputStrings.map(
       input => input.toLowerCase());
     return normalizedInput.some(
-      input => checkEditDistance(input, normalizedAnswer,
+      input => this.stringUtilityService.checkEditDistance(
+        input, normalizedAnswer,
         ExplorationPlayerConstants.THRESHOLD_EDIT_DISTANCE_FOR_MISSPELLINGS));
   }
 
@@ -207,10 +210,13 @@ export class AnswerClassificationService {
       const answerGroup = answerGroups[i];
       if (answerGroup.outcome.labelledAsCorrect) {
         for (var j = 0; j < answerGroup.rules.length; ++j) {
-          const ruleInputs = answerGroup.rules[j].inputs;
+          let rule = answerGroup.rules[j];
+          let inputStrings = (
+            rule.inputs.x as TranslatableSetOfNormalizedString)
+            .normalizedStrSet;
           if (this.checkForMisspellings(
             answer,
-            ruleInputs as any
+            inputStrings
           )) {
             return true;
           }

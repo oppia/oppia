@@ -1877,7 +1877,8 @@ describe('Conversation skin component', () => {
         '', true, false, false, '');
       return false;
     };
-    spyOn(answerClassificationService, 'isAnswerOnlyMisspelled').and.returnValue(true);
+    spyOn(answerClassificationService, 'isAnswerOnlyMisspelled').
+      and.returnValue(true);
     spyOn(explorationEngineService, 'submitAnswer').and.callFake(callback);
     spyOn(playerPositionService, 'getCurrentStateName')
       .and.returnValue('oldState');
@@ -1988,7 +1989,7 @@ describe('Conversation skin component', () => {
     expect(
       componentInstance.getFeedbackHtmlWhenAnswerMisspelled())
       .toEqual('I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_1');
-  })
+  });
 
   it('should check if current card was completed in a previous session',
     () => {
