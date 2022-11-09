@@ -1,5 +1,4 @@
 const puppeteer = require("puppeteer");
-const select = require ('puppeteer-select');
 const basicFunctions = require("./utility-functions/basicFunctions");
 
 //adding headless flag to false and maximizing browser height-width
@@ -14,8 +13,18 @@ puppeteer
     await page.setViewport({ width: 0, height: 0 }); // for maximizing page height-width
 
     await page.goto("http://localhost:8181/", {waitUntil: "networkidle0"});
-    await basicFunctions.clicks(page, "button.e2e-test-oppia-cookie-banner-accept-button");
-    await basicFunctions.clicks(page, "button.e2e-mobile-test-login");
+    // const [button] = await page.$x("//button[contains(., 'OK')]");
+    // await button.click();
+
+    // await basicFunctions.clicks(page, "button.e2e-mobile-test-login");
+    // const [button] = await page.$x("//button[contains(., 'SIGN IN')]");
+    // if (button) {
+    //   await button.click();
+    //   await console.log(button);
+    // }
+    await page.$x("//button[contains(., 'SIGN IN')]").then(async(b) => {
+      await console.log(b, "b");
+    }).catch((err) => {console.log(err, "errr")});
     await basicFunctions.types(page, "input.e2e-test-sign-in-email-input", "testadmin@example.com");
     await page.evaluate(() => {
       document.querySelector('.e2e-test-sign-in-button').click();
