@@ -227,11 +227,7 @@ var BlogPages = function() {
   };
 
   this.expectRecommendationsToContainPostWithTitle = async function(title) {
-    if (title) {
-      await this.waitForBlogPostsToLoad();
-    } else {
-      expect(await blogPostsList.isDisplayed()).toBe(false);
-    }
+    await this.waitForBlogPostsToLoad();
     var blogPostRecommendationTiles = (
       await blogPostTilesSelector());
     var titleList = await Promise.all(
