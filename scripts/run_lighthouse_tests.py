@@ -114,7 +114,7 @@ def run_ng_compilation() -> None:
         if os.path.isdir(ng_bundles_dir_name):
             break
     if not os.path.isdir(ng_bundles_dir_name):
-        print('Failed to complete webpack compilation, exiting...')
+        print('Failed to complete ng build compilation, exiting...')
         sys.exit(1)
 
 
