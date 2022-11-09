@@ -399,6 +399,20 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
             )
         self.assertEqual(json_response['summary_dicts'], [])
 
+    def test_invalid_author_username_raises_error(self) -> None:
+        json_response = self.get_json(
+            '%s/%s?offset=0' % (
+                feconf.BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_PREFIX,
+                'Invalid_author_username'
+            ),
+            expected_status_int=500
+        )
+        self.assertEqual(
+            json_response['error'],
+            'No user settings found for the given author_username: '
+            'Invalid_author_username'
+        )
+
 
 class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
     """Checks that the search functionality for blog posts is working as

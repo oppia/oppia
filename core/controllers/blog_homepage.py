@@ -358,7 +358,10 @@ class AuthorsPageHandler(
             user_services.get_user_settings_from_username(author_username)
         )
         if user_settings is None:
-            raise Exception
+            raise Exception(
+                'No user settings found for the given author_username: %s' %
+                author_username
+            )
 
         author_details = blog_services.get_blog_author_details(
             user_settings.user_id).to_dict()
