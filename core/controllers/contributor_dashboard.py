@@ -310,9 +310,9 @@ class ReviewableOpportunitiesHandler(
         """Handles GET requests."""
         assert self.normalized_request is not None
         topic_name = self.normalized_request.get('topic_name')
-        opportunity_dicts: (
-            List[opportunity_domain.PartialExplorationOpportunitySummaryDict]
-        ) = []
+        opportunity_dicts: List[
+            opportunity_domain.PartialExplorationOpportunitySummaryDict
+        ] = []
         if self.user_id:
             for opp in self._get_reviewable_exploration_opportunity_summaries(
                 self.user_id, topic_name
@@ -362,7 +362,9 @@ class ReviewableOpportunitiesHandler(
             reference.story_id
             for topic in topics
             for reference in topic.get_all_story_references()
-            if reference.story_is_published], strict=True)
+            if reference.story_is_published],
+            strict=True
+        )
         topic_exp_ids = []
         for story in topic_stories:
             for node in story.story_contents.get_ordered_nodes():
@@ -473,9 +475,9 @@ class TranslatableTextHandler(
 
     def _get_state_names_to_not_set_content_id_mapping(
         self,
-        state_names_to_content_id_mapping: (
-            Dict[str, Dict[str, state_domain.TranslatableItem]]
-        )
+        state_names_to_content_id_mapping: Dict[
+            str, Dict[str, state_domain.TranslatableItem]
+        ]
     ) -> Dict[str, Dict[str, state_domain.TranslatableItem]]:
         """Returns a copy of the supplied state_names_to_content_id_mapping
         minus any contents of which the data is set of strings.
@@ -508,9 +510,9 @@ class TranslatableTextHandler(
 
     def _get_state_names_to_not_in_review_content_id_mapping(
         self,
-        state_names_to_content_id_mapping: (
-            Dict[str, Dict[str, state_domain.TranslatableItem]]
-        ),
+        state_names_to_content_id_mapping: Dict[
+            str, Dict[str, state_domain.TranslatableItem]
+        ],
         suggestions: List[suggestion_registry.BaseSuggestion]
     ) -> Dict[str, Dict[str, state_domain.TranslatableItemDict]]:
         """Returns a copy of the supplied state_names_to_content_id_mapping
@@ -878,13 +880,11 @@ class ContributorStatsSummariesHandler(
             )
 
         user_id = user_services.get_user_id_from_username(username)
-
         if user_id is None:
             raise Exception(
-                'Error: No user_id exists for the given username: %s' %
+                'No user_id exists for the given username: %s' %
                 username
             )
-
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
                 stats: ListOfContributorDashboardStatsTypes = (
@@ -941,13 +941,11 @@ class ContributorAllStatsSummariesHandler(
     def get(self, username: str) -> None:
         """Handles GET requests."""
         user_id = user_services.get_user_id_from_username(username)
-
         if user_id is None:
             raise Exception(
-                'Error: No user_id exists for the given username: %s' %
+                'No user_id exists for the given username: %s' %
                 username
             )
-
         stats = suggestion_services.get_all_contributor_stats(user_id)
         response = {}
 

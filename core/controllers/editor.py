@@ -837,7 +837,9 @@ class ExplorationSnapshotsHandler(
         snapshots_committer_ids = [
             snapshot['committer_id'] for snapshot in snapshots]
         committer_usernames = user_services.get_usernames(
-            snapshots_committer_ids, strict=True)
+            snapshots_committer_ids,
+            strict=True
+        )
         for index, snapshot in enumerate(snapshots):
             snapshot['committer_id'] = committer_usernames[index]
 
