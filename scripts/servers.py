@@ -414,9 +414,7 @@ def managed_ng_build(
     Raises:
         OSError. First build never completed.
     """
-    compiler_args = [
-        common.NG_BIN_PATH, 'build'
-    ]
+    compiler_args = [common.NG_BIN_PATH, 'build']
     if use_prod_env:
         compiler_args.append('--prod')
     if watch_mode:
@@ -425,9 +423,12 @@ def managed_ng_build(
         # OK to use shell=True here because we are passing string literals and
         # constants, so there is no risk of a shell-injection attack.
         proc = exit_stack.enter_context(managed_process(
-            compiler_args, human_readable_name='Angular Compiler', shell=True,
+            compiler_args,
+            human_readable_name='Angular Compiler',
+            shell=True,
             # Capture compiler's output to detect when builds have completed.
-            stdout=subprocess.PIPE))
+            stdout=subprocess.PIPE
+        ))
         read_line_func: Callable[[], Optional[bytes]] = (
             lambda: proc.stdout.readline() or None
         )
@@ -509,9 +510,12 @@ def managed_webpack_compiler(
         # OK to use shell=True here because we are passing string literals and
         # constants, so there is no risk of a shell-injection attack.
         proc = exit_stack.enter_context(managed_process(
-            compiler_args, human_readable_name='Webpack Compiler', shell=True,
+            compiler_args,
+            human_readable_name='Webpack Compiler',
+            shell=True,
             # Capture compiler's output to detect when builds have completed.
-            stdout=subprocess.PIPE))
+            stdout=subprocess.PIPE
+        ))
 
         read_line_func: Callable[[], Optional[bytes]] = (
             lambda: proc.stdout.readline() or None

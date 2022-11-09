@@ -187,11 +187,14 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             def wait(self) -> None: # pylint: disable=missing-docstring
                 raise subprocess.CalledProcessError(
                     returncode=1, cmd='', output='Subprocess execution failed.')
-        class MockFailedCompilerContextManager():
+
+        class MockFailedCompilerContextManager:
             def __init__(self) -> None:
                 pass
+
             def __enter__(self) -> MockFailedCompiler:
                 return MockFailedCompiler()
+
             def __exit__(self, *unused_args: str) -> None:
                 pass
 
@@ -239,11 +242,14 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             def wait(self) -> None: # pylint: disable=missing-docstring
                 raise subprocess.CalledProcessError(
                     returncode=1, cmd='', output='Subprocess execution failed.')
-        class MockFailedCompilerContextManager():
+
+        class MockFailedCompilerContextManager:
             def __init__(self) -> None:
                 pass
+
             def __enter__(self) -> MockFailedCompiler:
                 return MockFailedCompiler()
+
             def __exit__(self, *unused_args: str) -> None:
                 pass
 

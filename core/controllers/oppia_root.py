@@ -54,6 +54,4 @@ class OppiaLightweightRootPage(base.BaseHandler):
         if self.request.cookies.get('dir') == 'rtl':
             self.render_template('lightweight-oppia-root.mainpage.html') # type: ignore[no-untyped-call]
             return
-        if self.request.params.get('dir') == 'rtl':
-            self.render_template('lightweight-oppia-root.mainpage.html') # type: ignore[no-untyped-call]
         self.render_template('index.html', template_is_aot_compiled=True) # type: ignore[no-untyped-call]
