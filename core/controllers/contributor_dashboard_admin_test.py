@@ -759,7 +759,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
                 expected_status_int=500
             )
         self.assertEqual(
-            'No language_code found for the give '
-            'TranslationContributionStatsDict',
+            'No language_code found for the given '
+            'TranslationContributionStatsDict.',
             response['error']
         )

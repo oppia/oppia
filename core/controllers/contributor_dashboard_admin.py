@@ -412,7 +412,7 @@ class TranslationContributionStatsHandler(
         Raises:
             Exception. There is no topic_id associated with the given
                 TranslationContributionStatsDict.
-            Exception. No language_code found for the give
+            Exception. No language_code found for the given
                 TranslationContributionStatsDict.
         """
         translation_contribution_stats_dicts = [
@@ -443,8 +443,8 @@ class TranslationContributionStatsHandler(
             assert stats_dict['topic_id'] is not None
             if stats_dict['language_code'] is None:
                 raise Exception(
-                    'No language_code found for the give '
-                    'TranslationContributionStatsDict'
+                    'No language_code found for the given '
+                    'TranslationContributionStatsDict.'
                 )
 
             response_translation_contribution_stats_dicts.append({
