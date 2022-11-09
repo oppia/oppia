@@ -42,5 +42,5 @@ class CloudSecretsServicesTests(test_utils.GenericTestBase):
             'access_secret_version',
             Exception('Secret not found')
         ):
-            secret = cloud_secrets_services.get_secret('name')
+            secret = cloud_secrets_services.get_secret('name2')
             self.assertIsNone(secret)
