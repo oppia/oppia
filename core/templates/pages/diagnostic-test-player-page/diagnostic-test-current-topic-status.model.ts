@@ -34,12 +34,12 @@ export class DiagnosticTestCurrentTopicStatusModel {
   // the main question incorrectly the backup question will be presented.
   // Otherwise, the backup question will not be presented. The difficulty level
   // for both the main question and the backup question are the same.
-  _skillIdToQuestionsDict: SkillIdToQuestionsDict;
+  private _skillIdToQuestionsDict: SkillIdToQuestionsDict;
 
   // A list of diagnostic test skill IDs from which questions will be presented
   // to the learners. The pending skill IDs are the ones which have not yet
   // been tested in the diagnostic test.
-  _pendingSkillIdsToTest: string[];
+  private _pendingSkillIdsToTest: string[];
 
   // A boolean variable that keeps track of whether a wrong attempt has
   // already been made in any previous questions. This lifeline option
@@ -47,7 +47,7 @@ export class DiagnosticTestCurrentTopicStatusModel {
   // (backup question) if the earlier one has been attempted incorrectly.
   // Attempting a question incorrectly after the lifeline has been used results
   // in the topic being marked as failed.
-  _lifelineIsConsumed: boolean;
+  private _lifelineIsConsumed: boolean;
 
   // A dict with skill ID as key and a boolean as value. The boolean value
   // represents whether the given skill passed or failed in the diagnostic test.
@@ -55,8 +55,7 @@ export class DiagnosticTestCurrentTopicStatusModel {
   // correctly, otherwise the skill is marked as failed. Initially, all the
   // skill ID keys map to false values, which represent that the skills are
   // not yet passed.
-  _skillIdToTestStatus: {[skillId: string]: boolean} = {};
-
+  private _skillIdToTestStatus: {[skillId: string]: boolean} = {};
   numberOfAttemptedQuestions: number;
 
   constructor(skillIdToQuestionsDict: SkillIdToQuestionsDict) {
@@ -112,7 +111,7 @@ export class DiagnosticTestCurrentTopicStatusModel {
     return this._pendingSkillIdsToTest.length === 0;
   }
 
-  isLifelineConsumeed(): boolean {
+  isLifelineConsumed(): boolean {
     return this._lifelineIsConsumed;
   }
 }

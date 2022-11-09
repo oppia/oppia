@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -265,7 +265,6 @@ export class DiagnosticTestPlayerEngineService {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         let topicId: string = tempStack.shift()!;
         let prerequisites: string[] = topicIdToPrerequisiteTopicId[topicId];
-
         let nonVisitedPrerequisites: string[] = prerequisites.filter(
           (prerequisiteTopicId: string) => {
             return visitedTopicIds.indexOf(prerequisiteTopicId) === -1;
@@ -286,16 +285,14 @@ export class DiagnosticTestPlayerEngineService {
   computeProgressPercentage(): number {
     let numberOfAttemptedQuestionsInCurrentTopic = (
       this.diagnosticTestCurrentTopicStatusModel.numberOfAttemptedQuestions);
-
     let initialTopicIdsList = (
       this.initialCopyOfTopicTrackerModel.getEligibleTopicIds());
-
     let pendingTopicIdsToTest = (
       this.diagnosticTestTopicTrackerModel.getEligibleTopicIds());
 
     // Each topic can contain a maximum of 3 diagnostic test skills and at most
     // 2 questions [main question & backup question] can be presented from each
-    // skill. Thus the maximum number of questions that can be asked from a
+    // skill. Thus, the maximum number of questions that can be asked from a
     // topic is 6.
     let completionMetric = (((
       initialTopicIdsList.length - pendingTopicIdsToTest.length) * 6 +
@@ -308,7 +305,8 @@ export class DiagnosticTestPlayerEngineService {
   getLanguageCode(): string {
     return (
       this.diagnosticTestCurrentTopicStatusModel.getNextQuestion(
-        this.currentSkillId).getLanguageCode());
+        this.currentSkillId).getLanguageCode()
+    );
   }
 
   recordNewCardAdded(): void {
@@ -318,20 +316,22 @@ export class DiagnosticTestPlayerEngineService {
   }
 
   createCard(): StateCard {
-    if (!this.diagnosticTestCurrentTopicStatusModel.isLifelineConsumeed()) {
+    if (!this.diagnosticTestCurrentTopicStatusModel.isLifelineConsumed()) {
       this.currentSkillId = (
         this.diagnosticTestCurrentTopicStatusModel.getNextSkill());
     }
     this.currentQuestion = (
       this.diagnosticTestCurrentTopicStatusModel.getNextQuestion(
-        this.currentSkillId));
+        this.currentSkillId)
+    );
 
     this.encounteredQuestionIds.push(this.currentQuestion.getId() as string);
 
     const stateData: State = this.currentQuestion.getStateData();
     const questionHtml: string = (
       this.expressionInterpolationService.processHtml(
-        stateData.content.html, []));
+        stateData.content.html, [])
+    );
 
     if (questionHtml === '') {
       this.alertsService.addWarning('Question name should not be empty.');
