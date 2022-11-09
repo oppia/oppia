@@ -219,7 +219,7 @@
     "id": "ItemSelectionInput",
     "customization_arg_specs": [
       {
-        "description": "Minimum number of selections permitted.",
+        "description": "Minimum number of selections permitted",
         "name": "minAllowableSelectionCount",
         "schema": {
           "type": "int",
