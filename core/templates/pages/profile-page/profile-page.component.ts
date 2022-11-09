@@ -101,80 +101,82 @@ export class ProfilePageComponent {
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
       .getStaticImageUrl('/general/no_profile_picture.png');
     this.loaderService.showLoadingScreen('Loading');
-    this.profilePageBackendApiService.fetchProfileDataAsync()
-      .then((data) => {
-        this.data = data;
-        this.username = {
-          title: 'Username',
-          value: data.usernameOfViewedProfile,
-          helpText: data.usernameOfViewedProfile
-        };
-        this.usernameIsLong = data.usernameOfViewedProfile.length > 16;
-        this.userBio = data.userBio;
-        this.userDisplayedStatistics = [{
-          title: 'Impact',
-          value: data.userImpactScore,
-          helpText: (
-            'A rough measure of the impact of explorations created by ' +
-            'this user. Better ratings and more playthroughs improve ' +
-            'this score.')
-        }, {
-          title: 'Created',
-          value: data.createdExpSummaries.length,
-          helpText: null
-        }, {
-          title: 'Edited',
-          value: data.createdExpSummaries.length,
-          helpText: null
-        }];
+    Promise.all([
+      this.profilePageBackendApiService.fetchProfileDataAsync(),
+      this.profilePageBackendApiService.fetchProfileImageDataUrlAsync()
+    ]).then(([data, profileImageData]) => {
+      this.data = data;
+      this.username = {
+        title: 'Username',
+        value: data.usernameOfViewedProfile,
+        helpText: data.usernameOfViewedProfile
+      };
+      this.usernameIsLong = data.usernameOfViewedProfile.length > 16;
+      this.userBio = data.userBio;
+      this.userDisplayedStatistics = [{
+        title: 'Impact',
+        value: data.userImpactScore,
+        helpText: (
+          'A rough measure of the impact of explorations created by ' +
+          'this user. Better ratings and more playthroughs improve ' +
+          'this score.')
+      }, {
+        title: 'Created',
+        value: data.createdExpSummaries.length,
+        helpText: null
+      }, {
+        title: 'Edited',
+        value: data.createdExpSummaries.length,
+        helpText: null
+      }];
 
-        this.userEditedExplorations = data.editedExpSummaries.sort(
-          (exploration1, exploration2) => {
-            const avgRating1 = (
-              this.ratingComputationService.computeAverageRating(
-                exploration1.ratings));
-            const avgRating2 = (
-              this.ratingComputationService.computeAverageRating(
-                exploration2.ratings));
-            if (avgRating2 === null) {
+      this.userEditedExplorations = data.editedExpSummaries.sort(
+        (exploration1, exploration2) => {
+          const avgRating1 = (
+            this.ratingComputationService.computeAverageRating(
+              exploration1.ratings));
+          const avgRating2 = (
+            this.ratingComputationService.computeAverageRating(
+              exploration2.ratings));
+          if (avgRating2 === null) {
+            return 1;
+          }
+          if (avgRating1 !== null && (avgRating1 > avgRating2)) {
+            return 1;
+          } else if (avgRating1 === avgRating2) {
+            if (exploration1.numViews > exploration2.numViews) {
               return 1;
-            }
-            if (avgRating1 !== null && (avgRating1 > avgRating2)) {
-              return 1;
-            } else if (avgRating1 === avgRating2) {
-              if (exploration1.numViews > exploration2.numViews) {
-                return 1;
-              } else if (
-                exploration1.numViews === exploration2.numViews) {
-                return 0;
-              } else {
-                return -1;
-              }
+            } else if (
+              exploration1.numViews === exploration2.numViews) {
+              return 0;
             } else {
               return -1;
             }
+          } else {
+            return -1;
           }
-        );
+        }
+      );
 
-        this.userNotLoggedIn = !data.username;
-        this.isAlreadySubscribed = data.isAlreadySubscribed;
-        this.isUserVisitingOwnProfile = data.isUserVisitingOwnProfile;
+      this.userNotLoggedIn = !data.username;
+      this.isAlreadySubscribed = data.isAlreadySubscribed;
+      this.isUserVisitingOwnProfile = data.isUserVisitingOwnProfile;
 
-        this.subscriptionButtonPopoverText = '';
-        this.currentPageNumber = 0;
-        this.PAGE_SIZE = 6;
-        this.startingExplorationNumber = 1;
-        this.endingExplorationNumber = 6;
-        this.profileIsOfCurrentUser = data.profileIsOfCurrentUser;
+      this.subscriptionButtonPopoverText = '';
+      this.currentPageNumber = 0;
+      this.PAGE_SIZE = 6;
+      this.startingExplorationNumber = 1;
+      this.endingExplorationNumber = 6;
+      this.profileIsOfCurrentUser = data.profileIsOfCurrentUser;
 
-        this.updateSubscriptionButtonPopoverText();
-        this.numUserPortfolioExplorations = data.editedExpSummaries.length;
-        this.subjectInterests = data.subjectInterests;
-        this.firstContributionMsec = data.firstContributionMsec;
-        this.profilePictureDataUrl = decodeURIComponent((
-          data.profilePictureDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
-        this.loaderService.hideLoadingScreen();
-      });
+      this.updateSubscriptionButtonPopoverText();
+      this.numUserPortfolioExplorations = data.editedExpSummaries.length;
+      this.subjectInterests = data.subjectInterests;
+      this.firstContributionMsec = data.firstContributionMsec;
+      this.profilePictureDataUrl = decodeURIComponent((
+        profileImageData || this.DEFAULT_PROFILE_PICTURE_URL));
+      this.loaderService.hideLoadingScreen();
+    });
   }
 
   changeSubscriptionStatus(): void {

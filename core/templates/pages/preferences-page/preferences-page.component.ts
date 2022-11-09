@@ -17,18 +17,26 @@
  */
 
 import { Component } from '@angular/core';
+import { SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { HttpClient } from '@angular/common/http';
+
 import { AppConstants } from 'app.constants';
 import { LanguageIdAndText, LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { ContextService } from 'services/context.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { EmailPreferencesBackendDict, SubscriptionSummary, UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+
 import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 require('cropperjs/dist/cropper.min.css');
 
@@ -37,6 +45,10 @@ import './preferences-page.component.css';
 interface AudioLangaugeChoice {
   id: string;
   text: string;
+}
+
+interface ImageUploadBackendResponse {
+  filename: string;
 }
 
 @Component({
@@ -51,7 +63,7 @@ export class PreferencesPageComponent {
   preferredLanguageCodes!: string[];
   preferredSiteLanguageCode!: string;
   preferredAudioLanguageCode!: string;
-  profilePictureDataUrl!: string;
+  profilePictureDataUrl!: SafeResourceUrl | string;
   AUDIO_LANGUAGE_CHOICES!: AudioLangaugeChoice[];
   userBio!: string;
   defaultDashboard!: string;
@@ -78,10 +90,15 @@ export class PreferencesPageComponent {
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   constructor(
+    private http: HttpClient,
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
     private alertsService: AlertsService,
+    private assetsBackendApiService: AssetsBackendApiService,
+    private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
+    private imageLocalStorageService: ImageLocalStorageService,
+    private imageUploadHelperService: ImageUploadHelperService,
     private languageUtilService: LanguageUtilService,
     private loaderService: LoaderService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
@@ -175,18 +192,53 @@ export class PreferencesPageComponent {
     }
   }
 
+  private saveProfileImage(image: Blob): void {
+    if (
+      this.contextService.getImageSaveDestination() ===
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+    ) {
+      this.saveProfileImageToLocalStorage(image);
+    } else {
+      this.postProfileImageToServer(image);
+    }
+  }
+
+  private saveProfileImageToLocalStorage(image: Blob): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const imageData = reader.result as string;
+      this.imageLocalStorageService.saveImage(
+        `${this.username}/profile_image.png`, imageData);
+    };
+    reader.readAsDataURL(image);
+  }
+
+  private postProfileImageToServer(image: Blob): void {
+    let form = new FormData();
+    form.append('image', image);
+    this.http.post<ImageUploadBackendResponse>(
+      this.urlInterpolationService.interpolateUrl(
+        AppConstants.PROFILE_PHOTO_UPLOAD_URL_TEMPLATE, {
+          username: this.username
+        }
+      ), form
+    ).toPromise().then(() => {
+        // The reload is needed in order to update the profile picture
+        // in the top-right corner.
+        this.windowRef.nativeWindow.location.reload();
+    });
+  }
+
   showEditProfilePictureModal(): void {
     let modalRef = this.ngbModal.open(EditProfilePictureModalComponent, {
       backdrop: 'static'
     });
 
     modalRef.result.then((newProfilePictureDataUrl) => {
-      this.userService.setProfileImageDataUrlAsync(newProfilePictureDataUrl)
-        .then(() => {
-          // The reload is needed in order to update the profile picture
-          // in the top-right corner.
-          this.windowRef.nativeWindow.location.reload();
-        });
+      const newImageFile = (
+        this.imageUploadHelperService.convertImageDataToImageFile(
+          newProfilePictureDataUrl));
+      this.saveProfileImage(newImageFile);
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
@@ -219,8 +271,9 @@ export class PreferencesPageComponent {
       this.userBio = data.user_bio;
       this.subjectInterests = data.subject_interests;
       this.preferredLanguageCodes = data.preferred_language_codes;
-      this.profilePictureDataUrl = decodeURIComponent(
-        data.profile_picture_data_url);
+      this.userService.getProfileImageDataUrlAsync().then(data => {
+        this.profilePictureDataUrl = data;
+      });
       this.defaultDashboard = data.default_dashboard;
       this.canReceiveEmailUpdates = data.can_receive_email_updates;
       this.canReceiveEditorRoleEmail =

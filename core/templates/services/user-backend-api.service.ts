@@ -19,7 +19,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { AppConstants } from 'app.constants';
 import { UserInfo, UserInfoBackendDict } from 'domain/user/user-info.model';
+import { ImageFile } from 'domain/utilities/image-file.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 
 export interface SubscriptionSummary {
   'creator_picture_data_url': string;
@@ -78,7 +83,10 @@ export interface UserContributionRightsDataBackendDict {
 })
 export class UserBackendApiService {
   constructor(
-    private http: HttpClient) {}
+    private assetsBackendApiService: AssetsBackendApiService,
+    private urlInterpolationService: UrlInterpolationService,
+    private http: HttpClient
+  ) {}
 
   private USER_INFO_URL = '/userinfohandler';
   private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
@@ -87,6 +95,9 @@ export class UserBackendApiService {
     '/usercontributionrightsdatahandler');
 
   private SITE_LANGUAGE_URL = '/save_site_language';
+
+  // Map from username to profile image.
+  private profileImageCache: Map<string, Blob> = new Map();
 
   async getUserInfoAsync(): Promise<UserInfo> {
     return this.http.get<UserInfoBackendDict>(
@@ -97,12 +108,16 @@ export class UserBackendApiService {
       });
   }
 
-  async getProfileImageDataUrlAsync(defaultUrl: string): Promise<string> {
-    return this.http.get<PreferencesBackendDict>(
-      this.PROFILE_PICTURE_URL).toPromise().then(
-      (backendDict) => {
-        return backendDict.profile_picture_data_url || defaultUrl;
+  async getProfileImageDataUrlAsync(): Promise<string> {
+    return this.loadProfileImage().then(image => {
+      return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          resolve(reader.result as string);
+        };
+        reader.readAsDataURL(image.data);
       });
+    });
   }
 
   async setProfileImageDataUrlAsync(
@@ -149,6 +164,67 @@ export class UserBackendApiService {
       update_type: updateType,
       data: data
     }).toPromise();
+  }
+
+  async loadProfileImage(username: string = ''): Promise<ImageFile> {
+    // Artificially load an image from a random exploration where you
+    // uploaded an image. We'll pretend that it is the profile image
+    // that is retrieved from the backend.
+
+    // Test image 1.
+    const image_1 = this.assetsBackendApiService.loadImage(
+      AppConstants.ENTITY_TYPE.EXPLORATION, 'lOZraTUa1x8b',
+      'img_20221108_210419_1pse2cowr9_height_275_width_237.png');
+
+    // Test image 2.
+    const image_2 = this.assetsBackendApiService.loadImage(
+      AppConstants.ENTITY_TYPE.EXPLORATION, 'sIW3TNaiFWQD',
+      'img_20221108_111758_k26g4dj4h7_height_201_width_203.png');
+
+    username = username || await this.getUserInfoAsync().then(
+      userInfo => userInfo.getUsername());
+    // All of this logic is just for testing.
+    if (username === 'eric') {
+      return image_1;
+    } else {
+      return image_2;
+    }
+    // ^^^ Delete everything above this line once merged with Hitesh's changes.
+
+    // Fetch profile image for the current user if not specified.
+    username = username || await this.getUserInfoAsync().then(
+      userInfo => userInfo.getUsername());
+    
+    const filename = `${username}/profile_image.png`;
+    let data = this.profileImageCache.get(filename);
+    if (this.profileImageCache.has(filename) && data !== undefined) {
+      return new ImageFile(filename, data);
+    }
+    return this.fetchProfileImage(username);
+  }
+
+  private async fetchProfileImage(username: string): Promise<ImageFile> {
+    let onResolve!: (_: Blob) => void;
+    let onReject!: () => void;
+    const blobPromise = new Promise<Blob>((resolve, reject) => {
+      onResolve = resolve;
+      onReject = reject;
+    });
+
+    const subscription = this.http.get(
+      this.urlInterpolationService.interpolateUrl(
+        this.assetsBackendApiService.profileImageUrlTemplate, {username: username}), {
+        responseType: 'blob'
+      }).subscribe(onResolve, onReject);
+
+    const filename = `${username}/profile_image.png`;
+    try {
+      const blob = await blobPromise;
+      this.profileImageCache.set(filename, blob);
+      return new ImageFile(filename, blob);
+    } catch {
+      return Promise.reject(filename);
+    }  
   }
 }
 angular.module('oppia').factory(
