@@ -3442,6 +3442,28 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             old_states, exp_versions_diff)
         self.assertEqual(actual_dict, expected_dict)
 
+        exploration.add_states(['End', 'Stuck State'])
+        end_state = exploration.states['End']
+        init_state = exploration.states['Introduction']
+        stuck_state = exploration.states['Stuck State']
+        state_default_outcome = state_domain.Outcome(
+            'Introduction', 'Stuck State', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Default outcome for State1</p>'),
+            False, [], None, None
+        )
+        init_state.update_interaction_default_outcome(state_default_outcome)
+        self.set_interaction_for_state(stuck_state, 'TextInput')
+        self.set_interaction_for_state(end_state, 'EndExploration')
+        end_state.update_interaction_default_outcome(None)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Please fix the following issues before saving this exploration: '
+            '1. The following states are not reachable from the initial state: '
+            'End 2. It is impossible to complete the exploration from the '
+            'following states: Introduction, Stuck State'):
+            exploration.validate(strict=True)
+
         # Add new state to trigger change in answer groups.
         exploration.add_states(['New state'])
         exploration.states['New state'] = copy.deepcopy(
