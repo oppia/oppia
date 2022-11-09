@@ -2401,6 +2401,24 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.TypeIgnoreCommentChecker)
         self.checker_test_object.setup_method()
+        self.checker_test_object.checker.config.allowed_type_ignore_error_codes = [  # pylint: disable=line-too-long
+            'attr-defined',
+            'union-attr',
+            'arg-type',
+            'call-overload',
+            'override',
+            'return',
+            'assignment',
+            'list-item',
+            'dict-item',
+            'typeddict-item',
+            'func-returns-value',
+            'misc',
+            'type-arg',
+            'no-untyped-def',
+            'no-untyped-call',
+            'no-any-return'
+        ]
 
     def test_type_ignore_used_without_comment_raises_error(self):
         node_function_with_type_ignore_only = astroid.scoped_nodes.Module(
@@ -2428,6 +2446,146 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             self.checker_test_object.checker.visit_module(
                 node_function_with_type_ignore_only
+            )
+        temp_file.close()
+
+    def test_raises_error_if_prohibited_error_code_is_used(self):
+        node_with_prohibited_error_code = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                suggestion.change.new_value = (  # type: ignore[some-new-ignore]
+                    new_content
+                ) #@
+                """
+            )
+        node_with_prohibited_error_code.file = filename
+
+        message = testutils.Message(
+            msg_id='prohibited-type-ignore-used',
+            line=2,
+            node=node_with_prohibited_error_code,
+            args=('some-new-ignore',)
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_module(
+                node_with_prohibited_error_code
+            )
+        temp_file.close()
+
+        node_with_prohibited_type_ignore_error_code = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'
+            )
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # Here we use MyPy ignore because ...
+                suggestion.change.new_value = (  # type: ignore[attr-defined]
+                    new_content
+                )
+
+                suggestion.change.new_value = (  # type: ignore[truthy-bool]
+                    new_content
+                )
+
+                # Here we use MyPy ignore because ...
+                func_only_accept_str('hi')  # type: ignore[attr-defined]
+
+                #@
+                """
+            )
+        node_with_prohibited_type_ignore_error_code.file = filename
+
+        message = testutils.Message(
+            msg_id='prohibited-type-ignore-used',
+            line=7,
+            node=node_with_prohibited_type_ignore_error_code,
+            args=('truthy-bool',)
+        )
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_module(
+                node_with_prohibited_type_ignore_error_code
+            )
+        temp_file.close()
+
+    def test_raises_error_if_prohibited_error_code_is_used_in_combined_form(
+        self
+    ):
+        node_with_prohibited_error_code_in_combined_form = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'
+            )
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                suggestion.change.new_value = (  # type: ignore[arg-type, no-untyped-call, truthy-bool] pylint: disable=line-too-long
+                    new_content
+                ) #@
+                """
+            )
+        node_with_prohibited_error_code_in_combined_form.file = filename
+
+        message = testutils.Message(
+            msg_id='prohibited-type-ignore-used',
+            line=2,
+            node=node_with_prohibited_error_code_in_combined_form,
+            args=('truthy-bool',)
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_module(
+                node_with_prohibited_error_code_in_combined_form
+            )
+        temp_file.close()
+
+        node_with_multiple_prohibited_error_code_in_combined_form = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'
+            )
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                suggestion.change.new_value = (  # type: ignore[return-none, no-untyped-call, truthy-bool] pylint: disable=line-too-long
+                    new_content
+                ) #@
+                """
+            )
+        node_with_multiple_prohibited_error_code_in_combined_form.file = (
+            filename)
+
+        message = testutils.Message(
+            msg_id='prohibited-type-ignore-used',
+            line=2,
+            node=node_with_multiple_prohibited_error_code_in_combined_form,
+            args=('return-none', 'truthy-bool')
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_module(
+                node_with_multiple_prohibited_error_code_in_combined_form
             )
         temp_file.close()
 
@@ -2471,7 +2629,8 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         )
         message2 = testutils.Message(
             msg_id='redundant-type-comment',
-            line=15
+            line=15,
+            node=node_function_with_extra_comment
         )
         with self.checker_test_object.assertAddsMessages(message1, message2):
             self.checker_test_object.checker.visit_module(
@@ -2548,7 +2707,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         temp_file.close()
 
     def test_type_ignores_with_comments_should_not_raises_error(self):
-        node_function = astroid.scoped_nodes.Module(
+        node_with_type_ignore_in_single_form = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
@@ -2571,10 +2730,40 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 func_only_accept_str(1234)  # type: ignore[arg-type] #@
                 """
             )
-        node_function.file = filename
+        node_with_type_ignore_in_single_form.file = filename
 
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(node_function)
+            self.checker_test_object.checker.visit_module(
+                node_with_type_ignore_in_single_form
+            )
+        temp_file.close()
+
+        node_with_type_ignore_in_combined_form = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # Here we use MyPy ignore because ...
+                suggestion.change.new_value = (  # type: ignore[attr-defined, list-item]
+                    new_content
+                )
+
+                # Here we use MyPy ignore because ...
+                func_only_accept_str(1234)  # type: ignore[arg-type]
+                #@
+                """
+            )
+        node_with_type_ignore_in_combined_form.file = filename
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_module(
+                node_with_type_ignore_in_combined_form
+            )
         temp_file.close()
 
     def test_untyped_call_type_ignores_should_not_raise_error(self):
@@ -2647,13 +2836,93 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         )
         message2 = testutils.Message(
             msg_id='redundant-type-comment',
-            line=2
+            line=2,
+            node=node_with_ignore_and_more_than_fifteen_gap
         )
         with self.checker_test_object.assertAddsMessages(
             message1, message2
         ):
             self.checker_test_object.checker.visit_module(
                 node_with_ignore_and_more_than_fifteen_gap
+            )
+        temp_file.close()
+
+    def test_generic_type_ignore_raises_pylint_error(self):
+        node_with_generic_type_ignore = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
+                # are not available yet.
+
+                def foo(exp_id: str) -> str:  # type: ignore
+                    return 'hi' #@
+                """
+            )
+        node_with_generic_type_ignore.file = filename
+
+        message1 = testutils.Message(
+            msg_id='generic-mypy-ignore-used',
+            line=5,
+            node=node_with_generic_type_ignore
+        )
+        message2 = testutils.Message(
+            msg_id='redundant-type-comment',
+            line=2,
+            node=node_with_generic_type_ignore
+        )
+
+        with self.checker_test_object.assertAddsMessages(
+            message1, message2
+        ):
+            self.checker_test_object.checker.visit_module(
+                node_with_generic_type_ignore
+            )
+        temp_file.close()
+
+        node_with_both_generic_and_non_generic_type_ignores = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'
+            )
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
+                # are not available yet.
+                def foo(exp_id: str) -> str:  # type: ignore[arg-type]
+                    return 'hi' #@
+
+                def foo(exp_id: str) -> str:  # type: ignore
+                    return 'hi' #@
+
+                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
+                # are not available yet.
+                def foo(exp_id: str) -> str:  # type: ignore[misc]
+                    return 'hi' #@
+                """
+            )
+        node_with_both_generic_and_non_generic_type_ignores.file = filename
+
+        message1 = testutils.Message(
+            msg_id='generic-mypy-ignore-used',
+            line=7,
+            node=node_with_both_generic_and_non_generic_type_ignores
+        )
+
+        with self.checker_test_object.assertAddsMessages(message1):
+            self.checker_test_object.checker.visit_module(
+                node_with_both_generic_and_non_generic_type_ignores
             )
         temp_file.close()
 
