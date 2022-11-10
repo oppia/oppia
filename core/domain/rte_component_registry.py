@@ -21,12 +21,12 @@ from __future__ import annotations
 import inspect
 import os
 import pkgutil
+from types import ModuleType
 
 from core import constants
 from core import feconf
 from core import utils
 
-from types import ModuleType
 from typing import Any, Dict, List, Optional, Type, TypedDict, Union
 
 MYPY = False
