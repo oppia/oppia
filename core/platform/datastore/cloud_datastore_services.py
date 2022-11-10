@@ -27,6 +27,8 @@ from google.cloud import ndb
 from typing import (
     Any, ContextManager, Dict, List, Optional, Sequence, Tuple, TypeVar)
 
+from core.storage.base_model.gae_models import MAX_RETRIES
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models  # pylint: disable=unused-import
@@ -94,7 +96,7 @@ def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
             return result
         except Exception as unused_e:
             continue
-    return result
+    raise Exception('get_multi failed after %s retries' % MAX_RETRIES)
 
 
 def update_timestamps_multi(
