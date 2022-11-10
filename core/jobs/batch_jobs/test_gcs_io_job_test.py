@@ -18,27 +18,11 @@
 
 from __future__ import annotations
 
-from apache_beam.io.gcp import gcsio_test
-from core import feconf
-from core.constants import constants
-from core.domain import state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import test_gcs_io_job
-from core.jobs.io import gcs_io_test
 from core.jobs.types import job_run_result
-from core.platform import models
 
-import os
-
-MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import app_identity_services
-    from mypy_imports import exp_models
-
-datastore_services = models.Registry.import_datastore_services()
-app_identity_services = models.Registry.import_app_identity_services()
-
-(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
+from apache_beam.io.gcp import gcsio_test
 
 
 class TestGCSIoJobTests(job_test_utils.JobTestBase):
