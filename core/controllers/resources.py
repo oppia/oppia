@@ -93,7 +93,7 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'type': 'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
-                    'regex_pattern': r'\w+[.]\w+'
+                    'regex_pattern': r'[-\w]+[.]\w+'
                 }]
             }
         }
