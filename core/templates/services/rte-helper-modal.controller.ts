@@ -24,14 +24,14 @@ angular.module('oppia').controller('RteHelperModalController', [
   'ExternalRteSaveService', 'FocusManagerService',
   'ImageLocalStorageService', 'ImageUploadHelperService',
   'attrsCustomizationArgsDict', 'customizationArgSpecs',
-  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE', 'ENTITY_TYPE',
   function(
       $q, $scope, $timeout, $uibModalInstance, AlertsService,
       AssetsBackendApiService, ContextService,
       ExternalRteSaveService, FocusManagerService,
       ImageLocalStorageService, ImageUploadHelperService,
       attrsCustomizationArgsDict, customizationArgSpecs,
-      IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+      IMAGE_SAVE_DESTINATION_LOCAL_STORAGE, ENTITY_TYPE) {
     var extractVideoIdFromVideoUrl = function(videoUrl) {
       videoUrl = videoUrl.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
       return (
@@ -211,10 +211,20 @@ angular.module('oppia').controller('RteHelperModalController', [
         }
         var resampledFile = (
           ImageUploadHelperService.convertImageDataToImageFile(svgFile));
-        const HUNDRED_KB_IN_BYTES = 100 * 1024;
-        if (resampledFile.size > HUNDRED_KB_IN_BYTES) {
+
+        let maxAllowedFileSize;
+        if (
+          ContextService.getEntityType() === ENTITY_TYPE.BLOG_POST
+        ) {
+          const ONE_MB_IN_BYTES = 1 * 1024 * 1024;
+          maxAllowedFileSize = ONE_MB_IN_BYTES;
+        } else {
+          const HUNDRED_KB_IN_BYTES = 100 * 1024;
+          maxAllowedFileSize = HUNDRED_KB_IN_BYTES;
+        }
+        if (resampledFile.size > maxAllowedFileSize) {
           AlertsService.addInfoMessage(
-            'The SVG file generated exceeds 100' +
+            `The SVG file generated exceeds ${maxAllowedFileSize / 1024}` +
             ' KB. Please split the expression into smaller ones.' +
             '   Example: x^2 + y^2 + z^2 can be split as \'x^2 + y^2\' ' +
             'and \'+ z^2\'', 5000);
