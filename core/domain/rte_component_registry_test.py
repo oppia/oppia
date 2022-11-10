@@ -303,6 +303,32 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
             set(obtained_component_class_names),
             set(actual_component_class_names))
 
+    def test_get_component_types_to_component_classes_when_no_modules_found(
+        self
+    ) -> None:
+        with self.swap_with_checks(
+            pkgutil, 'iter_modules', lambda path: [],
+            expected_kwargs=[{'path': [feconf.RTE_EXTENSIONS_DIR]}]
+        ):
+            component_types_to_component_classes = (
+                rte_component_registry.Registry
+                .get_component_types_to_component_classes()
+            )
+            self.assertEqual(component_types_to_component_classes, {})
+
+    def test_get_component_types_to_component_classes_when_no_component_found(
+        self
+    ) -> None:
+        with self.swap_with_checks(
+            pkgutil, 'iter_modules', lambda path: [('loader', 'directive', False)],
+            expected_kwargs=[{'path': [feconf.RTE_EXTENSIONS_DIR]}]
+        ):
+            component_types_to_component_classes = (
+                rte_component_registry.Registry
+                .get_component_types_to_component_classes()
+            )
+            self.assertEqual(component_types_to_component_classes, {})
+
     def test_get_component_tag_names(self) -> None:
         """Test get_component_tag_names method."""
         component_specs = (

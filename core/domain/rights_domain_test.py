@@ -288,6 +288,15 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_VIEWER)
 
+        # Changing the role to 'None'.
+        self.activity_rights.assign_new_role('123456', rights_domain.ROLE_NONE)
+        # Reassigning the role 'None' raises no error.
+        self.activity_rights.assign_new_role('123456', rights_domain.ROLE_NONE)
+
+        self.assertNotIn('123456', self.activity_rights.owner_ids)
+        self.assertNotIn('123456', self.activity_rights.editor_ids)
+        self.assertNotIn('123456', self.activity_rights.viewer_ids)
+
     def test_cannot_assign_viewer_to_public_exp(self) -> None:
         self.activity_rights.owner_ids = []
         self.activity_rights.editor_ids = []

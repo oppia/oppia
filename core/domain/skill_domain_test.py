@@ -390,6 +390,54 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             new_explanation
         )
 
+    def test_update_explanation_when_old_explanation_is_none(self) -> None:
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('10', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('9', '<p>Example Explanation 1</p>')
+        )
+        skill_contents = skill_domain.SkillContents(
+            None, [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '10': {}, '9': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '10': {}, '9': {}
+                }
+            })
+        )
+        misconceptions = [skill_domain.Misconception(
+            self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
+            '<p>default_feedback</p>', True)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 3</p>'])]
+        skill = skill_domain.Skill(
+            self.SKILL_ID, 'Description', misconceptions, rubrics,
+            skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, 1,
+            None, False, ['skill_id_2'],
+            created_on=datetime.datetime.now(),
+            last_updated=datetime.datetime.now())
+
+        new_explanation = state_domain.SubtitledHtml(
+            '1',
+            '<p>New Explanation</p>'
+        )
+        skill.update_explanation(new_explanation)
+        skill.validate()
+        self.assertEqual(
+            skill.skill_contents.explanation,
+            new_explanation
+        )
+
     def test_update_rubric(self) -> None:
         difficulty = constants.SKILL_DIFFICULTIES[0]
         explanations = ['explanation1']

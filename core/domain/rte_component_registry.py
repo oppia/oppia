@@ -25,6 +25,7 @@ import pkgutil
 from core import constants
 from core import feconf
 from core import utils
+from types import ModuleType  # pylint: disable=import-only-modules
 
 from typing import Any, Dict, List, Type, TypedDict, Union
 
@@ -119,6 +120,7 @@ class Registry:
             classes.
         """
         rte_path = [feconf.RTE_EXTENSIONS_DIR]
+        module: ModuleType = None
 
         for loader, name, _ in pkgutil.iter_modules(path=rte_path):
             if name == 'components':
