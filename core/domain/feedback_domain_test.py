@@ -130,7 +130,6 @@ class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
             'num_total_threads': 2
         })
 
-
 class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -139,8 +138,7 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
         self.message_id = 10
         self.thread_id = 'exp.thread'
 
-    def test_to_dict(self) -> None:
-        expected_feedback_message_reference: (
+        self.feedback_message_reference_dict : (
             feedback_domain.FeedbackMessageReferenceDict
         ) = {
             'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
@@ -149,11 +147,21 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
             'message_id': self.message_id
         }
 
-        observed_feedback_message_reference = (
+        self.feedback_message_reference = (
             feedback_domain.FeedbackMessageReference(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.thread_id,
                 self.message_id))
 
+    def test_to_dict(self) -> None:
         self.assertDictEqual(
-            observed_feedback_message_reference.to_dict(),
-            expected_feedback_message_reference)
+            self.feedback_message_reference.to_dict(),
+            self.feedback_message_reference_dict)
+
+    def test_from_dict(self) -> None:
+        observed_message_reference = feedback_domain.FeedbackMessageReference.from_dict(
+            self.feedback_message_reference_dict)
+
+        self.assertEqual(observed_message_reference.entity_id, self.exp_id)
+        self.assertEqual(observed_message_reference.entity_type, feconf.ENTITY_TYPE_EXPLORATION)
+        self.assertEqual(observed_message_reference.message_id, self.message_id)
+        self.assertEqual(observed_message_reference.thread_id, self.thread_id)
