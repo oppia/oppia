@@ -231,14 +231,14 @@ describe('Customize Interaction Modal Component', () => {
     expect(changeDetectorRef.detectChanges).not.toHaveBeenCalled();
   });
 
-  // it('should update Save interaction Button when userinputs data', () => {
-  //   component.hasCustomizationArgs = true;
+  it('should update Save interaction Button when userinputs data', () => {
+    component.hasCustomizationArgs = true;
 
-  //   spyOn(component, 'getCustomizationArgsWarningsList').and
-  //     .returnValue([]);
+    spyOn(component, 'getCustomizationArgsWarningsList').and
+      .returnValue([]);
 
-  //   expect(component.isSaveInteractionButtonEnabled()).toBe(true);
-  // });
+    expect(component.isSaveInteractionButtonEnabled()).toBe(true);
+  });
 
   it('should enable Save Interaction button when no recommendation IDs' +
   ' are provided', () => {
@@ -274,7 +274,6 @@ describe('Customize Interaction Modal Component', () => {
     spyOn(component, 'getTitle').and
       .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
     
-    // let inputValue = null;
     let className = 'oppia-exploration-id-input';
 
     spyOn(

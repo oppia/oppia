@@ -264,16 +264,15 @@ export class CustomizeInteractionModalComponent
     let inputField = document.
       getElementsByClassName('oppia-exploration-id-input');
     if (inputField === undefined) {
-      console.log("no id");
       return true;
     }
-    let inputValue = angular.element(
-      inputField[inputField.length - 1]).attr('ng-reflect-model');
-    if (inputValue === undefined || inputValue.length > 0) {
-      console.log("not empty");
-      return true;
+    if(inputField !== null) {
+      let inputValue = angular.element(
+        inputField[inputField.length - 1]).attr('ng-reflect-model');
+      if (inputValue === undefined || inputValue.length > 0) {
+        return true;
+      }
     }
-    console.log("empty");
     return false;
   }
 
