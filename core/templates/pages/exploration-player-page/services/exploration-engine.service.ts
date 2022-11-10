@@ -436,6 +436,9 @@ export class ExplorationEngineService {
         focusLabel: string
       ) => void
   ): boolean {
+    console.log("\n\n");
+      console.log("Chal to rha atleast");
+      console.log("\n\n");
     if (this.answerIsBeingProcessed) {
       return;
     }
@@ -555,14 +558,10 @@ export class ExplorationEngineService {
       this.exploration.getState(this.nextStateName).content.contentId,
       this.audioTranslationLanguageService);
 
-      console.log("\n\n");
-      console.log(newStateNameIfStuck);
-      console.log("\n\n");
-
     if (newStateNameIfStuck !== null) {
       let newStateIfStuck = this.exploration.getState(newStateNameIfStuck);
       console.log("\n\n");
-      console.log(newStateNameIfStuck);
+      console.log("Goes inside");
       console.log("\n\n");
       let newParamsIfStuck = (
         newStateIfStuck ? this.makeParams(

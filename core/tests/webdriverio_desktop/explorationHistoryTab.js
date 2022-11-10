@@ -476,7 +476,7 @@ describe('Exploration history', function() {
       '        content_id: ca_buttonText_0\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
-      '    dest_if_really_stuck: null\n' +
+      '    dest_if_really_stuck: first\n' +
       '    feedback:\n' +
       '      html: \'\'\n' +
       '      content_id: default_outcome\n' +
