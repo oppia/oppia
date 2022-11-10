@@ -50,7 +50,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, TypedDict, Union, cast
+from typing import Dict, Final, List, TypedDict, Union
 import webapp2
 import webtest
 
@@ -6680,7 +6680,11 @@ class MockHandlerNormalizedPayloadDict(TypedDict):
 class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
     """Tests for oppia_ml_access decorator."""
 
-    class MockHandler(base.OppiaMLVMHandler):
+    class MockHandler(
+        base.OppiaMLVMHandler[
+            MockHandlerNormalizedPayloadDict, Dict[str, str]
+        ]
+    ):
         REQUIRE_PAYLOAD_CSRF_CHECK = False
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -6714,16 +6718,10 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
                 OppiaMLAuthInfo. Message at index 0, vm_id at index 1 and
                 signature at index 2.
             """
-            # Here we use cast because we are narrowing down the type of
-            # 'normalized_payload' from Dict[str, Any] to a particular
-            # TypedDict that was defined according to the schemas. So that
-            # the type of fetched values is not considered as Any type.
-            payload = cast(
-                MockHandlerNormalizedPayloadDict, self.normalized_payload
-            )
-            signature = payload['signature']
-            vm_id = payload['vm_id']
-            message = payload['message']
+            assert self.normalized_payload is not None
+            signature = self.normalized_payload['signature']
+            vm_id = self.normalized_payload['vm_id']
+            message = self.normalized_payload['message']
             return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
 
         @acl_decorators.is_from_oppia_ml

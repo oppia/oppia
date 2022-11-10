@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -29,14 +31,20 @@ from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
+from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 
-(suggestion_models, feedback_models) = models.Registry.import_models([
-    models.Names.SUGGESTION, models.Names.FEEDBACK])
+from typing import Dict, Final, Union
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import suggestion_models
+
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
@@ -44,7 +52,7 @@ class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
     to the new one.
     """
 
-    def test_old_learner_dashboard_page_url(self):
+    def test_old_learner_dashboard_page_url(self) -> None:
         """Test to validate that the old learner dashboard page url redirects
         to the new one.
         """
@@ -57,36 +65,33 @@ class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
 class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
     test_utils.GenericTestBase):
 
-    OWNER_EMAIL = 'owner@example.com'
-    OWNER_USERNAME = 'owner'
+    EXP_ID_1: Final = 'EXP_ID_1'
+    EXP_TITLE_1: Final = 'Exploration title 1'
+    EXP_ID_2: Final = 'EXP_ID_2'
+    EXP_TITLE_2: Final = 'Exploration title 2'
+    EXP_ID_3: Final = 'EXP_ID_3'
+    EXP_TITLE_3: Final = 'Exploration title 3'
 
-    EXP_ID_1 = 'EXP_ID_1'
-    EXP_TITLE_1 = 'Exploration title 1'
-    EXP_ID_2 = 'EXP_ID_2'
-    EXP_TITLE_2 = 'Exploration title 2'
-    EXP_ID_3 = 'EXP_ID_3'
-    EXP_TITLE_3 = 'Exploration title 3'
+    COL_ID_1: Final = 'COL_ID_1'
+    COL_TITLE_1: Final = 'Collection title 1'
+    COL_ID_2: Final = 'COL_ID_2'
+    COL_TITLE_2: Final = 'Collection title 2'
+    COL_ID_3: Final = 'COL_ID_3'
+    COL_TITLE_3: Final = 'Collection title 3'
 
-    COL_ID_1 = 'COL_ID_1'
-    COL_TITLE_1 = 'Collection title 1'
-    COL_ID_2 = 'COL_ID_2'
-    COL_TITLE_2 = 'Collection title 2'
-    COL_ID_3 = 'COL_ID_3'
-    COL_TITLE_3 = 'Collection title 3'
+    STORY_ID_1: Final = 'STORY_1'
+    STORY_TITLE_1: Final = 'Story title 1'
+    STORY_ID_2: Final = 'STORY_2'
+    STORY_TITLE_2: Final = 'Story title 2'
+    STORY_ID_3: Final = 'STORY_3'
+    STORY_TITLE_3: Final = 'Story title 3'
 
-    STORY_ID_1 = 'STORY_1'
-    STORY_TITLE_1 = 'Story title 1'
-    STORY_ID_2 = 'STORY_2'
-    STORY_TITLE_2 = 'Story title 2'
-    STORY_ID_3 = 'STORY_3'
-    STORY_TITLE_3 = 'Story title 3'
-
-    TOPIC_ID_1 = 'TOPIC_1'
-    TOPIC_NAME_1 = 'Topic title 1'
-    TOPIC_ID_2 = 'TOPIC_2'
-    TOPIC_NAME_2 = 'Topic title 2'
-    TOPIC_ID_3 = 'TOPIC_3'
-    TOPIC_NAME_3 = 'Topic title 3'
+    TOPIC_ID_1: Final = 'TOPIC_1'
+    TOPIC_NAME_1: Final = 'Topic title 1'
+    TOPIC_ID_2: Final = 'TOPIC_2'
+    TOPIC_NAME_2: Final = 'Topic title 2'
+    TOPIC_ID_3: Final = 'TOPIC_3'
+    TOPIC_NAME_3: Final = 'Topic title 3'
 
     subtopic_0 = topic_domain.Subtopic(
         0, 'Title 1', ['skill_id_1'], 'image.svg',
@@ -98,7 +103,7 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
         constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
         'dummy-subtopic-zero')
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -109,7 +114,7 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
-    def test_can_see_completed_stories(self):
+    def test_can_see_completed_stories(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(
@@ -139,7 +144,7 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
             response['completed_stories_list'][0]['id'], self.STORY_ID_1)
         self.logout()
 
-    def test_can_see_learnt_topics(self):
+    def test_can_see_learnt_topics(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(
@@ -171,7 +176,7 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
             response['learnt_topics_list'][0]['id'], self.TOPIC_ID_1)
         self.logout()
 
-    def test_can_see_partially_learnt_topics(self):
+    def test_can_see_partially_learnt_topics(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(
@@ -195,7 +200,7 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
             response['partially_learnt_topics_list'][0]['id'], self.TOPIC_ID_1)
         self.logout()
 
-    def test_can_see_topics_to_learn(self):
+    def test_can_see_topics_to_learn(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(
@@ -224,7 +229,7 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
             response['topics_to_learn_list'][0]['id'], self.TOPIC_ID_1)
         self.logout()
 
-    def test_can_see_all_topics(self):
+    def test_can_see_all_topics(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(
@@ -270,7 +275,7 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
             response['all_topics_list'][0]['id'], self.TOPIC_ID_1)
         self.logout()
 
-    def test_can_see_untracked_topics(self):
+    def test_can_see_untracked_topics(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(
@@ -314,7 +319,7 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
         self.assertEqual(len(response['untracked_topics']), 1)
         self.logout()
 
-    def test_get_learner_dashboard_ids(self):
+    def test_get_learner_dashboard_ids(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         self.save_new_default_exploration(
@@ -444,7 +449,7 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
             learner_dashboard_activity_ids['topic_ids_to_learn'],
             [self.TOPIC_ID_3])
 
-    def test_learner_dashboard_page(self):
+    def test_learner_dashboard_page(self) -> None:
         self.login(self.OWNER_EMAIL)
 
         response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
@@ -455,36 +460,33 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
 
 class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
 
-    OWNER_EMAIL = 'owner@example.com'
-    OWNER_USERNAME = 'owner'
+    EXP_ID_1: Final = 'EXP_ID_1'
+    EXP_TITLE_1: Final = 'Exploration title 1'
+    EXP_ID_2: Final = 'EXP_ID_2'
+    EXP_TITLE_2: Final = 'Exploration title 2'
+    EXP_ID_3: Final = 'EXP_ID_3'
+    EXP_TITLE_3: Final = 'Exploration title 3'
 
-    EXP_ID_1 = 'EXP_ID_1'
-    EXP_TITLE_1 = 'Exploration title 1'
-    EXP_ID_2 = 'EXP_ID_2'
-    EXP_TITLE_2 = 'Exploration title 2'
-    EXP_ID_3 = 'EXP_ID_3'
-    EXP_TITLE_3 = 'Exploration title 3'
+    COL_ID_1: Final = 'COL_ID_1'
+    COL_TITLE_1: Final = 'Collection title 1'
+    COL_ID_2: Final = 'COL_ID_2'
+    COL_TITLE_2: Final = 'Collection title 2'
+    COL_ID_3: Final = 'COL_ID_3'
+    COL_TITLE_3: Final = 'Collection title 3'
 
-    COL_ID_1 = 'COL_ID_1'
-    COL_TITLE_1 = 'Collection title 1'
-    COL_ID_2 = 'COL_ID_2'
-    COL_TITLE_2 = 'Collection title 2'
-    COL_ID_3 = 'COL_ID_3'
-    COL_TITLE_3 = 'Collection title 3'
+    STORY_ID_1: Final = 'STORY_1'
+    STORY_TITLE_1: Final = 'Story title 1'
+    STORY_ID_2: Final = 'STORY_2'
+    STORY_TITLE_2: Final = 'Story title 2'
+    STORY_ID_3: Final = 'STORY_3'
+    STORY_TITLE_3: Final = 'Story title 3'
 
-    STORY_ID_1 = 'STORY_1'
-    STORY_TITLE_1 = 'Story title 1'
-    STORY_ID_2 = 'STORY_2'
-    STORY_TITLE_2 = 'Story title 2'
-    STORY_ID_3 = 'STORY_3'
-    STORY_TITLE_3 = 'Story title 3'
-
-    TOPIC_ID_1 = 'TOPIC_1'
-    TOPIC_NAME_1 = 'Topic title 1'
-    TOPIC_ID_2 = 'TOPIC_2'
-    TOPIC_NAME_2 = 'Topic title 2'
-    TOPIC_ID_3 = 'TOPIC_3'
-    TOPIC_NAME_3 = 'Topic title 3'
+    TOPIC_ID_1: Final = 'TOPIC_1'
+    TOPIC_NAME_1: Final = 'Topic title 1'
+    TOPIC_ID_2: Final = 'TOPIC_2'
+    TOPIC_NAME_2: Final = 'Topic title 2'
+    TOPIC_ID_3: Final = 'TOPIC_3'
+    TOPIC_NAME_3: Final = 'Topic title 3'
 
     subtopic_0 = topic_domain.Subtopic(
         0, 'Title 1', ['skill_id_1'], 'image.svg',
@@ -496,7 +498,7 @@ class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
         constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
         'dummy-subtopic-zero')
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -507,7 +509,7 @@ class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
-    def test_can_get_completed_chapters_count(self):
+    def test_can_get_completed_chapters_count(self) -> None:
         self.save_new_topic(
             self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
             url_fragment='topic-one',
@@ -577,36 +579,33 @@ class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
 class LearnerDashboardCollectionsProgressHandlerTests(
     test_utils.GenericTestBase):
 
-    OWNER_EMAIL = 'owner@example.com'
-    OWNER_USERNAME = 'owner'
+    EXP_ID_1: Final = 'EXP_ID_1'
+    EXP_TITLE_1: Final = 'Exploration title 1'
+    EXP_ID_2: Final = 'EXP_ID_2'
+    EXP_TITLE_2: Final = 'Exploration title 2'
+    EXP_ID_3: Final = 'EXP_ID_3'
+    EXP_TITLE_3: Final = 'Exploration title 3'
 
-    EXP_ID_1 = 'EXP_ID_1'
-    EXP_TITLE_1 = 'Exploration title 1'
-    EXP_ID_2 = 'EXP_ID_2'
-    EXP_TITLE_2 = 'Exploration title 2'
-    EXP_ID_3 = 'EXP_ID_3'
-    EXP_TITLE_3 = 'Exploration title 3'
+    COL_ID_1: Final = 'COL_ID_1'
+    COL_TITLE_1: Final = 'Collection title 1'
+    COL_ID_2: Final = 'COL_ID_2'
+    COL_TITLE_2: Final = 'Collection title 2'
+    COL_ID_3: Final = 'COL_ID_3'
+    COL_TITLE_3: Final = 'Collection title 3'
 
-    COL_ID_1 = 'COL_ID_1'
-    COL_TITLE_1 = 'Collection title 1'
-    COL_ID_2 = 'COL_ID_2'
-    COL_TITLE_2 = 'Collection title 2'
-    COL_ID_3 = 'COL_ID_3'
-    COL_TITLE_3 = 'Collection title 3'
+    STORY_ID_1: Final = 'STORY_1'
+    STORY_TITLE_1: Final = 'Story title 1'
+    STORY_ID_2: Final = 'STORY_2'
+    STORY_TITLE_2: Final = 'Story title 2'
+    STORY_ID_3: Final = 'STORY_3'
+    STORY_TITLE_3: Final = 'Story title 3'
 
-    STORY_ID_1 = 'STORY_1'
-    STORY_TITLE_1 = 'Story title 1'
-    STORY_ID_2 = 'STORY_2'
-    STORY_TITLE_2 = 'Story title 2'
-    STORY_ID_3 = 'STORY_3'
-    STORY_TITLE_3 = 'Story title 3'
-
-    TOPIC_ID_1 = 'TOPIC_1'
-    TOPIC_NAME_1 = 'Topic title 1'
-    TOPIC_ID_2 = 'TOPIC_2'
-    TOPIC_NAME_2 = 'Topic title 2'
-    TOPIC_ID_3 = 'TOPIC_3'
-    TOPIC_NAME_3 = 'Topic title 3'
+    TOPIC_ID_1: Final = 'TOPIC_1'
+    TOPIC_NAME_1: Final = 'Topic title 1'
+    TOPIC_ID_2: Final = 'TOPIC_2'
+    TOPIC_NAME_2: Final = 'Topic title 2'
+    TOPIC_ID_3: Final = 'TOPIC_3'
+    TOPIC_NAME_3: Final = 'Topic title 3'
 
     subtopic_0 = topic_domain.Subtopic(
         0, 'Title 1', ['skill_id_1'], 'image.svg',
@@ -618,7 +617,7 @@ class LearnerDashboardCollectionsProgressHandlerTests(
         constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
         'dummy-subtopic-zero')
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -629,7 +628,7 @@ class LearnerDashboardCollectionsProgressHandlerTests(
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
-    def test_can_see_completed_collections(self):
+    def test_can_see_completed_collections(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(
@@ -649,7 +648,7 @@ class LearnerDashboardCollectionsProgressHandlerTests(
             response['completed_collections_list'][0]['id'], self.COL_ID_1)
         self.logout()
 
-    def test_can_see_incomplete_collections(self):
+    def test_can_see_incomplete_collections(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL)
@@ -667,7 +666,7 @@ class LearnerDashboardCollectionsProgressHandlerTests(
             response['incomplete_collections_list'][0]['id'], self.COL_ID_1)
         self.logout()
 
-    def test_can_see_collection_playlist(self):
+    def test_can_see_collection_playlist(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL)
@@ -685,7 +684,7 @@ class LearnerDashboardCollectionsProgressHandlerTests(
             response['collection_playlist'][0]['id'], self.COL_ID_1)
         self.logout()
 
-    def test_learner_dashboard_page(self):
+    def test_learner_dashboard_page(self) -> None:
         self.login(self.OWNER_EMAIL)
 
         response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
@@ -697,36 +696,33 @@ class LearnerDashboardCollectionsProgressHandlerTests(
 class LearnerDashboardExplorationsProgressHandlerTests(
     test_utils.GenericTestBase):
 
-    OWNER_EMAIL = 'owner@example.com'
-    OWNER_USERNAME = 'owner'
+    EXP_ID_1: Final = 'EXP_ID_1'
+    EXP_TITLE_1: Final = 'Exploration title 1'
+    EXP_ID_2: Final = 'EXP_ID_2'
+    EXP_TITLE_2: Final = 'Exploration title 2'
+    EXP_ID_3: Final = 'EXP_ID_3'
+    EXP_TITLE_3: Final = 'Exploration title 3'
 
-    EXP_ID_1 = 'EXP_ID_1'
-    EXP_TITLE_1 = 'Exploration title 1'
-    EXP_ID_2 = 'EXP_ID_2'
-    EXP_TITLE_2 = 'Exploration title 2'
-    EXP_ID_3 = 'EXP_ID_3'
-    EXP_TITLE_3 = 'Exploration title 3'
+    COL_ID_1: Final = 'COL_ID_1'
+    COL_TITLE_1: Final = 'Collection title 1'
+    COL_ID_2: Final = 'COL_ID_2'
+    COL_TITLE_2: Final = 'Collection title 2'
+    COL_ID_3: Final = 'COL_ID_3'
+    COL_TITLE_3: Final = 'Collection title 3'
 
-    COL_ID_1 = 'COL_ID_1'
-    COL_TITLE_1 = 'Collection title 1'
-    COL_ID_2 = 'COL_ID_2'
-    COL_TITLE_2 = 'Collection title 2'
-    COL_ID_3 = 'COL_ID_3'
-    COL_TITLE_3 = 'Collection title 3'
+    STORY_ID_1: Final = 'STORY_1'
+    STORY_TITLE_1: Final = 'Story title 1'
+    STORY_ID_2: Final = 'STORY_2'
+    STORY_TITLE_2: Final = 'Story title 2'
+    STORY_ID_3: Final = 'STORY_3'
+    STORY_TITLE_3: Final = 'Story title 3'
 
-    STORY_ID_1 = 'STORY_1'
-    STORY_TITLE_1 = 'Story title 1'
-    STORY_ID_2 = 'STORY_2'
-    STORY_TITLE_2 = 'Story title 2'
-    STORY_ID_3 = 'STORY_3'
-    STORY_TITLE_3 = 'Story title 3'
-
-    TOPIC_ID_1 = 'TOPIC_1'
-    TOPIC_NAME_1 = 'Topic title 1'
-    TOPIC_ID_2 = 'TOPIC_2'
-    TOPIC_NAME_2 = 'Topic title 2'
-    TOPIC_ID_3 = 'TOPIC_3'
-    TOPIC_NAME_3 = 'Topic title 3'
+    TOPIC_ID_1: Final = 'TOPIC_1'
+    TOPIC_NAME_1: Final = 'Topic title 1'
+    TOPIC_ID_2: Final = 'TOPIC_2'
+    TOPIC_NAME_2: Final = 'Topic title 2'
+    TOPIC_ID_3: Final = 'TOPIC_3'
+    TOPIC_NAME_3: Final = 'Topic title 3'
 
     subtopic_0 = topic_domain.Subtopic(
         0, 'Title 1', ['skill_id_1'], 'image.svg',
@@ -738,7 +734,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
         'dummy-subtopic-zero')
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -749,7 +745,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
-    def test_can_see_completed_explorations(self):
+    def test_can_see_completed_explorations(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
@@ -767,7 +763,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             response['completed_explorations_list'][0]['id'], self.EXP_ID_1)
         self.logout()
 
-    def test_can_see_incomplete_explorations(self):
+    def test_can_see_incomplete_explorations(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
@@ -788,7 +784,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             response['incomplete_explorations_list'][0]['id'], self.EXP_ID_1)
         self.logout()
 
-    def test_can_see_exploration_playlist(self):
+    def test_can_see_exploration_playlist(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
@@ -806,7 +802,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             response['exploration_playlist'][0]['id'], self.EXP_ID_1)
         self.logout()
 
-    def test_can_see_subscription(self):
+    def test_can_see_subscription(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
@@ -824,17 +820,15 @@ class LearnerDashboardExplorationsProgressHandlerTests(
 
 class LearnerDashboardFeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
 
-    OWNER_EMAIL = 'owner@example.com'
-    OWNER_USERNAME = 'owner'
     EXP_ID_1 = 'EXP_ID_1'
     EXP_TITLE_1 = 'Exploration title 1'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-    def test_get_threads_after_updating_thread_summaries(self):
+    def test_get_threads_after_updating_thread_summaries(self) -> None:
         self.login(self.OWNER_EMAIL)
 
         csrf_token = self.get_new_csrf_token()
@@ -874,7 +868,7 @@ class LearnerDashboardFeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(thread.entity_type, 'exploration')
         self.logout()
 
-    def test_get_more_threads_on_request(self):
+    def test_get_more_threads_on_request(self) -> None:
         self.login(self.OWNER_EMAIL)
 
         csrf_token = self.get_new_csrf_token()
@@ -938,7 +932,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
     EXP_ID_1 = '0'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
@@ -956,7 +950,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         }, csrf_token=self.csrf_token)
         self.logout()
 
-    def test_get_message_summaries(self):
+    def test_get_message_summaries(self) -> None:
         self.login(self.EDITOR_EMAIL)
         # Fetch all the feedback threads of that exploration.
         response_dict = self.get_json(
@@ -1003,7 +997,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_anonymous_feedback_is_recorded_correctly(self):
+    def test_anonymous_feedback_is_recorded_correctly(self) -> None:
         self.post_json(
             '/explorehandler/give_feedback/%s' % self.EXP_ID_1,
             {
@@ -1027,7 +1021,43 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(messages_summary['author_username'], None)
         self.assertEqual(messages_summary['author_picture_data_url'], None)
 
-    def test_get_suggestions_after_updating_suggestion_summary(self):
+    def test_raises_error_if_wrong_type_of_suggestion_provided(self) -> None:
+        self.login(self.EDITOR_EMAIL)
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>This is a content.</p>',
+            'translation_html': '<p>This is translated html.</p>',
+            'data_format': 'html'
+        }
+        translation_suggestion = suggestion_registry.SuggestionTranslateContent(
+            'exploration.exp1.thread1', 'exp1',
+            1, suggestion_models.STATUS_ACCEPTED, 'author',
+            'review_id', change_dict, 'translation.Algebra',
+            'en', False, datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
+        )
+
+        response_dict = self.get_json(
+            '%s/%s' %
+            (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
+        )
+        thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
+        thread_url = '%s/%s' % (
+            feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL, thread_id)
+        with self.swap_to_always_return(
+            suggestion_services, 'get_suggestion_by_id', translation_suggestion
+        ):
+            with self.assertRaisesRegex(
+                Exception,
+                'No edit state content suggestion found for the given '
+                'thread_id: %s' % thread_id
+            ):
+                self.get_json(thread_url)
+
+    def test_get_suggestions_after_updating_suggestion_summary(self) -> None:
         self.login(self.EDITOR_EMAIL)
 
         response_dict = self.get_json(
@@ -1050,7 +1080,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         new_content = state_domain.SubtitledHtml(
             'content', '<p>new content html</p>').to_dict()
-        change_cmd = {
+        change_cmd: Dict[str, Union[str, state_domain.SubtitledHtmlDict]] = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'Welcome!',

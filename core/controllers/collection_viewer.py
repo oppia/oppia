@@ -23,8 +23,10 @@ from core.controllers import base
 from core.domain import rights_manager
 from core.domain import summary_services
 
+from typing import Dict
 
-class CollectionPage(base.BaseHandler):
+
+class CollectionPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Page describing a single collection."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -34,18 +36,16 @@ class CollectionPage(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_collection
-    def get(self, _):
+    def get(self, _: str) -> None:
         """Handles GET requests."""
 
         self.render_template('collection-player-page.mainpage.html')
 
 
-class CollectionDataHandler(base.BaseHandler):
+class CollectionDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides the data for a single collection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -56,12 +56,10 @@ class CollectionDataHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_collection
-    def get(self, collection_id):
+    def get(self, collection_id: str) -> None:
         """Populates the data on the individual collection page."""
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(

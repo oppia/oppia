@@ -4200,7 +4200,7 @@ def is_from_oppia_ml(
     # arguments with different types.
     @functools.wraps(handler)
     def test_request_originates_from_valid_oppia_ml_instance(
-        self: base.OppiaMLVMHandler,
+        self: base.OppiaMLVMHandler[Dict[str, str], Dict[str, str]],
         **kwargs: Any
     ) -> _GenericHandlerFunctionReturnType:
         """Checks if the incoming request is from a valid Oppia-ML VM

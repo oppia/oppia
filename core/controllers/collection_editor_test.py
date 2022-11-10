@@ -28,10 +28,12 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
 
+from typing import Final
+
 
 class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the sign-up process for self.EDITOR_EMAIL."""
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -62,9 +64,10 @@ class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
 
 
 class CollectionEditorTests(BaseCollectionEditorControllerTests):
-    COLLECTION_ID = '0'
 
-    def setUp(self):
+    COLLECTION_ID: Final = '0'
+
+    def setUp(self) -> None:
         super().setUp()
         system_user = user_services.get_system_user()
 
@@ -72,7 +75,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         rights_manager.release_ownership_of_collection(
             system_user, self.COLLECTION_ID)
 
-    def test_access_collection_editor_page(self):
+    def test_access_collection_editor_page(self) -> None:
         """Test access to editor pages for the sample collection."""
         whitelisted_usernames = [self.EDITOR_USERNAME]
         self.set_collection_editors(whitelisted_usernames)
@@ -102,7 +105,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.assertTrue(json_response['can_edit'])
         self.logout()
 
-    def test_editable_collection_handler_get(self):
+    def test_editable_collection_handler_get(self) -> None:
         whitelisted_usernames = [self.EDITOR_USERNAME]
         self.set_collection_editors(whitelisted_usernames)
 
@@ -124,7 +127,9 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
         self.logout()
 
-    def test_editable_collection_handler_put_with_invalid_payload_version(self):
+    def test_editable_collection_handler_put_with_invalid_payload_version(
+        self
+    ) -> None:
         whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
         self.set_collection_editors(whitelisted_usernames)
 
@@ -173,7 +178,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         self.logout()
 
-    def test_editable_collection_handler_put_cannot_access(self):
+    def test_editable_collection_handler_put_cannot_access(self) -> None:
         """Check that non-editors cannot access editable put handler."""
         whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
         self.set_collection_editors(whitelisted_usernames)
@@ -201,7 +206,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         self.logout()
 
-    def test_editable_collection_handler_put_can_access(self):
+    def test_editable_collection_handler_put_can_access(self) -> None:
         """Check that editors can access put handler."""
         whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
         self.set_collection_editors(whitelisted_usernames)
@@ -228,7 +233,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         self.logout()
 
-    def test_cannot_put_long_commit_message(self):
+    def test_cannot_put_long_commit_message(self) -> None:
         """Check that putting a long commit message is denied."""
         rights_manager.create_new_collection_rights(
             self.COLLECTION_ID, self.owner_id)
@@ -256,7 +261,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         self.logout()
 
-    def test_collection_rights_handler(self):
+    def test_collection_rights_handler(self) -> None:
         collection_id = 'collection_id'
         collection = collection_domain.Collection.create_default_collection(
             collection_id, title='A title',
@@ -285,7 +290,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             collection_rights.status,
             rights_domain.ACTIVITY_STATUS_PRIVATE)
 
-    def test_get_collection_rights(self):
+    def test_get_collection_rights(self) -> None:
         whitelisted_usernames = [self.OWNER_USERNAME]
         self.set_collection_editors(whitelisted_usernames)
 
@@ -309,7 +314,9 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.assertFalse(json_response['is_private'])
         self.logout()
 
-    def test_can_not_publish_collection_with_invalid_payload_version(self):
+    def test_can_not_publish_collection_with_invalid_payload_version(
+        self
+    ) -> None:
         self.set_collection_editors([self.OWNER_USERNAME])
 
         # Login as owner and try to publish a collection with a public
@@ -345,7 +352,9 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         self.logout()
 
-    def test_can_not_unpublish_collection_with_invalid_payload_version(self):
+    def test_can_not_unpublish_collection_with_invalid_payload_version(
+        self
+    ) -> None:
         self.set_collection_editors([self.OWNER_USERNAME])
 
         # Login as owner and publish a collection with a public exploration.
@@ -391,7 +400,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         self.logout()
 
-    def test_publish_unpublish_collection(self):
+    def test_publish_unpublish_collection(self) -> None:
         self.set_collection_editors([self.OWNER_USERNAME])
 
         # Login as owner and publish a collection with a public exploration.
@@ -421,7 +430,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.assertTrue(response_dict['is_private'])
         self.logout()
 
-    def test_can_search_exploration_with_exploration_id(self):
+    def test_can_search_exploration_with_exploration_id(self) -> None:
         self.set_collection_editors([self.OWNER_USERNAME])
         self.login(self.OWNER_EMAIL)
         exploration_id = exp_fetchers.get_new_exploration_id()
@@ -436,3 +445,31 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.get_json(
             '/exploration/metadata_search?q=%s' % exploration_id)
         self.logout()
+
+    def test_invalid_collection_id_raise_error_while_handling_collection_rights(
+        self
+    ) -> None:
+        self.login(self.OWNER_EMAIL)
+
+        collection_rights = rights_domain.ActivityRights(
+            'Invalid_collection_id', [feconf.SYSTEM_COMMITTER_ID],
+            [], [], [])
+        swap_collection_rights = self.swap_to_always_return(
+            rights_manager, 'get_collection_rights', collection_rights
+        )
+        swap_can_edit_activity_status = self.swap_to_always_return(
+            rights_manager, 'check_can_edit_activity', True
+        )
+
+        with swap_collection_rights, swap_can_edit_activity_status:
+            response = self.get_json(
+                '%s/%s' %
+                (feconf.COLLECTION_RIGHTS_PREFIX, 'Invalid_collection_id'),
+                expected_status_int=500
+            )
+
+        self.assertEqual(
+            'No collection found for the given collection_id: '
+            'Invalid_collection_id',
+            response['error']
+        )

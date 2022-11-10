@@ -28,7 +28,7 @@ from core.tests import test_utils
 class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
     """Tests the concept card data handler for a skill."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Before each individual test, create a dummy skill."""
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -85,7 +85,7 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
             skill_contents=self.skill_contents_1)
         self.skill_id_2 = skill_services.get_new_skill_id()
 
-    def test_get_concept_cards(self):
+    def test_get_concept_cards(self) -> None:
         json_response = self.get_json(
             '%s/%s' % (
                 feconf.CONCEPT_CARD_DATA_URL_PREFIX,
@@ -126,14 +126,14 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
             ).to_dict()],
             json_response['concept_card_dicts'][1]['worked_examples'])
 
-    def test_get_concept_cards_fails_when_skill_doesnt_exist(self):
+    def test_get_concept_cards_fails_when_skill_doesnt_exist(self) -> None:
         self.get_json(
             '%s/%s' % (
                 feconf.CONCEPT_CARD_DATA_URL_PREFIX,
                 json.dumps([self.skill_id_2])),
             expected_status_int=404)
 
-    def test_invalid_skill_id(self):
+    def test_invalid_skill_id(self) -> None:
         skill_ids = [1, 2]
         json_response = self.get_json(
             '%s/%s' % (

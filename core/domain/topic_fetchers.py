@@ -541,6 +541,24 @@ def get_topic_summary_from_model(
     )
 
 
+@overload
+def get_topic_summary_by_id(
+    topic_id: str
+) -> topic_domain.TopicSummary: ...
+
+
+@overload
+def get_topic_summary_by_id(
+    topic_id: str, *, strict: Literal[True]
+) -> topic_domain.TopicSummary: ...
+
+
+@overload
+def get_topic_summary_by_id(
+    topic_id: str, *, strict: Literal[False]
+) -> Optional[topic_domain.TopicSummary]: ...
+
+
 def get_topic_summary_by_id(
     topic_id: str, strict: bool = True
 ) -> Optional[topic_domain.TopicSummary]:
@@ -549,7 +567,7 @@ def get_topic_summary_by_id(
     Args:
         topic_id: str. ID of the topic summary.
         strict: bool. Whether to fail noisily if no topic summary with the given
-            id exists in the datastore.
+            id exist in the datastore.
 
     Returns:
         TopicSummary or None. The topic summary domain object corresponding to
@@ -575,24 +593,57 @@ def get_new_topic_id() -> str:
     return topic_models.TopicModel.get_new_id('')
 
 
+@overload
+def get_multi_topic_rights(
+    topic_ids: List[str], *, strict: Literal[True]
+) -> List[topic_domain.TopicRights]: ...
+
+
+@overload
 def get_multi_topic_rights(
     topic_ids: List[str]
-) -> List[Optional[topic_domain.TopicRights]]:
+) -> List[Optional[topic_domain.TopicRights]]: ...
+
+
+@overload
+def get_multi_topic_rights(
+    topic_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[topic_domain.TopicRights]]: ...
+
+
+def get_multi_topic_rights(
+    topic_ids: List[str], strict: bool = False
+) -> Sequence[Optional[topic_domain.TopicRights]]:
     """Returns the rights of all topics whose topic ids are passed in.
 
     Args:
         topic_ids: list(str). The IDs of topics for which rights are to be
             returned.
+        strict: bool. Whether to fail noisily if no TopicRights exists for
+            the given topic id.
 
     Returns:
-        list(TopicRights). The list of rights of all given topics present in
-        the datastore.
+        Sequence[Optional[TopicRights]]. The list of rights of all given topics
+        present in the datastore.
+
+    Raises:
+        Exception. No topic_rights exists for the given topic_id.
     """
     topic_rights_models: List[Optional[topic_models.TopicRightsModel]] = (
         topic_models.TopicRightsModel.get_multi(topic_ids))
-    topic_rights: List[Optional[topic_domain.TopicRights]] = [
-        get_topic_rights_from_model(rights) if rights else None
-        for rights in topic_rights_models]
+    topic_rights: List[Optional[topic_domain.TopicRights]] = []
+    for index, rights in enumerate(topic_rights_models):
+        if rights is None:
+            if strict:
+                raise Exception(
+                    'No topic_rights exists for the given topic_id: %s' %
+                    topic_ids[index]
+                )
+            topic_rights.append(rights)
+        else:
+            topic_rights.append(
+                get_topic_rights_from_model(rights)
+            )
     return topic_rights
 
 

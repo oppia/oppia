@@ -692,11 +692,14 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'job_id of the ClassifierTrainingJob does not exist.'):
             classifier_services.mark_training_job_pending('invalid_job_id')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_can_not_store_classifier_data_due_to_invalid_job_id(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'The ClassifierTrainingJobModel corresponding to the '
             'job_id of the ClassifierTrainingJob does not exist.'):
-            classifier_services.store_classifier_data('invalid_job_id', {})
+            classifier_services.store_classifier_data('invalid_job_id', {})  # type: ignore[arg-type]
 
     def test_generate_signature(self) -> None:
         """Test the generate_signature method."""

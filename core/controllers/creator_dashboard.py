@@ -38,52 +38,95 @@ from core.domain import summary_services
 from core.domain import topic_fetchers
 from core.domain import user_services
 
-EXPLORATION_ID_KEY = 'exploration_id'
-COLLECTION_ID_KEY = 'collection_id'
+from typing import Dict, Final, List, TypedDict
+
+EXPLORATION_ID_KEY: Final = 'exploration_id'
+COLLECTION_ID_KEY: Final = 'collection_id'
 
 
-class OldContributorDashboardRedirectPage(base.BaseHandler):
+class DisplayableExplorationSummaryDict(TypedDict):
+    """Type for the displayable exploration summary dictionary."""
+
+    id: str
+    title: str
+    activity_type: str
+    category: str
+    created_on_msec: float
+    objective: str
+    language_code: str
+    last_updated_msec: float
+    human_readable_contributors_summary: Dict[str, Dict[str, int]]
+    status: str
+    ratings: Dict[str, int]
+    community_owned: bool
+    tags: List[str]
+    thumbnail_icon_url: str
+    thumbnail_bg_color: str
+    num_views: int
+    num_open_threads: int
+    num_total_threads: int
+
+
+class OldContributorDashboardRedirectPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Redirects the old contributor dashboard URL to the new one."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         self.redirect('/contributor-dashboard', permanent=True)
 
 
-class OldCreatorDashboardRedirectPage(base.BaseHandler):
+class OldCreatorDashboardRedirectPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Redirects the old creator dashboard URL to the new one."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         self.redirect(feconf.CREATOR_DASHBOARD_URL, permanent=True)
 
 
-class CreatorDashboardPage(base.BaseHandler):
+class CreatorDashboardPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Page showing the user's creator dashboard."""
 
     ADDITIONAL_DEPENDENCY_IDS = ['codemirror']
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_creator_dashboard
-    def get(self):
+    def get(self) -> None:
 
         self.render_template('creator-dashboard-page.mainpage.html')
 
 
-class CreatorDashboardHandler(base.BaseHandler):
+class CreatorDashboardHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of CreatorDashboardHandler's normalized_payload
+    dictionary.
+    """
+
+    display_preference: str
+
+
+class CreatorDashboardHandler(
+    base.BaseHandler[
+        CreatorDashboardHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Provides data for the user's creator dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {
@@ -100,10 +143,11 @@ class CreatorDashboardHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_creator_dashboard
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
 
-        def _round_average_ratings(rating):
+        def _round_average_ratings(rating: float) -> float:
             """Returns the rounded average rating to display on the creator
             dashboard.
 
@@ -137,11 +181,36 @@ class CreatorDashboardHandler(base.BaseHandler):
         # TODO(bhenning): Update this to use unresolved answers from
         # stats_services once the training interface is enabled and it's cheaper
         # to retrieve top answers from stats_services.
+        displayable_exploration_summary_dicts: List[
+            DisplayableExplorationSummaryDict
+        ] = []
         for ind, exploration in enumerate(exp_summary_dicts):
-            exploration.update(feedback_thread_analytics[ind].to_dict())
+            feedback_analytics_dict = feedback_thread_analytics[ind].to_dict()
+            displayable_exploration_summary_dicts.append({
+                'id': exploration['id'],
+                'title': exploration['title'],
+                'activity_type': exploration['activity_type'],
+                'category': exploration['category'],
+                'created_on_msec': exploration['created_on_msec'],
+                'objective': exploration['objective'],
+                'language_code': exploration['language_code'],
+                'last_updated_msec': exploration['last_updated_msec'],
+                'human_readable_contributors_summary': (
+                    exploration['human_readable_contributors_summary']),
+                'status': exploration['status'],
+                'ratings': exploration['ratings'],
+                'community_owned': exploration['community_owned'],
+                'tags': exploration['tags'],
+                'thumbnail_icon_url': exploration['thumbnail_icon_url'],
+                'thumbnail_bg_color': exploration['thumbnail_bg_color'],
+                'num_views': exploration['num_views'],
+                'num_open_threads': feedback_analytics_dict['num_open_threads'],
+                'num_total_threads': (
+                    feedback_analytics_dict['num_total_threads'])
+            })
 
-        exp_summary_dicts = sorted(
-            exp_summary_dicts,
+        displayable_exploration_summary_dicts = sorted(
+            displayable_exploration_summary_dicts,
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
@@ -174,13 +243,18 @@ class CreatorDashboardHandler(base.BaseHandler):
                 })
 
         dashboard_stats = user_services.get_dashboard_stats(self.user_id)
-        dashboard_stats.update({
+        dashboard_stats_dict = {
+            'num_ratings': dashboard_stats['num_ratings'],
+            'average_ratings': dashboard_stats['average_ratings'],
+            'total_plays': dashboard_stats['total_plays'],
             'total_open_feedback': feedback_services.get_total_open_threads(
                 feedback_thread_analytics)
-        })
-        if dashboard_stats and dashboard_stats.get('average_ratings'):
-            dashboard_stats['average_ratings'] = (
-                _round_average_ratings(dashboard_stats['average_ratings']))
+        }
+        if dashboard_stats:
+            average_ratings = dashboard_stats_dict.get('average_ratings')
+            if average_ratings:
+                dashboard_stats_dict['average_ratings'] = (
+                    _round_average_ratings(average_ratings))
 
         last_week_stats = (
             user_services.get_last_week_dashboard_stats(self.user_id))
@@ -204,7 +278,9 @@ class CreatorDashboardHandler(base.BaseHandler):
 
         subscriber_ids = subscription_services.get_all_subscribers_of_creator(
             self.user_id)
-        subscribers_settings = user_services.get_users_settings(subscriber_ids)
+        subscribers_settings = user_services.get_users_settings(
+            subscriber_ids, strict=True
+        )
         subscribers_list = []
         for index, subscriber_settings in enumerate(subscribers_settings):
             subscriber_summary = {
@@ -218,7 +294,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             subscribers_list.append(subscriber_summary)
 
         user_settings = user_services.get_user_settings(
-            self.user_id, strict=False)
+            self.user_id, strict=True)
         creator_dashboard_display_pref = (
             user_settings.creator_dashboard_display_pref)
 
@@ -256,9 +332,9 @@ class CreatorDashboardHandler(base.BaseHandler):
                 ids_of_suggestions_which_can_be_reviewed)])
 
         self.values.update({
-            'explorations_list': exp_summary_dicts,
+            'explorations_list': displayable_exploration_summary_dicts,
             'collections_list': collection_summary_dicts,
-            'dashboard_stats': dashboard_stats,
+            'dashboard_stats': dashboard_stats_dict,
             'last_week_stats': last_week_stats,
             'subscribers_list': subscribers_list,
             'display_preference': creator_dashboard_display_pref,
@@ -275,18 +351,33 @@ class CreatorDashboardHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_access_creator_dashboard
-    def post(self):
-        creator_dashboard_display_pref = (
-            self.normalized_payload.get('display_preference'))
+    def post(self) -> None:
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        creator_dashboard_display_pref = self.normalized_payload[
+            'display_preference']
         user_services.update_user_creator_dashboard_display(
             self.user_id, creator_dashboard_display_pref)
         self.render_json({})
 
 
-class NewExplorationHandler(base.BaseHandler):
+class NewExplorationHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of NewExplorationHandler's normalized_payload
+    dictionary.
+    """
+
+    title: str
+
+
+class NewExplorationHandler(
+    base.BaseHandler[
+        NewExplorationHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Creates a new exploration."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'title': {
@@ -299,9 +390,11 @@ class NewExplorationHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_create_exploration
-    def post(self):
+    def post(self) -> None:
         """Handles POST requests."""
-        title = self.normalized_payload.get('title')
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        title = self.normalized_payload['title']
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -313,17 +406,18 @@ class NewExplorationHandler(base.BaseHandler):
         })
 
 
-class NewCollectionHandler(base.BaseHandler):
+class NewCollectionHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Creates a new collection."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'POST': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_create_collection
-    def post(self):
+    def post(self) -> None:
         """Handles POST requests."""
+        assert self.user_id is not None
         new_collection_id = collection_services.get_new_collection_id()
         collection = collection_domain.Collection.create_default_collection(
             new_collection_id)
@@ -334,25 +428,39 @@ class NewCollectionHandler(base.BaseHandler):
         })
 
 
-class UploadExplorationHandler(base.BaseHandler):
+class UploadExplorationHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of UploadExplorationHandler's normalized_request
+    dictionary.
+    """
+
+    yaml_file: str
+
+
+class UploadExplorationHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        UploadExplorationHandlerNormalizedRequestDict
+    ]
+):
     """Uploads a new exploration."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'yaml_file': {
                 'schema': {
                     'type': 'basestring'
-                },
-                'default_value': None
+                }
             }
         }
     }
 
     @acl_decorators.can_upload_exploration
-    def post(self):
+    def post(self) -> None:
         """Handles POST requests."""
-        yaml_content = self.normalized_request.get('yaml_file')
+        assert self.user_id is not None
+        assert self.normalized_request is not None
+        yaml_content = self.normalized_request['yaml_file']
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         if constants.ALLOW_YAML_FILE_UPLOAD:

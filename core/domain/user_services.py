@@ -2306,7 +2306,8 @@ def allow_user_to_review_translation_in_language(
     user_contribution_rights = get_user_contribution_rights(user_id)
     allowed_language_codes = set(
         user_contribution_rights.can_review_translation_for_language_codes)
-    allowed_language_codes.add(language_code)
+    if language_code is not None:
+        allowed_language_codes.add(language_code)
     user_contribution_rights.can_review_translation_for_language_codes = (
         sorted(list(allowed_language_codes)))
     _save_user_contribution_rights(user_contribution_rights)

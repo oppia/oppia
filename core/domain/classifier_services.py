@@ -36,6 +36,7 @@ from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classifier_models
+    from proto_files import text_classifier_pb2
 
 (classifier_models,) = models.Registry.import_models([models.Names.CLASSIFIER])
 
@@ -525,14 +526,10 @@ def fetch_next_job() -> Optional[classifier_domain.ClassifierTrainingJob]:
     return next_job
 
 
-# TODO(#15451): Add stubs for protobuf once we have enough type info regarding
-# protobuf's library. Because currently, the stubs in typeshed is not fully
-# type annotated yet and the main repository is also not type annotated yet.
-# Here we use object because the argument classifier_data_proto can accept
-# instances of `TextClassifierFrozenModel` class. But since we excluded
-# proto_files/ from the static type annotations, this argument
-# is annotated as general object type.
-def store_classifier_data(job_id: str, classifier_data_proto: object) -> None:
+def store_classifier_data(
+    job_id: str,
+    classifier_data_proto: text_classifier_pb2.TextClassifierFrozenModel
+) -> None:
     """Checks for the existence of the model and then updates it.
 
     Args:

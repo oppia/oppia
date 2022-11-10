@@ -23,7 +23,7 @@ from core.tests import test_utils
 class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
     """Test for redirecting landing page for fractions."""
 
-    def test_old_fractions_landing_url_without_viewer_type(self):
+    def test_old_fractions_landing_url_without_viewer_type(self) -> None:
         """Test to validate the old Fractions landing url without viewerType
         redirects to the new Fractions landing url.
         """
@@ -33,7 +33,7 @@ class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
             'http://localhost/math/fractions',
             response.headers['location'])
 
-    def test_old_fraction_landing_url_with_viewer_type(self):
+    def test_old_fraction_landing_url_with_viewer_type(self) -> None:
         """Test to validate the old Fractions landing url with viewerType
         redirects to the new Fractions landing url.
         """
@@ -48,7 +48,7 @@ class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
 class TopicLandingRedirectPageTest(test_utils.GenericTestBase):
     """Test for redirecting the old landing page URL to the new one."""
 
-    def test_old_topic_url_redirect(self):
+    def test_old_topic_url_redirect(self) -> None:
         response = self.get_html_response(
             '/learn/maths/fractions', expected_status_int=302)
         self.assertEqual(
