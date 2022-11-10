@@ -101,8 +101,6 @@ NOT_FULLY_COVERED_FILES: Final = [
     'core/controllers/skill_editor_test.py',
     'core/controllers/story_viewer.py',
     'core/controllers/story_viewer_test.py',
-    'core/controllers/subtopic_viewer.py',
-    'core/controllers/subtopic_viewer_test.py',
     'core/controllers/suggestion.py',
     'core/controllers/suggestion_test.py',
     'core/controllers/tasks.py',
