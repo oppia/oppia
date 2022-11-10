@@ -94,7 +94,7 @@ def _get_matching_blog_card_summary_dicts(
     blog_post_summaries = (
         blog_services.get_blog_post_summary_models_by_ids(blog_post_ids))
     if len(blog_post_summaries) == feconf.DEFAULT_QUERY_LIMIT:
-        logging.exception(
+        logging.error(
             '%s blog post summaries were fetched to load the search/filter by '
             'result page. You may be running up against the default query '
             'limits.'
