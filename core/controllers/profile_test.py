@@ -38,7 +38,9 @@ from typing import Final
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
+    from mypy_imports import secrets_services
 
+secrets_services = models.Registry.import_secrets_services()
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
 
@@ -1064,8 +1066,8 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.swap_secret = self.swap(
-            feconf, 'MAILCHIMP_WEBHOOK_SECRET', 'secret')
+        self.swap_secret = self.swap_to_always_return(
+            secrets_services, 'get_secret', 'secret')
         self.swap_audience_id = (
             self.swap(feconf, 'MAILCHIMP_AUDIENCE_ID', 'audience_id'))
         user_services.update_email_preferences(
