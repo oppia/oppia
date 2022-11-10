@@ -291,7 +291,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       14: {
-        text: '        dest_if_really_stuck: first',
+        text: '        dest_if_really_stuck: second',
         highlighted: true
       },
       15: {
@@ -355,7 +355,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       30: {
-        text: '    dest_if_really_stuck: first',
+        text: '    dest_if_really_stuck: third',
         highlighted: false
       },
       31: {
@@ -476,7 +476,7 @@ describe('Exploration history', function() {
       '        content_id: ca_buttonText_0\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
-      '    dest_if_really_stuck: first\n' +
+      '    dest_if_really_stuck: null\n' +
       '    feedback:\n' +
       '      html: \'\'\n' +
       '      content_id: default_outcome\n' +

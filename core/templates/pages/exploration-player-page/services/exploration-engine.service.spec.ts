@@ -42,7 +42,7 @@ import { StatsReportingService } from './stats-reporting.service';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 
-describe('Exploration engine service ', () => {
+fdescribe('Exploration engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let audioPreloaderService: AudioPreloaderService;

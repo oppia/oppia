@@ -436,9 +436,6 @@ export class ExplorationEngineService {
         focusLabel: string
       ) => void
   ): boolean {
-    console.log("\n\n");
-      console.log("Chal to rha atleast");
-      console.log("\n\n");
     if (this.answerIsBeingProcessed) {
       return;
     }
@@ -549,7 +546,6 @@ export class ExplorationEngineService {
     questionHtml = questionHtml + this._getRandomSuffix();
     nextInteractionHtml = nextInteractionHtml + this._getRandomSuffix();
 
-
     let nextCard = StateCard.createNewCard(
       this.nextStateName, questionHtml, nextInteractionHtml,
       this.exploration.getInteraction(this.nextStateName),
@@ -560,35 +556,14 @@ export class ExplorationEngineService {
 
     if (newStateNameIfStuck !== null) {
       let newStateIfStuck = this.exploration.getState(newStateNameIfStuck);
-      console.log("\n\n");
-      console.log("Goes inside");
-      console.log("\n\n");
       let newParamsIfStuck = (
         newStateIfStuck ? this.makeParams(
           oldParams, newStateIfStuck.paramChanges, [oldParams]) : oldParams);
-      console.log("\n\n");
-      console.log(newParamsIfStuck);
-      console.log("\n\n");
-      if (newParamsIfStuck === null) {
-        console.log("\nParam stuck received.\n");
-        this.answerIsBeingProcessed = false;
-        this.alertsService.addWarning('Parameters should not be empty.');
-        return;
-      }
 
       let questionHtmlIfStuck = this.makeQuestion(
         newStateIfStuck, [newParamsIfStuck, {
           answer: 'answer'
         }]);
-      console.log("\n\n");
-      console.log(questionHtmlIfStuck);
-      console.log("\n\n");
-      if (questionHtmlIfStuck === null) {
-        this.answerIsBeingProcessed = false;
-        // TODO(#13133): Remove all question related naming conventions.
-        this.alertsService.addWarning('Question content should not be empty.');
-        return;
-      }
 
       newParamsIfStuck.answer = answer;
 
