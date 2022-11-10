@@ -685,27 +685,6 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_subscription_email)
 
 
-class ProfilePictureHandlerTests(test_utils.GenericTestBase):
-
-    def test_get_profile_picture_with_updated_value(self):
-        self.get_json(
-            '/preferenceshandler/profile_picture', expected_status_int=401)
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.login(self.OWNER_EMAIL)
-        user_settings = user_services.get_user_settings(owner_id)
-        response = self.get_json('/preferenceshandler/profile_picture')
-        self.assertEqual(
-            response['profile_picture_data_url'],
-            user_settings.profile_picture_data_url)
-        user_services.update_profile_picture_data_url(
-            owner_id, 'new_profile_picture')
-        response = self.get_json('/preferenceshandler/profile_picture')
-        self.assertEqual(
-            response['profile_picture_data_url'], 'new_profile_picture')
-        self.logout()
-
-
 class SignupTests(test_utils.GenericTestBase):
 
     def test_signup_page_does_not_have_top_right_menu(self):

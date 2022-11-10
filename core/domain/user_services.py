@@ -25,6 +25,7 @@ import itertools
 import logging
 import re
 import urllib
+import webptools
 
 from core import feconf
 from core import utils
@@ -32,6 +33,7 @@ from core.constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import exp_fetchers
+from core.domain import fs_services
 from core.domain import role_services
 from core.domain import state_domain
 from core.domain import user_domain
@@ -824,8 +826,6 @@ def _get_user_settings_from_model(
             user_settings_model.last_edited_an_exploration),
         last_created_an_exploration=(
             user_settings_model.last_created_an_exploration),
-        profile_picture_data_url=(
-            user_settings_model.profile_picture_data_url),
         default_dashboard=user_settings_model.default_dashboard,
         creator_dashboard_display_pref=(
             user_settings_model.creator_dashboard_display_pref),
@@ -1355,8 +1355,16 @@ def update_profile_picture_data_url(
         profile_picture_data_url: str. New profile picture url to be set.
     """
     user_settings = get_user_settings(user_id, strict=True)
-    user_settings.profile_picture_data_url = profile_picture_data_url
-    save_user_settings(user_settings)
+    username = user_settings.username
+    fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
+    filename_png = 'profile_picture.png'
+    fs.commit(filename_png, profile_picture_data_url, mimetype='image/png')
+
+    profile_picture_webp = webptools.base64str2webp_base64str(
+        base64str=profile_picture_data_url, image_type="png",
+        option="-q 80",logging="-v")
+    filename_webp = 'profile_picture.webp'
+    fs.commit(filename_webp, profile_picture_webp, mimetype='image/webp')
 
 
 def update_user_bio(user_id: str, user_bio: str) -> None:
