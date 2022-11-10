@@ -41,8 +41,12 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
 
+from typing import Dict, List, Optional, TypedDict
 
-def _require_valid_version(version_from_payload, exploration_version):
+
+def _require_valid_version(
+    version_from_payload: Optional[int], exploration_version: int
+) -> None:
     """Check that the payload version matches the given exploration version."""
 
     if version_from_payload != exploration_version:
@@ -70,14 +74,7 @@ SCHEMA_FOR_VERSION = {
 }
 
 
-class EditorHandler(base.BaseHandler):
-    """Base class for all handlers for the editor page."""
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {}
-
-
-class ExplorationPage(EditorHandler):
+class ExplorationPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """The editor page for a single exploration."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -85,18 +82,40 @@ class ExplorationPage(EditorHandler):
             'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(self, unused_exploration_id):
+    def get(self, unused_exploration_id: str) -> None:
         """Handles GET requests."""
 
         self.render_template('exploration-editor-page.mainpage.html')
 
 
-class ExplorationHandler(EditorHandler):
+class ExplorationHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of ExplorationHandler's
+    normalized_request dictionary.
+    """
+
+    v: Optional[int]
+    apply_draft: bool
+
+
+class ExplorationHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ExplorationHandler's
+    normalized_payload dictionary.
+    """
+
+    version: int
+    commit_message: Optional[str]
+    change_list: List[exp_domain.ExplorationChange]
+
+
+class ExplorationHandler(
+    base.BaseHandler[
+        ExplorationHandlerNormalizedPayloadDict,
+        ExplorationHandlerNormalizedRequestDict
+    ]
+):
     """Page with editor data for a single exploration."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -146,17 +165,19 @@ class ExplorationHandler(EditorHandler):
     }
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id):
+    def get(self, exploration_id: str) -> None:
         """Gets the data for the exploration overview page."""
         # 'apply_draft' and 'v'(version) are optional parameters because the
         # exploration history tab also uses this handler, and these parameters
         # are not used by that tab.
+        assert self.user_id is not None
+        assert self.normalized_request is not None
         version = self.normalized_request.get('v')
-        apply_draft = self.normalized_request.get('apply_draft')
+        apply_draft = self.normalized_request['apply_draft']
 
         user_settings = user_services.get_user_settings(
             self.user_id, strict=False
-        )
+        ) if self.user_id else None
         has_seen_editor_tutorial = False
         has_seen_translation_tutorial = False
         if user_settings is not None:
@@ -169,11 +190,14 @@ class ExplorationHandler(EditorHandler):
             exploration_data = exp_services.get_user_exploration_data(
                 self.user_id, exploration_id, apply_draft=apply_draft,
                 version=version)
-            exploration_data['show_state_editor_tutorial_on_load'] = (
+            exploration_data['show_state_editor_tutorial_on_load'] = bool(
                 self.user_id and not has_seen_editor_tutorial)
-            exploration_data['show_state_translation_tutorial_on_load'] = (
+            exploration_data['show_state_translation_tutorial_on_load'] = bool(
                 self.user_id and not has_seen_translation_tutorial)
-            exploration_data['exploration_is_linked_to_story'] = (
+            # Here we use MyPy ignore because here we are defining a new
+            # 'exploration_is_linked_to_story' key on a well defined TypedDict
+            # dictionary.
+            exploration_data['exploration_is_linked_to_story'] = (  # type: ignore[misc]
                 exp_services.get_story_id_linked_to_exploration(
                     exploration_id) is not None)
         except Exception as e:
@@ -183,10 +207,12 @@ class ExplorationHandler(EditorHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_save_exploration
-    def put(self, exploration_id):
+    def put(self, exploration_id: str) -> None:
         """Updates properties of the given exploration."""
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        version = self.normalized_payload.get('version')
+        version = self.normalized_payload['version']
 
         if version > exploration.version:
             raise base.BaseHandler.InvalidInputException(
@@ -198,7 +224,7 @@ class ExplorationHandler(EditorHandler):
                 'This exploration cannot be edited. Please contact the admin.')
 
         commit_message = self.normalized_payload.get('commit_message')
-        change_list = self.normalized_payload.get('change_list')
+        change_list = self.normalized_payload['change_list']
 
         changes_are_mergeable = exp_services.are_changes_mergeable(
             exploration_id, version, change_list)
@@ -227,9 +253,10 @@ class ExplorationHandler(EditorHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_delete_exploration
-    def delete(self, exploration_id):
+    def delete(self, exploration_id: str) -> None:
         """Deletes the given exploration."""
 
+        assert self.user_id is not None
         log_debug_string = '(%s) %s tried to delete exploration %s' % (
             self.roles, self.user_id, exploration_id)
         logging.debug(log_debug_string)
@@ -245,7 +272,9 @@ class ExplorationHandler(EditorHandler):
         self.render_json(self.values)
 
 
-class UserExplorationPermissionsHandler(EditorHandler):
+class UserExplorationPermissionsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles user permissions for a particular exploration."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -254,12 +283,10 @@ class UserExplorationPermissionsHandler(EditorHandler):
             'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id):
+    def get(self, exploration_id: str) -> None:
         """Gets the user permissions for an exploration."""
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
@@ -288,7 +315,32 @@ class UserExplorationPermissionsHandler(EditorHandler):
         self.render_json(self.values)
 
 
-class ExplorationRightsHandler(EditorHandler):
+class ExplorationRightsHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ExplorationRightsHandler's
+    normalized_payload dictionary.
+    """
+
+    version: Optional[int]
+    make_community_owned: bool
+    new_member_username: Optional[str]
+    new_member_role: Optional[str]
+    viewable_if_private: Optional[bool]
+
+
+class ExplorationRightsHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of ExplorationRightsHandler's
+    normalized_request dictionary.
+    """
+
+    username: str
+
+
+class ExplorationRightsHandler(
+    base.BaseHandler[
+        ExplorationRightsHandlerNormalizedPayloadDict,
+        ExplorationRightsHandlerNormalizedRequestDict
+    ]
+):
     """Handles management of exploration editing rights."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -337,14 +389,16 @@ class ExplorationRightsHandler(EditorHandler):
     }
 
     @acl_decorators.can_modify_exploration_roles
-    def put(self, exploration_id):
+    def put(self, exploration_id: str) -> None:
         """Updates the editing rights for the given exploration."""
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        version = self.normalized_payload.get('version')
+        version = self.normalized_payload['version']
         _require_valid_version(version, exploration.version)
 
         make_community_owned = (
-            self.normalized_payload.get('make_community_owned'))
+            self.normalized_payload['make_community_owned'])
         new_member_username = self.normalized_payload.get('new_member_username')
         new_member_role = self.normalized_payload.get('new_member_role')
         viewable_if_private = self.normalized_payload.get('viewable_if_private')
@@ -355,6 +409,11 @@ class ExplorationRightsHandler(EditorHandler):
             if new_member_id is None:
                 raise self.InvalidInputException(
                     'Sorry, we could not find the specified user.')
+            if new_member_role is None:
+                raise self.InvalidInputException(
+                    'Please provide a role for the new member of the '
+                    'exploration.'
+                )
             if new_member_id == self.user_id:
                 raise self.InvalidInputException(
                     'Users are not allowed to assign other roles to themselves')
@@ -388,9 +447,10 @@ class ExplorationRightsHandler(EditorHandler):
         })
 
     @acl_decorators.can_modify_exploration_roles
-    def delete(self, exploration_id):
+    def delete(self, exploration_id: str) -> None:
         """Deletes user roles from the exploration."""
-        username = self.normalized_request.get('username')
+        assert self.normalized_request is not None
+        username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -407,7 +467,20 @@ class ExplorationRightsHandler(EditorHandler):
         })
 
 
-class ExplorationStatusHandler(EditorHandler):
+class ExplorationStatusHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ExplorationStatusHandler's
+    normalized_request dictionary.
+    """
+
+    make_public: bool
+
+
+class ExplorationStatusHandler(
+    base.BaseHandler[
+        ExplorationStatusHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Handles publishing of an exploration."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -426,7 +499,7 @@ class ExplorationStatusHandler(EditorHandler):
         }
     }
 
-    def _publish_exploration(self, exploration_id):
+    def _publish_exploration(self, exploration_id: str) -> None:
         """Publish an exploration.
 
         Args:
@@ -446,8 +519,9 @@ class ExplorationStatusHandler(EditorHandler):
         exp_services.index_explorations_given_ids([exploration_id])
 
     @acl_decorators.can_publish_exploration
-    def put(self, exploration_id):
-        make_public = self.normalized_payload.get('make_public')
+    def put(self, exploration_id: str) -> None:
+        assert self.normalized_payload is not None
+        make_public = self.normalized_payload['make_public']
 
         if make_public:
             self._publish_exploration(exploration_id)
@@ -458,7 +532,21 @@ class ExplorationStatusHandler(EditorHandler):
         })
 
 
-class ExplorationModeratorRightsHandler(EditorHandler):
+class ExplorationModeratorRightsHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ExplorationModeratorRightsHandler's
+    normalized_payload dictionary.
+    """
+
+    email_body: str
+    version: Optional[int]
+
+
+class ExplorationModeratorRightsHandler(
+    base.BaseHandler[
+        ExplorationModeratorRightsHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Handles management of exploration rights by moderators."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -480,13 +568,15 @@ class ExplorationModeratorRightsHandler(EditorHandler):
     }
 
     @acl_decorators.can_access_moderator_page
-    def put(self, exploration_id):
+    def put(self, exploration_id: str) -> None:
         """Unpublishes the given exploration, and sends an email to all its
         owners.
         """
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        email_body = self.normalized_payload.get('email_body')
-        version = self.normalized_payload.get('version')
+        email_body = self.normalized_payload['email_body']
+        version = self.normalized_payload['version']
         _require_valid_version(version, exploration.version)
 
         # If moderator emails can be sent, check that all the prerequisites are
@@ -516,7 +606,21 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         })
 
 
-class UserExplorationEmailsHandler(EditorHandler):
+class UserExplorationEmailsHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of UserExplorationEmailsHandler's
+    normalized_payload dictionary.
+    """
+
+    mute: Optional[bool]
+    message_type: str
+
+
+class UserExplorationEmailsHandler(
+    base.BaseHandler[
+        UserExplorationEmailsHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Handles management of user email notification preferences for this
     exploration.
     """
@@ -547,7 +651,7 @@ class UserExplorationEmailsHandler(EditorHandler):
     }
 
     @acl_decorators.can_edit_exploration
-    def put(self, exploration_id):
+    def put(self, exploration_id: str) -> None:
         """Updates the email notification preferences for the given exploration.
 
         Args:
@@ -557,8 +661,10 @@ class UserExplorationEmailsHandler(EditorHandler):
             InvalidInputException. Invalid message type.
         """
 
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
         mute = self.normalized_payload.get('mute')
-        message_type = self.normalized_payload.get('message_type')
+        message_type = self.normalized_payload['message_type']
 
         if message_type == feconf.MESSAGE_TYPE_FEEDBACK:
             user_services.set_email_preferences_for_exploration(
@@ -576,7 +682,21 @@ class UserExplorationEmailsHandler(EditorHandler):
         })
 
 
-class ExplorationFileDownloader(EditorHandler):
+class ExplorationFileDownloaderNormalizedRequestDict(TypedDict):
+    """Dict representation of ExplorationFileDownloader's
+    normalized_request dictionary.
+    """
+
+    v: Optional[int]
+    output_format: str
+
+
+class ExplorationFileDownloader(
+    base.BaseHandler[
+        Dict[str, str],
+        ExplorationFileDownloaderNormalizedRequestDict
+    ]
+):
     """Downloads an exploration as a zip file, or dict of YAML strings
     representing states.
     """
@@ -607,11 +727,12 @@ class ExplorationFileDownloader(EditorHandler):
     }
 
     @acl_decorators.can_download_exploration
-    def get(self, exploration_id):
+    def get(self, exploration_id: str) -> None:
         """Handles GET requests."""
+        assert self.normalized_request is not None
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         version = self.normalized_request.get('v')
-        output_format = self.normalized_request.get('output_format')
+        output_format = self.normalized_request['output_format']
 
         if version is None:
             version = exploration.version
@@ -634,7 +755,21 @@ class ExplorationFileDownloader(EditorHandler):
                 exploration_id, version=version))
 
 
-class StateYamlHandler(EditorHandler):
+class StateYamlHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of StateYamlHandler's
+    normalized_payload dictionary.
+    """
+
+    state_dict: state_domain.StateDict
+    width: int
+
+
+class StateYamlHandler(
+    base.BaseHandler[
+        StateYamlHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Given a representation of a state, converts it to a YAML string.
 
     Note that this handler is stateless; it does not make use of the storage
@@ -668,10 +803,11 @@ class StateYamlHandler(EditorHandler):
     }
 
     @acl_decorators.can_play_exploration
-    def post(self, unused_exploration_id):
+    def post(self, unused_exploration_id: str) -> None:
         """Handles POST requests."""
-        state_dict = self.normalized_payload.get('state_dict')
-        width = self.normalized_payload.get('width')
+        assert self.normalized_payload is not None
+        state_dict = self.normalized_payload['state_dict']
+        width = self.normalized_payload['width']
 
         self.render_json({
             'yaml': state_domain.State.convert_state_dict_to_yaml(
@@ -679,7 +815,9 @@ class StateYamlHandler(EditorHandler):
         })
 
 
-class ExplorationSnapshotsHandler(EditorHandler):
+class ExplorationSnapshotsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Returns the exploration snapshot history."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -688,10 +826,10 @@ class ExplorationSnapshotsHandler(EditorHandler):
             'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id):
+    def get(self, exploration_id: str) -> None:
         """Handles GET requests."""
 
         snapshots = exp_services.get_exploration_snapshots_metadata(
@@ -701,7 +839,9 @@ class ExplorationSnapshotsHandler(EditorHandler):
         snapshots_committer_ids = [
             snapshot['committer_id'] for snapshot in snapshots]
         committer_usernames = user_services.get_usernames(
-            snapshots_committer_ids)
+            snapshots_committer_ids,
+            strict=True
+        )
         for index, snapshot in enumerate(snapshots):
             snapshot['committer_id'] = committer_usernames[index]
 
@@ -710,7 +850,11 @@ class ExplorationSnapshotsHandler(EditorHandler):
         })
 
 
-class ExplorationCheckRevertValidHandler(EditorHandler):
+class ExplorationCheckRevertValidHandler(
+    base.BaseHandler[
+        Dict[str, str], Dict[str, str]
+    ]
+):
     """Checks if an older version of an exploration is valid."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -722,17 +866,31 @@ class ExplorationCheckRevertValidHandler(EditorHandler):
             'schema': SCHEMA_FOR_VERSION
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_exploration
-    def get(self, exploration_id, version):
+    def get(self, exploration_id: str, version: int) -> None:
         """Handles GET requests."""
         info = exp_services.get_exploration_validation_error(
             exploration_id, version)
         self.render_json({'valid': not info, 'details': info})
 
 
-class ExplorationRevertHandler(EditorHandler):
+class ExplorationRevertHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ExplorationRevertHandler's
+    normalized_request dictionary.
+    """
+
+    current_version: int
+    revert_to_version: int
+
+
+class ExplorationRevertHandler(
+    base.BaseHandler[
+        ExplorationRevertHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Reverts an exploration to an older version."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -752,10 +910,12 @@ class ExplorationRevertHandler(EditorHandler):
     }
 
     @acl_decorators.can_edit_exploration
-    def post(self, exploration_id):
+    def post(self, exploration_id: str) -> None:
         """Handles POST requests."""
-        current_version = self.normalized_payload.get('current_version')
-        revert_to_version = self.normalized_payload.get('revert_to_version')
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        current_version = self.normalized_payload['current_version']
+        revert_to_version = self.normalized_payload['revert_to_version']
 
         if revert_to_version >= current_version:
             raise self.InvalidInputException(
@@ -768,7 +928,9 @@ class ExplorationRevertHandler(EditorHandler):
         self.render_json({})
 
 
-class ExplorationStatisticsHandler(EditorHandler):
+class ExplorationStatisticsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Returns statistics for an exploration. This is the handler for the new
     statistics framework.
     """
@@ -779,10 +941,10 @@ class ExplorationStatisticsHandler(EditorHandler):
             'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_exploration_stats
-    def get(self, exploration_id):
+    def get(self, exploration_id: str) -> None:
         """Handles GET requests."""
         current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
@@ -791,7 +953,9 @@ class ExplorationStatisticsHandler(EditorHandler):
             exploration_id, current_exploration.version).to_frontend_dict())
 
 
-class StateInteractionStatsHandler(EditorHandler):
+class StateInteractionStatsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Returns detailed learner answer statistics for a state."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -805,10 +969,10 @@ class StateInteractionStatsHandler(EditorHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_exploration_stats
-    def get(self, exploration_id, state_name):
+    def get(self, exploration_id: str, state_name: str) -> None:
         """Handles GET requests."""
         current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
@@ -823,7 +987,17 @@ class StateInteractionStatsHandler(EditorHandler):
         self.render_json({'visualizations_info': []})
 
 
-class FetchIssuesHandler(EditorHandler):
+class FetchIssuesHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of FetchIssuesHandler's
+    normalized_request dictionary.
+    """
+
+    exp_version: int
+
+
+class FetchIssuesHandler(
+    base.BaseHandler[Dict[str, str], FetchIssuesHandlerNormalizedRequestDict]
+):
     """Handler used for retrieving the list of unresolved issues in an
     exploration. This removes the invalid issues and returns the remaining
     unresolved ones.
@@ -844,9 +1018,10 @@ class FetchIssuesHandler(EditorHandler):
     }
 
     @acl_decorators.can_view_exploration_stats
-    def get(self, exp_id):
+    def get(self, exp_id: str) -> None:
         """Handles GET requests."""
-        exp_version = self.normalized_request.get('exp_version')
+        assert self.normalized_request is not None
+        exp_version = self.normalized_request['exp_version']
         exp_issues = stats_services.get_exp_issues(
             exp_id, exp_version, strict=False
         )
@@ -863,7 +1038,9 @@ class FetchIssuesHandler(EditorHandler):
         self.render_json(exp_issues_dict)
 
 
-class FetchPlaythroughHandler(EditorHandler):
+class FetchPlaythroughHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler used for retrieving a playthrough."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -877,10 +1054,10 @@ class FetchPlaythroughHandler(EditorHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_exploration_stats
-    def get(self, unused_exploration_id, playthrough_id):
+    def get(self, unused_exploration_id: str, playthrough_id: str) -> None:
         """Handles GET requests."""
         playthrough = stats_services.get_playthrough_by_id(playthrough_id)
         if playthrough is None:
@@ -889,7 +1066,21 @@ class FetchPlaythroughHandler(EditorHandler):
         self.render_json(playthrough.to_dict())
 
 
-class ResolveIssueHandler(EditorHandler):
+class ResolveIssueHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ResolveIssueHandler's
+    normalized_payload dictionary.
+    """
+
+    exp_issue_object: Optional[stats_domain.ExplorationIssue]
+    exp_version: int
+
+
+class ResolveIssueHandler(
+    base.BaseHandler[
+        ResolveIssueHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Handler used for resolving an issue. Currently, when an issue is
     resolved, the issue is removed from the unresolved issues list in the
     ExplorationIssuesModel instance, and all corresponding playthrough
@@ -918,10 +1109,11 @@ class ResolveIssueHandler(EditorHandler):
     }
 
     @acl_decorators.can_edit_exploration
-    def post(self, exp_id):
+    def post(self, exp_id: str) -> None:
         """Handles POST requests."""
+        assert self.normalized_payload is not None
         exp_issue_object = self.normalized_payload.get('exp_issue_object')
-        exp_version = self.normalized_payload.get('exp_version')
+        exp_version = self.normalized_payload['exp_version']
 
         exp_issues = stats_services.get_exp_issues(
             exp_id, exp_version, strict=False
@@ -955,7 +1147,29 @@ class ResolveIssueHandler(EditorHandler):
         self.render_json({})
 
 
-class ImageUploadHandler(EditorHandler):
+class ImageUploadHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ImageUploadHandler's
+    normalized_payload dictionary.
+    """
+
+    filename: str
+    filename_prefix: str
+
+
+class ImageUploadHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of ImageUploadHandler's
+    normalized_request dictionary.
+    """
+
+    image: bytes
+
+
+class ImageUploadHandler(
+    base.BaseHandler[
+        ImageUploadHandlerNormalizedPayloadDict,
+        ImageUploadHandlerNormalizedRequestDict
+    ]
+):
     """Handles image uploads."""
 
     _decorator = None
@@ -998,12 +1212,14 @@ class ImageUploadHandler(EditorHandler):
     }
 
     @acl_decorators.can_edit_entity
-    def post(self, entity_type, entity_id):
+    def post(self, entity_type: str, entity_id: str) -> None:
         """Saves an image uploaded by a content creator."""
 
-        raw = self.normalized_request.get('image')
-        filename = self.normalized_payload.get('filename')
-        filename_prefix = self.normalized_payload.get('filename_prefix')
+        assert self.normalized_payload is not None
+        assert self.normalized_request is not None
+        raw = self.normalized_request['image']
+        filename = self.normalized_payload['filename']
+        filename_prefix = self.normalized_payload['filename_prefix']
 
         try:
             file_format = image_validation_services.validate_image_and_filename(
@@ -1028,7 +1244,9 @@ class ImageUploadHandler(EditorHandler):
         self.render_json({'filename': filename})
 
 
-class StartedTutorialEventHandler(EditorHandler):
+class StartedTutorialEventHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Records that this user has started the state editor tutorial."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -1036,13 +1254,12 @@ class StartedTutorialEventHandler(EditorHandler):
             'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'POST': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_play_exploration
-    def post(self, unused_exploration_id):
+    def post(self, unused_exploration_id: str) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
         user_services.record_user_started_state_editor_tutorial(self.user_id)
         self.render_json({})
 
@@ -1089,12 +1306,14 @@ class EditorAutosaveHandler(ExplorationHandler):
     }
 
     @acl_decorators.can_save_exploration
-    def put(self, exploration_id):
+    def put(self, exploration_id: str) -> None:
         """Handles PUT requests for draft updation."""
         # Raise an Exception if the draft change list fails non-strict
         # validation.
-        change_list = self.normalized_payload.get('change_list')
-        version = self.normalized_payload.get('version')
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        change_list = self.normalized_payload['change_list']
+        version = self.normalized_payload['version']
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
         can_edit = rights_manager.check_can_edit_activity(
@@ -1128,13 +1347,16 @@ class EditorAutosaveHandler(ExplorationHandler):
                 exploration_id, version, change_list)})
 
     @acl_decorators.can_save_exploration
-    def post(self, exploration_id):
+    def post(self, exploration_id: str) -> None:
         """Handles POST request for discarding draft changes."""
+        assert self.user_id is not None
         exp_services.discard_draft(exploration_id, self.user_id)
         self.render_json({})
 
 
-class StateAnswerStatisticsHandler(EditorHandler):
+class StateAnswerStatisticsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Returns basic learner answer statistics for a state."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1143,16 +1365,18 @@ class StateAnswerStatisticsHandler(EditorHandler):
             'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_exploration_stats
-    def get(self, unused_exploration_id):
+    def get(self, unused_exploration_id: str) -> None:
         """Handles GET requests."""
         # TODO(#11475): Return visualizations info based on Apache Beam job.
         self.render_json({'answers': {}, 'interaction_ids': {}})
 
 
-class TopUnresolvedAnswersHandler(EditorHandler):
+class TopUnresolvedAnswersHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Returns a list of top N unresolved answers."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1161,16 +1385,29 @@ class TopUnresolvedAnswersHandler(EditorHandler):
             'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_exploration
-    def get(self, unused_exploration_id):
+    def get(self, unused_exploration_id: str) -> None:
         """Handles GET requests for unresolved answers."""
         # TODO(#11475): Return visualizations info based on Apache Beam job.
         self.render_json({'unresolved_answers': []})
 
 
-class ExplorationEditsAllowedHandler(EditorHandler):
+class ExplorationEditsAllowedHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ExplorationEditsAllowedHandler's
+    normalized_payload dictionary.
+    """
+
+    edits_are_allowed: bool
+
+
+class ExplorationEditsAllowedHandler(
+    base.BaseHandler[
+        ExplorationEditsAllowedHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Toggles whether exploration can be edited."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1190,15 +1427,31 @@ class ExplorationEditsAllowedHandler(EditorHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def put(self, exploration_id):
+    def put(self, exploration_id: str) -> None:
         """Handles PUT request to set whether exploration can be edited."""
+        assert self.normalized_payload is not None
         exp_services.set_exploration_edits_allowed(
             exploration_id,
-            self.normalized_payload.get('edits_are_allowed'))
+            self.normalized_payload['edits_are_allowed']
+        )
         self.render_json({})
 
 
-class LearnerAnswerInfoHandler(EditorHandler):
+class LearnerAnswerInfoHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of LearnerAnswerInfoHandler's
+    normalized_request dictionary.
+    """
+
+    state_name: str
+    learner_answer_info_id: str
+
+
+class LearnerAnswerInfoHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        LearnerAnswerInfoHandlerNormalizedRequestDict
+    ]
+):
     """Handles the learner answer info for an exploration state."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1234,7 +1487,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
     }
 
     @acl_decorators.can_play_entity
-    def get(self, entity_type, entity_id):
+    def get(self, entity_type: str, entity_id: str) -> None:
         """Handles the GET requests for learner answer info for an
         exploration state.
         """
@@ -1242,6 +1495,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
             raise self.PageNotFoundException
 
         learner_answer_info_data = []
+        learner_answer_info_data_dict = {}
 
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             exp = exp_fetchers.get_exploration_by_id(entity_id)
@@ -1273,21 +1527,28 @@ class LearnerAnswerInfoHandler(EditorHandler):
                 learner_answer_info_dicts = [
                     learner_answer_info.to_dict() for learner_answer_info in
                     learner_answer_details.learner_answer_info_list]
-            learner_answer_info_data = {
-                'interaction_id': learner_answer_details.interaction_id,
-                'customization_args': question.question_state_data.interaction
-                                      .to_dict()['customization_args'],
-                'learner_answer_info_dicts': learner_answer_info_dicts
-            }
+                learner_answer_info_data_dict = {
+                    'interaction_id': learner_answer_details.interaction_id,
+                    'customization_args': (
+                        question.question_state_data.interaction.to_dict()[
+                            'customization_args']
+                        ),
+                    'learner_answer_info_dicts': learner_answer_info_dicts
+                }
 
         self.render_json({
-            'learner_answer_info_data': learner_answer_info_data
+            'learner_answer_info_data': (
+                learner_answer_info_data_dict
+                if entity_type == feconf.ENTITY_TYPE_QUESTION else
+                learner_answer_info_data
+            )
         })
 
     @acl_decorators.can_edit_entity
-    def delete(self, entity_type, entity_id):
+    def delete(self, entity_type: str, entity_id: str) -> None:
         """Deletes the learner answer info by the given id."""
 
+        assert self.normalized_request is not None
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.PageNotFoundException
 
@@ -1303,7 +1564,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
                 stats_services.get_state_reference_for_question(
                     entity_id))
         learner_answer_info_id = (
-            self.normalized_request.get('learner_answer_info_id'))
+            self.normalized_request['learner_answer_info_id'])
 
         stats_services.delete_learner_answer_info(
             entity_type, state_reference, learner_answer_info_id)
