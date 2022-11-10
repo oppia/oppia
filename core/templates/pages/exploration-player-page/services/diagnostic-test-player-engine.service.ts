@@ -237,7 +237,7 @@ export class DiagnosticTestPlayerEngineService {
   getRecommendedTopicIds(): string[] {
     let recommendedTopicIds: string[] = [];
     let failedTopicIds: string[] = this.getFailedTopicIds();
-    let rootTopicIds: string[] = this._getRootTopicIds();
+    let rootTopicIds: string[] = this.getRootTopicIds();
     let failedRootTopicIds: string[] = rootTopicIds.filter(
       topicId => failedTopicIds.indexOf(topicId) !== -1
     );
@@ -248,7 +248,7 @@ export class DiagnosticTestPlayerEngineService {
     } else if (failedRootTopicIds.length === 1) {
       recommendedTopicIds.push(failedRootTopicIds[0]);
     } else {
-      let sortedTopicIds = this._getSortedTopicIds();
+      let sortedTopicIds = this.getSortedTopicIds();
       for (let topicId of sortedTopicIds) {
         if (failedTopicIds.indexOf(topicId) !== -1) {
           recommendedTopicIds.push(topicId);
@@ -259,7 +259,7 @@ export class DiagnosticTestPlayerEngineService {
     return recommendedTopicIds;
   }
 
-  _getRootTopicIds(): string[] {
+  getRootTopicIds(): string[] {
     let topicIdToPrerequisiteTopicId = (
       this._initialCopyOfTopicTrackerModel.getTopicIdToPrerequisiteTopicIds());
     let rootTopicIds: string[] = [];
@@ -272,7 +272,7 @@ export class DiagnosticTestPlayerEngineService {
     return rootTopicIds;
   }
 
-  private _getSortedTopicIds(): string[] {
+   getSortedTopicIds(): string[] {
     let visitedTopicIds: string[] = [];
     let topicIdToPrerequisiteTopicId = (
       this._initialCopyOfTopicTrackerModel.getTopicIdToPrerequisiteTopicIds());
