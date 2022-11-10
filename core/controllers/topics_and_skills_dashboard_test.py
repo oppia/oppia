@@ -629,8 +629,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
-            'name': 'Topic name',
-            'abbreviatedName': 'name-one',
+            'name': 'TopicName',
             'description': 'Topic description',
             'filename': 'test_svg.svg',
             'thumbnailBgColor': '#C6DCDA',
@@ -657,8 +656,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
-            'name': 'Topic name that is too long for validation.',
-            'abbreviatedName': 'name-two'
+            'name': 'Topic name that is too long for validation.'
         }
         self.post_json(
             self.url, payload, csrf_token=csrf_token, expected_status_int=400)
@@ -668,8 +666,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
-            'name': 'Topic name',
-            'abbreviatedName': 'name-three',
+            'name': 'TopicName',
             'description': 'Topic description',
             'filename': 'cafe.flac',
             'thumbnailBgColor': '#C6DCDA',
