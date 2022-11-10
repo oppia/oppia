@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 
 from core import utils
 
@@ -361,6 +362,34 @@ class FeedbackMessageReference:
             'thread_id': self.thread_id,
             'message_id': self.message_id
         }
+
+    @classmethod
+    def from_dict(
+        cls,
+        reference_dict: FeedbackMessageReferenceDict
+        ) -> FeedbackMessageReference:
+        """ Return a FeedbackMessageReference domain object from a dict.
+
+        Args:
+            reference_dict: dict. The dict representation of a
+                FeedbackMessageReference object.
+        Returns:
+            FeedbackMessageReference. The corresponding FeedbackMessageReference domain object.
+        """
+        # TODO: Investigate why reference_dict is passed as 
+        # string and not FeedbackMessageReferenceDict when called from Postman
+        if isinstance(reference_dict, str):
+            reference_dict = json.loads(reference_dict)
+        return cls(
+            reference_dict['entity_type'],
+            reference_dict['entity_id'],
+            reference_dict['thread_id'],
+            reference_dict['message_id']
+        )
+
+    def validate(self) -> None:
+        """Validates various properties of the FeedbackMessageReference."""
+        # TODO: implement validation for object
 
 
 class FeedbackThreadSummary:
