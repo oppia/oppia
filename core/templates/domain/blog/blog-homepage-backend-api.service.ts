@@ -25,10 +25,20 @@ import { BlogHomePageConstants } from 'pages/blog-home-page/blog-home-page.const
 import { BlogPostPageConstants } from 'pages/blog-post-page/blog-post-page.constants';
 import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { BlogAuthorProfilePageConstants } from 'pages/blog-author-profile-page/blog-author-profile-page.constants';
+import { BlogAuthorDetailsBackendDict } from './blog-dashboard-backend-api.service';
+
 export interface BlogHomePageBackendResponse {
   'no_of_blog_post_summaries': number;
   'blog_post_summary_dicts': BlogPostSummaryBackendDict[];
   'list_of_default_tags': string[];
+}
+
+export interface BlogAuthorProfilePageBackendResponse {
+  'author_details': BlogAuthorDetailsBackendDict;
+  'no_of_blog_post_summaries': number;
+  'summary_dicts': BlogPostSummaryBackendDict[];
+  'profile_picture_data_url': string;
 }
 
 export interface SearchResponseBackendDict {
@@ -38,6 +48,7 @@ export interface SearchResponseBackendDict {
 }
 
 export interface BlogPostPageBackendResponse {
+  'author_username': string;
   'profile_picture_data_url': string;
   'blog_post_dict': BlogPostBackendDict;
   'summary_dicts': BlogPostSummaryBackendDict[];
@@ -56,9 +67,18 @@ export interface BlogHomePageData {
 }
 
 export interface BlogPostPageData {
+  authorUsername: string;
   profilePictureDataUrl: string;
   blogPostDict: BlogPostData;
   summaryDicts: BlogPostSummary[];
+}
+
+export interface BlogAuthorProfilePageData {
+  displayedAuthorName: string;
+  authorBio: string;
+  numOfBlogPostSummaries: number;
+  blogPostSummaries: BlogPostSummary[];
+  profilePictureDataUrl: string;
 }
 
 @Injectable({
@@ -87,6 +107,35 @@ export class BlogHomePageBackendApiService {
               blogPostSummary => {
                 return BlogPostSummary.createFromBackendDict(blogPostSummary);
               })),
+        });
+      }, errorResponse => {
+        reject(errorResponse);
+      });
+    });
+  }
+
+
+  async fetchBlogAuthorProfilePageDataAsync(
+      authorUsername: string, offset: string
+  ): Promise<BlogAuthorProfilePageData> {
+    return new Promise((resolve, reject) => {
+      const authorProfilePageUrl = this.urlInterpolationService.interpolateUrl(
+        BlogAuthorProfilePageConstants.BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_TEMPLATE, { // eslint-disable-line max-len
+          author_username: authorUsername
+        });
+      this.http.get<BlogAuthorProfilePageBackendResponse>(
+        authorProfilePageUrl + '?offset=' + offset
+      ).toPromise().then(response => {
+        resolve({
+          numOfBlogPostSummaries: response.no_of_blog_post_summaries,
+          blogPostSummaries: (
+            response.summary_dicts.map(
+              blogPostSummary => {
+                return BlogPostSummary.createFromBackendDict(blogPostSummary);
+              })),
+          displayedAuthorName: response.author_details.displayed_author_name,
+          authorBio: response.author_details.author_bio,
+          profilePictureDataUrl: response.profile_picture_data_url
         });
       }, errorResponse => {
         reject(errorResponse);
@@ -125,6 +174,7 @@ export class BlogHomePageBackendApiService {
       this.http.get<BlogPostPageBackendResponse>(blogPostDataUrl).toPromise()
         .then(response => {
           resolve({
+            authorUsername: response.author_username,
             profilePictureDataUrl: response.profile_picture_data_url,
             summaryDicts: (
               response.summary_dicts.map(
