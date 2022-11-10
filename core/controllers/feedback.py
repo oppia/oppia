@@ -20,34 +20,200 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import suggestion_services
 from core.domain import user_services
 
+from typing import Dict, List, Optional, TypedDict
 
-def replace_user_id_with_username_in_dict(thread_dicts, user_keys):
-    """Replace user id with the corresponding username in the given dictionary.
+
+class UpdatedLastMessageAuthorFeedbackThreadDict(TypedDict):
+    """Dict representation of FeedbackThread domain object with
+    updated author_username and last_nonempty_message_author keys.
+    """
+
+    last_updated_msecs: float
+    original_author_username: Optional[str]
+    state_name: Optional[str]
+    status: str
+    subject: str
+    summary: str
+    thread_id: str
+    message_count: int
+    last_nonempty_message_text: Optional[str]
+    last_nonempty_message_author: Optional[str]
+
+
+class UpdatedAuthorUsernameFeedbackThreadDict(TypedDict):
+    """Dict representation of FeedbackThread domain object with
+    updated author_username key.
+    """
+
+    last_updated_msecs: float
+    original_author_username: Optional[str]
+    state_name: Optional[str]
+    status: str
+    subject: str
+    summary: str
+    thread_id: str
+    message_count: int
+    last_nonempty_message_text: Optional[str]
+    last_nonempty_message_author_id: Optional[str]
+
+
+class UpdatedFeedbackMessageDict(TypedDict):
+    """Dict representation of FeedbackMessage object with updated
+    author_username key.
+    """
+
+    author_username: Optional[str]
+    created_on_msecs: float
+    entity_type: str
+    entity_id: str
+    message_id: int
+    text: str
+    updated_status: str
+    updated_subject: str
+
+
+def update_original_and_last_message_author_id_in_feedback_thread_dicts(
+    feedback_thread_dicts: List[feedback_domain.FeedbackThreadDict]
+) -> List[UpdatedLastMessageAuthorFeedbackThreadDict]:
+    """Replaces original author id and last message author id with there
+    corresponding username in the given feedback thread dictionaries.
 
     Args:
-        thread_dicts: list(dict). The dictionary that will be updated.
-        user_keys: list(tuple). A list that contains tuples of keys. The first
-            item in the tuple is a key of the user ID and the second item is a
-            key of a newly added username.
+        feedback_thread_dicts: list(dict). The list of feedback thread
+            dictionaries that need to be updated.
 
     Returns:
-        list(dict). The updated dictionary.
+        list(dict). The list of updated feedback thread dictionaries.
     """
-    for thread_dict in thread_dicts:
-        for user_id_key, username_key in user_keys:
-            thread_dict[username_key] = (
-                user_services.get_username(thread_dict[user_id_key])
-                if thread_dict[user_id_key] else None
+    updated_feedback_thread_dicts = []
+    for feedback_thread_dict in feedback_thread_dicts:
+        last_nonempty_message_author_id = (
+            feedback_thread_dict['last_nonempty_message_author_id']
+        )
+        updated_feedback_thread_dict: (
+            UpdatedLastMessageAuthorFeedbackThreadDict
+        ) = {
+            'last_updated_msecs': feedback_thread_dict['last_updated_msecs'],
+            'original_author_username': (
+                user_services.get_username(
+                    feedback_thread_dict['original_author_id']
+                )
+                if feedback_thread_dict['original_author_id'] else None
+            ),
+            'state_name': feedback_thread_dict['state_name'],
+            'status': feedback_thread_dict['status'],
+            'subject': feedback_thread_dict['subject'],
+            'summary': feedback_thread_dict['summary'],
+            'thread_id': feedback_thread_dict['thread_id'],
+            'message_count': feedback_thread_dict['message_count'],
+            'last_nonempty_message_text': (
+                feedback_thread_dict['last_nonempty_message_text']
+            ),
+            'last_nonempty_message_author': (
+                user_services.get_username(
+                    last_nonempty_message_author_id
+                ) if last_nonempty_message_author_id else None
             )
-            thread_dict.pop(user_id_key)
-    return thread_dicts
+        }
+        updated_feedback_thread_dicts.append(updated_feedback_thread_dict)
+    return updated_feedback_thread_dicts
 
 
-class ThreadListHandler(base.BaseHandler):
+def update_original_author_id_in_feedback_thread_dicts(
+    feedback_thread_dicts: List[feedback_domain.FeedbackThreadDict]
+) -> List[UpdatedAuthorUsernameFeedbackThreadDict]:
+    """Replaces original author id with the corresponding username in the
+    given feedback thread dictionaries.
+
+    Args:
+        feedback_thread_dicts: list(dict). The list of feedback thread
+            dictionaries that need to be updated.
+
+    Returns:
+        list(dict). The list of updated feedback thread dictionaries.
+    """
+    updated_feedback_thread_dicts = []
+    for feedback_thread_dict in feedback_thread_dicts:
+        updated_feedback_thread_dict: (
+            UpdatedAuthorUsernameFeedbackThreadDict
+        ) = {
+            'last_updated_msecs': feedback_thread_dict['last_updated_msecs'],
+            'original_author_username': (
+                user_services.get_username(
+                    feedback_thread_dict['original_author_id']
+                )
+                if feedback_thread_dict['original_author_id'] else None
+            ),
+            'state_name': feedback_thread_dict['state_name'],
+            'status': feedback_thread_dict['status'],
+            'subject': feedback_thread_dict['subject'],
+            'summary': feedback_thread_dict['summary'],
+            'thread_id': feedback_thread_dict['thread_id'],
+            'message_count': feedback_thread_dict['message_count'],
+            'last_nonempty_message_text': (
+                feedback_thread_dict['last_nonempty_message_text']
+            ),
+            'last_nonempty_message_author_id': (
+                feedback_thread_dict['last_nonempty_message_author_id']
+            )
+        }
+        updated_feedback_thread_dicts.append(updated_feedback_thread_dict)
+    return updated_feedback_thread_dicts
+
+
+def update_author_id_in_message_dicts(
+    message_dicts: List[feedback_domain.FeedbackMessageDict]
+) -> List[UpdatedFeedbackMessageDict]:
+    """Replaces author id with the corresponding username in the
+    given message dictionaries.
+
+    Args:
+        message_dicts: list(dict). The list of message
+            dictionaries that need to be updated.
+
+    Returns:
+        list(dict). The list of updated message dictionaries.
+    """
+    updated_message_dicts = []
+    for message_dict in message_dicts:
+        updated_message_dict: UpdatedFeedbackMessageDict = {
+            'author_username': (
+                user_services.get_username(
+                    message_dict['author_id']
+                )
+                if message_dict['author_id'] else None
+            ),
+            'created_on_msecs': message_dict['created_on_msecs'],
+            'entity_type': message_dict['entity_type'],
+            'entity_id': message_dict['entity_id'],
+            'message_id': message_dict['message_id'],
+            'text': message_dict['text'],
+            'updated_status': message_dict['updated_status'],
+            'updated_subject': message_dict['updated_subject']
+        }
+        updated_message_dicts.append(updated_message_dict)
+    return updated_message_dicts
+
+
+class ThreadListHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ThreadListHandler's
+    normalized_Payload dictionary.
+    """
+
+    subject: str
+    text: str
+
+
+class ThreadListHandler(
+    base.BaseHandler[
+        ThreadListHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handles operations relating to feedback thread lists."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -79,7 +245,7 @@ class ThreadListHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id):
+    def get(self, exploration_id: str) -> None:
 
         feedback_thread_dicts = [
             thread.to_dict() for thread in feedback_services.get_all_threads(
@@ -87,22 +253,19 @@ class ThreadListHandler(base.BaseHandler):
             )
         ]
         self.values.update({
-            'feedback_thread_dicts': replace_user_id_with_username_in_dict(
-                feedback_thread_dicts, [
-                    ('original_author_id', 'original_author_username'),
-                    (
-                        'last_nonempty_message_author_id',
-                        'last_nonempty_message_author'
-                    )
-                ]
+            'feedback_thread_dicts': (
+                update_original_and_last_message_author_id_in_feedback_thread_dicts(  # pylint: disable=line-too-long
+                    feedback_thread_dicts
+                )
             )
         })
         self.render_json(self.values)
 
     @acl_decorators.can_create_feedback_thread
-    def post(self, exploration_id):
-        subject = self.normalized_payload.get('subject')
-        text = self.normalized_payload.get('text')
+    def post(self, exploration_id: str) -> None:
+        assert self.normalized_payload is not None
+        subject = self.normalized_payload['subject']
+        text = self.normalized_payload['text']
 
         feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION, exploration_id, self.user_id,
@@ -110,7 +273,9 @@ class ThreadListHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ThreadListHandlerForTopicsHandler(base.BaseHandler):
+class ThreadListHandlerForTopicsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles listing of suggestions threads linked to topics."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -125,12 +290,10 @@ class ThreadListHandlerForTopicsHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_topic
-    def get(self, topic_id):
+    def get(self, topic_id: str) -> None:
 
         suggestion_thread_dicts = [
             thread.to_dict() for thread in feedback_services.get_all_threads(
@@ -138,15 +301,28 @@ class ThreadListHandlerForTopicsHandler(base.BaseHandler):
             )
         ]
         self.values.update({
-            'suggestion_thread_dicts': replace_user_id_with_username_in_dict(
-                suggestion_thread_dicts,
-                [('original_author_id', 'original_author_username')]
+            'suggestion_thread_dicts': (
+                update_original_author_id_in_feedback_thread_dicts(
+                    suggestion_thread_dicts
+                )
             )
         })
         self.render_json(self.values)
 
 
-class ThreadHandler(base.BaseHandler):
+class ThreadHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ThreadHandler's
+    normalized_Payload dictionary.
+    """
+
+    updated_status: Optional[str]
+    text: str
+    updated_subject: Optional[str]
+
+
+class ThreadHandler(
+    base.BaseHandler[ThreadHandlerNormalizedPayloadDict, Dict[str, str]]
+):
     """Handles operations relating to feedback threads."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -185,7 +361,7 @@ class ThreadHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_view_feedback_thread
-    def get(self, thread_id):
+    def get(self, thread_id: str) -> None:
         suggestion_id = thread_id
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_id, strict=False
@@ -202,20 +378,21 @@ class ThreadHandler(base.BaseHandler):
                 self.user_id, thread_id, message_ids)
 
         self.values.update({
-            'messages': replace_user_id_with_username_in_dict(
-                message_dicts,
-                [('author_id', 'author_username')]
+            'messages': update_author_id_in_message_dicts(
+                message_dicts
             ),
             'suggestion': suggestion.to_dict() if suggestion else None
         })
         self.render_json(self.values)
 
     @acl_decorators.can_comment_on_feedback_thread
-    def post(self, thread_id):
+    def post(self, thread_id: str) -> None:
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
         suggestion = suggestion_services.get_suggestion_by_id(
             thread_id, strict=False
         )
-        text = self.normalized_payload.get('text')
+        text = self.normalized_payload['text']
         updated_status = self.normalized_payload.get('updated_status')
         updated_subject = self.normalized_payload.get('updated_subject')
 
@@ -235,14 +412,25 @@ class ThreadHandler(base.BaseHandler):
         message_dict = [message.to_dict() for message in messages]
 
         self.render_json({
-            'messages': replace_user_id_with_username_in_dict(
-                message_dict,
-                [('author_id', 'author_username')]
+            'messages': update_author_id_in_message_dicts(
+                message_dict
             )
         })
 
 
-class RecentFeedbackMessagesHandler(base.BaseHandler):
+class RecentFeedbackMessagesHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of RecentFeedbackMessagesHandler's
+    normalized_request dictionary.
+    """
+
+    cursor: Optional[str]
+
+
+class RecentFeedbackMessagesHandler(
+    base.BaseHandler[
+        Dict[str, str], RecentFeedbackMessagesHandlerNormalizedRequestDict
+    ]
+):
     """Returns a list of recently-posted feedback messages.
 
     Note that this currently also includes messages posted in private
@@ -250,7 +438,7 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'cursor': {
@@ -263,7 +451,8 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_moderator_page
-    def get(self):
+    def get(self) -> None:
+        assert self.normalized_request is not None
         urlsafe_start_cursor = self.normalized_request.get('cursor')
 
         all_feedback_messages, new_urlsafe_start_cursor, more = (
@@ -273,16 +462,17 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
         message_dict = [message.to_dict() for message in all_feedback_messages]
 
         self.render_json({
-            'results': replace_user_id_with_username_in_dict(
-                message_dict,
-                [('author_id', 'author_username')]
+            'results': update_author_id_in_message_dicts(
+                message_dict
             ),
             'cursor': new_urlsafe_start_cursor,
             'more': more,
         })
 
 
-class FeedbackStatsHandler(base.BaseHandler):
+class FeedbackStatsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Returns Feedback stats for an exploration.
         - Number of open threads.
         - Number of total threads.
@@ -300,12 +490,10 @@ class FeedbackStatsHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id):
+    def get(self, exploration_id: str) -> None:
         feedback_thread_analytics = (
             feedback_services.get_thread_analytics(
                 exploration_id))
@@ -318,7 +506,9 @@ class FeedbackStatsHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class FeedbackThreadViewEventHandler(base.BaseHandler):
+class FeedbackThreadViewEventHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Records when the given user views a feedback thread, in order to clear
     viewed feedback messages from emails that might be sent in future to this
     user.
@@ -335,12 +525,10 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'POST': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_comment_on_feedback_thread
-    def post(self, thread_id):
+    def post(self, thread_id: str) -> None:
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
         feedback_services.clear_feedback_message_references_transactional(
             self.user_id, exploration_id, thread_id)

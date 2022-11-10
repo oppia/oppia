@@ -24,7 +24,9 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_fetchers
+from core.domain import opportunity_domain
 from core.domain import opportunity_services
+from core.domain import state_domain
 from core.domain import story_fetchers
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
@@ -32,19 +34,41 @@ from core.domain import topic_fetchers
 from core.domain import translation_services
 from core.domain import user_services
 
-from typing import List, Union
+from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 
 
-class ContributorDashboardPage(base.BaseHandler):
+ListOfContributorDashboardStatsTypes = Sequence[Union[
+    suggestion_registry.TranslationContributionStats,
+    suggestion_registry.TranslationReviewStats,
+    suggestion_registry.QuestionContributionStats,
+    suggestion_registry.QuestionReviewStats
+]]
+
+
+ListOfContributorDashboardStatsDictTypes = Sequence[Union[
+    suggestion_registry.TranslationContributionStatsFrontendDict,
+    suggestion_registry.TranslationReviewStatsFrontendDict,
+    suggestion_registry.QuestionContributionStatsFrontendDict,
+    suggestion_registry.QuestionReviewStatsFrontendDict
+]]
+
+
+class ClientSideSkillOpportunityDict(opportunity_domain.SkillOpportunityDict):
+    """A dictionary representation of client side SkillOpportunity object."""
+
+    topic_name: str
+
+
+class ContributorDashboardPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Page showing the contributor dashboard."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         # TODO(#7402): Serve this page statically through app.yaml once
         # the CONTRIBUTOR_DASHBOARD_ENABLED flag is removed.
         if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
@@ -52,7 +76,21 @@ class ContributorDashboardPage(base.BaseHandler):
         self.render_template('contributor-dashboard-page.mainpage.html')
 
 
-class ContributionOpportunitiesHandler(base.BaseHandler):
+class ContributionOpportunitiesHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of ContributionOpportunitiesHandler's
+    normalized_request dictionary.
+    """
+
+    cursor: Optional[str]
+    language_code: Optional[str]
+    topic_name: Optional[str]
+
+
+class ContributionOpportunitiesHandler(
+    base.BaseHandler[
+        Dict[str, str], ContributionOpportunitiesHandlerNormalizedRequestDict
+    ]
+):
     """Provides data for opportunities available in different categories."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -90,15 +128,16 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def get(self, opportunity_type):
+    def get(self, opportunity_type: str) -> None:
         """Handles GET requests."""
+        assert self.normalized_request is not None
         if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
             raise self.PageNotFoundException
         search_cursor = self.normalized_request.get('cursor')
         language_code = self.normalized_request.get('language_code')
 
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
-            opportunities, next_cursor, more = (
+            skill_opportunities, next_cursor, more = (
                 self._get_skill_opportunities_with_corresponding_topic_name(
                     search_cursor))
 
@@ -106,21 +145,28 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
             topic_name = self.normalized_request.get('topic_name')
             if language_code is None:
                 raise self.InvalidInputException
-            opportunities, next_cursor, more = (
+            translation_opportunities, next_cursor, more = (
                 self._get_translation_opportunity_dicts(
                     language_code, topic_name, search_cursor))
-
         else:
             raise self.PageNotFoundException
 
         self.values = {
-            'opportunities': opportunities,
+            'opportunities': (
+                skill_opportunities
+                if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL
+                else translation_opportunities
+            ),
             'next_cursor': next_cursor,
             'more': more
         }
         self.render_json(self.values)
 
-    def _get_skill_opportunities_with_corresponding_topic_name(self, cursor):
+    def _get_skill_opportunities_with_corresponding_topic_name(
+        self, cursor: Optional[str]
+    ) -> Tuple[
+        List[ClientSideSkillOpportunityDict], Optional[str], bool
+    ]:
         """Returns a list of skill opportunities available for questions with
         a corresponding topic name.
 
@@ -158,7 +204,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
 
         skill_opportunities, cursor, more = (
             opportunity_services.get_skill_opportunities(cursor))
-        opportunities = []
+        opportunities: List[ClientSideSkillOpportunityDict] = []
         # Fetch opportunities until we have at least a page's worth that
         # correspond to a classroom or there are no more opportunities.
         while len(opportunities) < constants.OPPORTUNITIES_PAGE_SIZE:
@@ -167,10 +213,22 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                         skill_opportunity.id
                         in classroom_topic_skill_id_to_topic_name):
                     skill_opportunity_dict = skill_opportunity.to_dict()
-                    skill_opportunity_dict['topic_name'] = (
-                        classroom_topic_skill_id_to_topic_name[
-                            skill_opportunity.id])
-                    opportunities.append(skill_opportunity_dict)
+                    client_side_skill_opportunity_dict: (
+                        ClientSideSkillOpportunityDict
+                    ) = {
+                        'id': skill_opportunity_dict['id'],
+                        'skill_description': skill_opportunity_dict[
+                            'skill_description'
+                        ],
+                        'question_count': skill_opportunity_dict[
+                            'question_count'
+                        ],
+                        'topic_name': (
+                            classroom_topic_skill_id_to_topic_name[
+                                skill_opportunity.id]
+                            )
+                    }
+                    opportunities.append(client_side_skill_opportunity_dict)
             if (
                     not more or
                     len(opportunities) >= constants.OPPORTUNITIES_PAGE_SIZE):
@@ -181,7 +239,15 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         return opportunities, cursor, more
 
     def _get_translation_opportunity_dicts(
-            self, language_code, topic_name, search_cursor):
+        self,
+        language_code: str,
+        topic_name: Optional[str],
+        search_cursor: Optional[str]
+    ) -> Tuple[
+        List[opportunity_domain.PartialExplorationOpportunitySummaryDict],
+        Optional[str],
+        bool
+    ]:
         """Returns a list of translation opportunity dicts.
 
         Args:
@@ -211,11 +277,23 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         return opportunity_dicts, next_cursor, more
 
 
-class ReviewableOpportunitiesHandler(base.BaseHandler):
+class ReviewableOpportunitiesHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of ReviewableOpportunitiesHandler's
+    normalized_request dictionary.
+    """
+
+    topic_name: Optional[str]
+
+
+class ReviewableOpportunitiesHandler(
+    base.BaseHandler[
+        Dict[str, str], ReviewableOpportunitiesHandlerNormalizedRequestDict
+    ]
+):
     """Provides opportunities that have translation suggestions in review."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'topic_name': {
@@ -228,22 +306,27 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
+        assert self.normalized_request is not None
         topic_name = self.normalized_request.get('topic_name')
-        opportunity_dicts = [
-            opp.to_dict()
-            for opp in self
-                ._get_reviewable_exploration_opportunity_summaries(
-                    self.user_id, topic_name)]
+        opportunity_dicts: List[
+            opportunity_domain.PartialExplorationOpportunitySummaryDict
+        ] = []
+        if self.user_id:
+            for opp in self._get_reviewable_exploration_opportunity_summaries(
+                self.user_id, topic_name
+            ):
+                if opp is not None:
+                    opportunity_dicts.append(opp.to_dict())
         self.values = {
             'opportunities': opportunity_dicts,
         }
         self.render_json(self.values)
 
     def _get_reviewable_exploration_opportunity_summaries(
-        self, user_id, topic_name
-    ):
+        self, user_id: str, topic_name: Optional[str]
+    ) -> List[Optional[opportunity_domain.ExplorationOpportunitySummary]]:
         """Returns exploration opportunity summaries that have translation
         suggestions that are reviewable by the supplied user. The result is
         sorted in descending order by topic, story, and story node order.
@@ -251,13 +334,16 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
         Args:
             user_id: str. The user ID of the user for which to filter
                 translation suggestions.
-            topic_name: str. A topic name for which to filter the exploration
-                opportunity summaries. If 'All' is supplied, all available
-                exploration opportunity summaries will be returned.
+            topic_name: str or None. A topic name for which to filter the
+                exploration opportunity summaries. If 'All' is supplied, all
+                available exploration opportunity summaries will be returned.
 
         Returns:
             list(ExplorationOpportunitySummary). A list of the matching
             exploration opportunity summaries.
+
+        Raises:
+            Exception. No exploration_id found for the node_id.
         """
         # 1. Fetch the eligible topics.
         # 2. Fetch the stories for the topics.
@@ -272,16 +358,24 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'The supplied input topic: %s is not valid' % topic_name)
             topics = [topic]
-        topic_stories = story_fetchers.get_stories_by_ids([
-            reference.story_id
-            for topic in topics
-            for reference in topic.get_all_story_references()
-            if reference.story_is_published])
-        topic_exp_ids = [
-            node.exploration_id
-            for story in topic_stories
-            for node in story.story_contents.get_ordered_nodes()
-        ]
+        topic_stories = story_fetchers.get_stories_by_ids(
+            [
+                reference.story_id
+                for topic in topics
+                for reference in topic.get_all_story_references()
+                if reference.story_is_published
+            ],
+            strict=True
+        )
+        topic_exp_ids = []
+        for story in topic_stories:
+            for node in story.story_contents.get_ordered_nodes():
+                if node.exploration_id is None:
+                    raise Exception(
+                        'No exploration_id found for the node_id: %s'
+                        % node.id
+                    )
+                topic_exp_ids.append(node.exploration_id)
         in_review_suggestions, _ = (
             suggestion_services
             .get_reviewable_translation_suggestions_by_offset(
@@ -299,16 +393,29 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
             for exp_id in topic_exp_ids
             if exp_id in in_review_suggestion_target_ids
         ]
-        return (
+        return list(
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
                 exp_ids).values())
 
 
-class TranslatableTextHandler(base.BaseHandler):
+class TranslatableTextHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of TranslatableTextHandler's
+    normalized_request dictionary.
+    """
+
+    language_code: str
+    exp_id: str
+
+
+class TranslatableTextHandler(
+    base.BaseHandler[
+        Dict[str, str], TranslatableTextHandlerNormalizedRequestDict
+    ]
+):
     """Provides lessons content which can be translated in a given language."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'language_code': {
@@ -328,10 +435,11 @@ class TranslatableTextHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
-        language_code = self.normalized_request.get('language_code')
-        exp_id = self.normalized_request.get('exp_id')
+        assert self.normalized_request is not None
+        language_code = self.normalized_request['language_code']
+        exp_id = self.normalized_request['exp_id']
 
         if not opportunity_services.is_exploration_available_for_contribution(
                 exp_id):
@@ -340,10 +448,12 @@ class TranslatableTextHandler(base.BaseHandler):
         exp = exp_fetchers.get_exploration_by_id(exp_id)
         state_names_to_content_id_mapping = exp.get_translatable_text(
             language_code)
-        contribution_rights = user_services.get_user_contribution_rights(
-            self.user_id)
-        reviewable_language_codes = (
-            contribution_rights.can_review_translation_for_language_codes)
+        reviewable_language_codes = []
+        if self.user_id:
+            contribution_rights = user_services.get_user_contribution_rights(
+                self.user_id)
+            reviewable_language_codes = (
+                contribution_rights.can_review_translation_for_language_codes)
         if language_code not in reviewable_language_codes:
             state_names_to_content_id_mapping = (
                 self._get_state_names_to_not_set_content_id_mapping(
@@ -366,7 +476,11 @@ class TranslatableTextHandler(base.BaseHandler):
         self.render_json(self.values)
 
     def _get_state_names_to_not_set_content_id_mapping(
-            self, state_names_to_content_id_mapping):
+        self,
+        state_names_to_content_id_mapping: Dict[
+            str, Dict[str, state_domain.TranslatableItem]
+        ]
+    ) -> Dict[str, Dict[str, state_domain.TranslatableItem]]:
         """Returns a copy of the supplied state_names_to_content_id_mapping
         minus any contents of which the data is set of strings.
 
@@ -397,7 +511,12 @@ class TranslatableTextHandler(base.BaseHandler):
         return mapping_without_set_data_format
 
     def _get_state_names_to_not_in_review_content_id_mapping(
-            self, state_names_to_content_id_mapping, suggestions):
+        self,
+        state_names_to_content_id_mapping: Dict[
+            str, Dict[str, state_domain.TranslatableItem]
+        ],
+        suggestions: List[suggestion_registry.BaseSuggestion]
+    ) -> Dict[str, Dict[str, state_domain.TranslatableItemDict]]:
         """Returns a copy of the supplied state_names_to_content_id_mapping
         minus any contents found in suggestions.
 
@@ -431,7 +550,12 @@ class TranslatableTextHandler(base.BaseHandler):
                 }
         return final_mapping
 
-    def _is_content_in_review(self, state_name, content_id, suggestions):
+    def _is_content_in_review(
+        self,
+        state_name: str,
+        content_id: str,
+        suggestions: List[suggestion_registry.BaseSuggestion]
+    ) -> bool:
         """Returns whether a suggestion exists in suggestions with a change dict
         matching the supplied state_name and content_id.
 
@@ -449,11 +573,26 @@ class TranslatableTextHandler(base.BaseHandler):
             s.change.content_id == content_id for s in suggestions)
 
 
-class MachineTranslationStateTextsHandler(base.BaseHandler):
+class MachineTranslationStateTextsHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of MachineTranslationStateTextsHandler's
+    normalized_request dictionary.
+    """
+
+    exp_id: str
+    state_name: str
+    content_ids: str
+    target_language_code: str
+
+
+class MachineTranslationStateTextsHandler(
+    base.BaseHandler[
+        Dict[str, str], MachineTranslationStateTextsHandlerNormalizedRequestDict
+    ]
+):
     """Provides a machine translation of exploration content."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'exp_id': {
@@ -485,7 +624,7 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests. Responds with a mapping from content id to
         translation of form:
 
@@ -516,12 +655,13 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
             404 (Not Found): PageNotFoundException. At least one identifier does
                 not correspond to an entry in the datastore.
         """
-        exp_id = self.normalized_request.get('exp_id')
+        assert self.normalized_request is not None
+        exp_id = self.normalized_request['exp_id']
 
-        state_name = self.normalized_request.get('state_name')
+        state_name = self.normalized_request['state_name']
 
-        content_ids_string = self.normalized_request.get('content_ids')
-        content_ids = []
+        content_ids_string = self.normalized_request['content_ids']
+        content_ids: List[str] = []
         try:
             content_ids = json.loads(content_ids_string)
         except Exception as e:
@@ -529,8 +669,7 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
                 'Improperly formatted content_ids: %s' % content_ids_string
             ) from e
 
-        target_language_code = self.normalized_request.get(
-            'target_language_code')
+        target_language_code = self.normalized_request['target_language_code']
 
         exp = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if exp is None:
@@ -541,7 +680,7 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
             raise self.PageNotFoundException()
         content_id_to_translatable_item_mapping = (
             state_names_to_content_id_mapping[state_name])
-        translated_texts = {}
+        translated_texts: Dict[str, Optional[str]] = {}
         for content_id in content_ids:
             if content_id not in content_id_to_translatable_item_mapping:
                 translated_texts[content_id] = None
@@ -560,20 +699,27 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class UserContributionRightsDataHandler(base.BaseHandler):
+class UserContributionRightsDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Provides contribution rights of the logged in user in translation,
     voiceover and question category on the contributor dashboard.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         contribution_rights = None
         if self.username:
+            # Here we are sure that 'user_id' is not None because
+            # 'user_id' is recorded every time whenever a user claims
+            # an authentication whereas 'username' is recorded iff the
+            # user claims an authentication and successfully logged in.
+            assert self.user_id is not None
             contribution_rights = user_services.get_user_contribution_rights(
                 self.user_id)
         self.render_json({
@@ -592,17 +738,17 @@ class UserContributionRightsDataHandler(base.BaseHandler):
         })
 
 
-class FeaturedTranslationLanguagesHandler(base.BaseHandler):
+class FeaturedTranslationLanguagesHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Provides featured translation languages set in admin config."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         self.render_json({
             'featured_translation_languages':
@@ -610,17 +756,17 @@ class FeaturedTranslationLanguagesHandler(base.BaseHandler):
         })
 
 
-class TranslatableTopicNamesHandler(base.BaseHandler):
+class TranslatableTopicNamesHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Provides names of all translatable topics in the datastore."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         # Only published topics are translatable.
         topic_summaries = topic_fetchers.get_published_topic_summaries()
         topic_names = [summary.name for summary in topic_summaries]
@@ -630,13 +776,25 @@ class TranslatableTopicNamesHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class TranslationPreferenceHandler(base.BaseHandler):
+class TranslationPreferenceHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of TranslationPreferenceHandler's
+    normalized_request dictionary.
+    """
+
+    language_code: str
+
+
+class TranslationPreferenceHandler(
+    base.BaseHandler[
+        TranslationPreferenceHandlerNormalizedRequestDict, Dict[str, str]
+    ]
+):
     """Provides the preferred translation language in the
     contributor dashboard page.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     # TODO(#15559): Rename 'is_supported_audio_language_code' and
     # 'SUPPORTED_AUDIO_LANGUAGES' constant to make sure that the name
     # clearly defines the purpose.
@@ -655,8 +813,9 @@ class TranslationPreferenceHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_manage_own_account
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
         return self.render_json({
             'preferred_translation_language_code': (
@@ -664,15 +823,19 @@ class TranslationPreferenceHandler(base.BaseHandler):
         })
 
     @acl_decorators.can_manage_own_account
-    def post(self):
+    def post(self) -> None:
         """Handles POST requests."""
-        language_code = self.normalized_payload.get('language_code')
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        language_code = self.normalized_payload['language_code']
         user_services.update_preferred_translation_language_code(
             self.user_id, language_code)
         self.render_json({})
 
 
-class ContributorStatsSummariesHandler(base.BaseHandler):
+class ContributorStatsSummariesHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Returns contribution statistics for the supplied contribution type."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -693,12 +856,15 @@ class ContributorStatsSummariesHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_fetch_contributor_dashboard_stats
-    def get(self, contribution_type, contribution_subtype, username):
+    def get(
+        self,
+        contribution_type: str,
+        contribution_subtype: str,
+        username: str
+    ) -> None:
         """Handles GET requests."""
         if contribution_type not in [
             feconf.CONTRIBUTION_TYPE_TRANSLATION,
@@ -716,10 +882,14 @@ class ContributorStatsSummariesHandler(base.BaseHandler):
             )
 
         user_id = user_services.get_user_id_from_username(username)
-
+        # Here we are sure that user_id will never be None, because
+        # we are already handling the None case of user_id in
+        # `can_fetch_contributor_dashboard_stats` decorator by
+        # raising an exception.
+        assert user_id is not None
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
-                stats = (
+                stats: ListOfContributorDashboardStatsTypes = (
                     suggestion_services.get_all_translation_contribution_stats(
                         user_id))
                 self.values = {
@@ -754,7 +924,9 @@ class ContributorStatsSummariesHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ContributorAllStatsSummariesHandler(base.BaseHandler):
+class ContributorAllStatsSummariesHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Returns all contribution statistics associated with the user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -765,15 +937,17 @@ class ContributorAllStatsSummariesHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
-    def get(self, username):
+    def get(self, username: str) -> None:
         """Handles GET requests."""
         user_id = user_services.get_user_id_from_username(username)
-
+        # Here we are sure that user_id will never be None, because
+        # we are already handling the None case of user_id in
+        # `can_fetch_all_contributor_dashboard_stats` decorator by
+        # raising an exception.
+        assert user_id is not None
         stats = suggestion_services.get_all_contributor_stats(user_id)
         response = {}
 
@@ -797,13 +971,8 @@ class ContributorAllStatsSummariesHandler(base.BaseHandler):
 
 
 def _get_client_side_stats(
-    backend_stats: List[Union[
-        suggestion_registry.TranslationContributionStats,
-        suggestion_registry.TranslationReviewStats,
-        suggestion_registry.QuestionContributionStats,
-        suggestion_registry.QuestionReviewStats
-    ]]
-):
+    backend_stats: ListOfContributorDashboardStatsTypes
+) -> ListOfContributorDashboardStatsDictTypes:
     """Returns corresponding stats dicts with all the necessary
     information for the frontend.
 
@@ -819,38 +988,38 @@ def _get_client_side_stats(
                 months of format: "%b %Y", e.g. "Jan 2021".
         Unnecessary keys topic_id, contribution_dates, contributor_user_id
         are consequently deleted.
+
+    Raises:
+        Exception. No topic_id associated with stats object.
     """
     stats_dicts = [
-        stats.to_dict() for stats in backend_stats
+        stats.to_frontend_dict() for stats in backend_stats
     ]
-    topic_ids = [
-        stats_dict['topic_id']
-        for stats_dict in stats_dicts
-    ]
+    topic_ids = []
+    for index, stats_dict in enumerate(stats_dicts):
+        if stats_dict['topic_id'] is None:
+            raise Exception(
+                'No topic_id associated with stats: %s.' %
+                type(backend_stats[index]).__name__
+            )
+        topic_ids.append(stats_dict['topic_id'])
     topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
     topic_name_by_topic_id = {
         topic_summary.id: topic_summary.name
         for topic_summary in topic_summaries if topic_summary is not None
     }
     for stats_dict in stats_dicts:
-        stats_dict['topic_name'] = topic_name_by_topic_id.get(
+        # Here we are asserting that 'stats_dict['topic_id']' will never be None
+        # because above we are already handling the case of None 'topic_id' by
+        # raising an exception.
+        assert stats_dict['topic_id'] is not None
+        # Here we use MyPy ignore because 'stats_dict' is of union TypedDicts
+        # and MyPy is unable to infer on which TypedDict 'topic_name' key
+        # is added. So, due to this MyPy throws an error. Thus, to avoid
+        # the error, we use ignore here.
+        stats_dict['topic_name'] = topic_name_by_topic_id.get(  # type: ignore[index]
             stats_dict['topic_id'], 'UNKNOWN')
-
-        # TODO(#16051): TranslationContributionStats to use
-        # first_contribution_date and last_contribution_date.
-        if 'contribution_dates' in stats_dict.keys():
-            sorted_contribution_dates = sorted(stats_dict['contribution_dates'])
-            first_contribution_date = sorted_contribution_dates[0]
-            last_contribution_date = sorted_contribution_dates[-1]
-            del stats_dict['contribution_dates']
-        else:
-            first_contribution_date = stats_dict['first_contribution_date']
-            last_contribution_date = stats_dict['last_contribution_date']
-        stats_dict['first_contribution_date'] = (
-            first_contribution_date.strftime('%b %Y'))
-        stats_dict['last_contribution_date'] = (
-            last_contribution_date.strftime('%b %Y'))
-
-        del stats_dict['topic_id']
-        del stats_dict['contributor_user_id']
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion
+        # from TypedDict.
+        del stats_dict['topic_id']  # type: ignore[misc]
     return stats_dicts

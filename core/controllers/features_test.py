@@ -22,8 +22,10 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
 
+from typing import Final, List
 
-def exploration_features_url(exp_id):
+
+def exploration_features_url(exp_id: str) -> str:
     """Returns URL for getting which features the given exploration supports."""
     return '%s/%s' % (feconf.EXPLORATION_FEATURES_PREFIX, exp_id)
 
@@ -31,9 +33,9 @@ def exploration_features_url(exp_id):
 class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
     """Does common exploration set up for testing feature handlers."""
 
-    EXP_ID = 'expId'
+    EXP_ID: Final = 'expId'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -47,7 +49,7 @@ class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
 class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
     """Tests for fetching whether playthrough recording is enabled."""
 
-    def test_can_record_playthroughs_in_whitelisted_explorations(self):
+    def test_can_record_playthroughs_in_whitelisted_explorations(self) -> None:
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.EXP_ID])
@@ -56,16 +58,20 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
         self.assertTrue(json_response['is_exploration_whitelisted'])
 
-    def test_can_not_record_playthroughs_with_empty_whitelist(self):
+    def test_can_not_record_playthroughs_with_empty_whitelist(self) -> None:
+        config_value: List[str] = []
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [])
+            config_value
+        )
 
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
         self.assertFalse(json_response['is_exploration_whitelisted'])
 
-    def test_can_not_record_playthroughs_for_exploration_not_in_whitelist(self):
+    def test_can_not_record_playthroughs_for_exploration_not_in_whitelist(
+        self
+    ) -> None:
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.EXP_ID + '-differentiate'])

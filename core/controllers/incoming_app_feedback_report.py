@@ -21,7 +21,7 @@ from core.controllers import base
 from core.domain import app_feedback_report_domain
 from core.domain import app_feedback_report_services
 
-from typing import Dict, Any # isort:skip # pylint: disable=unused-import
+from typing import Dict, TypedDict
 
 
 USER_SUPPLIED_FEEDBACK_DICT_SCHEMA = {
@@ -191,10 +191,23 @@ ANDROID_APP_CONTEXT_DICT_SCHEMA = {
 }
 
 
-class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
+class IncomingAndroidFeedbackReportHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of IncomingAndroidFeedbackReportHandler's
+    normalized_payload dictionary.
+    """
+
+    report: app_feedback_report_domain.AndroidFeedbackReportDict
+
+
+class IncomingAndroidFeedbackReportHandler(
+    base.BaseHandler[
+        IncomingAndroidFeedbackReportHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Handles incoming android feedback reports from the app."""
 
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'report': {
@@ -239,13 +252,14 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
     }
 
     @acl_decorators.is_from_oppia_android
-    def post(self):
+    def post(self) -> None:
         """Handles POST requests.
 
         Verifies that the incoming message is from Oppia Android based on the
         request header and stores the feedback report.
         """
-        report_dict = self.normalized_payload.get('report')
+        assert self.normalized_payload is not None
+        report_dict = self.normalized_payload['report']
         report_obj = (
             app_feedback_report_domain.AppFeedbackReport.from_submitted_feedback_dict(  # pylint: disable=line-too-long
                 report_dict

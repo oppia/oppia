@@ -24,26 +24,39 @@ from core.domain import activity_services
 from core.domain import email_manager
 from core.domain import summary_services
 
+from typing import Dict, List, TypedDict
 
-class ModeratorPage(base.BaseHandler):
+
+class ModeratorPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """The moderator page."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_moderator_page
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         self.render_template('moderator-page.mainpage.html')
 
 
-class FeaturedActivitiesHandler(base.BaseHandler):
+class FeaturedActivitiesHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of FeaturedActivitiesHandler's
+    normalized_Payload dictionary.
+    """
+
+    featured_activity_reference_dicts: List[activity_domain.ActivityReference]
+
+
+class FeaturedActivitiesHandler(
+    base.BaseHandler[
+        FeaturedActivitiesHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """The moderator page handler for featured activities."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {
@@ -60,7 +73,7 @@ class FeaturedActivitiesHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_moderator_page
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         self.render_json({
             'featured_activity_references': [
@@ -70,10 +83,11 @@ class FeaturedActivitiesHandler(base.BaseHandler):
         })
 
     @acl_decorators.can_access_moderator_page
-    def post(self):
+    def post(self) -> None:
         """Handles POST requests."""
-        featured_activity_references = self.normalized_payload.get(
-            'featured_activity_reference_dicts')
+        assert self.normalized_payload is not None
+        featured_activity_references = self.normalized_payload[
+            'featured_activity_reference_dicts']
 
         try:
             summary_services.require_activities_to_be_public(
@@ -87,17 +101,15 @@ class FeaturedActivitiesHandler(base.BaseHandler):
         self.render_json({})
 
 
-class EmailDraftHandler(base.BaseHandler):
+class EmailDraftHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provide default email templates for moderator emails."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_send_moderator_emails
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         self.render_json({
             'draft_email_body': (

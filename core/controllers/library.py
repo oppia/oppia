@@ -28,9 +28,20 @@ from core.domain import exp_services
 from core.domain import summary_services
 from core.domain import user_services
 
+from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
+
+UnionSummaryDictType = Union[
+    summary_services.DisplayableExplorationSummaryDict,
+    summary_services.DisplayableCollectionSummaryDict
+]
+
 
 def get_matching_activity_dicts(
-        query_string, categories, language_codes, search_offset):
+    query_string: str,
+    categories: List[str],
+    language_codes: List[str],
+    search_offset: Optional[int]
+) -> Tuple[Sequence[UnionSummaryDictType], Optional[int]]:
     """Given the details of a query and a search offset, returns a list of
     activity dicts that satisfy the query.
 
@@ -61,7 +72,7 @@ def get_matching_activity_dicts(
     # frontend search infrastructure is set up to only deal with one search
     # offset at a time.
     # TODO(sll): Remove this special casing.
-    collection_ids = []
+    collection_ids: List[str] = []
     if not search_offset:
         collection_ids, _ = (
             collection_services.get_collection_ids_matching_query(
@@ -70,11 +81,15 @@ def get_matching_activity_dicts(
     exp_ids, new_search_offset = (
         exp_services.get_exploration_ids_matching_query(
             query_string, categories, language_codes, offset=search_offset))
-    activity_list = (
-        summary_services.get_displayable_collection_summary_dicts_matching_ids(
-            collection_ids) +
-        summary_services.get_displayable_exp_summary_dicts_matching_ids(
-            exp_ids))
+    activity_list: List[UnionSummaryDictType] = []
+    for collection_summary_dict in summary_services.get_displayable_collection_summary_dicts_matching_ids(  # pylint: disable=line-too-long
+        collection_ids
+    ):
+        activity_list.append(collection_summary_dict)
+    for exp_summary_dict in summary_services.get_displayable_exp_summary_dicts_matching_ids(  # pylint: disable=line-too-long
+        exp_ids
+    ):
+        activity_list.append(exp_summary_dict)
 
     if len(activity_list) == feconf.DEFAULT_QUERY_LIMIT:
         logging.exception(
@@ -84,31 +99,27 @@ def get_matching_activity_dicts(
     return activity_list, new_search_offset
 
 
-class OldLibraryRedirectPage(base.BaseHandler):
+class OldLibraryRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Redirects the old library URL to the new one."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         self.redirect(feconf.LIBRARY_INDEX_URL, permanent=True)
 
 
-class LibraryIndexHandler(base.BaseHandler):
+class LibraryIndexHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides data for the default library index page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         # TODO(sll): Support index pages for other language codes.
         summary_dicts_by_category = summary_services.get_library_groups([
@@ -127,6 +138,9 @@ class LibraryIndexHandler(base.BaseHandler):
             preferred_language_codes = user_settings.preferred_language_codes
 
         if top_rated_activity_summary_dicts:
+            # Here we use MyPy ignore because here we are adding a new
+            # 'protractor_id' key on a TypedDict dictionary, and addition
+            # of any new key on typedDict is prohibited by MyPy.
             summary_dicts_by_category.insert(
                 0, {
                     'activity_summary_dicts': top_rated_activity_summary_dicts,
@@ -135,7 +149,7 @@ class LibraryIndexHandler(base.BaseHandler):
                         feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
                     'has_full_results_page': True,
                     'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
-                    'protractor_id': 'top-rated',
+                    'protractor_id': 'top-rated',  # type: ignore[typeddict-item]
                 })
         if featured_activity_summary_dicts:
             summary_dicts_by_category.insert(
@@ -156,11 +170,24 @@ class LibraryIndexHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class LibraryGroupIndexHandler(base.BaseHandler):
+class LibraryGroupIndexHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of LibraryGroupIndexHandler's
+    normalized_request dictionary.
+    """
+
+    group_name: str
+
+
+class LibraryGroupIndexHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        LibraryGroupIndexHandlerNormalizedRequestDict
+    ]
+):
     """Provides data for categories such as top rated and recently published."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'group_name': {
@@ -176,10 +203,11 @@ class LibraryGroupIndexHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests for group pages."""
         # TODO(sll): Support index pages for other language codes.
-        group_name = self.normalized_request.get('group_name')
+        assert self.normalized_request is not None
+        group_name = self.normalized_request['group_name']
         activity_list = []
         header_i18n_id = ''
 
@@ -213,11 +241,27 @@ class LibraryGroupIndexHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class SearchHandler(base.BaseHandler):
+class SearchHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of SearchHandler's
+    normalized_request dictionary.
+    """
+
+    q: str
+    category: str
+    language_code: str
+    offset: Optional[int]
+
+
+class SearchHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        SearchHandlerNormalizedRequestDict
+    ]
+):
     """Provides data for activity search results."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'q': {
@@ -260,15 +304,16 @@ class SearchHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
+        assert self.normalized_request is not None
         query_string = utils.get_formatted_query_string(
-            self.normalized_request.get('q')
+            self.normalized_request['q']
         )
 
         # If there is a category parameter, it should be in the following form:
         #     category=("Algebra" OR "Math")
-        category_string = self.normalized_request.get('category')
+        category_string = self.normalized_request['category']
         categories = utils.convert_filter_parameter_string_into_list(
             category_string
         )
@@ -276,7 +321,7 @@ class SearchHandler(base.BaseHandler):
         # If there is a language code parameter, it should be in the following
         # form:
         #     language_code=("en" OR "hi")
-        language_code_string = self.normalized_request.get('language_code')
+        language_code_string = self.normalized_request['language_code']
         language_codes = utils.convert_filter_parameter_string_into_list(
             language_code_string
         )
@@ -294,27 +339,39 @@ class SearchHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class LibraryRedirectPage(base.BaseHandler):
+class LibraryRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """An old 'gallery' page that should redirect to the library index page."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         self.redirect('/community-library')
 
 
-class ExplorationSummariesHandler(base.BaseHandler):
+class ExplorationSummariesHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of ExplorationSummariesHandler's
+    normalized_request dictionary.
+    """
+
+    stringified_exp_ids: str
+    include_private_explorations: Optional[bool]
+
+
+class ExplorationSummariesHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        ExplorationSummariesHandlerNormalizedRequestDict
+    ]
+):
     """Returns summaries corresponding to ids of public explorations. This
     controller supports returning private explorations for the given user.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'stringified_exp_ids': {
@@ -333,9 +390,10 @@ class ExplorationSummariesHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
-        exp_ids = self.normalized_request.get('stringified_exp_ids')
+        assert self.normalized_request is not None
+        exp_ids = self.normalized_request['stringified_exp_ids']
         include_private_exps = self.normalized_request.get(
             'include_private_explorations')
 
@@ -363,11 +421,24 @@ class ExplorationSummariesHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class CollectionSummariesHandler(base.BaseHandler):
+class CollectionSummariesHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of CollectionSummariesHandler's
+    normalized_request dictionary.
+    """
+
+    stringified_collection_ids: List[str]
+
+
+class CollectionSummariesHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        CollectionSummariesHandlerNormalizedRequestDict
+    ]
+):
     """Returns collection summaries corresponding to collection ids."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'stringified_collection_ids': {
@@ -380,10 +451,11 @@ class CollectionSummariesHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
+        assert self.normalized_request is not None
         collection_ids = (
-            self.normalized_request.get('stringified_collection_ids'))
+            self.normalized_request['stringified_collection_ids'])
 
         summaries = (
             summary_services.get_displayable_collection_summary_dicts_matching_ids( # pylint: disable=line-too-long
