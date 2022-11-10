@@ -272,7 +272,7 @@ export class DiagnosticTestPlayerEngineService {
     return rootTopicIds;
   }
 
-   getSortedTopicIds(): string[] {
+  getSortedTopicIds(): string[] {
     let visitedTopicIds: string[] = [];
     let topicIdToPrerequisiteTopicId = (
       this._initialCopyOfTopicTrackerModel.getTopicIdToPrerequisiteTopicIds());
