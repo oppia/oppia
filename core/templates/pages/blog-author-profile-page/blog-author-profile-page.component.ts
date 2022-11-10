@@ -72,7 +72,8 @@ export class BlogAuthorProfilePageComponent implements OnInit {
 
   loadInitialBlogAuthorProfilePageData(): void {
     this.blogHomePageBackendApiService.fetchBlogAuthorProfilePageDataAsync(
-      this.authorUsername, '0').then((data: BlogAuthorProfilePageData) => {
+      this.authorUsername, '0'
+    ).then((data: BlogAuthorProfilePageData) => {
       if (data.numOfBlogPostSummaries) {
         this.totalBlogPosts = data.numOfBlogPostSummaries;
         this.authorName = data.displayedAuthorName;

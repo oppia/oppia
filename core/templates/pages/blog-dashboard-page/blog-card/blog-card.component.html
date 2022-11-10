@@ -12,7 +12,9 @@
     </picture>
   </div>
   <div class="blog-card-content" [ngClass]="{'mx-1 my-1': shownOnblogPostPage}">
-    <mat-card-title class="blog-card-title">{{ blogPostSummary.title }}</mat-card-title>
+    <mat-card-title class="blog-card-title e2e-test-blog-post-tile-title">
+      {{ blogPostSummary.title }}
+    </mat-card-title>
     <mat-card-header class="mt-2">
       <img mat-card-avatar
            [src]="authorProfilePictureUrl"

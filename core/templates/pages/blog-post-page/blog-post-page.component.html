@@ -1,16 +1,16 @@
 <div class="justify-content-center" *ngIf="this.blogPost">
-  <mat-card class="oppia-blog-post-page-card oppia-page-card py-5 mb-4">
-    <mat-card-title class="blog-card-title" [ngClass]="{'mt-5': !isSmallScreenViewActive()}">
+  <mat-card class="oppia-blog-post-page-card oppia-page-card py-5 mb-4 e2e-test-oppia-blog-post-page-card">
+    <mat-card-title class="blog-card-title e2e-test-blog-post-page-title-container" [ngClass]="{'mt-5': !isSmallScreenViewActive()}">
       {{ blogPost.title }}
     </mat-card-title>
     <div class="blog-card-header-content">
       <mat-card-header [ngClass]="{'mb-5': !isSmallScreenViewActive(), 'mb-0': isSmallScreenViewActive()}">
         <img mat-card-avatar
-             class="mr-2"
+             class="mr-2 e2e-test-author-profile-photo"
              [src]="authorProfilePicUrl"
              alt="Profile image of the author of the blog post"
              (click)="navigateToAuthorProfilePage()">
-        <mat-card-subtitle class="blog-author-name" (click)="navigateToAuthorProfilePage()">
+        <mat-card-subtitle class="blog-author-name e2e-test-author-name" (click)="navigateToAuthorProfilePage()">
           {{ blogPost.displayedAuthorName }}
         </mat-card-subtitle>
         <mat-card-subtitle class="pt-2 font-weight-light mobile-published-date" (click)="navigateToAuthorProfilePage()">
@@ -75,10 +75,12 @@
       {{ 'I18N_BLOG_POST_PAGE_RECOMMENDATION_SECTON_HEADING' | translate }}
     </h3>
     <div class="justify-content-between" [ngClass]="{'d-flex': !isSmallScreenViewActive()}">
-      <div *ngFor="let blogPostSummary of postsToRecommend" class="blog-post-card mb-4">
+      <div *ngFor="let blogPostSummary of postsToRecommend"
+           class="blog-post-card mb-4 e2e-test-blog-post-list">
         <oppia-blog-card [blogPostSummary]="blogPostSummary"
                          [authorProfilePicDataUrl]="blogPostSummary.authorProfilePicUrl"
-                         [shownOnblogPostPage]="true">
+                         [shownOnblogPostPage]="true"
+                         class="e2e-test-blog-post-tile-item">
         </oppia-blog-card>
       </div>
     </div>

@@ -159,7 +159,7 @@ var BlogDashboardPage = function() {
     await action.setValue(
       'New blog post title field', blogAuthorDetailsModalNameField, authorName);
     await action.setValue(
-      'New blog post title field', blogAuthorDetailsModalBioField, authorBio);
+      'New blog post bio field', blogAuthorDetailsModalBioField, authorBio);
     await action.click(
       'Save Blog Author Details button', saveAuthorDetailsButton);
   };
@@ -395,6 +395,7 @@ var BlogDashboardPage = function() {
     var newThumbnailSource = await this.getThumbnailSource();
     expect(newThumbnailSource).not.toEqual('');
     await waitFor.visibilityOfSuccessToast('Thumbnail Saved Successfully.');
+    await waitFor.invisibilityOfSuccessToast('Thumbnail Saved Successfully.');
   };
 };
 
