@@ -525,7 +525,7 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
                     logs[0],
                     '2 blog post summaries were fetched to load the search'
                     '/filter by result page. You may be running up against the '
-                    'default query limits.\nNoneType: None')
+                    'default query limits.')
                 self.assertEqual(
                     len(response_dict['blog_post_summaries_list']), 2)
                 self.assertEqual(response_dict['search_offset'], 2)

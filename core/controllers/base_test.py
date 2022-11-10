@@ -57,6 +57,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import platform_auth_services as auth_services
 
 auth_services = models.Registry.import_auth_services()
+datastore_services = models.Registry.import_datastore_services()
+secrets_services = models.Registry.import_secrets_services()
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 FORTY_EIGHT_HOURS_IN_SECS: Final = 48 * 60 * 60
 PADDING: Final = 1
@@ -172,13 +175,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         """Test that no GET request results in a 500 error."""
 
         for route in main.URLS:
-            # This was needed for the Django tests to pass (at the time we had
-            # a Django branch of the codebase).
-            if isinstance(route, tuple):
-                continue
-            else:
-                url = route.template
-            url = re.sub('<([^/^:]+)>', 'abc123', url)
+            url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
             # This url is ignored since it is only needed for a protractor test.
             # The backend tests fetch templates from
@@ -190,9 +187,12 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             if url == '/console_errors':
                 continue
 
-            # Some of these will 404 or 302. This is expected.
-            self.get_response_without_checking_for_errors(
-                url, [200, 301, 302, 400, 401, 404])
+            with self.swap_to_always_return(
+                secrets_services, 'get_secret', 'secret'
+            ):
+                # Some of these will 404 or 302. This is expected.
+                self.get_response_without_checking_for_errors(
+                    url, [200, 301, 302, 400, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
         # TODO(sll): Set a self.payload attr in the BaseHandler for
@@ -471,7 +471,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             logs,
             [
                 'Cannot find user auth_id with email %s on '
-                'page http://localhost/\nNoneType: None' % self.NEW_USER_EMAIL
+                'page http://localhost/' % self.NEW_USER_EMAIL
             ]
         )
         self.assertEqual(call_counter.times_called, 1)

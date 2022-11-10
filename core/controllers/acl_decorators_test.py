@@ -57,8 +57,10 @@ import webtest
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
+    from mypy_imports import secrets_services
 
 datastore_services = models.Registry.import_datastore_services()
+secrets_services = models.Registry.import_secrets_services()
 
 
 class OpenAccessDecoratorTests(test_utils.GenericTestBase):
@@ -126,12 +128,22 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
 
     def test_error_when_mailchimp_webhook_secret_is_none(self) -> None:
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        swap_api_key_feconf = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
+        swap_api_key_secrets_return_none = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            lambda _: None,
+            expected_args=[
+                ('MAILCHIMP_WEBHOOK_SECRET',),
+            ]
+        )
 
-        with testapp_swap:
-            response = self.get_json(
-                '/mock_secret_page/%s' % self.secret,
-                expected_status_int=404
-            )
+        with testapp_swap, swap_api_key_feconf:
+            with swap_api_key_secrets_return_none:
+                response = self.get_json(
+                    '/mock_secret_page/%s' % self.secret,
+                    expected_status_int=404
+                )
 
         error_msg = (
             'Could not find the page http://localhost'
@@ -143,7 +155,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
     def test_error_when_given_webhook_secret_is_invalid(self) -> None:
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         mailchimp_swap = self.swap_to_always_return(
-            feconf, 'MAILCHIMP_WEBHOOK_SECRET', value=self.secret)
+            secrets_services, 'get_secret', self.secret)
 
         with testapp_swap, mailchimp_swap:
             response = self.get_json(
@@ -160,8 +172,8 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
 
     def test_no_error_when_given_webhook_secret_is_valid(self) -> None:
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        mailchimp_swap = self.swap(
-            feconf, 'MAILCHIMP_WEBHOOK_SECRET', self.secret)
+        mailchimp_swap = self.swap_to_always_return(
+            secrets_services, 'get_secret', self.secret)
 
         with testapp_swap, mailchimp_swap:
             response = self.get_json(

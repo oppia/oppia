@@ -246,7 +246,7 @@ class BaseHandler(
                     user_settings = (
                         user_services.create_new_user(auth_id, email))
                 else:
-                    logging.exception(
+                    logging.error(
                         'Cannot find user %s with email %s on page %s' % (
                             auth_id, email, self.request.uri))
                     auth_services.destroy_auth_session(self.response)
