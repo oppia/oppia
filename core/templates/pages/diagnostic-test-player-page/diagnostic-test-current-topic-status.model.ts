@@ -114,4 +114,12 @@ export class DiagnosticTestCurrentTopicStatusModel {
   isLifelineConsumed(): boolean {
     return this._lifelineIsConsumed;
   }
+
+  getPendingSkillIds(): string[] {
+    return this._pendingSkillIdsToTest;
+  }
+
+  getSkillIdToTestStatus(): {[skillId: string]: boolean} {
+    return this._skillIdToTestStatus;
+  }
 }

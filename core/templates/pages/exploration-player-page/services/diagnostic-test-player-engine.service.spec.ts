@@ -316,6 +316,7 @@ describe('Diagnostic test engine service', () => {
       // Submitting incorrect answer.
       diagnosticTestPlayerEngineService.submitAnswer(
         answer, textInputService, submitAnswerSuccessCb);
+      tick();
 
       expect(submitAnswerSuccessCb).toHaveBeenCalled();
 
@@ -377,6 +378,7 @@ describe('Diagnostic test engine service', () => {
       // Submitting the correct answer.
       diagnosticTestPlayerEngineService.submitAnswer(
         answer, textInputService, submitAnswerSuccessCb);
+      tick();
 
       expect(submitAnswerSuccessCb).toHaveBeenCalled();
 
@@ -433,6 +435,7 @@ describe('Diagnostic test engine service', () => {
       // Submitting the correct answer.
       diagnosticTestPlayerEngineService.submitAnswer(
         answer, textInputService, submitAnswerSuccessCb);
+      tick();
 
       expect(diagnosticTestPlayerEngineService.isDiagnosticTestFinished())
         .toBeTrue();
@@ -497,6 +500,7 @@ describe('Diagnostic test engine service', () => {
       // Submitting incorrect answer.
       diagnosticTestPlayerEngineService.submitAnswer(
         answer, textInputService, submitAnswerSuccessCb);
+      tick();
 
       // Encountering the backup question from skill 1, since the earlier
       // attempt was incorrect.
@@ -512,6 +516,7 @@ describe('Diagnostic test engine service', () => {
       // Submitting incorrect answer.
       diagnosticTestPlayerEngineService.submitAnswer(
         answer, textInputService, submitAnswerSuccessCb);
+      tick();
 
       // Submitting two incorrect answers for the questions associated with a
       // topic marks the current topic as failed.
@@ -582,6 +587,7 @@ describe('Diagnostic test engine service', () => {
       // Submitting incorrect answer.
       diagnosticTestPlayerEngineService.submitAnswer(
         answer, textInputService, submitAnswerSuccessCb);
+      tick();
       diagnosticTestPlayerEngineService.recordNewCardAdded();
     }));
 
@@ -634,6 +640,7 @@ describe('Diagnostic test engine service', () => {
     // list.
     diagnosticTestPlayerEngineService.submitAnswer(
       answer, textInputService, submitAnswerSuccessCb);
+    tick();
 
     expect(diagnosticTestPlayerEngineService.getCurrentTopicId()).toEqual(
       'topicId3');
