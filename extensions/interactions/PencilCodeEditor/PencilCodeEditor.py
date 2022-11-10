@@ -20,23 +20,29 @@ from __future__ import annotations
 
 from extensions.interactions import base
 
+from typing import List
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
+
 
 class PencilCodeEditor(base.BaseInteraction):
     """Interaction for running code in Pencil Code."""
 
-    name = 'Pencil Code Editor'
-    description = 'Allows learners to edit code in Pencil Code.'
-    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
-    is_trainable = False
-    _dependency_ids = ['pencilcode']
-    answer_type = 'CodeEvaluation'
-    instructions = 'I18N_INTERACTIONS_PENCILCODE_INSTRUCTION'
-    narrow_instructions = 'I18N_INTERACTIONS_PENCILCODE_NARROW_INSTRUCTION'
-    needs_summary = True
-    can_have_solution = True
-    show_generic_submit_button = False
+    name: str = 'Pencil Code Editor'
+    description: str = 'Allows learners to edit code in Pencil Code.'
+    display_mode: str = base.DISPLAY_MODE_SUPPLEMENTAL
+    is_trainable: bool = False
+    _dependency_ids: List[str] = ['pencilcode']
+    answer_type: str = 'CodeEvaluation'
+    instructions: str = 'I18N_INTERACTIONS_PENCILCODE_INSTRUCTION'
+    narrow_instructions: str = 'I18N_INTERACTIONS_PENCILCODE_NARROW_INSTRUCTION'
+    needs_summary: bool = True
+    can_have_solution: bool = True
+    show_generic_submit_button: bool = False
 
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'initialCode',
         'description': 'The initial code',
         'schema': {

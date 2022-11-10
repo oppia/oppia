@@ -125,13 +125,10 @@ var publishExploration = async function() {
 
   let width = (await browser.getWindowSize()).width;
   if (width > 768) {
-    await waitFor.elementToBeClickable(publishButton);
-    await publishButton.isDisplayed();
     await action.click('Test Publish Exploration', publishButton);
   } else {
     var changesOptions = $('.e2e-test-mobile-changes-dropdown');
     await action.click('Changes options', changesOptions);
-    await publishButtonMobile.isDisplayed();
     await action.click('Publish button mobile', publishButtonMobile);
   }
 
@@ -306,15 +303,32 @@ var addExplorationPlaytester = async function(username) {
 };
 
 // Here, roleName is the server-side form of the name (e.g. 'owner').
-var _getExplorationRoles = async function(roleName) {
+var _getExplorationRoles = async function(roleName, isEmpty) {
   var explorationRoleNameLocator = '.e2e-test-' + roleName + '-role-names';
+  if (!isEmpty) {
+    await waitFor.visibilityOf(
+      $(explorationRoleNameLocator),
+      `Exploration ${roleName} name is not visible`);
+  }
   return await $$(explorationRoleNameLocator).map(async function(elem) {
     return await elem.getText();
   });
 };
 
-var getExplorationManagers = async function() {
-  return await _getExplorationRoles('owner');
+var getExplorationManagers = async function(isEmpty = false) {
+  return await _getExplorationRoles('owner', isEmpty);
+};
+
+var getExplorationCollaborators = async function(isEmpty = false) {
+  return await _getExplorationRoles('editor', isEmpty);
+};
+
+var getExplorationVoiceArtists = async function(isEmpty = false) {
+  return await _getExplorationRoles('voiceArtist', isEmpty);
+};
+
+var getExplorationPlaytesters = async function(isEmpty = false) {
+  return await _getExplorationRoles('viewer', isEmpty);
 };
 
 var createSkillAndAssignTopic = async function(
@@ -426,6 +440,9 @@ exports.addExplorationCollaborator = addExplorationCollaborator;
 exports.addExplorationVoiceArtist = addExplorationVoiceArtist;
 exports.addExplorationPlaytester = addExplorationPlaytester;
 exports.getExplorationManagers = getExplorationManagers;
+exports.getExplorationCollaborators = getExplorationCollaborators;
+exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
+exports.getExplorationPlaytesters = getExplorationPlaytesters;
 exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
 exports.createSkillAndAssignTopic = createSkillAndAssignTopic;
 exports.createQuestion = createQuestion;

@@ -29,15 +29,17 @@ from core.constants import constants
 from core.domain import customization_args_util
 from core.domain import exp_domain
 
-from typing import Any, Dict, List, Optional, Union
-from typing_extensions import Final, Literal, TypedDict
+from typing import Any, Dict, Final, List, Literal, Optional, TypedDict, Union
 
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 from core.domain import action_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import playthrough_issue_registry  # pylint: disable=invalid-import-from # isort:skip
 
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
+MYPY = False
+if MYPY:  # pragma: no cover
+    from core.domain import state_domain
 
 # These are special sentinel values attributed to answers migrated from the old
 # answer storage model. Those answers could not have session IDs or time spent
@@ -75,7 +77,7 @@ IssuesCustomizationArgsDictType = Dict[
 class SubmittedAnswerDict(TypedDict):
     """Dictionary representing the SubmittedAnswer object."""
 
-    answer: Optional[str]
+    answer: state_domain.AcceptableCorrectAnswerTypes
     time_spent_in_sec: float
     answer_group_index: int
     rule_spec_index: int
@@ -85,6 +87,16 @@ class SubmittedAnswerDict(TypedDict):
     params: Dict[str, Union[str, int]]
     rule_spec_str: Optional[str]
     answer_str: Optional[str]
+
+
+class StateAnswersDict(TypedDict):
+    """Dictionary representing the StateAnswers object."""
+
+    exploration_id: str
+    exploration_version: int
+    state_name: str
+    interaction_id: str
+    submitted_answer_list: List[SubmittedAnswerDict]
 
 
 class ExplorationIssueDict(TypedDict):
@@ -167,7 +179,7 @@ class LearnerActionDict(TypedDict):
 class AnswerOccurrenceDict(TypedDict):
     """Dictionary representing the AnswerOccurrence object."""
 
-    answer: str
+    answer: state_domain.AcceptableCorrectAnswerTypes
     frequency: int
 
 
@@ -1473,7 +1485,7 @@ class SubmittedAnswer:
 
     def __init__(
         self,
-        answer: Optional[str],
+        answer: state_domain.AcceptableCorrectAnswerTypes,
         interaction_id: str,
         answer_group_index: int,
         rule_spec_index: int,
@@ -1628,7 +1640,10 @@ class AnswerOccurrence:
     of times.
     """
 
-    def __init__(self, answer: str, frequency: int) -> None:
+    def __init__(
+        self, answer: state_domain.AcceptableCorrectAnswerTypes,
+        frequency: int
+    ) -> None:
         """Initialize domain object for answer occurrences."""
         self.answer = answer
         self.frequency = frequency
@@ -1811,7 +1826,9 @@ class StateAnswersCalcOutput:
         state_name: str,
         interaction_id: str,
         calculation_id: str,
-        calculation_output: AnswerCalculationOutput
+        calculation_output: Union[
+            AnswerFrequencyList, CategorizedAnswerFrequencyLists
+        ]
     ) -> None:
         """Initialize domain object for state answers calculation output.
 

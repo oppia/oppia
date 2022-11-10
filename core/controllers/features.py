@@ -22,8 +22,12 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
 
+from typing import Dict
 
-class ExplorationFeaturesHandler(base.BaseHandler):
+
+class ExplorationFeaturesHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Returns features the given exploration is configured to support."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -38,12 +42,10 @@ class ExplorationFeaturesHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id):
+    def get(self, exploration_id: str) -> None:
         """Handles GET requests for an exploration's features.
 
         Args:

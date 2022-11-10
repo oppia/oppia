@@ -59,7 +59,7 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
 
         for interaction in interactions:
             for rule_name in interaction.rules_dict:
-                param_list = interaction.get_rule_param_list(rule_name)  # type: ignore[no-untyped-call]
+                param_list = interaction.get_rule_param_list(rule_name)
 
                 for (_, param_obj_type) in param_list:
                     param_obj_type_name = param_obj_type.__name__

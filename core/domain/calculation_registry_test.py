@@ -34,10 +34,4 @@ class CalculationRegistryTests(test_utils.GenericTestBase):
                 models.AnswerFrequencies))
         with self.assertRaisesRegex(
             TypeError, '\'a\' is not a valid calculation id.'):
-            # Here we use MyPy ignore because get_calculation_by_id
-            # has calculation_id argument, which can accept only keys
-            # of CalculationDict and 'a' is not one of them. So, we
-            # don't have any overload function for 'a' key but still we
-            # are passing 'a' to function which causes MyPy to throw a
-            # error. Thus to avoid the error, we used ignore here.
-            calculation_registry.Registry.get_calculation_by_id('a')  # type: ignore[call-overload]
+            calculation_registry.Registry.get_calculation_by_id('a')

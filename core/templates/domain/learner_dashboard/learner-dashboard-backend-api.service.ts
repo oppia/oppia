@@ -57,6 +57,10 @@ import {
   CreatorSummaryBackendDict,
   ProfileSummary,
 } from 'domain/user/profile-summary.model';
+import {
+  ShortLearnerGroupSummary,
+  ShortLearnerGroupSummaryBackendDict
+} from 'domain/learner_group/short-learner-group-summary.model';
 import { FeedbackMessageSummaryBackendDict } from 'domain/feedback_message/feedback-message-summary.model';
 import { AppConstants } from 'app.constants';
 
@@ -103,6 +107,11 @@ interface LearnerCompletedChaptersCountDataBackendDict {
   'completed_chapters_count': number;
 }
 
+interface LearnerDashboardLearnerGroupsBackendDict {
+  'learner_groups_joined': ShortLearnerGroupSummaryBackendDict[];
+  'invited_to_learner_groups': ShortLearnerGroupSummaryBackendDict[];
+}
+
 interface LearnerDashboardTopicsAndStoriesData {
   completedStoriesList: StorySummary[];
   learntTopicsList: LearnerTopicSummary[];
@@ -141,6 +150,11 @@ interface LearnerDashboardFeedbackUpdatesData {
 
 interface LearnerCompletedChaptersCountData {
   completedChaptersCount: number;
+}
+
+interface LearnerDashboardLearnerGroups {
+  learnerGroupsJoined: ShortLearnerGroupSummary[];
+  invitedToLearnerGroups: ShortLearnerGroupSummary[];
 }
 
 export interface AddMessagePayload {
@@ -401,6 +415,32 @@ export class LearnerDashboardBackendApiService {
       topicIds: string[]
   ): Promise<Record<string, SubtopicMasterySummaryBackendDict>> {
     return this._fetchSubtopicMastery(topicIds);
+  }
+
+  async _fetchLearnerDashboardLearnerGroupsAsync():
+  Promise<LearnerDashboardLearnerGroups> {
+    return new Promise((resolve, reject) => {
+      this.http.get<LearnerDashboardLearnerGroupsBackendDict>(
+        '/learner_dashboard_learner_groups_handler'
+      ).toPromise().then(dashboardData => {
+        resolve(
+          {
+            learnerGroupsJoined: (
+              dashboardData.learner_groups_joined.map(
+                shortLearnerGroupSummary => ShortLearnerGroupSummary
+                  .createFromBackendDict(shortLearnerGroupSummary))),
+            invitedToLearnerGroups: (
+              dashboardData.invited_to_learner_groups.map(
+                shortLearnerGroupSummary => ShortLearnerGroupSummary
+                  .createFromBackendDict(shortLearnerGroupSummary)))
+          });
+      });
+    });
+  }
+
+  async fetchLearnerDashboardLearnerGroupsAsync():
+  Promise<LearnerDashboardLearnerGroups> {
+    return this._fetchLearnerDashboardLearnerGroupsAsync();
   }
 }
 

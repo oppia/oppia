@@ -31,6 +31,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
+from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 from proto_files import text_classifier_pb2
@@ -40,7 +41,9 @@ from typing import Dict, List, Tuple
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classifier_models
+    from mypy_imports import datastore_services
 
+datastore_services = models.Registry.import_datastore_services()
 (classifier_models,) = models.Registry.import_models([
     models.Names.CLASSIFIER
 ])
@@ -102,7 +105,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
 
     def test_creation_of_jobs_and_mappings(self) -> None:
         """Test the handle_trainable_states method and
-        handle_non_retrainable_states method by triggering
+        get_job_models_that_handle_non_trainable_states method by triggering
         update_exploration() method.
         """
         exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
@@ -121,11 +124,13 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         new_answer_group.outcome.feedback.content_id = 'new_feedback'
         new_answer_group.rule_specs[0].inputs[
             'x']['contentId'] = 'rule_input_4'
+        new_answer_group.rule_specs[0].inputs[
+            'x']['normalizedStrSet'] = ['Divide']
         state.recorded_voiceovers.voiceovers_mapping['new_feedback'] = {}
         state.recorded_voiceovers.voiceovers_mapping[
             'rule_input_4'] = {}
         state.interaction.answer_groups.insert(3, new_answer_group)
-        answer_groups = []
+        answer_groups: List[state_domain.AnswerGroupDict] = []
         for answer_group in state.interaction.answer_groups:
             answer_groups.append(answer_group.to_dict())
         change_list = [exp_domain.ExplorationChange({
@@ -210,6 +215,8 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         new_answer_group.outcome.feedback.content_id = 'new_feedback'
         new_answer_group.rule_specs[0].inputs[
             'x']['contentId'] = 'rule_input_4'
+        new_answer_group.rule_specs[0].inputs[
+            'x']['normalizedStrSet'] = ['Multiplication']
         state.recorded_voiceovers.voiceovers_mapping['new_feedback'] = {}
         state.recorded_voiceovers.voiceovers_mapping[
             'rule_input_4'] = {}
@@ -279,12 +286,16 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 3)
 
-    def test_handle_trainable_states(self) -> None:
+    def test_get_new_job_models_for_trainable_states(self) -> None:
         """Test the handle_trainable_states method."""
         exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         state_names = ['Home']
-        classifier_services.handle_trainable_states(
-            exploration, state_names)
+        job_models = (
+            classifier_services.get_new_job_models_for_trainable_states(
+                exploration, state_names
+            )
+        )
+        datastore_services.put_multi(job_models)
 
         # There should be two jobs (the first job because of the creation of the
         # exploration) in the data store now.
@@ -310,11 +321,11 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             Exception,
             'No classifier algorithm found for Invalid_id interaction'
         ):
-            classifier_services.handle_trainable_states(
+            classifier_services.get_new_job_models_for_trainable_states(
                 exploration, state_names)
 
-    def test_handle_non_retrainable_states(self) -> None:
-        """Test the handle_non_retrainable_states method."""
+    def test_get_new_job_models_for_non_trainable_states(self) -> None:
+        """Test the get_job_models_that_handle_non_trainable_states method."""
         exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         next_scheduled_check_time = datetime.datetime.utcnow()
         state_names = ['Home']
@@ -331,13 +342,25 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         with self.assertRaisesRegex(
             Exception, 'This method should not be called by exploration with '
                        'version number 1'):
-            classifier_services.handle_non_retrainable_states(
-                exploration, state_names, exp_versions_diff)
+            (
+                _,
+                job_models
+            ) = (
+                classifier_services
+                .get_new_job_models_for_non_trainable_states(
+                    exploration, state_names, exp_versions_diff
+                )
+            )
+            datastore_services.put_multi(job_models)
 
         exploration.version += 1
         # Test that mapping cant be created if job doesn't exist.
-        classifier_services.handle_non_retrainable_states(
-            exploration, state_names, exp_versions_diff)
+        (_, job_models) = (
+            classifier_services.get_new_job_models_for_non_trainable_states(
+                exploration, state_names, exp_versions_diff
+            )
+        )
+        datastore_services.put_multi(job_models)
         # There will be only one mapping (because of the creation of the
         # exploration).
         all_mappings = (
@@ -359,8 +382,12 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 2)
 
-        classifier_services.handle_non_retrainable_states(
-            exploration, state_names, exp_versions_diff)
+        (_, job_models) = (
+            classifier_services.get_new_job_models_for_non_trainable_states(
+                exploration, state_names, exp_versions_diff
+            )
+        )
+        datastore_services.put_multi(job_models)
 
         # There should be three mappings (the first mapping because of the
         # creation of the exploration) in the data store now.
@@ -541,10 +568,10 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
 
     def test_fetch_next_job(self) -> None:
         """Test the fetch_next_jobs method."""
-        exp1_id = u'1'
+        exp1_id = '1'
         state_name = 'Home'
         interaction_id = 'TextInput'
-        exp2_id = u'2'
+        exp2_id = '0'
 
         job1_id = self._create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
@@ -665,11 +692,14 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'job_id of the ClassifierTrainingJob does not exist.'):
             classifier_services.mark_training_job_pending('invalid_job_id')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_can_not_store_classifier_data_due_to_invalid_job_id(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'The ClassifierTrainingJobModel corresponding to the '
             'job_id of the ClassifierTrainingJob does not exist.'):
-            classifier_services.store_classifier_data('invalid_job_id', {})
+            classifier_services.store_classifier_data('invalid_job_id', {})  # type: ignore[arg-type]
 
     def test_generate_signature(self) -> None:
         """Test the generate_signature method."""

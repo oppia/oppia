@@ -23,13 +23,15 @@ import threading
 import time
 import traceback
 
-LOG_LOCK = threading.Lock()
-ALL_ERRORS = []
-SUCCESS_MESSAGE_PREFIX = 'SUCCESS '
-FAILED_MESSAGE_PREFIX = 'FAILED '
+from typing import Any, Callable, Final, List, Optional
+
+LOG_LOCK: Final = threading.Lock()
+ALL_ERRORS: Final = []
+SUCCESS_MESSAGE_PREFIX: Final = 'SUCCESS '
+FAILED_MESSAGE_PREFIX: Final = 'FAILED '
 
 
-def log(message, show_time=False):
+def log(message: str, show_time: bool = False) -> None:
     """Logs a message to the terminal.
 
     If show_time is True, prefixes the message with the current time.
@@ -44,7 +46,13 @@ def log(message, show_time=False):
 class TaskResult:
     """Task result for concurrent_task_utils."""
 
-    def __init__(self, name, failed, trimmed_messages, messages):
+    def __init__(
+        self,
+        name: str,
+        failed: bool,
+        trimmed_messages: List[str],
+        messages: List[str]
+    ) -> None:
         """Constructs a TaskResult object.
 
         Args:
@@ -60,7 +68,7 @@ class TaskResult:
         self.trimmed_messages = trimmed_messages
         self.messages = messages
 
-    def get_report(self):
+    def get_report(self) -> List[str]:
         """Returns a list of message with pass or fail status for the current
         check.
 
@@ -81,19 +89,28 @@ class TaskResult:
 class TaskThread(threading.Thread):
     """Runs a task in its own thread."""
 
-    def __init__(self, func, verbose, semaphore, name, report_enabled):
+    # Here we use type Any because the argument 'func' can accept any
+    # kind of function to create a task thread for it.
+    def __init__(
+        self,
+        func: Callable[..., Any],
+        verbose: bool,
+        semaphore: threading.Semaphore,
+        name: Optional[str],
+        report_enabled: bool
+    ) -> None:
         super().__init__()
         self.func = func
-        self.task_results = []
-        self.exception = None
-        self.stacktrace = None
+        self.task_results: List[TaskResult] = []
+        self.exception: Optional[Exception] = None
+        self.stacktrace: Optional[str] = None
         self.verbose = verbose
         self.name = name
         self.semaphore = semaphore
         self.finished = False
         self.report_enabled = report_enabled
 
-    def run(self):
+    def run(self) -> None:
         try:
             self.task_results = self.func()
             if self.verbose:
@@ -121,7 +138,7 @@ class TaskThread(threading.Thread):
             self.exception = e
             self.stacktrace = traceback.format_exc()
             if 'KeyboardInterrupt' not in self.exception.args[0]:
-                log(e)
+                log(str(e))
                 log(
                     'ERROR %s: %.1f secs' %
                     (self.name, time.time() - self.start_time), show_time=True)
@@ -130,7 +147,7 @@ class TaskThread(threading.Thread):
             self.finished = True
 
 
-def _check_all_tasks(tasks):
+def _check_all_tasks(tasks: List[TaskThread]) -> None:
     """Checks the results of all tasks."""
     running_tasks_data = []
 
@@ -151,16 +168,19 @@ def _check_all_tasks(tasks):
             log(task_details)
 
 
-def execute_tasks(tasks, semaphore):
+def execute_tasks(
+    tasks: List[TaskThread], semaphore: threading.Semaphore
+) -> None:
     """Starts all tasks and checks the results.
     Runs no more than the allowable limit defined in the semaphore.
 
     Args:
-        tasks: list(TestingTaskSpec). The tasks to run.
+        tasks: list(TaskThread). The tasks to run.
         semaphore: threading.Semaphore. The object that controls how many tasks
             can run at any time.
     """
-    remaining_tasks = [] + tasks
+    empty_tasks_list: List[TaskThread] = []
+    remaining_tasks: List[TaskThread] = empty_tasks_list + tasks
     currently_running_tasks = []
 
     while remaining_tasks:
@@ -183,7 +203,15 @@ def execute_tasks(tasks, semaphore):
     _check_all_tasks(currently_running_tasks)
 
 
-def create_task(func, verbose, semaphore, name=None, report_enabled=True):
+# Here we use type Any because the argument 'func' can accept any kind of
+# function to create a task thread for it.
+def create_task(
+    func: Callable[..., Any],
+    verbose: bool,
+    semaphore: threading.Semaphore,
+    name: Optional[str] = None,
+    report_enabled: bool = True
+) -> TaskThread:
     """Create a Task in its Thread.
 
     Args:
@@ -191,7 +219,7 @@ def create_task(func, verbose, semaphore, name=None, report_enabled=True):
         verbose: bool. True if verbose mode is enabled.
         semaphore: threading.Semaphore. The object that controls how many tasks
             can run at any time.
-        name: str. Name of the task that is going to be created.
+        name: str|None. Name of the task that is going to be created.
         report_enabled: bool. Decide whether task result will print or not.
 
     Returns:

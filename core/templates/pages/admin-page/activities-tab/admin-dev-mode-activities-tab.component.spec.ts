@@ -396,6 +396,47 @@ describe('Admin dev mode activities tab', () => {
     }));
   });
 
+  describe('.generateNewClassroom', () => {
+    it('should generate classroom data', async(() => {
+      spyOn(adminBackendApiService, 'generateDummyClassroomDataAsync')
+        .and.returnValue(Promise.resolve());
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.generateNewClassroom();
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Processing...');
+
+      // The status message changes after the completion of the asynchronous
+      // call, thus the whenStable method is used to detect the changes and
+      // validate accordingly.
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Dummy new classroom generated successfully.');
+      });
+    }));
+
+    it(
+      'should show error message if new classroom data is not generated',
+      async(() => {
+        spyOn(adminBackendApiService, 'generateDummyClassroomDataAsync')
+          .and.returnValue(Promise.reject('New classroom data not generated.'));
+        spyOn(component.setStatusMessage, 'emit');
+        component.generateNewClassroom();
+
+        expect(component.setStatusMessage.emit)
+          .toHaveBeenCalledWith('Processing...');
+
+        // The status message changes after the completion of the asynchronous
+        // call, thus the whenStable method is used to detect the changes and
+        // validate accordingly.
+        fixture.whenStable().then(() => {
+          expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+            'Server error: New classroom data not generated.');
+        });
+      }));
+  });
+
   describe('.reloadCollection', () => {
     it('should not reload collection if a task is already running', () => {
       let adminBackendSpy = spyOn(

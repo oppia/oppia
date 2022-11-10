@@ -2,7 +2,7 @@
   Off-screen preview of the learner view card in order to check if the height of the card has exceeded a specified limit.
 -->
 <div class="oppia-shadow-preview-card" aria-hidden="true">
-  <div class="oppia-learner-view-card-content">
+  <div class="oppia-learner-view-card-content e2e-test-learner-view-card-content">
     <div class="oppia-learner-view-card-top-section">
       <oppia-rte-output-display class="oppia-rte-viewer oppia-learner-view-card-top-content"
                                 [rteString]="stateContentService.displayed._html">
@@ -13,7 +13,7 @@
 
 <div *ngIf="!contentEditorIsOpen">
   <div *ngIf="cardHeightLimitReached && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning e2e-test-card-height-limit-warning">
-    <i class="material-icons oppia-hide-card-height-warning-icon e2e-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()">&#xe002;</i>
+    <i class="fas fa-exclamation-triangle oppia-hide-card-height-warning-icon e2e-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()"></i>
     <span [innerHTML]="'I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE' | translate"></span>
   </div>
   <div *ngIf="isContentEditable()"
@@ -59,12 +59,12 @@
                        [(localValue)]="stateContentService.displayed._html">
   </schema-based-editor>
   <div *ngIf="cardHeightLimitReached && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning e2e-test-card-height-limit-warning mt-2">
-    <i class="material-icons oppia-hide-card-height-warning-icon e2e-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()">&#xe002;</i>
+    <i class="fas fa-exclamation-triangle oppia-hide-card-height-warning-icon e2e-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()"></i>
     <span [innerHTML]="'I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE' | translate"></span>
   </div>
   <div class="mt-2">
     <div *ngIf="isCardContentLengthLimitReached()" class="oppia-card-content-limit-error e2e-test-card-height-limit-warning mt-2">
-      <i class="material-icons oppia-hide-card-content-error-icon e2e-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()">&#xe002;</i>
+      <i class="fas fa-exclamation-triangle oppia-hide-card-content-error-icon e2e-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()"></i>
       <span [innerHTML]="'I18N_CARD_CONTENT_LIMIT_ERROR_MESSAGE' | translate"></span>
     </div>
     <button type="button"
@@ -81,9 +81,15 @@
 <style>
   .oppia-hide-card-height-warning-icon {
     color: #827127;
+    font-size: 18px;
+    line-height: 1;
+    vertical-align: middle;
   }
   .oppia-hide-card-content-error-icon {
     color: #d1180a;
+    font-size: 18px;
+    line-height: 1;
+    vertical-align: middle;
   }
   .oppia-card-height-limit-warning {
     background: #fff5c8;
