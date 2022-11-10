@@ -24,6 +24,10 @@ var workflow = require('../webdriverio_utils/workflow.js');
 var general = require('../webdriverio_utils/general.js');
 
 var BlogDashboardPage = function() {
+  var blogAuthorDetailsModal = $('.e2e-test-blog-author-details-modal');
+  var blogAuthorDetailsModalBioField = $('.e2e-test-blog-author-bio-field');
+  var blogAuthorDetailsModalNameField = $('.e2e-test-blog-author-name-field');
+  var saveAuthorDetailsButton = $('.e2e-test-save-author-details-button');
   var currUserProfilePhoto = $('.e2e-test-profile-current-user-photo');
   var createBlogPostButton = $('.e2e-test-create-blog-post-button');
   var editBlogPostButton = $('.e2e-test-edit-blog-post-button');
@@ -146,6 +150,18 @@ var BlogDashboardPage = function() {
     await action.click('Save as draft Button', saveBlogPostAsDraftButton);
     await waitFor.visibilityOfSuccessToast('Blog Post Saved Successfully.');
     await waitFor.invisibilityOfSuccessToast('Blog Post Saved Successfully.');
+  };
+
+  this.updateAuthorDetails = async function(authorName, authorBio) {
+    await waitFor.visibilityOf(
+      blogAuthorDetailsModal, 'Author Details Editor Modal not showing up'
+    );
+    await action.setValue(
+      'New blog post title field', blogAuthorDetailsModalNameField, authorName);
+    await action.setValue(
+      'New blog post title field', blogAuthorDetailsModalBioField, authorBio);
+    await action.click(
+      'Save Blog Author Details button', saveAuthorDetailsButton);
   };
 
   this.publishNewBlogPost = async function(
