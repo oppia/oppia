@@ -4438,13 +4438,9 @@ class ClassifierTestBase(GenericEmailTestBase):
         )
         return result
 
-    # TODO(#15451): Here we use type Any because currently, the stubs of
-    # protobuf in typeshed are not fully type annotated yet and because of
-    # this MyPy is not able to fetch the return type of this method and
-    # assuming it as Any type.
     def _get_classifier_data_from_classifier_training_job(
         self, classifier_training_job: classifier_domain.ClassifierTrainingJob
-    ) -> Any:
+    ) -> text_classifier_pb2.TextClassifierFrozenModel:
         """Retrieves classifier training job from GCS using metadata stored in
         classifier_training_job.
 
