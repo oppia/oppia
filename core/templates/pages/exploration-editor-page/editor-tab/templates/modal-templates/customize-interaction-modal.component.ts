@@ -266,7 +266,7 @@ export class CustomizeInteractionModalComponent
     if (inputField === undefined) {
       return true;
     }
-    if(inputField !== null) {
+    if (inputField !== null) {
       let inputValue = angular.element(
         inputField[inputField.length - 1]).attr('ng-reflect-model');
       if (inputValue === undefined || inputValue.length > 0) {
