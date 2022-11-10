@@ -6,6 +6,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 class Request:
     uri: str
+    body: bytes
     environ: Dict[str, Any]
     route_kwargs: Dict[str, Any]
     path: str
