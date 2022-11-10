@@ -26,6 +26,7 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import question_domain
+from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
@@ -38,24 +39,31 @@ from core.platform import models
 from core.tests import test_utils
 import main
 
+from typing import Dict, Final, List, Set, Union
 import webtest
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import app_feedback_report_models
+    from mypy_imports import exp_models
+    from mypy_imports import suggestion_models
+    from mypy_imports import user_models
+
 (
-    app_feedback_report_models, exp_models, job_models,
-    suggestion_models, user_models
+    app_feedback_report_models, exp_models, suggestion_models, user_models
 ) = models.Registry.import_models([
     models.Names.APP_FEEDBACK_REPORT, models.Names.EXPLORATION,
-    models.Names.JOB, models.Names.SUGGESTION, models.Names.USER
+    models.Names.SUGGESTION, models.Names.USER
 ])
 
 
 class CronJobTests(test_utils.GenericTestBase):
 
-    FIVE_WEEKS = datetime.timedelta(weeks=5)
-    NINE_WEEKS = datetime.timedelta(weeks=9)
-    FOURTEEN_WEEKS = datetime.timedelta(weeks=14)
+    FIVE_WEEKS: Final = datetime.timedelta(weeks=5)
+    NINE_WEEKS: Final = datetime.timedelta(weeks=9)
+    FOURTEEN_WEEKS: Final = datetime.timedelta(weeks=14)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -63,9 +71,11 @@ class CronJobTests(test_utils.GenericTestBase):
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
-        self.email_subjects = []
-        self.email_bodies = []
-        def _mock_send_mail_to_admin(email_subject, email_body):
+        self.email_subjects: List[str] = []
+        self.email_bodies: List[str] = []
+        def _mock_send_mail_to_admin(
+            email_subject: str, email_body: str
+        ) -> None:
             """Mocks email_manager.send_mail_to_admin() as it's not possible to
             send mail with self.testapp_swap, i.e with the URLs defined in
             main.
@@ -78,7 +88,8 @@ class CronJobTests(test_utils.GenericTestBase):
 
         self.task_status = 'Not Started'
         def _mock_taskqueue_service_defer(
-                unused_function_id, unused_queue_name):
+            unused_function_id: str, unused_queue_name: str
+        ) -> None:
             """Mocks taskqueue_services.defer() so that it can be checked
             if the method is being invoked or not.
             """
@@ -87,7 +98,7 @@ class CronJobTests(test_utils.GenericTestBase):
         self.taskqueue_service_defer_swap = self.swap(
             taskqueue_services, 'defer', _mock_taskqueue_service_defer)
 
-    def test_run_cron_to_hard_delete_models_marked_as_deleted(self):
+    def test_run_cron_to_hard_delete_models_marked_as_deleted(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
@@ -110,7 +121,9 @@ class CronJobTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(admin_user_id))
 
-    def test_run_cron_to_hard_delete_versioned_models_marked_as_deleted(self):
+    def test_run_cron_to_hard_delete_versioned_models_marked_as_deleted(
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
@@ -126,7 +139,7 @@ class CronJobTests(test_utils.GenericTestBase):
 
         self.assertIsNone(exp_models.ExplorationModel.get_by_id('exp_id'))
 
-    def test_run_cron_to_mark_old_models_as_deleted(self):
+    def test_run_cron_to_mark_old_models_as_deleted(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
@@ -145,7 +158,9 @@ class CronJobTests(test_utils.GenericTestBase):
 
         self.assertTrue(user_query_model.get_by_id('query_id').deleted)
 
-    def test_run_cron_to_scrub_app_feedback_reports_scrubs_reports(self):
+    def test_run_cron_to_scrub_app_feedback_reports_scrubs_reports(
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         report_timestamp = (
@@ -215,7 +230,7 @@ class CronJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             scrubbed_report_info['logcat_logs'], [])
 
-    def test_cron_user_deletion_handler(self):
+    def test_cron_user_deletion_handler(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         self.assertEqual(self.task_status, 'Not Started')
@@ -224,7 +239,7 @@ class CronJobTests(test_utils.GenericTestBase):
             self.assertEqual(self.task_status, 'Started')
         self.logout()
 
-    def test_cron_fully_complete_user_deletion_handler(self):
+    def test_cron_fully_complete_user_deletion_handler(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         self.assertEqual(self.task_status, 'Not Started')
@@ -240,12 +255,14 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
     target_id = 'exp1'
     language_code = 'en'
     default_translation_html = '<p>Sample translation</p>'
-    AUTHOR_USERNAME = 'author'
-    AUTHOR_EMAIL = 'author@example.com'
-    REVIEWER_USERNAME = 'reviewer'
-    REVIEWER_EMAIL = 'reviewer@community.org'
+    AUTHOR_USERNAME: Final = 'author'
+    AUTHOR_EMAIL: Final = 'author@example.com'
+    REVIEWER_USERNAME: Final = 'reviewer'
+    REVIEWER_EMAIL: Final = 'reviewer@community.org'
 
-    def _create_translation_suggestion(self):
+    def _create_translation_suggestion(
+        self
+    ) -> suggestion_registry.BaseSuggestion:
         """Creates a translation suggestion."""
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -265,8 +282,14 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             'test description')
 
     def _assert_reviewable_suggestion_email_infos_are_equal(
-            self, reviewable_suggestion_email_info,
-            expected_reviewable_suggestion_email_info):
+        self,
+        reviewable_suggestion_email_info: (
+            suggestion_registry.ReviewableSuggestionEmailInfo
+        ),
+        expected_reviewable_suggestion_email_info: (
+            suggestion_registry.ReviewableSuggestionEmailInfo
+        )
+    ) -> None:
         """Asserts that the reviewable suggestion email info is equal to the
         expected reviewable suggestion email info.
         """
@@ -284,7 +307,12 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             expected_reviewable_suggestion_email_info.submission_datetime)
 
     def _mock_send_contributor_dashboard_reviewers_emails(
-            self, reviewer_ids, reviewers_suggestion_email_infos):
+        self,
+        reviewer_ids: List[str],
+        reviewers_suggestion_email_infos: List[
+            List[suggestion_registry.ReviewableSuggestionEmailInfo]
+        ]
+    ) -> None:
         """Mocks
         email_manager.send_mail_to_notify_contributor_dashboard_reviewers as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
@@ -293,7 +321,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self.reviewer_ids = reviewer_ids
         self.reviewers_suggestion_email_infos = reviewers_suggestion_email_infos
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -325,7 +353,9 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self.reviewers_suggestion_email_infos = []
         self.reviewer_ids = []
 
-    def test_email_not_sent_if_sending_reviewer_emails_is_not_enabled(self):
+    def test_email_not_sent_if_sending_reviewer_emails_is_not_enabled(
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
@@ -344,7 +374,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
         self.logout()
 
-    def test_email_not_sent_if_sending_emails_is_not_enabled(self):
+    def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
@@ -363,7 +393,9 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
         self.logout()
 
-    def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(self):
+    def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
@@ -385,7 +417,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             self.reviewers_suggestion_email_infos[0][0],
             self.expected_reviewable_suggestion_email_info)
 
-    def test_email_not_sent_if_reviewer_ids_is_empty(self):
+    def test_email_not_sent_if_reviewer_ids_is_empty(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
@@ -413,9 +445,11 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
     target_id = 'exp1'
     skill_id = 'skill_123456'
     language_code = 'en'
-    AUTHOR_EMAIL = 'author@example.com'
+    AUTHOR_EMAIL: Final = 'author@example.com'
 
-    def _create_translation_suggestion_with_language_code(self, language_code):
+    def _create_translation_suggestion_with_language_code(
+        self, language_code: str
+    ) -> suggestion_registry.BaseSuggestion:
         """Creates a translation suggestion in the given language_code."""
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -435,9 +469,11 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             'test description'
         )
 
-    def _create_question_suggestion(self):
+    def _create_question_suggestion(self) -> suggestion_registry.BaseSuggestion:
         """Creates a question suggestion."""
-        add_question_change_dict = {
+        add_question_change_dict: Dict[
+            str, Union[str, question_domain.QuestionDict, float]
+        ] = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
@@ -446,7 +482,9 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                'version': 44,
+                'id': ''
             },
             'skill_id': self.skill_id,
             'skill_difficulty': 0.3
@@ -461,8 +499,14 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         )
 
     def _assert_reviewable_suggestion_email_infos_are_equal(
-            self, reviewable_suggestion_email_info,
-            expected_reviewable_suggestion_email_info):
+        self,
+        reviewable_suggestion_email_info: (
+            suggestion_registry.ReviewableSuggestionEmailInfo
+        ),
+        expected_reviewable_suggestion_email_info: (
+           suggestion_registry.ReviewableSuggestionEmailInfo
+        )
+    ) -> None:
         """Asserts that the reviewable suggestion email info is equal to the
         expected reviewable suggestion email info.
         """
@@ -480,8 +524,12 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             expected_reviewable_suggestion_email_info.submission_datetime)
 
     def mock_send_mail_to_notify_admins_that_reviewers_are_needed(
-            self, admin_ids, translation_admin_ids, question_admin_ids,
-            suggestion_types_needing_reviewers):
+        self,
+        admin_ids: List[str],
+        translation_admin_ids: List[str],
+        question_admin_ids: List[str],
+        suggestion_types_needing_reviewers: Dict[str, Set[str]]
+    ) -> None:
         """Mocks
         email_manager.send_mail_to_notify_admins_that_reviewers_are_needed as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
@@ -494,8 +542,14 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             suggestion_types_needing_reviewers)
 
     def _mock_send_mail_to_notify_admins_suggestions_waiting(
-            self, admin_ids, translation_admin_ids, question_admin_ids,
-            reviewable_suggestion_email_infos):
+        self,
+        admin_ids: List[str],
+        translation_admin_ids: List[str],
+        question_admin_ids: List[str],
+        reviewable_suggestion_email_infos: List[
+            suggestion_registry.ReviewableSuggestionEmailInfo
+        ]
+    ) -> None:
         """Mocks
         email_manager.send_mail_to_notify_admins_suggestions_waiting_long as
         it's not possible to send mail with self.testapp_swap, i.e with the URLs
@@ -507,7 +561,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.reviewable_suggestion_email_infos = (
             reviewable_suggestion_email_infos)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -548,7 +602,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.translation_admin_ids = []
         self.question_admin_ids = []
 
-    def test_email_not_sent_if_sending_emails_is_disabled(self):
+    def test_email_not_sent_if_sending_emails_is_disabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
@@ -578,7 +632,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.assertDictEqual(self.suggestion_types_needing_reviewers, {})
 
     def test_email_not_sent_if_notifying_admins_reviewers_needed_is_disabled(
-            self):
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
@@ -598,7 +653,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.logout()
 
     def test_email_not_sent_if_notifying_admins_about_suggestions_is_disabled(
-            self):
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
@@ -618,7 +674,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.logout()
 
     def test_email_sent_to_admin_if_sending_admin_need_reviewers_emails_enabled(
-            self):
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
@@ -639,7 +696,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             self.expected_suggestion_types_needing_reviewers)
 
     def test_email_sent_to_admin_if_notifying_admins_about_suggestions_enabled(
-            self):
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
