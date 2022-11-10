@@ -236,11 +236,8 @@ export class DiagnosticTestPlayerEngineService {
 
   getRecommendedTopicIds(): string[] {
     let recommendedTopicIds: string[] = [];
-
     let failedTopicIds: string[] = this.getFailedTopicIds();
-
     let rootTopicIds: string[] = this._getRootTopicIds();
-
     let failedRootTopicIds: string[] = rootTopicIds.filter(
       topicId => failedTopicIds.indexOf(topicId) !== -1
     );
@@ -275,7 +272,7 @@ export class DiagnosticTestPlayerEngineService {
     return rootTopicIds;
   }
 
-  _getSortedTopicIds(): string[] {
+  private _getSortedTopicIds(): string[] {
     let visitedTopicIds: string[] = [];
     let topicIdToPrerequisiteTopicId = (
       this._initialCopyOfTopicTrackerModel.getTopicIdToPrerequisiteTopicIds());
