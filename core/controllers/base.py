@@ -983,7 +983,9 @@ class CsrfTokenHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
         })
 
 
-class OppiaMLVMHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
+class OppiaMLVMHandler(
+    BaseHandler[_NormalizedPayloadDictType, _NormalizedRequestDictType]
+):
     """Base class for the handlers that communicate with Oppia-ML VM instances.
     """
 
