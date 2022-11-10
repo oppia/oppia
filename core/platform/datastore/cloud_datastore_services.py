@@ -27,8 +27,6 @@ from google.cloud import ndb
 from typing import (
     Any, ContextManager, Dict, List, Optional, Sequence, Tuple, TypeVar)
 
-from core.storage.base_model.gae_models import MAX_RETRIES
-
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models  # pylint: disable=unused-import
@@ -88,6 +86,9 @@ def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
     Returns:
         list(datastore_services.Model | None). List whose items are either a
         Model instance or None if the corresponding key wasn't found.
+
+    Raises:
+        Exception. If ndb.get_multi fails for MAX_GET_RETRIES.
     """
     result: List[Optional[TYPE_MODEL_SUBCLASS]] = []
     for unused_i in range(0, MAX_GET_RETRIES):
