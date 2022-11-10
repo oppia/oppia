@@ -37,6 +37,7 @@ export class HintsAndSolutionManagerService {
   // or when the service is reset.
   timeout: NodeJS.Timeout | null = null;
   tooltipTimeout: NodeJS.Timeout | null = null;
+  solutionTooltipTimeout: NodeJS.Timeout | null = null;
 
   ACCELERATED_HINT_WAIT_TIME_MSEC: number = 10000;
   WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 500;
@@ -58,12 +59,21 @@ export class HintsAndSolutionManagerService {
   _hintConsumedEventEmitter = new EventEmitter();
   _hintsExhaustedEventEmitter = new EventEmitter();
 
-  // Variable tooltipIsOpen is a flag which says that the tooltip is currently
-  // visible to the learner.
+  // Variable tooltipIsOpen is a flag which says that the hint tooltip is
+  // currently visible to the learner.
   tooltipIsOpen: boolean = false;
+
+  // Variable solutionTooltipIsOpen is a flag which says that the solution
+  // tooltip is currently visible to the learner.
+  solutionTooltipIsOpen: boolean = false;
+
   // This is set to true as soon as a hint is clicked or when the
   // tooltip has been triggered.
   hintsDiscovered: boolean = false;
+
+  // This is set to true as soon as the solution icon is clicked or when the
+  // tooltip has been triggered.
+  solutionDiscovered: boolean = false;
 
   constructor(private playerPositionService: PlayerPositionService) {
     // TODO(#10904): Refactor to move subscriptions into components.
@@ -71,6 +81,7 @@ export class HintsAndSolutionManagerService {
       () => {
         this.correctAnswerSubmitted = true;
         this.tooltipIsOpen = false;
+        this.solutionTooltipIsOpen = false;
       }
     );
   }
@@ -90,6 +101,12 @@ export class HintsAndSolutionManagerService {
     this._timeoutElapsedEventEmitter.emit();
   }
 
+  showSolutionTooltip(): void {
+    this.solutionTooltipIsOpen = true;
+    this.solutionDiscovered = true;
+    this._timeoutElapsedEventEmitter.emit();
+  }
+
   releaseHint(): void {
     if (!this.correctAnswerSubmitted) {
       this.numHintsReleased++;
@@ -105,6 +122,11 @@ export class HintsAndSolutionManagerService {
   // when no separate path for the stuck learner exists.
   releaseSolution(): void {
     this.solutionReleased = true;
+    if (!this.solutionDiscovered && !this.solutionTooltipTimeout) {
+      console.log("timeout set");
+      this.solutionTooltipTimeout = setTimeout(
+        this.showSolutionTooltip.bind(this), this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+    }
     this._timeoutElapsedEventEmitter.emit();
   }
 
@@ -162,6 +184,10 @@ export class HintsAndSolutionManagerService {
       clearTimeout(this.tooltipTimeout);
       this.tooltipTimeout = null;
     }
+    if (this.solutionTooltipTimeout) {
+      clearTimeout(this.solutionTooltipTimeout);
+      this.solutionTooltipTimeout = null;
+    }
 
     if (this.hintsForLatestCard.length > 0) {
       this.enqueueTimeout(
@@ -189,9 +215,9 @@ export class HintsAndSolutionManagerService {
   displaySolution(): Solution {
     this.solutionConsumed = true;
     this._solutionViewedEventEmitter.emit();
-    if (this.tooltipTimeout) {
-      clearTimeout(this.tooltipTimeout);
-      this.tooltipTimeout = null;
+    if (this.solutionTooltipTimeout) {
+      clearTimeout(this.solutionTooltipTimeout);
+      this.solutionTooltipTimeout = null;
     }
     return this.solutionForLatestCard;
   }
@@ -210,6 +236,10 @@ export class HintsAndSolutionManagerService {
 
   isHintTooltipOpen(): boolean {
     return this.tooltipIsOpen;
+  }
+
+  isSolutionTooltipOpen(): boolean {
+    return this.solutionTooltipIsOpen;
   }
 
   isSolutionViewable(): boolean {

@@ -1117,6 +1117,7 @@
 	"I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK": "Text to introduce the regular feedback that Oppia shows after the student submits the answer details.",
 	"I18N_SOLICIT_ANSWER_DETAILS_QUESTION": "Text for the question which asks the students to explain why they entered a particular answer.",
 	"I18N_SOLUTION_EXPLANATION_TITLE": "Title shown in the section that shows the explanation of a solution to the learner.\n{{identical|Explanation}}",
+	"I18N_SOLUTION_NEED_HELP": "Text shown in the modal to prompt the learner to view the solution",
 	"I18N_SOLUTION_TITLE": "Title shown in the modal that shows the solution of a state to the learner",
 	"I18N_SPLASH_BENEFITS_ONE": "The first benefit, shown in the splash page, of using Oppia.",
 	"I18N_SPLASH_BENEFITS_THREE": "The third benefit, shown in the splash page, of using Oppia.",
