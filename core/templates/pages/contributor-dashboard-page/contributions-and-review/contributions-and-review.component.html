@@ -16,8 +16,8 @@
         </div>
         <div class="oppia-contributions-dropdown-list-option"
              *ngFor="let tab of reviewTabs"
-             (click)="switchToTab(TAB_TYPE_REVIEWS, tab.suggestionType)"
-             [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+             (click)="switchToTab(TAB_TYPE_REVIEWS, tab.tabSubType)"
+             [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.tabSubType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
           {{ tab.text }}
         </div>
         <div class="oppia-contributions-option-group-label"
@@ -26,19 +26,19 @@
         </div>
         <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of contributionTabs">
           <div *ngIf="tab && tab.enabled"
-               (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
-               [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+               (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.tabSubType)"
+               [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.tabSubType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
             {{ tab.text }}
           </div>
         </div>
         <div class="oppia-contributions-option-group-label"
-             *ngIf="userIsLoggedIn && accomplishmentsTabIsEnabled">
+             *ngIf="accomplishmentsTabIsEnabled && userIsLoggedIn">
           Accomplishments
         </div>
         <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of accomplishmentsTabs">
           <div *ngIf="tab && tab.enabled"
-               (click)="switchToTab(TAB_TYPE_ACCOMPLISHMENTS, tab.accomplishmentType)"
-               [ngClass]="isActiveTab(TAB_TYPE_ACCOMPLISHMENTS, tab.accomplishmentType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+               (click)="switchToTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType)"
+               [ngClass]="isActiveTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
             {{ tab.text }}
           </div>
         </div>
@@ -51,8 +51,8 @@
       <div class="oppia-contributions-navbar-items-list" navbar-label="Available Tasks">
         <div class="oppia-contributions-navbar-item" *ngFor="let tab of reviewTabs">
           <button class="oppia-contributions-navbar-button"
-                  (click)="switchToTab(TAB_TYPE_REVIEWS, tab.suggestionType)"
-                  [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.suggestionType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
+                  (click)="switchToTab(TAB_TYPE_REVIEWS, tab.tabSubType)"
+                  [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.tabSubType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
           </button>
         </div>
       </div>
@@ -62,18 +62,18 @@
         <div class="oppia-contributions-navbar-item" *ngFor="let tab of contributionTabs">
           <button *ngIf="tab && tab.enabled"
                   class="oppia-contributions-navbar-button"
-                  (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
-                  [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
+                  (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.tabSubType)"
+                  [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.tabSubType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
           </button>
         </div>
       </div>
-      <div class="oppia-contributions-side-navbar-part" *ngIf="userIsLoggedIn && accomplishmentsTabIsEnabled">
+      <div class="oppia-contributions-side-navbar-part" *ngIf="accomplishmentsTabIsEnabled && userIsLoggedIn">
         <div class="oppia-contributions-navbar-items-list" navbar-label="Accomplishments">
           <div class="oppia-contributions-navbar-item" *ngFor="let tab of accomplishmentsTabs">
             <button *ngIf="tab && tab.enabled"
                     class="oppia-contributions-navbar-button"
-                    (click)="switchToTab(TAB_TYPE_ACCOMPLISHMENTS, tab.accomplishmentType)"
-                    [ngClass]="isActiveTab(TAB_TYPE_ACCOMPLISHMENTS, tab.accomplishmentType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
+                    (click)="switchToTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType)"
+                    [ngClass]="isActiveTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
             </button>
           </div>
         </div>
@@ -108,7 +108,7 @@
                                   [showOpportunityButton]="false">
         </oppia-opportunities-list>
       </div>
-      <div *ngIf="activeTabIsAccomplishments && accomplishmentsTabIsEnabled && activeAccomplishmentType === 'stats'">
+      <div *ngIf="accomplishmentsTabIsEnabled && activeTabIsAccomplishments && activeSubType === 'stats'">
         <contributor-stats [type]="defaultContributionType">
         </contributor-stats>
       </div>
