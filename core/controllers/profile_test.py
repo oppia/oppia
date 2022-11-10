@@ -37,8 +37,8 @@ from typing import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import user_models
     from mypy_imports import secrets_services
+    from mypy_imports import user_models
 
 secrets_services = models.Registry.import_secrets_services()
 (user_models,) = models.Registry.import_models([models.Names.USER])
