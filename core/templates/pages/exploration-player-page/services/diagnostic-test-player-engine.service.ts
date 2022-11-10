@@ -131,13 +131,8 @@ export class DiagnosticTestPlayerEngineService {
             new DiagnosticTestCurrentTopicStatusModel(
               skillIdToQuestionsModel)
           );
-
-          if (
-            !this._diagnosticTestCurrentTopicStatusModel.isLifelineConsumed()
-          ) {
-            this._currentSkillId = (
-              this._diagnosticTestCurrentTopicStatusModel.getNextSkill());
-          }
+          this._currentSkillId = (
+            this._diagnosticTestCurrentTopicStatusModel.getNextSkill());
 
           this._currentQuestion = (
             this._diagnosticTestCurrentTopicStatusModel.getNextQuestion(
@@ -235,20 +230,32 @@ export class DiagnosticTestPlayerEngineService {
   }
 
   getRecommendedTopicIds(): string[] {
+    // The method used to recommend topics to the learner based on their
+    // performance in the diagnostic test.
     let recommendedTopicIds: string[] = [];
     let failedTopicIds: string[] = this.getFailedTopicIds();
+    // The topics which do not contain any prerequisites are referred to as
+    // root topics.
     let rootTopicIds: string[] = this.getRootTopicIds();
     let failedRootTopicIds: string[] = rootTopicIds.filter(
       topicId => failedTopicIds.indexOf(topicId) !== -1
     );
 
     if (failedRootTopicIds.length >= 2) {
+      // If the learner failed in two or more root topics, then any two root
+      // topics were recommended, so that learner can start with any
+      // one of them.
       recommendedTopicIds.push(failedRootTopicIds[0]);
       recommendedTopicIds.push(failedRootTopicIds[1]);
     } else if (failedRootTopicIds.length === 1) {
+      // Among the failed topics, if any of the topics is a root topic, then
+      // it must be recommended.
       recommendedTopicIds.push(failedRootTopicIds[0]);
     } else {
-      let sortedTopicIds = this.getSortedTopicIds();
+      // If none of the failed topics is a root topic, then the failed topics
+      // are topologically sorted and then the first topic among the sorted list
+      // will be recommended.
+      let sortedTopicIds = this.getSortedInitialTopicIds();
       for (let topicId of sortedTopicIds) {
         if (failedTopicIds.indexOf(topicId) !== -1) {
           recommendedTopicIds.push(topicId);
@@ -260,6 +267,8 @@ export class DiagnosticTestPlayerEngineService {
   }
 
   getRootTopicIds(): string[] {
+    // The topics which do not contain any prerequisites are referred to as
+    // root topics.
     let topicIdToPrerequisiteTopicId = (
       this._initialCopyOfTopicTrackerModel.getTopicIdToPrerequisiteTopicIds());
     let rootTopicIds: string[] = [];
@@ -272,7 +281,7 @@ export class DiagnosticTestPlayerEngineService {
     return rootTopicIds;
   }
 
-  getSortedTopicIds(): string[] {
+  getSortedInitialTopicIds(): string[] {
     let visitedTopicIds: string[] = [];
     let topicIdToPrerequisiteTopicId = (
       this._initialCopyOfTopicTrackerModel.getTopicIdToPrerequisiteTopicIds());
@@ -312,9 +321,9 @@ export class DiagnosticTestPlayerEngineService {
     let numberOfAttemptedQuestionsInCurrentTopic = (
       this._diagnosticTestCurrentTopicStatusModel.numberOfAttemptedQuestions);
     let initialTopicIdsList = (
-      this._initialCopyOfTopicTrackerModel.getEligibleTopicIds());
+      this._initialCopyOfTopicTrackerModel.getPendingTopicIds());
     let pendingTopicIdsToTest = (
-      this._diagnosticTestTopicTrackerModel.getEligibleTopicIds());
+      this._diagnosticTestTopicTrackerModel.getPendingTopicIds());
 
     // Each topic can contain a maximum of 3 diagnostic test skills and at most
     // 2 questions [main question & backup question] can be presented from each
@@ -381,20 +390,18 @@ export class DiagnosticTestPlayerEngineService {
 
   isDiagnosticTestFinished(): boolean {
     const pendingTopicIdsToTest = (
-      this._diagnosticTestTopicTrackerModel.getEligibleTopicIds().length
+      this._diagnosticTestTopicTrackerModel.getPendingTopicIds().length
     );
 
     if (pendingTopicIdsToTest === 0) {
       return true;
-    }
-    if (
-      pendingTopicIdsToTest > 0 &&
-        this._numberOfAttemptedQuestions >= DiagnosticTestPlayerEngineService
-          .MAX_ALLOWED_QUESTIONS_IN_THE_DIAGNOSTIC_TEST
-    ) {
+    } else if (
+      this._numberOfAttemptedQuestions >= DiagnosticTestPlayerEngineService
+        .MAX_ALLOWED_QUESTIONS_IN_THE_DIAGNOSTIC_TEST) {
       return true;
+    } else {
+      return false;
     }
-    return false;
   }
 
   getCurrentQuestion(): Question {

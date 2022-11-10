@@ -678,7 +678,7 @@ describe('Diagnostic test engine service', () => {
     tick();
 
     let sortedTopicIds: string[] = (
-      diagnosticTestPlayerEngineService.getSortedTopicIds());
+      diagnosticTestPlayerEngineService.getSortedInitialTopicIds());
 
     expect(sortedTopicIds).toEqual(['topicId1', 'topicId2', 'topicId3']);
   }));
@@ -720,7 +720,7 @@ describe('Diagnostic test engine service', () => {
     // string in comparison to a list is easy, hence the list is converted into
     // a string.
     let sortedTopicIds: string = (
-      diagnosticTestPlayerEngineService.getSortedTopicIds()).join(',');
+      diagnosticTestPlayerEngineService.getSortedInitialTopicIds()).join(',');
 
     let possibleSortedAnswers = [
       ['topicId1', 'topicId2', 'topicId3', 'topicId4', 'topicId5'].join(','),
@@ -796,7 +796,7 @@ describe('Diagnostic test engine service', () => {
       spyOn(diagnosticTestPlayerEngineService, 'getFailedTopicIds')
         .and.returnValue(['topicId2', 'topicId3']);
 
-      spyOn(diagnosticTestPlayerEngineService, 'getSortedTopicIds')
+      spyOn(diagnosticTestPlayerEngineService, 'getSortedInitialTopicIds')
         .and.returnValue(
           ['topicId1', 'topicId2', 'topicId3', 'topicId4', 'topicId5']);
 
@@ -815,7 +815,7 @@ describe('Diagnostic test engine service', () => {
       spyOn(diagnosticTestPlayerEngineService, 'getFailedTopicIds')
         .and.returnValue([]);
 
-      spyOn(diagnosticTestPlayerEngineService, 'getSortedTopicIds')
+      spyOn(diagnosticTestPlayerEngineService, 'getSortedInitialTopicIds')
         .and.returnValue(
           ['topicId1', 'topicId2', 'topicId3', 'topicId4', 'topicId5']);
 

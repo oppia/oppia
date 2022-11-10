@@ -28,9 +28,9 @@ export interface TopicIdToRelatedTopicIds {
 
 
 export class DiagnosticTestTopicTrackerModel {
-  // The list of eligible topic IDs from which the next topic can be selected
+  // The list of pending topic IDs from which the next topic can be selected
   // and tested in the diagnostic test.
-  _eligibleTopicIds: string[];
+  _pendingTopicIds: string[];
 
   // The field keeps track of the topic ID that are failed by the learner.
   // Failing on a topic means the learner has attempted two questions
@@ -58,15 +58,15 @@ export class DiagnosticTestTopicTrackerModel {
     this._topicIdToSuccessorTopicIds = {};
 
     this._topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
-    this._eligibleTopicIds = Object.keys(
+    this._pendingTopicIds = Object.keys(
       this._topicIdToPrerequisiteTopicIds).sort();
 
     this.generateTopicIdToAncestorTopicIds();
     this.generateTopicIdToSuccessorTopicIds();
   }
 
-  getEligibleTopicIds(): string[] {
-    return this._eligibleTopicIds;
+  getPendingTopicIds(): string[] {
+    return this._pendingTopicIds;
   }
 
   getFailedTopicIds(): string[] {
@@ -192,7 +192,7 @@ export class DiagnosticTestTopicTrackerModel {
     // min(length of ancestors, length of successors) topic IDs as value.
     let topicIdToLengthOfRelatedTopicIds: {[topicId: string]: number} = {};
 
-    for (let topicId of this._eligibleTopicIds) {
+    for (let topicId of this._pendingTopicIds) {
       let ancestorTopicIds = this._topicIdToAncestorTopicIds[topicId];
       let successorTopicIds = this._topicIdToSuccessorTopicIds[topicId];
 
@@ -229,7 +229,7 @@ export class DiagnosticTestTopicTrackerModel {
     // Removing the given topic ID because it is already tested.
     topicIdsToRemove.push(passedTopicId);
 
-    this._eligibleTopicIds = this._eligibleTopicIds.filter((topicId) => {
+    this._pendingTopicIds = this._pendingTopicIds.filter((topicId) => {
       return (topicIdsToRemove.indexOf(topicId) === -1);
     });
     this.removeTopicIdsFromTopicIdToAncestorsDict(topicIdsToRemove);
@@ -251,7 +251,7 @@ export class DiagnosticTestTopicTrackerModel {
     // Removing the given topic ID because it is already tested.
     topicIdsToRemove.push(failedTopicId);
 
-    this._eligibleTopicIds = this._eligibleTopicIds.filter((topicId) => {
+    this._pendingTopicIds = this._pendingTopicIds.filter((topicId) => {
       return (topicIdsToRemove.indexOf(topicId) === -1);
     });
     this.removeTopicIdsFromTopicIdToAncestorsDict(topicIdsToRemove);

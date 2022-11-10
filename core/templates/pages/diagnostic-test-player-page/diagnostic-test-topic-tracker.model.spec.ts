@@ -103,7 +103,7 @@ describe('Diagnostic test topic tracker model', () => {
     const diagnosticTestTopicTrackerModel = new DiagnosticTestTopicTrackerModel(
       topicIdToPrerequisiteTopicIds);
 
-    expect(diagnosticTestTopicTrackerModel.getEligibleTopicIds()).toEqual(
+    expect(diagnosticTestTopicTrackerModel.getPendingTopicIds()).toEqual(
       expectedEligibleTopicIDs);
   });
 
@@ -147,7 +147,7 @@ describe('Diagnostic test topic tracker model', () => {
       // Initially, all the topics are eligible for testing, then eventually
       // topics were filtered from the eligible list based on the performance
       // in any selected topic.
-      expect(diagnosticTestTopicTrackerModel.getEligibleTopicIds()).toEqual(
+      expect(diagnosticTestTopicTrackerModel.getPendingTopicIds()).toEqual(
         ['topicID1', 'topicID2', 'topicID3', 'topicID4', 'topicID5']);
 
       // Assuming L = min(length of ancestors, length of successors). Among all
@@ -167,7 +167,7 @@ describe('Diagnostic test topic tracker model', () => {
       diagnosticTestTopicTrackerModel.recordTopicFailed('topicID2');
 
       // Updated eligible topic IDs list.
-      expect(diagnosticTestTopicTrackerModel.getEligibleTopicIds()).toEqual(
+      expect(diagnosticTestTopicTrackerModel.getPendingTopicIds()).toEqual(
         ['topicID1', 'topicID3', 'topicID5']);
 
       // Updated topic ID to ancestor topic IDs dict.
@@ -235,7 +235,7 @@ describe('Diagnostic test topic tracker model', () => {
       // Initially, all the topics are eligible for testing, then eventually
       // topics were filtered from the eligible list based on the performance
       // in any selected topic.
-      expect(diagnosticTestTopicTrackerModel.getEligibleTopicIds()).toEqual(
+      expect(diagnosticTestTopicTrackerModel.getPendingTopicIds()).toEqual(
         ['topicID1', 'topicID2', 'topicID3', 'topicID4', 'topicID5']);
 
       // Assuming L = min(length of ancestors, length of successors). Among all
@@ -251,7 +251,7 @@ describe('Diagnostic test topic tracker model', () => {
       diagnosticTestTopicTrackerModel.recordTopicPassed('topicID2');
 
       // Updated eligible topic IDs list after removing the ancestors.
-      expect(diagnosticTestTopicTrackerModel.getEligibleTopicIds()).toEqual(
+      expect(diagnosticTestTopicTrackerModel.getPendingTopicIds()).toEqual(
         ['topicID3', 'topicID4', 'topicID5']);
 
       // Updated topic ID to ancestor topic IDs dict.
