@@ -112,6 +112,7 @@
 /core/templates/pages/blog-dashboard-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/blog-home-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/blog-post-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/blog-author-profile-page/ @oppia/lace-frontend-reviewers
 
 # Collection project.
 /core/controllers/collection*.py @oppia/lace-backend-reviewers
@@ -675,6 +676,8 @@
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @oppia/lace-backend-reviewers
 
+# Android Updates
+/core/templates/domain/android-updates/android-updates-backend-api.service*.ts @oppia/lace-frontend-reviewers
 
 # Data stability.
 /core/controllers/domain_objects_validator*.py @oppia/data-and-stability-reviewers

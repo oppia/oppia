@@ -24,6 +24,8 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { UrlService } from 'services/contextual/url.service';
 import { BlogPostPageConstants } from './blog-post-page.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { BlogPostPageService } from './services/blog-post-page.service';
 import dayjs from 'dayjs';
 
 import './blog-post-page.component.css';
@@ -43,6 +45,7 @@ export class BlogPostPageComponent implements OnInit {
   blogPost!: BlogPostData;
   publishedDateString: string = '';
   authorProfilePicUrl!: string;
+  authorUsername!: string;
   DEFAULT_PROFILE_PICTURE_URL!: string;
   postsToRecommend: BlogPostSummary[] = [];
   blogPostLinkCopied: boolean = false;
@@ -50,14 +53,18 @@ export class BlogPostPageComponent implements OnInit {
   constructor(
     private windowDimensionsService: WindowDimensionsService,
     private urlService: UrlService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef,
+    private blogPostPageService: BlogPostPageService,
   ) {}
 
   ngOnInit(): void {
     this.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST = (
       BlogPostPageConstants.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST);
     this.blogPostUrlFragment = this.urlService.getBlogPostUrlFromUrl();
+    this.authorUsername = this.blogPostPageData.authorUsername;
     this.blogPost = this.blogPostPageData.blogPostDict;
+    this.blogPostPageService.blogPostId = this.blogPostPageData.blogPostDict.id;
     this.postsToRecommend = this.blogPostPageData.summaryDicts;
     this.decodeAuthorProfilePicUrl(
       this.blogPostPageData.profilePictureDataUrl
@@ -100,5 +107,14 @@ export class BlogPostPageComponent implements OnInit {
 
   isSmallScreenViewActive(): boolean {
     return this.windowDimensionsService.getWidth() <= 900;
+  }
+
+  navigateToAuthorProfilePage(): void {
+    this.windowRef.nativeWindow.location.href = (
+      this.urlInterpolationService.interpolateUrl(
+        BlogPostPageConstants.BLOG_AUTHOR_PROFILE_PAGE_URL_TEMPLATE,
+        { author_username: this.authorUsername }
+      )
+    );
   }
 }

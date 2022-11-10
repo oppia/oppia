@@ -186,11 +186,11 @@ def refresh_state_of_beam_job_run_model(
             job_id=job_id, project_id=feconf.OPPIA_PROJECT_ID,
             location=feconf.GOOGLE_APP_ENGINE_REGION))
 
-    except Exception:
+    except Exception as e:
         job_state = beam_job_models.BeamJobState.UNKNOWN.value
         job_state_updated = beam_job_run_model.last_updated
 
-        logging.exception('Failed to update job_id="%s"!' % job_id)
+        logging.warning('Failed to update job_id="%s": %s', job_id, e)
 
     else:
         job_state = _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE.get(
