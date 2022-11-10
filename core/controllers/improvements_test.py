@@ -31,6 +31,12 @@ from core.domain import improvements_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Final, Optional
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import improvements_models
+
 (improvements_models,) = (
     models.Registry.import_models([models.Names.IMPROVEMENTS]))
 
@@ -38,13 +44,21 @@ from core.tests import test_utils
 class ImprovementsTestBase(test_utils.GenericTestBase):
     """Base class with helper methods related to building improvement tasks."""
 
-    EXP_ID = 'eid'
-    MOCK_DATE = datetime.datetime(2020, 6, 22)
+    EXP_ID: Final = 'eid'
+    MOCK_DATE: Final = datetime.datetime(2020, 6, 22)
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.exp = self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
 
     def _new_obsolete_task(
-            self, state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            exploration_version=1):
+        self,
+        state_name: str = feconf.DEFAULT_INIT_STATE_NAME,
+        task_type: str = constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+        exploration_version: int = 1
+    ) -> improvements_domain.TaskEntry:
         """Constructs a new default obsolete task with the provided values.
 
         Args:
@@ -69,9 +83,11 @@ class ImprovementsTestBase(test_utils.GenericTestBase):
             resolved_on=None)
 
     def _new_open_task(
-            self, state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            exploration_version=1):
+        self,
+        state_name: str = feconf.DEFAULT_INIT_STATE_NAME,
+        task_type: str = constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+        exploration_version: int = 1
+    ) -> improvements_domain.TaskEntry:
         """Constructs a new default open task with the provided values.
 
         Args:
@@ -96,9 +112,12 @@ class ImprovementsTestBase(test_utils.GenericTestBase):
             resolved_on=None)
 
     def _new_resolved_task(
-            self, state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            exploration_version=1, resolved_on=MOCK_DATE):
+        self,
+        state_name: str = feconf.DEFAULT_INIT_STATE_NAME,
+        task_type: str = constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+        exploration_version: int = 1,
+        resolved_on: datetime.datetime = MOCK_DATE
+    ) -> improvements_domain.TaskEntry:
         """Constructs a new default resolved task with the provided values.
 
         Args:
@@ -126,15 +145,12 @@ class ImprovementsTestBase(test_utils.GenericTestBase):
 
 class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.exp = self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
 
-    def get_url(self, exp_id=None):
+    def get_url(self, exp_id: Optional[str] = None) -> str:
         """Returns the URL corresponding to the handler.
 
         Args:
@@ -149,23 +165,27 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
             constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.EXP_ID if exp_id is None else exp_id)
 
-    def test_get_with_invalid_exploration_returns_invalid_input_page(self):
+    def test_get_with_invalid_exploration_returns_invalid_input_page(
+        self
+    ) -> None:
         with self.login_context(self.OWNER_EMAIL):
             self.get_json(
                 self.get_url(exp_id='bad_exp_id'), expected_status_int=404)
 
-    def test_get_with_non_creator_returns_401_error(self):
+    def test_get_with_non_creator_returns_401_error(self) -> None:
         with self.login_context(self.VIEWER_EMAIL):
             self.get_json(self.get_url(), expected_status_int=401)
 
-    def test_get_when_no_tasks_exist_returns_response_with_empty_fields(self):
+    def test_get_when_no_tasks_exist_returns_response_with_empty_fields(
+        self
+    ) -> None:
         with self.login_context(self.OWNER_EMAIL):
             self.assertEqual(self.get_json(self.get_url()), {
                 'open_tasks': [],
                 'resolved_task_types_by_state_name': {},
             })
 
-    def test_get_returns_open_tasks(self):
+    def test_get_returns_open_tasks(self) -> None:
         task_entries = [
             self._new_open_task(state_name=name) for name in ['A', 'B', 'C']]
         improvements_services.put_tasks(task_entries)
@@ -179,7 +199,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 'resolved_task_types_by_state_name': {},
             })
 
-    def test_get_returns_resolved_tasks(self):
+    def test_get_returns_resolved_tasks(self) -> None:
         task_entries = [
             self._new_resolved_task(
                 state_name=name,
@@ -197,7 +217,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 },
             })
 
-    def test_post_with_non_creator_returns_401_error(self):
+    def test_post_with_non_creator_returns_401_error(self) -> None:
         with self.login_context(self.VIEWER_EMAIL):
             self.post_json(self.get_url(), {
                 'task_entries': [{
@@ -209,7 +229,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 }]
             }, csrf_token=self.get_new_csrf_token(), expected_status_int=401)
 
-    def test_post_invalid_exploration_returns_invalid_input_page(self):
+    def test_post_invalid_exploration_returns_invalid_input_page(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(exp_id='bad_exp_id'), {
                 'task_entries': [{
@@ -221,7 +241,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 }]
             }, csrf_token=self.get_new_csrf_token(), expected_status_int=404)
 
-    def test_post_without_csrf_token_returns_401_error(self):
+    def test_post_without_csrf_token_returns_401_error(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
                 'task_entries': [{
@@ -233,12 +253,12 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 }]
             }, csrf_token=None, expected_status_int=401)
 
-    def test_post_with_missing_task_entries_returns_401_error(self):
+    def test_post_with_missing_task_entries_returns_401_error(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
             }, csrf_token=self.get_new_csrf_token(), expected_status_int=400)
 
-    def test_post_with_missing_entity_version_returns_401_error(self):
+    def test_post_with_missing_entity_version_returns_401_error(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
                 'task_entries': [{
@@ -250,7 +270,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 }]
             }, csrf_token=self.get_new_csrf_token(), expected_status_int=400)
 
-    def test_post_with_missing_task_type_returns_401_error(self):
+    def test_post_with_missing_task_type_returns_401_error(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
                 'task_entries': [{
@@ -262,7 +282,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 }]
             }, csrf_token=self.get_new_csrf_token(), expected_status_int=400)
 
-    def test_post_with_missing_target_id_returns_401_error(self):
+    def test_post_with_missing_target_id_returns_401_error(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
                 'task_entries': [{
@@ -274,7 +294,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 }]
             }, csrf_token=self.get_new_csrf_token(), expected_status_int=400)
 
-    def test_post_with_missing_issue_description_is_allowed(self):
+    def test_post_with_missing_issue_description_is_allowed(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
                 'task_entries': [{
@@ -298,7 +318,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         self.assertIsNotNone(task_entry_model)
         self.assertIsNone(task_entry_model.issue_description)
 
-    def test_post_with_missing_status_returns_401_error(self):
+    def test_post_with_missing_status_returns_401_error(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
                 'task_entries': [{
@@ -310,7 +330,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 }]
             }, csrf_token=self.get_new_csrf_token(), expected_status_int=400)
 
-    def test_post_can_create_new_open_task_in_storage(self):
+    def test_post_can_create_new_open_task_in_storage(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
                 'task_entries': [{
@@ -353,7 +373,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         self.assertIsNone(task_entry_model.resolver_id)
         self.assertIsNone(task_entry_model.resolved_on)
 
-    def test_post_can_create_new_obsolete_task_in_storage(self):
+    def test_post_can_create_new_obsolete_task_in_storage(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
                 'task_entries': [{
@@ -396,7 +416,9 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         self.assertIsNone(task_entry_model.resolver_id)
         self.assertIsNone(task_entry_model.resolved_on)
 
-    def test_post_can_create_new_resolved_task_in_storage_with_utcnow(self):
+    def test_post_can_create_new_resolved_task_in_storage_with_utcnow(
+        self
+    ) -> None:
         login_context = self.login_context(self.OWNER_EMAIL)
         mock_datetime_utcnow = self.mock_datetime_utcnow(self.MOCK_DATE)
         with login_context, mock_datetime_utcnow:
@@ -452,8 +474,8 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
             constants.TASK_STATUS_RESOLVED, invalid_resolver_id,
             self.MOCK_DATE)
-        with self.assertRaisesRegex(Exception, 'User not found'): # type: ignore[no-untyped-call]
-            improvements.get_task_dict_with_username_and_profile_picture( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'User not found'):
+            improvements.get_task_dict_with_username_and_profile_picture(
              task_entry)
 
     def test_to_dict_with_non_existing_resolver_id(self) -> None:
@@ -468,7 +490,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         # get_task_dict_with_username_and_profile_picture should return
         # with no changes to the TaskEntry dict.
         task_entry_dict = (
-            improvements.get_task_dict_with_username_and_profile_picture( # type: ignore[no-untyped-call]
+            improvements.get_task_dict_with_username_and_profile_picture(
             task_entry))
         self.assertEqual(task_entry_dict, {
             'entity_type': 'exploration',
@@ -487,15 +509,16 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
 
 class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.exp = self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
 
-    def get_url(self, exp_id=None, cursor=None):
+    def get_url(
+        self,
+        exp_id: Optional[str] = None,
+        cursor: Optional[str] = None
+    ) -> str:
         """Returns the URL corresponding to the handler.
 
         Args:
@@ -516,20 +539,24 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
             url = '%s?cursor=%s' % (url, cursor)
         return url
 
-    def test_get_with_invalid_exploration_returns_invalid_input_page(self):
+    def test_get_with_invalid_exploration_returns_invalid_input_page(
+        self
+    ) -> None:
         with self.login_context(self.OWNER_EMAIL):
             self.get_json(
                 self.get_url(exp_id='bad_exp_id'), expected_status_int=404)
 
-    def test_get_with_non_creator_returns_401_error(self):
+    def test_get_with_non_creator_returns_401_error(self) -> None:
         with self.login_context(self.VIEWER_EMAIL):
             self.get_json(self.get_url(), expected_status_int=401)
 
-    def test_get_with_invalid_cursor_returns_500_error(self):
+    def test_get_with_invalid_cursor_returns_500_error(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
-            self.get_json(self.get_url(cursor=234), expected_status_int=500)
+            self.get_json(self.get_url(cursor='234'), expected_status_int=500)
 
-    def test_get_when_no_tasks_exist_returns_response_with_empty_fields(self):
+    def test_get_when_no_tasks_exist_returns_response_with_empty_fields(
+        self
+    ) -> None:
         with self.login_context(self.OWNER_EMAIL):
             self.assertEqual(self.get_json(self.get_url()), {
                 'results': [],
@@ -537,7 +564,7 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
                 'more': False,
             })
 
-    def test_get_with_cursor_as_none_returns_first_page(self):
+    def test_get_with_cursor_as_none_returns_first_page(self) -> None:
         task_entries = [
             self._new_resolved_task(
                 state_name='State %d' % i,
@@ -554,7 +581,7 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
         self.assertIsNotNone(json_response['cursor'])
         self.assertTrue(json_response['more'])
 
-    def test_get_can_build_full_task_list_after_enough_fetches(self):
+    def test_get_can_build_full_task_list_after_enough_fetches(self) -> None:
         task_entries = [
             self._new_resolved_task(
                 state_name='State %d' % i,
@@ -581,9 +608,9 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
 
 class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
-    EXP_ID = 'eid'
+    EXP_ID: Final = 'eid'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
@@ -591,7 +618,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp = self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
 
-    def get_url(self, exp_id=None):
+    def get_url(self, exp_id: Optional[str] = None) -> str:
         """Returns the URL corresponding to the handler.
 
         Args:
@@ -606,22 +633,24 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
             constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.EXP_ID if exp_id is None else exp_id)
 
-    def test_get_for_public_exploration_as_non_owning_user_fails(self):
+    def test_get_for_public_exploration_as_non_owning_user_fails(self) -> None:
         self.publish_exploration(self.owner_id, self.EXP_ID)
         with self.login_context(self.VIEWER_EMAIL):
             self.get_json(self.get_url(), expected_status_int=401)
 
-    def test_get_for_private_exploration_as_non_owning_user_fails(self):
+    def test_get_for_private_exploration_as_non_owning_user_fails(
+        self
+    ) -> None:
         # Fail to call `publish_exploration`.
         with self.login_context(self.VIEWER_EMAIL):
             self.get_json(self.get_url(), expected_status_int=401)
 
-    def test_get_for_non_existing_exploration_fails(self):
+    def test_get_for_non_existing_exploration_fails(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             self.get_json(
                 self.get_url(exp_id='bad_exp_id'), expected_status_int=404)
 
-    def test_get_returns_exploration_id(self):
+    def test_get_returns_exploration_id(self) -> None:
         self.set_config_property(
             config_domain.IS_IMPROVEMENTS_TAB_ENABLED, False)
 
@@ -630,7 +659,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(json_response['exploration_id'], self.EXP_ID)
 
-    def test_get_returns_exploration_version(self):
+    def test_get_returns_exploration_version(self) -> None:
         with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url())
 
@@ -649,7 +678,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(json_response['exploration_version'], 2)
 
-    def test_improvements_tab_disabled(self):
+    def test_improvements_tab_disabled(self) -> None:
         self.set_config_property(
             config_domain.IS_IMPROVEMENTS_TAB_ENABLED, False)
 
@@ -658,7 +687,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
         self.assertFalse(json_response['is_improvements_tab_enabled'])
 
-    def test_improvements_tab_enabled(self):
+    def test_improvements_tab_enabled(self) -> None:
         self.set_config_property(
             config_domain.IS_IMPROVEMENTS_TAB_ENABLED, True)
 
@@ -667,7 +696,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
         self.assertTrue(json_response['is_improvements_tab_enabled'])
 
-    def test_custom_high_bounce_rate_creation_threshold(self):
+    def test_custom_high_bounce_rate_creation_threshold(self) -> None:
         self.set_config_property((
             config_domain
             .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD), 0.35)
@@ -680,7 +709,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
                 'high_bounce_rate_task_state_bounce_rate_creation_threshold'],
             0.35)
 
-    def test_custom_high_bounce_rate_obsoletion_threshold(self):
+    def test_custom_high_bounce_rate_obsoletion_threshold(self) -> None:
         self.set_config_property(
             (
                 config_domain
@@ -695,7 +724,9 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
                 'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold'],
             0.05)
 
-    def test_custom_high_bounce_rate_task_minimum_exploration_starts(self):
+    def test_custom_high_bounce_rate_task_minimum_exploration_starts(
+        self
+    ) -> None:
         self.set_config_property(
             config_domain.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS,
             20)
