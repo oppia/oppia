@@ -24,7 +24,7 @@
         </i>
       </span>
       <span class="new-chapter-error-msg" ng-if="errorMsg">
-        <span><[errorMsg]></span>
+        <span><[ errorMsg ]></span>
       </span>
     </div>
 
@@ -35,14 +35,20 @@
       <input ng-change="resetErrorMsg()" ng-model="explorationId" class="form-control e2e-test-chapter-exploration-input">
       <div ng-if="invalidExpId || explorationId && !validateExplorationId()">
         <div ng-repeat="invalidExpErrorString in invalidExpErrorStrings" class="new-chapter-error-msg e2e-test-invalid-exp-id">
-          <span><[invalidExpErrorString]></span>
+          <span><[ invalidExpErrorString ]></span>
         </div>
       </div>
       <span class="new-chapter-error-msg" ng-if="correctnessFeedbackDisabled">
-        <span><[correctnessFeedbackDisabledString]></span>
+        <span><[ correctnessFeedbackDisabledString ]></span>
       </span>
       <span class="new-chapter-error-msg" ng-if="!categoryIsDefault">
         <span>The category of this exploration is invalid. Curated lessons need to have their category to be one of the default categories.</span>
+      </span>
+      <span class="new-chapter-error-msg" ng-if="statesWithRestrictedInteractions.length > 0">
+        <span>The states [<[ statesWithRestrictedInteractions.join(', ') ]>] contain restricted interaction types.</span>
+      </span>
+      <span class="new-chapter-error-msg" ng-if="statesWithTooFewMultipleChoiceOptions.length > 0">
+        <span>The states [<[ statesWithTooFewMultipleChoiceOptions.join(', ') ]>] contain invalid multiple choice interactions. They must each have at least 4 options.</span>
       </span>
     </div>
     <div class="chapter-input chapter-input-thumbnail e2e-test-chapter-input-thumbnail">

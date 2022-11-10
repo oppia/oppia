@@ -253,6 +253,9 @@ ENTITY_TYPE_SKILL = 'skill'
 ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
 
+DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN = 'main_question'
+DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP = 'backup_question'
+
 IMAGE_CONTEXT_QUESTION_SUGGESTIONS = 'question_suggestions'
 IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS = 'exploration_suggestions'
 
@@ -545,6 +548,10 @@ MAILCHIMP_API_KEY = None
 MAILCHIMP_USERNAME = None
 # Mailchimp secret, used to authenticate webhook requests.
 MAILCHIMP_WEBHOOK_SECRET = None
+# Valid Mailchimp merge keys.
+VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
+# Valid Mailchimp tags.
+VALID_MAILCHIMP_TAGS = ['Android', 'Web']
 
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
@@ -760,7 +767,7 @@ MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE = 10
 
 # The maximum number of blog post cards to be visible on each page in author
 # specific blog post page.
-MAX_NUM_CARDS_TO_DISPLAY_ON_AUTHOR_SPECIFIC_BLOG_POST_PAGE = 12
+MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_AUTHOR_PROFILE_PAGE = 12
 
 # The maximum number of blog post cards to be visible as suggestions on the
 # blog post page.
@@ -916,8 +923,8 @@ BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
 BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'
 BLOG_HOMEPAGE_URL = '/blog'
 BLOG_SEARCH_DATA_URL = '/blog/searchhandler/data'
-AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX = '/blog/author'
-AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX = '/blog/author/data'
+BLOG_AUTHOR_PROFILE_PAGE_URL_PREFIX = '/blog/author'
+BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_PREFIX = '/blog/author/data'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
@@ -1036,6 +1043,7 @@ SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
 DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER = (
     '/diagnostic_test_skill_assignment_handler')
+DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL = '/diagnostic_test_questions_handler_url'
 STATE_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/state'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
@@ -1246,8 +1254,8 @@ DEPRECATED_ROLE_ACTION_UPDATE = 'update'
 ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
 ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
-USER_FILTER_CRITERION_ROLE = 'role'
-USER_FILTER_CRITERION_USERNAME = 'username'
+USER_FILTER_CRITERION_ROLE: Final = 'role'
+USER_FILTER_CRITERION_USERNAME: Final = 'username'
 
 # Max questions allowed in a session of practice questions.
 QUESTION_BATCH_SIZE = 10
