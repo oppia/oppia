@@ -368,16 +368,18 @@ class FeedbackMessageReference:
         cls,
         reference_dict: FeedbackMessageReferenceDict
         ) -> FeedbackMessageReference:
-        """ Return a FeedbackMessageReference domain object from a dict.
+        """Return a FeedbackMessageReference domain object from a dict.
 
         Args:
             reference_dict: dict. The dict representation of a
                 FeedbackMessageReference object.
+
         Returns:
-            FeedbackMessageReference. The corresponding FeedbackMessageReference domain object.
+            FeedbackMessageReference. The corresponding FeedbackMessageReference
+            domain object.
         """
-        # TODO: Investigate why reference_dict is passed as 
-        # string and not FeedbackMessageReferenceDict when called from Postman
+        # Investigate why reference_dict is passed as
+        # string and not FeedbackMessageReferenceDict when called from Postman.
         if isinstance(reference_dict, str):
             reference_dict = json.loads(reference_dict)
         return cls(
@@ -389,7 +391,7 @@ class FeedbackMessageReference:
 
     def validate(self) -> None:
         """Validates various properties of the FeedbackMessageReference."""
-        # TODO: implement validation for object
+        # Implement validation for object.
 
 
 class FeedbackThreadSummary:
