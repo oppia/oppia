@@ -320,7 +320,8 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.swap_with_checks(
-            pkgutil, 'iter_modules', lambda path: [('loader', 'directive', False)],
+            pkgutil, 'iter_modules',
+            lambda path: [('loader', 'directive', False)],
             expected_kwargs=[{'path': [feconf.RTE_EXTENSIONS_DIR]}]
         ):
             component_types_to_component_classes = (

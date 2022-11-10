@@ -395,8 +395,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml('10', '<p>Example Question 1</p>'),
             state_domain.SubtitledHtml('9', '<p>Example Explanation 1</p>')
         )
+        # Here we use MyPy ignore because we want to test the case when the
+        # skill is created without its explanation. Hence we use ignore to
+        # silence the error.
         skill_contents = skill_domain.SkillContents(
-            None, [example_1],
+            None, [example_1], # type: ignore[arg-type]
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     '10': {}, '9': {}
