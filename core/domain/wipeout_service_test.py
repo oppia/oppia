@@ -2453,7 +2453,7 @@ class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             status=suggestion_models.STATUS_IN_REVIEW,
             author_id=self.user_1_id,
             final_reviewer_id=self.user_1_id,
-            change_cmd={},
+            change={},
             score_category=suggestion_models.SCORE_TYPE_CONTENT
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
