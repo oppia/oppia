@@ -18,16 +18,15 @@
 
 from __future__ import annotations
 
-from apache_beam.io.gcp import gcsio_test
 from core.jobs import base_jobs
 from core.jobs.io import gcs_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Optional
-
 import apache_beam as beam
+from apache_beam.io.gcp import gcsio_test
+from typing import Optional
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -51,8 +50,8 @@ class TestGCSIoJob(base_jobs.JobBase):
             | 'Create PCollection having test bucket and test files' >> (
                 beam.Create(
                     [
-                        {'file': 'gs://test-bucket/dummy_file_1', 'data': b'testing_1'},
-                        {'file': 'gs://test-bucket/dummy_file_2', 'data': b'testing_2'}
+                        {'file': 'dummy_file_1', 'data': b'testing_1'},
+                        {'file': 'dummy_file_2', 'data': b'testing_2'}
                     ]
                 ))
             | 'Write files to GCS' >> gcs_io.WriteFile(self.client)
@@ -70,8 +69,8 @@ class TestGCSIoJob(base_jobs.JobBase):
             | 'Create PCollection of files that needs to be fetched' >> (
                 beam.Create(
                     [
-                        'gs://test-bucket/dummy_file_1',
-                        'gs://test-bucket/dummy_file_2'
+                        'dummy_file_1',
+                        'dummy_file_2'
                     ]
                 ))
             | 'Read files from the GCS' >> gcs_io.ReadFile(self.client)

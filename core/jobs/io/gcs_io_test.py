@@ -20,11 +20,17 @@ from __future__ import annotations
 
 from core.jobs import job_test_utils
 from core.jobs.io import gcs_io
-from apache_beam.io.gcp import gcsio_test
-from apache_beam.io.gcp import gcsio
+from core.platform import models
 
-import os
 import apache_beam as beam
+from apache_beam.io.gcp import gcsio
+from apache_beam.io.gcp import gcsio_test
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import app_identity_services
+
+app_identity_services = models.Registry.import_app_identity_services()
 
 
 def insert_random_file(
@@ -38,7 +44,7 @@ def insert_random_file(
     Args:
         client: FakeGcsClient. The fake GCS client for testing purpose.
         path: str. The file path to where store the content.
-        content: bytes: The content to store.
+        content: bytes. The content to store.
         generation: int. The file generation.
 
     Returns:
@@ -55,13 +61,14 @@ class ReadFileTest(job_test_utils.PipelinedTestBase):
 
     def test_read_from_gcs(self) -> None:
         client = gcsio_test.FakeGcsClient()
-        file_name = 'gs://gcsio-test/dummy_file'
+        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        file_name = f'gs://{bucket}/dummy_file'
         string = b'testing'
         insert_random_file(client, file_name, string)
-        filenames = [file_name]
+        filenames = ['dummy_file']
         filename_p_collec = (
             self.pipeline
-            |'Create pcoll of filenames' >> beam.Create(filenames)
+            | 'Create pcoll of filenames' >> beam.Create(filenames)
             | 'Read file from GCS' >> gcs_io.ReadFile(client)
         )
         self.assert_pcoll_equal(filename_p_collec, [string])
@@ -72,43 +79,14 @@ class WriteFileTest(job_test_utils.PipelinedTestBase):
 
     def test_write_to_gcs(self) -> None:
         client = gcsio_test.FakeGcsClient()
-        file_name_1 = 'gs://gcsio-test/dummy_file_1'
-        file_name_2 = 'gs://gcsio-test/dummy_file_2'
         string = b'testing'
         filenames = [
-            {'file': file_name_1, 'data': string},
-            {'file': file_name_2, 'data': string}
+            {'file': 'dummy_file_1', 'data': string},
+            {'file': 'dummy_file_2', 'data': string}
         ]
         filename_p_collec = (
             self.pipeline
-            |'Create pcoll of filenames' >> beam.Create(filenames)
-            |'Write to GCS' >> gcs_io.WriteFile(client)
+            | 'Create pcoll of filenames' >> beam.Create(filenames)
+            | 'Write to GCS' >> gcs_io.WriteFile(client)
         )
         self.assert_pcoll_equal(filename_p_collec, [7, 7])
-
-
-class ReadWriteFileToGCSTest(job_test_utils.PipelinedTestBase):
-    """Read and write file to GCS."""
-
-    def test_read_and_write_file_to_gcs(self) -> None:
-        client = gcsio_test.FakeGcsClient()
-        file_name_1 = 'gs://gcsio-test/dummy_file_1'
-        file_name_2 = 'gs://gcsio-test/dummy_file_2'
-        string = b'testing'
-        filenames = [
-            {'file': file_name_1, 'data': string},
-            {'file': file_name_2, 'data': string}
-        ]
-        filename_p_collec_write = (
-            self.pipeline
-            |'Create pcoll of filenames to write' >> beam.Create(filenames)
-            |'Write to GCS' >> gcs_io.WriteFile(client)
-        )
-        self.assert_pcoll_equal(filename_p_collec_write, [7, 7])
-
-        filename_p_collec_read = (
-            self.pipeline
-            |'Create pcoll of filenames to read' >> beam.Create(filenames)
-            | 'Read file from GCS' >> gcs_io.ReadFile(client)
-        )
-        self.assert_pcoll_equal(filename_p_collec_read, [string, string])
