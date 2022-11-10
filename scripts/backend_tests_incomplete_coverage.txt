@@ -57,7 +57,6 @@ core.domain.platform_parameter_domain_test
 core.domain.platform_parameter_registry_test
 core.domain.question_domain_test
 core.domain.question_services_test
-core.domain.recommendations_services_test
 core.domain.rights_domain_test
 core.domain.rights_manager_test
 core.domain.rte_component_registry_test

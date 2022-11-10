@@ -18,7 +18,10 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf
+from core.constants import constants
 from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -30,10 +33,11 @@ from typing import Dict, Final
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import exp_models
     from mypy_imports import recommendations_models
 
-(recommendations_models,) = models.Registry.import_models(
-    [models.Names.RECOMMENDATIONS]
+(exp_models, recommendations_models) = models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.RECOMMENDATIONS]
 )
 
 
@@ -276,6 +280,28 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             sorted(recommendations_services.RECOMMENDATION_CATEGORIES))
 
     def test_get_item_similarity(self) -> None:
+        created_time = datetime.datetime.utcnow() - datetime.timedelta(days=10)
+        exp_summary_model = (
+            exp_models.ExpSummaryModel(
+                id='exp_id_5',
+                title='title',
+                category='category',
+                objective='objective',
+                language_code='language_code',
+                tags=['tag'],
+                status=constants.ACTIVITY_STATUS_PUBLIC,
+                community_owned=False,
+                owner_ids=['alice'],
+                editor_ids=['editor_id'],
+                viewer_ids=['viewer_id'],
+                contributor_ids=[''],
+                contributors_summary={},
+                version=0,
+                exploration_model_last_updated=created_time,
+                exploration_model_created_on=created_time,
+            ))
+        exp_summary_model.update_timestamps(update_last_updated_time=False)
+        exp_summary_model.put()
         exp_summaries = exp_services.get_all_exploration_summaries()
 
         self.assertEqual(
@@ -287,6 +313,16 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             recommendations_services.get_item_similarity(
                 exp_summaries['exp_id_4'], exp_summaries['exp_id_4']),
             9.0
+        )
+        self.assertEqual(
+            recommendations_services.get_item_similarity(
+                exp_summaries['exp_id_1'], exp_summaries['exp_id_3']),
+            3.5
+        )
+        self.assertEqual(
+            recommendations_services.get_item_similarity(
+                exp_summaries['exp_id_1'], exp_summaries['exp_id_5']),
+            2.5
         )
 
         system_user = user_services.get_system_user()
