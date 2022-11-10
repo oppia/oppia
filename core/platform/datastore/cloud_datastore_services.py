@@ -96,7 +96,7 @@ def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
             return result
         except Exception as unused_e:
             continue
-    raise Exception('get_multi failed after %s retries' % MAX_RETRIES)
+    raise Exception('get_multi failed after %s retries' % MAX_GET_RETRIES)
 
 
 def update_timestamps_multi(
