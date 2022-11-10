@@ -412,7 +412,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(logs, [
                 '\'last_week_stats\' should contain only one key-value pair'
                 ' denoting last week dashboard stats of the user keyed by a'
-                ' datetime string.\nNoneType: None'
+                ' datetime string.'
             ])
         self.assertIsNone(last_week_stats)
 
