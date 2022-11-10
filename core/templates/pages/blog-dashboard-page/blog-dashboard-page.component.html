@@ -1,21 +1,38 @@
 <div *ngIf="activeTab === 'main'">
   <mat-card *ngIf="blogDashboardData" class="oppia-page-card blog-dashboard-card">
-    <mat-card-header class="blog-dashboard-header">
+    <mat-card-header class="blog-dashboard-header mr-0">
       <img mat-card-avatar
            [src]="authorProfilePictureUrl"
            alt="Profile image of the author of the blog post"
            class="e2e-test-profile-current-user-photo">
-      <mat-card-title class="blog-dashboard-card-title e2e-test-username-visible">
-        {{ blogDashboardData.username }}
-      </mat-card-title>
-      <mat-card-subtitle>
+      <mat-card-title class="w-100 d-flex justify-content-between">
+        <span class="blog-dashboard-card-title e2e-test-username-visible">
+          {{ authorName }}
+          <button class="fas fa-pen oppia-editor-edit-icon"
+                  title="Edit Author Name"
+                  (click)="showAuthorDetailsEditor()">
+          </button>
+        </span>
         <button mat-button
+                *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts"
                 class="new-post-button e2e-test-create-blog-post-button"
-                (click)="createNewBlogPost()"
-                *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts">
+                (click)="createNewBlogPost()">
           <mat-icon class="new-post-icon position-absolute">+</mat-icon>
-          <span class="d-flex pl-3">{{ 'I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON' | translate | uppercase}}</span>
+          <span class="d-flex pl-3">{{ 'I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON' | translate | uppercase }}</span>
         </button>
+      </mat-card-title>
+      <mat-card-subtitle class="mt-2">
+        <div class="blog-author-bio-container">
+          <span class="d-flex">
+            <span class="blog-author-bio">
+              {{ authorBio }}
+            </span>
+            <button class="fas fa-pen oppia-editor-edit-icon mb-auto"
+                    title="Edit Author Name"
+                    (click)="showAuthorDetailsEditor()">
+            </button>
+          </span>
+        </div>
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
@@ -23,7 +40,7 @@
            *ngIf="!(blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts)">
         <blockquote class="blog-dashboard-intro-card">
           <p class="blog-dashboard-intro-card-message">
-            {{ 'I18N_BLOG_DASHBOARD_INTRO_MESSAGE' | translate}}
+            {{ 'I18N_BLOG_DASHBOARD_INTRO_MESSAGE' | translate }}
           </p>
           <button mat-button
                   class="mx-2 my-2 create-new-blog-post-button e2e-test-create-blog-post-button"
@@ -36,7 +53,7 @@
       <mat-tab-group class="e2e-test-mat-tabs" *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts">
         <mat-tab>
           <ng-template mat-tab-label>
-            {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase}} ({{ blogDashboardData.numOfDraftBlogPosts }})
+            {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase }} ({{ blogDashboardData.numOfDraftBlogPosts }})
           </ng-template>
           <div class="justify-content-end d-flex" *ngIf="!windowIsNarrow">
             <button mat-icon-button (click)="activeView = 'gridView'" class="e2e-test-tiles-view-button">
@@ -68,7 +85,7 @@
         </mat-tab>
         <mat-tab>
           <ng-template mat-tab-label class="e2e-test-publish-tab-button">
-            {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase}} ({{ blogDashboardData.numOfPublishedBlogPosts }})
+            {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase }} ({{ blogDashboardData.numOfPublishedBlogPosts }})
           </ng-template>
           <div class="justify-content-end d-flex" *ngIf="!windowIsNarrow">
             <button mat-icon-button (click)="activeView = 'gridView'" class="e2e-test-tiles-view-button">
@@ -111,6 +128,27 @@
     padding-bottom: 100px;
   }
 
+  .oppia-editor-edit-icon {
+    border: unset;
+    font-size: 16px;
+    position: relative;
+    right: unset;
+    top: unset;
+  }
+
+  .blog-author-bio-container {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 100;
+    line-height: 18px;
+    text-align: left;
+  }
+
+  .oppia-editor-edit-icon:hover {
+    opacity: 1;
+  }
+
   .blog-dashboard-tiles-container {
     display: flex;
     flex-flow: wrap;
@@ -119,12 +157,12 @@
   }
 
   .blog-dashboard-card .mat-card-avatar {
-    height: 7.5vw;
-    max-height: 100px;
-    max-width: 100px;
-    min-height: 36px;
-    min-width: 36px;
-    width: 7.5vw;
+    height: 12vw;
+    max-height: 140px;
+    max-width: 140px;
+    min-height: 44px;
+    min-width: 44px;
+    width: 12vw;
   }
 
   .blog-dashboard-card-title {
@@ -238,6 +276,12 @@
     overflow: hidden;
   }
 
+  :host /deep/ mat-card-header .mat-card-header-text {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
   mat-card-header.blog-dashboard-header {
     margin: 3.75vw 3.438vw;
   }
@@ -248,15 +292,8 @@
       width: unset;
     }
 
-    :host /deep/ mat-card-header .mat-card-header-text {
-      display: flex;
-      flex-grow: 1;
-      justify-content: space-between;
-    }
-
     .new-post-button {
       margin-bottom: unset;
-      margin-top: 15px;
     }
 
     :host /deep/ .mat-tab-label {
@@ -266,9 +303,25 @@
   }
 
   @media(max-width: 620px) {
+    .blog-dashboard-card-title {
+      color: #333;
+      font-family: 'Roboto', Arial, sans-serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      text-align: left;
+    }
+
     .new-post-button {
+      font-size: 14px;
       margin-bottom: unset;
-      margin-top: 10px;
+      padding-left: 0;
+      padding-right: 0;
+      width: 96px;
+    }
+
+    .blog-author-bio-container {
+      font-size: 14px;
+      line-height: 16px;
     }
 
     :host /deep/ .mat-card-header-text {

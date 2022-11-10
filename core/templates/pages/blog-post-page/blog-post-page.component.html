@@ -8,11 +8,12 @@
         <img mat-card-avatar
              class="mr-2"
              [src]="authorProfilePicUrl"
-             alt="Profile image of the author of the blog post">
-        <mat-card-subtitle class="e2e-test-username-visible">
-          {{ blogPost.authorUsername }}
+             alt="Profile image of the author of the blog post"
+             (click)="navigateToAuthorProfilePage()">
+        <mat-card-subtitle class="blog-author-name" (click)="navigateToAuthorProfilePage()">
+          {{ blogPost.displayedAuthorName }}
         </mat-card-subtitle>
-        <mat-card-subtitle class="pt-2 font-weight-light mobile-published-date">
+        <mat-card-subtitle class="pt-2 font-weight-light mobile-published-date" (click)="navigateToAuthorProfilePage()">
           {{ publishedDateString }}
         </mat-card-subtitle>
         <button class="mr-0 mt-auto ml-auto mb-2"
@@ -51,16 +52,18 @@
           </div>
         </mat-menu>
       </mat-card-header>
-      <mat-card-content class="mt-4 blog-card-content">
+      <mat-card-content class="blog-card-content"
+                        [ngClass]="{'mt-4': !isSmallScreenViewActive(), 'mt-2': isSmallScreenViewActive()}">
         <oppia-rte-output-display [rteString]="this.blogPost.content"
-                                  class="d-block">
+                                  class="d-block"
+                                  [ngClass]="{'pt-3': !isSmallScreenViewActive(), 'pt-1': isSmallScreenViewActive()}">
         </oppia-rte-output-display>
       </mat-card-content>
     </div>
   </mat-card>
   <div class="d-flex blog-card-tag-container flex-wrap pt-2 mx-auto mb-5 oppia-blog-post-page-card">
     <h4 class="blog-post-sub-heading-font my-auto mr-2">
-      {{ 'I18N_BLOG_POST_PAGE_TAGS_HEADING' | translate }}
+      {{ 'I18N_BLOG_POST_PAGE_TAGS_HEADING' | translate }}:
     </h4>
     <div *ngFor="let tag of blogPost.tags"
          class="blog-card-tag px-1 py-1 mx-1 my-1">
