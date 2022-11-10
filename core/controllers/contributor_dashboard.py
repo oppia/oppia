@@ -358,12 +358,14 @@ class ReviewableOpportunitiesHandler(
                 raise self.InvalidInputException(
                     'The supplied input topic: %s is not valid' % topic_name)
             topics = [topic]
-        topic_stories = story_fetchers.get_stories_by_ids([
-            reference.story_id
-            for topic in topics
-            for reference in topic.get_all_story_references()
-            if reference.story_is_published],
-            strict=True
+        topic_stories = story_fetchers.get_stories_by_ids(
+            [
+                reference.story_id
+                for topic in topics
+                for reference in topic.get_all_story_references()
+                if reference.story_is_published
+            ],
+                strict=True
         )
         topic_exp_ids = []
         for story in topic_stories:
@@ -880,9 +882,9 @@ class ContributorStatsSummariesHandler(
             )
 
         user_id = user_services.get_user_id_from_username(username)
-        # Here we are sure that user_id will never going to be a None
-        # value, because we are already handling the None case of user_id
-        # in `can_fetch_contributor_dashboard_stats` decorator by
+        # Here we are sure that user_id will never be None, because
+        # we are already handling the None case of user_id in
+        # `can_fetch_contributor_dashboard_stats` decorator by
         # raising an exception.
         assert user_id is not None
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
@@ -941,9 +943,9 @@ class ContributorAllStatsSummariesHandler(
     def get(self, username: str) -> None:
         """Handles GET requests."""
         user_id = user_services.get_user_id_from_username(username)
-        # Here we are sure that user_id will never going to be a None
-        # value, because we are already handling the None case of user_id
-        # in `can_fetch_all_contributor_dashboard_stats` decorator by
+        # Here we are sure that user_id will never be None, because
+        # we are already handling the None case of user_id in
+        # `can_fetch_all_contributor_dashboard_stats` decorator by
         # raising an exception.
         assert user_id is not None
         stats = suggestion_services.get_all_contributor_stats(user_id)

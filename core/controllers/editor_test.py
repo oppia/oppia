@@ -1612,7 +1612,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         )
         self.assertEqual(
             response['error'],
-            'Please provide a role to a new member for exploration.'
+            'Please provide a role for the new member of the exploration.'
         )
 
     def test_that_an_editor_can_edit_the_exploration(self) -> None:

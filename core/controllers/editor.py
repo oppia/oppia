@@ -411,7 +411,9 @@ class ExplorationRightsHandler(
                     'Sorry, we could not find the specified user.')
             if new_member_role is None:
                 raise self.InvalidInputException(
-                    'Please provide a role to a new member for exploration.')
+                    'Please provide a role for the new member of the '
+                    'exploration.'
+                )
             if new_member_id == self.user_id:
                 raise self.InvalidInputException(
                     'Users are not allowed to assign other roles to themselves')

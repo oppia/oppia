@@ -20,41 +20,184 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import suggestion_services
 from core.domain import user_services
 
-from typing import Any, Dict, List, Optional, Tuple, TypedDict, TypeVar
+from typing import Dict, List, Optional, TypedDict
 
 
-# Here we use type Any because we want to allow list of different
-# TypedDict dictionaries through this type variable.
-ThreadDictType = TypeVar('ThreadDictType', bound=List[Any])
+class UpdatedLastMessageAuthorFeedbackThreadDict(TypedDict):
+    """Dict representation of FeedbackThread domain object with
+    updated author_username and last_nonempty_message_author keys.
+    """
+
+    last_updated_msecs: float
+    original_author_username: Optional[str]
+    state_name: Optional[str]
+    status: str
+    subject: str
+    summary: str
+    thread_id: str
+    message_count: int
+    last_nonempty_message_text: Optional[str]
+    last_nonempty_message_author: Optional[str]
 
 
-def replace_user_id_with_username_in_dict(
-    thread_dicts: ThreadDictType,
-    user_keys: List[Tuple[str, str]]
-) -> ThreadDictType:
-    """Replace user id with the corresponding username in the given dictionary.
+class UpdatedAuthorUsernameFeedbackThreadDict(TypedDict):
+    """Dict representation of FeedbackThread domain object with
+    updated author_username key.
+    """
+
+    last_updated_msecs: float
+    original_author_username: Optional[str]
+    state_name: Optional[str]
+    status: str
+    subject: str
+    summary: str
+    thread_id: str
+    message_count: int
+    last_nonempty_message_text: Optional[str]
+    last_nonempty_message_author_id: Optional[str]
+
+
+class UpdatedFeedbackMessageDict(TypedDict):
+    """Dict representation of FeedbackMessage object with updated
+    author_username key.
+    """
+
+    author_username: Optional[str]
+    created_on_msecs: float
+    entity_type: str
+    entity_id: str
+    message_id: int
+    text: str
+    updated_status: str
+    updated_subject: str
+
+
+def update_original_and_last_message_author_id_in_feedback_thread_dicts(
+    feedback_thread_dicts: List[feedback_domain.FeedbackThreadDict]
+) -> List[UpdatedLastMessageAuthorFeedbackThreadDict]:
+    """Replaces original author id and last message author id with there
+    corresponding username in the given feedback thread dictionaries.
 
     Args:
-        thread_dicts: list(dict). The dictionary that will be updated.
-        user_keys: list(tuple). A list that contains tuples of keys. The first
-            item in the tuple is a key of the user ID and the second item is a
-            key of a newly added username.
+        feedback_thread_dicts: list(dict). The list of feedback thread
+            dictionaries that need to be updated.
 
     Returns:
-        list(dict). The updated dictionary.
+        list(dict). The list of updated feedback thread dictionaries.
     """
-    for thread_dict in thread_dicts:
-        for user_id_key, username_key in user_keys:
-            thread_dict[username_key] = (
-                user_services.get_username(thread_dict[user_id_key])
-                if thread_dict[user_id_key] else None
+    updated_feedback_thread_dicts = []
+    for feedback_thread_dict in feedback_thread_dicts:
+        last_nonempty_message_author_id = (
+            feedback_thread_dict['last_nonempty_message_author_id']
+        )
+        updated_feedback_thread_dict: (
+            UpdatedLastMessageAuthorFeedbackThreadDict
+        ) = {
+            'last_updated_msecs': feedback_thread_dict['last_updated_msecs'],
+            'original_author_username': (
+                user_services.get_username(
+                    feedback_thread_dict['original_author_id']
+                )
+                if feedback_thread_dict['original_author_id'] else None
+            ),
+            'state_name': feedback_thread_dict['state_name'],
+            'status': feedback_thread_dict['status'],
+            'subject': feedback_thread_dict['subject'],
+            'summary': feedback_thread_dict['summary'],
+            'thread_id': feedback_thread_dict['thread_id'],
+            'message_count': feedback_thread_dict['message_count'],
+            'last_nonempty_message_text': (
+                feedback_thread_dict['last_nonempty_message_text']
+            ),
+            'last_nonempty_message_author': (
+                user_services.get_username(
+                    last_nonempty_message_author_id
+                ) if last_nonempty_message_author_id else None
             )
-            thread_dict.pop(user_id_key)
-    return thread_dicts
+        }
+        updated_feedback_thread_dicts.append(updated_feedback_thread_dict)
+    return updated_feedback_thread_dicts
+
+
+def update_original_author_id_in_feedback_thread_dicts(
+    feedback_thread_dicts: List[feedback_domain.FeedbackThreadDict]
+) -> List[UpdatedAuthorUsernameFeedbackThreadDict]:
+    """Replaces original author id with the corresponding username in the
+    given feedback thread dictionaries.
+
+    Args:
+        feedback_thread_dicts: list(dict). The list of feedback thread
+            dictionaries that need to be updated.
+
+    Returns:
+        list(dict). The list of updated feedback thread dictionaries.
+    """
+    updated_feedback_thread_dicts = []
+    for feedback_thread_dict in feedback_thread_dicts:
+        updated_feedback_thread_dict: (
+            UpdatedAuthorUsernameFeedbackThreadDict
+        ) = {
+            'last_updated_msecs': feedback_thread_dict['last_updated_msecs'],
+            'original_author_username': (
+                user_services.get_username(
+                    feedback_thread_dict['original_author_id']
+                )
+                if feedback_thread_dict['original_author_id'] else None
+            ),
+            'state_name': feedback_thread_dict['state_name'],
+            'status': feedback_thread_dict['status'],
+            'subject': feedback_thread_dict['subject'],
+            'summary': feedback_thread_dict['summary'],
+            'thread_id': feedback_thread_dict['thread_id'],
+            'message_count': feedback_thread_dict['message_count'],
+            'last_nonempty_message_text': (
+                feedback_thread_dict['last_nonempty_message_text']
+            ),
+            'last_nonempty_message_author_id': (
+                feedback_thread_dict['last_nonempty_message_author_id']
+            )
+        }
+        updated_feedback_thread_dicts.append(updated_feedback_thread_dict)
+    return updated_feedback_thread_dicts
+
+
+def update_author_id_in_message_dicts(
+    message_dicts: List[feedback_domain.FeedbackMessageDict]
+) -> List[UpdatedFeedbackMessageDict]:
+    """Replaces author id with the corresponding username in the
+    given message dictionaries.
+
+    Args:
+        message_dicts: list(dict). The list of message
+            dictionaries that need to be updated.
+
+    Returns:
+        list(dict). The list of updated message dictionaries.
+    """
+    updated_message_dicts = []
+    for message_dict in message_dicts:
+        updated_message_dict: UpdatedFeedbackMessageDict = {
+            'author_username': (
+                user_services.get_username(
+                    message_dict['author_id']
+                )
+                if message_dict['author_id'] else None
+            ),
+            'created_on_msecs': message_dict['created_on_msecs'],
+            'entity_type': message_dict['entity_type'],
+            'entity_id': message_dict['entity_id'],
+            'message_id': message_dict['message_id'],
+            'text': message_dict['text'],
+            'updated_status': message_dict['updated_status'],
+            'updated_subject': message_dict['updated_subject']
+        }
+        updated_message_dicts.append(updated_message_dict)
+    return updated_message_dicts
 
 
 class ThreadListHandlerNormalizedPayloadDict(TypedDict):
@@ -110,14 +253,10 @@ class ThreadListHandler(
             )
         ]
         self.values.update({
-            'feedback_thread_dicts': replace_user_id_with_username_in_dict(
-                feedback_thread_dicts, [
-                    ('original_author_id', 'original_author_username'),
-                    (
-                        'last_nonempty_message_author_id',
-                        'last_nonempty_message_author'
-                    )
-                ]
+            'feedback_thread_dicts': (
+                update_original_and_last_message_author_id_in_feedback_thread_dicts(  # pylint: disable=line-too-long
+                    feedback_thread_dicts
+                )
             )
         })
         self.render_json(self.values)
@@ -162,9 +301,10 @@ class ThreadListHandlerForTopicsHandler(
             )
         ]
         self.values.update({
-            'suggestion_thread_dicts': replace_user_id_with_username_in_dict(
-                suggestion_thread_dicts,
-                [('original_author_id', 'original_author_username')]
+            'suggestion_thread_dicts': (
+                update_original_author_id_in_feedback_thread_dicts(
+                    suggestion_thread_dicts
+                )
             )
         })
         self.render_json(self.values)
@@ -238,9 +378,8 @@ class ThreadHandler(
                 self.user_id, thread_id, message_ids)
 
         self.values.update({
-            'messages': replace_user_id_with_username_in_dict(
-                message_dicts,
-                [('author_id', 'author_username')]
+            'messages': update_author_id_in_message_dicts(
+                message_dicts
             ),
             'suggestion': suggestion.to_dict() if suggestion else None
         })
@@ -273,9 +412,8 @@ class ThreadHandler(
         message_dict = [message.to_dict() for message in messages]
 
         self.render_json({
-            'messages': replace_user_id_with_username_in_dict(
-                message_dict,
-                [('author_id', 'author_username')]
+            'messages': update_author_id_in_message_dicts(
+                message_dict
             )
         })
 
@@ -324,9 +462,8 @@ class RecentFeedbackMessagesHandler(
         message_dict = [message.to_dict() for message in all_feedback_messages]
 
         self.render_json({
-            'results': replace_user_id_with_username_in_dict(
-                message_dict,
-                [('author_id', 'author_username')]
+            'results': update_author_id_in_message_dicts(
+                message_dict
             ),
             'cursor': new_urlsafe_start_cursor,
             'more': more,
