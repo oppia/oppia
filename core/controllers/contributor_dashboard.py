@@ -365,7 +365,7 @@ class ReviewableOpportunitiesHandler(
                 for reference in topic.get_all_story_references()
                 if reference.story_is_published
             ],
-                strict=True
+            strict=True
         )
         topic_exp_ids = []
         for story in topic_stories:

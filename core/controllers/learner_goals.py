@@ -57,11 +57,11 @@ class LearnerGoalsHandler(
         'DELETE': {}
     }
 
-    # Note: Currently this handler only accepting one type of activity
+    # Note: Currently this handler only accepts one type of activity
     # which is 'ACTIVITY_TYPE_LEARN_TOPIC', so 'activity_type' argument
-    # is not used inside the function body but, in future if this handler
-    # accepts more than one activity of type then please remove pylint
-    # exception from below and use 'if-else' clause inside the function
+    # is not used inside the function body. But, in future, if this handler
+    # accepts more than one activity type, then please remove the pylint
+    # exception below and use an 'if-else' clause inside the function
     # body to handle the different activity cases properly.
     @acl_decorators.can_access_learner_dashboard
     def post(self, activity_type: str, topic_id: str) -> None:  # pylint: disable=unused-argument
@@ -80,11 +80,11 @@ class LearnerGoalsHandler(
 
         self.render_json(self.values)
 
-    # Note: Currently this handler only accepting one type of activity
+    # Note: Currently this handler only accepts one type of activity
     # which is 'ACTIVITY_TYPE_LEARN_TOPIC', so 'activity_type' argument
-    # is not used inside the function body but, in future if this handler
-    # accepts more than one activity of type then please remove pylint
-    # exception from below and use 'if-else' clause inside the function
+    # is not used inside the function body. But, in future, if this handler
+    # accepts more than one activity type, then please remove the pylint
+    # exception below and use an 'if-else' clause inside the function
     # body to handle the different activity cases properly.
     @acl_decorators.can_access_learner_dashboard
     def delete(self, activity_type: str, topic_id: str) -> None:  # pylint: disable=unused-argument
