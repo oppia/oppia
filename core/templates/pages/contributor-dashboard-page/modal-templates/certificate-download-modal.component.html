@@ -25,10 +25,7 @@
     </div>
   </div>
   <div *ngIf="certificateDownloadiing" class="certficate-generation-await">
-    Please wait!<br>
-    The certificate is being generated for the contributions<br>
-    from {{fromDate}}<br>
-    to {{toDate}}!<br>
+    Generating certificate for time range {{fromDate}} to {{toDate}}. Please wait.
   </div>
 </div>
 <div class="oppia-translate-modal-footer modal-footer">
@@ -44,7 +41,7 @@
 </div>
 <style>
   .certficate-generation-await {
-    font-size: 26px;
+    font-size: 20px;
     text-align: center;
   }
   .date-range-error {

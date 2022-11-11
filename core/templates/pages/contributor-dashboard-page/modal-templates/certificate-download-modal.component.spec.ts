@@ -26,6 +26,7 @@ import { ContextService } from 'services/context.service';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { CertificateDownloadModalComponent } from './certificate-download-modal.component';
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
+import { AlertsService } from 'services/alerts.service';
 
 class MockChangeDetectorRef {
   detectChanges(): void {}
@@ -38,6 +39,7 @@ describe('Contributor Certificate Download Modal Component', () => {
   let component: CertificateDownloadModalComponent;
   let changeDetectorRef: MockChangeDetectorRef = new MockChangeDetectorRef();
   let contributionAndReviewService: ContributionAndReviewService;
+  let alertsService: AlertsService;
   const fileResponse: Blob = {
     size: 100,
     type: 'image/png',
@@ -58,6 +60,7 @@ describe('Contributor Certificate Download Modal Component', () => {
       ],
       providers: [
         NgbActiveModal,
+        AlertsService,
         {
           provide: ChangeDetectorRef,
           useValue: changeDetectorRef
@@ -80,6 +83,7 @@ describe('Contributor Certificate Download Modal Component', () => {
     httpTestingController = TestBed.inject(HttpTestingController);
     activeModal = TestBed.inject(NgbActiveModal);
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
+    alertsService = TestBed.inject(AlertsService);
     fixture.detectChanges();
   });
 
@@ -90,6 +94,7 @@ describe('Contributor Certificate Download Modal Component', () => {
       contributionAndReviewService,
       'downloadContributorCertificateAsync')
       .and.returnValue(Promise.resolve(fileResponse));
+    spyOn(alertsService, 'addInfoMessage').and.stub();
 
     component.downloadCertificate();
 
@@ -97,6 +102,8 @@ describe('Contributor Certificate Download Modal Component', () => {
     expect(
       contributionAndReviewService.downloadContributorCertificateAsync
     ).toHaveBeenCalled();
+    expect(alertsService.addSuccessMessage)
+      .toHaveBeenCalledWith('Generating certificate...', 5000);
   });
 
   it('should show errors when invalid', fakeAsync(() => {

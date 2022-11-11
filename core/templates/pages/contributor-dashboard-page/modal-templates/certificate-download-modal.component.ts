@@ -19,6 +19,7 @@
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AlertsService } from 'services/alerts.service';
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
 
 @Component({
@@ -35,6 +36,7 @@ export class CertificateDownloadModalComponent {
   errorsFound = false;
   certificateDownloadiing = false;
   constructor(
+    private alertsService: AlertsService,
     private readonly activeModal: NgbActiveModal,
     private api: ContributionAndReviewService) {
   }
@@ -60,6 +62,8 @@ export class CertificateDownloadModalComponent {
     }
     this.certificateDownloadiing = true;
     if (!this.errorsFound) {
+      this.alertsService.addInfoMessage(
+        'Generating certificate...', 5000);
       this.api.downloadContributorCertificateAsync(
         this.username,
         this.suggestionType,

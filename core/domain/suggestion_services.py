@@ -3020,6 +3020,7 @@ def _generate_translation_contributor_certificate(
     """
     minutes_per_sentence = 5
     signature = feconf.TRANSLATION_TEAM_LEAD
+    print(from_date)
 
     languages = list(filter(
         lambda lang: lang['id'] == language_code,
@@ -3054,7 +3055,9 @@ def _generate_translation_contributor_certificate(
                 get_html_representing_suggestion(suggestion))
 
             sentences = plain_text.split('.')
-            sentences_count += len(sentences) - 1
+            sentences_without_empty_strings = [
+                sentence for sentence in sentences if sentence != '']
+            sentences_count += len(sentences_without_empty_strings)
     hours_contributed = round(
         ((sentences_count * minutes_per_sentence) / 60), 2)
 
@@ -3106,8 +3109,8 @@ def _generate_translation_contributor_certificate(
         <br><br> 
         This certificate confirms that """ + username + """ has contributed 
         """ + str(hours_contributed) + """ hours’ worth of translations
-        from """ + from_date.strftime('%m-%Y') + """ to 
-        """ + to_date.strftime('%m-%Y') + """ </p> </div> 
+        from """ + from_date.strftime('%d-%m-%Y') + """ to 
+        """ + to_date.strftime('%d-%m-%Y') + """ </p> </div> 
         <div style="display:block; position: absolute; top: 80%; 
         left: 50%; transform: translate(-50%, -50%); width: 100%;">
         <div class="signature" style="width: 50%; float:left; 
@@ -3231,8 +3234,8 @@ def _generate_question_contributor_certificate(
         <br><br> 
         We confirm that  """ + username + """ has contributed 
         """ + str(hours_contributed) + """ hours’ to Oppia
-        from """ + from_date.strftime('%m-%Y') + """ to 
-        """ + to_date.strftime('%m-%Y') + """ </p> </div> 
+        from """ + from_date.strftime('%d-%m-%Y') + """ to 
+        """ + to_date.strftime('%d-%m-%Y') + """ </p> </div> 
         <div style="display:block; position: absolute; top: 80%; 
         left: 50%; transform: translate(-50%, -50%); width: 100%;">
         <div class="signature" style="width: 50%; float:left; 
