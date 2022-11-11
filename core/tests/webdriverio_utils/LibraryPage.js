@@ -33,7 +33,9 @@ var LibraryPage = function() {
   var explorationObjective = $('.e2e-test-exp-summary-tile-objective');
   var expHoverElement = $('.e2e-test-exploration-dashboard-card');
   var expSummaryTileTitleLocator = '.e2e-test-exp-summary-tile-title';
+  var homeSection = $('.e2e-test-home-section');
   var mainHeader = $('.e2e-test-library-main-header');
+  var oppiaLogo = $('.e2e-test-oppia-main-logo');
   var searchButton = $('.e2e-test-search-button');
   var searchInputElement = $('.e2e-test-search-input');
   var searchInputsSelector = function() {
@@ -99,6 +101,12 @@ var LibraryPage = function() {
   this.get = async function() {
     await browser.url(LIBRARY_URL_SUFFIX);
     await waitFor.pageToFullyLoad();
+  };
+
+  this.getHomePage = async function() {
+    await action.click('Oppia logo', oppiaLogo);
+    await waitFor.textToBePresentInElement(
+      homeSection, 'Home', 'Library page takes too long to load');
   };
 
   this.addSelectedExplorationToPlaylist = async function() {
