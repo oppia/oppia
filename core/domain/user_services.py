@@ -1739,7 +1739,7 @@ def update_email_preferences(
     if not bulk_email_db_already_updated and feconf.CAN_SEND_EMAILS:
         user_creation_successful = (
             bulk_email_services.add_or_update_user_status(
-                email, {}, 'Web',
+                email, {}, 'Account',
                 can_receive_email_updates=can_receive_email_updates))
         if not user_creation_successful:
             email_preferences_model.site_updates = False
