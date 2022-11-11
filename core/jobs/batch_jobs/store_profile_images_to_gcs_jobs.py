@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import webptools
 
+from core import utils
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.io import gcs_io
@@ -44,10 +45,11 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
         file_dict = {}
         username = user_model.username
         filename = f'user/{username}/profile_picture.png'
-        profile_picture = user_model.profile_picture_data_url
+        profile_picture_binary = utils.convert_png_data_url_to_binary(
+            user_model.profile_picture_data_url)
         file_dict = {
             'file': filename,
-            'data': profile_picture
+            'data': profile_picture_binary
         }
         return file_dict
 
@@ -60,9 +62,10 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
         webp_base64 = webptools.base64str2webp_base64str(
             base64str=profile_picture, image_type="png",
             option="-q 80",logging="-v")
+        webp_binary = utils.convert_webp_data_url_to_binary(webp_base64)
         file_dict = {
             'file': filename,
-            'data': webp_base64
+            'data': webp_binary
         }
         return file_dict
 
@@ -78,12 +81,56 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
         write_png_files_to_gcs = (
             users_with_valid_username
             | 'Map files for png' >> beam.Map(self._filenames_png)
-            | 'Write png file to GCS' >> gcs_io.WriteFile(mime_type='image/png')
+            | 'Write png file to GCS' >> gcs_io.WriteFile(
+                mode='wb', mime_type='image/png')
+        )
+
+        total_png_images = (
+            write_png_files_to_gcs
+            | 'Total png images wrote to GCS' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL PNG IMAGES'))
         )
 
         write_webp_files_to_gcs = (
             users_with_valid_username
             | 'Map files for webp' >> beam.Map(self._filenames_webp)
             | 'Write webp file to GCS' >> gcs_io.WriteFile(
-                mime_type='image/webp')
+                mode='wb', mime_type='image/webp')
+        )
+
+        total_webp_images = (
+            write_webp_files_to_gcs
+            | 'Total webp images wrote to GCS' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL WEBP IMAGES'))
+        )
+
+        return (
+            (
+                total_png_images,
+                total_webp_images
+            )
+            | 'Combine results' >> beam.Flatten()
+        )
+
+
+class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
+    """Audit profile pictures are present in GCS."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        users_with_valid_username = (
+            self.pipeline
+            | 'Get all non-deleted UserSettingsModel' >> ndb_io.GetModels(
+                user_models.UserSettingsModel.get_all(include_deleted=False))
+            | 'Filter valid users with not None username' >> beam.Filter(
+                lambda model: model.username is not None)
+        )
+
+        audit_png_profile_pictures = (
+            users_with_valid_username
+            | 'Map with username' >> beam.Map(lambda model: model.username)
+            | 'Map with filename' >> beam.Map(
+                lambda username: f'user/{username}/profile_picture.png')
+            | 'Read png files from GCS' >> gcs_io.ReadFile(mode='rb')
         )

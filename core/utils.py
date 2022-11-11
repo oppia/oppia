@@ -48,6 +48,7 @@ from typing import ( # isort:skip
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
 PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
+WEBP_DATA_URL_PREFIX = 'data:image/webp;base64,'
 SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 
@@ -414,6 +415,27 @@ def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
         return base64.b64decode(
             urllib.parse.unquote(
                 image_data_url[len(PNG_DATA_URL_PREFIX):]))
+    else:
+        raise Exception('The given string does not represent a PNG data URL.')
+
+
+def convert_webp_data_url_to_binary(image_data_url: str) -> bytes:
+    """Converts a webp base64 data URL to a webp binary data.
+
+    Args:
+        image_data_url: str. A string that is to be interpreted as a webp
+            data URL.
+
+    Returns:
+        bytes. Binary content of the webp created from the data URL.
+
+    Raises:
+        Exception. The given string does not represent a webp data URL.
+    """
+    if image_data_url.startswith(WEBP_DATA_URL_PREFIX):
+        return base64.b64decode(
+            urllib.parse.unquote(
+                image_data_url[len(WEBP_DATA_URL_PREFIX):]))
     else:
         raise Exception('The given string does not represent a PNG data URL.')
 
