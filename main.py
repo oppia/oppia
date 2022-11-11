@@ -134,9 +134,11 @@ class FrontendErrorHandler(
     REQUIRE_PAYLOAD_CSRF_CHECK = False
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
-        'error': {
-            'schema': {
-                'type': 'basestring'
+        'POST': {
+            'error': {
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
     }
