@@ -35,7 +35,7 @@ import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.com
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
-describe('HintAndSolutionButtonsComponent', () => {
+fdescribe('HintAndSolutionButtonsComponent', () => {
   let component: HintAndSolutionButtonsComponent;
   let fixture: ComponentFixture<HintAndSolutionButtonsComponent>;
   let playerPositionService: PlayerPositionService;
@@ -412,6 +412,15 @@ describe('HintAndSolutionButtonsComponent', () => {
     expect(component.solutionModalIsActive).toBe(false);
     expect(component.displaySolutionModal).not.toHaveBeenCalled();
   }));
+
+  it('should show \'Would you like to view the complete solution?' +
+    ' \' tooltip', () => {
+    spyOn(hintsAndSolutionManagerService, 'isSolutionTooltipOpen')
+      .and.returnValues(true, false);
+
+    expect(component.isSolutionTooltipVisible()).toBe(true);
+    expect(component.isSolutionTooltipVisible()).toBe(false);
+  });
 
   it('should show \'Need help? View a hint for this' +
     ' problem!\' tooltip', () => {
