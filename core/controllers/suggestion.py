@@ -34,6 +34,29 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_services
 
+SCHEMA_FOR_SUBTITLED_HTML_DICT = {
+    'type': 'dict',
+    'properties': [{
+        'name': 'content_id',
+        'schema': {
+            'type': 'basestring'
+        }
+    }, {
+        'name': 'html',
+        'schema': {
+            'type': 'basestring'
+        }
+    }]
+}
+
+SCHEMA_FOR_TARGET_ID = {
+    'type': 'basestring',
+    'validators': [{
+        'id': 'is_regex_matched',
+        'regex_pattern': constants.ENTITY_ID_REGEX
+    }]
+}
+
 
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to suggestions."""
@@ -143,6 +166,50 @@ class SuggestionHandler(base.BaseHandler):
 class SuggestionToExplorationActionHandler(base.BaseHandler):
     """Handles actions performed on suggestions to explorations."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'target_id': {
+            'schema': SCHEMA_FOR_TARGET_ID
+        },
+        'suggestion_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'action': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        constants.ACTION_ACCEPT_SUGGESTION,
+                        constants.ACTION_REJECT_SUGGESTION
+                    ]
+                }
+            },
+            'commit_message': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH
+                    }]
+                },
+                'default_value': None
+            },
+            'review_message': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_REVIEW_MESSAGE_LENGTH
+                    }]
+                }
+            }
+        }
+    }
+
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration)
     def put(self, target_id, suggestion_id):
@@ -164,7 +231,7 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
                 'The exploration id provided does not match the exploration id '
                 'present as part of the suggestion_id')
 
-        action = self.payload.get('action')
+        action = self.normalized_payload.get('action')
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if suggestion.author_id == self.user_id:
@@ -172,26 +239,78 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
                 'You cannot accept/reject your own suggestion.')
 
         if action == constants.ACTION_ACCEPT_SUGGESTION:
-            commit_message = self.payload.get('commit_message')
-            if (commit_message is not None and
-                    len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
-                raise self.InvalidInputException(
-                    'Commit messages must be at most %s characters long.'
-                    % constants.MAX_COMMIT_MESSAGE_LENGTH)
+            commit_message = self.normalized_payload.get('commit_message')
             suggestion_services.accept_suggestion(
-                suggestion_id, self.user_id, self.payload.get('commit_message'),
-                self.payload.get('review_message'))
-        elif action == constants.ACTION_REJECT_SUGGESTION:
-            suggestion_services.reject_suggestion(
-                suggestion_id, self.user_id, self.payload.get('review_message'))
+                suggestion_id, self.user_id, commit_message,
+                self.normalized_payload.get('review_message')
+            )
         else:
-            raise self.InvalidInputException('Invalid action.')
+            assert action == constants.ACTION_REJECT_SUGGESTION
+            suggestion_services.reject_suggestion(
+                suggestion_id, self.user_id,
+                self.normalized_payload.get('review_message')
+            )
 
         self.render_json(self.values)
 
 
 class ResubmitSuggestionHandler(base.BaseHandler):
     """Handler to reopen a rejected suggestion."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'suggestion_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'action': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': ['resubmit']
+                }
+            },
+            'change': {
+                'schema': {
+                    'type': 'dict',
+                    'properties': [{
+                        'name': 'cmd',
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    }, {
+                        'name': 'property_name',
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    }, {
+                        'name': 'state_name',
+                        'schema': {
+                            'type': 'basestring',
+                            'validators': [{
+                                'id': 'has_length_at_most',
+                                'max_value': constants.MAX_STATE_NAME_LENGTH
+                            }]
+                        }
+                    }, {
+                        'name': 'new_value',
+                        'schema': SCHEMA_FOR_SUBTITLED_HTML_DICT
+                    }, {
+                        'name': 'old_value',
+                        'schema': SCHEMA_FOR_SUBTITLED_HTML_DICT
+                    }]
+                }
+            },
+            'summary_message': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_resubmit_suggestion
     def put(self, suggestion_id):
@@ -201,10 +320,10 @@ class ResubmitSuggestionHandler(base.BaseHandler):
             suggestion_id: str. The ID of the suggestion.
         """
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        new_change = self.payload.get('change')
+        new_change = self.normalized_payload.get('change')
         change_cls = type(suggestion.change)
         change_object = change_cls(new_change)
-        summary_message = self.payload.get('summary_message')
+        summary_message = self.normalized_payload.get('summary_message')
         suggestion_services.resubmit_rejected_suggestion(
             suggestion_id, summary_message, self.user_id, change_object)
         self.render_json(self.values)
@@ -212,6 +331,46 @@ class ResubmitSuggestionHandler(base.BaseHandler):
 
 class SuggestionToSkillActionHandler(base.BaseHandler):
     """Handles actions performed on suggestions to skills."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'target_id': {
+            'schema': SCHEMA_FOR_TARGET_ID
+        },
+        'suggestion_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'action': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        constants.ACTION_ACCEPT_SUGGESTION,
+                        constants.ACTION_REJECT_SUGGESTION
+                    ]
+                }
+            },
+            'review_message': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_REVIEW_MESSAGE_LENGTH
+                    }]
+                }
+            },
+            'skill_difficulty': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_skill)
@@ -231,13 +390,13 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
                 'The skill id provided does not match the skill id present as '
                 'part of the suggestion_id')
 
-        action = self.payload.get('action')
+        action = self.normalized_payload.get('action')
 
         if action == constants.ACTION_ACCEPT_SUGGESTION:
             # Question suggestions do not use commit messages.
             suggestion_services.accept_suggestion(
                 suggestion_id, self.user_id, 'UNUSED_COMMIT_MESSAGE',
-                self.payload.get('review_message'))
+                self.normalized_payload.get('review_message'))
 
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
             target_entity_html_list = (
@@ -250,11 +409,12 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
                 suggestion.target_type, suggestion.target_id,
                 feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, suggestion.target_id,
                 target_image_filenames)
-        elif action == constants.ACTION_REJECT_SUGGESTION:
-            suggestion_services.reject_suggestion(
-                suggestion_id, self.user_id, self.payload.get('review_message'))
         else:
-            raise self.InvalidInputException('Invalid action.')
+            assert action == constants.ACTION_REJECT_SUGGESTION
+            suggestion_services.reject_suggestion(
+                suggestion_id, self.user_id,
+                self.normalized_payload.get('review_message')
+            )
 
         self.render_json(self.values)
 
@@ -263,6 +423,8 @@ class SuggestionsProviderHandler(base.BaseHandler):
     """Provides suggestions for a user and given suggestion type."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {}
 
     def _require_valid_suggestion_and_target_types(
             self, target_type, suggestion_type):
@@ -413,7 +575,6 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
             'choices': feconf.SUGGESTION_TYPE_CHOICES
         }
     }
-
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'limit': {
@@ -480,6 +641,38 @@ class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'suggestion_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.SUGGESTION_TYPE_CHOICES
+                },
+                'default_value': None
+            },
+            'target_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
+                },
+                'default_value': None
+            },
+            'target_id': {
+                'schema': SCHEMA_FOR_TARGET_ID,
+                'default_value': None
+            },
+            'author_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_user_id'
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -491,12 +684,6 @@ class SuggestionListHandler(base.BaseHandler):
         # format. So in the url, the query should be passed as:
         # ?field1=value1&field2=value2...fieldN=valueN.
         query_fields_and_values = list(self.request.GET.items())
-
-        for query in query_fields_and_values:
-            if query[0] not in feconf.ALLOWED_SUGGESTION_QUERY_FIELDS:
-                raise self.InvalidInputException(
-                    'Not allowed to query on field %s' % query[0])
-
         suggestions = suggestion_services.query_suggestions(
             query_fields_and_values)
 
@@ -506,6 +693,25 @@ class SuggestionListHandler(base.BaseHandler):
 
 class UpdateTranslationSuggestionHandler(base.BaseHandler):
     """Handles update operations relating to translation suggestions."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'suggestion_id': {
+            'schema': {
+                'type': 'basestring',
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'translation_html': {
+                'schema': {
+                    'type': 'weak_multiple',
+                    'options': ['basestring', 'list']
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_update_suggestion
     def put(self, suggestion_id):
@@ -524,28 +730,40 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
                 % (suggestion_id)
             )
 
-        if self.payload.get('translation_html') is None:
-            raise self.InvalidInputException(
-                'The parameter \'translation_html\' is missing.'
-            )
-
-        if (
-                not isinstance(self.payload.get('translation_html'), str)
-                and not isinstance(self.payload.get('translation_html'), list)
-        ):
-            raise self.InvalidInputException(
-                'The parameter \'translation_html\' should be a string or a' +
-                ' list.'
-            )
-
         suggestion_services.update_translation_suggestion(
-            suggestion_id, self.payload.get('translation_html'))
+            suggestion_id, self.normalized_payload.get('translation_html'))
 
         self.render_json(self.values)
 
 
 class UpdateQuestionSuggestionHandler(base.BaseHandler):
     """Handles update operations relating to question suggestions."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'suggestion_id': {
+            'schema': {
+                'type': 'basestring',
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'skill_difficulty': {
+                'schema': {
+                    'type': 'float'
+                }
+            },
+            'question_state_data': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.validate_state_dict
+                    )
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_update_suggestion
     def post(self, suggestion_id):
@@ -567,29 +785,10 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
                 % suggestion_id
             )
 
-        if self.payload.get('skill_difficulty') is None:
-            raise self.InvalidInputException(
-                'The parameter \'skill_difficulty\' is missing.'
-            )
-
-        if not isinstance(self.payload.get('skill_difficulty'), (float, int)):
-            raise self.InvalidInputException(
-                'The parameter \'skill_difficulty\' should be a decimal.'
-            )
-
-        if self.payload.get('question_state_data') is None:
-            raise self.InvalidInputException(
-                'The parameter \'question_state_data\' is missing.'
-            )
-
-        question_state_data_obj = state_domain.State.from_dict(
-            self.payload.get('question_state_data'))
-        question_state_data_obj.validate(None, False)
-
         suggestion_services.update_question_suggestion(
             suggestion_id,
-            self.payload.get('skill_difficulty'),
-            self.payload.get('question_state_data'))
+            self.normalized_payload.get('skill_difficulty'),
+            self.normalized_payload.get('question_state_data'))
 
         self.render_json(self.values)
 

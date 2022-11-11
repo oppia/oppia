@@ -388,8 +388,11 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             {'action': 'invalid_action'}, csrf_token=csrf_token,
             expected_status_int=400)
 
-        self.assertEqual(
-            response['error'], 'Invalid action.')
+        self.assertIn(
+            'Received invalid_action which is not in the allowed '
+            'range of choices',
+            response['error']
+        )
 
         self.logout()
 
@@ -446,9 +449,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     u'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1),
                 'review_message': u'Accepted'
             }, csrf_token=csrf_token, expected_status_int=400)
-        self.assertEqual(
-            response['error'],
-            'Commit messages must be at most 375 characters long.'
+        self.assertIn(
+            'Schema validation for \'commit_message\' failed: Validation '
+            'failed: has_length_at_most',
+            response['error']
         )
 
     def test_accept_suggestion(self):
@@ -588,9 +592,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             '%s?invalid_query_field=value' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX), expected_status_int=400)
 
-        self.assertEqual(
-            response['error'],
-            'Not allowed to query on field invalid_query_field')
+        self.assertIn(
+            'Found extra args: [\'invalid_query_field\']', response['error']
+        )
 
     def test_suggestion_list_handler(self):
         suggestions = self.get_json(
@@ -607,8 +611,15 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         response = self.put_json(
             '%s/resubmit/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX, 'invalid_suggestion_id'), {
-                    'action': u'reject',
-                    'review_message': u'Rejected!'
+                    'summary_message': 'summary message',
+                    'action': u'resubmit',
+                    'change': {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'State 1',
+                        'new_value': self.resubmit_change_content,
+                        'old_value': self.old_content
+                    }
                 }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -906,7 +917,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             expected_status_int=400)
         self.assertEqual(
             response['error'],
-            'The parameter \'translation_html\' is missing.')
+            'Missing key in handler args: translation_html.')
         self.logout()
 
     def test_cannot_update_translation_with_invalid_translation_html(self):
@@ -934,9 +945,11 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 },
             csrf_token=csrf_token,
             expected_status_int=400)
-        self.assertEqual(
-            response['error'],
-            'The parameter \'translation_html\' should be a string or a list.')
+        self.assertIn(
+            'Schema validation for \'translation_html\' failed: Type of '
+            '12 is not present in options',
+            response['error']
+        )
         self.logout()
 
     def test_update_suggestion_updates_question_suggestion_content(self):
@@ -981,12 +994,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb',
-            encoding=None
-        ) as f:
-            raw_image = f.read()
 
         self.post_json(
             '%s/%s' % (
@@ -996,8 +1003,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'question_state_data': question_state_data,
                 'skill_difficulty': 0.6
             },
-            csrf_token=csrf_token,
-            upload_files=(('img.png', 'img.png', raw_image),)
+            csrf_token=csrf_token
         )
 
         updated_suggestion = suggestion_services.get_suggestion_by_id(
@@ -1063,15 +1069,17 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             ),
             {
                 'question_state_data': question_state_data,
-                'skill_difficulty': '0.6'
+                'skill_difficulty': 'string_value'
             },
             csrf_token=csrf_token,
             expected_status_int=400
         )
 
-        self.assertEqual(
-            response['error'],
-            'The parameter \'skill_difficulty\' should be a decimal.')
+        self.assertIn(
+            'Schema validation for \'skill_difficulty\' failed: Could '
+            'not convert str to float',
+            response['error']
+        )
         self.logout()
 
     def test_cannot_update_question_without_state_data(self):
@@ -1126,7 +1134,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'The parameter \'question_state_data\' is missing.')
+            'Missing key in handler args: question_state_data.'
+        )
         self.logout()
 
     def test_cannot_update_question_without_skill_difficulty(self):
@@ -1181,7 +1190,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(
-            response['error'], 'The parameter \'skill_difficulty\' is missing.')
+            response['error'],
+            'Missing key in handler args: skill_difficulty.'
+        )
+
         self.logout()
 
     def test_cannot_update_already_handled_question(self):
@@ -1534,9 +1546,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 suggestion_to_accept['target_id'],
                 suggestion_to_accept['suggestion_id']), {
                     'action': u'accept',
-                    'commit_message': u'commit message',
                     'review_message': u'This looks good!',
-                    'skill_id': self.SKILL_ID
                 }, csrf_token=csrf_token)
 
         suggestion_post_accept = self.get_json(
@@ -1719,9 +1729,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 suggestion.target_id,
                 suggestion.suggestion_id), {
                     'action': u'accept',
-                    'commit_message': u'commit message',
                     'review_message': u'This looks good!',
-                    'skill_id': skill_id
                 }, csrf_token=csrf_token)
 
         self.logout()
@@ -1991,8 +1999,11 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                 {'action': 'invalid_action'}, csrf_token=csrf_token,
                 expected_status_int=400)
 
-        self.assertEqual(
-            response['error'], 'Invalid action.')
+        self.assertIn(
+            'Received invalid_action which is not in the allowed range '
+            'of choices',
+            response['error']
+        )
         self.logout()
 
     def test_reject_suggestion_to_skill(self):
@@ -2044,9 +2055,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                 suggestion_to_accept['target_id'],
                 suggestion_to_accept['suggestion_id']), {
                     'action': u'accept',
-                    'commit_message': u'commit message',
                     'review_message': u'Accepted!',
-                    'skill_id': self.skill_id
                 }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -2076,9 +2085,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                 suggestion_to_accept['target_id'],
                 suggestion_to_accept['suggestion_id']), {
                     'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'Accepted!',
-                    'skill_id': self.skill_id
+                    'review_message': u'Accepted!'
                 }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
