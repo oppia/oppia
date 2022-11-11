@@ -975,6 +975,8 @@ class CsrfTokenHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     REDIRECT_UNFINISHED_SIGNUPS = False
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     # Here we use MyPy ignore because the signature of 'get' method is not
     # compatible with super class's (BaseHandler) 'get' method.
@@ -991,6 +993,10 @@ class OppiaMLVMHandler(
 ):
     """Base class for the handlers that communicate with Oppia-ML VM instances.
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {}
 
     @abc.abstractmethod
     def extract_request_message_vm_id_and_signature(

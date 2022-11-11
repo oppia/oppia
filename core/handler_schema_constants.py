@@ -31,24 +31,13 @@ from __future__ import annotations
 HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'AudioUploadHandler',
     'DeferredTasksHandler',
-    'DeleteAccountPage',
     'EditableStoryDataHandler',
     'FeedbackThreadStatusChangeEmailHandler',
     'FlagExplorationEmailHandler',
-    'IncomingReplyEmailHandler',
     'InstantFeedbackMessageEmailHandler',
-    'MemoryCacheAdminHandler',
     'MergeSkillHandler',
     'NewTopicHandler',
-    'NotificationHandler',
-    'NotificationsDashboardHandler',
-    'NotificationsDashboardPage',
-    'NotificationsHandler',
-    'OldNotificationsDashboardRedirectPage',
-    'PendingAccountDeletionPage',
-    'PreferenceHandler',
     'PreferencesHandler',
-    'ProfilePage',
     'QuestionCreationHandler',
     'ResubmitSuggestionHandler',
     'StartedTranslationTutorialEventHandler',
@@ -64,10 +53,7 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'UpdateTranslationSuggestionHandler',
     'ValidateExplorationsHandler',
     'VoiceArtistManagementHandler',
-    'OppiaMLVMHandler',
-    'CsrfTokenHandler',
-    'Error404Handler',
-    'FrontendErrorHandler',
+    'Error404Handler'
 ]
 
 # These handlers do not require any schema validation.
