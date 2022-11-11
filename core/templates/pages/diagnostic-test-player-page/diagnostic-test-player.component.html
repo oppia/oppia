@@ -52,7 +52,10 @@
             </oppia-topic-summary-tile>
             <div class="start-button">
               <button class="btn start-topic-button">
-                {{getTopicButtonText(topicSummary.getName())}}
+                <a class="oppia-anchor-tag-under-button"
+                   [href]="getTopicUrlFromUrlFragment(topicSummary.getUrlFragment())">
+                  {{getTopicButtonText(topicSummary.getName())}}
+                </a>
               </button>
             </div>
           </div>
@@ -62,7 +65,9 @@
       <div *ngIf="recommendedTopicSummaries.length === 0">
         <div class="oppia-no-recommendation-header">
           <div class="oppia-result-page-image">
-            <img class="oppia-otter-image" [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
+            <img class="oppia-otter-image"
+                 [src]="OPPIA_AVATAR_IMAGE_URL"
+                 alt="Oppia avatar image">
           </div>
           <h3 class="oppia-no-recommendation-header-text">
             Test complete. Well done!
@@ -76,7 +81,9 @@
         </p>
         <div class="classroom-button-container">
           <button class="btn oppia-goto-classroom-button">
-            Go to classroom
+            <a class="oppia-anchor-tag-under-button" href="/learn/math">
+              Go to classroom
+            </a>
           </button>
         </div>
       </div>
@@ -85,6 +92,10 @@
 </div>
 
 <style>
+  .oppia-anchor-tag-under-button {
+    color: white;
+    text-decoration: none;
+  }
   .oppia-question-player-card {
     background: #fff;
     border-radius: 4px;

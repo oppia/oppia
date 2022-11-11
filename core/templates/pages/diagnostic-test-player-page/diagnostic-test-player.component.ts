@@ -37,9 +37,8 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   diagnosticTestIsStarted: boolean = false;
   diagnosticTestIsFinished = false;
   classroomUrlFragment: string = 'math';
-  classroomId: string = 'bQLCpXYaCCPc';
-  recommendedTopicSummaries!: CreatorTopicSummary[];
-  recommendedTopicIds: string[] = ['dyeMiEAvJOIU', 'N8yf4a0YUJqD'];
+  recommendedTopicSummaries: CreatorTopicSummary[] = [];
+  recommendedTopicIds: string[] = [];
   progressPercentage: number = 0;
 
   componentSubscription = new Subscription();
@@ -99,6 +98,10 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
   getTopicButtonText(topicName: string): string {
     return 'Start ' + topicName;
+  }
+
+  getTopicUrlFromUrlFragment(urlFragment: string): string {
+    return '/learn/math/' + urlFragment;
   }
 }
 
