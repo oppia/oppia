@@ -3881,8 +3881,8 @@ def can_access_subtopic_viewer_page(
 
 
 def get_decorator_for_accepting_suggestion(
-    decorator: Callable[..., Callable[..., _GenericHandlerFunctionReturnType]]
-) -> Callable[..., Callable[..., _GenericHandlerFunctionReturnType]]:
+    decorator: Callable[[Callable[..., None]], Callable[..., None]]
+) -> Callable[[Callable[..., None]], Callable[..., None]]:
     """Function that takes a decorator as an argument and then applies some
     common checks and then checks the permissions specified by the passed in
     decorator.
@@ -3901,8 +3901,8 @@ def get_decorator_for_accepting_suggestion(
             accept/reject suggestions for that entity.
     """
     def generate_decorator_for_handler(
-        handler: Callable[..., _GenericHandlerFunctionReturnType]
-    ) -> Callable[..., _GenericHandlerFunctionReturnType]:
+        handler: Callable[..., None]
+    ) -> Callable[..., None]:
         """Function that generates a decorator for a given handler.
 
         Args:
@@ -3924,7 +3924,7 @@ def get_decorator_for_accepting_suggestion(
             target_id: str,
             suggestion_id: str,
             **kwargs: Any
-        ) -> _GenericHandlerFunctionReturnType:
+        ) -> None:
             """Returns a (possibly-decorated) handler to test whether a
             suggestion can be accepted based on the user actions and roles.
 

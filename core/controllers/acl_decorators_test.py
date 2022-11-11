@@ -3530,10 +3530,8 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         }
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        # Here we use MyPy ignore because the signature of 'get' method does not
-        # match with the signature of super class's (BaseHandler) 'get' method.
         @acl_decorators.get_decorator_for_accepting_suggestion(
-            acl_decorators.open_access)  # type: ignore[override]
+            acl_decorators.open_access)
         def get(self, target_id: str, suggestion_id: str) -> None:
             self.render_json({
                 'target_id': target_id,
