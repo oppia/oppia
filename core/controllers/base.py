@@ -995,8 +995,14 @@ class OppiaMLVMHandler(
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {}
+    # Here we use type Any because the sub-classes of OppiaMLVMHandler ca
+    # contain different schemas with different types of values, like str,
+    # complex Dicts and etc.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    # Here we use type Any because the sub-classes of OppiaMLVMHandler ca
+    # contain different schemas with different types of values, like str,
+    # complex Dicts and etc.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {}
 
     @abc.abstractmethod
     def extract_request_message_vm_id_and_signature(

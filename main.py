@@ -144,6 +144,7 @@ class FrontendErrorHandler(
     @acl_decorators.open_access
     def post(self) -> None:
         """Records errors reported by the frontend."""
+        assert self.normalized_payload is not None
         logging.error(
             'Frontend error: %s' % self.normalized_payload.get('error')
         )
