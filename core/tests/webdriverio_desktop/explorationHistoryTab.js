@@ -291,7 +291,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       14: {
-        text: '        dest_if_really_stuck: first',
+        text: '        dest_if_really_stuck: null',
         highlighted: true
       },
       15: {
