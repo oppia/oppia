@@ -400,7 +400,10 @@ def check_test_results(
                     # There was an internal error, and the tests did not run
                     # (The error message did not match
                     # `tests_failed_regex_match`).
-                    raise Exception
+                    raise Exception(
+                        'The error message did not match '
+                        'tests_failed_regex_match'
+                    )
                 test_count = int(tests_failed_regex_match.group(1))
                 errors = int(tests_failed_regex_match.group(2))
                 failures = int(tests_failed_regex_match.group(3))
@@ -428,7 +431,9 @@ def check_test_results(
                     # There was an error, and the tests did not run
                     # (The error message did not match
                     # `tests_run_regex_match`).
-                    raise Exception
+                    raise Exception(
+                        'The error message did not match tests_run_regex_match'
+                    )
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
                 print(

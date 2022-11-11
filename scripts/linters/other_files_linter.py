@@ -29,7 +29,6 @@ from typing import Any, Dict, Final, List, Tuple, TypedDict
 import yaml
 
 from . import linter_utils
-
 from .. import concurrent_task_utils
 
 MYPY = False

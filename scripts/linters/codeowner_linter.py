@@ -25,7 +25,6 @@ import subprocess
 from typing import Final, Iterator, List, Tuple
 
 from . import linter_utils
-
 from .. import concurrent_task_utils
 
 MYPY = False

@@ -26,7 +26,6 @@ import subprocess
 from typing import Dict, List, Optional, Tuple
 
 from . import linter_utils
-
 from .. import common
 from .. import concurrent_task_utils
 

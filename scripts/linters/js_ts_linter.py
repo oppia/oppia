@@ -29,7 +29,6 @@ import esprima
 from typing import Dict, Final, List, Tuple, Union
 
 from . import linter_utils
-
 from .. import common
 from .. import concurrent_task_utils
 

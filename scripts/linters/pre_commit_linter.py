@@ -63,7 +63,7 @@ import subprocess
 import sys
 import threading
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
@@ -82,7 +82,6 @@ from . import other_files_linter  # isort:skip
 from . import python_linter  # isort:skip
 from .. import concurrent_task_utils  # isort:skip
 from .. import install_third_party_libs  # isort:skip
-
 
 OTHER_SHARD_NAME = 'other'
 
@@ -307,7 +306,7 @@ def _get_all_files_in_directory(
     return files_in_directory
 
 
-def _get_file_extensions(file_extensions_to_lint: List[str]) -> List[str]:
+def _get_file_extensions(file_extensions_to_lint: List[str]) -> Set[str]:
     """This function is used to return the file extensions which need to be
     linted and checked.
 
@@ -319,7 +318,7 @@ def _get_file_extensions(file_extensions_to_lint: List[str]) -> List[str]:
         list(str). The list of all file extensions
         to be linted and checked.
     """
-    all_file_extensions_type = ['js', 'py', 'html', 'css', 'other']
+    all_file_extensions_type = {'js', 'py', 'html', 'css', 'other'}
 
     if file_extensions_to_lint:
         # Check if 'js' and 'ts' both are present in file_extensions_to_lint.
@@ -334,7 +333,7 @@ def _get_file_extensions(file_extensions_to_lint: List[str]) -> List[str]:
             print('Exiting...')
             sys.exit(1)
 
-        return list(set(file_extensions_to_lint))
+        return set(file_extensions_to_lint)
 
     return all_file_extensions_type
 
@@ -626,7 +625,8 @@ def main(args: Optional[List[str]] = None) -> None:
     parsed_args = _PARSER.parse_args(args=args)
     # File extension to be linted.
     file_extension_types = _get_file_extensions(
-        parsed_args.only_check_file_extensions)
+        parsed_args.only_check_file_extensions
+    )
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
