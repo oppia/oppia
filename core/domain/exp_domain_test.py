@@ -2197,26 +2197,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
             'rule_specs': [
                 {
-                    'rule_type': 'HasElementXAtPositionY',
-                    'inputs': {
-                        'x': 'ca_choices_0',
-                        'y': 4
-                    }
-                },
-                {
-                    'rule_type': 'IsEqualToOrdering',
-                    'inputs': {
-                        'x': [
-                            [
-                            'ca_choices_0', 'ca_choices_1', 'ca_choices_2'
-                            ],
-                            [
-                            'ca_choices_3'
-                            ]
-                        ]
-                    }
-                },
-                {
                     'rule_type': (
                         'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
                     'inputs': {
@@ -2401,21 +2381,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
             state_domain.SubtitledHtml('ca_choices_2', '<p>3</p>')
         ]
-
-        self.state.interaction.customization_args[
-            'allowMultipleItemsInSamePosition'].value = True
-
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Rule - 1 of answer group 0 '
-            'does not have the enough position to match for the '
-            'HasElementXAtPositionY rule above.'
-        ):
-            self.new_exploration.validate(strict=True)
-        rule_specs.remove(rule_specs[0])
-        rule_specs.remove(rule_specs[0])
-
-        self.state.interaction.customization_args[
-            'allowMultipleItemsInSamePosition'].value = False
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'The rule \'0\' of answer group \'0\' '
@@ -9847,7 +9812,7 @@ states:
       solution:
         answer_is_exclusive: true
         correct_answer:
-          - <p>1</p>
+          - ca_choices_20
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
@@ -10010,7 +9975,7 @@ states:
       solution:
         answer_is_exclusive: true
         correct_answer:
-        - <p>1</p>
+        - ca_choices_20
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
@@ -10210,7 +10175,7 @@ states:
       solution:
         answer_is_exclusive: true
         correct_answer:
-          - <p>  </p>
+          - ca_choices_23
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
@@ -11049,11 +11014,6 @@ states:
             x: ca_choices_27
             y: 4
           rule_type: HasElementXAtPositionY
-        - inputs:
-            x:
-            - - ca_choices_29
-            - - ca_choices_28
-          rule_type: IsEqualToOrdering
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -11345,6 +11305,17 @@ states:
               - ca_choices_28
             - - ca_choices_26
           rule_type: IsEqualToOrdering
+        - inputs:
+            x: ca_choices_27
+            y: 4
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x:
+            - - ca_choices_29
+              - ca_choices_27
+              - ca_choices_28
+              - ca_choices_26
+          rule_type: IsEqualToOrdering
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -11474,6 +11445,17 @@ states:
             - - ca_choices_28
             - - ca_choices_29
           rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x: ca_choices_27
+            y: 4
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x:
+            - - ca_choices_29
+              - ca_choices_27
+              - ca_choices_28
+              - ca_choices_26
+          rule_type: IsEqualToOrdering
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
