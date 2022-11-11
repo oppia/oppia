@@ -4646,7 +4646,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             str. Returns the updated html value.
         """
-        soup = bs4.BeautifulSoup(html, 'html.parser')
+        soup = bs4.BeautifulSoup(
+            html.encode(encoding='utf-8'), 'html.parser',
+            exclude_encodings=['windows-1252'])
 
         for tag in soup.find_all('oppia-noninteractive-image'):
             if not tag.has_attr('alt-with-value'):
@@ -4808,7 +4810,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             str. Returns the updated html value.
         """
-        soup = bs4.BeautifulSoup(html, 'html.parser')
+        soup = bs4.BeautifulSoup(
+            html.encode(encoding='utf-8'), 'html.parser',
+            exclude_encodings=['windows-1252'])
         tabs_tags = soup.find_all('oppia-noninteractive-tabs')
         for tag in tabs_tags:
             if tag.has_attr('tab_contents-with-value'):
@@ -4890,7 +4894,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         html = cls._fix_rte_tags(
             html, is_tags_nested_inside_tabs_or_collapsible=False)
         html = cls._fix_tabs_and_collapsible_tags(html)
-        return html
+        return html.replace('\xa0', '&nbsp;')
 
     @classmethod
     def _update_state_rte(
