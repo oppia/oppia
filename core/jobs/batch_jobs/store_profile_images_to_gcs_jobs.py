@@ -18,10 +18,11 @@
 
 from __future__ import annotations
 
-from core import utils
-from core.domain import user_services
+import webptools
+
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
+from core.jobs.io import gcs_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
@@ -38,6 +39,32 @@ if MYPY:  # pragma: no cover
 
 class StoreProfilePictureToGCSJob(base_jobs.JobBase):
     """Store profile picture to GCS job."""
+    def _filenames_png(self, user_model):
+        """"""
+        file_dict = {}
+        username = user_model.username
+        filename = f'user/{username}/profile_picture.png'
+        profile_picture = user_model.profile_picture_data_url
+        file_dict = {
+            'file': filename,
+            'data': profile_picture
+        }
+        return file_dict
+
+    def _filenames_webp(self, user_model):
+        """"""
+        file_dict = {}
+        username = user_model.username
+        filename = f'user/{username}/profile_picture.webp'
+        profile_picture = user_model.profile_picture_data_url
+        webp_base64 = webptools.base64str2webp_base64str(
+            base64str=profile_picture, image_type="png",
+            option="-q 80",logging="-v")
+        file_dict = {
+            'file': filename,
+            'data': webp_base64
+        }
+        return file_dict
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         users_with_valid_username = (
@@ -50,7 +77,13 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
 
         write_png_files_to_gcs = (
             users_with_valid_username
-            | 'Map with username' >> beam.Map(lambda model: model.username)
-            | 'Map with filenames to write to GCS' >> beam.Map(
-                lambda value: f'user/{value}/profile_picture.png')
+            | 'Map files for png' >> beam.Map(self._filenames_png)
+            | 'Write png file to GCS' >> gcs_io.WriteFile(mime_type='image/png')
+        )
+
+        write_webp_files_to_gcs = (
+            users_with_valid_username
+            | 'Map files for webp' >> beam.Map(self._filenames_webp)
+            | 'Write webp file to GCS' >> gcs_io.WriteFile(
+                mime_type='image/webp')
         )
