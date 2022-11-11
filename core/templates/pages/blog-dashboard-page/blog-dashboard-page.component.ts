@@ -27,7 +27,8 @@ import { Subscription } from 'rxjs';
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-
+import { BlogAuthorDetailsEditorComponent } from './modal-templates/author-detail-editor-modal.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'oppia-blog-dashboard-page',
   templateUrl: './blog-dashboard-page.component.html'
@@ -37,6 +38,8 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   activeTab!: string;
+  authorName!: string;
+  authorBio!: string;
   authorProfilePictureUrl!: string;
   blogDashboardData!: BlogDashboardData;
   windowIsNarrow: boolean = false;
@@ -49,6 +52,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     private blogDashboardPageService: BlogDashboardPageService,
     private loaderService: LoaderService,
     private urlInterpolationService: UrlInterpolationService,
+    private ngbModal: NgbModal,
     private windowDimensionService: WindowDimensionsService,
   ) {}
 
@@ -86,10 +90,15 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     this.blogDashboardBackendService.fetchBlogDashboardDataAsync().then(
       (dashboardData) => {
         this.blogDashboardData = dashboardData;
+        this.authorName = dashboardData.displayedAuthorName;
+        this.authorBio = dashboardData.authorBio;
         this.authorProfilePictureUrl = decodeURIComponent((
           // eslint-disable-next-line max-len
           dashboardData.profilePictureDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
         this.loaderService.hideLoadingScreen();
+        if (this.authorBio.length === 0) {
+          this.showAuthorDetailsEditor();
+        }
       }, (errorResponse) => {
         if (
           AppConstants.FATAL_ERROR_CODES.indexOf(
@@ -138,6 +147,37 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     if (index > -1) {
       summaryDicts.splice(index, 1);
     }
+  }
+
+  showAuthorDetailsEditor(): void {
+    let modelRef = this.ngbModal.open(BlogAuthorDetailsEditorComponent, {
+      backdrop: 'static',
+      keyboard: false,
+    });
+    modelRef.componentInstance.authorName = this.authorName;
+    modelRef.componentInstance.authorBio = this.authorBio;
+    modelRef.componentInstance.prevAuthorBio = this.authorBio;
+    modelRef.result.then((authorDetails) => {
+      this.authorName = authorDetails.authorName;
+      this.authorBio = authorDetails.authorBio;
+      this.updateAuthorDetails();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  updateAuthorDetails(): void {
+    this.blogDashboardBackendService.updateAuthorDetailsAsync(
+      this.authorName, this.authorBio).then(() => {
+      this.alertsService.addSuccessMessage(
+        'Author Details saved successfully.'
+      );
+    }, (error) => {
+      this.alertsService.addWarning(
+        `Unable to update author details. Error: ${error}`);
+    });
   }
 }
 
