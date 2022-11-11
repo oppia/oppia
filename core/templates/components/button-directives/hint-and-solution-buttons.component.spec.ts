@@ -35,7 +35,7 @@ import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.com
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
-fdescribe('HintAndSolutionButtonsComponent', () => {
+describe('HintAndSolutionButtonsComponent', () => {
   let component: HintAndSolutionButtonsComponent;
   let fixture: ComponentFixture<HintAndSolutionButtonsComponent>;
   let playerPositionService: PlayerPositionService;
