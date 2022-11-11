@@ -47,11 +47,20 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, TypedDict, Union, cast
+from typing import Dict, Final, List, TypedDict, Union
 import webapp2
 import webtest
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
+    from mypy_imports import secrets_services
+
+datastore_services = models.Registry.import_datastore_services()
+secrets_services = models.Registry.import_secrets_services()
 
 
 class OpenAccessDecoratorTests(test_utils.GenericTestBase):
@@ -119,12 +128,22 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
 
     def test_error_when_mailchimp_webhook_secret_is_none(self) -> None:
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        swap_api_key_feconf = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
+        swap_api_key_secrets_return_none = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            lambda _: None,
+            expected_args=[
+                ('MAILCHIMP_WEBHOOK_SECRET',),
+            ]
+        )
 
-        with testapp_swap:
-            response = self.get_json(
-                '/mock_secret_page/%s' % self.secret,
-                expected_status_int=404
-            )
+        with testapp_swap, swap_api_key_feconf:
+            with swap_api_key_secrets_return_none:
+                response = self.get_json(
+                    '/mock_secret_page/%s' % self.secret,
+                    expected_status_int=404
+                )
 
         error_msg = (
             'Could not find the page http://localhost'
@@ -136,7 +155,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
     def test_error_when_given_webhook_secret_is_invalid(self) -> None:
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         mailchimp_swap = self.swap_to_always_return(
-            feconf, 'MAILCHIMP_WEBHOOK_SECRET', value=self.secret)
+            secrets_services, 'get_secret', self.secret)
 
         with testapp_swap, mailchimp_swap:
             response = self.get_json(
@@ -153,8 +172,8 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
 
     def test_no_error_when_given_webhook_secret_is_valid(self) -> None:
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        mailchimp_swap = self.swap(
-            feconf, 'MAILCHIMP_WEBHOOK_SECRET', self.secret)
+        mailchimp_swap = self.swap_to_always_return(
+            secrets_services, 'get_secret', self.secret)
 
         with testapp_swap, mailchimp_swap:
             response = self.get_json(
@@ -3486,12 +3505,13 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         'new_value': ''
     }
     CHANGE_DICT_2: Final = {
-        'cmd': 'add_translation',
+        'cmd': 'add_written_translation',
         'state_name': 'Introduction',
         'language_code': constants.DEFAULT_LANGUAGE_CODE,
         'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
         'content_html': '',
-        'translation_html': ''
+        'translation_html': '',
+        'data_format': 'html'
     }
 
     class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -6672,7 +6692,11 @@ class MockHandlerNormalizedPayloadDict(TypedDict):
 class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
     """Tests for oppia_ml_access decorator."""
 
-    class MockHandler(base.OppiaMLVMHandler):
+    class MockHandler(
+        base.OppiaMLVMHandler[
+            MockHandlerNormalizedPayloadDict, Dict[str, str]
+        ]
+    ):
         REQUIRE_PAYLOAD_CSRF_CHECK = False
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -6706,16 +6730,10 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
                 OppiaMLAuthInfo. Message at index 0, vm_id at index 1 and
                 signature at index 2.
             """
-            # Here we use cast because we are narrowing down the type of
-            # 'normalized_payload' from Dict[str, Any] to a particular
-            # TypedDict that was defined according to the schemas. So that
-            # the type of fetched values is not considered as Any type.
-            payload = cast(
-                MockHandlerNormalizedPayloadDict, self.normalized_payload
-            )
-            signature = payload['signature']
-            vm_id = payload['vm_id']
-            message = payload['message']
+            assert self.normalized_payload is not None
+            signature = self.normalized_payload['signature']
+            vm_id = self.normalized_payload['vm_id']
+            message = self.normalized_payload['message']
             return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
 
         @acl_decorators.is_from_oppia_ml
@@ -6867,7 +6885,16 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(self.old_content))
         exploration.states['State 3'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
-        exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
+        exp_models = (
+            exp_services._compute_models_for_updating_exploration( # pylint: disable=protected-access
+                self.author_id,
+                exploration,
+                '',
+                []
+            )
+        )
+        datastore_services.update_timestamps_multi(exp_models)
+        datastore_services.put_multi(exp_models)
 
         rights_manager.publish_exploration(self.author, self.exploration_id)
 

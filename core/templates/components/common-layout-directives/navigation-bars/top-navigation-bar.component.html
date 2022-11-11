@@ -233,8 +233,8 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
-                 href="https://medium.com/oppia-org"
+              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-blog-link"
+                 [href]="getOppiaBlogUrl()"
                  target="_blank"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">

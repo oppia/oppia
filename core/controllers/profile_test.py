@@ -33,6 +33,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
+secrets_services = models.Registry.import_secrets_services()
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
 
@@ -301,8 +302,11 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         # Update the first_contribution_msec to the current time in
         # milliseconds.
         first_time_in_msecs = utils.get_current_time_in_millisecs()
-        user_services.update_first_contribution_msec_if_not_set(
-            user_id, first_time_in_msecs)
+        user_settings_to_update = user_services.get_user_settings(user_id)
+        user_settings_to_update.update_first_contribution_msec(
+            first_time_in_msecs
+        )
+        user_services.save_user_settings(user_settings_to_update)
 
         # Test the contribution date correctly changes to current_time_in_msecs.
         response_dict = self.get_json(
@@ -314,8 +318,11 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         # Test that the contribution date is not changed after the first time it
         # is set.
         second_time_in_msecs = utils.get_current_time_in_millisecs()
-        user_services.update_first_contribution_msec_if_not_set(
-            user_id, second_time_in_msecs)
+        user_settings_to_update = user_services.get_user_settings(user_id)
+        user_settings_to_update.update_first_contribution_msec(
+            second_time_in_msecs
+        )
+        user_services.save_user_settings(user_settings_to_update)
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME)
         self.assertEqual(
@@ -1033,8 +1040,8 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.swap_secret = self.swap(
-            feconf, 'MAILCHIMP_WEBHOOK_SECRET', 'secret')
+        self.swap_secret = self.swap_to_always_return(
+            secrets_services, 'get_secret', 'secret')
         self.swap_audience_id = (
             self.swap(feconf, 'MAILCHIMP_AUDIENCE_ID', 'audience_id'))
         user_services.update_email_preferences(
