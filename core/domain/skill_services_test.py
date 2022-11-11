@@ -1196,10 +1196,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_update_skill_contents_with_invalid_property(self) -> None:
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         class MockSkillChange:
-            def __init__(self, cmd, property_name, old_value, new_value) -> None:
+            def __init__(
+                self,
+                cmd: str,
+                property_name: str,
+                old_value: List[str],
+                new_value: List[str]
+            ) -> None:
                 self.cmd = cmd
-                self.property_name = property_name,
-                self.old_value = old_value,
+                self.property_name = property_name
+                self.old_value = old_value
                 self.new_value = new_value
         changelist = [
             MockSkillChange(
@@ -1209,17 +1215,26 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 new_value=['new_value']
             )
         ]
+        # Here we use MyPy ignore because we want to test the case when we
+        # update the skill with invalid property not defined in 'SkillChange'
+        # schema. Hence we use ignore to silence the error.
         updated_skill = skill_services.apply_change_list(
-            self.SKILL_ID, changelist, self.USER_ID)
+            self.SKILL_ID, changelist, self.USER_ID) # type: ignore[arg-type]
         self.assertEqual(skill.to_dict(), updated_skill.to_dict())
 
     def test_update_skill_contents_with_invalid_cmd(self) -> None:
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         class MockSkillChange:
-            def __init__(self, cmd, property_name, old_value, new_value) -> None:
+            def __init__(
+                self,
+                cmd: str,
+                property_name: str,
+                old_value: List[str],
+                new_value: List[str]
+            ) -> None:
                 self.cmd = cmd
-                self.property_name = property_name,
-                self.old_value = old_value,
+                self.property_name = property_name
+                self.old_value = old_value
                 self.new_value = new_value
         changelist = [
             MockSkillChange(
@@ -1230,8 +1245,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 new_value=['new_value']
             )
         ]
+        # Here we use MyPy ignore because we want to test the case when we
+        # update the skill with invalid command not defined in 'SkillChange'
+        # schema. Hence we use ignore to silence the error.
         updated_skill = skill_services.apply_change_list(
-            self.SKILL_ID, changelist, self.USER_ID)
+            self.SKILL_ID, changelist, self.USER_ID) # type: ignore[arg-type]
         self.assertEqual(skill.to_dict(), updated_skill.to_dict())
 
     def test_delete_skill_misconception(self) -> None:
