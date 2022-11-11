@@ -237,7 +237,7 @@ class RejectSuggestionWithMissingContentIdMigrationJobTests(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id='user1',
-            change_cmd=CHANGE_DICT_WITH_LIST_TRANSLATION,
+            change=CHANGE_DICT_WITH_LIST_TRANSLATION,
             score_category='irrelevant',
             status=suggestion_models.STATUS_IN_REVIEW,
             target_type='exploration',
@@ -264,7 +264,7 @@ class RejectSuggestionWithMissingContentIdMigrationJobTests(
             suggestion_models.STATUS_REJECTED
         )
         self.assertEqual(
-            migrated_suggestion_invalid_model.change_cmd['translation_html'], [
+            migrated_suggestion_invalid_model.change['translation_html'], [
                 '<p><oppia-noninteractive-image alt-with-value="&amp;quot;'
                 '&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" '
                 'filepath-with-value="&amp;quot;img.svg&amp;quot;">'
@@ -417,7 +417,7 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJobTests(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id='user1',
-            change_cmd=CHANGE_DICT_WITH_LIST_TRANSLATION,
+            change=CHANGE_DICT_WITH_LIST_TRANSLATION,
             score_category='irrelevant',
             status=suggestion_models.STATUS_IN_REVIEW,
             target_type='exploration',
@@ -459,5 +459,5 @@ class AuditRejectSuggestionWithMissingContentIdMigrationJobTests(
             suggestion_models.STATUS_IN_REVIEW
         )
         self.assertEqual(
-            migrated_suggestion_3_model.change_cmd['translation_html'],
+            migrated_suggestion_3_model.change['translation_html'],
             [ERRORED_TRANSLATION_VALUE, ''])
