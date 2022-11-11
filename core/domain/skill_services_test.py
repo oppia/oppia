@@ -250,6 +250,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'skill_id_1': 'Description 1'
             }
         )
+        with self.swap(
+            skill_services, 'get_multi_skill_summaries', lambda _: [None]
+        ):
+            skill_descriptions, deleted_skill_ids = (
+                skill_services.get_descriptions_of_skills(
+                    ['skill_id_1', 'skill_id_2']))
+            self.assertEqual(deleted_skill_ids, ['skill_id_1', 'skill_id_2'])
 
     def test_get_rubrics_of_linked_skills(self) -> None:
         example_1 = skill_domain.WorkedExample(
@@ -314,6 +321,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'skill_id_2': None
             }
         )
+        with self.swap(
+            skill_fetchers, 'get_multi_skills',
+            lambda *unused_args, **unused_kwargs: [None]
+        ):
+            skill_rubrics, deleted_skill_ids = (
+                skill_services.get_rubrics_of_skills(
+                    ['skill_id_1', 'skill_id_2']))
+            self.assertEqual(deleted_skill_ids, ['skill_id_1', 'skill_id_2'])
 
     def test_get_skill_from_model(self) -> None:
         skill_model = skill_models.SkillModel.get(self.SKILL_ID)
@@ -619,6 +634,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_get_all_topic_assignments_for_skill(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='Topic1',
             abbreviated_name='topic-three', url_fragment='topic-three',
@@ -645,11 +661,28 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[],
             subtopics=[subtopic], next_subtopic_id=2)
 
+        subtopic2 = topic_domain.Subtopic.from_dict({
+            'id': 2,
+            'title': 'subtopic2',
+            'skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
+            'url_fragment': 'subtopic-two'
+        })
+        self.save_new_topic(
+            topic_id_2, self.USER_ID, name='Topic3',
+            abbreviated_name='topic-five', url_fragment='topic-five',
+            description='Description3', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic2, subtopic], next_subtopic_id=3)
+
         topic_assignments = (
             skill_services.get_all_topic_assignments_for_skill(self.SKILL_ID))
         topic_assignments = sorted(
             topic_assignments, key=lambda i: i.topic_name)
-        self.assertEqual(len(topic_assignments), 2)
+        self.assertEqual(len(topic_assignments), 3)
         self.assertEqual(topic_assignments[0].topic_name, 'Topic1')
         self.assertEqual(topic_assignments[0].topic_id, topic_id)
         self.assertEqual(topic_assignments[0].topic_version, 1)
@@ -660,9 +693,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_assignments[1].topic_version, 1)
         self.assertEqual(topic_assignments[1].subtopic_id, 1)
 
+        self.assertEqual(topic_assignments[2].topic_name, 'Topic3')
+        self.assertEqual(topic_assignments[2].topic_id, topic_id_2)
+        self.assertEqual(topic_assignments[2].topic_version, 1)
+        self.assertEqual(topic_assignments[2].subtopic_id, 1)
+
     def test_remove_skill_from_all_topics(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        topic_id_3 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='Topic1',
             abbreviated_name='topic-five', url_fragment='topic-five',
@@ -688,6 +728,31 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[],
             uncategorized_skill_ids=[],
             subtopics=[subtopic], next_subtopic_id=2)
+
+        subtopic2 = topic_domain.Subtopic.from_dict({
+            'id': 2,
+            'title': 'subtopic2',
+            'skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
+            'url_fragment': 'subtopic-two'
+        })
+        self.save_new_topic(
+            topic_id_2, self.USER_ID, name='Topic3',
+            abbreviated_name='topic-seven', url_fragment='topic-seven',
+            description='Description3', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic2], next_subtopic_id=3)
+
+        self.save_new_topic(
+            topic_id_3, self.USER_ID, name='Topic4',
+            abbreviated_name='topic-eight', url_fragment='topic-eight',
+            description='Description4', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.SKILL_ID],
+            subtopics=[subtopic2], next_subtopic_id=3)
 
         skill_services.remove_skill_from_all_topics(self.USER_ID, self.SKILL_ID)
         topic_assignments_dict = (
@@ -697,6 +762,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_successfully_replace_skill_id_in_all_topics(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='Topic1',
             abbreviated_name='topic-five', url_fragment='topic-five',
@@ -722,6 +788,23 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[],
             uncategorized_skill_ids=[],
             subtopics=[subtopic], next_subtopic_id=2)
+
+        subtopic2 = topic_domain.Subtopic.from_dict({
+            'id': 2,
+            'title': 'subtopic2',
+            'skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
+            'url_fragment': 'subtopic-two'
+        })
+        self.save_new_topic(
+            topic_id_2, self.USER_ID, name='Topic3',
+            abbreviated_name='topic-seven', url_fragment='topic-seven',
+            description='Description3', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic2], next_subtopic_id=3)
 
         topic_assignments_dict = (
             skill_services.get_all_topic_assignments_for_skill('new_skill_id'))
@@ -1110,6 +1193,47 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill.skill_contents.worked_examples[0].to_dict(),
             new_worked_example)
 
+    def test_update_skill_contents_with_invalid_property(self) -> None:
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        class MockSkillChange:
+            def __init__(self, cmd, property_name, old_value, new_value) -> None:
+                self.cmd = cmd
+                self.property_name = property_name,
+                self.old_value = old_value,
+                self.new_value = new_value
+        changelist = [
+            MockSkillChange(
+                cmd=skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
+                property_name='invalid_property',
+                old_value=['old_value'],
+                new_value=['new_value']
+            )
+        ]
+        updated_skill = skill_services.apply_change_list(
+            self.SKILL_ID, changelist, self.USER_ID)
+        self.assertEqual(skill.to_dict(), updated_skill.to_dict())
+
+    def test_update_skill_contents_with_invalid_cmd(self) -> None:
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        class MockSkillChange:
+            def __init__(self, cmd, property_name, old_value, new_value) -> None:
+                self.cmd = cmd
+                self.property_name = property_name,
+                self.old_value = old_value,
+                self.new_value = new_value
+        changelist = [
+            MockSkillChange(
+                cmd='invalid_command',
+                property_name=(
+                    skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES),
+                old_value=['old_value'],
+                new_value=['new_value']
+            )
+        ]
+        updated_skill = skill_services.apply_change_list(
+            self.SKILL_ID, changelist, self.USER_ID)
+        self.assertEqual(skill.to_dict(), updated_skill.to_dict())
+
     def test_delete_skill_misconception(self) -> None:
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
 
@@ -1117,6 +1241,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.misconceptions[0].id, self.MISCONCEPTION_ID_1)
 
         changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'old_value': '',
+                'new_value': 'TestSkillId'
+            }),
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
                 'misconception_id': self.MISCONCEPTION_ID_1,
