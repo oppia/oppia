@@ -1,5 +1,17 @@
 <div class="diagnostic-test-container">
-  <div class="oppia-diagnostic-test-session">Learner Diagnostic Test</div>
+  <div class="diagnostic-test-page-header">
+    <button class="btn oppia-back-to-classroom-button">
+      <a class="oppia-anchor-tag-under-button" href="/learn/math">
+        <span>
+          <i class="fas fa-thin fa-arrow-left oppia-vcenter" aria-hidden="true"></i>
+        </span>
+        <span class="back-button-text-class">Go back</span>
+      </a>
+    </button>
+    <div class="oppia-diagnostic-test-session">
+      Learner Diagnostic Test
+    </div>
+  </div>
   <mat-card class="introductory-card" *ngIf="!diagnosticTestIsStarted">
     <div class="oppia-introductory-container">
       <div class="oppia-image">
@@ -92,6 +104,24 @@
 </div>
 
 <style>
+  .diagnostic-test-page-header {
+    align-items: center;
+    display: flex;
+    margin: 3%;
+  }
+  .oppia-back-to-classroom-button {
+    align-items: center;
+    background-color: #00645c;
+    color: #fff;
+    display: flex;
+    float: right;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    position: absolute;
+    text-transform: uppercase;
+  }
+  .back-button-text-class {
+    margin-left: 5px;
+  }
   .oppia-anchor-tag-under-button {
     color: white;
     text-decoration: none;
@@ -211,8 +241,7 @@
     color: #01645c;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 3em;
-    margin-bottom: 20px;
-    margin-top: 20px;
+    margin: auto;
     text-align: center;
   }
   .oppia-diagnostic-test-start-button {

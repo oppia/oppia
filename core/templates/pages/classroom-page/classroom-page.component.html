@@ -22,7 +22,8 @@
     <h2>{{ 'I18N_CLASSROOM_PAGE_TOPICS_COVERED' | translate }}</h2>
     <p>{{ 'I18N_MATH_TOPICS_COVERED' | translate }}</p>
   </div>
-  <div class="classroom-page-guidance-tile-container">
+  <div class="classroom-page-guidance-tile-container"
+       *ngIf="classroomData.getTopicSummaries().length > 0">
     <div class="classroom-page-guidance-tile">
       <p><strong>{{ 'I18N_CLASSROOM_PAGE_NEW_TO_MATH_HEADING' | translate}}</strong></p>
       <p>{{ begineWithFirstTopicDescriptionText }}</p>
