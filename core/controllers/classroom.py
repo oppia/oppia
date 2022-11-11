@@ -165,9 +165,7 @@ class ClassroomHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'classroom_id': {
-            'schema': SCHEMA_FOR_CLASSROOM_ID
-        }
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
@@ -183,10 +181,10 @@ class ClassroomHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self, classroom_id):
+    def get(self, classroom_url_fragment):
         """Handles GET requests."""
-        classroom = classroom_config_services.get_classroom_by_id(
-            classroom_id, strict=False)
+        classroom = classroom_config_services.get_classroom_by_url_fragment(
+            classroom_url_fragment)
         if classroom is None:
             raise self.PageNotFoundException(
                 'The classroom with the given id or url doesn\'t exist.')
@@ -197,10 +195,10 @@ class ClassroomHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_access_admin_page
-    def put(self, classroom_id):
+    def put(self, classroom_url_fragment):
         """Updates properties of a given classroom."""
         classroom = self.normalized_payload.get('classroom_dict')
-        if classroom_id != classroom.classroom_id:
+        if classroom_url_fragment != classroom.url_fragment:
             raise self.InvalidInputException(
                 'Classroom ID of the URL path argument must match with the ID '
                 'given in the classroom payload dict.'
@@ -210,9 +208,11 @@ class ClassroomHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_access_admin_page
-    def delete(self, classroom_id):
+    def delete(self, classroom_url_fragment):
         """Deletes classroom from the classroom admin page."""
-        classroom_config_services.delete_classroom(classroom_id)
+        classroom = classroom_config_services.get_classroom_by_url_fragment(
+            classroom_url_fragment)
+        classroom_config_services.delete_classroom(classroom.id)
         self.render_json(self.values)
 
 

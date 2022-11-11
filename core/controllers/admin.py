@@ -870,27 +870,72 @@ class AdminHandler(
                 question_id_12, 'Question 12', [skill_id_6])
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Topic1', 'topic-one', 'description', 'fragm')
+                topic_id_1, 'Addition', 'add', 'description', 'fragm')
             topic_1.skill_ids_for_diagnostic_test = [skill_id_1]
+            topic_1.thumbnail_filename = 'thumbnail.svg'
+            topic_1.thumbnail_bg_color = '#C6DCDA'
+            topic_1.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_1], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_1.next_subtopic_id = 2
+
 
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Topic2', 'topic-two', 'description', 'fragm')
+                topic_id_2, 'Subtraction', 'subtraction',
+                'description', 'fragm'
+            )
             topic_2.skill_ids_for_diagnostic_test = [skill_id_2]
+            topic_2.thumbnail_filename = 'thumbnail.svg'
+            topic_2.thumbnail_bg_color = '#C6DCDA'
+            topic_2.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_2], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_2.next_subtopic_id = 2
 
             topic_3 = topic_domain.Topic.create_default_topic(
-                topic_id_3, 'Topic3', 'topic-three', 'description', 'fragm')
+                topic_id_3, 'Multiplication', 'multiplication',
+                'description', 'fragm'
+            )
             topic_3.skill_ids_for_diagnostic_test = [skill_id_3]
+            topic_3.thumbnail_filename = 'thumbnail.svg'
+            topic_3.thumbnail_bg_color = '#C6DCDA'
+            topic_3.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_3], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_3.next_subtopic_id = 2
 
             topic_4 = topic_domain.Topic.create_default_topic(
-                topic_id_4, 'Topic4', 'topic-four', 'description', 'fragm')
+                topic_id_4, 'Division', 'division', 'description', 'fragm')
             topic_4.skill_ids_for_diagnostic_test = [skill_id_4]
+            topic_4.thumbnail_filename = 'thumbnail.svg'
+            topic_4.thumbnail_bg_color = '#C6DCDA'
+            topic_4.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_4], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_4.next_subtopic_id = 2
 
             topic_5 = topic_domain.Topic.create_default_topic(
-                topic_id_5, 'Topic5', 'topic-five', 'description', 'fragm')
+                topic_id_5, 'Fraction', 'fraction', 'description', 'fragm')
             topic_5.skill_ids_for_diagnostic_test = [skill_id_5]
+            topic_5.thumbnail_filename = 'thumbnail.svg'
+            topic_5.thumbnail_bg_color = '#C6DCDA'
+            topic_5.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_5], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_5.next_subtopic_id = 2
 
             topic_6 = topic_domain.Topic.create_default_topic(
-                topic_id_6, 'Topic6', 'topic-six', 'description', 'fragm')
+                topic_id_6, 'Vector', 'vector', 'description', 'fragm')
             topic_6.skill_ids_for_diagnostic_test = [skill_id_6]
 
             skill_1 = self._create_dummy_skill(
@@ -926,18 +971,24 @@ class AdminHandler(
             skill_services.save_new_skill(self.user_id, skill_5)
             skill_services.save_new_skill(self.user_id, skill_6)
 
-            topic_1.add_uncategorized_skill_id(skill_id_1)
-            topic_2.add_uncategorized_skill_id(skill_id_2)
-            topic_3.add_uncategorized_skill_id(skill_id_3)
-            topic_4.add_uncategorized_skill_id(skill_id_4)
-            topic_5.add_uncategorized_skill_id(skill_id_5)
+
             topic_6.add_uncategorized_skill_id(skill_id_6)
 
             topic_services.save_new_topic(self.user_id, topic_1)
+            topic_services.publish_topic(topic_id_1, self.user_id)
+
             topic_services.save_new_topic(self.user_id, topic_2)
+            topic_services.publish_topic(topic_id_2, self.user_id)
+
             topic_services.save_new_topic(self.user_id, topic_3)
+            topic_services.publish_topic(topic_id_3, self.user_id)
+
             topic_services.save_new_topic(self.user_id, topic_4)
+            topic_services.publish_topic(topic_id_4, self.user_id)
+
             topic_services.save_new_topic(self.user_id, topic_5)
+            topic_services.publish_topic(topic_id_5, self.user_id)
+
             topic_services.save_new_topic(self.user_id, topic_6)
 
             question_services.create_new_question_skill_link(
@@ -966,14 +1017,13 @@ class AdminHandler(
                 self.user_id, question_id_12, skill_id_6, 0.5)
 
             classroom_id_1 = classroom_config_services.get_new_classroom_id()
-            print(classroom_id_1)
             classroom_id_2 = classroom_config_services.get_new_classroom_id()
 
-            classroom_name_1 = 'Dummy Classroom with 5 topics'
-            classroom_name_2 = 'Dummy Classroom with 1 topic'
+            classroom_name_1 = 'Math'
+            classroom_name_2 = 'Physics'
 
-            classroom_url_fragment_1 = 'first-classroom'
-            classroom_url_fragment_2 = 'second-classroom'
+            classroom_url_fragment_1 = 'math'
+            classroom_url_fragment_2 = 'physics'
 
             topic_dependency_for_classroom_1: Dict[str, list[str]] = {
                 topic_id_1: [],

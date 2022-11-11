@@ -76,7 +76,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
   startDiagnosticTest(): void {
     this.classroomBackendApiService.getClassroomDataAsync(
-      this.classroomId).then(response => {
+      this.classroomUrlFragment).then(response => {
       this.diagnosticTestTopicTrackerModel = (
         new DiagnosticTestTopicTrackerModel(
           response.classroomDict.topicIdToPrerequisiteTopicIds));

@@ -407,7 +407,7 @@ URLS = [
         r'%s' % feconf.CLASSROOM_ID_HANDLER_URL,
         classroom.NewClassroomIdHandler),
     get_redirect_route(
-        r'%s/<classroom_id>' % feconf.CLASSROOM_HANDLER_URL,
+        r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_HANDLER_URL,
         classroom.ClassroomHandler),
     get_redirect_route(
         r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_URL_FRAGMENT_HANDLER,
