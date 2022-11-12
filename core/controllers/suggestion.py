@@ -1119,8 +1119,7 @@ def _upload_suggestion_images(
     for filename in filenames:
         image = files[filename]
         decoded_image = (
-            image
-            if isinstance(image, bytes)
+            image if isinstance(image, bytes)
             else base64.decodebytes(image.encode('utf-8'))
         )
         file_format = (
