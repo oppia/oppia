@@ -8,7 +8,7 @@
               aria-label="Previous Card"
               (click)="validateIndexAndChangeCard(displayedCardIndex-1)"
               class="e2e-test-back-button oppia-back-button oppia-nav-button oppia-nav-left-button">
-        <i class="fas fa-thin fa-arrow-left oppia-vcenter" aria-hidden="true"></i>
+        <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
       </button>
     </div>
   </div>
@@ -17,7 +17,7 @@
             (click)="validateIndexAndChangeCard(displayedCardIndex+1)"
             aria-label="Next Card"
             class="oppia-next-button e2e-test-next-button oppia-nav-button">
-      <i class="fas fa-thin fa-arrow-right material-icons oppia-vcenter" aria-hidden="true"></i>
+      <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
     </button>
   </div>
   <div *ngIf="!hasNext">

@@ -33,6 +33,7 @@ from core.platform.datastore import (
     cloud_datastore_services as datastore_services)
 from core.platform.email import dev_mode_email_services as email_services
 from core.platform.search import elastic_search_services as search_services
+from core.platform.secrets import cloud_secrets_services as secrets_services
 from core.platform.storage import dev_mode_storage_services as storage_services
 from core.platform.taskqueue import (
     dev_mode_taskqueue_services as platform_taskqueue_services)
@@ -99,6 +100,7 @@ __all__ = [
     'question_models',
     'recommendations_models',
     'search_services',
+    'secrets_services',
     'skill_models',
     'stats_models',
     'story_models',
