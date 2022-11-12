@@ -258,11 +258,13 @@ class ClassroomHandler(
     @acl_decorators.can_access_admin_page
     def put(self, classroom_url_fragment: str) -> None:
         """Updates properties of a given classroom."""
+        assert self.normalized_payload is not None
         classroom = self.normalized_payload.get('classroom_dict')
+        assert classroom is not None
         if classroom_url_fragment != classroom.url_fragment:
             raise self.InvalidInputException(
-                'Classroom ID of the URL path argument must match with the ID '
-                'given in the classroom payload dict.'
+                'Classroom URL fragment of the URL path argument must match '
+                'with the URL fragment given in the classroom payload dict.'
             )
 
         classroom_config_services.update_or_create_classroom_model(classroom)
@@ -273,7 +275,10 @@ class ClassroomHandler(
         """Deletes classroom from the classroom admin page."""
         classroom = classroom_config_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
-        classroom_config_services.delete_classroom(classroom.id)
+        if classroom is None:
+            raise self.InvalidInputException(
+                'A classroom with the given URL fragment does not exist.')
+        classroom_config_services.delete_classroom(classroom.classroom_id)
         self.render_json(self.values)
 
 
