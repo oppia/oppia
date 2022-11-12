@@ -1064,6 +1064,22 @@ class AdminHandler(
                 classroom_1)
             classroom_config_services.update_or_create_classroom_model(
                 classroom_2)
+
+            classroom_pages_data = [{
+                "name": "math",
+                "url_fragment": "math",
+                "course_details": "",
+                "topic_list_intro": "",
+                "topic_ids": [
+                    topic_id_1,
+                    topic_id_2,
+                    topic_id_3,
+                    topic_id_4,
+                    topic_id_5
+                ],
+            }]
+            config_services.set_property(
+                self.user_id, 'classroom_pages_data', classroom_pages_data)
         else:
             raise Exception('Cannot generate dummy classroom in production.')
 
