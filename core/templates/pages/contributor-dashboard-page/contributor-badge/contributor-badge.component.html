@@ -1,10 +1,10 @@
 <div class="stats-container">
-    <div class="stats-contribution-type-mobile-container">
+    <div class="badges-type-mobile-container">
         <div class="dropdown-label">Badge Type</div>
         <div #mobileBadgeTypeDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
             <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleMobileBadgeTypeDropdown()">
-              {{mobileTranslationBadgesShown ? 'Translation' : 'Question'}}
-              <span class="material-icons oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': mobileTranslationBadgesShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+              {{showMobileTranslationBadges ? 'Translation' : 'Question'}}
+              <span class="material-icons oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': showMobileTranslationBadges ? 'scaleY(-1)' : 'scaleY(1)' }">
                 arrow_drop_down
               </span>
             </div>
@@ -12,18 +12,18 @@
             <div *ngIf="mobileBadgeTypeDropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
               <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
                     (click)="selectBadgeType(true)"
-                    [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : mobileTranslationBadgesShown}">
+                    [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : showMobileTranslationBadges}">
                   Translation
               </div>
-              <div *ngIf="userCanSuggestQuestions || userCanReviewQuestionSuggestions" class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
+              <div *ngIf="userHasQuestionRights" class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
                     (click)="selectBadgeType(false)"
-                    [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : !mobileTranslationBadgesShown}">
+                    [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : !showMobileTranslationBadges}">
                   Question
               </div>
             </div>
         </div>
     </div>
-    <div class="stats-contribution-type-mobile-container" [hidden]="!mobileTranslationBadgesShown || languages.length === 0">
+    <div class="badges-type-mobile-container" [hidden]="!showMobileTranslationBadges || languages.length === 0">
         <div class="dropdown-label">Language</div>
         <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
             <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleMobileLanguageDropdown()">
@@ -43,9 +43,11 @@
             </div>
         </div>
     </div>
-    <div class="non-mobile-badge-containier">
+    <div class="desktop-badge-container">
         <div [hidden]="dataLoading || (languages.length === 0)" class="badges-header-container">
-            <div class="badge-type-text">Translations</div>
+            <div class="badge-type-text">
+              <div class="badge-type-text-field">Translations</div>
+            </div>
             <div class="stats-contribution-type-container">
                 <div class="stats-contribution-type-label">
                     Language
@@ -73,47 +75,47 @@
                 <div class="badge-box">
                     <div>Submission</div>
                     <div class="badge-container">
-                        <translation-badge *ngFor="let badge of translationBadges[selectedLanguage].submission" badgeUnlocked="{{badge.badgeUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.value}}">
-                        </translation-badge>
+                      <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].submission" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.contributionCount}}">
+                      </translation-badge>
                     </div>
                 </div>
                 <div *ngIf="userCanReviewTranslationSuggestion" class="badge-box">
                     <div>Review</div>
                     <div class="badge-container">
-                        <translation-badge *ngFor="let badge of translationBadges[selectedLanguage].review" badgeUnlocked="{{badge.badgeUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.value}}">
+                        <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].review" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.contributionCount}}">
                         </translation-badge>
                     </div>
                 </div>
                 <div *ngIf="userCanReviewTranslationSuggestion" class="badge-box">
                     <div>Correction</div>
                     <div class="badge-container">
-                        <translation-badge *ngFor="let badge of translationBadges[selectedLanguage].correction" badgeUnlocked="{{badge.badgeUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.value}}">
+                        <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].correction" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.contributionCount}}">
                         </translation-badge>
                     </div>
                 </div>
             </mat-card>
         </div>
         <div [hidden]="dataLoading || (!userCanSuggestQuestions && !userCanReviewQuestionSuggestions)" class="badge-type-text">Questions</div>
-        <div *ngIf="!dataLoading && (userCanSuggestQuestions || userCanReviewQuestionSuggestions)">
+        <div *ngIf="!dataLoading && userHasQuestionRights">
             <mat-card layout="row" class="list-view-item oppia-contributions-required-message-container">
                 <div *ngIf="userCanSuggestQuestions" class="badge-box">
                     <div>Submission</div>
                     <div class="badge-container">
-                        <question-badge *ngFor="let badge of questionSubmissionBadges" badgeUnlocked="{{badge.badgeUnlocked}}" type="{{badge.text}}" value="{{badge.value}}">
+                        <question-badge class="badge-item" *ngFor="let badge of questionSubmissionBadges" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" value="{{badge.contributionCount}}">
                         </question-badge>
                     </div>
                 </div>
                 <div *ngIf="userCanReviewQuestionSuggestions" class="badge-box">
                     <div>Review</div>
                     <div class="badge-container">
-                        <question-badge *ngFor="let badge of questionReviewBadges" badgeUnlocked="{{badge.badgeUnlocked}}" type="{{badge.text}}" value="{{badge.value}}">
+                        <question-badge class="badge-item" *ngFor="let badge of questionReviewBadges" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" value="{{badge.contributionCount}}">
                         </question-badge>
                     </div>
                 </div>
                 <div *ngIf="userCanReviewQuestionSuggestions" class="badge-box">
                     <div>Correction</div>
                     <div class="badge-container">
-                        <question-badge *ngFor="let badge of questionCorrectionBadges" badgeUnlocked="{{badge.badgeUnlocked}}" type="{{badge.text}}" value="{{badge.value}}">
+                        <question-badge class="badge-item" *ngFor="let badge of questionCorrectionBadges" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" value="{{badge.contributionCount}}">
                         </question-badge>
                     </div>
                 </div>
@@ -121,7 +123,7 @@
         </div>
     </div>
     <div class="mobile-badge-container">
-        <div [hidden]="!mobileTranslationBadgesShown">
+        <div [hidden]="!showMobileTranslationBadges">
             <div [hidden]="dataLoading || (languages.length === 0)" class="badges-header-container">
                 <div class="badge-type-text">Translations</div>
             </div>
@@ -130,49 +132,49 @@
                     <div class="badge-box">
                         <div>Submission</div>
                         <div class="badge-container">
-                            <translation-badge *ngFor="let badge of translationBadges[selectedLanguage].submission" badgeUnlocked="{{badge.badgeUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.value}}">
+                            <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].submission" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.contributionCount}}">
                             </translation-badge>
                         </div>
                     </div>
                     <div *ngIf="userCanReviewTranslationSuggestion" class="badge-box">
                         <div>Review</div>
                         <div class="badge-container">
-                            <translation-badge *ngFor="let badge of translationBadges[selectedLanguage].review" badgeUnlocked="{{badge.badgeUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.value}}">
+                            <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].review" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.contributionCount}}">
                             </translation-badge>
                         </div>
                     </div>
                     <div *ngIf="userCanReviewTranslationSuggestion" class="badge-box">
                         <div>Correction</div>
                         <div class="badge-container">
-                            <translation-badge *ngFor="let badge of translationBadges[selectedLanguage].correction" badgeUnlocked="{{badge.badgeUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.value}}">
+                            <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].correction" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.contributionCount}}">
                             </translation-badge>
                         </div>
                     </div>
                 </mat-card>
             </div>
         </div>
-        <div [hidden]="mobileTranslationBadgesShown">
+        <div [hidden]="showMobileTranslationBadges">
             <div [hidden]="dataLoading || (!userCanSuggestQuestions && !userCanReviewQuestionSuggestions)" class="badge-type-text">Questions</div>
-            <div *ngIf="!dataLoading && (userCanSuggestQuestions || userCanReviewQuestionSuggestions)">
+            <div *ngIf="!dataLoading && userHasQuestionRights">
                 <mat-card layout="row" class="list-view-item oppia-contributions-required-message-container">
                     <div *ngIf="userCanSuggestQuestions" class="badge-box">
                         <div>Submission</div>
                         <div class="badge-container">
-                            <question-badge *ngFor="let badge of questionSubmissionBadges" badgeUnlocked="{{badge.badgeUnlocked}}" type="{{badge.text}}" value="{{badge.value}}">
+                            <question-badge class="badge-item" *ngFor="let badge of questionSubmissionBadges" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" value="{{badge.contributionCount}}">
                             </question-badge>
                         </div>
                     </div>
                     <div *ngIf="userCanReviewQuestionSuggestions" class="badge-box">
                         <div>Review</div>
                         <div class="badge-container">
-                            <question-badge *ngFor="let badge of questionReviewBadges" badgeUnlocked="{{badge.badgeUnlocked}}" type="{{badge.text}}" value="{{badge.value}}">
+                            <question-badge class="badge-item" *ngFor="let badge of questionReviewBadges" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" value="{{badge.contributionCount}}">
                             </question-badge>
                         </div>
                     </div>
                     <div *ngIf="userCanReviewQuestionSuggestions" class="badge-box">
                         <div>Correction</div>
                         <div class="badge-container">
-                            <question-badge *ngFor="let badge of questionCorrectionBadges" badgeUnlocked="{{badge.badgeUnlocked}}" type="{{badge.text}}" value="{{badge.value}}">
+                            <question-badge class="badge-item" *ngFor="let badge of questionCorrectionBadges" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" value="{{badge.contributionCount}}">
                             </question-badge>
                         </div>
                     </div>
@@ -180,12 +182,12 @@
             </div>
         </div>
     </div>
-    <mat-card [hidden]="dataLoading" *ngIf="(mobileTranslationBadgesShown && !translationBadges[selectedLanguage])" layout="row" class="contributions-required-container mobile-badge-container list-view-item">
+    <mat-card [hidden]="dataLoading" *ngIf="(showMobileTranslationBadges && !translationBadges[selectedLanguage])" layout="row" class="contributions-required-container mobile-badge-container list-view-item">
       <div class="oppia-contributions-required-message">
         Start contributing to see your badges!
       </div>
     </mat-card>
-    <mat-card [hidden]="dataLoading" *ngIf="!translationBadges[selectedLanguage] && !(userCanSuggestQuestions || userCanReviewQuestionSuggestions)" layout="row" class="contributions-required-container non-mobile-badge-containier list-view-item">
+    <mat-card [hidden]="dataLoading" *ngIf="!translationBadges[selectedLanguage] && !userHasQuestionRights" layout="row" class="contributions-required-container desktop-badge-container list-view-item">
       <div class="oppia-contributions-required-message">
         Start contributing to see your badges!
       </div>
@@ -193,16 +195,22 @@
     <div class="oppia-lazy-loading-container"
          [hidden]="!dataLoading">
       <lazy-loading></lazy-loading>
-      <lazy-loading></lazy-loading>
     </div>
 </div>
 
 <style>
+  .badge-item {
+    margin: auto;
+  }
+  .badge-type-text-field {
+    bottom: 0;
+    position: absolute;
+  }
   .contributions-required-container {
     height: 300px;
     margin-top: 70px
   }
-  .non-mobile-badge-containier {
+  .desktop-badge-container {
     display: block;
   }
   .mobile-badge-container {
@@ -210,9 +218,8 @@
     margin-top: 10px;
   }
   .oppia-lazy-loading-container {
-    height: 120px;
+    height: 500px;
     margin-bottom: -20px;
-    margin-top: 12px;
     width: 100%;
   }
   .badges-header-container {
@@ -225,15 +232,18 @@
     font-family: Capriola;
     color: #00645c;
     display: inline-block;
-    width: 60%;
     font-size: 24px;
+    position: relative;
+    width: 60%;
   }
   .badge-container {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
     align-items: center;
     justify-content: center;
     gap: 8px;
+    margin-top: 25px;
+    margin-bottom: 30px;
   }
   .oppia-contributions-required-message-container {
     height: 100%;
@@ -276,7 +286,7 @@
   .oppia-contributions-dropdown-arrow {
     color: #009688;
   }
-  .stats-contribution-type-mobile-container {
+  .badges-type-mobile-container {
     display: none;
     background-color: #ffffff;
     font-size: 20px;
@@ -326,8 +336,7 @@
     vertical-align: top;
   }
   .stats-contribution-type-label {
-    font-size: 12px;
-    font-weight: bold;
+    font-size: 18px;
   }
   .stats-container {
     margin-left: 50px;
@@ -372,7 +381,6 @@
   .oppia-stats-type-selector-container {
     background-color: #fff;
     border-radius: 4px;
-    border: 1px solid #000;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
     cursor: pointer;
     justify-content: space-between;
@@ -384,7 +392,7 @@
     display: flex;
     flex: 1;
     justify-content: space-between;
-    font-size: 12px;
+    font-size: 16px;
   }
 
   .oppia-stats-type-selector-inner-container-arrow {
@@ -432,17 +440,28 @@
     background-color: rgb(238, 238, 238);
     border-radius: 4px;
   }
+  @media (max-width: 1000px) {
+    .badge-container {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  @media (max-width: 800px) {
+    .badge-container {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
   @media (max-width: 768px) {
     .list-view-item {
       margin-bottom: 30px;
     }
   }
   @media only screen and (max-width: 700px) {
-    .non-mobile-badge-containier {
+    .desktop-badge-container {
       display: none;
     }
     .mobile-badge-container {
       display: block;
+      grid-template-columns: repeat(4, 1fr);
     }
     .stats-welcome-text-container {
       width: 100%;
@@ -455,7 +474,7 @@
       margin-right: 10px;
       width: 175px;
     }
-    .stats-contribution-type-mobile-container {
+    .badges-type-mobile-container {
       align-items: center;
       display: flex;
       justify-content: space-between;
@@ -493,6 +512,16 @@
     }
     .oppia-stats-type-selector-inner-container {
       font-size: 20px;
+    }
+  }
+  @media (max-width: 600px) {
+    .badge-container {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  @media (max-width: 450px) {
+    .badge-container {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
   @media only screen and (max-width: 420px) {

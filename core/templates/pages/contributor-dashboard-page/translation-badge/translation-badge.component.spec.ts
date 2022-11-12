@@ -22,7 +22,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TranslationBadgeComponent } from './translation-badge.component';
 import { AppConstants } from 'app.constants';
 
-describe('Translation bdge component', () => {
+describe('Translation badge component', () => {
   let component: TranslationBadgeComponent;
   let fixture: ComponentFixture<TranslationBadgeComponent>;
   beforeEach(waitForAsync(() => {

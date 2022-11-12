@@ -22,7 +22,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AppConstants } from 'app.constants';
 import { QuestionBadgeComponent } from './question-badge.component';
 
-describe('Question bdge component', () => {
+describe('Question badge component', () => {
   let component: QuestionBadgeComponent;
   let fixture: ComponentFixture<QuestionBadgeComponent>;
   beforeEach(waitForAsync(() => {
@@ -38,7 +38,7 @@ describe('Question bdge component', () => {
   beforeEach(waitForAsync(() => {
     fixture = TestBed.createComponent(QuestionBadgeComponent);
     component = fixture.componentInstance;
-    component.badgeUnlocked = true;
+    component.isUnlocked = true;
     component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
 
     fixture.detectChanges();

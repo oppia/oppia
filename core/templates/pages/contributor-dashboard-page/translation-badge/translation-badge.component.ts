@@ -10,7 +10,7 @@ export class TranslationBadgeComponent {
   @Input() type!: string;
   @Input() value: number;
   @Input() language!: string;
-  @Input() badgeUnlocked: boolean;
+  @Input() isUnlocked: boolean;
   contributionTypeText: string;
 
   fontSize: string = '13px';

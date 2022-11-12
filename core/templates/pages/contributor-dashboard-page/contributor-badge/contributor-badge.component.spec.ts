@@ -155,6 +155,7 @@ describe('Contributor badge component', () => {
   let contributionAndReviewStatsService: ContributionAndReviewStatsService;
   let languageUtilService: LanguageUtilService;
   let userService: UserService;
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -169,6 +170,7 @@ describe('Contributor badge component', () => {
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
+
   beforeEach(waitForAsync(() => {
     fixture = TestBed.createComponent(ContributorBadgeComponent);
     component = fixture.componentInstance;
@@ -216,21 +218,23 @@ describe('Contributor badge component', () => {
       expect(component.questionBadges).not.toBeNull();
     }));
 
-    it('should should toggle language dropdown', fakeAsync(() => {
-      component.dropdownShown = false;
+    it('should toggle language dropdown when user clicks on it', fakeAsync(
+      () => {
+        component.dropdownShown = false;
 
-      component.toggleLanguageDropdown();
+        component.toggleLanguageDropdown();
 
-      expect(component.dropdownShown).toBeTrue();
-    }));
+        expect(component.dropdownShown).toBeTrue();
+      }));
 
-    it('should should toggle mobile language dropdown', fakeAsync(() => {
-      component.mobileDropdownShown = false;
+    it('should toggle mobile language dropdown when user clicks on it',
+      fakeAsync(() => {
+        component.mobileDropdownShown = false;
 
-      component.toggleMobileLanguageDropdown();
+        component.toggleMobileLanguageDropdown();
 
-      expect(component.mobileDropdownShown).toBeTrue();
-    }));
+        expect(component.mobileDropdownShown).toBeTrue();
+      }));
 
     it('should should toggle mobile badge type dropdown', fakeAsync(() => {
       component.mobileBadgeTypeDropdownShown = false;
@@ -249,13 +253,13 @@ describe('Contributor badge component', () => {
     it('should show show translation badges type in mobile', fakeAsync(() => {
       component.selectBadgeType(true);
 
-      expect(component.mobileTranslationBadgesShown).toBeTrue();
+      expect(component.showMobileTranslationBadges).toBeTrue();
     }));
 
     it('should show show question badges type in mobile', fakeAsync(() => {
       component.selectBadgeType(false);
 
-      expect(component.mobileTranslationBadgesShown).toBeFalse();
+      expect(component.showMobileTranslationBadges).toBeFalse();
     }));
   });
 
@@ -287,6 +291,7 @@ describe('Contributor badge component', () => {
             '.oppia-stats-type-selector-dropdown-container');
         };
       });
+
       it('should correctly show and hide when clicked away',
         fakeAsync(() => {
           let fakeClickAwayEvent = new MouseEvent('click');
@@ -294,8 +299,10 @@ describe('Contributor badge component', () => {
             fakeClickAwayEvent,
             'target',
             {value: document.createElement('div')});
+
           component.onDocumentClick(fakeClickAwayEvent);
           fixture.detectChanges();
+
           expect(component.dropdownShown).toBe(false);
           expect(getDropdownOptionsContainer()).toBeFalsy();
         }));

@@ -4,22 +4,20 @@ import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UserService } from 'services/user.service';
 import { ContributionAndReviewStatsService } from '../services/contribution-and-review-stats.service';
 
-interface TotalContributionsAndReviews {
+interface ContributionCounts {
   language?: string;
   submissions: number;
   reviews: number;
   corrections: number;
-  allSubmissionBadgesCreated: boolean;
-  allReviewBadgesCreated: boolean;
-  allCorrectionBadgesCreated: boolean;
 }
 
 interface Badge {
-  value: number;
+  contributionCount: number;
   text: string;
   language?: string;
-  badgeUnlocked: boolean;
+  isUnlocked: boolean;
 }
+
 @Component({
   selector: 'contributor-badge',
   templateUrl: './contributor-badge.component.html',
@@ -27,6 +25,7 @@ interface Badge {
 })
 export class ContributorBadgeComponent {
   @ViewChild('dropdown', {'static': false}) dropdownRef!: ElementRef;
+
   @ViewChild(
     'mobileDropdown', {'static': false}
   ) mobileDropdownRef!: ElementRef;
@@ -35,32 +34,31 @@ export class ContributorBadgeComponent {
     'mobileBadgeTypeDropdown', {'static': false}
   ) mobileBadgeTypeDropdownRef!: ElementRef;
 
-  totalTranslationStats = {};
-  translationBadges = {};
+  totalTranslationStats: {[key: string]: ContributionCounts} = {};
+  translationBadges: {[key: string]: {[key: string]: Badge[]}} = {};
   languages = [];
   questionBadges: Badge[];
   questionSubmissionBadges: Badge[];
   questionReviewBadges: Badge[];
   questionCorrectionBadges: Badge[];
-  totalQuestionStats: TotalContributionsAndReviews = {
+  totalQuestionStats: ContributionCounts = {
     submissions: 0,
     reviews: 0,
-    corrections: 0,
-    allSubmissionBadgesCreated: false,
-    allReviewBadgesCreated: false,
-    allCorrectionBadgesCreated: false
+    corrections: 0
   };
 
   dropdownShown = false;
   mobileDropdownShown = false;
   mobileBadgeTypeDropdownShown = false;
-  mobileTranslationBadgesShown = true;
+  showMobileTranslationBadges = true;
   selectedLanguage = '';
   dataLoading = false;
   userCanReviewTranslationSuggestion: boolean;
   userCanReviewQuestionSuggestions: boolean;
   userCanSuggestQuestions: boolean;
+  userHasQuestionRights: boolean;
   reviewableLanguages = [];
+
   constructor(
     private readonly languageUtilService: LanguageUtilService,
     private readonly contributionAndReviewStatsService:
@@ -88,10 +86,7 @@ export class ContributorBadgeComponent {
             languageDescription),
           submissions: 0,
           reviews: 0,
-          corrections: 0,
-          allSubmissionBadgesCreated: false,
-          allReviewBadgesCreated: false,
-          allCorrectionBadgesCreated: false
+          corrections: 0
         };
         this.reviewableLanguages.push(languageDescription);
       });
@@ -99,6 +94,9 @@ export class ContributorBadgeComponent {
       userContributionRights.can_review_questions);
     this.userCanSuggestQuestions = (
       userContributionRights.can_suggest_questions);
+    this.userHasQuestionRights = (
+      this.userCanSuggestQuestions ||
+      this.userCanReviewQuestionSuggestions);
 
     const response = await this.contributionAndReviewStatsService.fetchAllStats(
       username);
@@ -118,10 +116,7 @@ export class ContributorBadgeComponent {
               languageDescription),
             submissions: stat.accepted_translations_count,
             reviews: 0,
-            corrections: 0,
-            allSubmissionBadgesCreated: false,
-            allReviewBadgesCreated: false,
-            allCorrectionBadgesCreated: false
+            corrections: 0
           };
         } else {
           this.totalTranslationStats[languageDescription].submissions += (
@@ -155,44 +150,37 @@ export class ContributorBadgeComponent {
     }
 
     for (let language in this.totalTranslationStats) {
-      const predefinedTranslationBadges = this.getPredefinedBadges(
-        this.totalTranslationStats[language]);
-      const nonPredefinedTranslationBadges = this.getNonPredefinedBadges(
-        this.totalTranslationStats[language]);
-      const allBadges = predefinedTranslationBadges.concat(
-        nonPredefinedTranslationBadges);
-
       this.translationBadges[language] = {};
+
       this.translationBadges[language][
-        AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION] = allBadges.filter(
-        badge => badge.text === AppConstants.
-          CONTRIBUTION_STATS_SUBTYPE_SUBMISSION);
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION] =
+          this.getObtainedBadges(
+            this.totalTranslationStats[language].submissions,
+            AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION,
+            this.totalTranslationStats[language].language);
       this.translationBadges[language][
-        AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW] = allBadges.filter(
-        badge => badge.text === AppConstants.
-          CONTRIBUTION_STATS_SUBTYPE_REVIEW);
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW] =
+          this.getObtainedBadges(
+            this.totalTranslationStats[language].reviews,
+            AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW,
+            this.totalTranslationStats[language].language);
       this.translationBadges[language][
-        AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION] = allBadges.filter(
-        badge => badge.text === AppConstants.
-          CONTRIBUTION_STATS_SUBTYPE_CORRECTION);
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION] =
+          this.getObtainedBadges(
+            this.totalTranslationStats[language].corrections,
+            AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION,
+            this.totalTranslationStats[language].language);
     }
 
-    const predefinedQuestionBadges = this.getPredefinedBadges(
-      this.totalQuestionStats);
-    const nonPredefinedQuestionBadges = this.getNonPredefinedBadges(
-      this.totalQuestionStats);
-
-    this.questionBadges = predefinedQuestionBadges.concat(
-      nonPredefinedQuestionBadges);
-    this.questionSubmissionBadges = this.questionBadges.filter(
-      badge => badge.text === AppConstants.
-        CONTRIBUTION_STATS_SUBTYPE_SUBMISSION);
-    this.questionReviewBadges = this.questionBadges.filter(
-      badge => badge.text === AppConstants.
-        CONTRIBUTION_STATS_SUBTYPE_REVIEW);
-    this.questionCorrectionBadges = this.questionBadges.filter(
-      badge => badge.text === AppConstants.
-        CONTRIBUTION_STATS_SUBTYPE_CORRECTION);
+    this.questionSubmissionBadges = this.getObtainedBadges(
+      this.totalQuestionStats.submissions,
+      AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION);
+    this.questionReviewBadges = this.getObtainedBadges(
+      this.totalQuestionStats.reviews,
+      AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW);
+    this.questionCorrectionBadges = this.getObtainedBadges(
+      this.totalQuestionStats.corrections,
+      AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION);
 
     this.languages = Object.keys(this.totalTranslationStats);
 
@@ -204,139 +192,56 @@ export class ContributorBadgeComponent {
     this.dataLoading = false;
   }
 
-  getPredefinedBadges(data: TotalContributionsAndReviews): Badge[] {
+  getObtainedBadges(
+      contributionCount: number,
+      contributionSubType: string, language?: string): Badge[] {
     const badges: Badge[] = [];
-
-    AppConstants.CONTRIBUTOR_BADGE_INITIAL_LEVELS.map((value) => {
-      if (!data.allSubmissionBadgesCreated) {
-        if (data.submissions >= value) {
-          badges.push(
-            this.createBadgeObject(
-              value,
-              AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION,
-              true, data.language));
-        } else {
-          badges.push(
-            this.createBadgeObject(
-              (value - data.submissions),
-              AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION,
-              false, data.language));
-          data.allSubmissionBadgesCreated = true;
-        }
+    for (const value of AppConstants.CONTRIBUTOR_BADGE_INITIAL_LEVELS) {
+      if (contributionCount >= value) {
+        badges.push(
+          this.createBadgeObject(
+            value, contributionSubType, true, language)
+        );
+      } else {
+        badges.push(
+          this.createBadgeObject(
+            (value - contributionCount), contributionSubType, false, language)
+        );
+        break;
       }
-      if (!data.allReviewBadgesCreated) {
-        if (data.reviews >= value) {
-          badges.push(
-            this.createBadgeObject(
-              value,
-              AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW,
-              true, data.language));
-        } else {
-          badges.push(
-            this.createBadgeObject(
-              (value - data.reviews),
-              AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW,
-              false, data.language));
-          data.allReviewBadgesCreated = true;
-        }
-      }
-      if (!data.allCorrectionBadgesCreated) {
-        if (data.corrections >= value) {
-          badges.push(
-            this.createBadgeObject(
-              value,
-              AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION,
-              true, data.language));
-        } else {
-          badges.push(
-            this.createBadgeObject(
-              (value - data.corrections),
-              AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION,
-              false, data.language));
-          data.allCorrectionBadgesCreated = true;
-        }
-      }
-    });
-
-    return badges;
-  }
-
-  getNonPredefinedBadges(data: TotalContributionsAndReviews): Badge[] {
-    const badges: Badge[] = [];
-
-    let count = 1000;
-
-    while (
-      !data.allSubmissionBadgesCreated ||
-      !data.allReviewBadgesCreated ||
-      !data.allCorrectionBadgesCreated) {
-      if (!data.allSubmissionBadgesCreated) {
-        if (data.submissions >= count) {
-          badges.push(
-            this.createBadgeObject(
-              count,
-              AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION,
-              true, data.language));
-        } else {
-          badges.push(
-            this.createBadgeObject(
-              (count - data.submissions),
-              AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION,
-              false, data.language));
-          data.allSubmissionBadgesCreated = true;
-        }
-      }
-      if (!data.allReviewBadgesCreated) {
-        if (data.reviews >= count) {
-          badges.push(
-            this.createBadgeObject(
-              count,
-              AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW,
-              true, data.language));
-        } else {
-          badges.push(
-            this.createBadgeObject(
-              (count - data.reviews),
-              AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW,
-              false, data.language));
-          data.allReviewBadgesCreated = true;
-        }
-      }
-      if (!data.allCorrectionBadgesCreated) {
-        if (data.corrections >= count) {
-          badges.push(
-            this.createBadgeObject(
-              count,
-              AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION,
-              true, data.language));
-        } else {
-          badges.push(
-            this.createBadgeObject(
-              (count - data.corrections),
-              AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION,
-              false, data.language));
-          data.allCorrectionBadgesCreated = true;
-        }
-      }
-
-      count += 500;
     }
+
+    let level = 500;
+    while (contributionCount >= level) {
+      level += 500;
+      if (contributionCount >= level) {
+        badges.push(
+          this.createBadgeObject(
+            level, contributionSubType, true, language)
+        );
+      } else {
+        badges.push(
+          this.createBadgeObject(
+            (level - contributionCount), contributionSubType, false, language)
+        );
+        break;
+      }
+    }
+
     return badges;
   }
 
   createBadgeObject(
-      value: number,
+      contributionCount: number,
       text: string,
-      badgeUnlocked: boolean,
+      isUnlocked: boolean,
       language?: string): Badge {
     const badge: Badge = {
-      value,
+      contributionCount,
       text,
-      badgeUnlocked
+      isUnlocked,
+      language
     };
-    if (language) {
-      badge.language = language;
-    }
 
     return badge;
   }
@@ -361,8 +266,8 @@ export class ContributorBadgeComponent {
     this.mobileDropdownShown = false;
   }
 
-  selectBadgeType(mobileTranslationBadgesShown: boolean): void {
-    this.mobileTranslationBadgesShown = mobileTranslationBadgesShown;
+  selectBadgeType(showMobileTranslationBadges: boolean): void {
+    this.showMobileTranslationBadges = showMobileTranslationBadges;
     this.mobileBadgeTypeDropdownShown = false;
   }
 

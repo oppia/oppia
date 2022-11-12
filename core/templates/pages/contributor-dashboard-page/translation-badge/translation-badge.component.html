@@ -1,4 +1,4 @@
-<div *ngIf="badgeUnlocked === 'true'" class="badge-container">
+<div *ngIf="isUnlocked === 'true'" class="badge-container">
     <img class="translation-badge" src="/assets/images/contributor_dashboard/translation-{{type}}-badge.component.svg">
     <div class="badge-value">
         {{value}}
@@ -10,7 +10,7 @@
         {{language}}
     </div>
 </div>
-<div *ngIf="badgeUnlocked === 'false'"  
+<div *ngIf="isUnlocked === 'false'"  
      ngbTooltip="{{value}} more {{contributionTypeText.toLowerCase()}} to achieve this"
      class="locked-badge-container"
      container="body"

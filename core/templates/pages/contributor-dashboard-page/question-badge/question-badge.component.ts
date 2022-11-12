@@ -9,7 +9,7 @@ import { AppConstants } from 'app.constants';
 export class QuestionBadgeComponent {
   @Input() type!: string;
   @Input() value: number;
-  @Input() badgeUnlocked: boolean;
+  @Input() isUnlocked: boolean;
   contributionTypeText: string;
 
   constructor() {}
