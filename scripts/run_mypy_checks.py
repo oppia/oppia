@@ -72,8 +72,6 @@ NOT_FULLY_COVERED_FILES: Final = [
     'core/controllers/skill_editor_test.py',
     'core/controllers/story_viewer.py',
     'core/controllers/story_viewer_test.py',
-    'core/controllers/topic_viewer.py',
-    'core/controllers/topic_viewer_test.py',
     'core/controllers/topics_and_skills_dashboard.py',
     'core/controllers/topics_and_skills_dashboard_test.py',
     'core/controllers/voice_artist.py',
