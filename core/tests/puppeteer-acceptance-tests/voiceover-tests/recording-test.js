@@ -8,6 +8,11 @@ const translationTab = "li#tutorialTranslationTab";
 const startRecording = "button.e2e-test-accessibility-translation-start-record";
 const stopRecording = "button.e2e-test-stop-record-button";
 
+// currently, headless is set to false and the page viewport
+// is maximized so that it would be easy for the developers
+// to debug easily while testing.
+// We can remove these settings before merging as we have
+// to run the tests in headless mode.
 puppeteer
   .launch({
     headless: false,
@@ -15,7 +20,7 @@ puppeteer
   })
   .then(async (browser) => {
     const page = await browser.newPage();
-    await page.setViewport({ width: 0, height: 0 }); // for maximizing page height-width
+    await page.setViewport({ width: 0, height: 0 });
     
     await page.goto("http://localhost:8181/");
     await basicFunctions.clickByText(page, "button", "OK");
