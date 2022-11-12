@@ -881,7 +881,6 @@ class AdminHandler(
                     'dummy-subtopic-three')]
             topic_1.next_subtopic_id = 2
 
-
             topic_2 = topic_domain.Topic.create_default_topic(
                 topic_id_2, 'Subtraction', 'subtraction',
                 'description', 'fragm'
@@ -970,7 +969,6 @@ class AdminHandler(
             skill_services.save_new_skill(self.user_id, skill_4)
             skill_services.save_new_skill(self.user_id, skill_5)
             skill_services.save_new_skill(self.user_id, skill_6)
-
 
             topic_6.add_uncategorized_skill_id(skill_id_6)
 
@@ -1066,11 +1064,11 @@ class AdminHandler(
                 classroom_2)
 
             classroom_pages_data = [{
-                "name": "math",
-                "url_fragment": "math",
-                "course_details": "",
-                "topic_list_intro": "",
-                "topic_ids": [
+                'name': 'math',
+                'url_fragment': 'math',
+                'course_details': '',
+                'topic_list_intro': '',
+                'topic_ids': [
                     topic_id_1,
                     topic_id_2,
                     topic_id_3,

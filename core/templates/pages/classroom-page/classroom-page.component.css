@@ -108,8 +108,8 @@
   padding: 20px;
 }
 .classroom-page-tile-button-text {
-  text-transform: uppercase;
   color: #094142;
+  text-transform: uppercase;
 }
 classroom-page .oppia-classroom-page-subheading-text {
   font-size: 1em;

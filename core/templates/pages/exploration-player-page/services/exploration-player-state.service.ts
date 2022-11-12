@@ -422,9 +422,9 @@ export class ExplorationPlayerStateService {
     return this.currentEngineService.recordNewCardAdded();
   }
 
-  skipCurrentQuestion(successCallback) {
+  skipCurrentQuestion(successCallback: (stateCard: StateCard) => void): void {
     this.diagnosticTestPlayerEngineService
-    .getNextCardAfterSkippingCurrentQuestion(successCallback);
+      .getNextCardAfterSkippingCurrentQuestion(successCallback);
   }
 
   get onTotalQuestionsReceived(): EventEmitter<number> {
