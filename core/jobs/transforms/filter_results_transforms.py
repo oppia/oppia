@@ -68,7 +68,7 @@ class FilterResults(beam.PTransform):  # type: ignore[misc]
     # PCollection object to return the filtered migration results.
     def expand(
         self, objects: beam.PCollection[result.Result[Tuple[str, Any], Tuple[str, Exception]]] # pylint: disable=line-too-long
-    ) -> beam.PCollection[Any]:
+    ) -> beam.PCollection[result.Result[Tuple[str, Any], None]]:
         """Count error results in collection and flush the input
             in case of errors.
 
