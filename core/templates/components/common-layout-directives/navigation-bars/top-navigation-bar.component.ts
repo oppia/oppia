@@ -62,6 +62,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() subheaderText!: string;
 
   DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
+  MEDIUM_BLOG_URL = 'https://medium.com/oppia-org';
+  OPPIA_BLOG_URL = '/blog';
   url!: URL;
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
@@ -366,6 +368,14 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  getOppiaBlogUrl(): string {
+    if (this.platformFeatureService.status.BlogPages.isEnabled) {
+      return this.OPPIA_BLOG_URL;
+    } else {
+      return this.MEDIUM_BLOG_URL;
+    }
   }
 
   changeLanguage(languageCode: string): void {

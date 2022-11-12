@@ -28,12 +28,14 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ImageUploaderComponent } from './image-uploader.component';
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ContextService } from 'services/context.service';
 
 describe('ImageUploaderComponent', () => {
   let component: ImageUploaderComponent;
   let fixture: ComponentFixture<ImageUploaderComponent>;
   let igs: IdGenerationService;
   let windowRef: WindowRef;
+  let contextService: ContextService;
 
   let dropAreaRefSpy = jasmine.createSpy('dropAreaRefSpy');
   let windowRefSpy = jasmine.createSpy('windowRefSpy');
@@ -75,6 +77,7 @@ describe('ImageUploaderComponent', () => {
     fixture = TestBed.createComponent(ImageUploaderComponent);
     component = fixture.componentInstance;
     igs = TestBed.inject(IdGenerationService);
+    contextService = TestBed.inject(ContextService);
     fixture.detectChanges();
 
     dropAreaRefSpy = spyOn(
@@ -94,6 +97,7 @@ describe('ImageUploaderComponent', () => {
   });
 
   it('should register drag and drop event listener', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     component.ngAfterViewInit();
 
     expect(dropAreaRefSpy.calls.allArgs()).toEqual([
@@ -109,6 +113,7 @@ describe('ImageUploaderComponent', () => {
   });
 
   it('should upload image on drop', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
 
@@ -126,6 +131,7 @@ describe('ImageUploaderComponent', () => {
   });
 
   it('should not upload image on drop if the event is empty', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     spyOn(component.fileChanged, 'emit');
     component.ngAfterViewInit();
 
@@ -140,6 +146,7 @@ describe('ImageUploaderComponent', () => {
 
   it('should not upload image on drop if the image' +
     ' format is not allowed', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png'];
 
@@ -161,6 +168,7 @@ describe('ImageUploaderComponent', () => {
 
   it('should not upload image on drop if the image filename extension' +
     ' does not match the image format', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
 
@@ -182,6 +190,7 @@ describe('ImageUploaderComponent', () => {
 
   it('should not upload image on drop if the allowed image formats list' +
     ' contains non allowed file formats', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg', 'mp3'];
 
@@ -202,6 +211,7 @@ describe('ImageUploaderComponent', () => {
   });
 
   it('should not upload file on drop if the file is not an image', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
 
@@ -222,6 +232,7 @@ describe('ImageUploaderComponent', () => {
   });
 
   it('should not upload image if the size is more than 100KB', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
 
@@ -246,6 +257,33 @@ describe('ImageUploaderComponent', () => {
     expect(component.fileChanged.emit).not.toHaveBeenCalled();
   });
 
+  it('should not upload image if the size is more than 1MB for blog post',
+    () => {
+      spyOn(contextService, 'getEntityType').and.returnValue('blog_post');
+      component.ngAfterViewInit();
+      component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
+
+      let dataTransfer = new DataTransfer();
+      let fileWithLargeSize = new File(
+        [''], 'image.jpg', {type: 'image/jpg'});
+      let sizeOfLargeFileInBytes = 1024 * 1024 + 100;
+
+      Object.defineProperty(
+        fileWithLargeSize, 'size', {value: sizeOfLargeFileInBytes});
+
+      dataTransfer.items.add(fileWithLargeSize);
+
+      spyOn(component.fileChanged, 'emit');
+
+      component.dropAreaRef.nativeElement.dispatchEvent(new DragEvent('drop', {
+        dataTransfer: dataTransfer
+      }));
+
+      expect(component.errorMessage).toBe(
+        'The maximum allowed file size is 1024 KB (100.0 MB given).');
+      expect(component.fileChanged.emit).not.toHaveBeenCalled();
+    });
+
   it('should change background color when user drags and leaves an' +
   ' image into the window', () =>{
     let dragoverEvent = new DragEvent('dragover');
@@ -255,6 +293,7 @@ describe('ImageUploaderComponent', () => {
 
     expect(component.backgroundWhileUploading).toBe(false);
 
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     component.ngAfterViewInit();
     component.dropAreaRef.nativeElement.dispatchEvent(dragoverEvent);
 
@@ -279,6 +318,7 @@ describe('ImageUploaderComponent', () => {
     spyOn(dropEvent, 'preventDefault');
     spyOn(dragoverEvent, 'preventDefault');
 
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     component.ngAfterViewInit();
 
     document.dispatchEvent(dropEvent);

@@ -1136,7 +1136,7 @@ def get_translation_suggestions_waiting_longest_for_review(
 
 def get_translation_suggestions_in_review_by_exploration(
     exp_id: str, language_code: str
-) -> List[Optional[suggestion_registry.BaseSuggestion]]:
+) -> List[suggestion_registry.BaseSuggestion]:
     """Returns translation suggestions in review by exploration ID.
 
     Args:
@@ -1144,8 +1144,8 @@ def get_translation_suggestions_in_review_by_exploration(
         language_code: str. Language code.
 
     Returns:
-        list(Suggestion|None). A list of translation suggestions in review with
-        target_id == exp_id, or None if suggestion model does not exists.
+        list(Suggestion). A list of translation suggestions in review with
+        target_id == exp_id.
     """
     suggestion_models_in_review = (
         suggestion_models.GeneralSuggestionModel
@@ -1153,7 +1153,7 @@ def get_translation_suggestions_in_review_by_exploration(
             exp_id, language_code)
     )
     return [
-        get_suggestion_from_model(model) if model else None
+        get_suggestion_from_model(model)
         for model in suggestion_models_in_review
     ]
 
@@ -1187,8 +1187,8 @@ def get_translation_suggestions_in_review_by_exp_ids(
 
 
 def get_suggestions_with_translatable_explorations(
-    suggestions: List[suggestion_registry.BaseSuggestion]
-) -> List[suggestion_registry.BaseSuggestion]:
+    suggestions: List[suggestion_registry.SuggestionTranslateContent]
+) -> List[suggestion_registry.SuggestionTranslateContent]:
     """Filters the supplied suggestions for those suggestions that have
     translatable exploration content. That is, the following are true:
     - The suggestion's change content corresponds to an existing exploration
@@ -1204,7 +1204,7 @@ def get_suggestions_with_translatable_explorations(
     """
 
     def _has_translatable_exploration(
-        suggestion: suggestion_registry.BaseSuggestion,
+        suggestion: suggestion_registry.SuggestionTranslateContent,
         suggestion_exp_id_to_exp: Dict[str, exp_domain.Exploration]
     ) -> bool:
         """Returns whether the supplied suggestion corresponds to a translatable
