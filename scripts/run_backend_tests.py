@@ -397,9 +397,6 @@ def check_test_results(
 
             try:
                 if not tests_failed_regex_match:
-                    # There was an internal error, and the tests did not run
-                    # (The error message did not match
-                    # `tests_failed_regex_match`).
                     raise Exception(
                         'The error message did not match '
                         'tests_failed_regex_match'
@@ -428,9 +425,6 @@ def check_test_results(
                     r'Ran ([0-9]+) tests? in ([0-9\.]+)s',
                     task.task_results[0].get_report()[0])
                 if not tests_run_regex_match:
-                    # There was an error, and the tests did not run
-                    # (The error message did not match
-                    # `tests_run_regex_match`).
                     raise Exception(
                         'The error message did not match tests_run_regex_match'
                     )

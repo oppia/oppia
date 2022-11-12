@@ -577,7 +577,7 @@ def _get_task_output(
     return failed
 
 
-def _print_errors_stacktrace(errors_stacktrace: List[Optional[str]]) -> None:
+def _print_errors_stacktrace(errors_stacktrace: List[str]) -> None:
     """Print errors stacktrace caught during linter execution.
 
     Args:
