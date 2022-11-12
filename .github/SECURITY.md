@@ -4,14 +4,14 @@ This vulnerability disclosure process describes how we accept and respond to sec
 
 ## Report
 
-Reporters should email [security@oppia.org](mailto:security@oppia.org) with:
+Reporters should email [security@oppia.org](mailto:security@oppia.org) or open a [GitHub Security Vulnerability Report](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing/privately-reporting-a-security-vulnerability) with:
 
 * A description of the problem.
 * Steps we can follow to reproduce the problem.
 * Affected versions.
 * If known, mitigations for the problem.
 
-We will respond within 3 days of the reporter’s email to acknowledge receipt of their report. Here is a template acknowledgement email:
+We will respond within 3 days of the reporter's submission to acknowledge receipt of their report. Here is a template acknowledgement message:
 
 ```
 Hi $REPORTER,
@@ -51,7 +51,7 @@ The tech lead will designate one VRT member as the VRT lead responsible for driv
 
 Note that while the VRT contains multiple individuals, it’s ultimately expected that the VRT lead drives the effort. This should be in collaboration with VRT members, but in cases of urgent vulnerabilities the VRT lead can operate authoritatively to mitigate or remediate the issue (i.e. they do not need VRT consensus or review, but they should leverage VRT team members as a source for information and help).
 
-The VRT lead will notify the reporter of the classification and the reasoning behind the VRT’s decision within 7 days of the acknowledgement email. This notification should include links to any issues that were opened as a result of the report. For problems classified as bugs, feature requests, or low-severity vulnerabilities, issues will be opened and assigned to the relevant team.
+The VRT lead will notify the reporter of the classification and the reasoning behind the VRT’s decision within 7 days of the acknowledgement message. This notification should include links to any issues that were opened as a result of the report. For problems classified as bugs, feature requests, or low-severity vulnerabilities, issues will be opened and assigned to the relevant team.
 
 The rest of this document describes how we handle high-severity vulnerabilities.
 
