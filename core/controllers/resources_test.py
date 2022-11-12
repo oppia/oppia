@@ -521,16 +521,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         rights_manager.release_ownership_of_exploration(
             self.system_user, '0')
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-
-        mock_accepted_audio_extensions = {
-            'mp3': ['audio/mp3'],
-            'flac': ['audio/flac']
-        }
-
-        self.accepted_audio_extensions_swap = self.swap(
-            feconf, 'ACCEPTED_AUDIO_EXTENSIONS',
-            mock_accepted_audio_extensions)
-
+        
     def test_guest_can_not_upload(self):
         csrf_token = self.get_new_csrf_token()
 
@@ -600,15 +591,14 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
         self.assertFalse(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC))
 
-        with self.accepted_audio_extensions_swap:
-            response_dict = self.post_json(
-                '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
-                {'filename': self.TEST_AUDIO_FILE_FLAC},
-                csrf_token=csrf_token,
-                expected_status_int=400,
-                upload_files=[
-                    ('raw_audio_file', self.TEST_AUDIO_FILE_FLAC, raw_audio)]
-            )
+        response_dict = self.post_json(
+            '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
+            {'filename': self.TEST_AUDIO_FILE_FLAC},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+            upload_files=[
+                ('raw_audio_file', self.TEST_AUDIO_FILE_FLAC, raw_audio)]
+        )
         error_msg = (
             'Schema validation for \'raw_audio_file\' failed: '
             'Audio not recognized as a mp3 file\n'
@@ -632,15 +622,14 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         ) as f:
             raw_audio = f.read()
 
-        with self.accepted_audio_extensions_swap:
-            response_dict = self.post_json(
-                '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
-                {'filename': mismatched_filename},
-                csrf_token=csrf_token,
-                expected_status_int=400,
-                upload_files=[
-                    ('raw_audio_file', mismatched_filename, raw_audio)]
-            )
+        response_dict = self.post_json(
+            '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
+            {'filename': mismatched_filename},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+            upload_files=[
+                ('raw_audio_file', mismatched_filename, raw_audio)]
+        )
         self.logout()
         error_msg = (
             'Schema validation for \'raw_audio_file\' failed: '
@@ -661,14 +650,13 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         ) as f:
             raw_audio = f.read()
 
-        with self.accepted_audio_extensions_swap:
-            response_dict = self.post_json(
-                '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
-                {'filename': self.TEST_AUDIO_FILE_FLAC},
-                csrf_token=csrf_token,
-                expected_status_int=400,
-                upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
-            )
+        response_dict = self.post_json(
+            '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
+            {'filename': self.TEST_AUDIO_FILE_FLAC},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
+        )
         self.logout()
 
         error_msg = (
