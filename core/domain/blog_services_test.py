@@ -155,17 +155,12 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             'content': '<p>Hello</p>',
             'tags': ['one']
         }
-        blog_services.update_blog_post(
-            self.blog_post_b_id,
-            change_dict)
+        blog_services.update_blog_post(self.blog_post_b_id, change_dict)
         blog_services.publish_blog_post(self.blog_post_b_id)
         number_of_published_blogs = (
             blog_services.get_published_blog_post_summaries(size=1)
         )
-        self.assertEqual(
-            len(number_of_published_blogs),
-            1
-        )
+        self.assertEqual(len(number_of_published_blogs), 1)
 
     def test_get_total_number_of_published_blog_post_summaries_by_author(
         self
@@ -959,12 +954,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
     def test_get_blog_post_summaries_with_no_query(self) -> None:
         # An empty query should return all published blog posts.
         (blog_post_ids, search_offset) = (
-            blog_services.get_blog_post_ids_matching_query(
-                '',
-                [],
-                size=5
-            )
-        )
+            blog_services.get_blog_post_ids_matching_query('', [], size=5))
         self.assertEqual(
             sorted(blog_post_ids),
             sorted(self.all_blog_post_ids[:5])

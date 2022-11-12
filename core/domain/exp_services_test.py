@@ -1283,8 +1283,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         # exp_domain.ExplorationChange.
         changed_exploration_objective = (
             exp_services.apply_change_list(
-                self.EXP_0_ID,
-                change_list_objective)) # type: ignore[arg-type]
+                self.EXP_0_ID, change_list_objective)) # type: ignore[arg-type]
         self.assertEqual(
             changed_exploration_objective.objective,
             'new objective')
@@ -1322,8 +1321,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         # of exp_domain.ExplorationChange.
         changed_exploration_objective = (
             exp_services.apply_change_list(
-                self.EXP_0_ID,
-                change_list_objective))  # type: ignore[arg-type]
+                self.EXP_0_ID, change_list_objective))  # type: ignore[arg-type]
         self.assertEqual(
             changed_exploration_objective.objective,
             'new objective')
@@ -5217,7 +5215,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         def mock_get_exploration_version_history_model(
-                instance_id: str, strict: bool) -> None: # pylint: disable=unused-argument
+                instance_id: str, strict: bool # pylint: disable=unused-argument
+        ) -> None:
             return None
         with self.swap_with_checks(
             exp_models.ExplorationVersionHistoryModel, 'get',

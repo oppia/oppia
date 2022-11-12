@@ -438,8 +438,7 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.exp_version, exploration.version)
 
     def test_cannot_update_stats_events_for_older_exp_version(self) -> None:
-        all_models = (
-            stats_models.ExplorationStatsModel.get_all())
+        all_models = stats_models.ExplorationStatsModel.get_all()
         self.assertEqual(all_models.count(), 0)
 
         exp_id = 'eid1'

@@ -1912,9 +1912,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         continue
                     curr_state_name = curr_queue[0]
                     curr_queue = curr_queue[1:]
-                    # We do not need to check if 'curr_state' is already
-                    # processed because we only append unprocessed states
-                    # in the 'curr_queue'.
                     processed_state_names.add(curr_state_name)
                     curr_state = new_states[curr_state_name]
 
@@ -2024,8 +2021,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             curr_state_name = curr_queue[0]
             curr_queue = curr_queue[1:]
 
-            # We do not need to check if 'curr_state_name' is already processed
-            # because we only append unprocessed states in the 'curr_queue'.
             processed_queue.append(curr_state_name)
 
             curr_state = self.states[curr_state_name]
@@ -2067,13 +2062,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
             curr_state_name = curr_queue[0]
             curr_queue = curr_queue[1:]
 
-            # We do not need to check if 'curr_state_name' is already processed
-            # because we only append unprocessed states in the 'curr_queue'.
             processed_queue.append(curr_state_name)
 
             for (state_name, state) in self.states.items():
-                if (state_name not in curr_queue
-                        and state_name not in processed_queue):
+                if (
+                    state_name not in curr_queue and
+                    state_name not in processed_queue
+                ):
                     all_outcomes = (
                         state.interaction.get_all_outcomes())
                     for outcome in all_outcomes:
