@@ -361,7 +361,7 @@ export class DiagnosticTestPlayerEngineService {
 
   getNextCardAfterSkippingCurrentQuestion(
       successCallback: (stateCard: StateCard) => void
-  ): StateCard {
+  ): void {
     this.diagnosticTestCurrentTopicStatusModel.recordIncorrectAttempt(
       this.currentSkillId);
 
