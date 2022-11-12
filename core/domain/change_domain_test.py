@@ -17,6 +17,7 @@
 """Unit tests for change_domain.py"""
 
 from __future__ import annotations
+from lib2to3.pytree import Base
 
 
 from core import feconf
@@ -108,3 +109,67 @@ class ChangeDomainTests(test_utils.GenericTestBase):
             change_domain.validate_cmd(
             feconf.CMD_DELETE_COMMIT,
             valid_cmd_dict, actual_cmd_attributes)
+
+    def test_that_thing(self) -> None: #does not seem to work
+        change_domain.BaseChange.ALLOWED_COMMANDS = [{
+        'name': "CMD_CHANGE_PROPERTY_VALUE",
+        'required_attribute_names': ['new_value'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+        }]
+        change_object = change_domain.BaseChange({
+            'cmd': feconf.CMD_DELETE_COMMIT
+        })
+        expected_change_object_dict = {
+            'cmd': feconf.CMD_DELETE_COMMIT
+        }
+        base = change_domain.BaseChange(change_object.to_dict())
+        self.assertEqual(change_object.to_dict(), expected_change_object_dict)
+
+    def test_that_error_when_no_cmd(self) -> None: #does not seem to work
+        with self.assertRaisesRegex(utils.ValidationError, (
+            'Missing cmd key in change dict')):
+            valid_cmd_dict = change_domain.BaseChange({
+            'not cmd': feconf.CMD_DELETE_COMMIT
+            })
+
+    def test_that_deprecated_throws_error(self) -> None:
+        with self.assertRaisesRegex(utils.DeprecatedCommandError, (
+            'Command cmd_val is deprecated')):
+            change_domain.BaseChange.DEPRECATED_COMMANDS = ['cmd_val']
+            valid_cmd_dict = change_domain.BaseChange({
+            'cmd': 'cmd_val'
+            })
+
+    def test_from_dict_returns_correct_basechange(self) -> None:
+        expected_change_object_dict = change_domain.BaseChange({
+            'cmd': feconf.CMD_DELETE_COMMIT
+        })
+        change_object = {
+            'cmd': feconf.CMD_DELETE_COMMIT
+        }
+        self.assertEqual(change_domain.BaseChange.from_dict(change_object).to_dict(),
+        expected_change_object_dict.to_dict())
+
+    def test_validate_function_returns_correctly(self) -> None:
+        change_object = change_domain.BaseChange({
+            'cmd': feconf.CMD_DELETE_COMMIT
+        })
+        self.assertEqual(change_object.validate(), None)
+
+    def test_getattr_gets_attribute(self) -> None:
+        change_object = change_domain.BaseChange({
+            'cmd': feconf.CMD_DELETE_COMMIT
+        })
+        self.assertEqual(change_object.__getattr__('cmd'),
+        feconf.CMD_DELETE_COMMIT)
+
+    def test_getattr_returns_attribute_error(self) -> None:
+        with self.assertRaisesRegex(AttributeError, (
+            'invalid_name')):
+            change_object = change_domain.BaseChange({
+                'cmd': feconf.CMD_DELETE_COMMIT
+            })
+            change_object.__getattr__('invalid_name')
