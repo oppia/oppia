@@ -235,14 +235,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset(
             expected_suggestion_dict, observed_suggestion.to_dict())
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally test
-    # wrong inputs that we can normally catch by typing.
     def test_cannot_create_suggestion_with_invalid_suggestion_type(
         self
     ) -> None:
         with self.assertRaisesRegex(Exception, 'Invalid suggestion type'):
-            suggestion_services.create_suggestion(  # type: ignore[call-overload]
+            suggestion_services.create_suggestion(
                 'invalid_suggestion_type',
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,

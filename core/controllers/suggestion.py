@@ -25,14 +25,49 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator
+from core.domain import change_domain
 from core.domain import exp_fetchers
 from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import image_validation_services
+from core.domain import opportunity_domain
 from core.domain import opportunity_services
 from core.domain import skill_fetchers
 from core.domain import state_domain
+from core.domain import suggestion_registry
 from core.domain import suggestion_services
+
+from typing import (
+    Any, Dict, List, Mapping, Optional, Sequence, TypedDict, TypeVar, Union
+)
+
+# Note: These private type variables are only defined to implement the Generic
+# typing structure of SuggestionsProviderHandler. So, do not make them public
+# in the future.
+_NormalizedRequestDictType = TypeVar('_NormalizedRequestDictType')
+_NormalizedPayloadDictType = TypeVar('_NormalizedPayloadDictType')
+
+
+class FrontendBaseSuggestionDict(TypedDict):
+    """Dictionary representing the frontend BaseSuggestion object
+    with additional 'exploration_content_html' key.
+    """
+
+    suggestion_id: str
+    suggestion_type: str
+    target_type: str
+    target_id: str
+    target_version_at_submission: int
+    status: str
+    author_name: str
+    final_reviewer_id: Optional[str]
+    change: Dict[str, change_domain.AcceptableChangeDictTypes]
+    score_category: str
+    language_code: str
+    last_updated: float
+    edited_by_reviewer: bool
+    exploration_content_html: str
+
 
 SCHEMA_FOR_SUBTITLED_HTML_DICT = {
     'type': 'dict',
@@ -58,10 +93,29 @@ SCHEMA_FOR_TARGET_ID = {
 }
 
 
-class SuggestionHandler(base.BaseHandler):
+class SuggestionHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of SuggestionHandler's
+    normalized_payload dictionary.
+    """
+
+    suggestion_type: str
+    target_type: str
+    target_id: str
+    target_version_at_submission: int
+    change: Mapping[str, change_domain.AcceptableChangeDictTypes]
+    description: str
+    files: Optional[Dict[str, Union[bytes, str]]]
+
+
+class SuggestionHandler(
+    base.BaseHandler[
+        SuggestionHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """"Handles operations relating to suggestions."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'suggestion_type': {
@@ -117,21 +171,26 @@ class SuggestionHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_suggest_changes
-    def post(self):
+    def post(self) -> None:
         """Handles POST requests."""
-        if (self.normalized_payload.get('suggestion_type') ==
-                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        suggestion_type = self.normalized_payload['suggestion_type']
+        if (
+            suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT
+        ):
             raise self.InvalidInputException(
                 'Content suggestion submissions are no longer supported.')
 
         suggestion = suggestion_services.create_suggestion(
-            self.normalized_payload.get('suggestion_type'),
-            self.normalized_payload.get('target_type'),
-            self.normalized_payload.get('target_id'),
-            self.normalized_payload.get('target_version_at_submission'),
+            suggestion_type,
+            self.normalized_payload['target_type'],
+            self.normalized_payload['target_id'],
+            self.normalized_payload['target_version_at_submission'],
             self.user_id,
-            self.normalized_payload.get('change'),
-            self.normalized_payload.get('description'))
+            self.normalized_payload['change'],
+            self.normalized_payload['description']
+        )
 
         suggestion_change = suggestion.change
         if (
@@ -153,17 +212,35 @@ class SuggestionHandler(base.BaseHandler):
         # is not good, since when the user cancels a question suggestion after
         # adding an image, there is no method to remove the uploaded image.
         # See more - https://github.com/oppia/oppia/issues/14298
-        if self.normalized_payload.get(
-            'suggestion_type') != (feconf.SUGGESTION_TYPE_ADD_QUESTION):
-            _upload_suggestion_images(
-                self.normalized_payload.get('files'),
-                suggestion,
-                suggestion.get_new_image_filenames_added_in_suggestion())
+        if suggestion_type != (feconf.SUGGESTION_TYPE_ADD_QUESTION):
+            files = self.normalized_payload.get('files')
+            new_image_filenames = (
+                suggestion.get_new_image_filenames_added_in_suggestion()
+            )
+            if new_image_filenames and files is not None:
+                _upload_suggestion_images(
+                    files, suggestion, new_image_filenames
+                )
 
         self.render_json(self.values)
 
 
-class SuggestionToExplorationActionHandler(base.BaseHandler):
+class SuggestionToExplorationActionHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of SuggestionToExplorationActionHandler's
+    normalized_payload dictionary.
+    """
+
+    action: str
+    commit_message: Optional[str]
+    review_message: str
+
+
+class SuggestionToExplorationActionHandler(
+    base.BaseHandler[
+        SuggestionToExplorationActionHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Handles actions performed on suggestions to explorations."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -212,13 +289,19 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
 
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration)
-    def put(self, target_id, suggestion_id):
+    def put(self, target_id: str, suggestion_id: str) -> None:
         """Handles PUT requests.
 
         Args:
             target_id: str. The ID of the suggestion target.
             suggestion_id: str. The ID of the suggestion.
+
+        Raises:
+            Exception. The 'commit_message' must be provided when the
+                action is 'accept suggestion'.
         """
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
         if (
                 suggestion_id.split('.')[0] !=
                 feconf.ENTITY_TYPE_EXPLORATION):
@@ -231,7 +314,7 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
                 'The exploration id provided does not match the exploration id '
                 'present as part of the suggestion_id')
 
-        action = self.normalized_payload.get('action')
+        action = self.normalized_payload['action']
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if suggestion.author_id == self.user_id:
@@ -240,21 +323,41 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
 
         if action == constants.ACTION_ACCEPT_SUGGESTION:
             commit_message = self.normalized_payload.get('commit_message')
+            if commit_message is None:
+                raise Exception(
+                    'The \'commit_message\' must be provided when the '
+                    'action is \'accept suggestion\'.'
+                )
             suggestion_services.accept_suggestion(
                 suggestion_id, self.user_id, commit_message,
-                self.normalized_payload.get('review_message')
+                self.normalized_payload['review_message']
             )
         else:
             assert action == constants.ACTION_REJECT_SUGGESTION
             suggestion_services.reject_suggestion(
                 suggestion_id, self.user_id,
-                self.normalized_payload.get('review_message')
+                self.normalized_payload['review_message']
             )
 
         self.render_json(self.values)
 
 
-class ResubmitSuggestionHandler(base.BaseHandler):
+class ResubmitSuggestionHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ResubmitSuggestionHandler's
+    normalized_payload dictionary.
+    """
+
+    action: str
+    change: Dict[str, Union[str, state_domain.SubtitledHtmlDict]]
+    summary_message: str
+
+
+class ResubmitSuggestionHandler(
+    base.BaseHandler[
+        ResubmitSuggestionHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Handler to reopen a rejected suggestion."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -313,23 +416,40 @@ class ResubmitSuggestionHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_resubmit_suggestion
-    def put(self, suggestion_id):
+    def put(self, suggestion_id: str) -> None:
         """Handles PUT requests.
 
         Args:
             suggestion_id: str. The ID of the suggestion.
         """
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        new_change = self.normalized_payload.get('change')
+        new_change = self.normalized_payload['change']
         change_cls = type(suggestion.change)
         change_object = change_cls(new_change)
-        summary_message = self.normalized_payload.get('summary_message')
+        summary_message = self.normalized_payload['summary_message']
         suggestion_services.resubmit_rejected_suggestion(
             suggestion_id, summary_message, self.user_id, change_object)
         self.render_json(self.values)
 
 
-class SuggestionToSkillActionHandler(base.BaseHandler):
+class SuggestionToSkillActionHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of SuggestionToSkillActionHandler's
+    normalized_payload dictionary.
+    """
+
+    action: str
+    review_message: str
+    skill_difficulty: Optional[str]
+
+
+class SuggestionToSkillActionHandler(
+    base.BaseHandler[
+        SuggestionToSkillActionHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Handles actions performed on suggestions to skills."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -374,13 +494,15 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
 
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_skill)
-    def put(self, target_id, suggestion_id):
+    def put(self, target_id: str, suggestion_id: str) -> None:
         """Handles PUT requests.
 
         Args:
             target_id: str. The ID of the suggestion target.
             suggestion_id: str. The ID of the suggestion.
         """
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
         if suggestion_id.split('.')[0] != feconf.ENTITY_TYPE_SKILL:
             raise self.InvalidInputException(
                 'This handler allows actions only on suggestions to skills.')
@@ -390,13 +512,13 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
                 'The skill id provided does not match the skill id present as '
                 'part of the suggestion_id')
 
-        action = self.normalized_payload.get('action')
+        action = self.normalized_payload['action']
 
         if action == constants.ACTION_ACCEPT_SUGGESTION:
             # Question suggestions do not use commit messages.
             suggestion_services.accept_suggestion(
                 suggestion_id, self.user_id, 'UNUSED_COMMIT_MESSAGE',
-                self.normalized_payload.get('review_message'))
+                self.normalized_payload['review_message'])
 
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
             target_entity_html_list = (
@@ -413,21 +535,33 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
             assert action == constants.ACTION_REJECT_SUGGESTION
             suggestion_services.reject_suggestion(
                 suggestion_id, self.user_id,
-                self.normalized_payload.get('review_message')
+                self.normalized_payload['review_message']
             )
 
         self.render_json(self.values)
 
 
-class SuggestionsProviderHandler(base.BaseHandler):
+class SuggestionsProviderHandler(
+    base.BaseHandler[
+        _NormalizedPayloadDictType,
+        _NormalizedRequestDictType
+    ]
+):
     """Provides suggestions for a user and given suggestion type."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {}
+    # Here we use type Any because the sub-classes of SuggestionsProviderHandler
+    # can contain different schemas with different types of values, like str,
+    # complex Dicts and etc.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    # Here we use type Any because the sub-classes of SuggestionsProviderHandler
+    # can contain different schemas with different types of values, like str,
+    # complex Dicts and etc.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {}
 
     def _require_valid_suggestion_and_target_types(
-            self, target_type, suggestion_type):
+        self, target_type: str, suggestion_type: str
+    ) -> None:
         """Checks whether the given target_type and suggestion_type are valid.
 
         Args:
@@ -446,7 +580,11 @@ class SuggestionsProviderHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid suggestion_type: %s' % suggestion_type)
 
-    def _render_suggestions(self, target_type, suggestions, next_offset):
+    def _render_suggestions(
+        self, target_type: str,
+        suggestions: Sequence[suggestion_registry.BaseSuggestion],
+        next_offset: int
+    ) -> None:
         """Renders retrieved suggestions.
 
         Args:
@@ -456,28 +594,42 @@ class SuggestionsProviderHandler(base.BaseHandler):
                 of all results matching the original query.
         """
         if target_type == feconf.ENTITY_TYPE_EXPLORATION:
-            target_id_to_opportunity_dict = (
+            target_id_to_exp_opportunity_dict = (
                 _get_target_id_to_exploration_opportunity_dict(suggestions))
             self.render_json({
                 'suggestions': _construct_exploration_suggestions(suggestions),
                 'target_id_to_opportunity_dict':
-                    target_id_to_opportunity_dict,
+                    target_id_to_exp_opportunity_dict,
                 'next_offset': next_offset
             })
         elif target_type == feconf.ENTITY_TYPE_SKILL:
-            target_id_to_opportunity_dict = (
+            target_id_to_skill_opportunity_dict = (
                 _get_target_id_to_skill_opportunity_dict(suggestions))
             self.render_json({
                 'suggestions': [s.to_dict() for s in suggestions],
                 'target_id_to_opportunity_dict':
-                    target_id_to_opportunity_dict,
+                    target_id_to_skill_opportunity_dict,
                 'next_offset': next_offset
             })
         else:
             self.render_json({})
 
 
-class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
+class ReviewableSuggestionsHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of ReviewableSuggestionsHandler's
+    normalized_request dictionary.
+    """
+
+    limit: int
+    offset: int
+    exploration_id: Optional[str]
+
+
+class ReviewableSuggestionsHandler(
+    SuggestionsProviderHandler[
+        Dict[str, str], ReviewableSuggestionsHandlerNormalizedRequestDict
+    ]
+):
     """Provides all suggestions which can be reviewed by the user for a given
     suggestion type.
     """
@@ -526,28 +678,33 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
     }
 
     @acl_decorators.can_view_reviewable_suggestions
-    def get(self, target_type, suggestion_type):
+    def get(self, target_type: str, suggestion_type: str) -> None:
         """Handles GET requests.
 
         Args:
             target_type: str. The type of the suggestion target.
             suggestion_type: str. The type of the suggestion.
         """
+        assert self.user_id is not None
+        assert self.normalized_request is not None
         self._require_valid_suggestion_and_target_types(
             target_type, suggestion_type)
-        limit = self.normalized_request.get('limit')
-        offset = self.normalized_request.get('offset')
+        limit = self.normalized_request['limit']
+        offset = self.normalized_request['offset']
         exploration_id = self.normalized_request.get('exploration_id')
+        exp_ids = [exploration_id] if exploration_id else []
 
-        suggestions = []
+        suggestions: Sequence[suggestion_registry.BaseSuggestion] = []
         next_offset = 0
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
             suggestions, next_offset = (
                 suggestion_services.
                 get_reviewable_translation_suggestions_by_offset(
                     self.user_id,
-                    [exploration_id],
-                    limit, offset))
+                    exp_ids,
+                    limit, offset
+                )
+            )
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             suggestions, next_offset = (
                 suggestion_services.
@@ -556,7 +713,21 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
-class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
+class UserSubmittedSuggestionsHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of UserSubmittedSuggestionsHandler's
+    normalized_request dictionary.
+    """
+
+    limit: int
+    offset: int
+
+
+class UserSubmittedSuggestionsHandler(
+    SuggestionsProviderHandler[
+        Dict[str, str],
+        UserSubmittedSuggestionsHandlerNormalizedRequestDict
+    ]
+):
     """Provides all suggestions which are submitted by the user for a given
     suggestion type.
     """
@@ -599,17 +770,19 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
     }
 
     @acl_decorators.can_suggest_changes
-    def get(self, target_type, suggestion_type):
+    def get(self, target_type: str, suggestion_type: str) -> None:
         """Handles GET requests.
 
         Args:
             target_type: str. The type of the suggestion target.
             suggestion_type: str. The type of the suggestion.
         """
+        assert self.user_id is not None
+        assert self.normalized_request is not None
         self._require_valid_suggestion_and_target_types(
             target_type, suggestion_type)
-        limit = self.normalized_request.get('limit')
-        offset = self.normalized_request.get('offset')
+        limit = self.normalized_request['limit']
+        offset = self.normalized_request['offset']
         suggestions, next_offset = (
             suggestion_services.get_submitted_suggestions_by_offset(
             self.user_id, suggestion_type, limit, offset))
@@ -637,11 +810,13 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
-class SuggestionListHandler(base.BaseHandler):
+class SuggestionListHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles list operations on suggestions."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'suggestion_type': {
@@ -675,7 +850,7 @@ class SuggestionListHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         # The query_fields_and_values variable is a list of tuples. The first
         # element in each tuple is the field being queried and the second
@@ -691,7 +866,20 @@ class SuggestionListHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class UpdateTranslationSuggestionHandler(base.BaseHandler):
+class UpdateTranslationSuggestionHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of UpdateTranslationSuggestionHandler's
+    normalized_payload dictionary.
+    """
+
+    translation_html: str
+
+
+class UpdateTranslationSuggestionHandler(
+    base.BaseHandler[
+        UpdateTranslationSuggestionHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Handles update operations relating to translation suggestions."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -706,23 +894,20 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
         'PUT': {
             'translation_html': {
                 'schema': {
-                    'type': 'weak_multiple',
-                    'options': ['basestring', 'list']
+                    'type': 'basestring',
                 }
             }
         }
     }
 
     @acl_decorators.can_update_suggestion
-    def put(self, suggestion_id):
+    def put(self, suggestion_id: str) -> None:
         """Handles PUT requests.
 
         Raises:
             InvalidInputException. The suggestion is already handled.
-            InvalidInputException. The 'translation_html' parameter is missing.
-            InvalidInputException. The 'translation_html' parameter is not a
-                string.
         """
+        assert self.normalized_payload is not None
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if suggestion.is_handled:
             raise self.InvalidInputException(
@@ -731,12 +916,27 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
             )
 
         suggestion_services.update_translation_suggestion(
-            suggestion_id, self.normalized_payload.get('translation_html'))
+            suggestion_id, self.normalized_payload['translation_html']
+        )
 
         self.render_json(self.values)
 
 
-class UpdateQuestionSuggestionHandler(base.BaseHandler):
+class UpdateQuestionSuggestionHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of UpdateQuestionSuggestionHandler's
+    normalized_payload dictionary.
+    """
+
+    skill_difficulty: float
+    question_state_data: state_domain.StateDict
+
+
+class UpdateQuestionSuggestionHandler(
+    base.BaseHandler[
+        UpdateQuestionSuggestionHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Handles update operations relating to question suggestions."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -766,18 +966,13 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_update_suggestion
-    def post(self, suggestion_id):
+    def post(self, suggestion_id: str) -> None:
         """Handles PUT requests.
 
         Raises:
             InvalidInputException. The suggestion is already handled.
-            InvalidInputException. The 'skill_difficulty' parameter is missing.
-            InvalidInputException. The 'skill_difficulty' is not a decimal.
-            InvalidInputException. The 'question_state_data' parameter is
-                missing.
-            InvalidInputException. The 'question_state_data' parameter is
-                invalid.
         """
+        assert self.normalized_payload is not None
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if suggestion.is_handled:
             raise self.InvalidInputException(
@@ -787,13 +982,17 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
 
         suggestion_services.update_question_suggestion(
             suggestion_id,
-            self.normalized_payload.get('skill_difficulty'),
-            self.normalized_payload.get('question_state_data'))
+            self.normalized_payload['skill_difficulty'],
+            self.normalized_payload['question_state_data'])
 
         self.render_json(self.values)
 
 
-def _get_target_id_to_exploration_opportunity_dict(suggestions):
+def _get_target_id_to_exploration_opportunity_dict(
+    suggestions: Sequence[suggestion_registry.BaseSuggestion]
+) -> Dict[
+    str, Optional[opportunity_domain.PartialExplorationOpportunitySummaryDict]
+]:
     """Returns a dict of target_id to exploration opportunity summary dict.
 
     Args:
@@ -814,7 +1013,9 @@ def _get_target_id_to_exploration_opportunity_dict(suggestions):
     return opportunity_id_to_opportunity_dict
 
 
-def _get_target_id_to_skill_opportunity_dict(suggestions):
+def _get_target_id_to_skill_opportunity_dict(
+    suggestions: Sequence[suggestion_registry.BaseSuggestion]
+) -> Dict[str, Optional[opportunity_domain.SkillOpportunityDict]]:
     """Returns a dict of target_id to skill opportunity summary dict.
 
     Args:
@@ -839,14 +1040,22 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
     }
 
     for opp_id, skill in opportunity_id_to_skill.items():
-        if skill is not None:
-            opportunity_id_to_opportunity_dict[opp_id]['skill_rubrics'] = [
-                rubric.to_dict() for rubric in skill.rubrics]
+        opportunity_dict = opportunity_id_to_opportunity_dict[opp_id]
+        if skill is not None and opportunity_dict is not None:
+            # Here we use MyPy ignore because we are adding a new
+            # 'skill_rubrics' key on a well-defined TypedDict, and
+            # according to MyPy addition of a new key on TypedDict is
+            # prohibited.
+            opportunity_dict['skill_rubrics'] = [  # type: ignore[misc]
+                rubric.to_dict() for rubric in skill.rubrics
+            ]
 
     return opportunity_id_to_opportunity_dict
 
 
-def _construct_exploration_suggestions(suggestions):
+def _construct_exploration_suggestions(
+    suggestions: Sequence[suggestion_registry.BaseSuggestion]
+) -> List[FrontendBaseSuggestionDict]:
     """Returns exploration suggestions with current exploration content. This
     method assumes that the supplied suggestions represent changes that are
     still valid, e.g. the suggestions refer to content that still exist in the
@@ -860,7 +1069,7 @@ def _construct_exploration_suggestions(suggestions):
         exploration_content_html field representing the target
         exploration's current content.
     """
-    suggestion_dicts = []
+    suggestion_dicts: List[FrontendBaseSuggestionDict] = []
     exp_ids = {suggestion.target_id for suggestion in suggestions}
     exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(list(exp_ids))
     for suggestion in suggestions:
@@ -868,12 +1077,33 @@ def _construct_exploration_suggestions(suggestions):
         content_html = exploration.get_content_html(
             suggestion.change.state_name, suggestion.change.content_id)
         suggestion_dict = suggestion.to_dict()
-        suggestion_dict['exploration_content_html'] = content_html
-        suggestion_dicts.append(suggestion_dict)
+        updated_suggestion_dict: FrontendBaseSuggestionDict = {
+            'suggestion_id': suggestion_dict['suggestion_id'],
+            'suggestion_type': suggestion_dict['suggestion_type'],
+            'target_type': suggestion_dict['target_type'],
+            'target_id': suggestion_dict['target_id'],
+            'target_version_at_submission': (
+                suggestion_dict['target_version_at_submission']
+            ),
+            'status': suggestion_dict['status'],
+            'author_name': suggestion_dict['author_name'],
+            'final_reviewer_id': suggestion_dict['final_reviewer_id'],
+            'change': suggestion_dict['change'],
+            'score_category': suggestion_dict['score_category'],
+            'language_code': suggestion_dict['language_code'],
+            'last_updated': suggestion_dict['last_updated'],
+            'edited_by_reviewer': suggestion_dict['edited_by_reviewer'],
+            'exploration_content_html': content_html
+        }
+        suggestion_dicts.append(updated_suggestion_dict)
     return suggestion_dicts
 
 
-def _upload_suggestion_images(files, suggestion, filenames):
+def _upload_suggestion_images(
+    files: Dict[str, Union[str, bytes]],
+    suggestion: suggestion_registry.BaseSuggestion,
+    filenames: List[str]
+) -> None:
     """Saves a suggestion's images to storage.
 
     Args:
@@ -887,16 +1117,20 @@ def _upload_suggestion_images(files, suggestion, filenames):
     # TODO(#10513): Find a way to save the images before the suggestion is
     # created.
     for filename in filenames:
-        image = files.get(filename)
-        image = base64.decodebytes(image.encode('utf-8'))
+        image = files[filename]
+        decoded_image = (
+            image
+            if isinstance(image, bytes)
+            else base64.decodebytes(image.encode('utf-8'))
+        )
         file_format = (
             image_validation_services.validate_image_and_filename(
-                image, filename))
+                decoded_image, filename))
         image_is_compressible = (
             file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
         fs_services.save_original_and_compressed_versions_of_image(
             filename, suggestion_image_context, suggestion.target_id,
-            image, 'image', image_is_compressible)
+            decoded_image, 'image', image_is_compressible)
 
     target_entity_html_list = suggestion.get_target_entity_html_strings()
     target_image_filenames = (
