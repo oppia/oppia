@@ -271,7 +271,7 @@ describe('Customize Interaction Modal Component', () => {
   });
 
   it('should disable Save Interaction button when recommendation ID' +
-  ' is empty', () => {
+  ' is null', () => {
     spyOn(component, 'getTitle').and
       .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
 
@@ -280,6 +280,25 @@ describe('Customize Interaction Modal Component', () => {
     spyOn(
       document, 'getElementsByClassName'
     ).withArgs(className).and.returnValue(null);
+
+    expect(component.isSaveInteractionButtonEnabled()).toBe(false);
+  });
+
+  // working on this
+  it('should disable Save Interaction button when recommendation ID' +
+  ' is empty', () => {
+    spyOn(component, 'getTitle').and
+      .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
+
+    let inputField = document.createElement('input');
+    let inputValue = angular.element(inputField);
+    let className = 'oppia-exploration-id-input';
+    
+    expect(inputValue.length).toBe(0);
+
+    spyOn(
+      document, 'getElementsByClassName'
+    ).withArgs(className).and.returnValue(inputValue as any);
 
     expect(component.isSaveInteractionButtonEnabled()).toBe(false);
   });
