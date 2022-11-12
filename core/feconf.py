@@ -558,7 +558,6 @@ ES_LOCALHOST_PORT = 9200
 # auth information during deployment.
 ES_CLOUD_ID = None
 ES_USERNAME = None
-ES_PASSWORD = None
 
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
 # Port when switching to prod server. Keep this in sync with redis.conf in the

@@ -1393,6 +1393,24 @@ class TranslationContributionStatsDict(TypedDict):
     contribution_dates: Set[datetime.date]
 
 
+class TranslationContributionStatsFrontendDict(TypedDict):
+    """Dictionary representing the TranslationContributionStats
+    object for frontend.
+    """
+
+    language_code: Optional[str]
+    topic_id: Optional[str]
+    submitted_translations_count: int
+    submitted_translation_word_count: int
+    accepted_translations_count: int
+    accepted_translations_without_reviewer_edits_count: int
+    accepted_translation_word_count: int
+    rejected_translations_count: int
+    rejected_translation_word_count: int
+    first_contribution_date: str
+    last_contribution_date: str
+
+
 class TranslationContributionStats:
     """Domain object for the TranslationContributionStatsModel."""
 
@@ -1476,6 +1494,37 @@ class TranslationContributionStats:
             'contribution_dates': self.contribution_dates
         }
 
+    # TODO(#16051): TranslationContributionStats to use first_contribution_date
+    # and last_contribution_date.
+    def to_frontend_dict(self) -> TranslationContributionStatsFrontendDict:
+        """Returns a dict representation of a TranslationContributionStats
+        domain object for frontend.
+
+        Returns:
+            dict. A dict representation of a TranslationContributionStats
+            domain object for frontend.
+        """
+        sorted_contribution_dates = sorted(self.contribution_dates)
+        return {
+            'language_code': self.language_code,
+            'topic_id': self.topic_id,
+            'submitted_translations_count': self.submitted_translations_count,
+            'submitted_translation_word_count': (
+                self.submitted_translation_word_count),
+            'accepted_translations_count': self.accepted_translations_count,
+            'accepted_translations_without_reviewer_edits_count': (
+                self.accepted_translations_without_reviewer_edits_count),
+            'accepted_translation_word_count': (
+                self.accepted_translation_word_count),
+            'rejected_translations_count': self.rejected_translations_count,
+            'rejected_translation_word_count': (
+                self.rejected_translation_word_count),
+            'first_contribution_date': (
+                sorted_contribution_dates[0].strftime('%b %Y')),
+            'last_contribution_date': (
+                sorted_contribution_dates[-1].strftime('%b %Y'))
+        }
+
 
 class TranslationReviewStatsDict(TypedDict):
     """Dictionary representing the TranslationReviewStats object."""
@@ -1490,6 +1539,22 @@ class TranslationReviewStatsDict(TypedDict):
     accepted_translations_with_reviewer_edits_count: int
     first_contribution_date: datetime.date
     last_contribution_date: datetime.date
+
+
+class TranslationReviewStatsFrontendDict(TypedDict):
+    """Dictionary representing the TranslationReviewStats
+    object for frontend.
+    """
+
+    language_code: str
+    topic_id: str
+    reviewed_translations_count: int
+    reviewed_translation_word_count: int
+    accepted_translations_count: int
+    accepted_translation_word_count: int
+    accepted_translations_with_reviewer_edits_count: int
+    first_contribution_date: str
+    last_contribution_date: str
 
 
 class TranslationReviewStats:
@@ -1545,6 +1610,31 @@ class TranslationReviewStats:
             'last_contribution_date': self.last_contribution_date,
         }
 
+    def to_frontend_dict(self) -> TranslationReviewStatsFrontendDict:
+        """Returns a dict representation of a TranslationReviewStats
+        domain object for frontend.
+
+        Returns:
+            dict. A dict representation of a TranslationReviewStats
+            domain object for frontend.
+        """
+        return {
+            'language_code': self.language_code,
+            'topic_id': self.topic_id,
+            'reviewed_translations_count': self.reviewed_translations_count,
+            'reviewed_translation_word_count': (
+                self.reviewed_translation_word_count),
+            'accepted_translations_count': self.accepted_translations_count,
+            'accepted_translation_word_count': (
+                self.accepted_translation_word_count),
+            'accepted_translations_with_reviewer_edits_count': (
+                self.accepted_translations_with_reviewer_edits_count),
+            'first_contribution_date': (
+                self.first_contribution_date.strftime('%b %Y')),
+            'last_contribution_date': (
+                self.last_contribution_date.strftime('%b %Y'))
+        }
+
 
 class QuestionContributionStatsDict(TypedDict):
     """Dictionary representing the QuestionContributionStats object."""
@@ -1556,6 +1646,19 @@ class QuestionContributionStatsDict(TypedDict):
     accepted_questions_without_reviewer_edits_count: int
     first_contribution_date: datetime.date
     last_contribution_date: datetime.date
+
+
+class QuestionContributionStatsFrontendDict(TypedDict):
+    """Dictionary representing the QuestionContributionStats
+    object for frontend.
+    """
+
+    topic_id: str
+    submitted_questions_count: int
+    accepted_questions_count: int
+    accepted_questions_without_reviewer_edits_count: int
+    first_contribution_date: str
+    last_contribution_date: str
 
 
 class QuestionContributionStats:
@@ -1602,6 +1705,27 @@ class QuestionContributionStats:
             'last_contribution_date': self.last_contribution_date
         }
 
+    def to_frontend_dict(self) -> QuestionContributionStatsFrontendDict:
+        """Returns a dict representation of a QuestionContributionStats
+        domain object for frontend.
+
+        Returns:
+            dict. A dict representation of a QuestionContributionStats
+            domain object for frontend.
+        """
+        return {
+            'topic_id': self.topic_id,
+            'submitted_questions_count': self.submitted_questions_count,
+            'accepted_questions_count': (
+                self.accepted_questions_count),
+            'accepted_questions_without_reviewer_edits_count': (
+                self.accepted_questions_without_reviewer_edits_count),
+            'first_contribution_date': (
+                self.first_contribution_date.strftime('%b %Y')),
+            'last_contribution_date': (
+                self.last_contribution_date.strftime('%b %Y'))
+        }
+
 
 class QuestionReviewStatsDict(TypedDict):
     """Dictionary representing the QuestionReviewStats object."""
@@ -1613,6 +1737,19 @@ class QuestionReviewStatsDict(TypedDict):
     accepted_questions_with_reviewer_edits_count: int
     first_contribution_date: datetime.date
     last_contribution_date: datetime.date
+
+
+class QuestionReviewStatsFrontendDict(TypedDict):
+    """Dictionary representing the QuestionReviewStats
+    object for frontend.
+    """
+
+    topic_id: str
+    reviewed_questions_count: int
+    accepted_questions_count: int
+    accepted_questions_with_reviewer_edits_count: int
+    first_contribution_date: str
+    last_contribution_date: str
 
 
 class QuestionReviewStats:
@@ -1657,6 +1794,27 @@ class QuestionReviewStats:
             'first_contribution_date': (
                 self.first_contribution_date),
             'last_contribution_date': self.last_contribution_date
+        }
+
+    def to_frontend_dict(self) -> QuestionReviewStatsFrontendDict:
+        """Returns a dict representation of a QuestionContributionStats
+        domain object for frontend.
+
+        Returns:
+            dict. A dict representation of a QuestionContributionStats
+            domain object for frontend.
+        """
+        return {
+            'topic_id': self.topic_id,
+            'reviewed_questions_count': self.reviewed_questions_count,
+            'accepted_questions_count': (
+                self.accepted_questions_count),
+            'accepted_questions_with_reviewer_edits_count': (
+                self.accepted_questions_with_reviewer_edits_count),
+            'first_contribution_date': (
+                self.first_contribution_date.strftime('%b %Y')),
+            'last_contribution_date': (
+                self.last_contribution_date.strftime('%b %Y'))
         }
 
 
