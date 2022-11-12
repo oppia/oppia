@@ -20,7 +20,6 @@ from __future__ import annotations
 
 from core.jobs import job_test_utils
 from core.jobs.transforms import filter_results_transforms
-from core.jobs.types import job_run_result
 
 import apache_beam as beam
 import result
@@ -31,7 +30,8 @@ class FilterResultsTests(job_test_utils.PipelinedTestBase):
     def test_error_results_returns_empty_collection(self) -> None:
         transform_result = (
             self.pipeline
-            | beam.Create([result.Ok(('id_1', None)),
+            | beam.Create(
+                [result.Ok(('id_1', None)),
                 result.Ok(('id_2', None)),
                 result.Err(('id_3', None))]
             )
