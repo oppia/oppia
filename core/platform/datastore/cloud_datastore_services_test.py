@@ -23,6 +23,8 @@ from core.platform import models
 from core.platform.datastore import cloud_datastore_services
 from core.tests import test_utils
 
+from google.cloud import ndb
+
 from typing import Sequence, Tuple
 
 MYPY = False
@@ -140,6 +142,29 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
                     ('UserQueryModel', ['query_id'])
                 ]
             )
+
+    def test_fetch_multiple_entities_throws_error_on_get_multi_failure(
+            self) -> None:
+        def mock_get_multi(unused_keys):
+            raise Exception('Mock key error')
+        
+        self.get_multi_swap = self.swap(
+            ndb, 'get_multi', mock_get_multi)
+
+        cloud_datastore_services.update_timestamps_multi(
+            [self.completed_activities_model, self.user_query_model], False)
+        cloud_datastore_services.put_multi(
+            [self.completed_activities_model, self.user_query_model])
+
+        error_msg = 'Mock key error'
+        with self.get_multi_swap:
+            with self.assertRaisesRegex(Exception, error_msg):
+                cloud_datastore_services.fetch_multiple_entities_by_ids_and_models(
+                    [
+                        ('CompletedActivitiesModel', [self.admin_user_id]),
+                        ('UserQueryModel', ['query_id'])
+                    ]
+                )
 
     def test_ndb_query_with_filters(self) -> None:
         user_query_model1 = user_models.UserQueryModel(
