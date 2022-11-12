@@ -242,7 +242,7 @@ class ClassroomHandler(
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self, classroom_url_fragment) -> None:
+    def get(self, classroom_url_fragment: str) -> None:
         """Handles GET requests."""
         classroom = classroom_config_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
@@ -256,7 +256,7 @@ class ClassroomHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_access_admin_page
-    def put(self, classroom_url_fragment) -> None:
+    def put(self, classroom_url_fragment: str) -> None:
         """Updates properties of a given classroom."""
         classroom = self.normalized_payload.get('classroom_dict')
         if classroom_url_fragment != classroom.url_fragment:
@@ -269,7 +269,7 @@ class ClassroomHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_access_admin_page
-    def delete(self, classroom_url_fragment) -> None:
+    def delete(self, classroom_url_fragment: str) -> None:
         """Deletes classroom from the classroom admin page."""
         classroom = classroom_config_services.get_classroom_by_url_fragment(
             classroom_url_fragment)

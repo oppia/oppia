@@ -149,7 +149,6 @@ export class ProgressNavComponent {
     this.skipQuestion.emit();
   }
 
-
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
