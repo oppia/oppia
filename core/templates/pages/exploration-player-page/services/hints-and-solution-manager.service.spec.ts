@@ -24,7 +24,7 @@ import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObje
 import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 
-describe('HintsAndSolutionManager service', () => {
+fdescribe('HintsAndSolutionManager service', () => {
   let hasms: HintsAndSolutionManagerService;
   let hof: HintObjectFactory;
   let sof: SolutionObjectFactory;
@@ -39,7 +39,8 @@ describe('HintsAndSolutionManager service', () => {
   const ACCELERATED_HINT_WAIT_TIME_MSEC: number = 10000;
   const WAIT_FOR_FIRST_HINT_MSEC: number = 60000;
   const WAIT_FOR_SUBSEQUENT_HINTS_MSEC: number = 30000;
-  const WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 60000;
+  const WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 500;
+  const WAIT_FOR_SOLUTION_TOOLTIP_MSEC: number = 500
 
   beforeEach(fakeAsync(() => {
     pps = TestBed.inject(PlayerPositionService);
@@ -85,6 +86,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(0)).toBe(false);
     expect(hasms.isHintViewable(1)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.isSolutionTooltipOpen()).toBe(false);
     expect(hasms.isHintConsumed(0)).toBe(false);
     expect(hasms.isHintConsumed(1)).toBe(false);
 
@@ -97,6 +99,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.isSolutionTooltipOpen()).toBe(false);
     expect(hasms.displayHint(0)?.html).toBe('one');
     expect(hasms.isHintConsumed(0)).toBe(true);
     expect(hasms.isHintConsumed(1)).toBe(false);
@@ -108,11 +111,28 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(true);
     expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.isSolutionTooltipOpen()).toBe(false);
     expect(hasms.displayHint(0)?.html).toBe('one');
     expect(hasms.displayHint(1)?.html).toBe('two');
     expect(hasms.displayHint(3)).toBeNull();
     expect(hasms.isHintConsumed(0)).toBe(true);
     expect(hasms.isHintConsumed(1)).toBe(true);
+  }));
+
+  it('should correctly show release solution and show tooltip', fakeAsync(() => {
+    hasms.solutionDiscovered = false;
+    hasms.solutionTooltipTimeout = null;
+    hasms.reset([], solution);
+
+    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.isSolutionTooltipOpen()).toBe(false);
+
+    hasms.releaseSolution();
+
+    tick(1000);
+    expect(hasms.solutionReleased).toBe(true);
+    expect(hasms.solutionDiscovered).toBe(true);
+    expect(hasms.solutionTooltipIsOpen).toBe(true);
   }));
 
   it('should not continue to display hints after after a correct answer is' +
@@ -156,9 +176,7 @@ describe('HintsAndSolutionManager service', () => {
 
   it('should correctly retrieve the solution', fakeAsync(() => {
     // Initialize the service with two hints and a solution.
-    hasms.reset([firstHint, secondHint], solution);
-
-    tick(WAIT_FOR_FIRST_HINT_MSEC);
+    hasms.reset([], solution);
 
     expect(hasms.isSolutionConsumed()).toBe(false);
     expect(hasms.displaySolution()?.correctAnswer).toBe(
@@ -215,8 +233,9 @@ describe('HintsAndSolutionManager service', () => {
       tick(WAIT_FOR_FIRST_HINT_MSEC);
       // Set tooltipTimeout.
       tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+      tick(2000);
 
-      // Reset service to 0 solutions so releaseHint timeout won't be called.
+      // Reset service to 0 hints so releaseHint timeout won't be called.
       hasms.reset([], solution);
 
       // There is no timeout to flush. timeout and tooltipTimeout variables

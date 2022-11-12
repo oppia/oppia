@@ -29,7 +29,7 @@ import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from './audio-translation-language.service';
 
-describe('HintsAndSolutionManager service', () => {
+describe('ConceptCardManager service', () => {
   let ccms: ConceptCardManagerService;
   let pps: PlayerPositionService;
   let ees: ExplorationEngineService;
@@ -40,9 +40,9 @@ describe('HintsAndSolutionManager service', () => {
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
 
-  const WAIT_BEFORE_REALLY_STUCK_MSEC: number = 29000;
-  const WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 2000;
-  const WAIT_FOR_CONCEPT_CARD_MSEC: number = 6000;
+  const WAIT_BEFORE_REALLY_STUCK_MSEC: number = 160000;
+  const WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 500;
+  const WAIT_FOR_CONCEPT_CARD_MSEC: number = 60000;
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
@@ -119,7 +119,7 @@ describe('HintsAndSolutionManager service', () => {
 
       // There is no timeout to flush. timeout and tooltipTimeout variables
       // were cleaned.
-      expect(flush()).toBe(6000);
+      expect(flush()).toBe(60000);
     }));
 
   it('should return if concept card for the state exists', fakeAsync(() => {

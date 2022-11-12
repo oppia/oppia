@@ -24,9 +24,9 @@ export const ExplorationPlayerConstants = {
   CONTINUE_BUTTON_FOCUS_LABEL: 'continueButton',
 
   // The enforced waiting period before the first hint request.
-  WAIT_FOR_FIRST_HINT_MSEC: 6000,
+  WAIT_FOR_FIRST_HINT_MSEC: 60000,
   // The enforced waiting period before each of the subsequent hint requests.
-  WAIT_FOR_SUBSEQUENT_HINTS_MSEC: 5000,
+  WAIT_FOR_SUBSEQUENT_HINTS_MSEC: 30000,
 
   // The time delay between the learner clicking the hint button
   // and the appearance of the hint.
@@ -34,17 +34,17 @@ export const ExplorationPlayerConstants = {
 
   // The enforced waiting period before the concept card
   // icon appears.
-  WAIT_FOR_CONCEPT_CARD_MSEC: 6000,
+  WAIT_FOR_CONCEPT_CARD_MSEC: 60000,
 
   // The time delay after all the hints are exhausted, or after
   // the concept card is used. This is the stage when the learner
   // is said to be really stuck.
-  WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC: 22000,
+  WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC: 150000,
 
   // The time delay after all the hints are exhausted, or after
   // the concept card is used. This is the stage when the learner
   // is said to be really stuck.
-  WAIT_BEFORE_REALLY_STUCK_MSEC: 29000,
+  WAIT_BEFORE_REALLY_STUCK_MSEC: 160000,
 
   // The threshold for incorrect answers submitted after either
   // exhausting all the hints, or after using the concept card,

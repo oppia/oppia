@@ -123,9 +123,9 @@ export class HintsAndSolutionManagerService {
   releaseSolution(): void {
     this.solutionReleased = true;
     if (!this.solutionDiscovered && !this.solutionTooltipTimeout) {
-      console.log("timeout set");
       this.solutionTooltipTimeout = setTimeout(
-        this.showSolutionTooltip.bind(this), this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+        this.showSolutionTooltip.bind(this),
+          this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
     }
     this._timeoutElapsedEventEmitter.emit();
   }

@@ -35,7 +35,7 @@ export class ConceptCardManagerService {
   tooltipTimeout: NodeJS.Timeout | null = null;
   hintsAvailable: number = 0;
 
-  WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 2000;
+  WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 500;
 
   // Emitter to show that the learner is really stuck.
   _learnerReallyStuckEventEmitter = new EventEmitter();
