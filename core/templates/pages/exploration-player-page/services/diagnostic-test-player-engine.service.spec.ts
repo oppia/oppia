@@ -221,6 +221,41 @@ describe('Diagnostic test engine service', () => {
         question1);
     }));
 
+  it(
+    'should be able to show a warning if the initial question has failed ' +
+    'to load', fakeAsync(() => {
+      let initSuccessCb = jasmine.createSpy('success');
+
+      // A linear graph with 3 nodes.
+      const topicIdToPrerequisiteTopicIds = {
+        topicId1: [],
+        topicId2: ['topicId1'],
+        topicId3: ['topicId2']
+      };
+
+      const diagnosticTestTopicTrackerModel = (
+        new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds));
+
+      spyOn(
+        questionBackendApiService,
+        'fetchDiagnosticTestQuestionsAsync').and.returnValue(
+        Promise.reject()
+      );
+      spyOn(alertsService, 'addWarning');
+
+      // Initially, the current question should be undefined since the engine
+      // is not initialized.
+      expect(diagnosticTestPlayerEngineService.getCurrentQuestion()).toEqual(
+        undefined);
+
+      diagnosticTestPlayerEngineService.init(
+        diagnosticTestTopicTrackerModel, initSuccessCb);
+      tick();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Failed to load the questions.');
+    }));
+
   it('should throw warning when question html is empty', fakeAsync(() => {
     let initSuccessCb = jasmine.createSpy('success');
 
@@ -328,6 +363,69 @@ describe('Diagnostic test engine service', () => {
       // Getting the backup question i.e., question2.
       expect(diagnosticTestPlayerEngineService.getCurrentQuestion()).toEqual(
         question2);
+    }));
+
+  it(
+    'should be able to show a warning if the next question has not loaded',
+    fakeAsync(() => {
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let initSuccessCb = jasmine.createSpy('success');
+
+      // A linear graph with 3 nodes.
+      const topicIdToPrerequisiteTopicIds = {
+        topicId1: [],
+        topicId2: ['topicId1'],
+        topicId3: ['topicId2']
+      };
+
+      const diagnosticTestCurrentTopicStatusModel = {
+        skillId1: new DiagnosticTestQuestionsModel(question1, question2)
+      };
+
+      const diagnosticTestTopicTrackerModel = (
+        new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds));
+
+      let fetchDiagnosticTestQuestionsAsyncSpy = spyOn(
+        questionBackendApiService, 'fetchDiagnosticTestQuestionsAsync');
+
+      fetchDiagnosticTestQuestionsAsyncSpy.and.returnValue(
+        Promise.resolve(diagnosticTestCurrentTopicStatusModel));
+
+      // Initially, the current question should be undefined since the engine
+      // is not initialized.
+      expect(diagnosticTestPlayerEngineService.getCurrentQuestion()).toEqual(
+        undefined);
+
+      diagnosticTestPlayerEngineService.init(
+        diagnosticTestTopicTrackerModel, initSuccessCb);
+      tick();
+
+      expect(diagnosticTestPlayerEngineService.getCurrentSkillId()).toEqual(
+        'skillId1');
+      // Getting the main question from the current skill.
+      expect(diagnosticTestPlayerEngineService.getCurrentQuestion()).toEqual(
+        question1);
+
+      let answer = 'answer';
+      let answerClassificationResult = new AnswerClassificationResult(
+        outcomeObjectFactory
+          .createNew('default', '', '', []), 1, 0, 'default_outcome'
+      );
+      answerClassificationResult.outcome.labelledAsCorrect = false;
+
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.returnValue(answerClassificationResult);
+      spyOn(alertsService, 'addWarning');
+
+      fetchDiagnosticTestQuestionsAsyncSpy.and.returnValue(Promise.reject());
+
+      // Submitting incorrect answer.
+      diagnosticTestPlayerEngineService.submitAnswer(
+        answer, textInputService, submitAnswerSuccessCb);
+      tick();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Failed to load the questions.');
     }));
 
   it(
@@ -678,7 +776,7 @@ describe('Diagnostic test engine service', () => {
     tick();
 
     let sortedTopicIds: string[] = (
-      diagnosticTestPlayerEngineService.getSortedInitialTopicIds());
+      diagnosticTestPlayerEngineService.getTopologicallySortedTopicIds());
 
     expect(sortedTopicIds).toEqual(['topicId1', 'topicId2', 'topicId3']);
   }));
@@ -720,7 +818,8 @@ describe('Diagnostic test engine service', () => {
     // string in comparison to a list is easy, hence the list is converted into
     // a string.
     let sortedTopicIds: string = (
-      diagnosticTestPlayerEngineService.getSortedInitialTopicIds()).join(',');
+      diagnosticTestPlayerEngineService.getTopologicallySortedTopicIds()
+    ).join(',');
 
     let possibleSortedAnswers = [
       ['topicId1', 'topicId2', 'topicId3', 'topicId4', 'topicId5'].join(','),
@@ -796,7 +895,7 @@ describe('Diagnostic test engine service', () => {
       spyOn(diagnosticTestPlayerEngineService, 'getFailedTopicIds')
         .and.returnValue(['topicId2', 'topicId3']);
 
-      spyOn(diagnosticTestPlayerEngineService, 'getSortedInitialTopicIds')
+      spyOn(diagnosticTestPlayerEngineService, 'getTopologicallySortedTopicIds')
         .and.returnValue(
           ['topicId1', 'topicId2', 'topicId3', 'topicId4', 'topicId5']);
 
@@ -815,7 +914,7 @@ describe('Diagnostic test engine service', () => {
       spyOn(diagnosticTestPlayerEngineService, 'getFailedTopicIds')
         .and.returnValue([]);
 
-      spyOn(diagnosticTestPlayerEngineService, 'getSortedInitialTopicIds')
+      spyOn(diagnosticTestPlayerEngineService, 'getTopologicallySortedTopicIds')
         .and.returnValue(
           ['topicId1', 'topicId2', 'topicId3', 'topicId4', 'topicId5']);
 

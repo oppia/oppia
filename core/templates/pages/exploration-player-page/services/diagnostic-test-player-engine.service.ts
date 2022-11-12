@@ -79,7 +79,6 @@ export class DiagnosticTestPlayerEngineService {
     this._diagnosticTestTopicTrackerModel = diagnosticTestTopicTrackerModel;
     this._initialCopyOfTopicTrackerModel = cloneDeep(
       diagnosticTestTopicTrackerModel);
-
     this._currentTopicId = (
       this._diagnosticTestTopicTrackerModel.selectNextTopicIdToTest());
 
@@ -95,6 +94,8 @@ export class DiagnosticTestPlayerEngineService {
       );
       const stateCard = this.createCard(this._currentQuestion);
       successCallback(stateCard, this._focusLabel);
+    }, () => {
+      this.alertsService.addWarning('Failed to load the questions.');
     });
   }
 
@@ -139,6 +140,8 @@ export class DiagnosticTestPlayerEngineService {
               this._currentSkillId)
           );
           return successCallback(this._currentQuestion);
+        }, () => {
+          this.alertsService.addWarning('Failed to load the questions.');
         }
       );
     } else {
@@ -242,8 +245,8 @@ export class DiagnosticTestPlayerEngineService {
     );
 
     if (failedRootTopicIds.length >= 2) {
-      // If the learner failed in two or more root topics, then any two root
-      // topics were recommended, so that learner can start with any
+      // If the learner failed in two or more root topics, then we recommend
+      // any two root topics, so that the learner can start with any
       // one of them.
       recommendedTopicIds.push(failedRootTopicIds[0]);
       recommendedTopicIds.push(failedRootTopicIds[1]);
@@ -252,10 +255,10 @@ export class DiagnosticTestPlayerEngineService {
       // it must be recommended.
       recommendedTopicIds.push(failedRootTopicIds[0]);
     } else {
-      // If none of the failed topics is a root topic, then the failed topics
-      // are topologically sorted and then the first topic among the sorted list
-      // will be recommended.
-      let sortedTopicIds = this.getSortedInitialTopicIds();
+      // If none of the failed topics is a root topic, then we sort the failed
+      // topics topologically and recommend the first topic from the
+      // sorted list.
+      let sortedTopicIds = this.getTopologicallySortedTopicIds();
       for (let topicId of sortedTopicIds) {
         if (failedTopicIds.indexOf(topicId) !== -1) {
           recommendedTopicIds.push(topicId);
@@ -267,10 +270,10 @@ export class DiagnosticTestPlayerEngineService {
   }
 
   getRootTopicIds(): string[] {
-    // The topics which do not contain any prerequisites are referred to as
-    // root topics.
     let topicIdToPrerequisiteTopicId = (
       this._initialCopyOfTopicTrackerModel.getTopicIdToPrerequisiteTopicIds());
+    // The topics which do not contain any prerequisites are referred to as
+    // root topics.
     let rootTopicIds: string[] = [];
 
     for (let topicId in topicIdToPrerequisiteTopicId) {
@@ -281,7 +284,7 @@ export class DiagnosticTestPlayerEngineService {
     return rootTopicIds;
   }
 
-  getSortedInitialTopicIds(): string[] {
+  getTopologicallySortedTopicIds(): string[] {
     let visitedTopicIds: string[] = [];
     let topicIdToPrerequisiteTopicId = (
       this._initialCopyOfTopicTrackerModel.getTopicIdToPrerequisiteTopicIds());
@@ -321,9 +324,9 @@ export class DiagnosticTestPlayerEngineService {
     let numberOfAttemptedQuestionsInCurrentTopic = (
       this._diagnosticTestCurrentTopicStatusModel.numberOfAttemptedQuestions);
     let initialTopicIdsList = (
-      this._initialCopyOfTopicTrackerModel.getPendingTopicIds());
+      this._initialCopyOfTopicTrackerModel.getPendingTopicIdsToTest());
     let pendingTopicIdsToTest = (
-      this._diagnosticTestTopicTrackerModel.getPendingTopicIds());
+      this._diagnosticTestTopicTrackerModel.getPendingTopicIdsToTest());
 
     // Each topic can contain a maximum of 3 diagnostic test skills and at most
     // 2 questions [main question & backup question] can be presented from each
@@ -390,7 +393,7 @@ export class DiagnosticTestPlayerEngineService {
 
   isDiagnosticTestFinished(): boolean {
     const pendingTopicIdsToTest = (
-      this._diagnosticTestTopicTrackerModel.getPendingTopicIds().length
+      this._diagnosticTestTopicTrackerModel.getPendingTopicIdsToTest().length
     );
 
     if (pendingTopicIdsToTest === 0) {
