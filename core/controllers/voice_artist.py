@@ -81,59 +81,12 @@ class AudioUploadHandler(base.BaseHandler):
         """Saves an audio file uploaded by a content creator."""
         raw_audio_file = self.normalized_request.get('raw_audio_file')
         filename = self.normalized_payload.get('filename')
-        allowed_formats = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
-
-        if not raw_audio_file:
-            raise self.InvalidInputException('No audio supplied')
-        dot_index = filename.rfind('.')
-        extension = filename[dot_index + 1:].lower()
-
-        if dot_index in (-1, 0):
-            raise self.InvalidInputException(
-                'No filename extension: it should have '
-                'one of the following extensions: %s' % allowed_formats)
-        if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
-            raise self.InvalidInputException(
-                'Invalid filename extension: it should have '
-                'one of the following extensions: %s' % allowed_formats)
 
         tempbuffer = io.BytesIO()
         tempbuffer.write(raw_audio_file)
         tempbuffer.seek(0)
-        try:
-            # For every accepted extension, use the mutagen-specific
-            # constructor for that type. This will catch mismatched audio
-            # types e.g. uploading a flac file with an MP3 extension.
-            if extension == 'mp3':
-                audio = mp3.MP3(tempbuffer)
-            else:
-                audio = mutagen.File(tempbuffer)
-        except mutagen.MutagenError as e:
-            # The calls to mp3.MP3() versus mutagen.File() seem to behave
-            # differently upon not being able to interpret the audio.
-            # mp3.MP3() raises a MutagenError whereas mutagen.File()
-            # seems to return None. It's not clear if this is always
-            # the case. Occasionally, mutagen.File() also seems to
-            # raise a MutagenError.
-            raise self.InvalidInputException(
-                'Audio not recognized as a %s file' % extension
-            ) from e
+        audio = mp3.MP3(tempbuffer)
         tempbuffer.close()
-
-        if audio is None:
-            raise self.InvalidInputException(
-                'Audio not recognized as a %s file' % extension)
-        if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
-            raise self.InvalidInputException(
-                'Audio files must be under %s seconds in length. The uploaded '
-                'file is %.2f seconds long.' % (
-                    feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length))
-        if len(set(audio.mime).intersection(
-                set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
-            raise self.InvalidInputException(
-                'Although the filename extension indicates the file '
-                'is a %s file, it was not recognized as one. '
-                'Found mime types: %s' % (extension, audio.mime))
 
         mimetype = audio.mime[0]
         # Fetch the audio file duration from the Mutagen metadata.
