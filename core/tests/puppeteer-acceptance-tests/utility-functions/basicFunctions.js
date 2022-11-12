@@ -1,3 +1,5 @@
+// TODO: make a global class with page objects that can be used with many utility functions with passing that object class.
+
 module.exports = {
   clicks: async (page, selector, time = 0) => {
     await page.waitForSelector(selector);
