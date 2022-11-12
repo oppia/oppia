@@ -1013,8 +1013,10 @@ export class ConversationSkinComponent {
   private _initializeDirectiveComponents(initialCard, focusLabel): void {
     this._addNewCard(initialCard);
     this.nextCard = initialCard;
-    this.explorationPlayerStateService.onPlayerStateChange.emit(
-      this.nextCard.getStateName());
+    if (!this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()) {
+      this.explorationPlayerStateService.onPlayerStateChange.emit(
+        this.nextCard.getStateName());
+    }
 
     if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
       // We do not store checkpoints progress for iframes hence we do not
@@ -1194,6 +1196,10 @@ export class ConversationSkinComponent {
           Math.max(this.MIN_CARD_LOADING_DELAY_MSEC - (
             new Date().getTime() - timeAtServerCall),
           1.0));
+
+        if (this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()) {
+          millisecsLeftToWait = 1.0;
+        }
 
         setTimeout(() => {
           this.explorationPlayerStateService.onOppiaFeedbackAvailable.emit();

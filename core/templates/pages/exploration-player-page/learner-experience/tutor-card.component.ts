@@ -137,6 +137,7 @@ export class TutorCardComponent {
   checkMarkSkipped: boolean = false;
   confettiAnimationTimeout: NodeJS.Timeout | null = null;
   skipClickListener: Function | null = null;
+  celebrationComponentIsShown!: boolean;
 
   constructor(
     private audioBarStatusService: AudioBarStatusService,
@@ -200,6 +201,12 @@ export class TutorCardComponent {
         }
       )
     );
+
+    if (this.showOnlyLastInputPairResponse) {
+      this.celebrationComponentIsShown = false;
+    } else {
+      this.celebrationComponentIsShown = true;
+    }
   }
 
   ngOnDestroy(): void {
