@@ -1,71 +1,316 @@
 <div class="donate-page">
-  <div class="oppia-page-card oppia-static-content e2e-test-donate-page">
-    <div class="oppia-donation-card-content-wide">
-      <div class="oppia-donate-options">
-        <div *ngIf="windowIsNarrow">
-          <h1 class="oppia-donate-h1"><span [innerHTML]="'I18N_DONATE_PAGE_TITLE' | translate"></span></h1>
-        </div>
-        <div *ngIf="!windowIsNarrow">
-          <h1 class="oppia-donate-h1"><span [innerHTML]="'I18N_DONATE_PAGE_TITLE' | translate"></span></h1>
-        </div>
-        <div class="text-center">
-          <form ngNoForm action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-            <input type="hidden" name="cmd" value="_s-xclick">
-            <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
-            <button type="submit" class="btn oppia-donate-options-button e2e-test-paypal-donate-button" tabindex="0" (click)="onDonateThroughPayPal()">
-              PayPal
-            </button>
-          </form>
-        </div>
-        <div class="text-center">
-          <form ngNoForm action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-            <input type="hidden" name="cmd" value="_s-xclick">
-            <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
-            <button class="btn oppia-donate-options-button e2e-test-credit-card-donate-button" tabindex="0" (click)="onDonateThroughPayPal()">
-              Credit Card
-            </button>
-          </form>
-        </div>
-        <div class="text-center">
-          <a (click)="onDonateThroughAmazon()" class="btn oppia-donate-options-button" tabindex="0">Amazon Smile</a>
-        </div>
-        <h2 class="oppia-gift-funds-text">
-          <span [innerHTML]="'I18N_DONATE_PAGE_IMAGE_TITLE' | translate"></span>
-        </h2>
-        <div class="oppia-donate-img-container text-center">
-          <img [src]="donateImgUrl" alt="Server costs, student outreach, marketing">
-        </div>
-      </div>
-      <div class="oppia-donate-info">
-        <div class="position-relative oppia-meet-contributors-iframe-container">
-          <iframe title="Meet Oppia's Contributors"
-                  width="100%"
-                  height="100%"
-                  src="https://www.youtube.com/embed/OConyxG7HaM?rel=0&cc_lang_pref=en&cc_load_policy=1"
-                  frameborder="0"
-                  allowfullscreen
-                  class="position-absolute w-100 h-100 oppia-meet-contributors-iframe">
-          </iframe>
-        </div>
-        <h3 class="oppia-donate-h3">
-          <em>
-            <span [innerHTML]="'I18N_DONATE_PAGE_VIDEO_SUBTITLE' | translate"></span>
-          </em>
-        </h3>
-        <div class="oppia-vision-text-container">
-          <p class="oppia-vision-text">
-            <span [innerHTML]="'I18N_DONATE_PAGE_VISION_TEXT_ONE' | translate"></span>
-          </p>
-          <p class="oppia-vision-text">
-            <span [innerHTML]="'I18N_DONATE_PAGE_VISION_TEXT_TWO' | translate"></span>
-          </p>
-        </div>
-      </div>
-
+  <div class="oppia-donate-page-banner">
+    <div class="container">
+      <h1 class="text-light oppia-donate-page-heading">Donate to the Oppia Foundation</h1>
+      <picture class="oppia-donate-page-img">
+        <source type="image/webp" [srcset]="getImageSet('/splash/volunteer_section', 'webp')">
+        <source type="image/png" [srcset]="getImageSet('/splash/volunteer_section', 'png')">
+        <img [src]="getStaticImageUrl('/splash/volunteer_section', 'png')"
+            width="200px"
+            loading="lazy"
+            alt="Logo of Oppia containing photos of contributors">
+      </picture>
     </div>
+  </div>
+  <div class="oppia-page-card mt-0 mb-0 bg-white">
+    <div class="container oppia-donate-page-main-content-container">
+      <div class="row">
+        <div class="col-sm-7">
+          <div class="oppia-donation-card-content-wide oppia-donate-page-video-section bg-white mt-0 d-block">
+            <div class="mb-5">
+              To date, Oppia has served more than <b>1.5 million</b> learners around the world - many of whom come from the world's more underserved areas. Oppia relies on donations, and with <b>just $11</b>, you can help us continue our work and expand the reach of our platform, to expand equitable education for all.
+            </div>
+            <iframe class="oppia-donate-page-video"
+                    src="https://www.youtube.com/embed/oJQrQK8cdoM"
+                    title="YouTube video player"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+            </iframe>
+          </div>
+        </div>
+        <div class="col-sm-5">
+          <div>
+            <script src="https://donorbox.org/widget.js" paypalExpress="false"></script>
+            <iframe src="https://donorbox.org/embed/oppia-page?default_interval=o&hide_donation_meter=true"
+                    name="donorbox"
+                    allowpaymentrequest="allowpaymentrequest"
+                    seamless="seamless"
+                    frameborder="0"
+                    scrolling="no"
+                    width="100%"
+                    style="max-width: 500px; min-width: 250px; max-height:none!important">
+            </iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-page-card mt-0 mb-0 oppia-donate-page-section-gray-bg">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row container donate-page-section-heading">
+            <span>
+              Join us in ensuring access to
+              <span class="oppia-donate-page-text-color">
+                high quality and engaging education.
+              </span>
+            </span>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="oppia-donate-page-feature-text-container">
+                <div class="oppia-donate-page-text-color oppia-donate-page-feature-text">1,500,000+</div>
+                <div>Learners served worldwide.</div>
+              </div>
+              <div class="oppia-donate-page-feature-text-container">
+                <div class="oppia-donate-page-text-color oppia-donate-page-feature-text">2,000</div>
+                <div>Lessons in our virtual library</div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="oppia-donate-page-feature-text-container">
+                <div class="oppia-donate-page-text-color oppia-donate-page-feature-text">1</div>
+                <div>Randomized trial completed, with more to come</div>
+              </div>
+              <div class="oppia-donate-page-feature-text-container">
+                <div class="oppia-donate-page-text-color oppia-donate-page-feature-text">100+</div>
+                <div>Volunteers from all over the globe</div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-5">
+            <div class="col-sm-6">
+              <button class="btn oppia-donate-page-watch-video-btn">Watch a video</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn oppia-donate-page-read-blog-btn">Read our blog</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <picture class="oppia-donate-page-learner-img-container">
+            <source type="image/webp" [srcset]="getImageSet('/donate/oppia-donate-learner', 'webp')">
+            <source type="image/png" [srcset]="getImageSet('/donate/oppia-donate-learner', 'png')">
+            <img [src]="getStaticImageUrl('/donate/oppia-donate-learner', 'png')"
+                 class="img-fluid"
+                 height="400px"
+                 width="400px"
+                 loading="lazy"
+                 alt="Logo of Oppia containing photos of contributors">
+          </picture>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-page-card mt-0 mb-0 bg-white">
+    <div class="container">
+      <div class="row">
+        <div class="donate-page-section-heading oppia-donate-page-text-color">
+          Where does your money go?
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="oppia-donate-page-money-card">
+            <div class="container">
+              <div class="row">
+                <img class="oppia-donate-page-money-icon" [src]="getStaticImageUrl('/donate/oppia-donate-outreach.svg')">
+              </div>
+              <div class="row oppia-donate-page-money-main-text">Expanding Outreach</div>
+              <hr class="w-25 oppia-donate-page-hr">
+              <div class="row oppia-donate-page-money-sub-text">
+                Your donations strengthen our global partnerships and help us reach  and support new learning communities.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="oppia-donate-page-money-card">
+            <div class="container">
+              <div class="row">
+                <img class="oppia-donate-page-money-icon" [src]="getStaticImageUrl('/donate/oppia-donate-spread-word.svg')">
+              </div>
+              <div class="row oppia-donate-page-money-main-text">Spreading the word</div>
+              <hr class="w-25 oppia-donate-page-hr">
+              <div class="row oppia-donate-page-money-sub-text">
+                Your donations help with our efforts in raising awareness of Oppia across the world.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="oppia-donate-page-money-card">
+            <div class="container">
+              <div class="row">
+                <img class="oppia-donate-page-money-icon" [src]="getStaticImageUrl('/donate/oppia-donate-maintenance.svg')">
+              </div>
+              <div class="row oppia-donate-page-money-main-text">Maintenance</div>
+              <hr class="w-25 oppia-donate-page-hr">
+              <div class="row oppia-donate-page-money-sub-text">
+                Donations keep the Oppia platforms and servers running smoothly and reliably.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-page-card mt-0 mb-0 oppia-donate-page-section-gray-bg">
+    <ngb-carousel>
+      <ng-template ngbSlide>
+        <div class="oppia-donate-page-carousel-img-wrapper">
+          <picture>
+            <source type="image/webp" [srcset]="getImageSet('/splash/Gaurav', 'webp')">
+            <source type="image/png" [srcset]="getImageSet('/splash/Gaurav', 'png')">
+            <img [src]="getStaticImageUrl('/splash/Gaurav', 'png')"
+                width="200px"
+                alt="Logo of Oppia containing photos of contributors">
+          </picture>
+        </div>
+        <div class="carousel-caption text-dark">
+          <h3>From Khanpur, India</h3>
+          <p>“I liked learning the lessons on mobile because we get very good questions and if we get something wrong we are told how to correct it and we are not scared when we are doing this I really liked this app.”</p>
+        </div>
+      </ng-template>
+      <ng-template ngbSlide>
+        <div class="oppia-donate-page-carousel-img-wrapper">
+          <picture>
+            <source type="image/webp" [srcset]="getImageSet('/splash/mira', 'webp')">
+            <source type="image/png" [srcset]="getImageSet('/splash/mira', 'png')">
+            <img [src]="getStaticImageUrl('/splash/mira', 'png')"
+                width="200px"
+                alt="Logo of Oppia containing photos of contributors">
+          </picture>
+        </div>
+        <div class="carousel-caption text-dark">
+          <h3>From Palestine</h3>
+          <p>“I enjoyed playing the lesson a lot, I did not feel bored and I feel like I master the negative numbers now.”</p>
+        </div>
+      </ng-template>
+      <ng-template ngbSlide>
+        <div class="oppia-donate-page-carousel-img-wrapper">
+          <picture>
+            <source type="image/webp" [srcset]="getImageSet('/splash/Dheeraj', 'webp')">
+            <source type="image/png" [srcset]="getImageSet('/splash/Dheeraj', 'png')">
+            <img [src]="getStaticImageUrl('/splash/Dheeraj', 'png')"
+                width="200px"
+                alt="Logo of Oppia containing photos of contributors">
+          </picture>
+        </div>
+        <div class="carousel-caption text-dark">
+          <h3>From India</h3>
+          <p>“I really had fun while solving the questions because they had many colorful shapes and images. 
+            The images made it easier to understand the topics as well!”</p>
+        </div>
+      </ng-template>
+    </ngb-carousel>
   </div>
 </div>
 <style>
+  .oppia-donate-page-banner {
+    background: #879AA1;
+    height: 350px;
+  }
+  .oppia-donate-page-main-content-container {
+    margin-top: -97px;
+  }
+  .oppia-donate-page-heading {
+    text-align: center;
+    padding-top: 120px;
+  }
+  .oppia-donate-page-img {
+    display: block;
+    filter: grayscale(40%);
+    margin-right: 30px;
+    margin-top: -80px;
+    text-align: right;
+    z-index: -10;
+  }
+  .oppia-donate-page-video {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+  }
+  .donate-page-section-heading {
+    font-family:'Capriola', 'Roboto', Arial, sans-serif;
+    font-weight: 400;
+    font-size: 32px;
+  }
+  .oppia-donate-page-section-gray-bg {
+    background: #F4F4F4;
+  }
+  .oppia-donate-page-learner-img-container {
+    display: block;
+    text-align: center;
+  }
+  .oppia-donate-page-text-color {
+    color: #015C53;
+  }
+  .oppia-donate-page-feature-text {
+    font-family: 'Roboto';
+    font-weight: 700;
+    margin-top: 50px;
+  }
+  .oppia-donate-page-money-card {
+    box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 24%);
+    margin: 20px;
+    padding: 35px;
+  }
+  .oppia-donate-page-money-icon {
+    display: block;
+    margin: 0 auto;
+  }
+  .oppia-donate-page-money-main-text {
+    color: #252B42;
+    display: block;
+    font-family: 'Capriola';
+    font-size: 23px;
+    font-weight: 400;
+    padding-top: 10px;
+    text-align: center;
+  }
+  .oppia-donate-page-money-sub-text {
+    color: #737373;
+    display: block;
+    font-family: 'Roboto';
+    font-size: 14px;
+    padding-top: 10px;
+    text-align: center;
+  }
+  .donate-page .oppia-page-card {
+    box-shadow: none;
+  }
+  .oppia-donate-page-watch-video-btn {
+    background-color: #00645c;
+    border-radius: 4px;
+    color: #fff;
+    width: 100%;
+    margin: 10px auto;
+  }
+  .oppia-donate-page-read-blog-btn {
+    border-radius: 4px;
+    border: 1px solid #00645c;
+    color: #00645c;
+    width: 100%;
+    margin: 10px auto;
+  }
+  .oppia-donate-page-feature-text-container {
+    height: 50px;
+  }
+  .oppia-donate-page-hr {
+    background-color: #E74040;
+    border: none;
+    color: #E74040;
+    height: 1px;
+  }
+  .oppia-donate-page-carousel-img-wrapper {
+    height: 400px;
+  }
+  .oppia-donate-page-carousel-img-wrapper img {
+    display: block;
+    margin: 0 auto;
+  }
   h1.oppia-donate-h1 {
     color: #fff;
     font-size: 1.5em;
@@ -79,9 +324,17 @@
     margin: 2.33em 0;
     text-align: center;
   }
+  .carousel-indicators li {
+    background-color: #00645c;
+  }
   .donate-page .oppia-donation-card-content-wide {
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 24%);
+    margin-bottom: 80px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 30px 55px 30px 45px;
     margin: 40px auto 80px;
-    min-height: 670px;
     overflow: auto;
   }
   .donate-page .oppia-donate-options {
