@@ -331,9 +331,7 @@ def validate_rte_tags(
         ValidationError. Collapsible tag present inside tabs or another
             collapsible.
     """
-    soup = bs4.BeautifulSoup(
-            html_data.encode(encoding='utf-8'), 'html.parser',
-            exclude_encodings=['windows-1252'])
+    soup = bs4.BeautifulSoup(html_data, 'html.parser')
     for tag in soup.find_all('oppia-noninteractive-image'):
         if not tag.has_attr('alt-with-value'):
             raise utils.ValidationError(
@@ -547,9 +545,7 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
             present.
         ValidationError. Collapsible heading-with-value attribute is empty.
     """
-    soup = bs4.BeautifulSoup(
-            html_data.encode(encoding='utf-8'), 'html.parser',
-            exclude_encodings=['windows-1252'])
+    soup = bs4.BeautifulSoup(html_data, 'html.parser')
     tabs_tags = soup.find_all('oppia-noninteractive-tabs')
     for tag in tabs_tags:
         if not tag.has_attr('tab_contents-with-value'):

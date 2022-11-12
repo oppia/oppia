@@ -4646,9 +4646,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             str. Returns the updated html value.
         """
-        soup = bs4.BeautifulSoup(
-            html.encode(encoding='utf-8'), 'html.parser',
-            exclude_encodings=['windows-1252'])
+        soup = bs4.BeautifulSoup(html, 'html.parser')
 
         for tag in soup.find_all('oppia-noninteractive-image'):
             if not tag.has_attr('alt-with-value'):
@@ -4810,9 +4808,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             str. Returns the updated html value.
         """
-        soup = bs4.BeautifulSoup(
-            html.encode(encoding='utf-8'), 'html.parser',
-            exclude_encodings=['windows-1252'])
+        soup = bs4.BeautifulSoup(html, 'html.parser')
         tabs_tags = soup.find_all('oppia-noninteractive-tabs')
         for tag in tabs_tags:
             if tag.has_attr('tab_contents-with-value'):
