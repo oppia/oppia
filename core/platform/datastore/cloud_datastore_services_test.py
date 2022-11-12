@@ -67,12 +67,6 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
             last_updated=self.curr_time
         )
 
-        def mock_get_multi(unused_keys):
-            raise Exception('Mock key error')
-
-        self.get_multi_swap = self.swap(
-            ndb, 'get_multi', mock_get_multi)
-
     def test_update_timestamps_multi(self) -> None:
         self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id))
@@ -157,7 +151,11 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
             [self.completed_activities_model, self.user_query_model])
 
         error_msg = 'Mock key error'
-        with self.get_multi_swap:
+        with self.swap_to_always_raise(
+            ndb,
+            'get_multi',
+            Exception('Mock key error')
+        ):
             with self.assertRaisesRegex(Exception, error_msg):
                 cloud_datastore_services.fetch_multiple_entities_by_ids_and_models( # pylint: disable=line-too-long
                     [
