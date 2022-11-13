@@ -41,7 +41,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'IncomingReplyEmailHandler',
     'InstantFeedbackMessageEmailHandler',
     'LearnerAnswerDetailsSubmissionHandler',
-    'LearnerGoalsHandler',
     'MemoryCacheAdminHandler',
     'MergeSkillHandler',
     'NewTopicHandler',
@@ -81,9 +80,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'CsrfTokenHandler',
     'Error404Handler',
     'FrontendErrorHandler',
-    'WarmupPage',
-    'HomePageRedirectPage',
-    'SplashRedirectPage'
 ]
 
 # These handlers do not require any schema validation.

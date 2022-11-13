@@ -19,7 +19,9 @@
 from __future__ import annotations
 
 import datetime
+import html
 import logging
+import re
 
 from core import feconf
 from core import utils
@@ -29,6 +31,7 @@ from core.domain import html_cleaner
 from core.domain import role_services
 from core.domain import search_services
 from core.domain import user_domain
+from core.domain import user_services
 from core.platform import models
 
 from typing import (
@@ -396,7 +399,7 @@ def get_blog_post_rights(
 
 
 def get_published_blog_post_summaries_by_user_id(
-    user_id: str, max_limit: int
+    user_id: str, max_limit: int, offset: int=0
 ) -> List[blog_domain.BlogPostSummary]:
     """Retrieves the summary objects for given number of published blog posts
     for which the given user is an editor.
@@ -404,6 +407,7 @@ def get_published_blog_post_summaries_by_user_id(
     Args:
         user_id: str. ID of the user.
         max_limit: int. The number of models to be fetched.
+        offset: int. Number of query results to skip from top.
 
     Returns:
         list(BlogPostSummary). The summary objects associated with the
@@ -411,7 +415,9 @@ def get_published_blog_post_summaries_by_user_id(
     """
     blog_rights_models = (
         blog_models.BlogPostRightsModel.get_published_models_by_user(
-            user_id, max_limit))
+            user_id, offset, max_limit
+        )
+    )
     if not blog_rights_models:
         return []
     blog_post_ids = [model.id for model in blog_rights_models]
@@ -631,8 +637,8 @@ def generate_url_fragment(title: str, blog_post_id: str) -> str:
     Returns:
         str. The url fragment of the blog post.
     """
-    lower_title = title.lower()
-    hyphenated_title = lower_title.replace(' ', '-')
+    lower_title = title.lower().replace(':', '')
+    hyphenated_title = lower_title.replace('  ', ' ').replace(' ', '-')
     lower_id = blog_post_id.lower()
     return hyphenated_title + '-' + lower_id
 
@@ -647,12 +653,19 @@ def generate_summary_of_blog_post(content: str) -> str:
     Returns:
         str. The summary of the blog post.
     """
-    raw_text = html_cleaner.strip_html_tags(content)
+    # Stripping away headings and content within bold tags.
+    raw_html = re.sub(
+        '<strong>?(.*?)</strong>',
+        '',
+        re.sub('<h1>?(.*?)</h1>', '', content, flags=re.DOTALL),
+        flags=re.DOTALL
+    )
+    raw_text = html_cleaner.strip_html_tags(raw_html)
     max_chars_in_summary = constants.MAX_CHARS_IN_BLOG_POST_SUMMARY - 3
     if len(raw_text) > max_chars_in_summary:
-        summary = raw_text[:max_chars_in_summary] + '...'
-        return summary
-    return raw_text
+        summary = html.unescape(raw_text)[:max_chars_in_summary] + '...'
+        return summary.strip()
+    return html.unescape(raw_text)
 
 
 def compute_summary_of_blog_post(
@@ -766,18 +779,25 @@ def create_new_blog_post(author_id: str) -> blog_domain.BlogPost:
 
 
 def get_published_blog_post_summaries(
-    offset: int = 0
+    offset: int=0, size: Optional[int]=None
 ) -> List[blog_domain.BlogPostSummary]:
     """Returns published BlogPostSummaries list.
 
     Args:
         offset: int. Number of query results to skip from top.
+        size: int or None. Number of blog post summaries to return if there are
+            at least that many, otherwise it contains all remaining results. If
+            None, maximum number of blog post summaries to display on blog
+            homepage will be returned if there are at least that many.
 
     Returns:
         list(BlogPostSummaries). These are sorted in order of the
         date published.
     """
-    max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+    if size:
+        max_limit = size
+    else:
+        max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
     blog_post_rights_models: Sequence[blog_models.BlogPostRightsModel] = (
         blog_models.BlogPostRightsModel.query(
             blog_models.BlogPostRightsModel.blog_post_is_published == True  # pylint: disable=singleton-comparison
@@ -798,6 +818,29 @@ def get_published_blog_post_summaries(
         for model in blog_post_summary_models if model is not None
     ]
     return blog_post_summaries
+
+
+def get_total_number_of_published_blog_post_summaries() -> int:
+    """Returns total number of published BlogPostSummaries.
+
+    Returns:
+        int. Total number of published BlogPostSummaries.
+    """
+    return blog_models.BlogPostRightsModel.query(
+        blog_models.BlogPostRightsModel.blog_post_is_published == True  # pylint: disable=singleton-comparison
+    ).count()
+
+
+def get_total_number_of_published_blog_post_summaries_by_author(
+    author_id: str
+) -> int:
+    """Returns total number of published BlogPostSummaries by author.
+
+    Returns:
+        int. Total number of published BlogPostSummaries by author.
+    """
+    return len(blog_models.BlogPostRightsModel.get_published_models_by_user(
+        author_id))
 
 
 def update_blog_models_author_and_published_on_date(
@@ -852,7 +895,7 @@ def index_blog_post_summaries_given_ids(blog_post_ids: List[str]) -> None:
 
 
 def get_blog_post_ids_matching_query(
-    query_string: str, tags: List[str], offset: Optional[int]=None
+    query_string: str, tags: List[str], size: int, offset: Optional[int]=None
 ) -> Tuple[List[str], Optional[int]]:
     """Returns a list with all blog post ids matching the given search query
     string, as well as a search offset for future fetches.
@@ -868,6 +911,9 @@ def get_blog_post_ids_matching_query(
         tags: list(str). The list of tags to query for. If it is empty, no tags
             filter is applied to the results. If it is not empty, then a result
             is considered valid if it matches at least one of these tags.
+        size: int. The maximum number of blog post summary domain objects to
+            be returned if there are at least that many, otherwise it contains
+            all results.
         offset: int or None. Optional offset from which to start the search
             query. If no offset is supplied, the first N results matching
             the query are returned.
@@ -877,25 +923,25 @@ def get_blog_post_ids_matching_query(
             valid_blog_post_ids : list(str). A list with all
                 blog post ids matching the given search query string,
                 as well as a search offset for future fetches.
-                The list contains exactly
-                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
-                results if there are at least that many, otherwise it
-                contains all remaining results. (If this behaviour does
-                not occur, an error will be logged.)
+                The list contains exactly 'size' number of results if there are
+                at least that many, otherwise it contains all remaining results.
+                (If this behaviour does not occur, an error will be logged.)
             search_offset: int. Search offset for future fetches.
     """
     valid_blog_post_ids: List[str] = []
     search_offset: Optional[int] = offset
 
     for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = (
-            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE -
-            len(valid_blog_post_ids)
-        )
+        remaining_to_fetch = size - len(valid_blog_post_ids)
 
         blog_post_ids, search_offset = (
             search_services.search_blog_post_summaries(
-            query_string, tags, remaining_to_fetch, offset=search_offset))
+                query_string,
+                tags,
+                remaining_to_fetch,
+                offset=search_offset
+            )
+        )
 
         invalid_blog_post_ids = []
         for ind, model in enumerate(
@@ -928,3 +974,74 @@ def get_blog_post_ids_matching_query(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))
     return (valid_blog_post_ids, search_offset)
+
+
+def create_blog_author_details_model(user_id: str) -> None:
+    """Creates a new blog author details model.
+
+    Args:
+        user_id: str. The user ID of the blog author.
+    """
+    user_settings = user_services.get_user_settings(user_id, strict=True)
+    # Adding an if statement for mypy type checks to pass.
+    if user_settings.username:
+        blog_models.BlogAuthorDetailsModel.create(
+            user_id,
+            user_settings.username,
+            user_settings.user_bio
+        )
+
+
+def get_blog_author_details(user_id: str) -> blog_domain.BlogAuthorDetails:
+    """Returns the blog author details for the given user id. If
+    blogAuthorDetailsModel is not present, a new model with default values is
+    created.
+
+    Args:
+        user_id: str. The user id of the blog author.
+
+    Returns:
+        BlogAuthorDetails. The blog author details for the given user ID.
+
+    Raises:
+        Exception. Unable to fetch blog author details for the given user ID.
+    """
+    author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
+
+    if author_model is None:
+        create_blog_author_details_model(user_id)
+        author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
+
+    if author_model is None:
+        raise Exception('Unable to fetch author details for the given user.')
+
+    return blog_domain.BlogAuthorDetails(
+        author_model.id,
+        author_model.author_id,
+        author_model.displayed_author_name,
+        author_model.author_bio,
+        author_model.last_updated
+        )
+
+
+def update_blog_author_details(
+    user_id: str, displayed_author_name: str, author_bio: str
+) -> None:
+    """Updates the author name and bio for the given user id.
+
+    Args:
+        user_id: str. The user id of the blog author.
+        displayed_author_name: str. The publicly viewable name of the author.
+        author_bio: str. The bio of the blog author.
+    """
+    blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
+        user_id)
+    blog_domain.BlogAuthorDetails.require_valid_displayed_author_name(
+        displayed_author_name)
+
+    # Adding an if statement for mypy type checks to pass.
+    if blog_author_model:
+        blog_author_model.displayed_author_name = displayed_author_name
+        blog_author_model.author_bio = author_bio
+        blog_author_model.update_timestamps()
+        blog_author_model.put()

@@ -30,6 +30,7 @@ from core import handler_schema_constants
 from pylint import utils as pylint_utils
 
 from .. import docstrings_checker
+from .. import run_mypy_checks
 
 # List of punctuation symbols that can be used at the end of
 # comments and docstrings.
@@ -52,9 +53,7 @@ ALLOWED_LINES_OF_GAP_IN_COMMENT = 15
 # in these dirs which causes linters to throw an error. So, once these dirs
 # are annotated completely, we can remove these dirs from this list and fix
 # the lint errors accordingly.
-EXCLUDED_TYPE_COMMENT_DIRECTORIES = [
-    'core/controllers/',
-]
+EXCLUDED_TYPE_COMMENT_DIRECTORIES = run_mypy_checks.NOT_FULLY_COVERED_FILES
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
@@ -1983,8 +1982,37 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
             ' remove it.',
             'redundant-type-comment',
             'No corresponding \'type: ignore\' is found for the comment.'
+        ),
+        'C0050': (
+            'Please avoid the usage of \'type: ignore[%s]\' as it is'
+            ' not allowed in the codebase. Instead try to fix the code'
+            ' implementation so that the MyPy error is suppressed. For'
+            ' more information, visit :'
+            ' https://github.com/oppia/oppia/wiki/Backend-Type-Annotations',
+            'prohibited-type-ignore-used',
+            'Only a limited number of type ignores are allowed in the codebase.'
+        ),
+        'C0051': (
+            'Usage of generic MyPy type ignores is prohibited. '
+            'MyPy type ignores can only be used with specific '
+            'error codes: type: ignore[<error-code>]',
+            'generic-mypy-ignore-used',
+            'Generic type ignore can be ambiguous while reading and could be '
+            'dangerous for python static typing. So, only error code specific '
+            'type ignores are allowed.'
         )
     }
+
+    options = (
+        (
+            'allowed-type-ignore-error-codes',
+                {
+                    'default': [],
+                    'type': 'csv', 'metavar': '<comma separated list>',
+                    'help': 'List of allowed MyPy type ignore error codes.'
+                }
+        ),
+    )
 
     def visit_module(self, node):
         """Visit a module to ensure that there is a comment for each MyPy
@@ -2034,8 +2062,33 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
 
                     comment_line_number = line_num
 
-                if re.search(r'(\s*type:\s*ignore)', line):
-                    if 'type: ignore[no-untyped-call]' in line:
+                if re.search(r'(\s*type:\s*ignore\[)', line):
+
+                    error_codes = re.search(
+                        r'(\s*type:\s*ignore)\[([a-z-\s\,]*)\]', line
+                    ).group(2)
+
+                    encountered_error_codes = []
+                    encountered_prohibited_error_codes = []
+                    for error_code in error_codes.split(','):
+                        error_code = error_code.strip()
+                        if (
+                            error_code not in
+                            self.config.allowed_type_ignore_error_codes
+                        ):
+                            encountered_prohibited_error_codes.append(
+                                error_code
+                            )
+                        encountered_error_codes.append(error_code)
+
+                    if encountered_prohibited_error_codes:
+                        self.add_message(
+                            'prohibited-type-ignore-used',
+                            line=line_num,
+                            args=tuple(encountered_prohibited_error_codes),
+                            node=node
+                        )
+                    if ['no-untyped-call'] == encountered_error_codes:
                         continue
                     if (
                         type_ignore_comment_present and
@@ -2046,14 +2099,18 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
                     ):
                         type_ignore_comment_present = False
                         no_of_type_ignore_comments = 0
-                    else:
+                    elif not encountered_prohibited_error_codes:
                         self.add_message(
                             'mypy-ignore-used', line=line_num, node=node
                         )
+                elif re.search(r'(\s*type:\s*ignore)', line):
+                    self.add_message(
+                        'generic-mypy-ignore-used', line=line_num, node=node
+                    )
 
         if type_ignore_comment_present:
             self.add_message(
-                'redundant-type-comment', line=comment_line_number)
+                'redundant-type-comment', line=comment_line_number, node=node)
 
 
 class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):

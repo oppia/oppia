@@ -371,6 +371,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/learner-dashboard-page/learner-dashboard-page.import.ts',
     'core/templates/pages/learner-group-pages/create-group/create-learner-group-page.import.ts',
     'core/templates/pages/learner-group-pages/edit-group/edit-learner-group-page.import.ts',
+    'core/templates/pages/learner-group-pages/view-group/view-learner-group-page.import.ts',
     'core/templates/pages/library-page/search-bar/search-bar.component.spec.ts',
     'core/templates/pages/oppia-root/app.module.ts',
     'core/templates/pages/oppia-root/app-error-handler.ts',

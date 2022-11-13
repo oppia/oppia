@@ -24,13 +24,16 @@ import { AppConstants } from 'app.constants';
 import { EntityContext } from 'domain/utilities/entity-context.model';
 import { ServicesConstants } from 'services/services.constants';
 import { UrlService } from 'services/contextual/url.service';
+import { BlogPostPageService } from 'pages/blog-post-page/services/blog-post-page.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ContextService {
   constructor(
-    private urlService: UrlService) {}
+    private urlService: UrlService,
+    private blogPostPageService: BlogPostPageService
+  ) {}
 
   // Entity context needs to be a static variable since multiple instances of
   // the ContextService class accesses the same class variable.
@@ -204,6 +207,9 @@ export class ContextService {
       if (pathnameArray[i] === 'blog-dashboard') {
         return decodeURI(this.urlService.getBlogPostIdFromUrl());
       }
+      if (pathnameArray[i] === 'blog') {
+        return this.blogPostPageService.blogPostId;
+      }
     }
     return decodeURI(pathnameArray[2]);
   }
@@ -237,6 +243,9 @@ export class ContextService {
         return AppConstants.ENTITY_TYPE.SKILL;
       }
       if (pathnameArray[i] === 'blog-dashboard') {
+        return AppConstants.ENTITY_TYPE.BLOG_POST;
+      }
+      if (pathnameArray[i] === 'blog') {
         return AppConstants.ENTITY_TYPE.BLOG_POST;
       }
     }
@@ -284,7 +293,7 @@ export class ContextService {
     let pathnameArray = this.urlService.getPathname().split('/');
     for (let i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'edit-learner-group' ||
-          pathnameArray[i] === 'learner-groups') {
+          pathnameArray[i] === 'learner-group') {
         this.learnerGroupId = pathnameArray[i + 1];
         return pathnameArray[i + 1];
       }
@@ -322,6 +331,13 @@ export class ContextService {
     return (
       this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR);
+  }
+
+  isInBlogPostEditorPage(): boolean {
+    return (
+      this.getPageContext() ===
+        ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD
+    );
   }
 
   canAddOrEditComponents(): boolean {

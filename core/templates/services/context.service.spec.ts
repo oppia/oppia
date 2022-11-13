@@ -21,6 +21,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
+import { BlogPostPageService } from 'pages/blog-post-page/services/blog-post-page.service';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UrlInterpolationService } from
@@ -55,6 +56,7 @@ describe('Context service', () => {
   let ecs: ContextService;
   let urlService: UrlService;
   let windowRef: MockWindowRef;
+  let blogPostPageService: BlogPostPageService;
 
   describe('behavior in the exploration learner view', () => {
     beforeEach(() => {
@@ -337,7 +339,7 @@ describe('Context service', () => {
       });
   });
 
-  describe('behavior in the blog dashboarrd page', () => {
+  describe('behavior in the blog dashboard page', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
@@ -382,6 +384,43 @@ describe('Context service', () => {
 
         expect(ecs.canAddOrEditComponents()).toBe(true);
       });
+
+    it('should check if rte is in blog post editor', () => {
+      expect(ecs.isInBlogPostEditorPage()).toBe(false);
+
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/blog-dashboard');
+
+      expect(ecs.isInBlogPostEditorPage()).toBe(true);
+    });
+  });
+
+  describe('behavior in the blog home pages', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      blogPostPageService = TestBed.get(BlogPostPageService);
+      ecs.removeCustomEntityContext();
+    });
+
+    it('should correctly retrieve the entity type', () => {
+      expect(ecs.getEntityType()).toBeUndefined();
+
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/blog');
+
+      expect(ecs.getEntityType()).toBe('blog_post');
+    });
+
+    it('should correctly retrieve the blog post id', () => {
+      expect(ecs.getEntityId()).toBe('undefined');
+
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/blog');
+      blogPostPageService.blogPostId = 'sample123456';
+
+      expect(ecs.getEntityId()).toBe('sample123456');
+    });
   });
 
   describe('behavior in the edit learner group page', () => {
@@ -423,7 +462,7 @@ describe('Context service', () => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue(
-        '/learner-groups/groupId');
+        '/learner-group/groupId');
       ecs.removeCustomEntityContext();
     });
 

@@ -23,17 +23,22 @@ from __future__ import annotations
 from core.constants import constants
 from core.controllers import base
 from core.domain import blog_domain
+from core.domain import blog_services
+from core.domain import change_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import image_validation_services
+from core.domain import improvements_domain
 from core.domain import question_domain
 from core.domain import state_domain
 from core.domain import stats_domain
 
-from typing import Dict, Optional, Union
+from typing import Dict, Mapping, Optional, Union
 
 
-def validate_suggestion_change(obj):
+def validate_suggestion_change(
+    obj: Mapping[str, change_domain.AcceptableChangeDictTypes]
+) -> Mapping[str, change_domain.AcceptableChangeDictTypes]:
     """Validates Exploration or Question change.
 
     Args:
@@ -68,7 +73,9 @@ def validate_suggestion_change(obj):
     return obj
 
 
-def validate_new_config_property_values(new_config_property):
+def validate_new_config_property_values(
+    new_config_property: Mapping[str, config_domain.AllowedDefaultValueTypes]
+) -> Mapping[str, config_domain.AllowedDefaultValueTypes]:
     """Validates new config property values.
 
     Args:
@@ -99,7 +106,9 @@ def validate_new_config_property_values(new_config_property):
     return new_config_property
 
 
-def validate_change_dict_for_blog_post(change_dict):
+def validate_change_dict_for_blog_post(
+    change_dict: blog_services.BlogPostChangeDict
+) -> blog_services.BlogPostChangeDict:
     """Validates change_dict required for updating values of blog post.
 
     Args:
@@ -112,19 +121,23 @@ def validate_change_dict_for_blog_post(change_dict):
         Exception. Invalid tags provided.
     """
     if 'title' in change_dict:
-        blog_domain.BlogPost.require_valid_title( # type: ignore[no-untyped-call]
+        blog_domain.BlogPost.require_valid_title(
             change_dict['title'], True)
     if 'thumbnail_filename' in change_dict:
-        blog_domain.BlogPost.require_valid_thumbnail_filename( # type: ignore[no-untyped-call]
+        blog_domain.BlogPost.require_valid_thumbnail_filename(
             change_dict['thumbnail_filename'])
     if 'tags' in change_dict:
-        blog_domain.BlogPost.require_valid_tags( # type: ignore[no-untyped-call]
+        blog_domain.BlogPost.require_valid_tags(
             change_dict['tags'], False)
         # Validates that the tags in the change dict are from the list of
         # default tags set by admin.
         list_of_default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post').value
-        if not all(tag in list_of_default_tags for tag in change_dict['tags']):
+            'list_of_default_tags_for_blog_post')
+        assert list_of_default_tags is not None
+        list_of_default_tags_value = list_of_default_tags.value
+        if not all(
+            tag in list_of_default_tags_value for tag in change_dict['tags']
+        ):
             raise Exception(
                 'Invalid tags provided. Tags not in default tags list.')
     # The method returns a dict containing blog post properties, they are used
@@ -134,16 +147,18 @@ def validate_change_dict_for_blog_post(change_dict):
     return change_dict
 
 
-def validate_state_dict(state_dict):
+def validate_state_dict(
+    state_dict: state_domain.StateDict
+) -> state_domain.StateDict:
     """Validates state dict.
 
     Args:
         state_dict: dict. The dict representation of State object.
 
     Returns:
-        State. The corresponding State domain object.
+        State. The state_dict after validation.
     """
-    state_object = state_domain.State.from_dict(state_dict) # type: ignore[no-untyped-call]
+    state_object = state_domain.State.from_dict(state_dict)
     state_object.validate(
         exp_param_specs_dict=None, allow_null_interaction=True)
     # State dict is used as dictionary form in the handler and the data is not
@@ -153,8 +168,8 @@ def validate_state_dict(state_dict):
 
 
 def validate_email_dashboard_data(
-        data: Dict[str, Optional[Union[bool, int]]]
-) -> None:
+    data: Dict[str, Optional[Union[bool, int]]]
+) -> Dict[str, Optional[Union[bool, int]]]:
     """Validates email dashboard data.
 
     Args:
@@ -182,7 +197,9 @@ def validate_email_dashboard_data(
     return data
 
 
-def validate_task_entries(task_entries):
+def validate_task_entries(
+    task_entries: improvements_domain.TaskEntryDict
+) -> improvements_domain.TaskEntryDict:
     """Validates the task entry dict.
 
     Args:
@@ -212,7 +229,9 @@ def validate_task_entries(task_entries):
     return task_entries
 
 
-def validate_aggregated_stats(aggregated_stats):
+def validate_aggregated_stats(
+    aggregated_stats: stats_domain.AggregatedStatsDict
+) -> stats_domain.AggregatedStatsDict:
     """Validates the attribute stats dict.
 
     Args:
@@ -228,7 +247,7 @@ def validate_aggregated_stats(aggregated_stats):
         aggregated_stats)
 
 
-def validate_suggestion_images(files):
+def validate_suggestion_images(files: Dict[str, bytes]) -> Dict[str, bytes]:
     """Validates the files dict.
 
     Args:

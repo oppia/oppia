@@ -22,6 +22,8 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { MatTabsModule } from '@angular/material/tabs';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { MockTranslatePipe, MockCapitalizePipe } from 'tests/unit-test-utils';
+import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { BlogAuthorDetailsEditorComponent } from './modal-templates/author-detail-editor-modal.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoaderService } from 'services/loader.service';
 import { AlertsService } from 'services/alerts.service';
@@ -44,6 +46,7 @@ describe('Blog Dashboard Page Component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let windowDimensionsService: WindowDimensionsService;
   let resizeEvent = new Event('resize');
+  let ngbModal: NgbModal;
 
   class MockWindowRef {
     nativeWindow = {
@@ -64,10 +67,12 @@ describe('Blog Dashboard Page Component', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        MatTabsModule
+        MatTabsModule,
+        NgbModalModule,
       ],
       declarations: [
         BlogDashboardPageComponent,
+        BlogAuthorDetailsEditorComponent,
         MockTranslatePipe
       ],
       providers: [
@@ -99,6 +104,7 @@ describe('Blog Dashboard Page Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(BlogDashboardPageComponent);
     component = fixture.componentInstance;
+    ngbModal = TestBed.inject(NgbModal);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
     blogDashboardPageService = TestBed.inject(BlogDashboardPageService);
@@ -173,7 +179,8 @@ describe('Blog Dashboard Page Component', () => {
   it('should initialize main tab', fakeAsync(() => {
     let defaultImageUrl = 'banner_image_url';
     let blogDashboardData = {
-      username: 'test_user',
+      displayedAuthorName: 'test_user',
+      authorBio: '',
       profilePictureDataUrl: 'sample_url',
       numOfPublishedBlogPosts: 0,
       numOfDraftBlogPosts: 0,
@@ -182,6 +189,7 @@ describe('Blog Dashboard Page Component', () => {
     };
     spyOn(urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue(defaultImageUrl);
+    spyOn(component, 'showAuthorDetailsEditor');
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(blogDashboardBackendApiService, 'fetchBlogDashboardDataAsync')
@@ -199,6 +207,7 @@ describe('Blog Dashboard Page Component', () => {
     expect(blogDashboardBackendApiService.fetchBlogDashboardDataAsync)
       .toHaveBeenCalled();
     expect(component.authorProfilePictureUrl).toEqual('sample_url');
+    expect(component.showAuthorDetailsEditor).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
     expect(component.windowIsNarrow).toBe(true);
@@ -261,7 +270,8 @@ describe('Blog Dashboard Page Component', () => {
   ' add it to drafts list', () => {
     let summaryObject = BlogPostSummary.createFromBackendDict(
       { id: 'sampleId',
-        author_username: 'test_user',
+        author_username: 'test_username',
+        displayed_author_name: 'test_user',
         title: 'Title',
         summary: 'Hello World',
         tags: ['news'],
@@ -271,7 +281,8 @@ describe('Blog Dashboard Page Component', () => {
         published_on: '3232323',
       });
     let blogDashboardData = {
-      username: 'test_user',
+      displayedAuthorName: 'test_user',
+      authorBio: 'bio',
       profilePictureDataUrl: 'sample_url',
       numOfPublishedBlogPosts: 1,
       numOfDraftBlogPosts: 0,
@@ -296,7 +307,8 @@ describe('Blog Dashboard Page Component', () => {
   'published blog post is deleted', () => {
     let summaryObject = BlogPostSummary.createFromBackendDict(
       { id: 'sampleId',
-        author_username: 'test_user',
+        author_username: 'test_username',
+        displayed_author_name: 'test_user',
         title: 'Title',
         summary: 'Hello World',
         tags: ['news'],
@@ -306,7 +318,8 @@ describe('Blog Dashboard Page Component', () => {
         published_on: '3232323',
       });
     let blogDashboardData = {
-      username: 'test_user',
+      displayedAuthorName: 'test_user',
+      authorBio: 'Bio',
       profilePictureDataUrl: 'sample_url',
       numOfPublishedBlogPosts: 0,
       numOfDraftBlogPosts: 0,
@@ -326,7 +339,8 @@ describe('Blog Dashboard Page Component', () => {
   'draft blog post is deleted', () => {
     let summaryObject = BlogPostSummary.createFromBackendDict(
       { id: 'sampleId',
-        author_username: 'test_user',
+        author_username: 'test_username',
+        displayed_author_name: 'test_user',
         title: 'Title',
         summary: 'Hello World',
         tags: ['news'],
@@ -336,7 +350,8 @@ describe('Blog Dashboard Page Component', () => {
         published_on: '3232323',
       });
     let blogDashboardData = {
-      username: 'test_user',
+      displayedAuthorName: 'test_user',
+      authorBio: 'Bio',
       profilePictureDataUrl: 'sample_url',
       numOfPublishedBlogPosts: 0,
       numOfDraftBlogPosts: 0,
@@ -350,4 +365,88 @@ describe('Blog Dashboard Page Component', () => {
     expect(component.blogDashboardData.draftBlogPostSummaryDicts).toEqual(
       []);
   });
+
+  it('should display alert when unable to update author details', fakeAsync(
+    () => {
+      component.authorName = 'new username';
+      component.authorBio = 'Oppia Blog Author';
+      spyOn(blogDashboardBackendApiService, 'updateAuthorDetailsAsync')
+        .and.returnValue(Promise.reject(
+          'Server responded with backend error.'));
+      spyOn(alertsService, 'addWarning');
+
+      component.updateAuthorDetails();
+      tick();
+
+      expect(blogDashboardBackendApiService.updateAuthorDetailsAsync)
+        .toHaveBeenCalled();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Unable to update author details. Error: Server responded with' +
+        ' backend error.');
+    })
+  );
+
+  it('should successfully update author details', fakeAsync(() => {
+    component.authorName = 'new username';
+    component.authorBio = 'Oppia Blog Author';
+    let BlogAuthorDetails = {
+      displayedAuthorName: 'new username',
+      authorBio: 'Oppia Blog Author'
+    };
+    spyOn(blogDashboardBackendApiService, 'updateAuthorDetailsAsync')
+      .and.returnValue(Promise.resolve(BlogAuthorDetails));
+    spyOn(alertsService, 'addSuccessMessage');
+
+    component.updateAuthorDetails();
+    tick();
+
+    expect(blogDashboardBackendApiService.updateAuthorDetailsAsync)
+      .toHaveBeenCalled();
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'Author Details saved successfully.');
+  }));
+
+  it('should cancel updating author details', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        authorName: '',
+        authorBio: ''
+      },
+      result: Promise.reject()
+    } as NgbModalRef);
+    spyOn(component, 'updateAuthorDetails');
+    component.authorBio = '';
+    component.authorName = 'test username';
+
+    component.showAuthorDetailsEditor();
+    tick();
+
+    expect(component.updateAuthorDetails).not.toHaveBeenCalled();
+  }));
+
+  it('should successfully place call to update author details', fakeAsync(
+    () => {
+      component.authorBio = '';
+      component.authorName = 'test username';
+      let updatedAuthorDetails = {
+        authorName: 'username',
+        authorBio: 'general bio'
+      };
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          authorName: '',
+          authorBio: ''
+        },
+        result: Promise.resolve(updatedAuthorDetails)
+      } as NgbModalRef);
+      spyOn(component, 'updateAuthorDetails');
+
+      component.showAuthorDetailsEditor();
+      tick();
+
+      expect(component.updateAuthorDetails).toHaveBeenCalled();
+      expect(component.authorBio).toBe('general bio');
+      expect(component.authorName).toBe('username');
+    })
+  );
 });
