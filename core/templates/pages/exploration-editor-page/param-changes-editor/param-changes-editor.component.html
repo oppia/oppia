@@ -1,18 +1,19 @@
 <style>
-  param-changes-editor .oppia-param-editor-row {
+  .oppia-param-editor-row {
+    margin-bottom: 15px;
     position: relative;
   }
-  param-changes-editor .oppia-param-display-row {
+  .oppia-param-display-row {
     margin-bottom: 4px;
   }
-  param-changes-editor .oppia-param-change-sort-handle {
+  .oppia-param-change-sort-handle {
     cursor: move;
     left: -20px;
     opacity: 0.3;
     position: absolute;
     top: 4px;
   }
-  param-changes-editor .oppia-delete-param-change-button {
+  .oppia-delete-param-change-button {
     background: none;
     border: 0;
     color: #000;
@@ -24,100 +25,96 @@
     top: 0;
     width: 30px;
   }
-  param-changes-editor .oppia-delete-param-change-button:hover {
+  .oppia-delete-param-change-button:hover {
     opacity: 1;
   }
-  param-changes-editor .oppia-form-control {
+  .oppia-form-control {
     display: inline;
     width: 110px;
   }
-  param-changes-editor .oppia-serious-warning-text-container {
+  .oppia-serious-warning-text-container {
     margin-bottom: 20px;
     margin-top: 20px;
   }
-  param-changes-editor .oppia-card-parameter {
+  .oppia-card-parameter {
     opacity: 0.7;
   }
 </style>
+
 <!--
-  We do not track by $index here, because if we do, then the select2 dropdown
+  We do not track by index here, because if we do, then the select2 dropdown
   will not update when elements are swapped or deleted.
 -->
-<div ng-if="isParamChangesEditorOpen && EditabilityService.isEditableOutsideTutorialMode()">
-  <div ng-model="$ctrl.paramChangesService.displayed"
-       ui-sortable="PARAM_CHANGE_LIST_SORTABLE_OPTIONS"
+<div *ngIf="isParamChangesEditorOpen && editabilityService.isEditableOutsideTutorialMode()">
+  <div cdkDropList
+       (cdkDropListDropped)="drop($event)"
        class="oppia-param-change-draggable-area">
-    <div ng-repeat="paramChange in $ctrl.paramChangesService.displayed"
+    <div *ngFor="let paramChange of paramChangesService.displayed; let index = index"
+         cdkDrag
          class="oppia-param-editor-row e2e-test-param-changes-list">
-      <span class="oppia-param-change-sort-handle" ng-if="$ctrl.paramChangesService.displayed.length > 1">
+      <span class="oppia-param-change-sort-handle" *ngIf="paramChangesService.displayed.length > 1">
         <picture>
-          <source type="image/webp" ng-srcset="<[getStaticImageUrl('/general/drag_dots.webp')]>">
-          <source type="image/png" ng-srcset="<[getStaticImageUrl('/general/drag_dots.png')]>">
-          <img ng-if="EditabilityService.isEditable()" ng-src="<[getStaticImageUrl('/general/drag_dots.png')]>" width="10">
+          <source type="image/webp" [src]="getStaticImageUrl('/general/drag_dots.webp')">
+          <source type="image/png" [src]="getStaticImageUrl('/general/drag_dots.png')">
+          <img *ngIf="editabilityService.isEditable()" [src]="getStaticImageUrl('/general/drag_dots.png')" width="10">
         </picture>
       </span>
       <span>
         Change
-        <select2-dropdown item="paramChange.name"
-                          choices="paramNameChoices"
-                          placeholder="Param name"
-                          new-choice-regex="^[A-Za-z]+$"
-                          width="143px">
-        </select2-dropdown>
-
-        <select class="form-control oppia-form-control" ng-model="paramChange.generatorId"
-                ng-options="key as PREAMBLE_TEXT[key] for (key, value) in PREAMBLE_TEXT"
-                required
-                ng-change="onChangeGeneratorType(paramChange)">
+        <select class="form-control e2e-test-history-version-dropdown-first"
+                [(ngModel)]="paramChange.generatorId"
+                (change)="onChangeGeneratorType(paramChange)">
+          <option *ngFor="let choice of PREAMBLE_TEXT | keyvalue; index as index" [value]="choice.key">{{ choice.value }}</option>
         </select>
-        <value-generator-editor generator-id="paramChange.generatorId"
-                                customization-args="paramChange.customizationArgs"
-                                obj-type="'UnicodeString'">
-        </value-generator-editor>
+        <br>
+        <oppia-value-generator-editor [generatorId]="paramChange.generatorId"
+                                      [customizationArgs]="paramChange.customizationArgs"
+                                      [objType]="'UnicodeString'">
+        </oppia-value-generator-editor>
       </span>
       <button type="button" class="oppia-delete-param-change-button oppia-transition-200"
-              ng-click="deleteParamChange($index)" title="Delete parameter change">
-        <i class="material-icons md-18" ng-if="EditabilityService.isEditable()">&#xE5CD;</i>
+              (click)="deleteParamChange(index)" title="Delete parameter change">
+        <i class="material-icons md-18" *ngIf="editabilityService.isEditable()">&#xE5CD;</i>
       </button>
     </div>
   </div>
 
   <div>
     <button type="button" class="btn btn-secondary btn-sm e2e-test-add-param-button"
-            ng-click="addParamChange()">
+            (click)="addParamChange()">
       Add parameter change
     </button>
   </div>
 
-  <div ng-if="warningText" class="oppia-serious-warning-text oppia-serious-warning-text-container">
+  <div *ngIf="warningText" class="oppia-serious-warning-text oppia-serious-warning-text-container">
     <i class="material-icons">&#xE002;</i>
-    <[warningText]>
+    {{ warningText }}
   </div>
 
   <button type="button"
           class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-param-changes-button"
-          ng-click="saveParamChanges()"
-          ng-disabled="!areDisplayedParamChangesValid()">
+          (click)="saveParamChanges()"
+          [disabled]="!areDisplayedParamChangesValid()">
     Save Changes
   </button>
-  <button type="button" class="btn btn-secondary float-right" ng-click="cancelEdit()">Cancel</button>
+  <button type="button" class="btn btn-secondary float-right" (click)="cancelEdit()">Cancel</button>
   <div class="oppia-clear"></div>
 </div>
 
-<div ng-if="!isParamChangesEditorOpen" ng-click="openParamChangesEditor()"
-     ng-class="{'oppia-editable-section': EditabilityService.isEditable()}">
-  <i ng-if="EditabilityService.isEditable()" class="material-icons oppia-editor-edit-icon"
+<div *ngIf="!isParamChangesEditorOpen" (click)="openParamChangesEditor()"
+     [ngClass]="{'oppia-editable-section': editabilityService.isEditable()}">
+  <i *ngIf="editabilityService.isEditable()" class="material-icons oppia-editor-edit-icon"
      title="Edit Card Parameter Changes">&#xE254;
   </i>
   <div class="oppia-param-changes-display oppia-card-parameter oppia-transition-200"
-       ng-class="{'oppia-prevent-selection': EditabilityService.isEditable()}"
+       [ngClass]="{'oppia-prevent-selection': editabilityService.isEditable()}"
        title="Card Parameter Changes">
-    <span ng-if="$ctrl.paramChangesService.savedMemento.length === 0">
+    <span *ngIf="paramChangesService.savedMemento && paramChangesService.savedMemento.length === 0">
       <em>No parameter changes.</em>
     </span>
-    <div class="oppia-param-display-row" ng-repeat="paramChange in $ctrl.paramChangesService.savedMemento track by $index">
-      <[$index + 1]>. Change <span class="badge badge-info"><[paramChange.name]></span>
-       <[HUMAN_READABLE_ARGS_RENDERERS[paramChange.generatorId](paramChange.customizationArgs)]>
+    <div class="oppia-param-display-row" *ngFor="let paramChange of paramChangesService.savedMemento; index as index">
+      {{ index + 1 }}. Change <span class="badge badge-info">{{ paramChange.name }}</span>
+      {{ HUMAN_READABLE_ARGS_RENDERERS[paramChange.generatorId](paramChange.customizationArgs) }}
     </div>
   </div>
 </div>

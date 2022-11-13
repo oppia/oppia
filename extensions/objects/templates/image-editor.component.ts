@@ -45,6 +45,9 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
+// eslint-disable-next-line oppia/disallow-httpclient
+import { HttpClient } from '@angular/common/http';
+
 import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
@@ -85,6 +88,10 @@ interface GifshotCallbackObject {
   errorCode: string;
   errorMsg: string;
   savedRenderingContexts: ImageData;
+}
+
+interface ImageUploadBackendResponse {
+  filename: string;
 }
 
 @Component({
@@ -135,6 +142,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   imageContainerStyle = {};
   allowedImageFormats = AppConstants.ALLOWED_IMAGE_FORMATS;
   HUNDRED_KB_IN_BYTES: number = 100 * 1024;
+  ONE_MB_IN_BYTES: number = 1 * 1024 * 1024;
   imageResizeRatio: number;
   cropArea: { x1: number; y1: number; x2: number; y2: number };
   mousePositionWithinCropArea: null | number;
@@ -166,6 +174,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   cropAreaYWhenLastDown: number;
 
   constructor(
+    private http: HttpClient,
     private alertsService: AlertsService,
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
@@ -938,11 +947,17 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     const mimeType = resampledImageData.split(';')[0];
     const imageSize = atob(
       resampledImageData.replace(`${mimeType};base64,`, '')).length;
-    // The processed image can sometimes be larger than 100 KB. This is
-    // because the output of HTMLCanvasElement.toDataURL() operation in
+    // The processed image can sometimes be larger than original file size. This
+    // is because the output of HTMLCanvasElement.toDataURL() operation in
     // getResampledImageData() is browser specific and can vary in size.
     // See https://stackoverflow.com/a/9777037.
-    this.processedImageIsTooLarge = imageSize > this.HUNDRED_KB_IN_BYTES;
+    if (
+      this.entityType === AppConstants.ENTITY_TYPE.BLOG_POST
+    ) {
+      this.processedImageIsTooLarge = imageSize > this.ONE_MB_IN_BYTES;
+    } else {
+      this.processedImageIsTooLarge = imageSize > this.HUNDRED_KB_IN_BYTES;
+    }
   }
 
   saveUploadedFile(): void {
@@ -1089,7 +1104,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   saveImage(
       dimensions: Dimensions,
       resampledFile: Blob,
-      imageType: string): void {
+      imageType: string
+  ): void {
     if (
       this.contextService.getImageSaveDestination() ===
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
@@ -1103,7 +1119,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   postImageToServer(
       dimensions: Dimensions,
       resampledFile: Blob,
-      imageType: string = 'png'): void {
+      imageType: string = 'png'
+  ): void {
     let form = new FormData();
     form.append('image', resampledFile);
     form.append('payload', JSON.stringify({
@@ -1112,47 +1129,33 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }));
     const imageUploadUrlTemplate = (
       '/createhandler/imageupload/<entity_type>/<entity_id>');
-    this.csrfTokenService.getTokenAsync().then((token) => {
-      form.append('csrf_token', token);
-      $.ajax({
-        url: this.urlInterpolationService.interpolateUrl(
-          imageUploadUrlTemplate, {
-            entity_type: this.entityType,
-            entity_id: this.entityId
-          }
-        ),
-        data: form,
-        processData: false,
-        contentType: false,
-        type: 'POST',
-        dataFilter: data => {
-          // Remove the XSSI prefix.
-          const transformedData = data.substring(5);
-          return JSON.parse(transformedData);
-        },
-        dataType: 'text'
-      }).done((data) => {
-        // Pre-load image before marking the image as saved.
-        const img = new Image();
-        img.onload = () => {
-          this.setSavedImageFilename(data.filename, true);
-          let dimensions = (
-            this.imagePreloaderService.getDimensionsOfImage(data.filename));
-          this.imageContainerStyle = {
-            height: dimensions.height + 'px',
-            width: dimensions.width + 'px'
-          };
+    this.http.post<ImageUploadBackendResponse>(
+      this.urlInterpolationService.interpolateUrl(
+        imageUploadUrlTemplate, {
+          entity_type: this.entityType,
+          entity_id: this.entityId
+        }
+      ),
+      form
+    ).toPromise().then((data) => {
+      // Pre-load image before marking the image as saved.
+      const img = new Image();
+      img.onload = () => {
+        this.setSavedImageFilename(data.filename, true);
+        let dimensions = (
+          this.imagePreloaderService.getDimensionsOfImage(data.filename));
+        this.imageContainerStyle = {
+          height: dimensions.height + 'px',
+          width: dimensions.width + 'px'
         };
-        // Check point 2 in the note before imports and after fileoverview.
-        img.src = this.getTrustedResourceUrlForImageFileName(
-          data.filename) as string;
-      }).fail((data) => {
-        // Remove the XSSI prefix.
-        var transformedData = data.responseText.substring(5);
-        var parsedResponse = JSON.parse(transformedData);
-        this.alertsService.addWarning(
-          parsedResponse.error || 'Error communicating with server.');
-      });
+      };
+      // Check point 2 in the note before imports and after fileoverview.
+      img.src = this.getTrustedResourceUrlForImageFileName(
+        data.filename) as string;
+    },
+    (response) => {
+      this.alertsService.addWarning(
+        response.error || 'Error communicating with server.');
     });
   }
 

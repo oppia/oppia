@@ -107,18 +107,21 @@ def get_exploration_opportunity_summary_from_model(
         {})
 
 
-def _save_multi_exploration_opportunity_summary(
+def _construct_new_opportunity_summary_models(
     exploration_opportunity_summary_list: List[
         opportunity_domain.ExplorationOpportunitySummary
     ]
-) -> None:
-    """Stores multiple ExplorationOpportunitySummary into datastore as a
-    ExplorationOpportunitySummaryModel.
+) -> List[opportunity_models.ExplorationOpportunitySummaryModel]:
+    """Create ExplorationOpportunitySummaryModels from domain objects.
 
     Args:
         exploration_opportunity_summary_list: list(
             ExplorationOpportunitySummary). A list of exploration opportunity
             summary object.
+
+    Returns:
+        list(ExplorationOpportunitySummaryModel). A list of
+        ExplorationOpportunitySummaryModel to be stored in the datastore.
     """
     exploration_opportunity_summary_model_list = []
     for opportunity_summary in exploration_opportunity_summary_list:
@@ -140,10 +143,31 @@ def _save_multi_exploration_opportunity_summary(
         )
 
         exploration_opportunity_summary_model_list.append(model)
+    return exploration_opportunity_summary_model_list
 
+
+def _save_multi_exploration_opportunity_summary(
+    exploration_opportunity_summary_list: List[
+        opportunity_domain.ExplorationOpportunitySummary
+    ]
+) -> None:
+    """Stores multiple ExplorationOpportunitySummary into datastore as a
+    ExplorationOpportunitySummaryModel.
+
+    Args:
+        exploration_opportunity_summary_list: list(
+            ExplorationOpportunitySummary). A list of exploration opportunity
+            summary object.
+    """
+    exploration_opportunity_summary_model_list = (
+        _construct_new_opportunity_summary_models(
+            exploration_opportunity_summary_list
+        )
+    )
     (
         opportunity_models.ExplorationOpportunitySummaryModel
-        .update_timestamps_multi(exploration_opportunity_summary_model_list))
+        .update_timestamps_multi(exploration_opportunity_summary_model_list)
+    )
     opportunity_models.ExplorationOpportunitySummaryModel.put_multi(
         exploration_opportunity_summary_model_list)
 
@@ -265,16 +289,24 @@ def _create_exploration_opportunities(
             create_exp_opportunity_summary(
                 topic, story, exploration))
     _save_multi_exploration_opportunity_summary(
-        exploration_opportunity_summary_list)
+        exploration_opportunity_summary_list
+    )
 
 
-def update_opportunity_with_updated_exploration(exp_id: str) -> None:
-    """Updates the opportunities models with the changes made in the
-    exploration.
+def compute_opportunity_models_with_updated_exploration(
+    exp_id: str
+) -> List[opportunity_models.ExplorationOpportunitySummaryModel]:
+    """Computes the opportunities models with the changes made in the
+    exploration. Note: This method does not perform a put operation. The caller
+    must perform the put operation.
 
     Args:
         exp_id: str. The exploration id which is also the id of the opportunity
             model.
+
+    Returns:
+        list(ExplorationOpportunitySummaryModel). A list of opportunity models
+        which are updated.
     """
     updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
     content_count = updated_exploration.get_content_count()
@@ -320,7 +352,7 @@ def update_opportunity_with_updated_exploration(exp_id: str) -> None:
 
     exploration_opportunity_summary.validate()
 
-    _save_multi_exploration_opportunity_summary(
+    return _construct_new_opportunity_summary_models(
         [exploration_opportunity_summary])
 
 
@@ -356,33 +388,8 @@ def update_exploration_opportunities_with_story_changes(
             exploration_opportunity_summary)
 
     _save_multi_exploration_opportunity_summary(
-        exploration_opportunity_summary_list)
-
-
-def update_exploration_voiceover_opportunities(
-    exp_id: str, assigned_voice_artist_in_language_code: str
-) -> None:
-    """Updates the language_codes_with_assigned_voice_artists of exploration
-    opportunity model.
-
-    Args:
-        exp_id: str. The ID of the exploration.
-        assigned_voice_artist_in_language_code: str. The language code in which
-            a voice artist is assigned to the exploration.
-    """
-    model = opportunity_models.ExplorationOpportunitySummaryModel.get(exp_id)
-    exploration_opportunity_summary = (
-        get_exploration_opportunity_summary_from_model(model))
-
-    exploration_opportunity_summary.language_codes_needing_voice_artists.remove(
-        assigned_voice_artist_in_language_code)
-    (
-        exploration_opportunity_summary
-        .language_codes_with_assigned_voice_artists.append(
-            assigned_voice_artist_in_language_code))
-    exploration_opportunity_summary.validate()
-    _save_multi_exploration_opportunity_summary(
-        [exploration_opportunity_summary])
+        exploration_opportunity_summary_list
+    )
 
 
 def delete_exploration_opportunities(exp_ids: List[str]) -> None:
@@ -560,48 +567,6 @@ def _build_exp_id_to_translation_suggestion_in_review_count(
     return exp_id_to_in_review_count
 
 
-def get_voiceover_opportunities(
-    language_code: str, cursor: Optional[str]
-) -> Tuple[
-    List[opportunity_domain.ExplorationOpportunitySummary],
-    Optional[str],
-    bool
-]:
-    """Returns a list of opportunities available for voiceover in a specific
-    language.
-
-    Args:
-        cursor: str or None. If provided, the list of returned entities
-            starts from this datastore cursor. Otherwise, the returned
-            entities start from the beginning of the full list of entities.
-        language_code: str. The language for which voiceover opportunities
-            to be fetched.
-
-    Returns:
-        3-tuple(opportunities, cursor, more). where:
-            opportunities: list(ExplorationOpportunitySummary). A list of
-                ExplorationOpportunitySummary domain objects.
-            cursor: str or None. A query cursor pointing to the next
-                batch of results. If there are no more results, this might
-                be None.
-            more: bool. If True, there are (probably) more results after
-                this batch. If False, there are no further results after
-                this batch.
-    """
-    page_size = constants.OPPORTUNITIES_PAGE_SIZE
-    exp_opportunity_summary_models, new_cursor, more = (
-        opportunity_models.ExplorationOpportunitySummaryModel
-        .get_all_voiceover_opportunities(page_size, cursor, language_code))
-
-    opportunities = []
-    for exp_opportunity_summary_model in exp_opportunity_summary_models:
-        exp_opportunity_summary = (
-            get_exploration_opportunity_summary_from_model(
-                exp_opportunity_summary_model))
-        opportunities.append(exp_opportunity_summary)
-    return opportunities, new_cursor, more
-
-
 def get_exploration_opportunity_summaries_by_ids(
     ids: List[str]
 ) -> Dict[str, Optional[opportunity_domain.ExplorationOpportunitySummary]]:
@@ -704,7 +669,8 @@ def update_opportunities_with_new_topic_name(
             exploration_opportunity_summary)
 
     _save_multi_exploration_opportunity_summary(
-        exploration_opportunity_summary_list)
+        exploration_opportunity_summary_list
+    )
 
 
 def get_skill_opportunity_from_model(

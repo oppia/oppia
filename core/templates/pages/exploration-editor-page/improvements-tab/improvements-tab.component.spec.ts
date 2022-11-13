@@ -17,56 +17,63 @@
  * the improvements tab.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
-
-import { ExplorationTaskType } from
-  'domain/improvements/exploration-task.model';
-import { HighBounceRateTask } from
-  'domain/improvements/high-bounce-rate-task.model';
-import { IneffectiveFeedbackLoopTask } from
-  'domain/improvements/ineffective-feedback-loop-task.model';
-import { NeedsGuidingResponsesTask } from
-  'domain/improvements/needs-guiding-response-task.model';
-import { SuccessiveIncorrectAnswersTask } from
-  'domain/improvements/successive-incorrect-answers-task.model';
+import { ImprovementsTabComponent } from './improvements-tab.component';
+import { ExplorationTaskType } from 'domain/improvements/exploration-task.model';
+import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
+import { IneffectiveFeedbackLoopTask } from 'domain/improvements/ineffective-feedback-loop-task.model';
+import { NeedsGuidingResponsesTask } from 'domain/improvements/needs-guiding-response-task.model';
+import { SuccessiveIncorrectAnswersTask } from 'domain/improvements/successive-incorrect-answers-task.model';
 import { StateStats } from 'domain/statistics/state-stats-model';
-import { ExplorationStats } from
-  'domain/statistics/exploration-stats.model';
-import { ExplorationImprovementsTaskRegistryService } from
-  'services/exploration-improvements-task-registry.service';
+import { ExplorationStats } from 'domain/statistics/exploration-stats.model';
+import { ExplorationImprovementsTaskRegistryService } from 'services/exploration-improvements-task-registry.service';
+import { ExplorationImprovementsService } from 'services/exploration-improvements.service';
+import { RouterService } from '../services/router.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FormsModule } from '@angular/forms';
 
-// TODO(#7222): Remove usages of UpgradedServices. Used here because too many
-// indirect AngularJS dependencies are required for the improvements tab.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-
-require(
-  'pages/exploration-editor-page/improvements-tab/' +
-  'improvements-tab.component.ts');
-
-describe('Improvements tab', function() {
-  let $ctrl, $scope, explorationImprovementsService, routerService;
-
+describe('Improvements tab', () => {
+  let component: ImprovementsTabComponent;
+  let fixture: ComponentFixture<ImprovementsTabComponent>;
+  let explorationImprovementsService: ExplorationImprovementsService;
+  let routerService: RouterService;
   let taskRegistryService: ExplorationImprovementsTaskRegistryService;
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
-  importAllAngularServices();
+  let expStatsSpy;
+  let hbrTasksSpy;
+  let iflTasksSpy;
+  let ngrTasksSpy;
+  let siaTasksSpy;
+  let stateTasksSpy;
+  let allStateTasksSpy;
 
-  beforeEach(angular.mock.inject(function(
-      $componentController, $rootScope, _ExplorationImprovementsService_,
-      _ExplorationImprovementsTaskRegistryService_, _RouterService_) {
-    explorationImprovementsService = _ExplorationImprovementsService_;
-    routerService = _RouterService_;
-    taskRegistryService = _ExplorationImprovementsTaskRegistryService_;
+  class MockNgbModal {
+    open() {
+      return {
+        result: Promise.resolve()
+      };
+    }
+  }
 
-    $scope = $rootScope.$new();
-    $ctrl = $componentController('improvementsTab');
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        FormsModule,
+      ],
+      declarations: [
+        ImprovementsTabComponent
+      ],
+      providers: [
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
   const emptyStateStats = new StateStats(0, 0, 0, 0, 0, 0);
@@ -75,44 +82,54 @@ describe('Improvements tab', function() {
   ]));
 
   beforeEach(() => {
-    this.expStatsSpy = spyOn(taskRegistryService, 'getExplorationStats');
-    this.hbrTasksSpy = (
-      spyOn(taskRegistryService, 'getOpenHighBounceRateTasks'));
-    this.iflTasksSpy = (
-      spyOn(taskRegistryService, 'getOpenIneffectiveFeedbackLoopTasks'));
-    this.ngrTasksSpy = (
-      spyOn(taskRegistryService, 'getOpenNeedsGuidingResponsesTasks'));
-    this.siaTasksSpy = (
-      spyOn(taskRegistryService, 'getOpenSuccessiveIncorrectAnswersTasks'));
-    this.stateTasksSpy = spyOn(taskRegistryService, 'getStateTasks');
-    this.allStateTasksSpy = spyOn(taskRegistryService, 'getAllStateTasks');
+    fixture = TestBed.createComponent(ImprovementsTabComponent);
+    component = fixture.componentInstance;
 
-    this.expStatsSpy.and.returnValue(emptyExpStats);
-    this.hbrTasksSpy.and.returnValue([]);
-    this.iflTasksSpy.and.returnValue([]);
-    this.ngrTasksSpy.and.returnValue([]);
-    this.siaTasksSpy.and.returnValue([]);
-    this.allStateTasksSpy.and.returnValue([]);
+    routerService = TestBed.inject(RouterService);
+    taskRegistryService = TestBed.inject(
+      ExplorationImprovementsTaskRegistryService);
+    explorationImprovementsService = TestBed.inject(
+      ExplorationImprovementsService
+    );
+
+    expStatsSpy = spyOn(taskRegistryService, 'getExplorationStats');
+    hbrTasksSpy = (
+      spyOn(taskRegistryService, 'getOpenHighBounceRateTasks'));
+    iflTasksSpy = (
+      spyOn(taskRegistryService, 'getOpenIneffectiveFeedbackLoopTasks'));
+    ngrTasksSpy = (
+      spyOn(taskRegistryService, 'getOpenNeedsGuidingResponsesTasks'));
+    siaTasksSpy = (
+      spyOn(taskRegistryService, 'getOpenSuccessiveIncorrectAnswersTasks'));
+    stateTasksSpy = spyOn(taskRegistryService, 'getStateTasks');
+    allStateTasksSpy = spyOn(taskRegistryService, 'getAllStateTasks');
+
+    expStatsSpy.and.returnValue(emptyExpStats);
+    hbrTasksSpy.and.returnValue([]);
+    iflTasksSpy.and.returnValue([]);
+    ngrTasksSpy.and.returnValue([]);
+    siaTasksSpy.and.returnValue([]);
+    allStateTasksSpy.and.returnValue([]);
   });
 
   it('should provide the time machine image URL', () => {
-    $ctrl.$onInit();
+    component.ngOnInit();
 
-    expect($ctrl.timeMachineImageUrl).toMatch('/icons/time_machine.svg');
+    expect(component.timeMachineImageUrl).toMatch('/icons/time_machine.svg');
   });
 
   it('should use router service to navigate to state editor', () => {
     const spy = spyOn(routerService, 'navigateToMainTab');
-    $ctrl.$onInit();
+    component.ngOnInit();
 
-    $ctrl.navigateToStateEditor('foo');
+    component.navigateToStateEditor('foo');
 
     expect(spy).toHaveBeenCalledWith('foo');
   });
 
   describe('Post-initialization', () => {
     const newTaskEntryBackendDict = (
-      <T extends ExplorationTaskType>(taskType: T, isOpen: boolean) => ({
+       <T extends ExplorationTaskType>(taskType: T, isOpen: boolean) => ({
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
@@ -141,71 +158,65 @@ describe('Improvements tab', function() {
     });
 
     it('should report the number of exp-level tasks', fakeAsync(() => {
-      this.hbrTasksSpy.and.returnValue([newHbrTask()]);
+      hbrTasksSpy.and.returnValue([newHbrTask()]);
 
-      $ctrl.$onInit();
+      component.ngOnInit();
       flushMicrotasks();
-      $scope.$apply();
 
-      expect($ctrl.getNumExpLevelTasks()).toEqual(1);
+      expect(component.getNumExpLevelTasks()).toEqual(1);
     }));
 
     it('should report the number of concept-level tasks', fakeAsync(() => {
-      this.iflTasksSpy.and.returnValue([newIflTask()]);
+      iflTasksSpy.and.returnValue([newIflTask()]);
 
-      $ctrl.$onInit();
+      component.ngOnInit();
       flushMicrotasks();
-      $scope.$apply();
 
-      expect($ctrl.getNumConceptLevelTasks()).toEqual(1);
+      expect(component.getNumConceptLevelTasks()).toEqual(1);
     }));
 
     it('should report the number of card-level tasks', fakeAsync(() => {
-      this.ngrTasksSpy.and.returnValue([newNgrTask()]);
-      this.siaTasksSpy.and.returnValue([newSiaTask()]);
+      ngrTasksSpy.and.returnValue([newNgrTask()]);
+      siaTasksSpy.and.returnValue([newSiaTask()]);
 
-      $ctrl.$onInit();
+      component.ngOnInit();
       flushMicrotasks();
-      $scope.$apply();
 
-      expect($ctrl.getNumCardLevelTasks()).toEqual(2);
+      expect(component.getNumCardLevelTasks()).toEqual(2);
     }));
 
     it('should report the total number of tasks', fakeAsync(() => {
-      this.hbrTasksSpy.and.returnValue([newHbrTask()]);
-      this.iflTasksSpy.and.returnValue([newIflTask()]);
-      this.ngrTasksSpy.and.returnValue([newNgrTask()]);
-      this.siaTasksSpy.and.returnValue([newSiaTask()]);
+      hbrTasksSpy.and.returnValue([newHbrTask()]);
+      iflTasksSpy.and.returnValue([newIflTask()]);
+      ngrTasksSpy.and.returnValue([newNgrTask()]);
+      siaTasksSpy.and.returnValue([newSiaTask()]);
 
-      $ctrl.$onInit();
+      component.ngOnInit();
       flushMicrotasks();
-      $scope.$apply();
 
-      expect($ctrl.getNumTasks()).toEqual(4);
+      expect(component.getNumTasks()).toEqual(4);
     }));
 
     it('should report that critical tasks exist', fakeAsync(() => {
-      this.ngrTasksSpy.and.returnValue([newNgrTask()]);
+      ngrTasksSpy.and.returnValue([newNgrTask()]);
 
-      $ctrl.$onInit();
+      component.ngOnInit();
       flushMicrotasks();
-      $scope.$apply();
 
-      expect($ctrl.hasCriticalTasks()).toEqual(true);
+      expect(component.hasCriticalTasks()).toEqual(true);
     }));
 
     it('should report the completion rate', fakeAsync(() => {
       const numStarts = 100;
       const numCompletions = 60;
-      this.expStatsSpy.and.returnValue(
+      expStatsSpy.and.returnValue(
         new ExplorationStats('id', 1, numStarts, 0, numCompletions, new Map()));
 
-      $ctrl.$onInit();
+      component.ngOnInit();
       flushMicrotasks();
-      $scope.$apply();
 
-      expect($ctrl.completionRate).toBeCloseTo(0.6);
-      expect($ctrl.completionRateAsPercent).toEqual('60%');
+      expect(component.completionRate).toBeCloseTo(0.6);
+      expect(component.completionRateAsPercent).toEqual('60%');
     }));
 
     it('should provide the correct state retention', fakeAsync(() => {
@@ -213,9 +224,9 @@ describe('Improvements tab', function() {
       const numCompletions = 60;
       const stateStats = (
         new StateStats(0, 0, totalHitCount, 0, 0, numCompletions));
-      this.expStatsSpy.and.returnValue(new ExplorationStats(
+      expStatsSpy.and.returnValue(new ExplorationStats(
         'id', 1, 0, 0, 0, new Map([['Introduction', stateStats]])));
-      this.allStateTasksSpy.and.returnValue([
+      allStateTasksSpy.and.returnValue([
         {
           stateName: 'Introduction',
           ngrTask: newNgrTask(),
@@ -224,15 +235,14 @@ describe('Improvements tab', function() {
         }
       ]);
 
-      $ctrl.$onInit();
+      component.ngOnInit();
       flushMicrotasks();
-      $scope.$apply();
 
-      expect($ctrl.getStateRetentionPercent('Introduction')).toEqual('60%');
+      expect(component.getStateRetentionPercent('Introduction')).toEqual('60%');
     }));
 
     it('should provide the number of open cards in a state', fakeAsync(() => {
-      this.expStatsSpy.and.returnValue(
+      expStatsSpy.and.returnValue(
         new ExplorationStats('id', 1, 0, 0, 0, new Map([
           ['Introduction', emptyStateStats],
           ['End', emptyStateStats],
@@ -251,23 +261,22 @@ describe('Improvements tab', function() {
           supportingStats: {stateStats: emptyStateStats},
         },
       };
-      this.stateTasksSpy.and.callFake(stateName => stateTasks[stateName]);
+      stateTasksSpy.and.callFake(stateName => stateTasks[stateName]);
 
-      $ctrl.$onInit();
+      component.ngOnInit();
       flushMicrotasks();
-      $scope.$apply();
 
-      expect($ctrl.getNumCardLevelTasksForState('Introduction')).toEqual(1);
-      expect($ctrl.getNumCardLevelTasksForState('End')).toEqual(2);
+      expect(component.getNumCardLevelTasksForState('Introduction')).toEqual(1);
+      expect(component.getNumCardLevelTasksForState('End')).toEqual(2);
     }));
 
     it('should toggle the visibility of state tasks', fakeAsync(() => {
-      this.expStatsSpy.and.returnValue(
+      expStatsSpy.and.returnValue(
         new ExplorationStats('id', 1, 0, 0, 0, new Map([
           ['Introduction', emptyStateStats],
           ['End', emptyStateStats],
         ])));
-      this.allStateTasksSpy.and.returnValue([
+      allStateTasksSpy.and.returnValue([
         {
           stateName: 'Introduction',
           ngrTask: newNgrTask(),
@@ -282,70 +291,64 @@ describe('Improvements tab', function() {
         },
       ]);
 
-      $ctrl.$onInit();
+      component.ngOnInit();
       flushMicrotasks();
-      $scope.$apply();
 
-      expect($ctrl.isStateTasksVisible('Introduction')).toBeTrue();
-      expect($ctrl.isStateTasksVisible('End')).toBeTrue();
+      expect(component.isStateTasksVisible('Introduction')).toBeTrue();
+      expect(component.isStateTasksVisible('End')).toBeTrue();
 
-      $ctrl.toggleStateTasks('End');
+      component.toggleStateTasks('End');
 
-      expect($ctrl.isStateTasksVisible('Introduction')).toBeTrue();
-      expect($ctrl.isStateTasksVisible('End')).toBeFalse();
+      expect(component.isStateTasksVisible('Introduction')).toBeTrue();
+      expect(component.isStateTasksVisible('End')).toBeFalse();
     }));
 
     describe('Exploration-health', () => {
       it('should report health as warning if HBR task exists', fakeAsync(() => {
-        this.hbrTasksSpy.and.returnValue([newHbrTask()]);
+        hbrTasksSpy.and.returnValue([newHbrTask()]);
 
-        $ctrl.$onInit();
+        component.ngOnInit();
         flushMicrotasks();
-        $scope.$apply();
 
-        expect($ctrl.getExplorationHealth()).toEqual('warning');
+        expect(component.getExplorationHealth()).toEqual('warning');
       }));
 
       it('should report heath as warning if only IFL task exists',
         fakeAsync(() => {
-          this.iflTasksSpy.and.returnValue([newIflTask()]);
+          iflTasksSpy.and.returnValue([newIflTask()]);
 
-          $ctrl.$onInit();
+          component.ngOnInit();
           flushMicrotasks();
-          $scope.$apply();
 
-          expect($ctrl.getExplorationHealth()).toEqual('warning');
+          expect(component.getExplorationHealth()).toEqual('warning');
         }));
 
       it('should report heath as critical if NGR task exists',
         fakeAsync(() => {
-          this.ngrTasksSpy.and.returnValue([newNgrTask()]);
+          ngrTasksSpy.and.returnValue([newNgrTask()]);
 
-          $ctrl.$onInit();
+          component.ngOnInit();
           flushMicrotasks();
-          $scope.$apply();
 
-          expect($ctrl.getExplorationHealth()).toEqual('critical');
+          expect(component.getExplorationHealth()).toEqual('critical');
         }));
 
       it('should report heath as warning if only SIA task exists',
         fakeAsync(() => {
-          this.siaTasksSpy.and.returnValue([newSiaTask()]);
+          siaTasksSpy.and.returnValue([newSiaTask()]);
 
-          $ctrl.$onInit();
+          component.ngOnInit();
           flushMicrotasks();
-          $scope.$apply();
 
-          expect($ctrl.getExplorationHealth()).toEqual('warning');
+          expect(component.getExplorationHealth()).toEqual('warning');
         }));
 
       it('should report health as healthy if zero tasks exist',
         fakeAsync(() => {
-          $ctrl.$onInit();
+          component.ngOnInit();
           flushMicrotasks();
-          $scope.$apply();
 
-          expect($ctrl.getExplorationHealth()).toEqual('healthy');
+          expect(component.getExplorationHealth()).toEqual('healthy');
         }));
     });
   });

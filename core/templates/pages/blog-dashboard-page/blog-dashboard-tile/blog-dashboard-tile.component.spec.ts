@@ -42,7 +42,7 @@ describe('Blog Dashboard Tile Component', () => {
   let alertsService: AlertsService;
   let sampleBlogPostBackendDict = {
     id: 'sampleId',
-    author_username: 'test_user',
+    displayed_author_name: 'test_user',
     title: 'Title',
     content: '<p>hello</p>',
     thumbnail_filename: 'image.png',
@@ -87,7 +87,8 @@ describe('Blog Dashboard Tile Component', () => {
     alertsService = TestBed.inject(AlertsService);
     sampleBlogPostSummary = {
       id: 'sampleId',
-      author_username: 'test_user',
+      author_username: 'test_username',
+      displayed_author_name: 'test_user',
       title: 'Title',
       summary: 'Hello World',
       tags: ['news'],

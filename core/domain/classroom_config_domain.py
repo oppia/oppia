@@ -26,9 +26,9 @@ from __future__ import annotations
 
 import copy
 from core import utils
+from core.constants import constants
 
-from typing import Dict, List
-from typing_extensions import TypedDict
+from typing import Dict, List, TypedDict
 
 
 class ClassroomDict(TypedDict):
@@ -110,6 +110,46 @@ class Classroom:
                 self.topic_id_to_prerequisite_topic_ids)
         }
 
+    @classmethod
+    def require_valid_name(cls, name: str) -> None:
+        """Checks whether the name of the classroom is a valid one.
+
+        Args:
+            name: str. The name to validate.
+        """
+        if not isinstance(name, str):
+            raise utils.ValidationError(
+                'Expected name of the classroom to be a string, received: %s.'
+                % name)
+
+        if name == '':
+            raise utils.ValidationError('Name field should not be empty')
+
+        if len(name) > constants.MAX_CHARS_IN_CLASSROOM_NAME:
+            raise utils.ValidationError(
+                'Classroom name should be at most %d characters, received %s.'
+                % (constants.MAX_CHARS_IN_CLASSROOM_NAME, name))
+
+    @classmethod
+    def require_valid_url_fragment(cls, url_fragment: str) -> None:
+        """Checks whether the url fragment of the classroom is a valid one.
+
+        Args:
+            url_fragment: str. The url fragment to validate.
+        """
+        if not isinstance(url_fragment, str):
+            raise utils.ValidationError(
+                'Expected url fragment of the classroom to be a string, '
+                'received: %s.' % url_fragment)
+
+        if url_fragment == '':
+            raise utils.ValidationError(
+                'Url fragment field should not be empty')
+
+        utils.require_valid_url_fragment(
+            url_fragment, 'Classroom URL Fragment',
+            constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT)
+
     def validate(self) -> None:
         """Validates various properties of the Classroom."""
 
@@ -117,22 +157,21 @@ class Classroom:
             raise utils.ValidationError(
                 'Expected ID of the classroom to be a string, received: %s.'
                 % self.classroom_id)
-        if not isinstance(self.name, str):
-            raise utils.ValidationError(
-                'Expected name of the classroom to be a string, received: %s.'
-                % self.name)
-        if not isinstance(self.url_fragment, str):
-            raise utils.ValidationError(
-                'Expected url fragment of the classroom to be a string, '
-                'received: %s.' % self.url_fragment)
+
+        self.require_valid_name(self.name)
+
+        self.require_valid_url_fragment(self.url_fragment)
+
         if not isinstance(self.course_details, str):
             raise utils.ValidationError(
                 'Expected course_details of the classroom to be a string, '
                 'received: %s.' % self.course_details)
+
         if not isinstance(self.topic_list_intro, str):
             raise utils.ValidationError(
                 'Expected topic list intro of the classroom to be a string, '
                 'received: %s.' % self.topic_list_intro)
+
         if not isinstance(self.topic_id_to_prerequisite_topic_ids, dict):
             raise utils.ValidationError(
                 'Expected topic ID to prerequisite topic IDs of the classroom '

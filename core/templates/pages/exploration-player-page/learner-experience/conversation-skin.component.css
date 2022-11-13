@@ -82,6 +82,7 @@ oppia-conversation-skin .supplemental-card-parent-container {
   flex-shrink: 1;
   margin-bottom: 200px;
   margin-left: 12px;
+  margin-top: 30px;
   max-width: 650px;
   position: relative;
   z-index: 2;
@@ -127,6 +128,10 @@ oppia-conversation-skin .oppia-button-raised.md-raised {
 
 oppia-conversation-skin .oppia-button-icon {
   color: #fff;
+}
+
+.oppia-exploration-checkpoints-message .toast-container .checkpoints-toast-info {
+  cursor: default;
 }
 
 @media screen and (max-width: 959px) {

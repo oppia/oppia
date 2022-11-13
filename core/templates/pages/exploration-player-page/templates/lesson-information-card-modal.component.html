@@ -21,11 +21,11 @@
             *ngIf="isHackyExpDescTranslationDisplayed()">
           {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
         </h4>
-        <h4 class="progress-bar-label-text">
+        <h4 [ngClass]="(checkpointCount === 1) ? 'd-none' : 'progress-bar-label-text'">
           Learning Progress
         </h4>
         <div class="progress-bar-container"
-             [ngClass]="{'single-checkpoint-bar': checkpointCount === 1, 'multiple-checkpoints-bar': checkpointCount > 1, 'reverse-checkpoint-order': isLanguageRTL()}">
+             [ngClass]="{'d-none': checkpointCount === 1, 'multiple-checkpoints-bar': checkpointCount > 1, 'reverse-checkpoint-order': isLanguageRTL()}">
           <div class="lesson-progress-bar"
                [ngClass]="{'reverse-checkpoint-order': isLanguageRTL()}">
             <div class="completed-progress-bar"
@@ -42,13 +42,19 @@
           {{ translatedCongratulatoryCheckpointMessage }}
         </p>
         <div class="save-progress-btn-container">
-          <button type="button"
-                  class="btn btn-secondary save-progress-btn"
-                  *ngIf="!userIsLoggedIn"
-                  [ngClass]="{'disabled oppia-disabled-link': checkpointStatusArray[0] === 'in-progress'}"
-                  (click)="saveLoggedOutProgress()">
-            {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
-          </button>
+          <div class="save-progress-btn-box">
+            <button type="button"
+                    class="btn btn-secondary save-progress-btn"
+                    *ngIf="(!userIsLoggedIn && checkpointCount>1)"
+                    [ngClass]="{'disabled oppia-disabled-link': checkpointStatusArray[0] === 'in-progress'}"
+                    (click)="saveLoggedOutProgress()">
+              {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
+            </button>
+          </div>
+          <div *ngIf="checkpointStatusArray[0] === 'in-progress'"
+               class="save-progress-btn-tooltip alert alert-danger">
+            {{ 'I18N_SAVE_BUTTON_ALERT_TOOLTIP' | translate }}
+          </div>
         </div>
         <p *ngIf="explorationIsPrivate"
            class="private-card-info">
@@ -188,9 +194,9 @@
   <div class="uid-box">
     <p class="guide-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_3' | translate }}<br>{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_4' | translate }}</p>
     <p class="copy-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_5' | translate }}</p>
-    <div class="uid-copy" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
-      <div class="unique-progress-id">{{ loggedOutProgressUniqueUrl }}</div>
-      <button type="button" class="btn btn-secondary uid-copy-btn" (click)="copyProgressUrl()">Copy</button>
+    <div [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }"
+         class="oppia-tooltip-container">
+      <oppia-copy-url [urlToCopy]="loggedOutProgressUniqueUrl"></oppia-copy-url>
     </div>
   </div>
   <button type="button" class="save-progress-close-button" (click)="closeSaveProgressMenu()">
