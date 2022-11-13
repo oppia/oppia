@@ -690,15 +690,21 @@
     </div>
   </mat-card>
 
-  <div *ngIf="canShowExploreVersionHistoryButton()" class="col-lg-12 col-md-12 col-sm-12">
-    <div class="mt-4">
-      <i>Last changed by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 }}</strong>.</i>
-      <a class="text-primary explore-version-history-button" (click)="onClickExploreVersionHistoryButton()"> More details.</a>
+  <mat-card class="oppia-settings-card-container oppia-editor-card">
+    <div *ngIf="canShowExploreVersionHistoryButton(); else elseBlock">
+      Metadata last changed by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 }} of the exploration</strong>.
+      <a class="text-primary explore-version-history-button" (click)="onClickExploreVersionHistoryButton()"> More details</a>.
     </div>
-  </div>
-</div>
+    <ng-template #elseBlock>
+      <div>No changes have been made to the exploration metadata after the initial creation of the exploration.</div>
+    </ng-template>
+  </mat-card>
 
 <style>
+  .explore-version-history-button {
+    font-weight: bold;
+  }
+
   .oppia-settings-tab-error-message {
     color: #f00;
   }

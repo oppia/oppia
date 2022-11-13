@@ -72,7 +72,7 @@ export class VersionHistoryService {
 
   shouldFetchNewStateVersionHistory(): boolean {
     if (
-      this.currentPositionInStateVersionHistoryList &&
+      this.currentPositionInStateVersionHistoryList !== null &&
       this.currentPositionInStateVersionHistoryList <
         this.fetchedStateVersionNumbers.length - 2
     ) {
@@ -83,7 +83,7 @@ export class VersionHistoryService {
 
   shouldFetchNewMetadataVersionHistory(): boolean {
     if (
-      this.currentPositionInMetadataVersionHistoryList &&
+      this.currentPositionInMetadataVersionHistoryList !== null &&
       this.currentPositionInMetadataVersionHistoryList <
         this.fetchedMetadataVersionNumbers.length - 2
     ) {
@@ -127,8 +127,10 @@ export class VersionHistoryService {
   }
 
   canShowBackwardStateDiffData(): boolean {
+    if (this.currentPositionInStateVersionHistoryList === null) {
+      return false;
+    }
     return (
-      this.currentPositionInStateVersionHistoryList !== null &&
       this.currentPositionInStateVersionHistoryList >= 0 &&
       this.currentPositionInStateVersionHistoryList <
         this.fetchedStateVersionNumbers.length - 1 &&
@@ -140,8 +142,10 @@ export class VersionHistoryService {
   }
 
   canShowForwardStateDiffData(): boolean {
+    if (this.currentPositionInStateVersionHistoryList === null) {
+      return false;
+    }
     return (
-      this.currentPositionInStateVersionHistoryList !== null &&
       this.currentPositionInStateVersionHistoryList >= 2 &&
       this.currentPositionInStateVersionHistoryList <
         this.fetchedStateVersionNumbers.length &&
@@ -201,8 +205,10 @@ export class VersionHistoryService {
   }
 
   canShowBackwardMetadataDiffData(): boolean {
+    if (this.currentPositionInMetadataVersionHistoryList === null) {
+      return false;
+    }
     return (
-      this.currentPositionInMetadataVersionHistoryList !== null &&
       this.currentPositionInMetadataVersionHistoryList >= 0 &&
       this.currentPositionInMetadataVersionHistoryList <
         this.fetchedMetadataVersionNumbers.length - 1 &&
@@ -214,8 +220,10 @@ export class VersionHistoryService {
   }
 
   canShowForwardMetadataDiffData(): boolean {
+    if (this.currentPositionInMetadataVersionHistoryList === null) {
+      return false;
+    }
     return (
-      this.currentPositionInMetadataVersionHistoryList !== null &&
       this.currentPositionInMetadataVersionHistoryList >= 2 &&
       this.currentPositionInMetadataVersionHistoryList <
         this.fetchedMetadataVersionNumbers.length &&
@@ -294,14 +302,14 @@ export class VersionHistoryService {
   }
 
   decrementCurrentPositionInStateVersionHistoryList(): void {
-    if (this.currentPositionInStateVersionHistoryList) {
+    if (this.currentPositionInStateVersionHistoryList !== null) {
       this.currentPositionInStateVersionHistoryList = (
         this.currentPositionInStateVersionHistoryList - 1);
     }
   }
 
   incrementCurrentPositionInStateVersionHistoryList(): void {
-    if (this.currentPositionInStateVersionHistoryList) {
+    if (this.currentPositionInStateVersionHistoryList !== null) {
       this.currentPositionInStateVersionHistoryList = (
         this.currentPositionInStateVersionHistoryList + 1);
     }
@@ -319,14 +327,14 @@ export class VersionHistoryService {
   }
 
   decrementCurrentPositionInMetadataVersionHistoryList(): void {
-    if (this.currentPositionInMetadataVersionHistoryList) {
+    if (this.currentPositionInMetadataVersionHistoryList !== null) {
       this.currentPositionInMetadataVersionHistoryList = (
         this.currentPositionInMetadataVersionHistoryList - 1);
     }
   }
 
   incrementCurrentPositionInMetadataVersionHistoryList(): void {
-    if (this.currentPositionInMetadataVersionHistoryList) {
+    if (this.currentPositionInMetadataVersionHistoryList !== null) {
       this.currentPositionInMetadataVersionHistoryList = (
         this.currentPositionInMetadataVersionHistoryList + 1);
     }
