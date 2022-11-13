@@ -144,7 +144,7 @@ export class DiagnosticTestPlayerEngineService {
         }
       );
     } else {
-      if (!this._diagnosticTestCurrentTopicStatusModel.isLifelineConsumeed()) {
+      if (!this._diagnosticTestCurrentTopicStatusModel.isLifelineConsumed()) {
         this._currentSkillId = (
           this._diagnosticTestCurrentTopicStatusModel.getNextSkill());
       }
@@ -339,9 +339,9 @@ export class DiagnosticTestPlayerEngineService {
     let numberOfAttemptedQuestionsInCurrentTopic = (
       this._diagnosticTestCurrentTopicStatusModel.numberOfAttemptedQuestions);
     let initialTopicIdsList = (
-      this._initialCopyOfTopicTrackerModel.getEligibleTopicIds());
+      this._initialCopyOfTopicTrackerModel.getPendingTopicIdsToTest());
     let pendingTopicIdsToTest = (
-      this._diagnosticTestTopicTrackerModel.getEligibleTopicIds());
+      this._diagnosticTestTopicTrackerModel.getPendingTopicIdsToTest());
 
     // Each topic can contain a maximum of 3 diagnostic test skills and at most
     // 2 questions [main question & backup question] can be presented from each
@@ -408,7 +408,7 @@ export class DiagnosticTestPlayerEngineService {
 
   isDiagnosticTestFinished(): boolean {
     const pendingTopicIdsToTest = (
-      this._diagnosticTestTopicTrackerModel.getEligibleTopicIds().length
+      this._diagnosticTestTopicTrackerModel.getPendingTopicIdsToTest().length
     );
 
     if (pendingTopicIdsToTest === 0) {
