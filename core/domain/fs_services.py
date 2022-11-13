@@ -29,6 +29,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import app_identity_services
     from mypy_imports import storage_services
+    from proto_files import text_classifier_pb2
 
 storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()
@@ -334,16 +335,10 @@ def save_original_and_compressed_versions_of_image(
             micro_image_filepath, micro_image_content, mimetype=mimetype)
 
 
-# TODO(#15451): Add stubs for protobuf once we have enough info regarding
-# protobuf's library.
-# Here we use object because the argument classifier_data_proto can accept
-# instances of `TextClassifierFrozenModel` class. But since we excluded
-# proto_files/ from the static type annotations, this argument is annotated
-# as general object type.
 def save_classifier_data(
     exp_id: str,
     job_id: str,
-    classifier_data_proto: object
+    classifier_data_proto: text_classifier_pb2.TextClassifierFrozenModel
 ) -> None:
     """Store classifier model data in a file.
 
@@ -356,12 +351,7 @@ def save_classifier_data(
     filepath = '%s-classifier-data.pb.xz' % (job_id)
     fs = GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
     content = utils.compress_to_zlib(
-        # Here we use MyPy ignore because classifier_data_proto is of general
-        # object type and general objects do not contain any extra methods and
-        # properties but for implementation we are accessing 'SerializeToString'
-        # method on classifier_data_proto which causes MyPy to throw an error.
-        # Thus to avoid the error, we added an [attr-defined] ignore statement.
-        classifier_data_proto.SerializeToString())  # type: ignore[attr-defined]
+        classifier_data_proto.SerializeToString())
     fs.commit(
         filepath, content, mimetype='application/octet-stream')
 
