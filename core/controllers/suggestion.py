@@ -485,7 +485,14 @@ class SuggestionToSkillActionHandler(
             },
             'skill_difficulty': {
                 'schema': {
-                    'type': 'float'
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }, {
+                        'id': 'is_at_most',
+                        'max_value': 1
+                    }]
                 },
                 'default_value': None
             }
@@ -951,7 +958,14 @@ class UpdateQuestionSuggestionHandler(
         'POST': {
             'skill_difficulty': {
                 'schema': {
-                    'type': 'float'
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }, {
+                        'id': 'is_at_most',
+                        'max_value': 1
+                    }]
                 }
             },
             'question_state_data': {
