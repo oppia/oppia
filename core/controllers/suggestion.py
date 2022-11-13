@@ -485,7 +485,7 @@ class SuggestionToSkillActionHandler(
             },
             'skill_difficulty': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'float'
                 },
                 'default_value': None
             }
