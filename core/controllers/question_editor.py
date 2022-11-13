@@ -33,7 +33,7 @@ from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, TypedDict
 
 SCHEMA_FOR_QUESTION_ID = {
     'type': 'basestring',
@@ -142,8 +142,9 @@ class QuestionCreationHandler(
                     image_validation_services.validate_image_and_filename(
                         image, filename))
             except utils.ValidationError as e:
-                error_msg = '%s %s' % (e, image_validation_error_message_suffix)
-                raise self.InvalidInputException(error_msg)
+                raise self.InvalidInputException(
+                    '%s %s' % (e, image_validation_error_message_suffix)
+                )
             image_is_compressible = (
                 file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
             fs_services.save_original_and_compressed_versions_of_image(
@@ -183,9 +184,9 @@ class QuestionSkillLinkHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-            'question_id': {
-                'schema': SCHEMA_FOR_QUESTION_ID
-            }
+        'question_id': {
+            'schema': SCHEMA_FOR_QUESTION_ID
+        }
     }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
@@ -197,7 +198,11 @@ class QuestionSkillLinkHandler(
                         'properties': [{
                             'name': 'id',
                             'schema': {
-                                'type': 'unicode'
+                                'type': 'basestring',
+                                'validators': [{
+                                    'id': 'is_regex_matched',
+                                    'regex_pattern': constants.ENTITY_ID_REGEX
+                                }]
                             }
                         }, {
                             'name': 'task',
@@ -210,7 +215,14 @@ class QuestionSkillLinkHandler(
                         }, {
                             'name': 'difficulty',
                             'schema': {
-                                'type': 'float'
+                                'type': 'float',
+                                'validators': [{
+                                    'id': 'is_at_least',
+                                    'min_value': 0
+                                }, {
+                                    'id': 'is_at_most',
+                                    'max_value': 1
+                                }]
                             }
                         }]
                     }
@@ -251,7 +263,7 @@ class EditableQuestionDataHandlerNormalizedPayloadDict(TypedDict):
     normalized_payload dictionary.
     """
 
-    commit_message: Optional[str]
+    commit_message: str
     change_list: List[question_domain.QuestionChange]
 
 
@@ -278,8 +290,7 @@ class EditableQuestionDataHandler(
                         'id': 'has_length_at_most',
                         'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH
                     }]
-                },
-                'default_value': None
+                }
             },
             'change_list': {
                 'schema': {
@@ -288,8 +299,7 @@ class EditableQuestionDataHandler(
                         'type': 'object_dict',
                         'object_class': question_domain.QuestionChange
                     }
-                },
-                'default_value': None
+                }
             }
         },
         'DELETE': {}
@@ -317,14 +327,8 @@ class EditableQuestionDataHandler(
         """Updates properties of the given question."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        commit_message = self.normalized_payload.get('commit_message')
-        change_list = self.normalized_payload.get('change_list')
-
-        if commit_message is None:
-            raise self.PageNotFoundException
-
-        if not change_list:
-            raise self.PageNotFoundException
+        commit_message = self.normalized_payload['commit_message']
+        change_list = self.normalized_payload['change_list']
 
         for change in change_list:
             if (

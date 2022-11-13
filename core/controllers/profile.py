@@ -210,7 +210,8 @@ class AndroidListSubscriptionHandlerNormalizedPayloadDict(TypedDict):
 class AndroidListSubscriptionHandler(
     base.BaseHandler[
         AndroidListSubscriptionHandlerNormalizedPayloadDict, Dict[str, str]
-    ]):
+    ]
+):
     """Adds user to Android mailing list."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}

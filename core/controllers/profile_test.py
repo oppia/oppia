@@ -1087,7 +1087,7 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(
-            Exception, ('No email_id found.')
+            Exception, 'No email_id found.'
         ):
             with self.swap_secret, self.swap_audience_id:
                 self.post_json(

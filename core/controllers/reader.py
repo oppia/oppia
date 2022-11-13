@@ -2030,7 +2030,8 @@ class QuestionPlayerHandler(
             },
             'fetch_by_difficulty': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': ['true', 'false']
                 }
             }
         }
@@ -2052,9 +2053,6 @@ class QuestionPlayerHandler(
             raise self.InvalidInputException(
                 'Question count has to be greater than 0')
 
-        if fetch_by_difficulty_value not in ('true', 'false'):
-            raise self.InvalidInputException(
-                'fetch_by_difficulty must be true or false')
         fetch_by_difficulty = (fetch_by_difficulty_value == 'true')
 
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:

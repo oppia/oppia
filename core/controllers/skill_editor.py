@@ -22,6 +22,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
@@ -301,7 +302,8 @@ class SkillDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     URL_PATH_ARGS_SCHEMAS = {
         'comma_separated_skill_ids': {
             'schema': {
-                'type': 'basestring'
+                'type': 'object_dict',
+                'validation_method': domain_objects_validator.validate_skill_ids
             }
         }
     }
@@ -313,12 +315,6 @@ class SkillDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         skill_ids = comma_separated_skill_ids.split(',')
 
-        try:
-            for skill_id in skill_ids:
-                skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError as e:
-            raise self.PageNotFoundException(
-                'Invalid skill id.') from e
         try:
             skills = skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:

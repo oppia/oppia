@@ -781,14 +781,14 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
                 self.question_id), payload,
-            csrf_token=csrf_token, expected_status_int=404)
+            csrf_token=csrf_token, expected_status_int=400)
         del payload['commit_message']
         payload['change_list'] = change_list
         self.put_json(
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
                 self.question_id), payload,
-            csrf_token=csrf_token, expected_status_int=404)
+            csrf_token=csrf_token, expected_status_int=400)
         payload['commit_message'] = 'update question data'
         self.put_json(
             feconf.QUESTION_EDITOR_DATA_URL_PREFIX, payload,

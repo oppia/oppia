@@ -428,7 +428,7 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.get_json(self.url, expected_status_int=404)
         self.url = '%s/1,%s' % (
             feconf.SKILL_DATA_URL_PREFIX, self.skill_id_2)
-        self.get_json(self.url, expected_status_int=404)
+        self.get_json(self.url, expected_status_int=400)
         self.logout()
 
 
