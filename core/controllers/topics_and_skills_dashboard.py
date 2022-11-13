@@ -370,7 +370,7 @@ class NewTopicHandler(
                         'id': 'has_length_at_most',
                         'max_value': android_validation_constants
                             .MAX_CHARS_IN_TOPIC_NAME
-                    },{
+                    }, {
                         'id': 'is_nonempty',
                     }]
                 }
