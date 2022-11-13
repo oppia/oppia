@@ -642,28 +642,30 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
             )).order(-cls.created_on)
 
-            results = []
+            sorted_results: List[GeneralSuggestionModel] = []
 
-            while len(results) < limit:
+            while len(sorted_results) < limit:
                 suggestion_model: GeneralSuggestionModel = (
                     suggestion_query.fetch(1, offset=offset))[0]
                 offset += 1
                 if suggestion_model.author_id != user_id:
-                    results.append(suggestion_model)
+                    sorted_results.append(suggestion_model)
 
-            next_offset = offset
-
-        else:
-            suggestion_query = cls.get_all().filter(datastore_services.all_of(
-                cls.status == STATUS_IN_REVIEW,
-                cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
-                cls.author_id != user_id
-            ))
-
-            results: Sequence[GeneralSuggestionModel] = (
-                suggestion_query.fetch(limit, offset=offset)
+            return (
+                sorted_results,
+                offset
             )
-            next_offset = offset + len(results)
+
+        suggestion_query = cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            cls.author_id != user_id
+        ))
+
+        results: Sequence[GeneralSuggestionModel] = (
+            suggestion_query.fetch(limit, offset=offset)
+        )
+        next_offset = offset + len(results)
 
         return (
             results,

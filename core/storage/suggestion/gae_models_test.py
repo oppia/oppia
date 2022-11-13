@@ -584,6 +584,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_get_in_review_question_suggestions_by_offset(self) -> None:
         suggestion_1_id = 'skill1.thread1'
         suggestion_2_id = 'skill1.thread2'
+        suggestion_3_id = 'skill2.thread3'
         user_id = 'author1'
         limit = 1
         suggestion_models.GeneralSuggestionModel.create(
@@ -600,6 +601,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW, 'author_4',
             'reviewer_2', self.change_cmd, 'category1',
             suggestion_2_id, self.question_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author1',
+            'reviewer_2', self.change_cmd, 'category1',
+            suggestion_3_id, self.question_language_code)
 
         results, offset_1 = (
             suggestion_models.GeneralSuggestionModel
@@ -636,31 +644,19 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(results), 0)
         self.assertEqual(offset_3, 2)
 
-        newest_results, offset_1 = (
+        sorted_results, offset_4 = (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_question_suggestions_by_offset(
-                limit=limit,
+                limit=2,
                 offset=0,
                 user_id=user_id,
                 newest_first=True))
         # Ruling out the possibility of None for mypy type checking.
-        assert newest_results is not None
-        self.assertEqual(len(newest_results), limit)
-        self.assertEqual(newest_results[0].id, suggestion_2_id)
-        self.assertEqual(offset_1, 1)
-
-        oldest_results, offset_2 = (
-            suggestion_models.GeneralSuggestionModel
-            .get_in_review_question_suggestions_by_offset(
-                limit=limit,
-                offset=offset_1,
-                user_id=user_id,
-                newest_first=True))
-        # Ruling out the possibility of None for mypy type checking.
-        assert oldest_results is not None
-        self.assertEqual(len(oldest_results), limit)
-        self.assertEqual(oldest_results[0].id, suggestion_1_id)
-        self.assertEqual(offset_2, 2)
+        assert sorted_results is not None
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, suggestion_2_id)
+        self.assertEqual(sorted_results[1].id, suggestion_1_id)
+        self.assertEqual(offset_4, 3)
 
     def test_user_created_suggestions_by_offset(self) -> None:
         authored_translation_suggestion_id = 'exploration.exp1.thread_6'
