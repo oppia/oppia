@@ -24,7 +24,7 @@ import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObje
 import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 
-fdescribe('HintsAndSolutionManager service', () => {
+describe('HintsAndSolutionManager service', () => {
   let hasms: HintsAndSolutionManagerService;
   let hof: HintObjectFactory;
   let sof: SolutionObjectFactory;
@@ -40,7 +40,6 @@ fdescribe('HintsAndSolutionManager service', () => {
   const WAIT_FOR_FIRST_HINT_MSEC: number = 60000;
   const WAIT_FOR_SUBSEQUENT_HINTS_MSEC: number = 30000;
   const WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 500;
-  const WAIT_FOR_SOLUTION_TOOLTIP_MSEC: number = 500
 
   beforeEach(fakeAsync(() => {
     pps = TestBed.inject(PlayerPositionService);
@@ -119,21 +118,23 @@ fdescribe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintConsumed(1)).toBe(true);
   }));
 
-  it('should correctly show release solution and show tooltip', fakeAsync(() => {
-    hasms.solutionDiscovered = false;
-    hasms.solutionTooltipTimeout = null;
-    hasms.reset([], solution);
+  it('should correctly show release solution and show tooltip',
+    fakeAsync(() => {
+      hasms.solutionDiscovered = false;
+      let mockSetTimeout = setTimeout(() => {});
+      hasms.solutionTooltipTimeout = mockSetTimeout;
+      hasms.reset([], solution);
 
-    expect(hasms.isSolutionViewable()).toBe(false);
-    expect(hasms.isSolutionTooltipOpen()).toBe(false);
+      expect(hasms.isSolutionViewable()).toBe(false);
+      expect(hasms.isSolutionTooltipOpen()).toBe(false);
 
-    hasms.releaseSolution();
+      hasms.releaseSolution();
 
-    tick(1000);
-    expect(hasms.solutionReleased).toBe(true);
-    expect(hasms.solutionDiscovered).toBe(true);
-    expect(hasms.solutionTooltipIsOpen).toBe(true);
-  }));
+      tick(1000);
+      expect(hasms.solutionReleased).toBe(true);
+      expect(hasms.solutionDiscovered).toBe(true);
+      expect(hasms.solutionTooltipIsOpen).toBe(true);
+    }));
 
   it('should not continue to display hints after after a correct answer is' +
      'submitted', fakeAsync(() => {
@@ -177,7 +178,8 @@ fdescribe('HintsAndSolutionManager service', () => {
   it('should correctly retrieve the solution', fakeAsync(() => {
     // Initialize the service with two hints and a solution.
     hasms.reset([], solution);
-
+    let mockSetTimeout = setTimeout(() => {});
+    hasms.solutionTooltipTimeout = mockSetTimeout;
     expect(hasms.isSolutionConsumed()).toBe(false);
     expect(hasms.displaySolution()?.correctAnswer).toBe(
       'This is a correct answer!');
