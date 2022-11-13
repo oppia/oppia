@@ -1626,32 +1626,16 @@ class AuxiliaryComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             | 'Group by key' >> beam.CoGroupByKey()
         )
 
-        formatted_model_groups = (
-            model_groups
-            | 'Get formatted model groups' >> beam.Map(
-                lambda model_group: (
-                    model_group[0],
-                    self.convert_to_formatted_model_group(model_group[1])
-                )
-            )
-        )
-
         valid_model_groups = (
-            formatted_model_groups
+            model_groups
             | 'Get rid of exploration id' >>
                 beam.Values() # pylint: disable=no-value-for-parameter
+            | 'Get formatted model groups' >> beam.Map(
+                self.convert_to_formatted_model_group
+            )
             | 'Filter valid model groups' >> beam.Filter(
                 lambda x: x is not None
             )
-        )
-
-        invalid_model_groups = (
-            formatted_model_groups
-            | 'Filter invalid model groups' >> beam.Filter(
-                lambda model_group: (model_group[1] is None)
-            )
-            | 'Get the invalid exploration IDs' >>
-                beam.Keys() # pylint: disable=no-value-for-parameter
         )
 
         version_history_models = (
@@ -1702,15 +1686,6 @@ class AuxiliaryComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 )
         )
 
-        report_details_of_exps_for_which_vh_cannot_be_computed =(
-            invalid_model_groups
-            | 'Save info on explorations for which vh cannot be computed' >>
-                beam.Map(lambda exp_id: job_run_result.JobRunResult.as_stderr(
-                    'Version history cannot be computed for exploration '
-                    'with ID %s' % (exp_id)
-                ))
-        )
-
         report_number_of_exps_with_invalid_change_list = (
             exps_having_invalid_change_list
             | 'Count explorations having invalid change list' >>
@@ -1748,7 +1723,6 @@ class AuxiliaryComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             (
                 report_number_of_exps_queried,
                 report_exps_count_for_which_version_history_can_be_computed,
-                report_details_of_exps_for_which_vh_cannot_be_computed,
                 report_number_of_exps_with_invalid_change_list,
                 report_details_of_exps_having_invalid_change_list,
                 report_number_of_exps_for_which_version_history_was_computed,

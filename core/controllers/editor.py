@@ -1571,7 +1571,9 @@ class LearnerAnswerInfoHandler(
         self.render_json({})
 
 
-class FixCommitCommandsHandler(EditorHandler):
+class FixCommitCommandsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     HANDLER_ARGS_SCHEMAS = {
         'POST': {}
