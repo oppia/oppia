@@ -28,29 +28,29 @@ export interface TopicIdToRelatedTopicIds {
 
 
 export class DiagnosticTestTopicTrackerModel {
-  // The list of eligible topic IDs from which the next topic can be selected
+  // The list of pending topic IDs from which the next topic can be selected
   // and tested in the diagnostic test.
-  _eligibleTopicIds: string[];
+  private _pendingTopicIdsToTest: string[];
 
   // The field keeps track of the topic ID that are failed by the learner.
   // Failing on a topic means the learner has attempted two questions
   // incorrectly that are associated with the given topic.
-  _failedTopicIds: string[];
+  private _failedTopicIds: string[];
 
   // The dependency among topics is represented in a form of a dict with
   // topic ID as key and a list of immediate parent topic IDs as value.
   // Example graph: A --> B --> C, here, the prerequisite of C is only B.
-  _topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds;
+  private _topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds;
 
   // A dict with topic ID as key and a list of ancestor topic IDs as value.
   // Example graph: A --> B --> C, therefore the ancestors of C are both
   // A and B.
-  _topicIdToAncestorTopicIds: TopicIdToRelatedTopicIds;
+  private _topicIdToAncestorTopicIds: TopicIdToRelatedTopicIds;
 
   // A dict with topic ID as key and a list of successor topic IDs as value.
   // Example graph: A --> B --> C, here the successors of A are B, C, and the
   // successor of B is only C.
-  _topicIdToSuccessorTopicIds: TopicIdToRelatedTopicIds;
+  private _topicIdToSuccessorTopicIds: TopicIdToRelatedTopicIds;
 
   constructor(topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds) {
     this._failedTopicIds = [];
@@ -58,15 +58,15 @@ export class DiagnosticTestTopicTrackerModel {
     this._topicIdToSuccessorTopicIds = {};
 
     this._topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
-    this._eligibleTopicIds = Object.keys(
+    this._pendingTopicIdsToTest = Object.keys(
       this._topicIdToPrerequisiteTopicIds).sort();
 
     this.generateTopicIdToAncestorTopicIds();
     this.generateTopicIdToSuccessorTopicIds();
   }
 
-  getEligibleTopicIds(): string[] {
-    return this._eligibleTopicIds;
+  getPendingTopicIdsToTest(): string[] {
+    return this._pendingTopicIdsToTest;
   }
 
   getFailedTopicIds(): string[] {
@@ -89,6 +89,9 @@ export class DiagnosticTestTopicTrackerModel {
     return this._topicIdToSuccessorTopicIds;
   }
 
+  getTopicIdToPrerequisiteTopicIds(): TopicIdToRelatedTopicIds {
+    return this._topicIdToPrerequisiteTopicIds;
+  }
 
   generateTopicIdToAncestorTopicIds(): void {
     // The method generates a dict with topic ID as the key and all of its
@@ -189,7 +192,7 @@ export class DiagnosticTestTopicTrackerModel {
     // min(length of ancestors, length of successors) topic IDs as value.
     let topicIdToLengthOfRelatedTopicIds: {[topicId: string]: number} = {};
 
-    for (let topicId of this._eligibleTopicIds) {
+    for (let topicId of this._pendingTopicIdsToTest) {
       let ancestorTopicIds = this._topicIdToAncestorTopicIds[topicId];
       let successorTopicIds = this._topicIdToSuccessorTopicIds[topicId];
 
@@ -226,9 +229,9 @@ export class DiagnosticTestTopicTrackerModel {
     // Removing the given topic ID because it is already tested.
     topicIdsToRemove.push(passedTopicId);
 
-    this._eligibleTopicIds = this._eligibleTopicIds.filter((topicId) => {
-      return (topicIdsToRemove.indexOf(topicId) === -1);
-    });
+    this._pendingTopicIdsToTest = this._pendingTopicIdsToTest.filter(
+      (topicId) => (topicIdsToRemove.indexOf(topicId) === -1)
+    );
     this.removeTopicIdsFromTopicIdToAncestorsDict(topicIdsToRemove);
     this.removeTopicIdsFromTopicIdToSuccessorsDict(topicIdsToRemove);
   }
@@ -248,9 +251,9 @@ export class DiagnosticTestTopicTrackerModel {
     // Removing the given topic ID because it is already tested.
     topicIdsToRemove.push(failedTopicId);
 
-    this._eligibleTopicIds = this._eligibleTopicIds.filter((topicId) => {
-      return (topicIdsToRemove.indexOf(topicId) === -1);
-    });
+    this._pendingTopicIdsToTest = this._pendingTopicIdsToTest.filter(
+      (topicId) => (topicIdsToRemove.indexOf(topicId) === -1)
+    );
     this.removeTopicIdsFromTopicIdToAncestorsDict(topicIdsToRemove);
     this.removeTopicIdsFromTopicIdToSuccessorsDict(topicIdsToRemove);
   }

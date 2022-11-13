@@ -58,7 +58,7 @@ interface SkillIdToQuestionsBackendResponse {
   };
 }
 
-interface SkillIdToQuestionsResponse {
+export interface SkillIdToQuestionsResponse {
   [skillId: string]: DiagnosticTestQuestionsModel;
 }
 

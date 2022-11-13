@@ -18,6 +18,7 @@
 
 
 import { TestBed } from '@angular/core/testing';
+import { DiagnosticTestQuestionsModel } from 'domain/question/diagnostic-test-questions.model';
 import { Question } from 'domain/question/QuestionObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { DiagnosticTestCurrentTopicStatusModel, SkillIdToQuestionsDict } from './diagnostic-test-current-topic-status.model';
@@ -63,24 +64,15 @@ describe('Diagnostic test current topic status model', () => {
 
   it('should be able to get the next skill and its main question', () => {
     let skillIdToQuestionsDict: SkillIdToQuestionsDict = {
-      skillID1: {
-        mainQuestion: question1,
-        backupQuestion: question2
-      },
-      skillID2: {
-        mainQuestion: question3,
-        backupQuestion: question4
-      },
-      skillID3: {
-        mainQuestion: question5,
-        backupQuestion: question6
-      }
+      skillID1: new DiagnosticTestQuestionsModel(question1, question2),
+      skillID2: new DiagnosticTestQuestionsModel(question3, question4),
+      skillID3: new DiagnosticTestQuestionsModel(question5, question6)
     };
 
     let diagnosticTestCurrentTopicStatusModel = (
       new DiagnosticTestCurrentTopicStatusModel(skillIdToQuestionsDict));
 
-    expect(diagnosticTestCurrentTopicStatusModel._pendingSkillIdsToTest)
+    expect(diagnosticTestCurrentTopicStatusModel.getPendingSkillIds())
       .toEqual(['skillID1', 'skillID2', 'skillID3']);
 
     let currentSkillId = diagnosticTestCurrentTopicStatusModel.getNextSkill();
@@ -88,7 +80,7 @@ describe('Diagnostic test current topic status model', () => {
     expect(currentSkillId).toEqual('skillID1');
 
     // The current skill ID should be removed from the eligible skill IDs.
-    expect(diagnosticTestCurrentTopicStatusModel._pendingSkillIdsToTest)
+    expect(diagnosticTestCurrentTopicStatusModel.getPendingSkillIds())
       .toEqual(['skillID2', 'skillID3']);
 
     // Currently, none of the questions are answered incorrectly, so the
@@ -103,31 +95,22 @@ describe('Diagnostic test current topic status model', () => {
     'should be able to get the status of the current skill as true after ' +
     'passing', () => {
       let skillIdToQuestionsDict: SkillIdToQuestionsDict = {
-        skillID1: {
-          mainQuestion: question1,
-          backupQuestion: question2
-        },
-        skillID2: {
-          mainQuestion: question3,
-          backupQuestion: question4
-        },
-        skillID3: {
-          mainQuestion: question5,
-          backupQuestion: question6
-        }
+        skillID1: new DiagnosticTestQuestionsModel(question1, question2),
+        skillID2: new DiagnosticTestQuestionsModel(question3, question4),
+        skillID3: new DiagnosticTestQuestionsModel(question5, question6)
       };
 
       let diagnosticTestCurrentTopicStatusModel = (
         new DiagnosticTestCurrentTopicStatusModel(skillIdToQuestionsDict));
 
-      expect(diagnosticTestCurrentTopicStatusModel._pendingSkillIdsToTest)
+      expect(diagnosticTestCurrentTopicStatusModel.getPendingSkillIds())
         .toEqual(['skillID1', 'skillID2', 'skillID3']);
 
       let currentSkillId = diagnosticTestCurrentTopicStatusModel.getNextSkill();
 
       expect(currentSkillId).toEqual('skillID1');
 
-      expect(diagnosticTestCurrentTopicStatusModel._pendingSkillIdsToTest)
+      expect(diagnosticTestCurrentTopicStatusModel.getPendingSkillIds())
         .toEqual(['skillID2', 'skillID3']);
 
       // Currently, none of the questions are answered incorrectly, so the
@@ -138,14 +121,14 @@ describe('Diagnostic test current topic status model', () => {
       expect(question).toEqual(question1);
 
       // Status of current skill should be false initially.
-      expect(diagnosticTestCurrentTopicStatusModel._skillIdToTestStatus[
+      expect(diagnosticTestCurrentTopicStatusModel.getSkillIdToTestStatus()[
         currentSkillId]).toBeFalse();
 
       diagnosticTestCurrentTopicStatusModel.recordCorrectAttempt(
         currentSkillId);
 
       // Status of current skill should be true, since the answer is correct.
-      expect(diagnosticTestCurrentTopicStatusModel._skillIdToTestStatus[
+      expect(diagnosticTestCurrentTopicStatusModel.getSkillIdToTestStatus()[
         currentSkillId]).toBeTrue();
 
       // Since the current question is answered correctly, the next skill
@@ -168,31 +151,22 @@ describe('Diagnostic test current topic status model', () => {
       // incorrect attempt for a topic is given another chance to try, so
       // the backup question from the same skill should be tested.
       let skillIdToQuestionsDict: SkillIdToQuestionsDict = {
-        skillID1: {
-          mainQuestion: question1,
-          backupQuestion: question2
-        },
-        skillID2: {
-          mainQuestion: question3,
-          backupQuestion: question4
-        },
-        skillID3: {
-          mainQuestion: question5,
-          backupQuestion: question6
-        }
+        skillID1: new DiagnosticTestQuestionsModel(question1, question2),
+        skillID2: new DiagnosticTestQuestionsModel(question3, question4),
+        skillID3: new DiagnosticTestQuestionsModel(question5, question6)
       };
 
       let diagnosticTestCurrentTopicStatusModel = (
         new DiagnosticTestCurrentTopicStatusModel(skillIdToQuestionsDict));
 
-      expect(diagnosticTestCurrentTopicStatusModel._pendingSkillIdsToTest)
+      expect(diagnosticTestCurrentTopicStatusModel.getPendingSkillIds())
         .toEqual(['skillID1', 'skillID2', 'skillID3']);
 
       let currentSkillId = diagnosticTestCurrentTopicStatusModel.getNextSkill();
 
       expect(currentSkillId).toEqual('skillID1');
 
-      expect(diagnosticTestCurrentTopicStatusModel._pendingSkillIdsToTest)
+      expect(diagnosticTestCurrentTopicStatusModel.getPendingSkillIds())
         .toEqual(['skillID2', 'skillID3']);
 
       // Currently, none of the questions are answered incorrectly, so the
@@ -217,31 +191,22 @@ describe('Diagnostic test current topic status model', () => {
     'should be able to mark the topic as failed if two incorrect attempts ' +
     'were made in the same or different skill', () => {
       let skillIdToQuestionsDict: SkillIdToQuestionsDict = {
-        skillID1: {
-          mainQuestion: question1,
-          backupQuestion: question2
-        },
-        skillID2: {
-          mainQuestion: question3,
-          backupQuestion: question4
-        },
-        skillID3: {
-          mainQuestion: question5,
-          backupQuestion: question6
-        }
+        skillID1: new DiagnosticTestQuestionsModel(question1, question2),
+        skillID2: new DiagnosticTestQuestionsModel(question3, question4),
+        skillID3: new DiagnosticTestQuestionsModel(question5, question6)
       };
 
       let diagnosticTestCurrentTopicStatusModel = (
         new DiagnosticTestCurrentTopicStatusModel(skillIdToQuestionsDict));
 
-      expect(diagnosticTestCurrentTopicStatusModel._pendingSkillIdsToTest)
+      expect(diagnosticTestCurrentTopicStatusModel.getPendingSkillIds())
         .toEqual(['skillID1', 'skillID2', 'skillID3']);
 
       let currentSkillId = diagnosticTestCurrentTopicStatusModel.getNextSkill();
 
       expect(currentSkillId).toEqual('skillID1');
 
-      expect(diagnosticTestCurrentTopicStatusModel._pendingSkillIdsToTest)
+      expect(diagnosticTestCurrentTopicStatusModel.getPendingSkillIds())
         .toEqual(['skillID2', 'skillID3']);
 
       // Currently, none of the questions are answered incorrectly, so the
@@ -281,14 +246,8 @@ describe('Diagnostic test current topic status model', () => {
     'skills were attempted correctly', () => {
       // Attempting questions from all the skills mark the topic as passed.
       let skillIdToQuestionsDict: SkillIdToQuestionsDict = {
-        skillID1: {
-          mainQuestion: question1,
-          backupQuestion: question2
-        },
-        skillID2: {
-          mainQuestion: question3,
-          backupQuestion: question4
-        }
+        skillID1: new DiagnosticTestQuestionsModel(question1, question2),
+        skillID2: new DiagnosticTestQuestionsModel(question3, question4)
       };
 
       let diagnosticTestCurrentTopicStatusModel = (

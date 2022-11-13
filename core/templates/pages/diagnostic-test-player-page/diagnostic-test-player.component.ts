@@ -29,6 +29,7 @@ import { PreventPageUnloadEventService } from 'services/prevent-page-unload-even
 })
 export class DiagnosticTestPlayerComponent implements OnInit {
   OPPIA_AVATAR_IMAGE_URL: string = '';
+  diagnosticTestStarted = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,

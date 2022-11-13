@@ -44,6 +44,9 @@ describe('Diagnostic test topic tracker model', () => {
     const diagnosticTestTopicTrackerModel = new DiagnosticTestTopicTrackerModel(
       topicIdToPrerequisiteTopicIds);
 
+    expect(diagnosticTestTopicTrackerModel.getTopicIdToPrerequisiteTopicIds())
+      .toEqual(topicIdToPrerequisiteTopicIds);
+
     expect(diagnosticTestTopicTrackerModel.getTopicIdToAncestorTopicIds())
       .toEqual(expectedTopicIdToAncestorTopicIds);
 
@@ -100,7 +103,7 @@ describe('Diagnostic test topic tracker model', () => {
     const diagnosticTestTopicTrackerModel = new DiagnosticTestTopicTrackerModel(
       topicIdToPrerequisiteTopicIds);
 
-    expect(diagnosticTestTopicTrackerModel.getEligibleTopicIds()).toEqual(
+    expect(diagnosticTestTopicTrackerModel.getPendingTopicIdsToTest()).toEqual(
       expectedEligibleTopicIDs);
   });
 
@@ -144,8 +147,8 @@ describe('Diagnostic test topic tracker model', () => {
       // Initially, all the topics are eligible for testing, then eventually
       // topics were filtered from the eligible list based on the performance
       // in any selected topic.
-      expect(diagnosticTestTopicTrackerModel.getEligibleTopicIds()).toEqual(
-        ['topicID1', 'topicID2', 'topicID3', 'topicID4', 'topicID5']);
+      expect(diagnosticTestTopicTrackerModel.getPendingTopicIdsToTest())
+        .toEqual(['topicID1', 'topicID2', 'topicID3', 'topicID4', 'topicID5']);
 
       // Assuming L = min(length of ancestors, length of successors). Among all
       // the eligible topic IDs, topic2 and topic3 have the maximum value for L.
@@ -164,8 +167,8 @@ describe('Diagnostic test topic tracker model', () => {
       diagnosticTestTopicTrackerModel.recordTopicFailed('topicID2');
 
       // Updated eligible topic IDs list.
-      expect(diagnosticTestTopicTrackerModel.getEligibleTopicIds()).toEqual(
-        ['topicID1', 'topicID3', 'topicID5']);
+      expect(diagnosticTestTopicTrackerModel.getPendingTopicIdsToTest())
+        .toEqual(['topicID1', 'topicID3', 'topicID5']);
 
       // Updated topic ID to ancestor topic IDs dict.
       expect(diagnosticTestTopicTrackerModel.getTopicIdToAncestorTopicIds())
@@ -232,8 +235,8 @@ describe('Diagnostic test topic tracker model', () => {
       // Initially, all the topics are eligible for testing, then eventually
       // topics were filtered from the eligible list based on the performance
       // in any selected topic.
-      expect(diagnosticTestTopicTrackerModel.getEligibleTopicIds()).toEqual(
-        ['topicID1', 'topicID2', 'topicID3', 'topicID4', 'topicID5']);
+      expect(diagnosticTestTopicTrackerModel.getPendingTopicIdsToTest())
+        .toEqual(['topicID1', 'topicID2', 'topicID3', 'topicID4', 'topicID5']);
 
       // Assuming L = min(length of ancestors, length of successors). Among all
       // the eligible topic IDs, topic 2 has the maximum value for L. Thus
@@ -248,8 +251,8 @@ describe('Diagnostic test topic tracker model', () => {
       diagnosticTestTopicTrackerModel.recordTopicPassed('topicID2');
 
       // Updated eligible topic IDs list after removing the ancestors.
-      expect(diagnosticTestTopicTrackerModel.getEligibleTopicIds()).toEqual(
-        ['topicID3', 'topicID4', 'topicID5']);
+      expect(diagnosticTestTopicTrackerModel.getPendingTopicIdsToTest())
+        .toEqual(['topicID3', 'topicID4', 'topicID5']);
 
       // Updated topic ID to ancestor topic IDs dict.
       expect(diagnosticTestTopicTrackerModel.getTopicIdToAncestorTopicIds())

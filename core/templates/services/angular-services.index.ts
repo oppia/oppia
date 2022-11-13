@@ -438,6 +438,8 @@ import { ContributionAndReviewStatsService } from 'pages/contributor-dashboard-p
 import { EntityCreationService } from 'pages/topic-editor-page/services/entity-creation.service';
 import { ClassroomAdminDataService } from 'pages/classroom-admin-page/services/classroom-admin-data.service';
 import { VoiceoverRecordingService } from 'pages/exploration-editor-page/translation-tab/services/voiceover-recording.service';
+import { DiagnosticTestPlayerEngineService } from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
+import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -527,6 +529,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['DateTimeFormatService', DateTimeFormatService],
   ['DebouncerService', DebouncerService],
   ['DeviceInfoService', DeviceInfoService],
+  ['DiagnosticTestPlayerEngineService', DiagnosticTestPlayerEngineService],
+  ['DiagnosticTestPlayerStatusService', DiagnosticTestPlayerStatusService],
   ['DocumentAttributeCustomizationService',
     DocumentAttributeCustomizationService],
   ['DragAndDropSortInputRulesService', DragAndDropSortInputRulesService],
