@@ -145,17 +145,18 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
 
     def test_get_multi_throws_error_on_failure(
             self) -> None:
-        dummyKeys = ['key1', 'key2', 'key3']
-        self.get_multi_swap = self.swap_to_always_raise(
+        dummy_keys = ['key1', 'key2', 'key3']
+        error_msg = (
+            'get_multi failed after %s retries' %
+            cloud_datastore_services.MAX_GET_RETRIES
+        )
+        with self.swap_to_always_raise(
             ndb,
             'get_multi',
             Exception('Mock key error')
-        )
-        error_msg = ('get_multi failed after %s retries' % 
-            cloud_datastore_services.MAX_GET_RETRIES)
-        with self.get_multi_swap:
+        ):
             with self.assertRaisesRegex(Exception, error_msg):
-                cloud_datastore_services.get_multi(dummyKeys)
+                cloud_datastore_services.get_multi(dummy_keys)
 
     def test_ndb_query_with_filters(self) -> None:
         user_query_model1 = user_models.UserQueryModel(
