@@ -186,11 +186,10 @@ def get_multi_user_ids_from_usernames(
     user_ids = []
     for username in normalized_usernames:
         user_id = username_to_user_id_map.get(username)
-        if strict:
-            if user_id is None:
-                raise Exception(
-                    'No user_id found for the username: %s' % username
-                )
+        if strict and user_id is None:
+            raise Exception(
+                'No user_id found for the username: %s' % username
+            )
         user_ids.append(user_id)
 
     return user_ids

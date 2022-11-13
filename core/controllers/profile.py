@@ -703,7 +703,7 @@ class SiteLanguageHandler(
     """Changes the preferred system language in the user's preferences."""
 
     LANGUAGE_ID_PROVIDER_FUNC: Callable[[Dict[str, str]], str] = (
-        lambda x: x['id']
+        lambda language_dict: language_dict['id']
     )
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {

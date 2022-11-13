@@ -25,9 +25,9 @@ from core import schema_utils
 from typing import Any, Dict, List, Tuple, Union
 
 
-# Here we use type Any because the sub-classes of BaseHandler can contain
-# different schemas with different types of values, like str, complex Dicts
-# and etc.
+# Here we use type Any because the sub-classes of BaseHandler can
+# contain different schemas with different types of values, like str,
+# complex dicts, etc.
 def get_schema_type(arg_schema: Dict[str, Any]) -> str:
     """Returns the schema type for an argument.
 
@@ -41,9 +41,9 @@ def get_schema_type(arg_schema: Dict[str, Any]) -> str:
     return schema_type
 
 
-# Here we use type Any because the sub-classes of BaseHandler can contain
-# different schemas with different types of values, like str, complex Dicts
-# and etc.
+# Here we use type Any because the sub-classes of BaseHandler can
+# contain different schemas with different types of values, like str,
+# complex dicts, etc.
 def get_corresponding_key_for_object(arg_schema: Dict[str, Any]) -> str:
     """Returns the new key for an argument from its schema.
 
@@ -58,11 +58,11 @@ def get_corresponding_key_for_object(arg_schema: Dict[str, Any]) -> str:
 
 
 # Here we use type Any because the argument 'handler_args' is a dictionary
-# representation of arguments that needs to be validated and these arguments
+# representation of arguments that need to be validated and these arguments
 # can be of any type, and the argument 'handler_args_schemas' is also annotated
 # with Any type because this argument can accept schemas of the handler and
 # those schemas can be of different kinds of dictionaries. The return type also
-# used Any because this method returns the normalized values of arguments.
+# uses Any because this method returns the normalized values of arguments.
 def validate_arguments_against_schema(
     handler_args: Dict[str, Any],
     handler_args_schemas: Dict[str, Any],
@@ -139,7 +139,8 @@ def convert_string_to_bool(param: str) -> Union[bool, str]:
         param: str. The params which needs normalization.
 
     Returns:
-        bool. Converts the string param into its expected bool type.
+        Union[bool, str]. Returns a boolean value if the param is either a
+        'true' or 'false' string literal, and returns string value otherwise.
     """
     case_insensitive_param = param.lower()
 
