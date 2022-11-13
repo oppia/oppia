@@ -143,26 +143,19 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
                 ]
             )
 
-    def test_fetch_multiple_entities_throws_error_on_get_multi_failure(
+    def test_get_multi_throws_error_on_failure(
             self) -> None:
-        cloud_datastore_services.update_timestamps_multi(
-            [self.completed_activities_model, self.user_query_model], False)
-        cloud_datastore_services.put_multi(
-            [self.completed_activities_model, self.user_query_model])
-
-        error_msg = 'Mock key error'
-        with self.swap_to_always_raise(
+        dummyKeys = ['key1', 'key2', 'key3']
+        self.get_multi_swap = self.swap_to_always_raise(
             ndb,
             'get_multi',
             Exception('Mock key error')
-        ):
+        )
+        error_msg = ('get_multi failed after %s retries' % 
+            cloud_datastore_services.MAX_GET_RETRIES)
+        with self.get_multi_swap:
             with self.assertRaisesRegex(Exception, error_msg):
-                cloud_datastore_services.fetch_multiple_entities_by_ids_and_models( # pylint: disable=line-too-long
-                    [
-                        ('CompletedActivitiesModel', [self.admin_user_id]),
-                        ('UserQueryModel', ['query_id'])
-                    ]
-                )
+                cloud_datastore_services.get_multi(dummyKeys)
 
     def test_ndb_query_with_filters(self) -> None:
         user_query_model1 = user_models.UserQueryModel(

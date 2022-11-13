@@ -90,11 +90,9 @@ def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
     Raises:
         Exception. If ndb.get_multi fails for MAX_GET_RETRIES.
     """
-    result: List[Optional[TYPE_MODEL_SUBCLASS]] = []
     for unused_i in range(0, MAX_GET_RETRIES):
         try:
-            result = ndb.get_multi(keys)
-            return result
+            return ndb.get_multi(keys)
         except Exception as unused_e:
             continue
     raise Exception('get_multi failed after %s retries' % MAX_GET_RETRIES)
