@@ -843,31 +843,40 @@ class AdminHandler(
             question_id_10 = question_services.get_new_question_id()
             question_id_11 = question_services.get_new_question_id()
             question_id_12 = question_services.get_new_question_id()
+            question_id_13 = question_services.get_new_question_id()
+            question_id_14 = question_services.get_new_question_id()
+            question_id_15 = question_services.get_new_question_id()
 
             question_1 = self._create_dummy_question(
                 question_id_1, 'Question 1', [skill_id_1])
             question_2 = self._create_dummy_question(
                 question_id_2, 'Question 2', [skill_id_1])
             question_3 = self._create_dummy_question(
-                question_id_3, 'Question 3', [skill_id_2])
+                question_id_3, 'Question 3', [skill_id_1])
             question_4 = self._create_dummy_question(
                 question_id_4, 'Question 4', [skill_id_2])
             question_5 = self._create_dummy_question(
-                question_id_5, 'Question 5', [skill_id_3])
+                question_id_5, 'Question 5', [skill_id_2])
             question_6 = self._create_dummy_question(
-                question_id_6, 'Question 6', [skill_id_3])
+                question_id_6, 'Question 6', [skill_id_2])
             question_7 = self._create_dummy_question(
-                question_id_7, 'Question 7', [skill_id_4])
+                question_id_7, 'Question 7', [skill_id_3])
             question_8 = self._create_dummy_question(
-                question_id_8, 'Question 8', [skill_id_4])
+                question_id_8, 'Question 8', [skill_id_3])
             question_9 = self._create_dummy_question(
-                question_id_9, 'Question 9', [skill_id_5])
+                question_id_9, 'Question 9', [skill_id_3])
             question_10 = self._create_dummy_question(
-                question_id_10, 'Question 10', [skill_id_5])
+                question_id_10, 'Question 10', [skill_id_4])
             question_11 = self._create_dummy_question(
-                question_id_11, 'Question 11', [skill_id_6])
+                question_id_11, 'Question 11', [skill_id_4])
             question_12 = self._create_dummy_question(
-                question_id_12, 'Question 12', [skill_id_6])
+                question_id_12, 'Question 12', [skill_id_4])
+            question_13 = self._create_dummy_question(
+                question_id_13, 'Question 13', [skill_id_5])
+            question_14 = self._create_dummy_question(
+                question_id_14, 'Question 14', [skill_id_5])
+            question_15 = self._create_dummy_question(
+                question_id_15, 'Question 15', [skill_id_5])
 
             topic_1 = topic_domain.Topic.create_default_topic(
                 topic_id_1, 'Addition', 'add', 'description', 'fragm')
@@ -962,6 +971,9 @@ class AdminHandler(
             question_services.add_question(self.user_id, question_10)
             question_services.add_question(self.user_id, question_11)
             question_services.add_question(self.user_id, question_12)
+            question_services.add_question(self.user_id, question_13)
+            question_services.add_question(self.user_id, question_14)
+            question_services.add_question(self.user_id, question_15)
 
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)
@@ -994,25 +1006,31 @@ class AdminHandler(
             question_services.create_new_question_skill_link(
                 self.user_id, question_id_2, skill_id_1, 0.5)
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_3, skill_id_2, 0.5)
+                self.user_id, question_id_3, skill_id_1, 0.5)
             question_services.create_new_question_skill_link(
                 self.user_id, question_id_4, skill_id_2, 0.5)
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_5, skill_id_3, 0.5)
+                self.user_id, question_id_5, skill_id_2, 0.5)
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_6, skill_id_3, 0.5)
+                self.user_id, question_id_6, skill_id_2, 0.5)
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_7, skill_id_4, 0.5)
+                self.user_id, question_id_7, skill_id_3, 0.5)
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_8, skill_id_4, 0.5)
+                self.user_id, question_id_8, skill_id_3, 0.5)
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_9, skill_id_5, 0.5)
+                self.user_id, question_id_9, skill_id_3, 0.5)
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_10, skill_id_5, 0.5)
+                self.user_id, question_id_10, skill_id_4, 0.5)
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_11, skill_id_6, 0.5)
+                self.user_id, question_id_11, skill_id_4, 0.5)
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_12, skill_id_6, 0.5)
+                self.user_id, question_id_12, skill_id_4, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_13, skill_id_5, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_14, skill_id_5, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_15, skill_id_5, 0.5)
 
             classroom_id_1 = classroom_config_services.get_new_classroom_id()
             classroom_id_2 = classroom_config_services.get_new_classroom_id()
@@ -1028,7 +1046,7 @@ class AdminHandler(
                 topic_id_2: [topic_id_1],
                 topic_id_3: [topic_id_1],
                 topic_id_4: [topic_id_2],
-                topic_id_5: [topic_id_3]
+                topic_id_5: [topic_id_2, topic_id_3]
             }
             topic_dependency_for_classroom_2: Dict[str, List[str]] = {
                 topic_id_6: []

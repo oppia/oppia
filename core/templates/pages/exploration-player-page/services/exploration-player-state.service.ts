@@ -423,8 +423,7 @@ export class ExplorationPlayerStateService {
   }
 
   skipCurrentQuestion(successCallback: (stateCard: StateCard) => void): void {
-    this.diagnosticTestPlayerEngineService
-      .getNextCardAfterSkippingCurrentQuestion(successCallback);
+    this.diagnosticTestPlayerEngineService.skipCurrentQuestion(successCallback);
   }
 
   get onTotalQuestionsReceived(): EventEmitter<number> {

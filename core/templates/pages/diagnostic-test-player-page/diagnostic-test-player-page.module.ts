@@ -41,6 +41,10 @@ import { DiagnosticTestPlayerComponent } from './diagnostic-test-player.componen
 import { InteractiveTextInputComponent } from '../../../../extensions/interactions/TextInput/directives/oppia-interactive-text-input.component';
 import { ResponseTextInputComponent } from '../../../../extensions/interactions/TextInput/directives/oppia-response-text-input.component';
 import { TopicSummaryTileComponent } from 'components/summary-tile/topic-summary-tile.component';
+import { InteractiveDragAndDropSortInputComponent } from 'interactions/DragAndDropSortInput/directives/oppia-interactive-drag-and-drop-sort-input.component';
+import { InteractiveMultipleChoiceInputComponent } from 'interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component';
+import { ResponseMultipleChoiceInputComponent } from 'interactions/MultipleChoiceInput/directives/oppia-response-multiple-choice-input.component';
+
 
 declare var angular: ng.IAngularStatic;
 
@@ -63,13 +67,19 @@ declare var angular: ng.IAngularStatic;
   declarations: [
     DiagnosticTestPlayerComponent,
     InteractiveTextInputComponent,
+    InteractiveDragAndDropSortInputComponent,
+    InteractiveMultipleChoiceInputComponent,
     ResponseTextInputComponent,
+    ResponseMultipleChoiceInputComponent,
     TopicSummaryTileComponent
   ],
   entryComponents: [
     DiagnosticTestPlayerComponent,
     InteractiveTextInputComponent,
+    InteractiveDragAndDropSortInputComponent,
+    InteractiveMultipleChoiceInputComponent,
     ResponseTextInputComponent,
+    ResponseMultipleChoiceInputComponent,
     TopicSummaryTileComponent
   ],
   providers: [
