@@ -601,6 +601,32 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(results), 0)
         self.assertEqual(offset_3, 2)
 
+        newest_results, offset_1 = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_question_suggestions_by_offset(
+                limit=limit,
+                offset=0,
+                user_id=user_id,
+                newest_first=True))
+        # Ruling out the possibility of None for mypy type checking.
+        assert newest_results is not None
+        self.assertEqual(len(newest_results), limit)
+        self.assertEqual(newest_results[0].id, suggestion_2_id)
+        self.assertEqual(offset_1, 1)
+
+        oldest_results, offset_2 = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_question_suggestions_by_offset(
+                limit=limit,
+                offset=offset_1,
+                user_id=user_id,
+                newest_first=True))
+        # Ruling out the possibility of None for mypy type checking.
+        assert oldest_results is not None
+        self.assertEqual(len(oldest_results), limit)
+        self.assertEqual(oldest_results[0].id, suggestion_1_id)
+        self.assertEqual(offset_2, 2)
+
     def test_user_created_suggestions_by_offset(self) -> None:
         authored_translation_suggestion_id = 'exploration.exp1.thread_6'
         non_authored_translation_suggestion_id = 'exploration.exp1.thread_7'

@@ -1041,7 +1041,8 @@ def get_reviewable_translation_suggestions_by_offset(
 def get_reviewable_question_suggestions_by_offset(
     user_id: str,
     limit: int,
-    offset: int
+    offset: int,
+    newest_first: bool = False
 ) -> Tuple[List[suggestion_registry.SuggestionAddQuestion], int]:
     """Returns a list of question suggestions which the user
        can review.
@@ -1051,6 +1052,8 @@ def get_reviewable_question_suggestions_by_offset(
         limit: int. The maximum number of results to return.
         offset: int. The number of results to skip from the beginning of all
             results matching the query.
+        newest_first: bool. Whether to sort the suggestions with the newest
+            first.
 
     Returns:
         Tuple of (results, next_offset). Where:
@@ -1061,7 +1064,8 @@ def get_reviewable_question_suggestions_by_offset(
     """
     suggestions, next_offset = (
         suggestion_models.GeneralSuggestionModel
-        .get_in_review_question_suggestions_by_offset(limit, offset, user_id))
+        .get_in_review_question_suggestions_by_offset(
+            limit, offset, user_id, newest_first))
 
     question_suggestions = []
     for suggestion_model in suggestions:

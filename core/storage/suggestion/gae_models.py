@@ -608,7 +608,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_in_review_question_suggestions_by_offset(
-        cls, limit: int, offset: int, user_id: str
+        cls, limit: int, offset: int, user_id: str, newest_first: bool = False
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches question suggestions that are in-review and not authored by
         the supplied user.
@@ -620,6 +620,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             user_id: str. The id of the user trying to make this query. As a
                 user cannot review their own suggestions, suggestions authored
                 by the user will be excluded.
+            newest_first: bool. Whether to sort the suggestions with the newest
+                first.
 
         Returns:
             Tuple of (results, next_offset). Where:
@@ -629,16 +631,39 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 next_offset: int. The input offset + the number of results
                     returned by the current query.
         """
-        suggestion_query = cls.get_all().filter(datastore_services.all_of(
-            cls.status == STATUS_IN_REVIEW,
-            cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            cls.author_id != user_id
-        ))
 
-        results: Sequence[GeneralSuggestionModel] = (
-            suggestion_query.fetch(limit, offset=offset)
-        )
-        next_offset = offset + len(results)
+        if newest_first:
+            # The first sort property must be the same as the property to which
+            # an inequality filter is applied. Thus, the inequality filter on
+            # author_id can not be used here.
+            suggestion_query = cls.get_all().filter(
+                datastore_services.all_of(
+                    cls.status == STATUS_IN_REVIEW,
+                    cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            )).order(-cls.created_on)
+
+            results = []
+
+            while len(results) < limit:
+                suggestion_model: GeneralSuggestionModel = (
+                    suggestion_query.fetch(1, offset=offset))[0]
+                offset += 1
+                if suggestion_model.author_id != user_id:
+                    results.append(suggestion_model)
+            
+            next_offset = offset
+
+        else:
+            suggestion_query = cls.get_all().filter(datastore_services.all_of(
+                cls.status == STATUS_IN_REVIEW,
+                cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                cls.author_id != user_id
+            ))
+
+            results: Sequence[GeneralSuggestionModel] = (
+                suggestion_query.fetch(limit, offset=offset)
+            )
+            next_offset = offset + len(results)
 
         return (
             results,

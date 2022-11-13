@@ -354,6 +354,12 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
                     }]
                 }
             },
+            'newest_first': {
+                'schema': {
+                    'type': 'bool'
+                },
+                'default_value': False
+            },
             'exploration_id': {
                 'schema': {
                     'type': 'basestring'
@@ -375,6 +381,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
             target_type, suggestion_type)
         limit = self.normalized_request.get('limit')
         offset = self.normalized_request.get('offset')
+        newest_first = self.normalized_request.get('newest_first')
         exploration_id = self.normalized_request.get('exploration_id')
 
         suggestions = []
@@ -390,7 +397,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
             suggestions, next_offset = (
                 suggestion_services.
                 get_reviewable_question_suggestions_by_offset(
-                    self.user_id, limit, offset))
+                    self.user_id, limit, offset, newest_first))
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
