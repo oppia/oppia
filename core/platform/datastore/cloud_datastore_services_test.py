@@ -145,7 +145,11 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
 
     def test_get_multi_throws_error_on_failure(
             self) -> None:
-        dummy_keys = ['key1', 'key2', 'key3']
+        dummy_keys = [
+            ndb.Key('model1', 'id1'),
+            ndb.Key('model2', 'id2'),
+            ndb.Key('model3', 'id3')
+        ]
         error_msg = (
             'get_multi failed after %s retries' %
             cloud_datastore_services.MAX_GET_RETRIES
