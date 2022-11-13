@@ -26,15 +26,16 @@ import isort.api
 import pycodestyle
 from pylint import lint
 from pylint.reporters import text
+from typing import List, Tuple
 
 from . import linter_utils
 from .. import concurrent_task_utils
 
 
-class ThirdPartyPythonLintChecksManager:
+class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
     """Manages all the third party Python linting functions."""
 
-    def __init__(self, files_to_lint):
+    def __init__(self, files_to_lint: List[str]) -> None:
         """Constructs a ThirdPartyPythonLintChecksManager object.
 
         Args:
@@ -43,12 +44,12 @@ class ThirdPartyPythonLintChecksManager:
         self.files_to_lint = files_to_lint
 
     @property
-    def all_filepaths(self):
+    def all_filepaths(self) -> List[str]:
         """Return all filepaths."""
         return self.files_to_lint
 
     @staticmethod
-    def get_trimmed_error_output(lint_message):
+    def get_trimmed_error_output(lint_message: str) -> str:
         """Remove extra bits from pylint error messages.
 
         Args:
@@ -72,7 +73,7 @@ class ThirdPartyPythonLintChecksManager:
 
         return trimmed_lint_message
 
-    def lint_py_files(self):
+    def lint_py_files(self) -> concurrent_task_utils.TaskResult:
         """Prints a list of lint errors in the given list of Python files.
 
         Returns:
@@ -137,7 +138,7 @@ class ThirdPartyPythonLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, errors_found, error_messages, full_error_messages)
 
-    def check_import_order(self):
+    def check_import_order(self) -> concurrent_task_utils.TaskResult:
         """This function is used to check that each file
         has imports placed in alphabetical order.
 
@@ -164,7 +165,9 @@ class ThirdPartyPythonLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def perform_all_lint_checks(self):
+    def perform_all_lint_checks(
+        self
+    ) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
@@ -185,7 +188,9 @@ class ThirdPartyPythonLintChecksManager:
         return linter_stdout
 
 
-def get_linters(files_to_lint):
+def get_linters(
+    files_to_lint: List[str]
+) -> Tuple[None, ThirdPartyPythonLintChecksManager]:
     """Creates ThirdPartyPythonLintChecksManager and returns it.
 
     Args:

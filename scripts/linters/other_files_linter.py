@@ -28,6 +28,7 @@ from core import utils
 from typing import Any, Dict, Final, List, Tuple, TypedDict
 import yaml
 
+from . import linter_utils
 from .. import concurrent_task_utils
 
 MYPY = False
@@ -102,7 +103,7 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
 ]
 
 
-class CustomLintChecksManager:
+class CustomLintChecksManager(linter_utils.BaseLinter):
     """Manages other files lint checks."""
 
     def __init__(self, file_cache: pre_commit_linter.FileCache) -> None:
@@ -125,7 +126,7 @@ class CustomLintChecksManager:
         failed = False
         error_messages = []
         skip_files_section_found = False
-        for line_num, line in enumerate(self.file_cache.readlines(  # type: ignore[no-untyped-call]
+        for line_num, line in enumerate(self.file_cache.readlines(
                 APP_YAML_FILEPATH)):
             stripped_line = line.strip()
             if '# Third party files:' in stripped_line:
@@ -244,7 +245,7 @@ class CustomLintChecksManager:
         error_messages = []
         plugins_section_found = False
         htmlwebpackplugin_section_found = False
-        for line_num, line in enumerate(self.file_cache.readlines(  # type: ignore[no-untyped-call]
+        for line_num, line in enumerate(self.file_cache.readlines(
                 WEBPACK_CONFIG_FILEPATH)):
             stripped_line = line.strip()
             if stripped_line.startswith('plugins:'):
@@ -295,7 +296,7 @@ class CustomLintChecksManager:
         }
         errors = []
         for workflow_path in workflow_paths:
-            workflow_str = self.file_cache.read(workflow_path)  # type: ignore[no-untyped-call]
+            workflow_str = self.file_cache.read(workflow_path)
             workflow_dict = yaml.load(workflow_str, Loader=yaml.Loader)
             errors += self._check_that_workflow_steps_use_merge_action(
                 workflow_dict, workflow_path)

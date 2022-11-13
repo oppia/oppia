@@ -159,7 +159,11 @@ def _check_all_tasks(tasks: List[TaskThread]) -> None:
             ))
 
         if task.exception:
-            ALL_ERRORS.append(task.stacktrace)
+            stacktrace = (
+                task.stacktrace
+                if task.stacktrace else 'No stacktrace present.'
+            )
+            ALL_ERRORS.append(stacktrace)
 
     if running_tasks_data:
         log('----------------------------------------')

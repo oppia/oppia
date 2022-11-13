@@ -101,13 +101,8 @@ NOT_FULLY_COVERED_FILES: Final = [
     'scripts/install_third_party_libs_test.py',
     'scripts/install_third_party.py',
     'scripts/install_third_party_test.py',
-    'scripts/run_backend_tests.py',
-    'scripts/linters/pre_commit_linter.py',
-    'scripts/linters/pre_commit_linter_test.py',
     'scripts/linters/pylint_extensions.py',
     'scripts/linters/pylint_extensions_test.py',
-    'scripts/linters/python_linter.py',
-    'scripts/linters/python_linter_test.py',
 ]
 
 

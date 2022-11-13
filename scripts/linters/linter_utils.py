@@ -19,6 +19,7 @@ Do not use this module anywhere else in the code base!
 
 from __future__ import annotations
 
+import abc
 import collections
 import contextlib
 import shutil
@@ -26,6 +27,8 @@ import sys
 import tempfile
 
 from typing import Dict, Iterator, List, Optional, TextIO
+
+from .. import concurrent_task_utils
 
 
 @contextlib.contextmanager
@@ -107,3 +110,17 @@ def print_success_message(success_message: str) -> None:
     """
     # \033[91m is the ANSI escape sequences for green color.
     print('\033[92m' + success_message + '\033[0m')
+
+
+class BaseLinter(abc.ABC):
+    """Base abstract linter manager for all linters."""
+
+    @abc.abstractmethod
+    def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
+        """Perform all the lint checks and returns the messages returned by all
+        the checks.
+
+        Returns:
+            list(TaskResult). A list of TaskResult objects representing the
+            results of the lint checks.
+        """
