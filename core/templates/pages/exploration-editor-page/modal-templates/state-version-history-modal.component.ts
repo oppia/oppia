@@ -23,7 +23,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 import { State } from 'domain/state/StateObjectFactory';
 import { ContextService } from 'services/context.service';
 import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
-import { VersionHistoryBackendApiService, StateVersionHistoryResponse } from '../services/version-history-backend-api.service';
+import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 import { VersionHistoryService } from '../services/version-history.service';
 
 interface headersAndYamlStrs {
@@ -44,12 +44,12 @@ interface mergeviewOptions {
 })
 export class StateVersionHistoryModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  committerUsername: string | null;
-  oldVersion: number | null;
-  newState: State | null;
-  oldState: State | null;
-  newStateName: string;
-  oldStateName: string;
+  committerUsername: string | null = null;
+  oldVersion: number | null = null;
+  newState: State | null = null;
+  oldState: State | null = null;
+  newStateName: string = '';
+  oldStateName: string = '';
   yamlStrs: headersAndYamlStrs = {
     leftPane: '',
     rightPane: '',
@@ -80,7 +80,7 @@ export class StateVersionHistoryModalComponent
     return this.versionHistoryService.canShowForwardStateDiffData();
   }
 
-  getLastEditedVersionNumber(): number {
+  getLastEditedVersionNumber(): number | null {
     return (
       this.versionHistoryService.getBackwardStateDiffData().oldVersionNumber);
   }
@@ -91,7 +91,7 @@ export class StateVersionHistoryModalComponent
   }
 
   // Returns the next version number at which the state was modified.
-  getNextEditedVersionNumber(): number {
+  getNextEditedVersionNumber(): number | null {
     return (
       this.versionHistoryService.getForwardStateDiffData().oldVersionNumber);
   }
@@ -109,8 +109,12 @@ export class StateVersionHistoryModalComponent
 
     this.newState = diffData.newState;
     this.oldState = diffData.oldState;
-    this.newStateName = diffData.newState.name;
-    this.oldStateName = diffData.oldState.name;
+    if (diffData.newState && diffData.newState.name !== null) {
+      this.newStateName = diffData.newState.name;
+    }
+    if (diffData.oldState && diffData.oldState.name !== null) {
+      this.oldStateName = diffData.oldState.name;
+    }
     this.committerUsername = diffData.committerUsername;
     this.oldVersion = diffData.oldVersionNumber;
 
@@ -130,8 +134,12 @@ export class StateVersionHistoryModalComponent
 
     this.newState = diffData.newState;
     this.oldState = diffData.oldState;
-    this.newStateName = diffData.newState.name;
-    this.oldStateName = diffData.oldState.name;
+    if (diffData.newState && diffData.newState.name !== null) {
+      this.newStateName = diffData.newState.name;
+    }
+    if (diffData.oldState && diffData.oldState.name !== null) {
+      this.oldStateName = diffData.oldState.name;
+    }
     this.committerUsername = diffData.committerUsername;
     this.oldVersion = diffData.oldVersionNumber;
 
@@ -148,18 +156,23 @@ export class StateVersionHistoryModalComponent
       return;
     }
     const diffData = this.versionHistoryService.getBackwardStateDiffData();
-    if (diffData.oldVersionNumber !== null) {
+    if (
+      diffData.oldVersionNumber !== null &&
+      diffData.oldState && diffData.oldState.name !== null
+    ) {
       this.versionHistoryBackendApiService.fetchStateVersionHistoryAsync(
         this.contextService.getExplorationId(),
         diffData.oldState.name, diffData.oldVersionNumber
-      ).then((response: StateVersionHistoryResponse) => {
-        this.versionHistoryService.insertStateVersionHistoryData(
-          response.lastEditedVersionNumber,
-          response.stateInPreviousVersion,
-          response.lastEditedCommitterUsername
-        );
-        this.versionHistoryService
-          .incrementCurrentPositionInStateVersionHistoryList();
+      ).then((response) => {
+        if (response !== null) {
+          this.versionHistoryService.insertStateVersionHistoryData(
+            response.lastEditedVersionNumber,
+            response.stateInPreviousVersion,
+            response.lastEditedCommitterUsername
+          );
+          this.versionHistoryService
+            .incrementCurrentPositionInStateVersionHistoryList();
+        }
       });
     }
   }

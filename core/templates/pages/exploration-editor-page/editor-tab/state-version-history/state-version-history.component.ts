@@ -41,7 +41,7 @@ export class StateVersionHistoryComponent {
     );
   }
 
-  getLastEditedVersionNumber(): number {
+  getLastEditedVersionNumber(): number | null {
     return (
       this.versionHistoryService.getBackwardStateDiffData().oldVersionNumber
     );
@@ -59,8 +59,12 @@ export class StateVersionHistoryComponent {
       this.versionHistoryService.getBackwardStateDiffData());
     modalRef.componentInstance.newState = stateDiffData.newState;
     modalRef.componentInstance.oldState = stateDiffData.oldState;
-    modalRef.componentInstance.newStateName = stateDiffData.newState.name;
-    modalRef.componentInstance.oldStateName = stateDiffData.oldState.name;
+    if (stateDiffData.newState && stateDiffData.newState.name) {
+      modalRef.componentInstance.newStateName = stateDiffData.newState.name;
+    }
+    if (stateDiffData.oldState && stateDiffData.oldState.name) {
+      modalRef.componentInstance.oldStateName = stateDiffData.oldState.name;
+    }
     modalRef.componentInstance.committerUsername = (
       stateDiffData.committerUsername);
     modalRef.componentInstance.oldVersion = stateDiffData.oldVersionNumber;

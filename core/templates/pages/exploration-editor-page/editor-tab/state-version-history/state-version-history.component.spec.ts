@@ -163,15 +163,15 @@ describe('State version history component', () => {
   it('should open the state version history modal on clicking the explore ' +
   'version history button', () => {
     class MockComponentInstance {
-      compoenentInstance: {
-        newState: null;
-        newStateName: 'A';
-        oldState: null;
-        oldStateName: 'B';
+      compoenentInstance = {
+        newState: null,
+        newStateName: 'A',
+        oldState: null,
+        oldStateName: 'B',
         headers: {
-          leftPane: '';
-          rightPane: '';
-        };
+          leftPane: '',
+          rightPane: '',
+        }
       };
     }
     spyOn(ngbModal, 'open').and.returnValues({

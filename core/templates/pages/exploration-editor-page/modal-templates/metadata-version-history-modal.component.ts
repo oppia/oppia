@@ -23,7 +23,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 import { ExplorationMetadata } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { ContextService } from 'services/context.service';
 import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
-import { VersionHistoryBackendApiService, MetadataVersionHistoryResponse } from '../services/version-history-backend-api.service';
+import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 import { VersionHistoryService } from '../services/version-history.service';
 
 interface headersAndYamlStrs {
@@ -44,10 +44,10 @@ interface mergeviewOptions {
 })
 export class MetadataVersionHistoryModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  committerUsername: string | null;
-  oldVersion: number | null;
-  newMetadata: ExplorationMetadata | null;
-  oldMetadata: ExplorationMetadata | null;
+  committerUsername: string | null = null;
+  oldVersion: number | null = null;
+  newMetadata: ExplorationMetadata | null = null;
+  oldMetadata: ExplorationMetadata | null = null;
   yamlStrs: headersAndYamlStrs = {
     leftPane: '',
     rightPane: '',
@@ -78,7 +78,7 @@ export class MetadataVersionHistoryModalComponent
     return this.versionHistoryService.canShowForwardMetadataDiffData();
   }
 
-  getLastEditedVersionNumber(): number {
+  getLastEditedVersionNumber(): number | null {
     return (
       this
         .versionHistoryService
@@ -97,7 +97,7 @@ export class MetadataVersionHistoryModalComponent
   }
 
   // Returns the next version number at which the state was modified.
-  getNextEditedVersionNumber(): number {
+  getNextEditedVersionNumber(): number | null {
     return (
       this
         .versionHistoryService
@@ -160,14 +160,16 @@ export class MetadataVersionHistoryModalComponent
     if (diffData.oldVersionNumber !== null) {
       this.versionHistoryBackendApiService.fetchMetadataVersionHistoryAsync(
         this.contextService.getExplorationId(), diffData.oldVersionNumber
-      ).then((response: MetadataVersionHistoryResponse) => {
-        this.versionHistoryService.insertMetadataVersionHistoryData(
-          response.lastEditedVersionNumber,
-          response.metadataInPreviousVersion,
-          response.lastEditedCommitterUsername
-        );
-        this.versionHistoryService
-          .incrementCurrentPositionInMetadataVersionHistoryList();
+      ).then((response) => {
+        if (response !== null) {
+          this.versionHistoryService.insertMetadataVersionHistoryData(
+            response.lastEditedVersionNumber,
+            response.metadataInPreviousVersion,
+            response.lastEditedCommitterUsername
+          );
+          this.versionHistoryService
+            .incrementCurrentPositionInMetadataVersionHistoryList();
+        }
       });
     }
   }
