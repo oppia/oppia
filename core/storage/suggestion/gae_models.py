@@ -650,7 +650,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 offset += 1
                 if suggestion_model.author_id != user_id:
                     results.append(suggestion_model)
-            
+
             next_offset = offset
 
         else:
