@@ -668,6 +668,14 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         }
         self.post_json(
             self.url, payload, csrf_token=csrf_token, expected_status_int=400)
+
+        payload = {
+            'name': '',
+            'abbreviatedName': 'name-two'
+        }
+        self.post_json(
+            self.url, payload, csrf_token=csrf_token, expected_status_int=400)
+
         self.logout()
 
     def test_topic_creation_with_invalid_image(self) -> None:

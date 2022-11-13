@@ -370,6 +370,8 @@ class NewTopicHandler(
                         'id': 'has_length_at_most',
                         'max_value': android_validation_constants
                             .MAX_CHARS_IN_TOPIC_NAME
+                    },{
+                        'id': 'is_nonempty',
                     }]
                 }
             },
@@ -437,11 +439,6 @@ class NewTopicHandler(
         raw_image = self.normalized_request['image']
         page_title_frag = self.normalized_payload['page_title_fragment']
 
-        try:
-            topic_domain.Topic.require_valid_name(name)
-        except Exception as e:
-            raise self.InvalidInputException(
-                'Invalid topic name, received %s.' % name) from e
         new_topic_id = topic_fetchers.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
             new_topic_id, name, url_fragment, description, page_title_frag)
@@ -654,14 +651,8 @@ class MergeSkillHandler(
         assert self.normalized_payload is not None
         old_skill_id = self.normalized_payload['old_skill_id']
         new_skill_id = self.normalized_payload['new_skill_id']
-        new_skill = skill_fetchers.get_skill_by_id(new_skill_id, strict=False)
-        if new_skill is None:
-            raise self.PageNotFoundException(
-                Exception('The new skill with the given id doesn\'t exist.'))
-        old_skill = skill_fetchers.get_skill_by_id(old_skill_id, strict=False)
-        if old_skill is None:
-            raise self.PageNotFoundException(
-                Exception('The old skill with the given id doesn\'t exist.'))
+        skill_fetchers.get_skill_by_id(new_skill_id, strict=True)
+        old_skill = skill_fetchers.get_skill_by_id(old_skill_id, strict=True)
 
         skill_services.replace_skill_id_in_all_topics(
             self.user_id, old_skill_id, new_skill_id)
