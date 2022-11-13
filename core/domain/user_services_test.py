@@ -42,7 +42,7 @@ from core.tests import test_utils
 
 import requests_mock
 
-from typing import Final, List
+from typing import Dict, Final, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -50,6 +50,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import auth_models
     from mypy_imports import user_models
 
+datastore_services = models.Registry.import_datastore_services()
 (auth_models, user_models, audit_models) = (models.Registry.import_models([
     models.Names.AUTH,
     models.Names.USER,
@@ -648,6 +649,28 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_email_prefs.can_receive_subscription_email,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
+    def test_add_user_to_android_list(self) -> None:
+        def _mock_add_or_update_user_status(
+            unused_email: str,
+            merge_fields: Dict[str, str],
+            unused_tag: str,
+            *,
+            can_receive_email_updates: bool
+        ) -> bool:
+            """Mocks bulk_email_services.add_or_update_user_status()."""
+            self.assertDictEqual(merge_fields, {
+                'NAME': 'Name'
+            })
+            return can_receive_email_updates
+
+        fn_swap = self.swap(
+            bulk_email_services, 'add_or_update_user_status',
+            _mock_add_or_update_user_status)
+        with fn_swap:
+            self.assertTrue(
+                user_services.add_user_to_android_list(
+                    'email@example.com', 'Name'))
+
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'
         username = 'username'
@@ -689,10 +712,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
              'API, since this is a dev environment.' % user_email])
 
         def _mock_add_or_update_user_status(
-            _email: str, _can_receive_updates: bool
+            unused_email: str,
+            unused_merge_fields: Dict[str, str],
+            unused_tag: str,
+            *,
+            can_receive_email_updates: bool
         ) -> bool:
             """Mocks bulk_email_services.add_or_update_user_status()."""
-            return False
+            return not can_receive_email_updates
 
         send_mail_swap = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         bulk_email_swap = self.swap(
@@ -947,9 +974,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'ACCESS_CREATOR_DASHBOARD', 'EDIT_ANY_TOPIC',
             'ACCEPT_ANY_SUGGESTION', 'PUBLISH_OWNED_ACTIVITY',
             'PLAY_ANY_PUBLIC_ACTIVITY',
-            'ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION',
             'EDIT_ANY_SUBTOPIC_PAGE', 'VISIT_ANY_QUESTION_EDITOR_PAGE',
-            'ACCESS_LEARNER_DASHBOARD', 'ACTION_SUBMIT_VOICEOVER_APPLICATION',
+            'ACCESS_LEARNER_DASHBOARD',
             'EDIT_ANY_ACTIVITY', 'VISIT_ANY_TOPIC_EDITOR_PAGE',
             'SUGGEST_CHANGES', 'DELETE_OWNED_PRIVATE_ACTIVITY',
             'EDIT_OWNED_ACTIVITY', 'EDIT_SKILL_DESCRIPTION',
@@ -1267,6 +1293,36 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, error_msg):
             user_services.add_user_role(
                 user_id, feconf.ROLE_ID_MOBILE_LEARNER)
+
+    def test_is_user_blog_post_author_returns_true_for_authors(self) -> None:
+        # When user is a blog admin.
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        blog_admin_id = (
+            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+        # Precheck before adding blog admin role.
+        self.assertFalse(user_services.is_user_blog_post_author(blog_admin_id))
+
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+
+        self.assertTrue(user_services.is_user_blog_post_author(blog_admin_id))
+
+        # When user is a blog editor.
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        blog_editor_id = (
+            self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
+        # Precheck before adding blog editor role.
+        self.assertFalse(user_services.is_user_blog_post_author(blog_editor_id))
+
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+
+        self.assertTrue(user_services.is_user_blog_post_author(blog_editor_id))
+
+        #  Assigning multiple roles to blog editor.
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_RELEASE_COORDINATOR)
+        self.assertTrue(user_services.is_user_blog_post_author(blog_editor_id))
 
     def test_removing_role_from_mobile_learner_user_raises_exception(
         self
@@ -1910,45 +1966,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             prev_started_state
         )
 
-    def test_create_user_contributions_with_bot_user_id_returns_none(
-        self
-    ) -> None:
-        user_id = feconf.MIGRATION_BOT_USER_ID
-        created_exp_ids = ['exp1', 'exp2', 'exp3']
-        edited_exp_ids = ['exp2', 'exp3', 'exp4']
-
-        user_contrib = user_services.create_user_contributions(
-            user_id,
-            created_exp_ids,
-            edited_exp_ids)
-
-        self.assertIsNone(user_contrib)
-
-    def test_create_user_contributions_already_existing_raises_error(
-        self
-    ) -> None:
-        auth_id = 'someUser'
-        user_email = 'user@example.com'
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        contributions = user_services.get_user_contributions(
-            user_id, strict=True
-        )
-        # Check that the user contributions for this user ID already exist.
-        # (Note that user contributions are created automatically when a new
-        # user is created.)
-        self.assertIsNotNone(contributions)
-        self.assertIsInstance(contributions, user_domain.UserContributions)
-
-        with self.assertRaisesRegex(
-            Exception,
-            'User contributions model for user %s already exists.'
-            % user_id
-        ):
-            user_services.create_user_contributions(
-                user_id,
-                ['expectedId1', 'expectedId2', 'expectedId3'],
-                ['expectedId2', 'expectedId3', 'expectedId4'])
-
     def test_create_user_contributions(self) -> None:
         auth_id = 'someUser'
         user_email = 'user@example.com'
@@ -1970,9 +1987,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             pre_add_contributions.edited_exploration_ids)
 
         for created_exp_id in created_exp_ids:
-            user_services.add_created_exploration_id(user_id, created_exp_id)
+            pre_add_contributions.add_created_exploration_id(
+                created_exp_id
+            )
         for edited_exp_id in edited_exp_ids:
-            user_services.add_edited_exploration_id(user_id, edited_exp_id)
+            pre_add_contributions.add_edited_exploration_id(
+                edited_exp_id
+            )
+        user_services.save_user_contributions(pre_add_contributions)
 
         contributions = user_services.get_user_contributions(
             user_id, strict=True
@@ -2040,26 +2062,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertNotIn('exp1', contributions.created_exploration_ids)
 
-        user_services.add_created_exploration_id(user_id, 'exp1')
+        contributions.add_created_exploration_id('exp1')
+        user_services.save_user_contributions(contributions)
         contributions = user_services.get_user_contributions(
             user_id, strict=True
         )
-        self.assertIn('exp1', contributions.created_exploration_ids)
-
-    def test_add_created_exploration_id_creates_user_contribution(self) -> None:
-        user_id = 'id_x'
-
-        pre_add_contributions = user_services.get_user_contributions(
-            user_id, strict=False
-        )
-        self.assertIsNone(pre_add_contributions)
-
-        user_services.add_created_exploration_id(user_id, 'exp1')
-        contributions = user_services.get_user_contributions(
-            user_id, strict=True
-        )
-
-        self.assertIsInstance(contributions, user_domain.UserContributions)
         self.assertIn('exp1', contributions.created_exploration_ids)
 
     def test_add_edited_exploration_id(self) -> None:
@@ -2072,27 +2079,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertNotIn('exp1', contributions.edited_exploration_ids)
 
-        user_services.add_edited_exploration_id(user_id, 'exp1')
+        contributions.add_edited_exploration_id('exp1')
+        user_services.save_user_contributions(contributions)
         contributions = user_services.get_user_contributions(
             user_id, strict=True
         )
         self.assertIn('exp1', contributions.edited_exploration_ids)
-
-    def test_add_edited_exploration_id_creates_user_contribution(self) -> None:
-        user_id = 'id_x'
-
-        pre_add_contributions = user_services.get_user_contributions(user_id)
-        self.assertIsNone(pre_add_contributions)
-
-        user_services.add_edited_exploration_id(user_id, 'exp1')
-        contributions = user_services.get_user_contributions(
-            user_id, strict=True
-        )
-
-        self.assertIsInstance(contributions, user_domain.UserContributions)
-        self.assertEqual(
-            ['exp1'],
-            contributions.edited_exploration_ids)
 
     def test_is_moderator(self) -> None:
         auth_id = 'someUser'
@@ -3247,7 +3239,8 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
             user_settings.last_edited_an_exploration -
             datetime.timedelta(hours=13))
         with self.mock_datetime_utcnow(mocked_datetime_utcnow):
-            user_services.record_user_edited_an_exploration(self.editor_id)
+            user_settings.record_user_edited_an_exploration()
+            user_services.save_user_settings(user_settings)
 
         editor_settings = user_services.get_user_settings(self.editor_id)
         previous_last_edited_an_exploration = (
@@ -3776,18 +3769,6 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_contribution_rights.can_review_translation_for_language_codes,
             ['en', 'hi'])
 
-    def test_assign_user_review_voiceover_application_in_language(self) -> None:
-        self.assertFalse(
-            user_services.can_review_voiceover_applications(
-                self.voice_artist_id))
-
-        user_services.allow_user_to_review_voiceover_in_language(
-            self.voice_artist_id, 'hi')
-
-        self.assertTrue(
-            user_services.can_review_voiceover_applications(
-                self.voice_artist_id, language_code='hi'))
-
     def test_voiceover_review_assignement_adds_language_in_sorted_order(
         self
     ) -> None:
@@ -3972,19 +3953,6 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.can_review_translation_suggestions(
                 self.translator_id, language_code='hi'))
 
-    def test_remove_voiceover_review_rights_in_language(self) -> None:
-        user_services.allow_user_to_review_voiceover_in_language(
-            self.voice_artist_id, 'hi')
-        self.assertTrue(
-            user_services.can_review_voiceover_applications(
-                self.voice_artist_id, language_code='hi'))
-        user_services.remove_voiceover_review_rights_in_language(
-            self.voice_artist_id, 'hi')
-
-        self.assertFalse(
-            user_services.can_review_voiceover_applications(
-                self.voice_artist_id, language_code='hi'))
-
     def test_remove_question_review_rights(self) -> None:
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         self.assertTrue(
@@ -3995,34 +3963,6 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.assertFalse(
             user_services.can_review_question_suggestions(
                 self.question_reviewer_id))
-
-    def test_remove_contribution_reviewer(self) -> None:
-        user_services.allow_user_to_review_translation_in_language(
-            self.translator_id, 'hi')
-        user_services.allow_user_to_review_voiceover_in_language(
-            self.translator_id, 'hi')
-        user_services.allow_user_to_review_question(self.translator_id)
-        self.assertTrue(
-            user_services.can_review_translation_suggestions(
-                self.translator_id, language_code='hi'))
-        self.assertTrue(
-            user_services.can_review_voiceover_applications(
-                self.translator_id, language_code='hi'))
-        self.assertTrue(
-            user_services.can_review_question_suggestions(
-                self.translator_id))
-
-        user_services.remove_contribution_reviewer(self.translator_id)
-
-        self.assertFalse(
-            user_services.can_review_translation_suggestions(
-                self.translator_id, language_code='hi'))
-        self.assertFalse(
-            user_services.can_review_voiceover_applications(
-                self.translator_id, language_code='hi'))
-        self.assertFalse(
-            user_services.can_review_question_suggestions(
-                self.translator_id))
 
     def test_removal_of_all_review_rights_deletes_model(self) -> None:
         user_services.allow_user_to_review_translation_in_language(

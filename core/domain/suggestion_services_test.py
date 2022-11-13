@@ -3303,13 +3303,20 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             [('author_id', self.author_id), ('target_id', self.EXP_ID)])
         self.assertEqual(len(suggestions), 1)
 
+        translatable_suggestions = []
+        for suggestion in suggestions:
+            assert isinstance(
+                suggestion, suggestion_registry.SuggestionTranslateContent
+            )
+            translatable_suggestions.append(suggestion)
+
         # Should return the created translation suggestion.
-        translatable_suggestions = (
+        filtered_translatable_suggestions = (
             suggestion_services.get_suggestions_with_translatable_explorations(
-                suggestions
+                translatable_suggestions
             )
         )
-        self.assertEqual(len(translatable_suggestions), 1)
+        self.assertEqual(len(filtered_translatable_suggestions), 1)
 
         # Delete the exploration state corresponding to the translation
         # suggestion.
@@ -3336,12 +3343,12 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         # The suggestion no longer corresponds to an existing exploration state,
         # so it should not be returned.
-        translatable_suggestions = (
+        filtered_translatable_suggestions = (
             suggestion_services.get_suggestions_with_translatable_explorations(
-                suggestions
+                translatable_suggestions
             )
         )
-        self.assertEqual(len(translatable_suggestions), 0)
+        self.assertEqual(len(filtered_translatable_suggestions), 0)
 
 
 class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
@@ -3407,43 +3414,6 @@ class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(scores_dict), 0)
         self.assertDictEqual(scores_dict, {})
-
-
-class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
-    """Tests for the ExplorationVoiceoverApplication class."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup('author@example.com', 'author')
-        self.author_id = self.get_user_id_from_email('author@example.com')
-
-        suggestion_models.GeneralVoiceoverApplicationModel(
-            id='application_id',
-            target_type='exploration',
-            target_id='0',
-            status='review',
-            author_id=self.author_id,
-            final_reviewer_id=None,
-            language_code='en',
-            filename='filename.mp3',
-            content='<p>content</p>',
-            rejection_message=None).put()
-        self.voiceover_application_model = (
-            suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
-                'application_id'))
-
-    def test_get_voiceover_application_from_model_with_invalid_type_raise_error(
-        self
-    ) -> None:
-        suggestion_services.get_voiceover_application(
-            self.voiceover_application_model.id)
-
-        self.voiceover_application_model.target_type = 'invalid_type'
-        with self.assertRaisesRegex(
-            Exception,
-            'Invalid target type for voiceover application: invalid_type'):
-            suggestion_services.get_voiceover_application(
-                self.voiceover_application_model.id)
 
 
 class ReviewableSuggestionEmailInfoUnitTests(

@@ -252,7 +252,9 @@ ENTITY_TYPE_TOPIC = 'topic'
 ENTITY_TYPE_SKILL = 'skill'
 ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
-ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
+
+DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN = 'main_question'
+DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP = 'backup_question'
 
 IMAGE_CONTEXT_QUESTION_SUGGESTIONS = 'question_suggestions'
 IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS = 'exploration_suggestions'
@@ -336,7 +338,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 52
+CURRENT_STATE_SCHEMA_VERSION = 53
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -546,13 +548,16 @@ MAILCHIMP_API_KEY = None
 MAILCHIMP_USERNAME = None
 # Mailchimp secret, used to authenticate webhook requests.
 MAILCHIMP_WEBHOOK_SECRET = None
+# Valid Mailchimp merge keys.
+VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
+# Valid Mailchimp tags.
+VALID_MAILCHIMP_TAGS = ['Android', 'Web']
 
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
 # auth information during deployment.
 ES_CLOUD_ID = None
 ES_USERNAME = None
-ES_PASSWORD = None
 
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
 # Port when switching to prod server. Keep this in sync with redis.conf in the
@@ -675,7 +680,6 @@ EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
 EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS = (
     'add_contributor_dashboard_reviewers'
 )
-EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
 EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
 EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS = (
     'notify_contributor_dashboard_achievements'
@@ -762,7 +766,7 @@ MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE = 10
 
 # The maximum number of blog post cards to be visible on each page in author
 # specific blog post page.
-MAX_NUM_CARDS_TO_DISPLAY_ON_AUTHOR_SPECIFIC_BLOG_POST_PAGE = 12
+MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_AUTHOR_PROFILE_PAGE = 12
 
 # The maximum number of blog post cards to be visible as suggestions on the
 # blog post page.
@@ -918,8 +922,8 @@ BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
 BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'
 BLOG_HOMEPAGE_URL = '/blog'
 BLOG_SEARCH_DATA_URL = '/blog/searchhandler/data'
-AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX = '/blog/author'
-AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX = '/blog/author/data'
+BLOG_AUTHOR_PROFILE_PAGE_URL_PREFIX = '/blog/author'
+BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_PREFIX = '/blog/author/data'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
@@ -1038,6 +1042,7 @@ SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
 DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER = (
     '/diagnostic_test_skill_assignment_handler')
+DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL = '/diagnostic_test_questions_handler_url'
 STATE_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/state'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
@@ -1084,6 +1089,8 @@ USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
 FACILITATOR_DASHBOARD_HANDLER = '/facilitator_dashboard_handler'
 FACILITATOR_DASHBOARD_PAGE_URL = '/facilitator-dashboard'
+LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER = (
+    '/learner_dashboard_learner_groups_handler')
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
 EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
 CLASSROOM_ADMIN_DATA_HANDLER_URL = '/classroom_admin_data_handler'
@@ -1246,8 +1253,8 @@ DEPRECATED_ROLE_ACTION_UPDATE = 'update'
 ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
 ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
-USER_FILTER_CRITERION_ROLE = 'role'
-USER_FILTER_CRITERION_USERNAME = 'username'
+USER_FILTER_CRITERION_ROLE: Final = 'role'
+USER_FILTER_CRITERION_USERNAME: Final = 'username'
 
 # Max questions allowed in a session of practice questions.
 QUESTION_BATCH_SIZE = 10

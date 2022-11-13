@@ -43,7 +43,7 @@ from core.platform import models
 
 from typing import (
     Callable, Dict, Final, List, Literal, Mapping, Match, Optional, Sequence,
-    Set, Tuple, Type, Union, cast, overload
+    Set, Tuple, Union, cast, overload
 )
 
 MYPY = False
@@ -1140,7 +1140,7 @@ def get_translation_suggestions_waiting_longest_for_review(
 
 def get_translation_suggestions_in_review_by_exploration(
     exp_id: str, language_code: str
-) -> List[Optional[suggestion_registry.BaseSuggestion]]:
+) -> List[suggestion_registry.BaseSuggestion]:
     """Returns translation suggestions in review by exploration ID.
 
     Args:
@@ -1148,8 +1148,8 @@ def get_translation_suggestions_in_review_by_exploration(
         language_code: str. Language code.
 
     Returns:
-        list(Suggestion|None). A list of translation suggestions in review with
-        target_id == exp_id, or None if suggestion model does not exists.
+        list(Suggestion). A list of translation suggestions in review with
+        target_id == exp_id.
     """
     suggestion_models_in_review = (
         suggestion_models.GeneralSuggestionModel
@@ -1157,7 +1157,7 @@ def get_translation_suggestions_in_review_by_exploration(
             exp_id, language_code)
     )
     return [
-        get_suggestion_from_model(model) if model else None
+        get_suggestion_from_model(model)
         for model in suggestion_models_in_review
     ]
 
@@ -1191,8 +1191,8 @@ def get_translation_suggestions_in_review_by_exp_ids(
 
 
 def get_suggestions_with_translatable_explorations(
-    suggestions: List[suggestion_registry.BaseSuggestion]
-) -> List[suggestion_registry.BaseSuggestion]:
+    suggestions: List[suggestion_registry.SuggestionTranslateContent]
+) -> List[suggestion_registry.SuggestionTranslateContent]:
     """Filters the supplied suggestions for those suggestions that have
     translatable exploration content. That is, the following are true:
     - The suggestion's change content corresponds to an existing exploration
@@ -1208,7 +1208,7 @@ def get_suggestions_with_translatable_explorations(
     """
 
     def _has_translatable_exploration(
-        suggestion: suggestion_registry.BaseSuggestion,
+        suggestion: suggestion_registry.SuggestionTranslateContent,
         suggestion_exp_id_to_exp: Dict[str, exp_domain.Exploration]
     ) -> bool:
         """Returns whether the supplied suggestion corresponds to a translatable
@@ -1706,59 +1706,6 @@ def check_can_resubmit_suggestion(suggestion_id: str, user_id: str) -> bool:
     suggestion = get_suggestion_by_id(suggestion_id)
 
     return suggestion.author_id == user_id
-
-
-def _get_voiceover_application_class(
-    target_type: str
-) -> Type[suggestion_registry.ExplorationVoiceoverApplication]:
-    """Returns the voiceover application class for a given target type.
-
-    Args:
-        target_type: str. The target type of the voiceover application.
-
-    Returns:
-        class. The voiceover application class for the given target type.
-
-    Raises:
-        Exception. The voiceover application target type is invalid.
-    """
-    target_type_to_classes = (
-        suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)
-    if target_type in target_type_to_classes:
-        return target_type_to_classes[target_type]
-    else:
-        raise Exception(
-            'Invalid target type for voiceover application: %s' % target_type)
-
-
-def get_voiceover_application(
-    voiceover_application_id: str
-) -> suggestion_registry.BaseVoiceoverApplication:
-    """Returns the BaseVoiceoverApplication object for the give
-    voiceover application model object.
-
-    Args:
-        voiceover_application_id: str. The ID of the voiceover application.
-
-    Returns:
-        BaseVoiceoverApplication. The domain object out of the given voiceover
-        application model object.
-    """
-    voiceover_application_model = (
-        suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
-            voiceover_application_id))
-    voiceover_application_class = _get_voiceover_application_class(
-        voiceover_application_model.target_type)
-    return voiceover_application_class(
-        voiceover_application_model.id,
-        voiceover_application_model.target_id,
-        voiceover_application_model.status,
-        voiceover_application_model.author_id,
-        voiceover_application_model.final_reviewer_id,
-        voiceover_application_model.language_code,
-        voiceover_application_model.filename,
-        voiceover_application_model.content,
-        voiceover_application_model.rejection_message)
 
 
 def create_community_contribution_stats_from_model(

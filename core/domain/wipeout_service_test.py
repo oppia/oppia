@@ -4011,28 +4011,6 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        suggestion_models.GeneralVoiceoverApplicationModel(
-            id=self.VOICEOVER_1_ID,
-            target_type=feconf.ENTITY_TYPE_EXPLORATION,
-            target_id=self.EXP_1_ID,
-            language_code='en',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            content='Text',
-            filename='filename.txt',
-            author_id=self.user_1_id,
-            final_reviewer_id=self.user_2_id,
-        ).put()
-        suggestion_models.GeneralVoiceoverApplicationModel(
-            id=self.VOICEOVER_2_ID,
-            target_type=feconf.ENTITY_TYPE_EXPLORATION,
-            target_id=self.EXP_2_ID,
-            language_code='en',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            content='Text',
-            filename='filename.txt',
-            author_id=self.user_2_id,
-            final_reviewer_id=self.user_1_id,
-        ).put()
         suggestion_models.TranslationContributionStatsModel(
             id=self.TRANSLATION_STATS_1_ID,
             language_code='cs',
@@ -4089,33 +4067,6 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
-    def test_voiceover_application_is_pseudonymized(self) -> None:
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_1_id))
-        suggestion_mappings = (
-            user_models.PendingDeletionRequestModel.get_by_id(
-                self.user_1_id
-            ).pseudonymizable_entity_mappings[models.Names.SUGGESTION.value]
-        )
-
-        # Verify user is pseudonymized.
-        voiceover_application_model_1 = (
-            suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
-                self.VOICEOVER_1_ID)
-        )
-        self.assertEqual(
-            voiceover_application_model_1.author_id,
-            suggestion_mappings[self.VOICEOVER_1_ID]
-        )
-        voiceover_application_model_2 = (
-            suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
-                self.VOICEOVER_2_ID)
-        )
-        self.assertEqual(
-            voiceover_application_model_2.final_reviewer_id,
-            suggestion_mappings[self.VOICEOVER_2_ID]
-        )
-
     def test_translation_contribution_stats_are_deleted(self) -> None:
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -4168,57 +4119,10 @@ class WipeoutServiceVerifyDeleteSuggestionModelsTests(
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        suggestion_models.GeneralVoiceoverApplicationModel(
-            id=self.VOICEOVER_1_ID,
-            target_type=feconf.ENTITY_TYPE_EXPLORATION,
-            target_id=self.EXP_1_ID,
-            language_code='en',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            content='Text',
-            filename='filename.txt',
-            author_id=self.user_1_id,
-            final_reviewer_id=self.user_2_id,
-        ).put()
-        suggestion_models.GeneralVoiceoverApplicationModel(
-            id=self.VOICEOVER_2_ID,
-            target_type=feconf.ENTITY_TYPE_EXPLORATION,
-            target_id=self.EXP_2_ID,
-            language_code='en',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            content='Text',
-            filename='filename.txt',
-            author_id=self.user_2_id,
-            final_reviewer_id=self.user_1_id,
-        ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
     def test_verify_user_delete_when_user_is_deleted_returns_true(self) -> None:
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
-    def test_verify_user_delete_when_user_is_not_deleted_returns_false(
-        self
-    ) -> None:
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
-        suggestion_models.GeneralVoiceoverApplicationModel(
-            id=self.VOICEOVER_1_ID,
-            target_type=feconf.ENTITY_TYPE_EXPLORATION,
-            target_id=self.EXP_1_ID,
-            language_code='en',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            content='Text',
-            filename='filename.txt',
-            author_id=self.user_1_id,
-            final_reviewer_id=self.user_2_id,
-        ).put()
-
-        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
-
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
@@ -5095,6 +4999,14 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
         self.blog_post_rights_model.update_timestamps()
         self.blog_post_rights_model.put()
 
+        blog_models.BlogAuthorDetailsModel.create(
+            author_id=self.user_1_id,
+            displayed_author_name='blog author',
+            author_bio='general bio'
+        )
+        self.author_details_model = (
+            blog_models.BlogAuthorDetailsModel.get_by_author(self.user_1_id))
+
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
         self.process_and_flush_pending_tasks()
@@ -5124,6 +5036,17 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             blog_post_summary_model.author_id,
             pseudonymizable_user_id_mapping[self.BLOG_1_ID]
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert self.author_details_model is not None
+        blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_id(
+            self.author_details_model.id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert blog_author_model is not None
+        self.assertEqual(
+            blog_author_model.author_id,
+            pseudonymizable_user_id_mapping[blog_author_model.id]
         )
 
         # Verify that the user id is removed from the list of editor ids in
@@ -5175,6 +5098,18 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             new_blog_post_model.author_id,
             pseudonymizable_user_id_mapping[self.BLOG_1_ID]
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert self.author_details_model is not None
+        blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_id(
+            self.author_details_model.id)
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert blog_author_model is not None
+        self.assertEqual(
+            blog_author_model.author_id,
+            pseudonymizable_user_id_mapping[blog_author_model.id]
         )
 
         # Verify that the user id is removed from the list of editor ids in
@@ -5268,6 +5203,16 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
                 blog_post_summary_model.author_id,
                 pseudonymizable_user_id_mapping[blog_post_summary_model.id]
             )
+        # Ruling out the possibility of None for mypy type checking.
+        assert self.author_details_model is not None
+        blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_id(
+            self.author_details_model.id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert blog_author_model is not None
+        self.assertEqual(
+            blog_author_model.author_id,
+            pseudonymizable_user_id_mapping[blog_author_model.id]
+        )
 
         # Verify that user id is removed from the list of editor ids in all
         # BlogPostRights models.

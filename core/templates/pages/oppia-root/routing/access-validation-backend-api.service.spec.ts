@@ -112,6 +112,25 @@ describe('Access validation backend api service', () => {
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
+  it('should validate whether given learner group exists', fakeAsync(() => {
+    let learnerGroupId = 'groupId';
+
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/access_validation_handler/does_learner_group_exist/' + learnerGroupId
+    );
+
+    avbas.doesLearnerGroupExist(learnerGroupId).then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/does_learner_group_exist/' + learnerGroupId);
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
   it('should not validate access to blog home page with invalid access',
     fakeAsync (() => {
       avbas.validateAccessToBlogHomePage().then(successSpy, failSpy);
@@ -175,6 +194,44 @@ describe('Access validation backend api service', () => {
       const req = httpTestingController.expectOne(
         '/access_validation_handler/can_access_blog_post_page?' +
         'blog_post_url_fragment=sample-post');
+      expect(req.request.method).toEqual('GET');
+      req.flush({});
+
+      flushMicrotasks();
+      expect(successSpy).toHaveBeenCalled();
+      expect(failSpy).not.toHaveBeenCalled();
+    }));
+
+  it('should not validate access to blog author profile page with invalid ' +
+  'access', fakeAsync (() => {
+    avbas.validateAccessToBlogAuthorProfilePage('username').then(
+      successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_blog_author_profile_page/username'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Access Denied.'
+    }, {
+      status: 401, statusText: 'Access Denied.'
+    });
+
+    flushMicrotasks();
+    expect(successSpy).not.toHaveBeenCalled();
+    expect(failSpy).toHaveBeenCalled();
+  })
+  );
+
+  it('should validate access to blog author profile page with valid access',
+    fakeAsync (() => {
+      avbas.validateAccessToBlogAuthorProfilePage('username').then(
+        successSpy, failSpy);
+
+      const req = httpTestingController.expectOne(
+        '/access_validation_handler/can_access_blog_author_profile_page/' +
+        'username'
+      );
       expect(req.request.method).toEqual('GET');
       req.flush({});
 

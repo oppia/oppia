@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import types
 
+from core import feconf
 from core import utils
 from core.platform import models
 from core.tests import test_utils
@@ -108,8 +109,8 @@ class BlogPostModelTest(test_utils.GenericTestBase):
 
         # Test create method.
         with self.assertRaisesRegex(
-            Exception, 'A blog post with the given blog post ID exists'
-            ' already.'):
+            Exception,
+            'A blog post with the given blog post ID exists already.'):
 
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
@@ -349,33 +350,38 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         blog_post_rights_draft_model.update_timestamps()
         blog_post_rights_draft_model.put()
 
-        blog_post_rights_punlished_model = blog_models.BlogPostRightsModel(
+        blog_post_rights_published_model = blog_models.BlogPostRightsModel(
             id='blog_post_one',
             editor_ids=[self.USER_ID_NEW],
             blog_post_is_published=True,
         )
-        blog_post_rights_punlished_model.update_timestamps()
-        blog_post_rights_punlished_model.put()
+        blog_post_rights_published_model.update_timestamps()
+        blog_post_rights_published_model.put()
 
         # The latest two published blog post rights models should be fetched.
         self.assertEqual(
             blog_models.BlogPostRightsModel.get_published_models_by_user(
-                self.USER_ID_NEW, 2),
-            [blog_post_rights_punlished_model, self.blog_post_rights_model])
+                self.USER_ID_NEW, 0, 2),
+            [blog_post_rights_published_model, self.blog_post_rights_model])
 
         # The latest published blog post rights model should be fetched.
         self.assertEqual(
             blog_models.BlogPostRightsModel.get_published_models_by_user(
-                self.USER_ID_NEW, 1), [blog_post_rights_punlished_model])
+                self.USER_ID_NEW, 0, 1), [blog_post_rights_published_model])
+
+        # The second latest published blog post rights model should be fetched.
+        self.assertEqual(
+            blog_models.BlogPostRightsModel.get_published_models_by_user(
+                self.USER_ID_NEW, 1, 1), [self.blog_post_rights_model])
 
     def test_get_published_models_by_user_when_no_limit(self) -> None:
-        blog_post_rights_punlished_model = blog_models.BlogPostRightsModel(
+        blog_post_rights_published_model = blog_models.BlogPostRightsModel(
             id='blog_post_one',
             editor_ids=[self.USER_ID_NEW],
             blog_post_is_published=True,
         )
-        blog_post_rights_punlished_model.update_timestamps()
-        blog_post_rights_punlished_model.put()
+        blog_post_rights_published_model.update_timestamps()
+        blog_post_rights_published_model.put()
 
         self.assertEqual(
             len(
@@ -489,3 +495,144 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         blog_post_rights_models = blog_models.BlogPostRightsModel.get_all()
         for model in blog_post_rights_models:
             self.assertTrue(self.USER_ID_NEW not in model.editor_ids)
+
+    def test_deassign_user_from_blog_post_handles_invalid_user_id(self) -> None:
+        # If the user is not in the editor list of any blog post, the
+        # method 'BlogPostRightsModel.deassign_user_from_all_blog_posts()'
+        # should do nothing and exit.
+        blog_models.BlogPostRightsModel.deassign_user_from_all_blog_posts(
+            self.NONEXISTENT_USER_ID)
+        blog_post_rights_models = blog_models.BlogPostRightsModel.get_all()
+        for model in blog_post_rights_models:
+            self.assertTrue(self.NONEXISTENT_USER_ID not in model.editor_ids)
+
+
+class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
+    """Tests for BlogAuthorDetailsModel class."""
+
+    NONEXISTENT_USER_ID: Final = 'id_x'
+    USER_1_ID: Final = 'user_id'
+    USER_1_ROLE: Final = feconf.ROLE_ID_BLOG_ADMIN
+    USER_1_NAME: Final = 'user'
+    USER_2_ID: Final = 'user_two_id'
+    USER_2_ROLE: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
+    USER_2_NAME: Final = 'user two'
+    GENERIC_DATE: Final = datetime.datetime(2019, 5, 20)
+    GENERIC_EPOCH: Final = utils.get_time_in_millisecs(
+        datetime.datetime(2019, 5, 20)
+    )
+    GENERIC_IMAGE_URL: Final = 'www.example.com/example.png'
+    GENERIC_USER_BIO: Final = 'I am a user of Oppia!'
+
+    def setUp(self) -> None:
+        """Set up author details models in datastore for use in testing."""
+        super().setUp()
+        author_model_one = blog_models.BlogAuthorDetailsModel(
+            id='author_model',
+            author_id=self.USER_1_ID,
+            displayed_author_name=self.USER_1_NAME,
+            author_bio=self.GENERIC_USER_BIO
+        )
+        author_model_one.update_timestamps()
+        author_model_one.put()
+
+    def test_raise_exception_by_mocking_collision(self) -> None:
+        """Tests create and generate_new_instance_id methods for raising
+        exception.
+        """
+        blog_author_details_model_cls = blog_models.BlogAuthorDetailsModel
+
+        # Test create method.
+        with self.assertRaisesRegex(
+            Exception,
+            'A blog author details model for given user already exists.'):
+
+            # Swap dependent method get_by_author to simulate collision every
+            # time.
+            with self.swap(
+                blog_author_details_model_cls, 'get_by_author',
+                types.MethodType(
+                    lambda x, y: True,
+                    blog_author_details_model_cls)):
+                blog_author_details_model_cls.create(
+                    self.USER_1_ID, 'displayed_author_name', '')
+
+        # Test generate_new_blog_post_id method.
+        with self.assertRaisesRegex(
+            Exception,
+            'New instance id generator is producing too many collisions.'):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                blog_author_details_model_cls, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    blog_author_details_model_cls)):
+                blog_author_details_model_cls.generate_new_instance_id()
+
+    def test_get_deletion_policy_is_delete(self) -> None:
+        self.assertEqual(
+            blog_models.BlogAuthorDetailsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            blog_models.BlogAuthorDetailsModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        self.assertEqual(
+            blog_models.BlogAuthorDetailsModel.get_export_policy(), {
+                'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'displayed_author_name': base_models.EXPORT_POLICY.EXPORTED,
+                'author_bio': base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            }
+        )
+
+    def test_export_data_on_nonexistent_author(self) -> None:
+        """Test if export_data returns None when user's author detail model is
+        not in datastore.
+        """
+        self.assertEqual(
+            blog_models.BlogAuthorDetailsModel.export_data(
+                self.NONEXISTENT_USER_ID
+            ), {}
+        )
+
+    def test_export_data_on_existent_author(self) -> None:
+        """Test if export_data works as intended on a user's author detail model
+         in datastore.
+        """
+        user_data = (
+            blog_models.BlogAuthorDetailsModel.export_data(self.USER_1_ID))
+        expected_data = {
+            'displayed_author_name': self.USER_1_NAME,
+            'author_bio': self.GENERIC_USER_BIO
+        }
+        self.assertEqual(expected_data, user_data)
+
+    def test_has_reference_to_user_id(self) -> None:
+        # Case for blog post author.
+        self.assertTrue(
+            blog_models.BlogAuthorDetailsModel.has_reference_to_user_id(
+                self.USER_1_ID)
+        )
+
+        # Case for a non existing user.
+        self.assertFalse(
+            blog_models.BlogAuthorDetailsModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID)
+        )
+
+    def test_creating_new_author_detail_model_instance(self) -> None:
+        blog_models.BlogAuthorDetailsModel.create(
+            self.USER_2_ID, self.USER_2_NAME, self.GENERIC_USER_BIO)
+        model_instance = blog_models.BlogAuthorDetailsModel.get_by_author(
+            self.USER_2_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert model_instance is not None
+        self.assertEqual(model_instance.author_id, self.USER_2_ID)
+        self.assertEqual(model_instance.displayed_author_name, self.USER_2_NAME)
+        self.assertEqual(model_instance.author_bio, self.GENERIC_USER_BIO)

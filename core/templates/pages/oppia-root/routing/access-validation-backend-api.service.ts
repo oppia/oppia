@@ -36,11 +36,17 @@ export class AccessValidationBackendApiService {
   RELEASE_COORDINATOR_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_release_coordinator_page');
 
+  DOES_LEARNER_GROUP_EXIST = (
+    '/access_validation_handler/does_learner_group_exist/<learner_group_id>');
+
   BLOG_HOME_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_blog_home_page');
 
   BLOG_POST_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_blog_post_page');
+
+  BLOG_AUTHOR_PROFILE_PAGE_ACCESS_VALIDATOR = (
+    '/access_validation_handler/can_access_blog_author_profile_page/<author_username>'); // eslint-disable-line max-len
 
   constructor(
     private http: HttpClient,
@@ -72,6 +78,16 @@ export class AccessValidationBackendApiService {
     }).toPromise();
   }
 
+  validateAccessToBlogAuthorProfilePage(
+      authorUsername: string
+  ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.BLOG_AUTHOR_PROFILE_PAGE_ACCESS_VALIDATOR, {
+        author_username: authorUsername
+      });
+    return this.http.get<void>(url).toPromise();
+  }
+
   validateCanManageOwnAccount(): Promise<void> {
     return this.http.get<void>(
       this.CAN_MANAGE_OWN_ACCOUNT_VALIDATOR).toPromise();
@@ -90,5 +106,14 @@ export class AccessValidationBackendApiService {
   Promise<void> {
     return this.http.get<void>(
       this.RELEASE_COORDINATOR_PAGE_ACCESS_VALIDATOR).toPromise();
+  }
+
+  doesLearnerGroupExist(learnerGroupId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.DOES_LEARNER_GROUP_EXIST, {
+        learner_group_id: learnerGroupId
+      });
+
+    return this.http.get<void>(url).toPromise();
   }
 }

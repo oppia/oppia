@@ -1395,6 +1395,28 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
+    def test_validate_translation_html_rte_tags(self) -> None:
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'], False, self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.change.translation_html = (
+            '<oppia-noninteractive-image></oppia-noninteractive-image>')
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Image tag does not have \'alt-with-value\' attribute.'
+        ):
+            suggestion.validate()
+
     def test_validate_language_code_fails_when_language_codes_do_not_match(
         self
     ) -> None:
@@ -2838,273 +2860,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 suggestion_models.STATUS_IN_REVIEW, self.author_id,
                 'test_reviewer', change, score_category, 'en', False,
                 self.fake_date)
-
-
-class MockInvalidVoiceoverApplication(
-        suggestion_registry.BaseVoiceoverApplication):
-
-    def __init__(self) -> None:  # pylint: disable=super-init-not-called
-        pass
-
-
-class BaseVoiceoverApplicationUnitTests(test_utils.GenericTestBase):
-    """Tests for the BaseVoiceoverApplication class."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.base_voiceover_application = MockInvalidVoiceoverApplication()
-
-    def test_base_class_init_raises_error(self) -> None:
-        with self.assertRaisesRegex(
-            NotImplementedError,
-            'Subclasses of BaseVoiceoverApplication should implement '
-            '__init__.'):
-            suggestion_registry.BaseVoiceoverApplication()
-
-    def test_base_class_accept_raises_error(self) -> None:
-        with self.assertRaisesRegex(
-            NotImplementedError,
-            'Subclasses of BaseVoiceoverApplication should implement accept.'):
-            self.base_voiceover_application.accept('abcd')
-
-    def test_base_class_reject_raises_error(self) -> None:
-        with self.assertRaisesRegex(
-            NotImplementedError,
-            'Subclasses of BaseVoiceoverApplication should implement reject.'):
-            self.base_voiceover_application.reject('abcd', 'abcd')
-
-
-class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
-    """Tests for the ExplorationVoiceoverApplication class."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup('author@example.com', 'author')
-        self.author_id = self.get_user_id_from_email('author@example.com')
-
-        self.signup('reviewer@example.com', 'reviewer')
-        self.reviewer_id = self.get_user_id_from_email('reviewer@example.com')
-
-        self.voiceover_application = (
-            suggestion_registry.ExplorationVoiceoverApplication(
-                'application_id', 'exp_id', suggestion_models.STATUS_IN_REVIEW,
-                self.author_id, None, 'en', 'audio_file.mp3', '<p>Content</p>',
-                None))
-
-    def test_validation_with_invalid_target_type_raise_exception(self) -> None:
-        self.voiceover_application.validate()
-
-        self.voiceover_application.target_type = 'invalid_target'
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected target_type to be among allowed choices, '
-            'received invalid_target'
-        ):
-            self.voiceover_application.validate()
-
-    # TODO(#13059): Here we use MyPy ignore because after we fully type the
-    # codebase we plan to get rid of the tests that intentionally test wrong
-    # inputs that we can normally catch by typing.
-    def test_validation_with_invalid_target_id_raise_exception(self) -> None:
-        self.voiceover_application.validate()
-
-        self.voiceover_application.target_id = 123  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected target_id to be a string'
-        ):
-            self.voiceover_application.validate()
-
-    def test_validation_with_invalid_status_raise_exception(self) -> None:
-        self.voiceover_application.validate()
-
-        self.voiceover_application.status = 'invalid_status'
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected status to be among allowed choices, '
-            'received invalid_status'
-        ):
-            self.voiceover_application.validate()
-
-    # TODO(#13059): Here we use MyPy ignore because after we fully type the
-    # codebase we plan to get rid of the tests that intentionally test wrong
-    # inputs that we can normally catch by typing.
-    def test_validation_with_invalid_author_id_raise_exception(self) -> None:
-        self.voiceover_application.validate()
-
-        self.voiceover_application.author_id = 123  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected author_id to be a string'
-        ):
-            self.voiceover_application.validate()
-
-    # TODO(#13059): Here we use MyPy ignore because after we fully type the
-    # codebase we plan to get rid of the tests that intentionally test wrong
-    # inputs that we can normally catch by typing.
-    def test_validation_with_invalid_final_reviewer_id_raise_exception(
-        self
-    ) -> None:
-        self.assertEqual(
-            self.voiceover_application.status,
-            suggestion_models.STATUS_IN_REVIEW)
-        self.assertEqual(self.voiceover_application.final_reviewer_id, None)
-        self.voiceover_application.validate()
-
-        self.voiceover_application.final_reviewer_id = 123  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected final_reviewer_id to be None as the '
-            'voiceover application is not yet handled.'
-        ):
-            self.voiceover_application.validate()
-
-    def test_validation_for_handled_application_with_invalid_final_review(
-        self
-    ) -> None:
-        self.assertEqual(
-            self.voiceover_application.status,
-            suggestion_models.STATUS_IN_REVIEW)
-        self.assertEqual(self.voiceover_application.final_reviewer_id, None)
-        self.voiceover_application.validate()
-
-        self.voiceover_application.status = suggestion_models.STATUS_ACCEPTED
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected final_reviewer_id to be a string'
-        ):
-            self.voiceover_application.validate()
-
-    def test_validation_for_rejected_application_with_no_message(self) -> None:
-        self.assertEqual(
-            self.voiceover_application.status,
-            suggestion_models.STATUS_IN_REVIEW)
-        self.assertEqual(self.voiceover_application.rejection_message, None)
-        self.voiceover_application.validate()
-
-        self.voiceover_application.final_reviewer_id = 'reviewer_id'
-        self.voiceover_application.status = suggestion_models.STATUS_REJECTED
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected rejection_message to be a string for a '
-            'rejected application'
-        ):
-            self.voiceover_application.validate()
-
-    def test_validation_for_accepted_application_with_message(self) -> None:
-        self.assertEqual(
-            self.voiceover_application.status,
-            suggestion_models.STATUS_IN_REVIEW)
-        self.assertEqual(self.voiceover_application.rejection_message, None)
-        self.voiceover_application.validate()
-
-        self.voiceover_application.final_reviewer_id = 'reviewer_id'
-        self.voiceover_application.status = suggestion_models.STATUS_ACCEPTED
-        self.voiceover_application.rejection_message = 'Invalid message'
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected rejection_message to be None for the accepted '
-            'voiceover application, received Invalid message'
-        ):
-            self.voiceover_application.validate()
-
-    # TODO(#13059): Here we use MyPy ignore because after we fully type the
-    # codebase we plan to get rid of the tests that intentionally test wrong
-    # inputs that we can normally catch by typing.
-    def test_validation_with_invalid_language_code_type_raise_exception(
-        self
-    ) -> None:
-        self.assertEqual(self.voiceover_application.language_code, 'en')
-        self.voiceover_application.validate()
-
-        self.voiceover_application.language_code = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected language_code to be a string'
-        ):
-            self.voiceover_application.validate()
-
-    def test_validation_with_invalid_language_code_raise_exception(
-        self
-    ) -> None:
-        self.assertEqual(self.voiceover_application.language_code, 'en')
-        self.voiceover_application.validate()
-
-        self.voiceover_application.language_code = 'invalid language'
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid language_code: invalid language'
-        ):
-            self.voiceover_application.validate()
-
-    # TODO(#13059): Here we use MyPy ignore because after we fully type the
-    # codebase we plan to get rid of the tests that intentionally test wrong
-    # inputs that we can normally catch by typing.
-    def test_validation_with_invalid_filename_type_raise_exception(
-        self
-    ) -> None:
-        self.assertEqual(self.voiceover_application.filename, 'audio_file.mp3')
-        self.voiceover_application.validate()
-
-        self.voiceover_application.filename = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected filename to be a string'
-        ):
-            self.voiceover_application.validate()
-
-    # TODO(#13059): Here we use MyPy ignore because after we fully type the
-    # codebase we plan to get rid of the tests that intentionally test wrong
-    # inputs that we can normally catch by typing.
-    def test_validation_with_invalid_content_type_raise_exception(self) -> None:
-        self.assertEqual(self.voiceover_application.content, '<p>Content</p>')
-        self.voiceover_application.validate()
-
-        self.voiceover_application.content = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected content to be a string'
-        ):
-            self.voiceover_application.validate()
-
-    def test_to_dict_returns_correct_dict(self) -> None:
-        self.voiceover_application.accept(self.reviewer_id)
-        expected_dict = {
-            'voiceover_application_id': 'application_id',
-            'target_type': 'exploration',
-            'target_id': 'exp_id',
-            'status': 'accepted',
-            'author_name': 'author',
-            'final_reviewer_name': 'reviewer',
-            'language_code': 'en',
-            'content': '<p>Content</p>',
-            'filename': 'audio_file.mp3',
-            'rejection_message': None
-        }
-        self.assertEqual(
-            self.voiceover_application.to_dict(), expected_dict)
-
-    def test_is_handled_property_returns_correct_value(self) -> None:
-        self.assertFalse(self.voiceover_application.is_handled)
-
-        self.voiceover_application.accept(self.reviewer_id)
-
-        self.assertTrue(self.voiceover_application.is_handled)
-
-    def test_accept_voiceover_application(self) -> None:
-        self.assertEqual(self.voiceover_application.final_reviewer_id, None)
-        self.assertEqual(self.voiceover_application.status, 'review')
-
-        self.voiceover_application.accept(self.reviewer_id)
-
-        self.assertEqual(
-            self.voiceover_application.final_reviewer_id, self.reviewer_id)
-        self.assertEqual(self.voiceover_application.status, 'accepted')
-
-    def test_reject_voiceover_application(self) -> None:
-        self.assertEqual(self.voiceover_application.final_reviewer_id, None)
-        self.assertEqual(self.voiceover_application.status, 'review')
-
-        self.voiceover_application.reject(self.reviewer_id, 'rejection message')
-
-        self.assertEqual(
-            self.voiceover_application.final_reviewer_id, self.reviewer_id)
-        self.assertEqual(self.voiceover_application.status, 'rejected')
-        self.assertEqual(
-            self.voiceover_application.rejection_message, 'rejection message')
 
 
 class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
