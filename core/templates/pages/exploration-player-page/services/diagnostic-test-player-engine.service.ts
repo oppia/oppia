@@ -39,7 +39,6 @@ import { QuestionBackendApiService } from 'domain/question/question-backend-api.
 import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 
-
 @Injectable({
   providedIn: 'root'
 })

@@ -21,7 +21,6 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-
 @Injectable({
   providedIn: 'root'
 })
