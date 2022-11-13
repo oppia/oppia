@@ -24,8 +24,7 @@ from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import repo_specific_changes_fetcher
 
-from typing import Dict, List
-from typing_extensions import Final
+from typing import Dict, Final, List
 
 RELEASE_TEST_DIR: Final = os.path.join('core', 'tests', 'release_sources', '')
 MOCK_FECONF_FILEPATH: Final = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
@@ -99,6 +98,38 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
             'core/storage/user/gae_models.py']
         self.assertEqual(actual_storgae_models, expected_storage_models)
 
+    def test_unmodified_state_shows_no_change_in_code_files(self) -> None:
+        def mock_get_changed_schema_version_constant_names(
+            unused_release_tag_to_diff_against: str
+        ) -> None:
+            return None
+        def mock_get_setup_scripts_changes_status(
+            unused_release_tag_to_diff_against: str
+        ) -> None:
+            return None
+        def mock_get_changed_storage_models_filenames(
+            unused_release_tag_to_diff_against: str
+        ) -> None:
+            return None
+
+        versions_swap = self.swap(
+            repo_specific_changes_fetcher,
+            'get_changed_schema_version_constant_names',
+            mock_get_changed_schema_version_constant_names)
+        setup_scripts_swap = self.swap(
+            repo_specific_changes_fetcher, 'get_setup_scripts_changes_status',
+            mock_get_setup_scripts_changes_status)
+        storage_models_swap = self.swap(
+            repo_specific_changes_fetcher,
+            'get_changed_storage_models_filenames',
+            mock_get_changed_storage_models_filenames)
+
+        with versions_swap, setup_scripts_swap, storage_models_swap:
+            expected_changes: List[str] = []
+            self.assertEqual(
+                repo_specific_changes_fetcher.get_changes('release_tag'),
+                expected_changes)
+
     def test_get_changes(self) -> None:
         def mock_get_changed_schema_version_constant_names(
             unused_release_tag_to_diff_against: str
@@ -125,12 +156,12 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
             'get_changed_storage_models_filenames',
             mock_get_changed_storage_models_filenames)
 
-        expected_changes = [
-            '\n### Feconf version changes:\nThis indicates '
-            'that a migration may be needed\n\n', '* version_change\n',
-            '\n### Changed setup scripts:\n', '* setup_changes\n',
-            '\n### Changed storage models:\n', '* setup_changes\n']
         with versions_swap, setup_scripts_swap, storage_models_swap:
+            expected_changes = [
+                '\n### Feconf version changes:\nThis indicates '
+                'that a migration may be needed\n\n', '* version_change\n',
+                '\n### Changed setup scripts:\n', '* setup_changes\n',
+                '\n### Changed storage models:\n', '* setup_changes\n']
             self.assertEqual(
                 repo_specific_changes_fetcher.get_changes('release_tag'),
                 expected_changes)
