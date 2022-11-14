@@ -531,7 +531,7 @@ describe('Translation contribution featured languages', () => {
   });
 });
 
-fdescribe('Contributor dashboard accomplishments', function() {
+describe('Contributor dashboard accomplishments', function() {
   const TOPIC_NAMES = [
     'Topic 0 for contribution', 'Topic 1 for contribution'];
   const SKILL_DESCRIPTIONS = [
@@ -575,41 +575,41 @@ fdescribe('Contributor dashboard accomplishments', function() {
     await users.createUser(USER_EMAILS[1], 'user1');
     await users.createUser(QUESTION_ADMIN_EMAIL, QUESTION_ADMIN_USERNAME);
 
-    await users.createAndLoginCurriculumAdminUser(ADMIN_EMAIL, 'management');
+    // await users.createAndLoginCurriculumAdminUser(ADMIN_EMAIL, 'management');
 
-    await adminPage.getFeaturesTab();
-    var accomplishmentsFeature = await adminPage
-      .geContributorDashboardAccomplishmentsFeatureElement();
-    await adminPage.enableFeatureForDev(accomplishmentsFeature);
+    // await adminPage.getFeaturesTab();
+    // var accomplishmentsFeature = await adminPage
+    //   .geContributorDashboardAccomplishmentsFeatureElement();
+    // await adminPage.enableFeatureForDev(accomplishmentsFeature);
 
-    await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic(
-      TOPIC_NAMES[0], 'community-topic-one', 'Topic description 1', false);
-    const URL = await browser.getUrl();
-    // Example URL: http://localhost:8181/topic_editor/jT9z3iLnFjsQ#/
-    const TOPIC_ID_URL_PART = URL.split('/')[4];
-    // We have to remove the ending "#".
-    const TOPIC_ID = TOPIC_ID_URL_PART.substring(
-      0, TOPIC_ID_URL_PART.length - 1);
-    await workflow.createSkillAndAssignTopic(
-      SKILL_DESCRIPTIONS[0], REVIEW_MATERIALS[0], TOPIC_NAMES[0]);
-    await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      SKILL_DESCRIPTIONS[1], REVIEW_MATERIALS[1]);
+    // await topicsAndSkillsDashboardPage.get();
+    // await topicsAndSkillsDashboardPage.createTopic(
+    //   TOPIC_NAMES[0], 'community-topic-one', 'Topic description 1', false);
+    // const URL = await browser.getUrl();
+    // // Example URL: http://localhost:8181/topic_editor/jT9z3iLnFjsQ#/
+    // const TOPIC_ID_URL_PART = URL.split('/')[4];
+    // // We have to remove the ending "#".
+    // const TOPIC_ID = TOPIC_ID_URL_PART.substring(
+    //   0, TOPIC_ID_URL_PART.length - 1);
+    // await workflow.createSkillAndAssignTopic(
+    //   SKILL_DESCRIPTIONS[0], REVIEW_MATERIALS[0], TOPIC_NAMES[0]);
+    // await topicsAndSkillsDashboardPage.get();
+    // await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+    //   SKILL_DESCRIPTIONS[1], REVIEW_MATERIALS[1]);
 
-    await adminPage.get();
-    await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
-    // Add topic to classroom to make it available for question contributions.
-    await adminPage.editConfigProperty(
-      'The details for each classroom page.',
-      'List',
-      async function(elem) {
-        elem = await elem.editItem(0, 'Dictionary');
-        elem = await elem.editEntry(4, 'List');
-        elem = await elem.addItem('Unicode');
-        await elem.setValue(TOPIC_ID);
-      });
-    await users.logout();
+    // await adminPage.get();
+    // await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
+    // // Add topic to classroom to make it available for question contributions.
+    // await adminPage.editConfigProperty(
+    //   'The details for each classroom page.',
+    //   'List',
+    //   async function(elem) {
+    //     elem = await elem.editItem(0, 'Dictionary');
+    //     elem = await elem.editEntry(4, 'List');
+    //     elem = await elem.addItem('Unicode');
+    //     await elem.setValue(TOPIC_ID);
+    //   });
+    // await users.logout();
 
     await users.login(QUESTION_ADMIN_EMAIL);
     await contributorDashboardAdminPage.get();
