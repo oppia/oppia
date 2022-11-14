@@ -316,11 +316,6 @@ def _rectify_third_party_directory(
                 _install_direct_url(
                     normalized_library_name, requirements_version
                 )
-            else:
-                print(
-                    f'Requirement version for library '
-                    f'{normalized_library_name} is None'
-                )
 
     for normalized_library_name, versions in pip_mismatches:
         requirements_version = (
