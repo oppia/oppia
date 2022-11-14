@@ -294,8 +294,8 @@ class NextJobHandler(
         assert self.normalized_payload is not None
         signature = self.normalized_payload['signature']
         vm_id = self.normalized_payload['vm_id']
-        message = self.normalized_payload['message']
-        return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
+        message: str = self.normalized_payload['message']
+        return classifier_domain.OppiaMLAuthInfo(message.encode('utf-8'), vm_id, signature)
 
     @acl_decorators.is_from_oppia_ml
     def post(self) -> None:
