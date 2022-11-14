@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import apache_beam as beam
 import result
-from typing import Any, Optional, Tuple
+from typing import Any, Tuple
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
