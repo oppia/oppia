@@ -129,7 +129,7 @@ class AuditInvalidProfilePictureJob(base_jobs.JobBase):
 
 
 class FixInvalidProfilePictureJob(base_jobs.JobBase):
-    """Fix invalid profile pictures insidr UserSettingsModel."""
+    """Fix invalid profile pictures inside UserSettingsModel."""
 
     def _fix_invalid_images(
         self, user_model: user_models.UserSettingsModel
