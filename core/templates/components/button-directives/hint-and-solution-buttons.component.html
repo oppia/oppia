@@ -1,6 +1,9 @@
-<div *ngIf="isHintButtonVisible(0) && currentlyOnLatestCard" class="oppia-hint-and-solution-buttons float-left">
+<div *ngIf="currentlyOnLatestCard" class="oppia-hint-and-solution-buttons float-left">
   <ul [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}" class="list-inline">
-    <span class="float-left footer-hints-label" translate="I18N_PLAYER_HINTS"></span>
+    <span class="float-left footer-hints-label"
+          translate="I18N_PLAYER_HINTS"
+          *ngIf="isHintButtonVisible(0)">
+    </span>
     <li *ngFor="let hintIndex of hintIndexes; index as idx">
       <button class="oppia-learner-hint-solution-button md-button md-default-theme e2e-test-view-hint"
               *ngIf="hintIndex === 0 && isHintButtonVisible(hintIndex)"
@@ -30,6 +33,17 @@
               class="btn close"
               aria-label="Close"
               (click)="isVisible = !isVisible">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <div class="hint-container solution-container" *ngIf="isTooltipForSolutionVisible && isSolutionTooltipVisible()">
+    <div class="hint-box hint-box-add-ons">
+      <span [innerHTML]="'I18N_SOLUTION_NEED_HELP' | translate"></span>
+      <button type="button"
+              class="btn close"
+              aria-label="Close"
+              (click)="isTooltipForSolutionVisible = !isTooltipForSolutionVisible">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
