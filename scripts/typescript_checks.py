@@ -203,6 +203,8 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-editor-page/translation-tab/state-translation/state-translation.component.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/state-translation/state-translation.component.ts',
     'core/templates/pages/exploration-player-page/exploration-player-page.import.ts',
+    'core/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.spec.ts',
+    'core/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.ts',
     'core/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.spec.ts',
     'core/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.ts',
     'core/templates/pages/exploration-player-page/services/answer-classification.service.spec.ts',
