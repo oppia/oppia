@@ -1,44 +1,34 @@
-const puppeteer = require("puppeteer");
-const basicFunctions = require("./utility-functions/basicFunctions");
+const acceptanceTests = require("./utility-functions/puppeteer_utils.js");
+const testConstants = require("./utility-functions/testConstants.js");
 
-const MainDashboard = ".oppia-learner-dashboard-main-content";
-const BlogDashboard = "http://localhost:8181/blog-dashboard";
-const signInInput = "input.e2e-test-sign-in-email-input";
+
 const blogEditOptions = "button.e2e-test-blog-post-edit-box";
 
-// currently, headless is set to false and the page viewport
-// is maximized so that it would be easy for the developers
-// to debug easily while testing.
-// We can remove these settings before merging as we have
-// to run the tests in headless mode.
-puppeteer
-  .launch({
-    headless: false,
-    args: ["--start-fullscreen", "--use-fake-ui-for-media-stream"], // giving microphone and other browser permissions
-  })
-  .then(async (browser) => {
-    const page = await browser.newPage();
-    await page.setViewport({ width: 0, height: 0 });
+async function blogDrafts_journey() {
+  const obj = await new acceptanceTests();
 
-    await page.goto("http://localhost:8181/");
-    await basicFunctions.clickByText(page, "button", "OK");
-    await basicFunctions.clickByText(page, "span", "Sign in");
-    await basicFunctions.types(page, signInInput, "testadmin@example.com");
-    await basicFunctions.clickByText(page, "span", "Sign In");
-    
-    await page.waitForSelector(MainDashboard);
-    await page.goto(BlogDashboard);
-    
-    // deleting a draft if present
-    try{
-      await basicFunctions.clicks(page, blogEditOptions); // an icon
-      await basicFunctions.clickByText(page, "span", "Delete", 100);
-      await basicFunctions.clickByText(page, "button", " Confirm ");
-    } catch {
-      console.log( "no blog post in drafts");
-    }
-    
+  const page = await obj.init();
+  await page.goto(testConstants.URLs.home);
+  // await obj.goto("http://localhost:8181/");
+  await obj.clickText("button", "OK");
+  await obj.clickText("span", "Sign in");
+  await obj.type(testConstants.SignInDetails.inputField, "testadmin@example.com");
+  await obj.clickText("span", "Sign In");
+  
+  await page.waitForSelector(testConstants.Dashboard.MainDashboard);
+  await page.goto(testConstants.URLs.BlogDashboard);
 
-    console.log("Successfully tested deletion of drafted blogs!");
-    await browser.close();
-  });
+  try{
+    await obj.clickOn(blogEditOptions); // an icon
+    await obj.clickText("span", "Delete", 100);
+    await obj.clickText("button", " Confirm ");
+  } catch {
+    console.log("no blog post in drafts");
+  }
+
+  console.log("Successfully tested deleting blog drafts");
+  await obj.browser.close();
+
+}
+
+blogDrafts_journey();

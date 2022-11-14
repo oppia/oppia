@@ -4,7 +4,7 @@ const basicFunctions = require("./utility-functions/basicFunctions");
 const MainDashboard = ".oppia-learner-dashboard-main-content";
 const BlogDashboard = "http://localhost:8181/blog-dashboard";
 const signInInput = "input.e2e-test-sign-in-email-input";
-const editBox = "button.e2e-test-blog-post-edit-box";
+const blogEditBox = "button.e2e-test-blog-post-edit-box";
 
 // currently, headless is set to false and the page viewport
 // is maximized so that it would be easy for the developers
@@ -35,7 +35,7 @@ puppeteer
     
     // deleting a draft if present
     try{
-      await basicFunctions.clicks(page, editBox);  // an icon
+      await basicFunctions.clicks(page, blogEditBox);  // an icon
       await basicFunctions.clickByText(page, "span", "Unpublish", 100);
       await basicFunctions.clickByText(page, "button", " Confirm ");
     } catch {
