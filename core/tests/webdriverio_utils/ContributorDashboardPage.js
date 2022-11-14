@@ -55,7 +55,7 @@ var ContributorDashboardPage = function() {
   var navigateToStatsTab = $('.e2e-test-show-stats');
   var navigateToBadgesTab = $('.e2e-test-show-badges');
   var contributionTypeSelectorContainer = $(
-    '.e2e-test-contribution-type-selector')
+    '.e2e-test-contribution-type-selector');
   var statsLoadingPlaceholder = $(
     '.e2e-test-stats-loading-placeholder');
   var badgesLoadingPlaceholder = $(

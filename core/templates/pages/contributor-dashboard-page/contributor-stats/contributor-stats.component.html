@@ -34,7 +34,7 @@
         </div>
 
         <div *ngIf="dropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
-          <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
+          <div class="oppia-stats-type-selector-dropdown-option e2e-test-show-{{option.contributionType}}"
                 *ngFor="let option of options"
                 (click)="selectOption(option.contributionType)"
                 [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
