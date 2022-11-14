@@ -1,13 +1,14 @@
 name: End-to-End tests
 on:
-  push:
-    branches:
-      - develop
-      - release-*
-  pull_request:
-    branches:
-      - develop
-      - release-*
+  workflow_dispatch:
+    push:
+      branches:
+        - develop
+        - release-*
+    pull_request:
+      branches:
+        - develop
+        - release-*
 
 jobs:
   e2e_user_features_and_library:

@@ -1,13 +1,14 @@
 name: Backend tests
 on:
-  push:
-    branches:
-      - develop
-      - release-*
-  pull_request:
-    branches:
-      - develop
-      - release-*
+  workflow_dispatch:
+    push:
+      branches:
+        - develop
+        - release-*
+    pull_request:
+      branches:
+        - develop
+        - release-*
 
 jobs:
   run_tests:

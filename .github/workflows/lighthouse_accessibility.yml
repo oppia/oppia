@@ -1,13 +1,14 @@
 name: Lighthouse CI accessibility tests
 on:
-  push:
-    branches:
-      - develop
-      - release-*
-  pull_request:
-    branches:
-      - develop
-      - release-*
+  workflow_dispatch:
+    push:
+      branches:
+        - develop
+        - release-*
+    pull_request:
+      branches:
+        - develop
+        - release-*
 
 jobs:
   lighthouse:
