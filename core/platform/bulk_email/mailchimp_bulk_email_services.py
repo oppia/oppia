@@ -58,7 +58,7 @@ def _get_subscriber_hash(email: str) -> str:
     return md5_hash.hexdigest()
 
 
-def _get_mailchimp_class() -> mailchimp3.MailChimp:
+def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
     """Returns the mailchimp api class. This is separated into a separate
     function to facilitate testing.
 
