@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides an Apache Beam API for operating on NDB models."""
+"""Provides a transform to drain PCollection in case of an error."""
 
 from __future__ import annotations
 
@@ -28,41 +28,10 @@ from typing import Any, Optional, Tuple
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error
 # (Class cannot subclass 'PTransform' (has type 'Any')), we added an
 # ignore here.
-class FilterResults(beam.PTransform):  # type: ignore[misc]
+class DrainResultsOnError(beam.PTransform):  # type: ignore[misc]
     """Transform that flushes an input PCollection if any error results
-       are encountered..
+       are encountered.
     """
-
-    def __init__(
-        self, prefix: Optional[str] = None, label: Optional[str] = None
-    ) -> None:
-        """Initializes the FilterResults PTransform.
-
-        Args:
-            prefix: str|None. The prefix for the result string.
-            label: str|None. The label of the PTransform.
-        """
-        super().__init__(label=label)
-        self.prefix = '%s ' % prefix if prefix else ''
-
-    # Here we use type Any because this method can accept Result object
-    # with any type of domain object.
-    @staticmethod
-    def _check_migration_errors(
-        unused_result: result.Result[Tuple[str, Any], Tuple[str, Exception]],
-        is_no_migration_error: beam.pvalue.AsSingleton
-    ) -> bool:
-        """Checks if any errors have occured.
-
-        Args:
-            unused_result: result.Result. Unused Result object.
-            is_no_migration_error: beam.pvalue.AsSingleton. Side input data
-                specifying non-zero erros during migration.
-
-        Returns:
-            bool. Specifies whether any migration errors were found.
-        """
-        return bool(is_no_migration_error)
 
     # Here we use type Any because this method can accept any kind of
     # PCollection object to return the filtered migration results.
@@ -90,8 +59,8 @@ class FilterResults(beam.PTransform):  # type: ignore[misc]
         filtered_results = (
             objects
             | 'Remove all results in case of errors' >> beam.Filter(
-                self._check_migration_errors,
-                is_no_migration_error=beam.pvalue.AsSingleton(
+                lambda _, no_migration_error: bool(no_migration_error),
+                no_migration_error=beam.pvalue.AsSingleton(
                     error_check))
         )
         return filtered_results

@@ -14,18 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides an Apache Beam API for operating on NDB models."""
+"""Unit tests for core.jobs.transforms.results_transforms."""
 
 from __future__ import annotations
 
 from core.jobs import job_test_utils
-from core.jobs.transforms import filter_results_transforms
+from core.jobs.transforms import results_transforms
 
 import apache_beam as beam
 import result
 
 
-class FilterResultsTests(job_test_utils.PipelinedTestBase):
+class DrainResultsOnErrorTests(job_test_utils.PipelinedTestBase):
 
     def test_error_results_returns_empty_collection(self) -> None:
         transform_result = (
@@ -35,7 +35,7 @@ class FilterResultsTests(job_test_utils.PipelinedTestBase):
                 result.Ok(('id_2', None)),
                 result.Err(('id_3', None))]
             )
-            | filter_results_transforms.FilterResults()
+            | results_transforms.DrainResultsOnError()
         )
 
         self.assert_pcoll_empty(transform_result)
@@ -48,7 +48,7 @@ class FilterResultsTests(job_test_utils.PipelinedTestBase):
                 result.Ok(('id_2', None)),
                 result.Ok(('id_3', None))]
             )
-            | filter_results_transforms.FilterResults()
+            | results_transforms.DrainResultsOnError()
         )
 
         self.assert_pcoll_equal(
@@ -62,7 +62,7 @@ class FilterResultsTests(job_test_utils.PipelinedTestBase):
         transform_result = (
             self.pipeline
             | beam.Create([])
-            | filter_results_transforms.FilterResults()
+            | results_transforms.DrainResultsOnError()
         )
 
         self.assert_pcoll_empty(transform_result)
