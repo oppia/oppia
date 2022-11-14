@@ -263,6 +263,7 @@ export class QuestionPlayerEngineService {
           wasOldStateInitial: boolean,
           isFirstHit: boolean,
           isFinalQuestion: boolean,
+          nextCardIfReallyStuck: null,
           focusLabel: string) => void): boolean {
     if (this.answerIsBeingProcessed) {
       return false;
@@ -343,6 +344,7 @@ export class QuestionPlayerEngineService {
 
     const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
     let nextCard = null;
+    let nextCardIfReallyStuck = null;
     if (!isFinalQuestion) {
       let nextInteractionHtml = this.getNextInteractionHtml(_nextFocusLabel);
 
@@ -365,6 +367,7 @@ export class QuestionPlayerEngineService {
       feedbackAudioTranslations,
       null, null, onSameCard, taggedSkillMisconceptionId,
       false, false, isFinalQuestion, _nextFocusLabel);
+      null, null, isFinalQuestion, nextCardIfReallyStuck, _nextFocusLabel);
     return answerIsCorrect;
   }
 }
