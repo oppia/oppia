@@ -2316,6 +2316,26 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                             ]
                         ]
                     }
+                },
+                {
+                    'rule_type': 'HasElementXAtPositionY',
+                    'inputs': {
+                        'x': 'ca_choices_0',
+                        'y': 4
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_0', 'ca_choices_1', 'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_3'
+                            ]
+                        ]
+                    }
                 }
             ],
             'outcome': {

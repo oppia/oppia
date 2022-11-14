@@ -1777,6 +1777,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             ele_position = ele['position']
                             ele_element = ele['element']
 
+                            if ele_position > len(rule_spec.inputs['x']):
+                                continue
+
                             rule_choice = rule_spec.inputs['x'][
                                 ele_position - 1]
                             for choice in rule_choice:
