@@ -456,11 +456,29 @@ describe('Outcome Editor Component', () => {
 
   it('should open destination if-stuck editor if it is editable', () => {
     component.destinationIfStuckEditorIsOpen = false;
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('first');
     component.isEditable = true;
-
+    component.savedOutcome = new Outcome(
+      'Introduction',
+      null,
+      new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
+      false,
+      [],
+      'ExpId',
+      'SkillId',
+    );
+    component.outcome = new Outcome(
+      'Introduction',
+      null,
+      new SubtitledHtml('<p>Outcome</p>', 'Id'),
+      true,
+      [],
+      '',
+      '',
+    );
     component.openDestinationIfStuckEditor();
-
     expect(component.destinationIfStuckEditorIsOpen).toBeTrue();
+    expect(component.outcome.destIfReallyStuck).toBe('first');
   });
 
   it('should save correctness label when it is changed', () => {

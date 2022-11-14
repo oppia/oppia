@@ -60,6 +60,15 @@ oppia-hint-and-solution-buttons .hint-box::before {
   top: 100%;
 }
 
+oppia-hint-and-solution-buttons .solution-container ::after,
+oppia-hint-and-solution-buttons .solution-container ::before {
+  border: solid transparent;
+  content: " ";
+  left: 55%;
+  position: absolute;
+  top: 100%;
+}
+
 oppia-hint-and-solution-buttons .hint-box::after {
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;

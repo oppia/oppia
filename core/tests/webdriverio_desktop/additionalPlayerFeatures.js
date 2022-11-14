@@ -304,7 +304,6 @@ describe('Full exploration editor', function() {
     await explorationPlayerPage.viewHint();
     await explorationPlayerPage.submitAnswer('TextInput', 'Greek');
 
-    await explorationPlayerPage.viewSolution();
     await explorationPlayerPage.expectExplorationToNotBeOver();
     await explorationPlayerPage.submitAnswer('TextInput', 'Finnish');
     await explorationPlayerPage.clickThroughToNextCard();

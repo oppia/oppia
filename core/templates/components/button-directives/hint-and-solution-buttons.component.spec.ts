@@ -413,6 +413,15 @@ describe('HintAndSolutionButtonsComponent', () => {
     expect(component.displaySolutionModal).not.toHaveBeenCalled();
   }));
 
+  it('should show \'Would you like to view the complete solution?' +
+    ' \' tooltip', () => {
+    spyOn(hintsAndSolutionManagerService, 'isSolutionTooltipOpen')
+      .and.returnValues(true, false);
+
+    expect(component.isSolutionTooltipVisible()).toBe(true);
+    expect(component.isSolutionTooltipVisible()).toBe(false);
+  });
+
   it('should show \'Need help? View a hint for this' +
     ' problem!\' tooltip', () => {
     spyOn(hintsAndSolutionManagerService, 'isHintTooltipOpen')

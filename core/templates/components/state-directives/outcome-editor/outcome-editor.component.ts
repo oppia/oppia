@@ -64,8 +64,6 @@ export class OutcomeEditorComponent implements OnInit {
   destinationEditorIsOpen: boolean = false;
   destinationIfStuckEditorIsOpen: boolean = false;
   feedbackEditorIsOpen: boolean = false;
-  destIfStuckFeatEnabled: boolean = (
-    AppConstants.DEST_IF_REALLY_STUCK_FEAT_ENABLED);
 
   onMobile: boolean = false;
   resizeSubscription!: Subscription;
@@ -202,6 +200,10 @@ export class OutcomeEditorComponent implements OnInit {
   openDestinationIfStuckEditor(): void {
     if (this.isEditable) {
       this.destinationIfStuckEditorIsOpen = true;
+      let activeStateName = this.stateEditorService.getActiveStateName();
+      if (!this.savedOutcome.destIfReallyStuck) {
+        this.outcome.destIfReallyStuck = activeStateName;
+      }
     }
   }
 

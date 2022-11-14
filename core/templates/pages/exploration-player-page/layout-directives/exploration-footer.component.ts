@@ -44,6 +44,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 
 import './exploration-footer.component.css';
+import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
+import { ConceptCardManagerService } from '../services/concept-card-manager.service';
+import { StateCard } from 'domain/state_card/state-card.model';
 
 
 @Component({
@@ -60,6 +63,7 @@ export class ExplorationFooterComponent {
   windowIsNarrow!: boolean;
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
+  isVisible: boolean = true;
 
   // Stores the number of checkpoints in an exploration.
   checkpointCount: number = 0;
@@ -75,6 +79,9 @@ export class ExplorationFooterComponent {
   userIsLoggedIn: boolean = false;
   footerIsInQuestionPlayerMode: boolean = false;
   CHECKPOINTS_FEATURE_IS_ENABLED = false;
+
+  conceptCardForStateExists: boolean = true;
+  linkedSkillId: string | null = null;
 
   constructor(
     private contextService: ContextService,
@@ -98,7 +105,8 @@ export class ExplorationFooterComponent {
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
     private checkpointCelebrationUtilityService:
-      CheckpointCelebrationUtilityService
+      CheckpointCelebrationUtilityService,
+    private conceptCardManagerService: ConceptCardManagerService
   ) {}
 
   ngOnInit(): void {
@@ -183,6 +191,17 @@ export class ExplorationFooterComponent {
           this.showInformationCard();
         })
     );
+    this.directiveSubscriptions.add(
+      this.playerPositionService.onNewCardOpened.subscribe(
+        (newCard: StateCard) => {
+          this.conceptCardManagerService.reset();
+        }
+      )
+    );
+  }
+
+  isConceptCardButtonVisible(): boolean {
+    return this.conceptCardManagerService.isConceptCardViewable();
   }
 
   showProgressReminderModal(): void {
@@ -215,6 +234,10 @@ export class ExplorationFooterComponent {
           this.explorationId);
       });
     }
+  }
+
+  isTooltipVisible(): boolean {
+    return this.conceptCardManagerService.isConceptCardTooltipOpen();
   }
 
   openProgressReminderModal(): void {
@@ -298,6 +321,15 @@ export class ExplorationFooterComponent {
     });
   }
 
+  openConceptCardModal(): void {
+    const modalRef = this.ngbModal.open(
+      OppiaNoninteractiveSkillreviewConceptCardModalComponent,
+      {backdrop: true}
+    );
+    this.conceptCardManagerService.consumeConceptCard();
+    modalRef.componentInstance.skillId = this.linkedSkillId;
+  }
+
   showInformationCard(): void {
     let stringifiedExpIds = JSON.stringify(
       [this.explorationId]);
@@ -322,6 +354,14 @@ export class ExplorationFooterComponent {
           'Information card failed to load for exploration ' +
           this.explorationId);
       });
+    }
+  }
+
+  showConceptCard(): void {
+    let state = this.explorationEngineService.getState();
+    this.linkedSkillId = state.linkedSkillId;
+    if (this.linkedSkillId) {
+      this.openConceptCardModal();
     }
   }
 

@@ -45,10 +45,11 @@ import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTran
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
+import { ConceptCardManagerService } from '../services/concept-card-manager.service';
 
 class MockCheckpointCelebrationUtilityService {
   private _openLessonInformationModalEmitter = new EventEmitter<void>();
@@ -90,6 +91,13 @@ class MockWindowRef {
   };
 }
 
+class MockNgbModalRef {
+  componentInstance = {
+    skillId: null,
+    explorationId: null
+  };
+}
+
 describe('ExplorationFooterComponent', () => {
   let component: ExplorationFooterComponent;
   let fixture: ComponentFixture<ExplorationFooterComponent>;
@@ -115,6 +123,9 @@ describe('ExplorationFooterComponent', () => {
   let urlInterpolationService: UrlInterpolationService;
   let checkpointCelebrationUtilityService:
     CheckpointCelebrationUtilityService;
+  let ngbModal: NgbModal;
+  let conceptCardManagerService: ConceptCardManagerService;
+  let interactionObjectFactory: InteractionObjectFactory;
 
   const sampleExpInfo = {
     category: 'dummy_category',
@@ -196,9 +207,16 @@ describe('ExplorationFooterComponent', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     checkpointCelebrationUtilityService = TestBed.inject(
       CheckpointCelebrationUtilityService);
+    conceptCardManagerService = TestBed.inject(
+      ConceptCardManagerService);
     fixture = TestBed.createComponent(ExplorationFooterComponent);
+    ngbModal = TestBed.inject(NgbModal);
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    spyOn(playerPositionService, 'onNewCardOpened').and.returnValue(
+      new EventEmitter<StateCard>());
   });
 
   afterEach(() => {
@@ -208,11 +226,13 @@ describe('ExplorationFooterComponent', () => {
   it('should initialise component when user opens exploration ' +
   'player', fakeAsync(() => {
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(playerPositionService.onNewCardOpened, 'subscribe');
     spyOn(urlService, 'isIframed').and.returnValue(true);
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
       mockResizeEventEmitter);
     spyOn(playerPositionService.onLoadedMostRecentCheckpoint, 'subscribe');
+    spyOn(conceptCardManagerService, 'reset');
     spyOn(
       checkpointCelebrationUtilityService
         .getOpenLessonInformationModalEmitter(), 'subscribe');
@@ -260,7 +280,67 @@ describe('ExplorationFooterComponent', () => {
         [], false, false,
         false, false, false, '', '', '', true)));
 
+    // A StateCard which supports hints.
+    let newCard = StateCard.createNewCard(
+      'State 2', '<p>Content</p>', '<interaction></interaction>',
+      interactionObjectFactory.createFromBackendDict({
+        id: 'TextInput',
+        answer_groups: [
+          {
+            outcome: {
+              dest: 'State',
+              dest_if_really_stuck: null,
+              feedback: {
+                html: '',
+                content_id: 'This is a new feedback text',
+              },
+              refresher_exploration_id: 'test',
+              missing_prerequisite_skill_id: 'test_skill_id',
+              labelled_as_correct: true,
+              param_changes: [],
+            },
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: '',
+          },
+        ],
+        default_outcome: {
+          dest: 'Hola',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: '',
+            html: '',
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: 'test',
+          missing_prerequisite_skill_id: 'test_skill_id',
+        },
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: true,
+          },
+          placeholder: {
+            value: 1,
+          }
+        },
+        hints: [],
+        solution: {
+          answer_is_exclusive: true,
+          correct_answer: 'test_answer',
+          explanation: {
+            content_id: '2',
+            html: 'test_explanation1',
+          },
+        }
+      }),
+      RecordedVoiceovers.createEmpty(),
+      writtenTranslationsObjectFactory.createEmpty(),
+      'content', audioTranslationLanguageService);
+
     component.ngOnInit();
+    playerPositionService.onNewCardOpened.emit(newCard);
     tick();
 
     expect(component.explorationId).toBe('exp1');
@@ -274,6 +354,8 @@ describe('ExplorationFooterComponent', () => {
       'contributor_2', 'contributor_3', 'contributor_1']);
     expect(playerPositionService.onLoadedMostRecentCheckpoint.subscribe)
       .toHaveBeenCalled();
+    expect(playerPositionService.onNewCardOpened.subscribe).toHaveBeenCalled();
+    expect(conceptCardManagerService.reset).toHaveBeenCalled();
 
     component.checkpointCount = 5;
 
@@ -420,6 +502,15 @@ describe('ExplorationFooterComponent', () => {
     expect(editableExplorationBackendApiService.resetExplorationProgressAsync)
       .toHaveBeenCalled();
   }));
+
+  it('should show \'Need help? Take a look at the concept' +
+    ' card for refreshing your concepts.\' tooltip', () => {
+    spyOn(conceptCardManagerService, 'isConceptCardTooltipOpen')
+      .and.returnValues(true, false);
+
+    expect(component.isTooltipVisible()).toBe(true);
+    expect(component.isTooltipVisible()).toBe(false);
+  });
 
   it('should resume exploration if progress reminder modal is canceled',
     fakeAsync(() => {
@@ -834,6 +925,65 @@ describe('ExplorationFooterComponent', () => {
     expect(ngbModal.open).toHaveBeenCalled();
     expect(component.lastCheckpointWasCompleted).toEqual(true);
     expect(component.completedCheckpointsCount).toEqual(2);
+  }));
+
+  it('should open concept card when user clicks on the icon', () => {
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return (
+          { componentInstance: MockNgbModalRef,
+            result: Promise.resolve()
+          }) as NgbModalRef;
+    });
+    component.openConceptCardModal();
+    expect(modalSpy).toHaveBeenCalled();
+  });
+
+  it('should trigger function to open concept card modal', fakeAsync(() => {
+    spyOn(component, 'openConceptCardModal');
+
+    const endState = {
+      classifier_model_id: null,
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {}
+        }
+      },
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {}
+        }
+      },
+      interaction: {
+        solution: null,
+        confirmed_unclassified_answers: [],
+        id: 'EndExploration',
+        hints: [],
+        customization_args: {
+          recommendedExplorationIds: {
+            value: ['recommendedExplorationId']
+          }
+        },
+        answer_groups: [],
+        default_outcome: null
+      },
+      param_changes: [],
+      next_content_id_index: 0,
+      card_is_checkpoint: false,
+      linked_skill_id: 'Id',
+      content: {
+        content_id: 'content',
+        html: 'Congratulations, you have finished!'
+      }
+    };
+    spyOn(explorationEngineService, 'getState')
+      .and.returnValue(
+        stateObjectFactory.createFromBackendDict('End', endState));
+
+    component.showConceptCard();
+
+    expect(component.linkedSkillId).toEqual('Id');
+    expect(component.openConceptCardModal).toHaveBeenCalled();
   }));
 
   it('should display lesson information card', fakeAsync(() => {

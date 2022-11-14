@@ -101,7 +101,8 @@ export class OutcomeObjectFactory {
 
   createNew(
       dest: string, feedbackTextId: string, feedbackText: string,
-      paramChanges: readonly ParamChangeBackendDict[]): Outcome {
+      paramChanges: readonly ParamChangeBackendDict[]
+  ): Outcome {
     return new Outcome(
       dest,
       null,

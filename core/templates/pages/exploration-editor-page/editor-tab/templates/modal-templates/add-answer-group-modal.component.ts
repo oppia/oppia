@@ -75,8 +75,6 @@ export class AddAnswerGroupModalComponent
    questionModeEnabled: boolean = false;
    isInvalid: boolean = false;
    validation: boolean = false;
-   destIfStuckFeatEnabled: boolean =
-     AppConstants.DEST_IF_REALLY_STUCK_FEAT_ENABLED;
 
    constructor(
      private ngbActiveModal: NgbActiveModal,
