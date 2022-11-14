@@ -71,7 +71,7 @@
         <div class="oppia-contributions-navbar-items-list" navbar-label="Accomplishments">
           <div class="oppia-contributions-navbar-item" *ngFor="let tab of accomplishmentsTabs">
             <button *ngIf="tab && tab.enabled"
-                    class="oppia-contributions-navbar-button"
+                    class="oppia-contributions-navbar-button e2e-test-show-{{tab.accomplishmentType}}"
                     (click)="switchToTab(TAB_TYPE_ACCOMPLISHMENTS, tab.accomplishmentType)"
                     [ngClass]="isActiveTab(TAB_TYPE_ACCOMPLISHMENTS, tab.accomplishmentType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
             </button>

@@ -54,6 +54,8 @@ var ContributorDashboardPage = function() {
   var reviewRightsDiv = $('.e2e-test-review-rights');
   var navigateToStatsTab = $('.e2e-test-show-stats');
   var navigateToBadgesTab = $('.e2e-test-show-badges');
+  var contributionTypeSelectorContainer = $(
+    '.e2e-test-contribution-type-selector')
   var statsLoadingPlaceholder = $(
     '.e2e-test-stats-loading-placeholder');
   var badgesLoadingPlaceholder = $(
@@ -62,9 +64,9 @@ var ContributorDashboardPage = function() {
     '.e2e-test-show-translationContribution');
   var navigateToTranslationReviewStats = $(
     '.e2e-test-show-translationReview');
-  var navigateToQuestionContributionStats = $(
+  var navigateToQuestionContributionStatsOption = $(
     '.e2e-test-show-questionContribution');
-  var navigateToQuestionReviewStats = $('.e2e-test-show-questionReview');
+  var navigateToQuestionReviewStatsOption = $('.e2e-test-show-questionReview');
   var statsContainer = $('.e2e-test-stats-card');
   var badgesContainer = $('.e2e-test-badges-container');
 
@@ -309,7 +311,9 @@ var ContributorDashboardPage = function() {
     await action.click(
       'Stats tab button', navigateToStatsTab);
     await action.click(
-      'Question contribution stats', navigateToQuestionContributionStats);
+      'Contribution type selector', contributionTypeSelectorContainer);
+    await action.click(
+      'Question contribution stats', navigateToQuestionContributionStatsOption);
     await this.waitForStatsToLoad();
   };
 
@@ -317,7 +321,9 @@ var ContributorDashboardPage = function() {
     await action.click(
       'Stats tab button', navigateToStatsTab);
     await action.click(
-      'Question review stats', navigateToQuestionReviewStats);
+      'Contribution type selector', contributionTypeSelectorContainer);
+    await action.click(
+      'Question review stats', navigateToQuestionReviewStatsOption);
     await this.waitForStatsToLoad();
   };
 
