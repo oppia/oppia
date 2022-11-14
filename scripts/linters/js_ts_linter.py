@@ -28,6 +28,7 @@ import esprima
 
 from typing import Dict, Final, List, Tuple, Union
 
+from . import linter_utils
 from .. import common
 from .. import concurrent_task_utils
 
@@ -151,7 +152,7 @@ def compile_all_ts_files() -> None:
         raise Exception(stderr)
 
 
-class JsTsLintChecksManager:
+class JsTsLintChecksManager(linter_utils.BaseLinter):
     """Manages all the Js and Ts linting functions."""
 
     def __init__(
@@ -210,7 +211,7 @@ class JsTsLintChecksManager:
         parsed_js_and_ts_files = {}
         concurrent_task_utils.log('Validating and parsing JS and TS files ...')
         for filepath in files_to_check:
-            file_content = self.file_cache.read(filepath)  # type: ignore[no-untyped-call]
+            file_content = self.file_cache.read(filepath)
 
             try:
                 # Use esprima to parse a JS or TS file.
@@ -222,7 +223,7 @@ class JsTsLintChecksManager:
                 # Compile typescript file which has syntax invalid for JS file.
                 compiled_js_filepath = self._get_compiled_ts_filepath(filepath)
 
-                file_content = self.file_cache.read(compiled_js_filepath)  # type: ignore[no-untyped-call]
+                file_content = self.file_cache.read(compiled_js_filepath)
                 parsed_js_and_ts_files[filepath] = _parse_js_or_ts_file(
                     filepath, file_content)
 
@@ -304,7 +305,7 @@ class JsTsLintChecksManager:
                 if is_corresponding_angularjs_filepath:
                     compiled_js_filepath = self._get_compiled_ts_filepath(
                         corresponding_angularjs_filepath)
-                    file_content = self.file_cache.read(compiled_js_filepath)  # type: ignore[no-untyped-call]
+                    file_content = self.file_cache.read(compiled_js_filepath)
 
                     parsed_script = (
                         _parse_js_or_ts_file(filepath, file_content))
@@ -392,12 +393,12 @@ class JsTsLintChecksManager:
             'export class ([A-Za-z0-9]*)')
         angular_services_index_path = (
             './core/templates/services/angular-services.index.ts')
-        angular_services_index = self.file_cache.read(  # type: ignore[no-untyped-call]
+        angular_services_index = self.file_cache.read(
             angular_services_index_path)
         error_messages = []
         failed = False
         for file_path in self.ts_files:
-            file_content = self.file_cache.read(file_path)  # type: ignore[no-untyped-call]
+            file_content = self.file_cache.read(file_path)
             class_names = re.findall(injectable_pattern, file_content)
             for class_name in class_names:
                 if class_name in INJECTABLES_TO_IGNORE:
@@ -463,7 +464,7 @@ class JsTsLintChecksManager:
         return linter_stdout
 
 
-class ThirdPartyJsTsLintChecksManager:
+class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
     """Manages all the third party Python linting functions."""
 
     def __init__(self, files_to_lint: List[str]) -> None:
