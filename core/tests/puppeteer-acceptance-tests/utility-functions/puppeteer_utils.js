@@ -23,17 +23,30 @@ module.exports = class acceptanceTests {
       return await this.page;
   }
 
-  async clickOn(selector, time = 0) {
-    await (this.page).waitForSelector(selector);
-    await (this.page).waitForTimeout(time);
-    await (this.page).click(selector);
-  }
+  // async clickOn(selector, time = 0) {
+  //   await (this.page).waitForSelector(selector);
+  //   await (this.page).waitForTimeout(time);
+  //   await (this.page).click(selector);
+  // }
   
-  async clickText(tag, text, time = 0) {
-    await (this.page).waitForXPath('//' + tag);
-    await (this.page).waitForTimeout(time);
-    const [button] = await (this.page).$x('//' + tag + '[contains(text(), "' + text + '")]');
-    await button.click();
+  // async clickText(tag, text, time = 0) {
+  //   await (this.page).waitForXPath('//' + tag);
+  //   await (this.page).waitForTimeout(time);
+  //   const [button] = await (this.page).$x('//' + tag + '[contains(text(), "' + text + '")]');
+  //   await button.click();
+  // }
+  
+  async clickOn(tag, selector, time = 0) {
+    try {
+      await (this.page).waitForXPath('//' + tag);
+      await (this.page).waitForTimeout(time);
+      const [button] = await (this.page).$x('//' + tag + '[contains(text(), "' + selector + '")]');
+      await button.click();
+    } catch {
+      await (this.page).waitForSelector(tag + '.' + selector);
+      await (this.page).waitForTimeout(time);
+      await (this.page).click(tag + '.' + selector);
+    }
   }
 
   async type(selector, text) {
@@ -45,28 +58,3 @@ module.exports = class acceptanceTests {
     await (this.page).goto(url, {waitUntil: "networkidle0"});
   }
 };
-
-
-// module.exports = {
-//   clicks: async (page, selector, time = 0) => {
-//     await page.waitForSelector(selector);
-//     await page.waitForTimeout(time);
-//     await page.click(selector);
-//   },
-  
-//   types: async (page, selector, text) => {
-//     await page.waitForSelector(selector);
-//     await page.type(selector, text);
-//   },
-
-//   goes: async(page, url) => {
-//     await page.goto(url, {waitUntil: "networkidle0"});
-//   },
-
-//   clickByText: async(page, tag, text, time = 0) => {
-//     await page.waitForXPath('//' + tag);
-//     await page.waitForTimeout(time);
-//     const [button] = await page.$x('//' + tag + '[contains(text(), "' + text + '")]');
-//     await button.click();
-//   }
-// };

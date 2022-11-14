@@ -1,3 +1,5 @@
+// this file is for exporting the constants in our tests, that can be used again-and-again..
+
 let testConstants = {
   URLs: {
     home: 'http://localhost:8181/',
