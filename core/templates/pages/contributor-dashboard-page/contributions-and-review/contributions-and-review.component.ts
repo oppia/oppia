@@ -91,8 +91,7 @@ export interface SuggestionDetails {
 
 export interface TabDetails {
   tabType: string;
-  suggestionType?: string;
-  accomplishmentType?: string;
+  tabSubType: string;
   text: string;
   enabled: boolean;
 }
@@ -117,8 +116,7 @@ export class ContributionsAndReview
   userDetailsLoading: boolean;
   userIsLoggedIn: boolean;
   activeTabType: string;
-  activeSuggestionType: string;
-  activeAccomplishmentType: string;
+  activeSubType: string;
   dropdownShown: boolean;
   activeTabIsAccomplishments: boolean;
   activeDropdownTabChoice: string;
@@ -131,8 +129,12 @@ export class ContributionsAndReview
     };
   };
 
-  TAB_TYPES_TO_NAMES = {};
-
+  /**
+   * The feature flag state to gate the contributor stats and badges sections.
+   * @type {boolean}
+   * This keeps whether the contributor_dashboard_accomplishments feature is
+   * enabled.
+   */
   accomplishmentsTabIsEnabled: boolean = false;
   defaultContributionType: string = 'translationContribution';
   SUGGESTION_LABELS = {
@@ -325,20 +327,15 @@ export class ContributionsAndReview
   }
 
   isActiveTab(tabType: string, subType: string): boolean {
-    if (tabType === this.TAB_TYPE_ACCOMPLISHMENTS) {
-      return (
-        this.activeTabType === tabType &&
-        this.activeAccomplishmentType === subType);
-    }
     return (
       this.activeTabType === tabType &&
-      this.activeSuggestionType === subType);
+      this.activeSubType === subType);
   }
 
   isReviewTranslationsTab(): boolean {
     return (
       this.activeTabType === this.TAB_TYPE_REVIEWS &&
-      this.activeSuggestionType === this.SUGGESTION_TYPE_TRANSLATE);
+      this.activeSubType === this.SUGGESTION_TYPE_TRANSLATE);
   }
 
   openQuestionSuggestionModal(
@@ -390,15 +387,24 @@ export class ContributionsAndReview
   getContributionSummaries(
       suggestionIdToSuggestions: Record<string, SuggestionDetails>
   ): ContributionsSummary[] {
-    if (this.activeSuggestionType === this.SUGGESTION_TYPE_TRANSLATE) {
+    if (this.activeSubType === this.SUGGESTION_TYPE_TRANSLATE) {
       return this.getTranslationContributionsSummary(suggestionIdToSuggestions);
-    } else if (this.activeSuggestionType === this.SUGGESTION_TYPE_QUESTION) {
+    } else if (this.activeSubType === this.SUGGESTION_TYPE_QUESTION) {
       return this.getQuestionContributionsSummary(suggestionIdToSuggestions);
     }
   }
 
   getActiveDropdownTabChoice(tabType: string, subType: string): string {
-    return this.TAB_TYPES_TO_NAMES[tabType][subType];
+    const tabs = this.contributionTabs.concat(
+      this.reviewTabs, this.accomplishmentsTabs);
+    const tab = tabs.find(
+      (tab) => tab.tabType === tabType && tab.tabSubType === subType);
+
+    if (!tab) {
+      throw new Error('Cannot find the tab');
+    }
+
+    return tab.text;
   }
 
   switchToTab(tabType: string, subType: string): void {
@@ -407,14 +413,11 @@ export class ContributionsAndReview
     this.activeDropdownTabChoice = this.getActiveDropdownTabChoice(
       tabType, subType);
 
+    this.activeSubType = subType;
     if (tabType === this.TAB_TYPE_ACCOMPLISHMENTS) {
-      this.activeSuggestionType = '';
       this.activeTabIsAccomplishments = true;
-      this.activeAccomplishmentType = subType;
     } else {
-      this.activeSuggestionType = subType;
       this.activeTabIsAccomplishments = false;
-      this.activeAccomplishmentType = '';
       this.contributionAndReviewService.setActiveTabType(tabType);
       this.contributionAndReviewService.setActiveSuggestionType(subType);
       this.activeExplorationId = null;
@@ -460,13 +463,13 @@ export class ContributionsAndReview
 
   loadContributions(shouldResetOffset: boolean):
     Promise<GetOpportunitiesResponse> {
-    if (!this.activeTabType || !this.activeSuggestionType) {
+    if (!this.activeTabType || !this.activeSubType) {
       return new Promise((resolve, reject) => {
         resolve({opportunitiesDicts: [], more: false});
       });
     }
     const fetchFunction = this.tabNameToOpportunityFetchFunction[
-      this.activeSuggestionType][this.activeTabType];
+      this.activeSubType][this.activeTabType];
 
     return fetchFunction(shouldResetOffset).then((response) => {
       Object.keys(response.suggestionIdToDetails).forEach(id => {
@@ -512,26 +515,12 @@ export class ContributionsAndReview
     this.TAB_TYPE_CONTRIBUTIONS = 'contributions';
     this.TAB_TYPE_REVIEWS = 'reviews';
     this.TAB_TYPE_ACCOMPLISHMENTS = 'accomplishments';
-    this.TAB_TYPES_TO_NAMES = {
-      [this.TAB_TYPE_CONTRIBUTIONS]: {
-        [this.SUGGESTION_TYPE_TRANSLATE]: 'Translations',
-        [this.SUGGESTION_TYPE_QUESTION]: 'Questions'
-      },
-      [this.TAB_TYPE_REVIEWS]: {
-        [this.SUGGESTION_TYPE_TRANSLATE]: 'Review Translations',
-        [this.SUGGESTION_TYPE_QUESTION]: 'Review Questions'
-      },
-      [this.TAB_TYPE_ACCOMPLISHMENTS]: {
-        [this.ACCOMPLISHMENTS_TYPE_BADGE]: 'Badges',
-        [this.ACCOMPLISHMENTS_TYPE_STATS]: 'Contribution Stats'
-      }
-    };
     this.activeExplorationId = null;
     this.contributions = {};
     this.userDetailsLoading = true;
     this.userIsLoggedIn = false;
     this.activeTabType = '';
-    this.activeSuggestionType = '';
+    this.activeSubType = '';
     this.dropdownShown = false;
     this.activeTabIsAccomplishments = false;
     this.activeDropdownTabChoice = '';
@@ -541,26 +530,26 @@ export class ContributionsAndReview
     this.contributionTabs = [
       {
         tabType: this.TAB_TYPE_CONTRIBUTIONS,
-        suggestionType: this.SUGGESTION_TYPE_QUESTION,
+        tabSubType: this.SUGGESTION_TYPE_QUESTION,
         text: 'Questions',
         enabled: false
       },
       {
         tabType: this.TAB_TYPE_CONTRIBUTIONS,
-        suggestionType: this.SUGGESTION_TYPE_TRANSLATE,
+        tabSubType: this.SUGGESTION_TYPE_TRANSLATE,
         text: 'Translations',
         enabled: true
       }
     ];
     this.accomplishmentsTabs = [
       {
-        accomplishmentType: 'stats',
+        tabSubType: 'stats',
         tabType: this.TAB_TYPE_ACCOMPLISHMENTS,
         text: 'Contribution Stats',
         enabled: true
       },
       {
-        accomplishmentType: 'badges',
+        tabSubType: 'badges',
         tabType: this.TAB_TYPE_ACCOMPLISHMENTS,
         text: 'Badges',
         enabled: true
@@ -590,7 +579,7 @@ export class ContributionsAndReview
             const userCanSuggestQuestions = (
               userContributionRights.can_suggest_questions);
             for (let index in this.contributionTabs) {
-              if (this.contributionTabs[index].suggestionType === (
+              if (this.contributionTabs[index].tabSubType === (
                 this.SUGGESTION_TYPE_QUESTION)) {
                 this.contributionTabs[index].enabled = (
                   userCanSuggestQuestions);
@@ -599,7 +588,7 @@ export class ContributionsAndReview
             if (userCanReviewQuestionSuggestions) {
               this.reviewTabs.push({
                 tabType: this.TAB_TYPE_REVIEWS,
-                suggestionType: this.SUGGESTION_TYPE_QUESTION,
+                tabSubType: this.SUGGESTION_TYPE_QUESTION,
                 text: 'Review Questions',
                 enabled: false
               });
@@ -610,7 +599,7 @@ export class ContributionsAndReview
                 .length > 0) {
               this.reviewTabs.push({
                 tabType: this.TAB_TYPE_REVIEWS,
-                suggestionType: this.SUGGESTION_TYPE_TRANSLATE,
+                tabSubType: this.SUGGESTION_TYPE_TRANSLATE,
                 text: 'Review Translations',
                 enabled: false
               });

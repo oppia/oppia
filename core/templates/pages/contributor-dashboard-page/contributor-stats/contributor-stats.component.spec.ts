@@ -210,10 +210,10 @@ describe('Contributor stats component', () => {
         ]
       };
 
-      component.nextPage(pagedStats);
+      component.goToNextPage(pagedStats);
       expect(pagedStats.currentPage).toBe(3);
 
-      component.previousPage(pagedStats);
+      component.goToPreviousPage(pagedStats);
       expect(pagedStats.currentPage).toBe(2);
     }));
   });

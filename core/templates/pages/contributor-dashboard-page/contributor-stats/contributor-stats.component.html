@@ -1,334 +1,317 @@
 <div class="stats-container">
-    <div class="stats-contribution-type-mobile-container">
-        <div class="dropdown-label">Type</div>
-        <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
-          <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleMobileDropdown()">
-            {{selectedContributionType}}
-            <span class="material-icons oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': mobileDropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
-              arrow_drop_down
-            </span>
-          </div>
-          
-          <div *ngIf="mobileDropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
-            <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option e2e-test-{{option.contributionType}}"
-                  *ngFor="let option of options"
-                  (click)="selectOption(option.contributionType)"
-                  [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
-                {{option.displayName}}
-            </div>
-          </div>
-        </div>
-    </div>
-    <div class="stats-welcome-text-container">
-      Explore the impact of your contributions!
-    </div>
-    <div class="stats-contribution-type-container">
-      <div class="stats-contribution-type-label">
-        Contribution Type
+  <div class="stats-contribution-type-mobile-container">
+    <div class="dropdown-label">Type</div>
+    <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
+      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleMobileDropdown()">
+        {{selectedContributionType}}
+        <span class="material-icons oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': mobileDropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+          arrow_drop_down
+        </span>
       </div>
-      <div #dropdown class="oppia-stats-type-selector-container e2e-test-contribution-type-selector">
-        <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleDropdown()">
-          {{selectedContributionType}}
-          <span class="fas fa-caret-down oppia-stats-type-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
-          </span>
-        </div>
 
-        <div *ngIf="dropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
-          <div class="oppia-stats-type-selector-dropdown-option e2e-test-show-{{option.contributionType}}"
-                *ngFor="let option of options"
-                (click)="selectOption(option.contributionType)"
-                [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
-              {{option.displayName}}
-          </div>
+      <div *ngIf="mobileDropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
+        <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
+             *ngFor="let option of options"
+             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
+            {{option.displayName}}
         </div>
       </div>
     </div>
-    <div *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-cards-container">
-      <mat-card *ngFor="let block of statsData[type] | keyvalue" layout="row" class="list-view-item e2e-test-stats-card">
-        <div>
-          {{selectedContributionType}} - {{block.value.language}}
+  </div>
+  <div class="stats-contribution-type-label">
+    Contribution Type
+  </div>
+  <div class="stats-welcome-text-container">
+    Explore the impact of your contributions!
+  </div>
+  <div class="stats-contribution-type-container">
+    <div #dropdown class="oppia-stats-type-selector-container e2e-test-topic-selector">
+      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleDropdown()">
+        {{selectedContributionType}}
+        <span class="fas fa-caret-down oppia-stats-type-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+        </span>
+      </div>
+
+      <div *ngIf="dropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
+        <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
+             *ngFor="let option of options"
+             (click)="selectOption(option.contributionType)"
+             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
+          {{option.displayName}}
         </div>
-        <table class="dashboard-table e2e-test-topics-table">
-          <tr>
-            <th *ngFor="let column of COLUMNS[type] | keyvalue: columnSortDirection"
-                class="dashboard-table-headings stats-data">
-              <div class="stats-column-name-container">
-                {{column.value}}
-              </div>
-            </th>
-          </tr>
-          <tr *ngFor="let row of block.value.data.slice(block.value.currentStartingIndex, block.value.currentEndingIndex)" class="stats-row">
-            <td class="stats-data">
+      </div>
+    </div>
+  </div>
+  <div *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-cards-container">
+    <mat-card *ngFor="let page of statsData[type] | keyvalue" layout="row" class="list-view-item">
+      <div>
+        {{selectedContributionType}} - {{page.value.language}}
+      </div>
+      <table class="dashboard-table e2e-test-topics-table">
+        <tr>
+          <th *ngFor="let column of COLUMNS[type] | keyvalue: getColumnSortDirection"
+              class="dashboard-table-headings stats-data">
+            <div class="stats-column-name-container">
+              {{column.value}}
+            </div>
+          </th>
+        </tr>
+        <tr *ngFor="let row of page.value.data.slice(page.value.currentPageStartIndex, page.value.currentPageEndIndex)" class="stats-row">
+          <td class="stats-data">
+            {{row.firstContributionDate}} - {{row.lastContributionDate}}
+          </td>
+          <td class="stats-data">
+            {{row.topicName}}
+          </td>
+          <td *ngIf="type == 'translationReview'" class="stats-data">
+            {{row.reviewedCards}}
+          </td>
+          <td *ngIf="type == 'translationReview'" class="stats-data">
+            {{row.reviewedWordCount}}
+          </td>
+          <td *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-data">
+            {{row.acceptedCards}}
+          </td>
+          <td *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-data">
+            {{row.acceptedWordCount}}
+          </td>
+        </tr>
+      </table>
+      <div *ngIf="type == 'translationContribution'" class="mobile-stats-page">
+        <div class="mobile-stats-data-container" *ngFor="let row of page.value.data.slice(page.value.currentPageStartIndex, page.value.currentPageEndIndex)">
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].months}}</b>
+            </div>
+            <div>
               {{row.firstContributionDate}} - {{row.lastContributionDate}}
-            </td>
-            <td class="stats-data">
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].topicNames}}</b>
+            </div>
+            <div>
               {{row.topicName}}
-            </td>
-            <td *ngIf="type == 'translationReview'" class="stats-data">
-              {{row.reviewedCards}}
-            </td>
-            <td *ngIf="type == 'translationReview'" class="stats-data">
-              {{row.reviewedWordCount}}
-            </td>
-            <td *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-data">
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].acceptedCards}}</b>
+            </div>
+            <div>
               {{row.acceptedCards}}
-            </td>
-            <td *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-data">
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].acceptedWordCount}}</b>
+            </div>
+            <div>
               {{row.acceptedWordCount}}
-            </td>
-          </tr>
-        </table>
-        <div *ngIf="type == 'translationContribution'" class="mobile-stats-block">
-          <div class="mobile-stats-data-container" *ngFor="let row of block.value.data.slice(block.value.currentStartingIndex, block.value.currentEndingIndex)">
-            <div class="mobile-stats-row">
-              <div class="mobile-stats-name">
-                <b>{{COLUMNS[type].months}}</b>
-              </div>
-              <div>
-                {{row.firstContributionDate}} - {{row.lastContributionDate}}
-              </div>
-            </div>
-            <div class="mobile-stats-row">
-              <div class="mobile-stats-name">
-                <b>{{COLUMNS[type].topicNames}}</b>
-              </div>
-              <div>
-                {{row.topicName}}
-              </div>
-            </div>
-            <div class="mobile-stats-row">
-              <div class="mobile-stats-name">
-                <b>{{COLUMNS[type].acceptedCards}}</b>
-              </div>
-              <div>
-                {{row.acceptedCards}}
-              </div>
-            </div>
-            <div class="mobile-stats-row">
-              <div class="mobile-stats-name">
-                <b>{{COLUMNS[type].acceptedWordCount}}</b>
-              </div>
-              <div>
-                {{row.acceptedWordCount}}
-              </div>
             </div>
           </div>
         </div>
-        <div *ngIf="type == 'translationReview'" class="mobile-stats-block">
-          <div class="mobile-stats-data-container" *ngFor="let row of block.value.data.slice(block.value.currentStartingIndex, block.value.currentEndingIndex)">
-            <div class="mobile-stats-row">
-              <div class="mobile-stats-name">
-                <b>{{COLUMNS[type].months}}</b>
-              </div>
-              <div>
-                {{row.firstContributionDate}} - {{row.lastContributionDate}}
-              </div>
+      </div>
+      <div *ngIf="type == 'translationReview'" class="mobile-stats-page">
+        <div class="mobile-stats-data-container" *ngFor="let row of page.value.data.slice(page.value.currentPageStartIndex, page.value.currentPageEndIndex)">
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].months}}</b>
             </div>
-            <div class="mobile-stats-row">
-              <div class="mobile-stats-name">
-                <b>{{COLUMNS[type].topicNames}}</b>
-              </div>
-              <div>
-                {{row.topicName}}
-              </div>
+            <div>
+              {{row.firstContributionDate}} - {{row.lastContributionDate}}
             </div>
-            <div class="mobile-stats-row">
-              <div class="mobile-stats-name">
-                <b>{{COLUMNS[type].reviewedCards}}</b>
-              </div>
-              <div>
-                {{row.reviewedCards}}
-              </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].topicNames}}</b>
             </div>
-            <div class="mobile-stats-row">
-              <div class="mobile-stats-name">
-                <b>{{COLUMNS[type].reviewedWordCount}}</b>
-              </div>
-              <div>
-                {{row.reviewedWordCount}}
-              </div>
+            <div>
+              {{row.topicName}}
             </div>
-            <div class="mobile-stats-row">
-              <div class="mobile-stats-name">
-                <b>{{COLUMNS[type].acceptedCards}}</b>
-              </div>
-              <div>
-                {{row.acceptedCards}}
-              </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].reviewedCards}}</b>
             </div>
-            <div class="mobile-stats-row">
-              <div class="mobile-stats-name">
-                <b>{{COLUMNS[type].acceptedWordCount}}</b>
-              </div>
-              <div>
-                {{row.acceptedWordCount}}
-              </div>
+            <div>
+              {{row.reviewedCards}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].reviewedWordCount}}</b>
+            </div>
+            <div>
+              {{row.reviewedWordCount}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].acceptedCards}}</b>
+            </div>
+            <div>
+              {{row.acceptedCards}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].acceptedWordCount}}</b>
+            </div>
+            <div>
+              {{row.acceptedWordCount}}
             </div>
           </div>
         </div>
-        <div class="oppia-pagination-container">
-          <button type="button"
-                  class="oppia-pagination-button"
-                  (click)="previousPage(block.value)"
-                  [disabled]="block.value.currentStartingIndex === 0">
-            <span class="material-icons">navigate_before</span>Previous
-          </button>
-          <button type="button"
-                  class="oppia-pagination-button"
-                  (click)="nextPage(block.value)"
-                  [disabled]="block.value.currentEndingIndex >= block.value.data.length">
-            Next<span class="material-icons">navigate_next</span>
-          </button>
-        </div>
-        <div class="certificate-download-button-container" *ngIf="type == 'translationContribution'">
-          <button class="btn btn-success certificate-download-button" (click)="openCertificateDownloadModal('translate_content', block.key)">
-            <span>
-              Download Certificate
-            </span>
-            <i class="fa fa-download"></i>
-          </button>
-        </div>
-      </mat-card>
-      <mat-card *ngIf="!statsDataAvailability[type]" layout="row" class="list-view-item oppia-contributions-required-message-container">
-        <div class="oppia-contributions-required-message e2e-test-stats-loading-placeholder">
-          Start contributing to see your stats!
-        </div>
-      </mat-card>
-    </div>
+      </div>
+      <div class="oppia-pagination-container">
+        <button type="button"
+                class="oppia-pagination-button"
+                (click)="goToPreviousPage(page.value)"
+                [disabled]="page.value.currentPageStartIndex === 0">
+          <span class="material-icons">navigate_before</span>Previous
+        </button>
+        <button type="button"
+                class="oppia-pagination-button"
+                (click)="goToNextPage(page.value)"
+                [disabled]="page.value.currentPageEndIndex >= page.value.data.length">
+          Next<span class="material-icons">navigate_next</span>
+        </button>
+      </div>
+    </mat-card>
+    <mat-card *ngIf="(statsData[type] | json) === '{}'" layout="row" class="list-view-item oppia-contributions-required-message-container">
+      <div class="oppia-contributions-required-message">
+        Start contributing to see your stats!
+      </div>
+    </mat-card>
+  </div>
 
-    <div *ngIf="type == 'questionContribution' || type == 'questionReview'" class="stats-cards-container">
-        <mat-card layout="row" class="list-view-item e2e-test-stats-card">
-          <div>
-            {{selectedContributionType}}
-          </div>
-          <table class="dashboard-table e2e-test-topics-table">
-            <tr>
-              <th *ngFor="let column of COLUMNS[type] | keyvalue: columnSortDirection"
-                  class="dashboard-table-headings stats-data">
-                <div class="stats-column-name-container">
-                    {{column.value}}
-                </div>
-              </th>
-            </tr>
-            <tr *ngFor="let row of statsData[type].data.slice(statsData[type].currentStartingIndex, statsData[type].currentEndingIndex)" class="stats-row">
-              <td class="stats-data">
-                {{row.firstContributionDate}} - {{row.lastContributionDate}}
-              </td>
-              <td class="stats-data">
-                {{row.topicName}}
-              </td>
-              <td *ngIf="type == 'questionReview'" class="stats-data">
-                {{row.reviewedQuestions}}
-              </td>
-              <td class="stats-data">
-                {{row.acceptedQuestions}}
-              </td>
-              <td *ngIf="type == 'questionContribution'" class="stats-data">
-                {{row.acceptedQuestionsWithoutEdits}}
-              </td>
-            </tr>
-          </table>
-          <div *ngIf="type == 'questionContribution'" class="mobile-stats-block">
-            <div class="mobile-stats-data-container" *ngFor="let row of statsData[type].data.slice(statsData[type].currentStartingIndex, statsData[type].currentEndingIndex)">
-              <div class="mobile-stats-row">
-                <div class="mobile-stats-name">
-                  <b>{{COLUMNS[type].months}}</b>
-                </div>
-                <div>
-                  {{row.firstContributionDate}} - {{row.lastContributionDate}}
-                </div>
-              </div>
-              <div class="mobile-stats-row">
-                <div class="mobile-stats-name">
-                  <b>{{COLUMNS[type].topicNames}}</b>
-                </div>
-                <div>
-                  {{row.topicName}}
-                </div>
-              </div>
-              <div class="mobile-stats-row">
-                <div class="mobile-stats-name">
-                  <b>{{COLUMNS[type].acceptedQuestions}}</b>
-                </div>
-                <div>
-                  {{row.acceptedQuestions}}
-                </div>
-              </div>
-              <div class="mobile-stats-row">
-                <div class="mobile-stats-name">
-                  <b>{{COLUMNS[type].acceptedQuestionsWithoutEdits}}</b>
-                </div>
-                <div>
-                  {{row.acceptedQuestionsWithoutEdits}}
-                </div>
-              </div>
+  <div *ngIf="type == 'questionContribution' || type == 'questionReview'" class="stats-cards-container">
+    <mat-card *ngIf="(statsData[type] | json) !== '{}'" layout="row" class="list-view-item">
+      <div>
+        {{selectedContributionType}}
+      </div>
+      <table class="dashboard-table e2e-test-topics-table">
+        <tr>
+          <th *ngFor="let column of COLUMNS[type] | keyvalue: getColumnSortDirection"
+              class="dashboard-table-headings stats-data">
+            <div class="stats-column-name-container">
+              {{column.value}}
+            </div>
+          </th>
+        </tr>
+        <tr *ngFor="let row of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageEndIndex)" class="stats-row">
+          <td class="stats-data">
+            {{row.firstContributionDate}} - {{row.lastContributionDate}}
+          </td>
+          <td class="stats-data">
+            {{row.topicName}}
+          </td>
+          <td *ngIf="type == 'questionReview'" class="stats-data">
+            {{row.reviewedQuestions}}
+          </td>
+          <td class="stats-data">
+            {{row.acceptedQuestions}}
+          </td>
+          <td *ngIf="type == 'questionContribution'" class="stats-data">
+            {{row.acceptedQuestionsWithoutEdits}}
+          </td>
+        </tr>
+      </table>
+      <div *ngIf="type == 'questionContribution'" class="mobile-stats-page">
+        <div class="mobile-stats-data-container" *ngFor="let row of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageEndIndex)">
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].months}}</b>
+            </div>
+            <div>
+              {{row.firstContributionDate}} - {{row.lastContributionDate}}
             </div>
           </div>
-          <div *ngIf="type == 'questionReview'" class="mobile-stats-block">
-            <div class="mobile-stats-data-container" *ngFor="let row of statsData[type].data.slice(statsData[type].currentStartingIndex, statsData[type].currentEndingIndex)">
-              <div class="mobile-stats-row">
-                <div class="mobile-stats-name">
-                  <b>{{COLUMNS[type].months}}</b>
-                </div>
-                <div>
-                  {{row.firstContributionDate}} - {{row.lastContributionDate}}
-                </div>
-              </div>
-              <div class="mobile-stats-row">
-                <div class="mobile-stats-name">
-                  <b>{{COLUMNS[type].topicNames}}</b>
-                </div>
-                <div>
-                  {{row.topicName}}
-                </div>
-              </div>
-              <div class="mobile-stats-row">
-                <div class="mobile-stats-name">
-                  <b>{{COLUMNS[type].reviewedQuestions}}</b>
-                </div>
-                <div>
-                  {{row.reviewedQuestions}}
-                </div>
-              </div>
-              <div class="mobile-stats-row">
-                <div class="mobile-stats-name">
-                  <b>{{COLUMNS[type].acceptedQuestions}}</b>
-                </div>
-                <div>
-                  {{row.acceptedQuestions}}
-                </div>
-              </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].topicNames}}</b>
+            </div>
+            <div>
+              {{row.topicName}}
             </div>
           </div>
-          <div class="oppia-pagination-container">
-            <button type="button"
-                    class="oppia-pagination-button"
-                    (click)="previousPage(statsData[type])"
-                    [disabled]="statsData[type].currentStartingIndex === 0">
-              <span class="material-icons">navigate_before</span>Previous
-            </button>
-            <button type="button"
-                    class="oppia-pagination-button"
-                    (click)="nextPage(statsData[type])"
-                    [disabled]="statsData[type].currentEndingIndex >= statsData[type].data.length">
-              Next<span class="material-icons">navigate_next</span>
-            </button>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].acceptedQuestions}}</b>
+            </div>
+            <div>
+              {{row.acceptedQuestions}}
+            </div>
           </div>
-          <div class="certificate-download-button-container" *ngIf="type == 'questionContribution'">
-            <button class="btn btn-success certificate-download-button" (click)="openCertificateDownloadModal('add_question', '-')">
-              <span>
-                Download Certificate
-              </span>
-              <i class="fa fa-download"></i>
-            </button>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].acceptedQuestionsWithoutEdits}}</b>
+            </div>
+            <div>
+              {{row.acceptedQuestionsWithoutEdits}}
+            </div>
           </div>
-        </mat-card>
-        <mat-card *ngIf="!statsDataAvailability[type]" layout="row" class="list-view-item oppia-contributions-required-message-container">
-          <div class="oppia-contributions-required-message e2e-test-stats-loading-placeholder">
-            Start contributing to see your stats!
+        </div>
+      </div>
+      <div *ngIf="type == 'questionReview'" class="mobile-stats-page">
+        <div class="mobile-stats-data-container" *ngFor="let row of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageEndIndex)">
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].months}}</b>
+            </div>
+            <div>
+              {{row.firstContributionDate}} - {{row.lastContributionDate}}
+            </div>
           </div>
-        </mat-card>
-    </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].topicNames}}</b>
+            </div>
+            <div>
+              {{row.topicName}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].reviewedQuestions}}</b>
+            </div>
+            <div>
+              {{row.reviewedQuestions}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].acceptedQuestions}}</b>
+            </div>
+            <div>
+              {{row.acceptedQuestions}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="oppia-pagination-container">
+        <button type="button"
+                class="oppia-pagination-button"
+                (click)="goToPreviousPage(statsData[type])"
+                [disabled]="statsData[type].currentPageStartIndex === 0">
+          <span class="material-icons">navigate_before</span>Previous
+        </button>
+        <button type="button"
+                class="oppia-pagination-button"
+                (click)="goToNextPage(statsData[type])"
+                [disabled]="statsData[type].currentPageEndIndex >= statsData[type].data.length">
+          Next<span class="material-icons">navigate_next</span>
+        </button>
+      </div>
+    </mat-card>
+    <mat-card *ngIf="(statsData[type] | json) === '{}'" layout="row" class="list-view-item oppia-contributions-required-message-container">
+      <div class="oppia-contributions-required-message">
+        Start contributing to see your stats!
+      </div>
+    </mat-card>
+  </div>
 </div>
 
 <style>
@@ -389,7 +372,7 @@
     padding: 0 20px;
     width: 100%;
   }
-  .mobile-stats-block {
+  .mobile-stats-page {
     margin-top: 30px;
   }
   .mobile-stats-data-container {
@@ -427,17 +410,17 @@
     font-size: 24px;
     height: 30%;
     vertical-align: middle;
-    width: 60%;
+    width: 65%;
   }
   .stats-contribution-type-container {
     display: inline-block;
-    width: 40%;
-    vertical-align: middle;
+    width: 35%;
+    vertical-align: top;
   }
   .stats-contribution-type-label {
     font-size: 14px;
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-left: 65%;
   }
   .stats-container {
     margin-left: 50px;
@@ -481,7 +464,6 @@
   .oppia-stats-type-selector-container {
     background-color: #fff;
     border-radius: 4px;
-    border: 1px solid #000;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
     cursor: pointer;
     justify-content: space-between;
@@ -493,7 +475,7 @@
     display: flex;
     flex: 1;
     justify-content: space-between;
-    font-size: 12px;
+    font-size: 16px;
   }
 
   .oppia-stats-type-selector-inner-container-arrow {
@@ -549,6 +531,9 @@
   @media only screen and (max-width: 700px) {
     .stats-welcome-text-container {
       width: 100%;
+    }
+    .stats-contribution-type-label {
+      display: none;
     }
     .stats-contribution-type-container {
       display: none;

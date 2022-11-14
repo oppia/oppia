@@ -31,44 +31,38 @@ interface Option {
   displayName: string;
 }
 
-interface Stats {
+interface StatsPage {
   language?: string;
-  currentStartingIndex: number;
-  currentEndingIndex: number;
+  currentPageStartIndex: number;
+  currentPageEndIndex: number;
   // eslint-disable-next-line max-len
   data: (TranslationContributionStats | TranslationReviewStats | QuestionContributionStats | QuestionReviewStats)[];
 }
 
-interface TranslationContributionStats {
+interface Stat {
+  topicName: string;
   firstContributionDate: string;
   lastContributionDate: string;
-  topicName: string;
+}
+
+interface TranslationContributionStats extends Stat {
   acceptedCards: number;
   acceptedWordCount: number;
 }
 
-interface TranslationReviewStats {
-  firstContributionDate: string;
-  lastContributionDate: string;
-  topicName: string;
+interface TranslationReviewStats extends Stat {
   acceptedCards: number;
   acceptedWordCount: number;
   reviewedCards: number;
   reviewedWordCount: number;
 }
 
-interface QuestionContributionStats {
-  firstContributionDate: string;
-  lastContributionDate: string;
-  topicName: string;
+interface QuestionContributionStats extends Stat {
   acceptedQuestions: number;
   acceptedQuestionsWithoutEdits: number;
 }
 
-interface QuestionReviewStats {
-  firstContributionDate: string;
-  lastContributionDate: string;
-  topicName: string;
+interface QuestionReviewStats extends Stat {
   reviewedQuestions: number;
   acceptedQuestions: number;
 }
@@ -157,26 +151,11 @@ export class ContributorStatsComponent {
     this.translationContributionOption
   ];
 
-  translationContributionStats: {[key: string]: Stats} = {};
-  translationReviewStats: {[key: string]: Stats} = {};
-  questionContributionStats: Stats;
-  questionReviewStats: Stats;
-
-  currentStartingIndex = 0;
-  currentEndingIndex = 5;
-
   statsData = {
     translationContribution: {},
     translationReview: {},
     questionContribution: {},
     questionReview: {},
-  };
-
-  statsDataAvailability = {
-    translationContribution: false,
-    translationReview: false,
-    questionContribution: false,
-    questionReview: false,
   };
 
   constructor(
@@ -196,9 +175,9 @@ export class ContributorStatsComponent {
       throw new Error('Cannot fetch username.');
     }
     this.username = username;
-    const currentOption = this.options.filter(
+    const currentOption = this.options.find(
       (option) => option.contributionType === this.type);
-    this.selectedContributionType = currentOption[0].displayName;
+    this.selectedContributionType = currentOption.displayName;
 
     const userContributionRights =
       await this.userService.getUserContributionRightsDataAsync();
@@ -233,9 +212,9 @@ export class ContributorStatsComponent {
 
   async selectOption(contributionType: string): Promise<void> {
     this.type = contributionType;
-    const currentOption = this.options.filter(
+    const currentOption = this.options.find(
       (option) => option.contributionType === contributionType);
-    this.selectedContributionType = currentOption[0].displayName;
+    this.selectedContributionType = currentOption.displayName;
     this.dropdownShown = false;
     this.mobileDropdownShown = false;
   }
@@ -246,66 +225,82 @@ export class ContributorStatsComponent {
 
     if (response.translation_contribution_stats.length > 0) {
       response.translation_contribution_stats.map((stat) => {
-        if (!this.translationContributionStats[stat.language_code]) {
-          this.translationContributionStats[stat.language_code] = {
-            data: [this.createTranslationContributionStat(stat)],
-            language: this.languageUtilService.getAudioLanguageDescription(
-              stat.language_code),
-            currentStartingIndex: 0,
-            currentEndingIndex: 5
-          };
+        if (!this.statsData.translationContribution[stat.language_code]) {
+          this.statsData.translationContribution[stat.language_code] = this
+            .createTranslationContributionStatsPage(stat);
         } else {
-          this.translationContributionStats[stat.language_code].data.push(
+          this.statsData.translationContribution[stat.language_code].data.push(
             this.createTranslationContributionStat(stat));
         }
       });
-      this.statsData.translationContribution = this.
-        translationContributionStats;
-      this.statsDataAvailability.translationContribution = true;
     }
 
     if (response.translation_review_stats.length > 0) {
       response.translation_review_stats.map((stat) => {
-        if (!this.translationReviewStats[stat.language_code]) {
-          this.translationReviewStats[stat.language_code] = {
-            data: [this.createTranslationReviewStat(stat)],
-            language: this.languageUtilService.getAudioLanguageDescription(
-              stat.language_code),
-            currentStartingIndex: 0,
-            currentEndingIndex: 5
-          };
+        if (!this.statsData.translationReview[stat.language_code]) {
+          this.statsData.translationReview[stat.language_code] = this
+            .createTranslationReviewStatsPage(stat);
         } else {
-          this.translationReviewStats[stat.language_code].data.push(
+          this.statsData.translationReview[stat.language_code].data.push(
             this.createTranslationReviewStat(stat));
         }
       });
-      this.statsData.translationReview = this.translationReviewStats;
-      this.statsDataAvailability.translationReview = true;
     }
 
     if (response.question_contribution_stats.length > 0) {
-      this.questionContributionStats = {
-        data: response.question_contribution_stats.map((stat) => {
-          return this.createQuestionContributionStat(stat);
-        }),
-        currentStartingIndex: 0,
-        currentEndingIndex: 5
-      };
-      this.statsData.questionContribution = this.questionContributionStats;
-      this.statsDataAvailability.questionContribution = true;
+      this.statsData.questionContribution = this
+        .createQuestionContributionStatsPage(
+          response.question_contribution_stats);
     }
 
     if (response.question_review_stats.length > 0) {
-      this.questionReviewStats = {
-        data: response.question_review_stats.map((stat) => {
-          return this.createQuestionReviewStat(stat);
-        }),
-        currentStartingIndex: 0,
-        currentEndingIndex: 5
-      };
-      this.statsData.questionReview = this.questionReviewStats;
-      this.statsDataAvailability.questionReview = true;
+      this.statsData.questionReview = this.createQuestionReviewStatsPage(
+        response.question_review_stats);
     }
+  }
+
+  createTranslationContributionStatsPage(
+      stat: TranslationContributionBackendDict): StatsPage {
+    return {
+      data: [this.createTranslationContributionStat(stat)],
+      language: this.languageUtilService.getAudioLanguageDescription(
+        stat.language_code),
+      currentPageStartIndex: 0,
+      currentPageEndIndex: 5
+    };
+  }
+
+  createTranslationReviewStatsPage(
+      stat: TranslationReviewBackendDict): StatsPage {
+    return {
+      data: [this.createTranslationReviewStat(stat)],
+      language: this.languageUtilService.getAudioLanguageDescription(
+        stat.language_code),
+      currentPageStartIndex: 0,
+      currentPageEndIndex: 5
+    };
+  }
+
+  createQuestionContributionStatsPage(
+      stats: QuestionContributionBackendDict[]): StatsPage {
+    return {
+      data: stats.map((stat) => {
+        return this.createQuestionContributionStat(stat);
+      }),
+      currentPageStartIndex: 0,
+      currentPageEndIndex: 5
+    };
+  }
+
+  createQuestionReviewStatsPage(
+      stat: QuestionReviewBackendDict[]): StatsPage {
+    return {
+      data: stat.map((stat) => {
+        return this.createQuestionReviewStat(stat);
+      }),
+      currentPageStartIndex: 0,
+      currentPageEndIndex: 5
+    };
   }
 
   createTranslationContributionStat(
@@ -355,17 +350,17 @@ export class ContributorStatsComponent {
     };
   }
 
-  nextPage(page: Stats): void {
-    page.currentStartingIndex += this.ITEMS_PER_PAGE;
-    page.currentEndingIndex += this.ITEMS_PER_PAGE;
+  goToNextPage(page: StatsPage): void {
+    page.currentPageStartIndex += this.ITEMS_PER_PAGE;
+    page.currentPageEndIndex += this.ITEMS_PER_PAGE;
   }
 
-  previousPage(page: Stats): void {
-    page.currentStartingIndex -= this.ITEMS_PER_PAGE;
-    page.currentEndingIndex -= this.ITEMS_PER_PAGE;
+  goToPreviousPage(page: StatsPage): void {
+    page.currentPageStartIndex -= this.ITEMS_PER_PAGE;
+    page.currentPageEndIndex -= this.ITEMS_PER_PAGE;
   }
 
-  columnSortDirection(): number {
+  getColumnSortDirection(): number {
     return 0;
   }
 
