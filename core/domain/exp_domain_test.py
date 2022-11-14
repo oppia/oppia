@@ -2329,10 +2329,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'inputs': {
                         'x': [
                             [
-                            'ca_choices_0', 'ca_choices_1', 'ca_choices_2'
+                            'ca_choices_3'
                             ],
                             [
-                            'ca_choices_3'
+                            'ca_choices_0', 'ca_choices_1', 'ca_choices_2'
                             ]
                         ]
                     }
