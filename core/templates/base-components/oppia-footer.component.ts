@@ -18,6 +18,7 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import { AppConstants } from 'app.constants';
 
@@ -32,6 +33,18 @@ export class OppiaFooterComponent {
   siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+
+  constructor(
+    private platformFeatureService: PlatformFeatureService
+  ) {}
+
+  getOppiaBlogUrl(): string {
+    if (this.platformFeatureService.status.BlogPages.isEnabled) {
+      return '/blog';
+    } else {
+      return 'https://medium.com/oppia-org';
+    }
+  }
 }
 
 angular.module('oppia').directive('oppiaFooter',

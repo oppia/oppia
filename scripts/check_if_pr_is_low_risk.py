@@ -30,8 +30,7 @@ import urllib
 from core import utils
 from scripts import common
 
-from typing import Dict, List, Optional, Tuple
-from typing_extensions import Final, TypedDict
+from typing import Dict, Final, List, Optional, Tuple, TypedDict
 
 GITHUB_API_PR_ENDPOINT: Final = (
     'https://api.github.com/repos/%s/%s/pulls/%s')
@@ -110,7 +109,11 @@ def load_diff(
             return [], {}
         elif len(split) == 2:
             diff_files.append((split[1], split[1]))
-        elif len(split) == 3:
+        else:
+            # When we rule out the possibility of 'len' being less than 2 or
+            # greater than 3, 'len' can only have two values. If len is not 2,
+            # then it must be 3.
+            assert len(split) == 3
             diff_files.append((split[1], split[2]))
     file_diffs = {}
     for file_tuple in diff_files:

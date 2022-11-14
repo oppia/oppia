@@ -24,8 +24,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import Optional
-from typing_extensions import TypedDict
+from typing import Optional, TypedDict
 
 
 class TaskEntryDict(TypedDict):

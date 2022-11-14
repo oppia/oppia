@@ -131,3 +131,40 @@
   cursor: pointer;
   font-weight: 500;
 }
+
+@media screen and (max-width: 940px) {
+  .oppia-learner-group-learners-progress,
+  .learner-specific-progress-view-selectors {
+    width: 90%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-learner-group-learners-progress,
+  .learner-specific-progress-view-selectors {
+    background: #fff;
+    margin-top: 0;
+    padding: 20px;
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 540px) {
+  .learner-specific-progress-view-selectors {
+    display: grid;
+    grid-gap: 20px;
+    justify-content: unset;
+    margin: 0;
+    padding: 20px;
+    width: 100%;
+  }
+
+  .learner-specific-progress-view-selectors .learners-dropdown-toggle {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .learner-specific-progress-view-selectors .oppia-search-bar-type-selector {
+    width: 100%;
+  }
+}

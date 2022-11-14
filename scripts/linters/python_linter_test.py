@@ -22,6 +22,7 @@ import multiprocessing
 import os
 
 from core.tests import test_utils
+from typing import Dict, List
 
 from . import pre_commit_linter
 from . import python_linter
@@ -38,7 +39,7 @@ INVALID_DOCSTRING_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_docstring.py')
 
 NAME_SPACE = multiprocessing.Manager().Namespace()
-PROCESSES = multiprocessing.Manager().dict()
+PROCESSES: Dict[str, List[str]] = multiprocessing.Manager().dict()
 NAME_SPACE.files = pre_commit_linter.FileCache()
 FILE_CACHE = NAME_SPACE.files
 
@@ -46,7 +47,7 @@ FILE_CACHE = NAME_SPACE.files
 class PythonLintChecksManagerTests(test_utils.LinterTestBase):
     """Test for python linter."""
 
-    def test_unsorted_import_order(self):
+    def test_unsorted_import_order(self) -> None:
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             [INVALID_IMPORT_FILEPATH]).check_import_order()
         self.assert_same_list_elements([
@@ -54,7 +55,7 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('Import order', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_sorted_import_order(self):
+    def test_sorted_import_order(self) -> None:
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             [VALID_PY_FILEPATH]).check_import_order()
         self.assertEqual(
@@ -63,7 +64,7 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('Import order', lint_task_report.name)
         self.assertFalse(lint_task_report.failed)
 
-    def test_valid_file_with_pylint(self):
+    def test_valid_file_with_pylint(self) -> None:
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             [VALID_PY_FILEPATH]).lint_py_files()
         self.assertEqual(
@@ -71,7 +72,7 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('Pylint', lint_task_report.name)
         self.assertFalse(lint_task_report.failed)
 
-    def test_invalid_file_with_pylint_error(self):
+    def test_invalid_file_with_pylint_error(self) -> None:
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             [INVALID_DOCSTRING_FILEPATH]).lint_py_files()
         self.assert_same_list_elements(
@@ -80,7 +81,7 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('Pylint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_get_trimmed_error_output(self):
+    def test_get_trimmed_error_output(self) -> None:
         lint_message = (
             '************* Module oppia.scripts.linters.test_files.invalid_'
             'docstring\n\n\n'
@@ -99,7 +100,7 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
             'invalid_docstring\n\n\nW: 27, 0: Period is not used at '
             'the end of the docstring. \n')
 
-    def test_third_party_linter_with_no_files(self):
+    def test_third_party_linter_with_no_files(self) -> None:
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             []).perform_all_lint_checks()
         self.assert_same_list_elements(
@@ -108,12 +109,12 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('Python lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 
-    def test_third_party_perform_all_lint_checks(self):
+    def test_third_party_perform_all_lint_checks(self) -> None:
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             [INVALID_PYCODESTYLE_FILEPATH]).perform_all_lint_checks()
         self.assertTrue(isinstance(lint_task_report, list))
 
-    def test_pycodestyle_with_error_message(self):
+    def test_pycodestyle_with_error_message(self) -> None:
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             [INVALID_PYCODESTYLE_FILEPATH]).lint_py_files()
         print(lint_task_report.trimmed_messages)
@@ -123,7 +124,7 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('Pylint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_get_linters_with_success(self):
+    def test_get_linters_with_success(self) -> None:
         custom_linter, third_party_linter = python_linter.get_linters(
             [VALID_PY_FILEPATH])
         self.assertIsNone(custom_linter)

@@ -197,6 +197,15 @@ const routes: Route[] = [
       .then(m => m.VolunteerPageModule)
   },
   {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_VIEWER.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/learner-group-pages/view-group/view-learner-group-page.module')
+      .then(m => m.ViewLearnerGroupPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.ROUTE,
     pathMatch: 'full',
     loadChildren: () => import(
@@ -211,6 +220,15 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/blog-home-page/blog-home-page.module')
       .then(m => m.BlogHomePageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_AUTHOR_PROFILE_PAGE.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-author-profile-page/blog-author-profile-page.module')
+      .then(m => m.BlogAuthorProfilePageModule)
   },
   {
     path: (

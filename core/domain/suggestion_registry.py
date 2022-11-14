@@ -40,9 +40,7 @@ from core.domain import user_services
 from core.platform import models
 
 from typing import (
-    Any, Callable, Dict, List, Mapping, Optional, Set, Type, Union
-)
-from typing_extensions import TypedDict
+    Any, Callable, Dict, List, Mapping, Optional, Set, Type, TypedDict, Union)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -697,6 +695,9 @@ class SuggestionTranslateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.change.language_code)
 
+        if isinstance(self.change.translation_html, str):
+            html_cleaner.validate_rte_tags(self.change.translation_html)
+
         if self.language_code is None:
             raise utils.ValidationError('language_code cannot be None')
 
@@ -1152,259 +1153,6 @@ class SuggestionAddQuestion(BaseSuggestion):
         )
 
 
-class BaseVoiceoverApplicationDict(TypedDict):
-    """Dictionary representing the BaseVoiceoverApplication object."""
-
-    voiceover_application_id: str
-    target_type: str
-    target_id: str
-    status: str
-    author_name: str
-    final_reviewer_name: Optional[str]
-    language_code: str
-    filename: str
-    content: str
-    rejection_message: Optional[str]
-
-
-class BaseVoiceoverApplication:
-    """Base class for a voiceover application."""
-
-    # Here, we explicitly defined all the attributes that are used in
-    # BaseVoiceoverApplication because in `to_dict`, `get_author_name`
-    # and other methods too we are accessing these attributes but due
-    # to the lack of definition in main implementation the types of
-    # these attributes are not available which causes MyPy to throw
-    # undefined attribute error for all attributes that are used in
-    # BaseVoiceoverApplication. Thus to provide the type-info to MyPy
-    # about these attributes, we defined them as class variables.
-    voiceover_application_id: str
-    target_type: str
-    target_id: str
-    status: str
-    author_id: str
-    final_reviewer_id: Optional[str]
-    language_code: str
-    filename: str
-    content: str
-    rejection_message: Optional[str]
-
-    def __init__(self) -> None:
-        """Initializes a GeneralVoiceoverApplication object."""
-        raise NotImplementedError(
-            'Subclasses of BaseVoiceoverApplication should implement __init__.')
-
-    def to_dict(self) -> BaseVoiceoverApplicationDict:
-        """Returns a dict representation of a voiceover application object.
-
-        Returns:
-            dict. A dict representation of a voiceover application object.
-        """
-        return {
-            'voiceover_application_id': self.voiceover_application_id,
-            'target_type': self.target_type,
-            'target_id': self.target_id,
-            'status': self.status,
-            'author_name': self.get_author_name(),
-            'final_reviewer_name': (
-                None if self.final_reviewer_id is None else (
-                    self.get_final_reviewer_name())),
-            'language_code': self.language_code,
-            'content': self.content,
-            'filename': self.filename,
-            'rejection_message': self.rejection_message
-        }
-
-    def get_author_name(self) -> str:
-        """Returns the author's username.
-
-        Returns:
-            str. The username of the author of the voiceover application.
-        """
-        return user_services.get_username(self.author_id)
-
-    def get_final_reviewer_name(self) -> str:
-        """Returns the reviewer's username.
-
-        Returns:
-            str. The username of the reviewer of the voiceover application.
-        """
-        # In `to_dict` method we are calling this method only when
-        # final_reviewer_id exists. So, here final_reviewer_id is
-        # never going to None and to just narrow down the type from
-        # Optional[str] to str, we used assertion here.
-        assert self.final_reviewer_id is not None
-        return user_services.get_username(self.final_reviewer_id)
-
-    def validate(self) -> None:
-        """Validates the BaseVoiceoverApplication object.
-
-        Raises:
-            ValidationError. One or more attributes of the
-                BaseVoiceoverApplication object are invalid.
-        """
-
-        if self.target_type not in feconf.SUGGESTION_TARGET_TYPE_CHOICES:
-            raise utils.ValidationError(
-                'Expected target_type to be among allowed choices, '
-                'received %s' % self.target_type)
-
-        if not isinstance(self.target_id, str):
-            raise utils.ValidationError(
-                'Expected target_id to be a string, received %s' % type(
-                    self.target_id))
-
-        if self.status not in suggestion_models.STATUS_CHOICES:
-            raise utils.ValidationError(
-                'Expected status to be among allowed choices, '
-                'received %s' % self.status)
-
-        if not isinstance(self.author_id, str):
-            raise utils.ValidationError(
-                'Expected author_id to be a string, received %s' % type(
-                    self.author_id))
-        if self.status == suggestion_models.STATUS_IN_REVIEW:
-            if self.final_reviewer_id is not None:
-                raise utils.ValidationError(
-                    'Expected final_reviewer_id to be None as the '
-                    'voiceover application is not yet handled.')
-        else:
-            if not isinstance(self.final_reviewer_id, str):
-                raise utils.ValidationError(
-                    'Expected final_reviewer_id to be a string, received %s' % (
-                        type(self.final_reviewer_id)))
-            if self.status == suggestion_models.STATUS_REJECTED:
-                if not isinstance(self.rejection_message, str):
-                    raise utils.ValidationError(
-                        'Expected rejection_message to be a string for a '
-                        'rejected application, received %s' % type(
-                            self.final_reviewer_id))
-            if self.status == suggestion_models.STATUS_ACCEPTED:
-                if self.rejection_message is not None:
-                    raise utils.ValidationError(
-                        'Expected rejection_message to be None for the '
-                        'accepted voiceover application, received %s' % (
-                            self.rejection_message))
-
-        if not isinstance(self.language_code, str):
-            raise utils.ValidationError(
-                'Expected language_code to be a string, received %s' %
-                self.language_code)
-        if not utils.is_supported_audio_language_code(self.language_code):
-            raise utils.ValidationError(
-                'Invalid language_code: %s' % self.language_code)
-
-        if not isinstance(self.filename, str):
-            raise utils.ValidationError(
-                'Expected filename to be a string, received %s' % type(
-                    self.filename))
-
-        if not isinstance(self.content, str):
-            raise utils.ValidationError(
-                'Expected content to be a string, received %s' % type(
-                    self.content))
-
-    def accept(self, reviewer_id: str) -> None:
-        """Accepts the voiceover application. Each subclass must implement this
-        function.
-        """
-        raise NotImplementedError(
-            'Subclasses of BaseVoiceoverApplication should implement accept.')
-
-    def reject(self, reviewer_id: str, rejection_message: str) -> None:
-        """Rejects the voiceover application. Each subclass must implement this
-        function.
-        """
-        raise NotImplementedError(
-            'Subclasses of BaseVoiceoverApplication should implement reject.')
-
-    @property
-    def is_handled(self) -> bool:
-        """Returns true if the voiceover application has either been accepted or
-        rejected.
-
-        Returns:
-            bool. Whether the voiceover application has been handled or not.
-        """
-        return self.status != suggestion_models.STATUS_IN_REVIEW
-
-
-class ExplorationVoiceoverApplication(BaseVoiceoverApplication):
-    """Domain object for a voiceover application for exploration."""
-
-    def __init__( # pylint: disable=super-init-not-called
-        self,
-        voiceover_application_id: str,
-        target_id: str,
-        status: str,
-        author_id: str,
-        final_reviewer_id: Optional[str],
-        language_code: str,
-        filename: str,
-        content: str,
-        rejection_message: Optional[str]
-    ) -> None:
-        """Initializes a ExplorationVoiceoverApplication domain object.
-
-        Args:
-            voiceover_application_id: str. The ID of the voiceover application.
-            target_id: str. The ID of the target entity.
-            status: str. The status of the voiceover application.
-            author_id: str. The ID of the user who submitted the voiceover
-                application.
-            final_reviewer_id: str|None. The ID of the reviewer who has
-                accepted/rejected the voiceover application.
-            language_code: str. The language code for the voiceover application.
-            filename: str. The filename of the voiceover audio.
-            content: str. The html content which is voiceover in the
-                application.
-            rejection_message: str|None. The plain text message submitted by the
-                reviewer while rejecting the application or None, if status is
-                accepted.
-        """
-        self.voiceover_application_id = voiceover_application_id
-        self.target_type = feconf.ENTITY_TYPE_EXPLORATION
-        self.target_id = target_id
-        self.status = status
-        self.author_id = author_id
-        self.final_reviewer_id = final_reviewer_id
-        self.language_code = language_code
-        self.filename = filename
-        self.content = content
-        self.rejection_message = rejection_message
-
-    def accept(self, reviewer_id: str) -> None:
-        """Accepts the voiceover application and updates the final_reviewer_id.
-
-        Args:
-            reviewer_id: str. The user ID of the reviewer.
-        """
-        self.final_reviewer_id = reviewer_id
-        self.status = suggestion_models.STATUS_ACCEPTED
-        self.validate()
-
-    def reject(self, reviewer_id: str, rejection_message: str) -> None:
-        """Rejects the voiceover application, updates the final_reviewer_id and
-        adds rejection message.
-
-        Args:
-            reviewer_id: str. The user ID of the reviewer.
-            rejection_message: str. The rejection message submitted by the
-                reviewer.
-        """
-        self.status = suggestion_models.STATUS_REJECTED
-        self.final_reviewer_id = reviewer_id
-        self.rejection_message = rejection_message
-        self.validate()
-
-
-VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES: Dict[
-    str, Type[ExplorationVoiceoverApplication]
-] = {
-    feconf.ENTITY_TYPE_EXPLORATION: (
-        ExplorationVoiceoverApplication)
-}
-
 SUGGESTION_TYPES_TO_DOMAIN_CLASSES: Dict[
     str,
     Union[
@@ -1645,6 +1393,24 @@ class TranslationContributionStatsDict(TypedDict):
     contribution_dates: Set[datetime.date]
 
 
+class TranslationContributionStatsFrontendDict(TypedDict):
+    """Dictionary representing the TranslationContributionStats
+    object for frontend.
+    """
+
+    language_code: Optional[str]
+    topic_id: Optional[str]
+    submitted_translations_count: int
+    submitted_translation_word_count: int
+    accepted_translations_count: int
+    accepted_translations_without_reviewer_edits_count: int
+    accepted_translation_word_count: int
+    rejected_translations_count: int
+    rejected_translation_word_count: int
+    first_contribution_date: str
+    last_contribution_date: str
+
+
 class TranslationContributionStats:
     """Domain object for the TranslationContributionStatsModel."""
 
@@ -1728,6 +1494,37 @@ class TranslationContributionStats:
             'contribution_dates': self.contribution_dates
         }
 
+    # TODO(#16051): TranslationContributionStats to use first_contribution_date
+    # and last_contribution_date.
+    def to_frontend_dict(self) -> TranslationContributionStatsFrontendDict:
+        """Returns a dict representation of a TranslationContributionStats
+        domain object for frontend.
+
+        Returns:
+            dict. A dict representation of a TranslationContributionStats
+            domain object for frontend.
+        """
+        sorted_contribution_dates = sorted(self.contribution_dates)
+        return {
+            'language_code': self.language_code,
+            'topic_id': self.topic_id,
+            'submitted_translations_count': self.submitted_translations_count,
+            'submitted_translation_word_count': (
+                self.submitted_translation_word_count),
+            'accepted_translations_count': self.accepted_translations_count,
+            'accepted_translations_without_reviewer_edits_count': (
+                self.accepted_translations_without_reviewer_edits_count),
+            'accepted_translation_word_count': (
+                self.accepted_translation_word_count),
+            'rejected_translations_count': self.rejected_translations_count,
+            'rejected_translation_word_count': (
+                self.rejected_translation_word_count),
+            'first_contribution_date': (
+                sorted_contribution_dates[0].strftime('%b %Y')),
+            'last_contribution_date': (
+                sorted_contribution_dates[-1].strftime('%b %Y'))
+        }
+
 
 class TranslationReviewStatsDict(TypedDict):
     """Dictionary representing the TranslationReviewStats object."""
@@ -1742,6 +1539,22 @@ class TranslationReviewStatsDict(TypedDict):
     accepted_translations_with_reviewer_edits_count: int
     first_contribution_date: datetime.date
     last_contribution_date: datetime.date
+
+
+class TranslationReviewStatsFrontendDict(TypedDict):
+    """Dictionary representing the TranslationReviewStats
+    object for frontend.
+    """
+
+    language_code: str
+    topic_id: str
+    reviewed_translations_count: int
+    reviewed_translation_word_count: int
+    accepted_translations_count: int
+    accepted_translation_word_count: int
+    accepted_translations_with_reviewer_edits_count: int
+    first_contribution_date: str
+    last_contribution_date: str
 
 
 class TranslationReviewStats:
@@ -1797,6 +1610,31 @@ class TranslationReviewStats:
             'last_contribution_date': self.last_contribution_date,
         }
 
+    def to_frontend_dict(self) -> TranslationReviewStatsFrontendDict:
+        """Returns a dict representation of a TranslationReviewStats
+        domain object for frontend.
+
+        Returns:
+            dict. A dict representation of a TranslationReviewStats
+            domain object for frontend.
+        """
+        return {
+            'language_code': self.language_code,
+            'topic_id': self.topic_id,
+            'reviewed_translations_count': self.reviewed_translations_count,
+            'reviewed_translation_word_count': (
+                self.reviewed_translation_word_count),
+            'accepted_translations_count': self.accepted_translations_count,
+            'accepted_translation_word_count': (
+                self.accepted_translation_word_count),
+            'accepted_translations_with_reviewer_edits_count': (
+                self.accepted_translations_with_reviewer_edits_count),
+            'first_contribution_date': (
+                self.first_contribution_date.strftime('%b %Y')),
+            'last_contribution_date': (
+                self.last_contribution_date.strftime('%b %Y'))
+        }
+
 
 class QuestionContributionStatsDict(TypedDict):
     """Dictionary representing the QuestionContributionStats object."""
@@ -1808,6 +1646,19 @@ class QuestionContributionStatsDict(TypedDict):
     accepted_questions_without_reviewer_edits_count: int
     first_contribution_date: datetime.date
     last_contribution_date: datetime.date
+
+
+class QuestionContributionStatsFrontendDict(TypedDict):
+    """Dictionary representing the QuestionContributionStats
+    object for frontend.
+    """
+
+    topic_id: str
+    submitted_questions_count: int
+    accepted_questions_count: int
+    accepted_questions_without_reviewer_edits_count: int
+    first_contribution_date: str
+    last_contribution_date: str
 
 
 class QuestionContributionStats:
@@ -1854,6 +1705,27 @@ class QuestionContributionStats:
             'last_contribution_date': self.last_contribution_date
         }
 
+    def to_frontend_dict(self) -> QuestionContributionStatsFrontendDict:
+        """Returns a dict representation of a QuestionContributionStats
+        domain object for frontend.
+
+        Returns:
+            dict. A dict representation of a QuestionContributionStats
+            domain object for frontend.
+        """
+        return {
+            'topic_id': self.topic_id,
+            'submitted_questions_count': self.submitted_questions_count,
+            'accepted_questions_count': (
+                self.accepted_questions_count),
+            'accepted_questions_without_reviewer_edits_count': (
+                self.accepted_questions_without_reviewer_edits_count),
+            'first_contribution_date': (
+                self.first_contribution_date.strftime('%b %Y')),
+            'last_contribution_date': (
+                self.last_contribution_date.strftime('%b %Y'))
+        }
+
 
 class QuestionReviewStatsDict(TypedDict):
     """Dictionary representing the QuestionReviewStats object."""
@@ -1865,6 +1737,19 @@ class QuestionReviewStatsDict(TypedDict):
     accepted_questions_with_reviewer_edits_count: int
     first_contribution_date: datetime.date
     last_contribution_date: datetime.date
+
+
+class QuestionReviewStatsFrontendDict(TypedDict):
+    """Dictionary representing the QuestionReviewStats
+    object for frontend.
+    """
+
+    topic_id: str
+    reviewed_questions_count: int
+    accepted_questions_count: int
+    accepted_questions_with_reviewer_edits_count: int
+    first_contribution_date: str
+    last_contribution_date: str
 
 
 class QuestionReviewStats:
@@ -1909,6 +1794,27 @@ class QuestionReviewStats:
             'first_contribution_date': (
                 self.first_contribution_date),
             'last_contribution_date': self.last_contribution_date
+        }
+
+    def to_frontend_dict(self) -> QuestionReviewStatsFrontendDict:
+        """Returns a dict representation of a QuestionContributionStats
+        domain object for frontend.
+
+        Returns:
+            dict. A dict representation of a QuestionContributionStats
+            domain object for frontend.
+        """
+        return {
+            'topic_id': self.topic_id,
+            'reviewed_questions_count': self.reviewed_questions_count,
+            'accepted_questions_count': (
+                self.accepted_questions_count),
+            'accepted_questions_with_reviewer_edits_count': (
+                self.accepted_questions_with_reviewer_edits_count),
+            'first_contribution_date': (
+                self.first_contribution_date.strftime('%b %Y')),
+            'last_contribution_date': (
+                self.last_contribution_date.strftime('%b %Y'))
         }
 
 
