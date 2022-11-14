@@ -18,11 +18,14 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
+from core import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import blog_domain
+from core.domain import blog_statistics_domain
 from core.domain import blog_services
+from core.domain import blog_statistics_services
 from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
@@ -250,4 +253,120 @@ class BlogPostHandler(base.BaseHandler):
         """Handles Delete requests."""
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_services.delete_blog_post(blog_post_id)
+        self.render_json(self.values)
+
+
+class BlogDashboardBlogPostStatisticsHandler(base.BaseHandler):
+    """Handler for blog dashboard statistics tab for blog post."""
+    
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'blog_post_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'chart_type': {
+            'schema': {
+                'type': 'basestring',
+                'choices': [
+                    'views_chart',
+                    'reads_chart',
+                    'reading_time'
+                ]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_blog_dashboard
+    def get(self, blog_post_id: str, chart_type: str) -> None:
+        """Populates the data for generating statistics plot."""
+        if chart_type == 'views_chart':
+            stats = blog_statistics_services.get_blog_post_views_stats_by_id(
+                blog_post_id
+            )
+            blog_statistics_services.add_missing_stat_keys_with_default_values_in_views_stats( # pylint: disable=line-too-long
+                stats
+            )
+        elif chart_type == 'reads_chart':
+            stats = blog_statistics_services.get_blog_post_reads_stats_by_id(
+                blog_post_id
+            )
+            blog_statistics_services.add_missing_stat_keys_with_default_values_in_reads_stats( # pylint: disable=line-too-long
+                stats
+            )
+        else:
+            stats = (
+                blog_statistics_services.get_blog_post_reading_time_stats_by_id(
+                    blog_post_id
+                )
+            )
+        stats_dict = stats.to_frontend_dict()
+
+        self.values.update({
+            'chart_type': chart_type,
+            'stats': stats_dict
+        })
+
+        self.render_json(self.values)
+
+
+class BlogDashboardAuthorBlogPostsStatisticsHandler(base.BaseHandler):
+    """Handler for blog dashboard statistics tab for author"""
+    
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'chart_type': {
+            'schema': {
+                'type': 'basestring',
+                'choices': [
+                    'views_chart',
+                    'reads_chart',
+                    'reading_time'
+                ]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_blog_dashboard
+    def get(self, chart_type: str) -> None:
+        """Populates the data for generating author statistics plot."""
+        author_id = self.user_id
+        if chart_type == 'views_chart':
+            stats = (
+                blog_statistics_services.get_author_blog_post_views_stats_by_id(
+                    author_id
+                )
+            )
+            blog_statistics_services.add_missing_stat_keys_with_default_values_in_views_stats( # pylint: disable=line-too-long
+                stats
+            )
+        elif chart_type == 'reads_chart':
+            stats = (
+                blog_statistics_services.get_author_blog_post_reads_stats_by_id(
+                    author_id
+                )
+            )
+            blog_statistics_services.add_missing_stat_keys_with_default_values_in_reads_stats( # pylint: disable=line-too-long
+                stats
+            )
+        else:
+            stats = (
+                blog_statistics_services.get_author_blog_posts_reading_time_stats_by_id( # pylint: disable=line-too-long
+                    author_id
+                )
+            )
+        stats_dict = stats.to_frontend_dict()
+
+        self.values.update({
+            'chart_type': chart_type,
+            'stats': stats_dict
+        })
+
         self.render_json(self.values)

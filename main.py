@@ -506,6 +506,18 @@ URLS = [
         r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_DATA_URL,
         blog_homepage.BlogPostDataHandler),
     get_redirect_route(
+        r'%s/blog_post_viewed_event/<blog_post_url>'
+        % feconf.BLOG_HOMEPAGE_DATA_URL,
+        blog_homepage.BlogPostViewsStatisticsDataHandler),
+    get_redirect_route(
+        r'%s/blog_post_read_event/<blog_post_url>'
+        % feconf.BLOG_HOMEPAGE_DATA_URL,
+        blog_homepage.BlogPostReadStatisticsDataHandler),
+    get_redirect_route(
+        r'%s/blog_post_exited_event/<blog_post_url>'
+        % feconf.BLOG_HOMEPAGE_DATA_URL,
+        blog_homepage.BlogPostExitedStatisticsDataHandler),
+    get_redirect_route(
         r'%s/<author_username>' %
         feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX,
         blog_homepage.AuthorsPageHandler),

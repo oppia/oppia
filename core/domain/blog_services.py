@@ -39,8 +39,10 @@ from typing import (
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import blog_models
+    from mypy_imports import blog_stats_models
 
-(blog_models,) = models.Registry.import_models([models.Names.BLOG])
+(blog_models, blog_stats_models, ) = models.Registry.import_models(
+    [models.Names.BLOG, models.Names.BLOG_STATISTICS])
 
 # The maximum number of iterations allowed for populating the results of a
 # search query.
@@ -481,11 +483,12 @@ def publish_blog_post(blog_post_id: str) -> None:
     blog_post.validate(strict=True)
     blog_post_summary = get_blog_post_summary_by_id(blog_post_id, strict=True)
     blog_post_summary.validate(strict=True)
-    blog_post_rights.blog_post_is_published = True
-
-    published_on = datetime.datetime.utcnow()
-    blog_post.published_on = published_on
-    blog_post_summary.published_on = published_on
+   
+    if not blog_post_rights.blog_post_is_published:
+        blog_post_rights.blog_post_is_published = True
+        published_on = datetime.datetime.utcnow()
+        blog_post.published_on = published_on
+        blog_post_summary.published_on = published_on
 
     save_blog_post_rights(blog_post_rights)
     _save_blog_post_summary(blog_post_summary)
@@ -772,6 +775,17 @@ def create_new_blog_post(author_id: str) -> blog_domain.BlogPost:
     _save_blog_post_summary(new_blog_post_summary_model)
 
     return new_blog_post
+
+
+def create_blog_post_stats_models(blog_post_id: str) -> None:
+    """Creates blog post stats models for a newly published blog post.
+
+    Args:
+        blog_post_id: str. The blog post ID of the newly published blog post
+    """
+    blog_stats_models.BlogPostReadsAggregatedStatsModel.create(blog_post_id)
+    blog_stats_models.BlogPostViewsAggregatedStatsModel.create(blog_post_id)
+    blog_stats_models.BlogPostReadingTimeModel.create(blog_post_id)
 
 
 def get_published_blog_post_summaries(

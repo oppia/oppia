@@ -99,6 +99,13 @@
             </mat-list-item>
           </mat-list>
         </mat-tab>
+        <mat-tab class="blog-statistics-tab-container">
+          <ng-template mat-tab-label>
+            {{ 'I18N_BLOG_DASHBOARD_TAB_STATISTICS' | translate | uppercase }}
+          </ng-template>
+          <oppia-blog-statistics-tab>
+          </oppia-blog-statistics-tab>
+        </mat-tab>
       </mat-tab-group>
     </mat-card-content>
   </mat-card>
@@ -282,4 +289,13 @@
       padding-right: 10px;
     }
   }
+
+  @media(min-width: 880px) {
+    :host /deep/ .blog-statistics-tab-container .mat-tab-body-wrapper {
+    margin-left: -35px;
+    margin-right: -45px;
+    }
+  }
+
+
 </style>

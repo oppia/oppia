@@ -16,7 +16,7 @@
  * @fileoverview Data and component for the blog post page.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { BlogPostPageData } from 'domain/blog/blog-homepage-backend-api.service';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { BlogPostData } from 'domain/blog/blog-post.model';
@@ -24,6 +24,8 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { UrlService } from 'services/contextual/url.service';
 import { BlogPostPageConstants } from './blog-post-page.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { BlogHomePageBackendApiService } from 'domain/blog/blog-homepage-backend-api.service';
+import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import dayjs from 'dayjs';
 
 import './blog-post-page.component.css';
@@ -32,13 +34,14 @@ import './blog-post-page.component.css';
   selector: 'oppia-blog-post-page',
   templateUrl: './blog-post-page.component.html'
 })
-export class BlogPostPageComponent implements OnInit {
+export class BlogPostPageComponent implements OnInit, OnDestroy {
   @Input() blogPostPageData!: BlogPostPageData;
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST!: number;
+  NUM_WORDS_READ_PER_MIN = BlogPostPageConstants.NORMAL_READING_SPEED;
   blogPostUrlFragment!: string;
   blogPost!: BlogPostData;
   publishedDateString: string = '';
@@ -46,11 +49,19 @@ export class BlogPostPageComponent implements OnInit {
   DEFAULT_PROFILE_PICTURE_URL!: string;
   postsToRecommend: BlogPostSummary[] = [];
   blogPostLinkCopied: boolean = false;
+  blogPostPageIsHidden!: string;
+  visibilityChange!: string;
+  timeUserStartedViewingPost!: number;
+  activeTimeUserStayedOnPostInMinutes: number = 0;
+  blogPostExitedEventFired: boolean = false;
+  blogPostReadEventFired: boolean = false;
 
   constructor(
     private windowDimensionsService: WindowDimensionsService,
     private urlService: UrlService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private blogHomePageBackendApiService: BlogHomePageBackendApiService,
+    private convertToPlainTextPipe: ConvertToPlainTextPipe,
   ) {}
 
   ngOnInit(): void {
@@ -66,6 +77,48 @@ export class BlogPostPageComponent implements OnInit {
       this.publishedDateString = this.getDateStringInWords(
         this.blogPost.publishedOn);
     }
+    this.blogHomePageBackendApiService.recordBlogPostViewedEvent(
+      this.blogPostUrlFragment
+    );
+    if (typeof document.hidden !== 'undefined') {
+      this.blogPostPageIsHidden = 'hidden';
+      this.visibilityChange = 'visibilitychange';
+    }
+    document.addEventListener(
+      this.visibilityChange, this.handleVisibilityChange, false
+    );
+    this.timeUserStartedViewingPost = new Date().getTime();
+    // If user stays on the blog post for more than 45 minutes or
+    // 5 time estimated reading time, which ever is greater, we fire the blog
+    // post exited event.
+    setTimeout(() => {
+      this.recordBlogPostExitedEvent();
+    }, Math.max(45, this.calculateEstimatedReadingTimeInMinutes() * 5));
+  }
+
+  ngOnDestroy(): void {
+    let timeUserExitedFromPost: number = new Date().getTime();
+    if (!this.blogPostExitedEventFired) {
+      this.recordBlogPostExitedEvent();
+    }
+    this.activeTimeUserStayedOnPostInMinutes += (
+      (timeUserExitedFromPost - this.timeUserStartedViewingPost) / 60000);
+    if (this.isBlogPostRead() && !this.blogPostReadEventFired) {
+      this.recordBlogPostReadEvent();
+    }
+  }
+
+  recordBlogPostExitedEvent(): void {
+    this.blogHomePageBackendApiService.recordBlogPostExitedEvent(
+      this.blogPostUrlFragment, this.activeTimeUserStayedOnPostInMinutes
+    );
+    this.blogPostExitedEventFired = true;
+  }
+
+  recordBlogPostReadEvent(): void {
+    this.blogHomePageBackendApiService.recordBlogPostReadEvent(
+      this.blogPostUrlFragment
+    );
   }
 
   getPageUrl(): string {
@@ -100,5 +153,39 @@ export class BlogPostPageComponent implements OnInit {
 
   isSmallScreenViewActive(): boolean {
     return this.windowDimensionsService.getWidth() <= 900;
+  }
+
+  handleVisibilityChange(): void {
+    if (document[this.blogPostPageIsHidden]) {
+      let timeUserMovedAwayFromPost: number = new Date().getTime();
+      this.activeTimeUserStayedOnPostInMinutes += (
+        (timeUserMovedAwayFromPost - this.timeUserStartedViewingPost) / 60000);
+      if (this.isBlogPostRead() && !this.blogPostReadEventFired) {
+        this.recordBlogPostReadEvent();
+      }
+    } else {
+      this.timeUserStartedViewingPost = new Date().getTime();
+    }
+  }
+
+  calculateEstimatedReadingTimeInMinutes(): number {
+    let numOfWordsInBlogPostContent = (
+      this.convertToPlainTextPipe.transform(
+        this.blogPost.content).split(' ').length
+    );
+    return (numOfWordsInBlogPostContent / this.NUM_WORDS_READ_PER_MIN);
+  }
+
+  isBlogPostRead(): boolean {
+    // If a user actively stays on a blog post for more than 50% of the
+    // calculated reading time of the blog post, we consider blogpost to be
+    // read by the user.
+    return (
+      (
+        this.activeTimeUserStayedOnPostInMinutes
+      ) > (
+        this.calculateEstimatedReadingTimeInMinutes() * 0.5
+      )
+    );
   }
 }
