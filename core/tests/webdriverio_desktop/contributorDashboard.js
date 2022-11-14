@@ -577,6 +577,11 @@ describe('Contributor dashboard accomplishments', function() {
 
     await users.createAndLoginCurriculumAdminUser(ADMIN_EMAIL, 'management');
 
+    await adminPage.getFeaturesTab();
+    var accomplishmentsFeature = await adminPage
+      .geContributorDashboardAccomplishmentsFeatureElement();
+    await adminPage.enableFeatureForDev(accomplishmentsFeature);
+
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_NAMES[0], 'community-topic-one', 'Topic description 1', false);
