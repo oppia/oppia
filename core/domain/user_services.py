@@ -1739,7 +1739,7 @@ def update_email_preferences(
     if not bulk_email_db_already_updated and feconf.CAN_SEND_EMAILS:
         user_creation_successful = (
             bulk_email_services.add_or_update_user_status(
-                email, {}, 'Web',
+                email, {}, 'Account',
                 can_receive_email_updates=can_receive_email_updates))
         if not user_creation_successful:
             email_preferences_model.site_updates = False
@@ -2306,7 +2306,8 @@ def allow_user_to_review_translation_in_language(
     user_contribution_rights = get_user_contribution_rights(user_id)
     allowed_language_codes = set(
         user_contribution_rights.can_review_translation_for_language_codes)
-    allowed_language_codes.add(language_code)
+    if language_code is not None:
+        allowed_language_codes.add(language_code)
     user_contribution_rights.can_review_translation_for_language_codes = (
         sorted(list(allowed_language_codes)))
     _save_user_contribution_rights(user_contribution_rights)
