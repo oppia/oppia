@@ -33,7 +33,7 @@ class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
 
         with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_bulk_email_services.add_or_update_user_status(
-                'test@example.com', True)
+                'test@example.com', {}, 'Web', can_receive_email_updates=True)
             self.assertItemsEqual(
                 observed_log_messages,
                 ['Updated status of email ID test@example.com\'s bulk email '
@@ -42,7 +42,7 @@ class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
 
             observed_log_messages = []
             dev_mode_bulk_email_services.add_or_update_user_status(
-                'test@example.com', False)
+                'test@example.com', {}, 'Web', can_receive_email_updates=False)
             self.assertItemsEqual(
                 observed_log_messages,
                 ['Updated status of email ID test@example.com\'s bulk email '

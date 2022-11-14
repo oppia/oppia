@@ -50,6 +50,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   solutionModalIsActive: boolean = false;
   currentlyOnLatestCard: boolean = true;
   isVisible: boolean = true;
+  isTooltipForSolutionVisible: boolean = true;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -172,6 +173,10 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
 
   isTooltipVisible(): boolean {
     return this.hintsAndSolutionManagerService.isHintTooltipOpen();
+  }
+
+  isSolutionTooltipVisible(): boolean {
+    return this.hintsAndSolutionManagerService.isSolutionTooltipOpen();
   }
 
   isHintConsumed(hintIndex: number): boolean {

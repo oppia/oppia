@@ -40,7 +40,7 @@ interface DeleteBlogPostBackendResponse {
 
 interface BlogPostEditorBackendResponse {
   'blog_post_dict': BlogPostBackendDict;
-  'username': string;
+  'displayed_author_name': string;
   'profile_picture_data_url': string;
   'max_no_of_tags': number;
   'list_of_default_tags': string[];
@@ -48,7 +48,7 @@ interface BlogPostEditorBackendResponse {
 
 export interface BlogPostEditorData {
   blogPostDict: BlogPostData;
-  username: string;
+  displayedAuthorName: string;
   profilePictureDataUrl: string;
   maxNumOfTags: number;
   listOfDefaulTags: string[];
@@ -74,7 +74,7 @@ export class BlogPostEditorBackendApiService {
         blogPostDataUrl).toPromise().then(
         (response) => {
           resolve({
-            username: response.username,
+            displayedAuthorName: response.displayed_author_name,
             blogPostDict: BlogPostData.createFromBackendDict(
               response.blog_post_dict),
             maxNumOfTags: response.max_no_of_tags,
