@@ -10,7 +10,7 @@
           </div>
           
           <div *ngIf="mobileDropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
-            <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
+            <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option e2e-test-{{option.contributionType}}"
                   *ngFor="let option of options"
                   (click)="selectOption(option.contributionType)"
                   [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
@@ -44,7 +44,7 @@
       </div>
     </div>
     <div *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-cards-container">
-      <mat-card *ngFor="let block of statsData[type] | keyvalue" layout="row" class="list-view-item">
+      <mat-card *ngFor="let block of statsData[type] | keyvalue" layout="row" class="list-view-item e2e-test-stats-card">
         <div>
           {{selectedContributionType}} - {{block.value.language}}
         </div>
@@ -190,14 +190,14 @@
         </div>
       </mat-card>
       <mat-card *ngIf="!statsDataAvailability[type]" layout="row" class="list-view-item oppia-contributions-required-message-container">
-        <div class="oppia-contributions-required-message">
+        <div class="oppia-contributions-required-message e2e-test-stats-loading-placeholder">
           Start contributing to see your stats!
         </div>
       </mat-card>
     </div>
 
     <div *ngIf="type == 'questionContribution' || type == 'questionReview'" class="stats-cards-container">
-        <mat-card layout="row" class="list-view-item">
+        <mat-card layout="row" class="list-view-item e2e-test-stats-card">
           <div>
             {{selectedContributionType}}
           </div>
@@ -324,7 +324,7 @@
           </div>
         </mat-card>
         <mat-card *ngIf="!statsDataAvailability[type]" layout="row" class="list-view-item oppia-contributions-required-message-container">
-          <div class="oppia-contributions-required-message">
+          <div class="oppia-contributions-required-message e2e-test-stats-loading-placeholder">
             Start contributing to see your stats!
           </div>
         </mat-card>

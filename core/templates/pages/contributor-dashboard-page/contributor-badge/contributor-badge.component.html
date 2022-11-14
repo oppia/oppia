@@ -71,7 +71,7 @@
             </div>
         </div>
         <div *ngIf="!dataLoading && (languages.length > 0)">
-            <mat-card layout="row" class="list-view-item oppia-contributions-required-message-container">
+            <mat-card layout="row" class="list-view-item oppia-contributions-required-message-container e2e-test-badges-container">
                 <div class="badge-box">
                     <div>Submission</div>
                     <div class="badge-container">
@@ -97,7 +97,7 @@
         </div>
         <div [hidden]="dataLoading || (!userCanSuggestQuestions && !userCanReviewQuestionSuggestions)" class="badge-type-text">Questions</div>
         <div *ngIf="!dataLoading && userHasQuestionRights">
-            <mat-card layout="row" class="list-view-item oppia-contributions-required-message-container">
+            <mat-card layout="row" class="list-view-item oppia-contributions-required-message-container e2e-test-badges-container">
                 <div *ngIf="userCanSuggestQuestions" class="badge-box">
                     <div>Submission</div>
                     <div class="badge-container">
@@ -128,7 +128,7 @@
                 <div class="badge-type-text">Translations</div>
             </div>
             <div *ngIf="!dataLoading && (languages.length > 0)">
-                <mat-card layout="row" class="list-view-item oppia-contributions-required-message-container">
+                <mat-card layout="row" class="list-view-item oppia-contributions-required-message-container e2e-test-badges-container">
                     <div class="badge-box">
                         <div>Submission</div>
                         <div class="badge-container">
@@ -156,7 +156,7 @@
         <div [hidden]="showMobileTranslationBadges">
             <div [hidden]="dataLoading || (!userCanSuggestQuestions && !userCanReviewQuestionSuggestions)" class="badge-type-text">Questions</div>
             <div *ngIf="!dataLoading && userHasQuestionRights">
-                <mat-card layout="row" class="list-view-item oppia-contributions-required-message-container">
+                <mat-card layout="row" class="list-view-item oppia-contributions-required-message-container e2e-test-badges-container">
                     <div *ngIf="userCanSuggestQuestions" class="badge-box">
                         <div>Submission</div>
                         <div class="badge-container">
@@ -192,7 +192,7 @@
         Start contributing to see your badges!
       </div>
     </mat-card>
-    <div class="oppia-lazy-loading-container"
+    <div class="oppia-lazy-loading-container e2e-test-badges-loading-placeholder"
          [hidden]="!dataLoading">
       <lazy-loading></lazy-loading>
     </div>

@@ -52,6 +52,21 @@ var ContributorDashboardPage = function() {
     '.e2e-test-question-suggestion-review-modal-header');
   var usernameContainer = $('.e2e-test-username');
   var reviewRightsDiv = $('.e2e-test-review-rights');
+  var navigateToStatsTab = $('.e2e-test-show-stats');
+  var navigateToBadgesTab = $('.e2e-test-show-badges');
+  var statsLoadingPlaceholder = $(
+    '.e2e-test-stats-loading-placeholder');
+  var badgesLoadingPlaceholder = $(
+    '.e2e-test-badges-loading-placeholder');
+  var navigateToTranslationContributionStats = $(
+    '.e2e-test-show-translationContribution');
+  var navigateToTranslationReviewStats = $(
+    '.e2e-test-show-translationReview');
+  var navigateToQuestionContributionStats = $(
+    '.e2e-test-show-questionContribution');
+  var navigateToQuestionReviewStats = $('.e2e-test-show-questionReview');
+  var statsContainer = $('.e2e-test-stats-card');
+  var badgesContainer = $('.e2e-test-badges-container');
 
   this.get = async function() {
     let width = (await browser.getWindowSize()).width;
@@ -66,6 +81,18 @@ var ContributorDashboardPage = function() {
   this.getTranslateTextTab = function() {
     return new ContributorDashboardTranslateTextTab
       .ContributorDashboardTranslateTextTab();
+  };
+
+  this.waitForStatsToLoad = async function() {
+    await waitFor.invisibilityOf(
+      statsLoadingPlaceholder,
+      'Stats placeholders take too long to become invisible.');
+  };
+
+  this.waitForBadgesToLoad = async function() {
+    await waitFor.invisibilityOf(
+      badgesLoadingPlaceholder,
+      'Badges placeholders take too long to become invisible.');
   };
 
   this.waitForOpportunitiesToLoad = async function() {
@@ -210,6 +237,16 @@ var ContributorDashboardPage = function() {
     }
   };
 
+  this.expectStatsToExist = async function() {
+    await this.waitForStatsToLoad();
+    expect(statsContainer).toExist();
+  };
+
+  this.expectBadgesToExist = async function() {
+    await this.waitForBadgesToLoad();
+    expect(badgesContainer).toExist();
+  };
+
   this.clickOpportunityActionButton = async function(
       opportunityHeading, opportunitySubheading) {
     await this.waitForOpportunitiesToLoad();
@@ -250,6 +287,44 @@ var ContributorDashboardPage = function() {
     await action.click(
       'Submit question tab button', submitQuestionTabButton);
     await this.waitForOpportunitiesToLoad();
+  };
+
+  this.navigateToTranslationContributionStats = async function() {
+    await action.click(
+      'Stats tab button', navigateToStatsTab);
+    await action.click(
+      'Translation contribution stats', navigateToTranslationContributionStats);
+    await this.waitForStatsToLoad();
+  };
+
+  this.navigateToTranslationReviewStats = async function() {
+    await action.click(
+      'Stats tab button', navigateToStatsTab);
+    await action.click(
+      'Translation review stats', navigateToTranslationReviewStats);
+    await this.waitForStatsToLoad();
+  };
+
+  this.navigateToQuestionContributionStats = async function() {
+    await action.click(
+      'Stats tab button', navigateToStatsTab);
+    await action.click(
+      'Question contribution stats', navigateToQuestionContributionStats);
+    await this.waitForStatsToLoad();
+  };
+
+  this.navigateToQuestionReviewStats = async function() {
+    await action.click(
+      'Stats tab button', navigateToStatsTab);
+    await action.click(
+      'Question review stats', navigateToQuestionReviewStats);
+    await this.waitForStatsToLoad();
+  };
+
+  this.navigateToBadgesTab = async function() {
+    await action.click(
+      'Badges tab button', navigateToBadgesTab);
+    await this.waitForBadgesToLoad();
   };
 };
 

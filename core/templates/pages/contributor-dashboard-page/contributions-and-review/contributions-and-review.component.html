@@ -36,6 +36,7 @@
         </div>
         <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of accomplishmentsTabs">
           <div *ngIf="tab && tab.enabled"
+               class="e2e-test-show-{{tab.accomplishmentType}}"
                (click)="switchToTab(TAB_TYPE_ACCOMPLISHMENTS, tab.accomplishmentType)"
                [ngClass]="isActiveTab(TAB_TYPE_ACCOMPLISHMENTS, tab.accomplishmentType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
             {{ tab.text }}

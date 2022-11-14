@@ -530,3 +530,162 @@ describe('Translation contribution featured languages', () => {
     await general.checkForConsoleErrors([]);
   });
 });
+
+describe('Contributor dashboard accomplishments', function() {
+  const TOPIC_NAMES = [
+    'Topic 0 for contribution', 'Topic 1 for contribution'];
+  const SKILL_DESCRIPTIONS = [
+    'Skill 0 for suggestion', 'Skill 1 for suggestion'];
+  const REVIEW_MATERIALS = [
+    'Review Material 0',
+    'Review Material 1'];
+  const ADMIN_EMAIL = 'management@contributor.com';
+  const USER_EMAILS = ['user0@contributor.com', 'user1@contributor.com'];
+  const QUESTION_ADMIN_EMAIL = 'user@contributor.com';
+  const QUESTION_ADMIN_USERNAME = 'user4321';
+  const GERMAN_LANGUAGE = 'Deutsch (German)';
+  let contributorDashboardPage = null;
+  let contributorDashboardTranslateTextTab = null;
+  let topicsAndSkillsDashboardPage = null;
+  let skillEditorPage = null;
+  let explorationEditorPage = null;
+  let explorationEditorMainTab = null;
+  let adminPage = null;
+  let contributorDashboardAdminPage = null;
+  let storyEditorPage = null;
+  let topicEditorPage = null;
+  let creatorDashboardPage = null;
+
+  beforeAll(async function() {
+    contributorDashboardPage = (
+      new ContributorDashboardPage.ContributorDashboardPage());
+    contributorDashboardTranslateTextTab = (
+      contributorDashboardPage.getTranslateTextTab());
+    topicsAndSkillsDashboardPage =
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
+    skillEditorPage =
+      new SkillEditorPage.SkillEditorPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    adminPage = new AdminPage.AdminPage();
+    contributorDashboardAdminPage = (
+      new ContributorDashboardAdminPage.ContributorDashboardAdminPage());
+
+    await users.createUser(USER_EMAILS[0], 'user0');
+    await users.createUser(USER_EMAILS[1], 'user1');
+    await users.createUser(QUESTION_ADMIN_EMAIL, QUESTION_ADMIN_USERNAME);
+
+    await users.createAndLoginCurriculumAdminUser(ADMIN_EMAIL, 'management');
+
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_NAMES[0], 'community-topic-one', 'Topic description 1', false);
+    const URL = await browser.getUrl();
+    // Example URL: http://localhost:8181/topic_editor/jT9z3iLnFjsQ#/
+    const TOPIC_ID_URL_PART = URL.split('/')[4];
+    // We have to remove the ending "#".
+    const TOPIC_ID = TOPIC_ID_URL_PART.substring(
+      0, TOPIC_ID_URL_PART.length - 1);
+    await workflow.createSkillAndAssignTopic(
+      SKILL_DESCRIPTIONS[0], REVIEW_MATERIALS[0], TOPIC_NAMES[0]);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      SKILL_DESCRIPTIONS[1], REVIEW_MATERIALS[1]);
+
+    await adminPage.get();
+    await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
+    // Add topic to classroom to make it available for question contributions.
+    await adminPage.editConfigProperty(
+      'The details for each classroom page.',
+      'List',
+      async function(elem) {
+        elem = await elem.editItem(0, 'Dictionary');
+        elem = await elem.editEntry(4, 'List');
+        elem = await elem.addItem('Unicode');
+        await elem.setValue(TOPIC_ID);
+      });
+    await users.logout();
+
+    await users.login(QUESTION_ADMIN_EMAIL);
+    await contributorDashboardAdminPage.get();
+    await contributorDashboardAdminPage.assignQuestionContributor('user0');
+    await contributorDashboardAdminPage.assignQuestionContributor('user1');
+    await contributorDashboardAdminPage.assignQuestionReviewer('user1');
+    await users.logout();
+  });
+
+  it('should show question stats', async function() {
+    // Baseline verification.
+    await users.login(USER_EMAILS[0]);
+    await contributorDashboardPage.get();
+
+    await contributorDashboardPage.navigateToSubmitQuestionTab();
+    await contributorDashboardPage.waitForOpportunitiesToLoad();
+    await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(0%)');
+
+    // Submit suggestion as user0.
+    await contributorDashboardPage.clickOpportunityActionButton(
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0]);
+    await skillEditorPage.confirmSkillDifficulty();
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Question 1'), true);
+    await explorationEditorMainTab.setInteraction('TextInput');
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('Correct Answer'), null, false,
+      'FuzzyEquals', ['correct']);
+    await (await explorationEditorMainTab.getResponseEditor(0)).markAsCorrect();
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
+    await explorationEditorMainTab.addHint('Hint 1');
+    await explorationEditorMainTab.addSolution('TextInput', {
+      correctAnswer: 'correct',
+      explanation: 'It is correct'
+    });
+    await skillEditorPage.saveQuestion();
+    await users.logout();
+
+    // Review and accept the suggestion as user1.
+    await users.login(USER_EMAILS[1]);
+    await contributorDashboardPage.get();
+    await contributorDashboardPage.waitForOpportunitiesToLoad();
+
+    let width = (await browser.getWindowSize()).width;
+    if (width < 700) {
+      let opportunityItemSelector = function() {
+        return $$('.e2e-test-opportunity-list-item');
+      };
+      let opportunity = (await opportunityItemSelector())[0];
+      await action.click('Opportunity Item', opportunity);
+    } else {
+      await contributorDashboardPage.clickOpportunityActionButton(
+        'Question 1', SKILL_DESCRIPTIONS[0]);
+    }
+    await (
+      contributorDashboardPage.waitForQuestionSuggestionReviewModalToAppear());
+    await contributorDashboardPage.clickAcceptQuestionSuggestionButton();
+    await contributorDashboardPage.waitForOpportunitiesToLoad();
+    await contributorDashboardPage.expectEmptyOpportunityAvailabilityMessage();
+
+    // Validate progress percentage was updated in the opportunity.
+    await contributorDashboardPage.get();
+    await contributorDashboardPage.navigateToQuestionReviewStats();
+    await contributorDashboardPage.waitForStatsToLoad();
+    await contributorDashboardPage.expectStatsToExist();
+    await users.logout();
+
+    // Validate the contribution status changed.
+    await users.login(USER_EMAILS[0]);
+    await contributorDashboardPage.get();
+    await contributorDashboardPage.navigateToQuestionContributionStats();
+    await contributorDashboardPage.waitForStatsToLoad();
+    await contributorDashboardPage.expectStatsToExist();
+    await users.logout();
+  });
+
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
+  });
+});
+
