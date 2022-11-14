@@ -2230,6 +2230,26 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     }
                 },
                 {
+                    'rule_type': 'HasElementXAtPositionY',
+                    'inputs': {
+                        'x': 'ca_choices_0',
+                        'y': 4
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_3'
+                            ],
+                            [
+                            'ca_choices_0', 'ca_choices_1', 'ca_choices_2'
+                            ]
+                        ]
+                    }
+                },
+                {
                     'rule_type': 'HasElementXBeforeElementY',
                     'inputs': {
                     'x': 'ca_choices_0',
@@ -2313,26 +2333,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                             ],
                             [
                             'ca_choices_0'
-                            ]
-                        ]
-                    }
-                },
-                {
-                    'rule_type': 'HasElementXAtPositionY',
-                    'inputs': {
-                        'x': 'ca_choices_0',
-                        'y': 4
-                    }
-                },
-                {
-                    'rule_type': 'IsEqualToOrdering',
-                    'inputs': {
-                        'x': [
-                            [
-                            'ca_choices_3'
-                            ],
-                            [
-                            'ca_choices_0', 'ca_choices_1', 'ca_choices_2'
                             ]
                         ]
                     }
@@ -2422,11 +2422,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state.interaction.customization_args[
             'allowMultipleItemsInSamePosition'].value = True
         with self.assertRaisesRegex(
-            utils.ValidationError, 'The rule \'1\' of answer group \'0\', '
+            utils.ValidationError, 'The rule \'3\' of answer group \'0\', '
             'the value 1 and value 2 cannot be same when rule type is '
             'HasElementXBeforeElementY of DragAndDropSortInput interaction.'
         ):
             self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[1])
+        rule_specs.remove(rule_specs[1])
         rule_specs.remove(rule_specs[1])
 
         self._assert_validation_error(
