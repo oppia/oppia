@@ -18,7 +18,7 @@
 
 import { EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NodeData, StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
+import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
 import * as d3 from 'd3';
 import { of } from 'rxjs';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
@@ -30,7 +30,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
-import { GraphData } from 'services/compute-graph.service';
 
 class MockNgbModal {
   open() {

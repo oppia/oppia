@@ -47,9 +47,6 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
 import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
-import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 
 class MockWindowRef {

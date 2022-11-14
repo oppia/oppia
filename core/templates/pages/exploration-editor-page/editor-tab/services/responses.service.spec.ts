@@ -18,7 +18,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { fakeAsync, TestBed } from '@angular/core/testing';
 
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AlertsService } from 'services/alerts.service';

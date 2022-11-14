@@ -33,8 +33,6 @@ import { StatisticsTabComponent } from './statistics-tab.component';
 import { ExplorationDataService } from '../services/exploration-data.service';
 import { ExplorationStats } from 'domain/statistics/exploration-stats.model';
 import { StateStatsModalComponent } from './templates/state-stats-modal.component';
-import { OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFactory';
-import { SolutionBackendDict } from 'domain/exploration/SolutionObjectFactory';
 
 describe('Statistics Tab Component', () => {
   let component: StatisticsTabComponent;
@@ -54,33 +52,6 @@ describe('Statistics Tab Component', () => {
   }
 
   let explorationId = 'exp1';
-  let state = {
-    card_is_checkpoint: false,
-    classifier_model_id: '1',
-    content: {
-      content_id: 'content1',
-      html: 'This is a html text'
-    },
-    interaction: {
-      answer_groups: [],
-      confirmed_unclassified_answers: [],
-      customization_args: {},
-      default_outcome: {} as OutcomeBackendDict,
-      hints: [],
-      solution: {} as SolutionBackendDict,
-      id: ''
-    },
-    linked_skill_id: null,
-    next_content_id_index: 0,
-    param_changes: [],
-    recorded_voiceovers: {
-      voiceovers_mapping: {}
-    },
-    solicit_answer_details: true,
-    written_translations: {
-      translations_mapping: {}
-    }
-  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
