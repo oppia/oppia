@@ -64,6 +64,7 @@ export class ExplorationEngineService {
   visitedStateNames: string[] = [];
   currentStateName: string;
   nextStateName: string;
+  nextStateIfStuckName: string | null;
 
   // Param changes to be used ONLY in editor preview mode.
   manualParamChanges: ParamChange[];
@@ -437,6 +438,7 @@ export class ExplorationEngineService {
         wasOldStateInitial: boolean,
         isFirstHit: boolean,
         isFinalQuestion: boolean,
+        nextCardIfReallyStuck: StateCard | null,
         focusLabel: string
       ) => void
   ): boolean {
@@ -460,6 +462,8 @@ export class ExplorationEngineService {
     // at oldState.interaction.default_outcome.
     let outcome = {...classificationResult.outcome};
     let newStateName: string = outcome.dest;
+    let newStateNameIfStuck: string | null = outcome.destIfReallyStuck;
+    let nextCardIfReallyStuck = null;
 
     if (!this._editorPreviewMode) {
       let feedbackIsUseful: boolean = (
@@ -540,6 +544,7 @@ export class ExplorationEngineService {
         this._getInteractionHtmlByStateName(_nextFocusLabel, this.nextStateName)
       );
     }
+
     if (newParams) {
       this.learnerParamsService.init(newParams);
     }
@@ -553,12 +558,51 @@ export class ExplorationEngineService {
       this.exploration.getState(this.nextStateName).recordedVoiceovers,
       this.exploration.getState(this.nextStateName).content.contentId,
       this.audioTranslationLanguageService);
+
+    if (newStateNameIfStuck !== null) {
+      let newStateIfStuck = this.exploration.getState(newStateNameIfStuck);
+      let newParamsIfStuck = (
+        newStateIfStuck ? this.makeParams(
+          oldParams, newStateIfStuck.paramChanges, [oldParams]) : oldParams);
+
+      let questionHtmlIfStuck = this.makeQuestion(
+        newStateIfStuck, [newParamsIfStuck, {
+          answer: 'answer'
+        }]);
+
+      newParamsIfStuck.answer = answer;
+
+      this.nextStateIfStuckName = newStateNameIfStuck;
+
+      let nextInteractionIfStuckHtml = null;
+      if (this.exploration.getInteraction(this.nextStateIfStuckName).id) {
+        nextInteractionIfStuckHtml = (
+          this._getInteractionHtmlByStateName(
+            _nextFocusLabel, this.nextStateIfStuckName)
+        );
+      }
+
+      questionHtmlIfStuck = questionHtmlIfStuck + this._getRandomSuffix();
+      nextInteractionIfStuckHtml = (
+        nextInteractionIfStuckHtml + this._getRandomSuffix());
+
+      nextCardIfReallyStuck = StateCard.createNewCard(
+        this.nextStateIfStuckName, questionHtmlIfStuck,
+        nextInteractionIfStuckHtml,
+        this.exploration.getInteraction(this.nextStateIfStuckName),
+        this.exploration.getState(this.nextStateIfStuckName).recordedVoiceovers,
+        this.exploration.getState(
+          this.nextStateIfStuckName).writtenTranslations,
+        this.exploration.getState(this.nextStateIfStuckName).content.contentId,
+        this.audioTranslationLanguageService);
+    }
+
     successCallback(
       nextCard, refreshInteraction, feedbackHtml,
       feedbackAudioTranslations, refresherExplorationId,
       missingPrerequisiteSkillId, onSameCard, null,
       (oldStateName === this.exploration.initStateName), isFirstHit, false,
-      _nextFocusLabel);
+      nextCardIfReallyStuck, _nextFocusLabel);
     return answerIsCorrect;
   }
 

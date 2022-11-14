@@ -30,6 +30,7 @@ from core.controllers import base
 from core.domain import blog_services
 from core.domain import classifier_services
 from core.domain import classroom_services
+from core.domain import email_manager
 from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_manager
@@ -142,10 +143,7 @@ def is_source_mailchimp(
         Returns:
             *. The return value of the decorated function.
         """
-        if feconf.MAILCHIMP_WEBHOOK_SECRET is None:
-            raise self.PageNotFoundException
-
-        if secret != feconf.MAILCHIMP_WEBHOOK_SECRET:
+        if not email_manager.verify_mailchimp_secret(secret):
             logging.error(
                 'Invalid Mailchimp webhook request received with secret: %s'
                 % secret)
@@ -4200,7 +4198,7 @@ def is_from_oppia_ml(
     # arguments with different types.
     @functools.wraps(handler)
     def test_request_originates_from_valid_oppia_ml_instance(
-        self: base.OppiaMLVMHandler,
+        self: base.OppiaMLVMHandler[Dict[str, str], Dict[str, str]],
         **kwargs: Any
     ) -> _GenericHandlerFunctionReturnType:
         """Checks if the incoming request is from a valid Oppia-ML VM

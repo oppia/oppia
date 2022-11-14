@@ -4102,10 +4102,20 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         exploration.validate()
 
-        exploration.add_states(['End'])
+        exploration.add_states(['End', 'Stuck State'])
         end_state = exploration.states['End']
+        init_state = exploration.states['Introduction']
+        stuck_state = exploration.states['Stuck State']
+        state_default_outcome = state_domain.Outcome(
+            'Introduction', 'Stuck State', state_domain.SubtitledHtml(
+                'default_outcome_1', '<p>Default outcome for State1</p>'),
+            False, [], None, None
+        )
+        init_state.update_interaction_default_outcome(state_default_outcome)
         self.set_interaction_for_state(
-            end_state, 'EndExploration', content_id_generator)
+          stuck_state, 'TextInput', content_id_generator)
+        self.set_interaction_for_state(
+          end_state, 'EndExploration', content_id_generator)
         end_state.update_interaction_default_outcome(None)
 
         with self.assertRaisesRegex(
@@ -4113,7 +4123,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Please fix the following issues before saving this exploration: '
             '1. The following states are not reachable from the initial state: '
             'End 2. It is impossible to complete the exploration from the '
-            'following states: Introduction'):
+            'following states: Stuck State, Introduction'):
             exploration.validate(strict=True)
 
     def test_update_init_state_name_with_invalid_state(self) -> None:
