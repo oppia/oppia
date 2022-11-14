@@ -6,8 +6,8 @@ const blogEditOptions = "button.e2e-test-blog-post-edit-box";
 
 async function blogDrafts_journey() {
   const obj = await new acceptanceTests();
-
   const page = await obj.init();
+  
   await page.goto(testConstants.URLs.home);
   // await obj.goto("http://localhost:8181/");
   await obj.clickText("button", "OK");
