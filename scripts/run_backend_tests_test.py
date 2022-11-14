@@ -24,6 +24,7 @@ import os
 import socket
 import subprocess
 import sys
+import threading
 
 from core import utils
 from core.tests import test_utils
@@ -32,22 +33,29 @@ from scripts import concurrent_task_utils
 from scripts import install_third_party_libs
 from scripts import servers
 
-from typing import List, Optional
+from typing import Callable, Final, List, Tuple
 
-TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
-SHARDS_SPEC_PATH = os.path.join(
-    os.getcwd(), 'scripts', 'backend_test_shards.json')
-SHARDS_WIKI_LINK = (
-    'https://github.com/oppia/oppia/wiki/Writing-backend-tests#common-errors')
-_LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
-COVERAGE_EXCLUSION_LIST_PATH = os.path.join(
-    os.getcwd(), 'scripts', 'backend_tests_incomplete_coverage.txt')
+TEST_RUNNER_PATH: Final = os.path.join(
+    os.getcwd(), 'core', 'tests', 'gae_suite.py'
+)
+SHARDS_SPEC_PATH: Final = os.path.join(
+    os.getcwd(), 'scripts', 'backend_test_shards.json'
+)
+SHARDS_WIKI_LINK: Final = (
+    'https://github.com/oppia/oppia/wiki/Writing-backend-tests#common-errors'
+)
+_LOAD_TESTS_DIR: Final = os.path.join(
+    os.getcwd(), 'core', 'tests', 'load_tests'
+)
+COVERAGE_EXCLUSION_LIST_PATH: Final = os.path.join(
+    os.getcwd(), 'scripts', 'backend_tests_incomplete_coverage.txt'
+)
 
 
-class MockTask:
-    finished: bool = True
-    exception: Optional[Exception] = None
-    task_results: List[concurrent_task_utils.TaskResult] = []
+def test_function(_: str) -> Callable[[], None]:
+    def task_func() -> None:
+        pass
+    return task_func
 
 
 class MockCompiler:
@@ -76,8 +84,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-
+        self.semaphore = threading.Semaphore(1)
         self.print_arr: list[str] = []
+
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
@@ -104,12 +113,12 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.call_count = 0
 
         self.terminal_logs: List[str] = []
+
         def mock_log(msg: str) -> None:
             self.terminal_logs.append(msg)
         self.swap_logs = self.swap(concurrent_task_utils, 'log', mock_log)
-        def mock_context_manager(
-            **unused_kwargs: str
-        ) -> MockCompilerContextManager:
+
+        def mock_context_manager(**_: str) -> MockCompilerContextManager:
             return MockCompilerContextManager()
         self.swap_redis_server = self.swap(
             servers, 'managed_redis_server', mock_context_manager)
@@ -140,7 +149,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
         with swap_popen, self.swap_logs:
-            returned_result = run_backend_tests.run_shell_cmd( # type: ignore[no-untyped-call]
+            returned_result = run_backend_tests.run_shell_cmd(
                 self.coverage_exc_list)
 
         self.assertIn('INFO: This is task output.', self.terminal_logs)
@@ -149,11 +158,11 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     def test_run_shell_command_failure_throws_error(self) -> None:
         class MockProcess:
             returncode = 1
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate(self) -> Tuple[bytes, bytes]:   # pylint: disable=missing-docstring
                 return (b'', b'Error XYZ occured.')
 
         def mock_popen(
-            cmd_tokens: list[str], **unsued_kwargs: str  # pylint: disable=unused-argument
+            cmd_tokens: List[str], **unsued_kwargs: str  # pylint: disable=unused-argument
         ) -> MockProcess:
             return MockProcess()
 
@@ -166,7 +175,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with swap_popen, self.swap_logs:
             with self.assertRaisesRegex(
                     Exception, 'Error 1\nError XYZ occured.'):
-                run_backend_tests.run_shell_cmd(self.coverage_exc_list) # type: ignore[no-untyped-call]
+                run_backend_tests.run_shell_cmd(self.coverage_exc_list)
 
     def test_comments_in_exclusion_file_are_ignored(self) -> None:
         with self.swap_install_third_party_libs:
@@ -187,7 +196,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             expected_args=((COVERAGE_EXCLUSION_LIST_PATH, 'r'),))
 
         with swap_open:
-            excluded_files = run_backend_tests.load_coverage_exclusion_list( # type: ignore[no-untyped-call]
+            excluded_files = run_backend_tests.load_coverage_exclusion_list(
                 COVERAGE_EXCLUSION_LIST_PATH)
 
         expected_excluded_files = [
@@ -209,7 +218,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             json, 'loads', lambda *unused_args, **unused_kwargs: shards_spec)
 
         with swap_shard_modules:
-            returned_error_msg = run_backend_tests.check_shards_match_tests() # type: ignore[no-untyped-call]
+            returned_error_msg = run_backend_tests.check_shards_match_tests()
 
         self.assertEqual(
             '%s duplicated in %s' % (shards_spec['1'][0], SHARDS_SPEC_PATH),
@@ -227,7 +236,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             json, 'loads', lambda *unused_args, **unused_kwargs: shards_spec)
 
         with swap_shard_modules:
-            returned_error_msg = run_backend_tests.check_shards_match_tests() # type: ignore[no-untyped-call]
+            returned_error_msg = run_backend_tests.check_shards_match_tests()
 
         self.assertEqual(
             'Modules %s are in the backend test shards but missing from the '
@@ -239,7 +248,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        test_modules = run_backend_tests.get_all_test_targets_from_path() # type: ignore[no-untyped-call]
+        test_modules = run_backend_tests.get_all_test_targets_from_path()
         test_modules.append('scripts.new_script_test')
 
         swap_test_modules = self.swap(
@@ -247,7 +256,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             lambda *unused_args, **unused_kwargs: test_modules)
 
         with swap_test_modules:
-            returned_error_msg = run_backend_tests.check_shards_match_tests() # type: ignore[no-untyped-call]
+            returned_error_msg = run_backend_tests.check_shards_match_tests()
 
         self.assertEqual(
             'Modules %s are present on the filesystem but are not listed in '
@@ -259,7 +268,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
-        test_modules = run_backend_tests.get_all_test_targets_from_path( # type: ignore[no-untyped-call]
+        test_modules = run_backend_tests.get_all_test_targets_from_path(
             include_load_tests=False)
         self.assertNotIn(os.path.join(
             _LOAD_TESTS_DIR, 'new_test.py'), test_modules)
@@ -269,37 +278,43 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             from scripts import run_backend_tests
 
         test_cmd = 'python -m scripts.run_backend_tests'
-        task1 = MockTask()
+        task1 = concurrent_task_utils.create_task(
+            test_function('unused_arg'), False, self.semaphore, name='test')
         task1.exception = subprocess.CalledProcessError(
-                returncode=1, cmd=test_cmd)
+            returncode=1, cmd=test_cmd
+        )
+        task1.finished = True
 
         tasks = [task1]
         task_to_taskspec = {}
-        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec( # type: ignore[no-untyped-call]
+        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec(
             'scripts.new_script.py', False)
 
         expected_error_msg = (
             'Command \'%s\' returned non-zero exit status 1.' % test_cmd)
         with self.assertRaisesRegex(
                 subprocess.CalledProcessError, expected_error_msg):
-            run_backend_tests.check_test_results( # type: ignore[no-untyped-call]
+            run_backend_tests.check_test_results(
                 tasks, task_to_taskspec, False)
 
     def test_empty_test_files_show_no_tests_were_run(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        task1 = MockTask()
+        task1 = concurrent_task_utils.create_task(
+            test_function, False, self.semaphore, name='test'
+        )
         task1.exception = Exception('No tests were run.')
+        task1.finished = True
 
         tasks = [task1]
         task_to_taskspec = {}
         test_target = 'scripts.new_script.py'
-        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec( # type: ignore[no-untyped-call]
+        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec(
             test_target, False)
 
         with self.print_swap:
-            run_backend_tests.check_test_results( # type: ignore[no-untyped-call]
+            run_backend_tests.check_test_results(
                 tasks, task_to_taskspec, False)
 
         self.assertIn(
@@ -309,19 +324,22 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        task1 = MockTask()
+        task1 = concurrent_task_utils.create_task(
+            test_function, False, self.semaphore, name='test'
+        )
         task1.exception = Exception(
             'Test suite failed: 6 tests run, 0 errors, '
             '2 failures')
+        task1.finished = True
 
         tasks = [task1]
         task_to_taskspec = {}
         test_target = 'scripts.new_script.py'
-        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec( # type: ignore[no-untyped-call]
+        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec(
             test_target, False)
 
         with self.print_swap:
-            run_backend_tests.check_test_results( # type: ignore[no-untyped-call]
+            run_backend_tests.check_test_results(
                 tasks, task_to_taskspec, False)
 
         self.assertIn(
@@ -332,19 +350,22 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        task1 = MockTask()
+        task1 = concurrent_task_utils.create_task(
+            test_function, False, self.semaphore, name='test'
+        )
         task1.exception = Exception('Some internal error.')
+        task1.finished = True
 
         tasks = [task1]
         task_to_taskspec = {}
         test_target = 'scripts.new_script.py'
-        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec( # type: ignore[no-untyped-call]
+        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec(
             test_target, False)
 
         with self.print_swap, self.assertRaisesRegex(
             Exception, 'Some internal error.'
         ):
-            run_backend_tests.check_test_results( # type: ignore[no-untyped-call]
+            run_backend_tests.check_test_results(
                 tasks, task_to_taskspec, False)
 
         self.assertIn(
@@ -356,7 +377,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        task = MockTask()
+        task = concurrent_task_utils.create_task(
+            test_function, False, self.semaphore, name='test'
+        )
         task.finished = False
         task_output = ['Ran 9 tests in 1.244s', '98']
         task_result = concurrent_task_utils.TaskResult(
@@ -366,11 +389,11 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         tasks = [task]
         task_to_taskspec = {}
         test_target = 'scripts.new_script.py'
-        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec( # type: ignore[no-untyped-call]
+        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec(
             test_target, False)
 
         with self.print_swap:
-            run_backend_tests.check_test_results( # type: ignore[no-untyped-call]
+            run_backend_tests.check_test_results(
                 tasks, task_to_taskspec, True)
 
         self.assertIn('CANCELED  %s' % test_target, self.print_arr)
@@ -379,7 +402,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        task = MockTask()
+        task = concurrent_task_utils.create_task(
+            test_function, False, self.semaphore, name='test'
+        )
+        task.finished = True
         task_output = ['Ran 9 tests in 1.244s', '98']
         task_result = concurrent_task_utils.TaskResult(
             'task1', False, task_output, task_output)
@@ -388,11 +414,11 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         tasks = [task]
         task_to_taskspec = {}
         test_target = 'scripts.new_script.py'
-        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec( # type: ignore[no-untyped-call]
+        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec(
             test_target, True)
 
         with self.print_swap:
-            run_backend_tests.check_test_results( # type: ignore[no-untyped-call]
+            run_backend_tests.check_test_results(
                 tasks, task_to_taskspec, True)
 
         self.assertIn(
@@ -402,7 +428,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        task = MockTask()
+        task = concurrent_task_utils.create_task(
+            test_function, False, self.semaphore, name='test'
+        )
+        task.finished = True
         task_output = ['Ran 9 tests in 1.234s', '100']
         task_result = concurrent_task_utils.TaskResult(
             'task1', False, task_output, task_output)
@@ -411,11 +440,11 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         tasks = [task]
         task_to_taskspec = {}
         test_target = 'scripts.new_script.py'
-        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec( # type: ignore[no-untyped-call]
+        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec(
             test_target, True)
 
         with self.print_swap:
-            run_backend_tests.check_test_results( # type: ignore[no-untyped-call]
+            run_backend_tests.check_test_results(
                 tasks, task_to_taskspec, False)
 
         self.assertIn(
@@ -426,7 +455,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        task = MockTask()
+        task = concurrent_task_utils.create_task(
+            test_function, False, self.semaphore, name='test'
+        )
+        task.finished = True
         task_output = ['Ran 9 tests in 1.234s', '98']
         task_result = concurrent_task_utils.TaskResult(
             'task1', False, task_output, task_output)
@@ -435,7 +467,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         tasks = [task]
         task_to_taskspec = {}
         test_target = 'scripts.new_script_test'
-        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec( # type: ignore[no-untyped-call]
+        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec(
             test_target, True)
         swap_load_excluded_files = self.swap_with_checks(
             run_backend_tests, 'load_coverage_exclusion_list',
@@ -443,7 +475,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             expected_args=((COVERAGE_EXCLUSION_LIST_PATH,),))
 
         with self.print_swap, swap_load_excluded_files:
-            run_backend_tests.check_test_results( # type: ignore[no-untyped-call]
+            run_backend_tests.check_test_results(
                 tasks, task_to_taskspec, True)
 
         self.assertNotIn(
@@ -456,7 +488,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        task = MockTask()
+        task = concurrent_task_utils.create_task(
+            test_function, False, self.semaphore, name='test'
+        )
+        task.finished = True
         task_output = ['XYZ', '100']
         task_result = concurrent_task_utils.TaskResult(
             'task1', False, task_output, task_output)
@@ -465,11 +500,11 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         tasks = [task]
         task_to_taskspec = {}
         test_target = 'scripts.random_script.py'
-        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec( # type: ignore[no-untyped-call]
+        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec(
             test_target, True)
 
         with self.print_swap:
-            run_backend_tests.check_test_results( # type: ignore[no-untyped-call]
+            run_backend_tests.check_test_results(
                 tasks, task_to_taskspec, True)
 
         self.assertIn(
@@ -492,7 +527,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             Exception,
             'Directory %s does not exist.' % common.DIRS_TO_ADD_TO_SYS_PATH[0]
         ):
-            run_backend_tests.main(args=[]) # type: ignore[no-untyped-call]
+            run_backend_tests.main(args=[])
 
     def test_invalid_delimiter_in_test_path_argument_throws_error(self) -> None:
         with self.swap_install_third_party_libs:
@@ -501,7 +536,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, r'The delimiter in test_path should be a slash \(/\)'
         ):
-            run_backend_tests.main( # type: ignore[no-untyped-call]
+            run_backend_tests.main(
                 args=['--test_path', 'scripts.run_backend_tests'])
 
     def test_invalid_delimiter_in_test_target_argument_throws_error(
@@ -512,7 +547,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, r'The delimiter in test_target should be a dot \(\.\)'
         ):
-            run_backend_tests.main( # type: ignore[no-untyped-call]
+            run_backend_tests.main(
                 args=['--test_target', 'scripts/run_backend_tests'])
 
     def test_invalid_test_target_message_is_displayed_correctly(self) -> None:
@@ -527,7 +562,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_execute_task, swapcheck_coverage, self.swap_redis_server:
             with self.swap_cloud_datastore_emulator, swap_check_results:
                 with self.print_swap:
-                    run_backend_tests.main( # type: ignore[no-untyped-call]
+                    run_backend_tests.main(
                         args=['--test_target', 'scripts.run_backend_tests.py'])
 
         self.assertIn(
@@ -557,7 +592,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             with self.swap_cloud_datastore_emulator, swap_check_results:
                 with self.print_swap, swapcheck_shards_match_tests:
                     with self.assertRaisesRegex(Exception, error_msg):
-                        run_backend_tests.main(args=['--test_shard', '1']) # type: ignore[no-untyped-call]
+                        run_backend_tests.main(args=['--test_shard', '1'])
 
     def test_no_tests_run_raises_error(self) -> None:
         with self.swap_install_third_party_libs:
@@ -574,7 +609,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 with self.swap_execute_task, self.assertRaisesRegex(
                     Exception, 'WARNING: No tests were run.'
                 ):
-                    run_backend_tests.main( # type: ignore[no-untyped-call]
+                    run_backend_tests.main(
                         args=['--test_target', 'scripts.run_backend_tests_test']
                     )
 
@@ -594,7 +629,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     Exception,
                     '2 tests incompletely cover associated code files.'
                 ):
-                    run_backend_tests.main(args=[]) # type: ignore[no-untyped-call]
+                    run_backend_tests.main(args=[])
 
     def test_incomplete_overall_backend_coverage_throws_error(self) -> None:
         with self.swap_install_third_party_libs:
@@ -612,7 +647,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     with self.assertRaisesRegex(
                         Exception, 'Backend test coverage is not 100%'
                     ):
-                        run_backend_tests.main( # type: ignore[no-untyped-call]
+                        run_backend_tests.main(
                             args=['--generate_coverage_report'])
 
         self.assertIn('Coverage report', self.print_arr)
@@ -620,7 +655,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     def test_failure_in_test_execution_throws_error(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
-        def mock_execute_tasks(*unused_args: str) -> None:
+
+        def mock_execute_tasks(*_: str) -> None:
             raise Exception('XYZ error occured.')
         self.swap_execute_task = self.swap(
             concurrent_task_utils, 'execute_tasks', mock_execute_tasks)
@@ -632,7 +668,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             with self.swap_cloud_datastore_emulator, self.assertRaisesRegex(
                 Exception, 'Task execution failed.'
             ):
-                run_backend_tests.main(args=[]) # type: ignore[no-untyped-call]
+                run_backend_tests.main(args=[])
 
     def test_errors_in_test_suite_throw_error(self) -> None:
         with self.swap_install_third_party_libs:
@@ -644,7 +680,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_execute_task, self.swap_redis_server, swap_check_results:
             with self.swap_cloud_datastore_emulator, self.print_swap:
                 with self.assertRaisesRegex(Exception, '2 errors, 0 failures'):
-                    run_backend_tests.main(args=['--test_shard', '1']) # type: ignore[no-untyped-call]
+                    run_backend_tests.main(args=['--test_shard', '1'])
 
         self.assertIn('(2 ERRORS, 0 FAILURES)', self.print_arr)
 
@@ -655,9 +691,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         executed_tasks = []
         test_target = (
             'scripts.new_test_file_test.NewTestFileTests.test_for_something')
+
         def mock_execute(
-            tasks: List[concurrent_task_utils.TaskThread],
-            *unused_args: str
+            tasks: List[concurrent_task_utils.TaskThread], *_: str
         ) -> None:
             for task in tasks:
                 executed_tasks.append(task)
@@ -675,7 +711,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.print_swap, self.swap_check_call:
             with swap_check_coverage, self.swap_redis_server, swap_execute_task:
                 with self.swap_cloud_datastore_emulator, swap_check_results:
-                    run_backend_tests.main(args=args) # type: ignore[no-untyped-call]
+                    run_backend_tests.main(args=args)
 
         self.assertEqual(len(executed_tasks), 1)
         self.assertEqual(executed_tasks[0].name, test_target)
@@ -695,7 +731,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_execute_task, self.swap_check_call, swap_check_results:
             with swap_check_coverage, self.swap_redis_server, self.print_swap:
                 with self.swap_cloud_datastore_emulator:
-                    run_backend_tests.main( # type: ignore[no-untyped-call]
+                    run_backend_tests.main(
                         args=['--generate_coverage_report'])
 
         self.assertIn('Coverage report', self.print_arr)
@@ -707,9 +743,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             from scripts import run_backend_tests
         failed_process_output = MockProcessOutput()
         failed_process_output.returncode = 1
-        def mock_subprocess_run(
-            cmd: List[str], **unused_kwargs: str
-        ) -> MockProcessOutput:
+
+        def mock_subprocess_run(cmd: List[str], **_: str) -> MockProcessOutput:
             if cmd == self.coverage_combine_cmd:
                 return failed_process_output
             elif cmd == self.coverage_check_cmd:
@@ -724,16 +759,15 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             '\n%s' % failed_process_output)
         with swap_subprocess_run, self.assertRaisesRegex(
                 RuntimeError, error_msg):
-            run_backend_tests.check_coverage(True) # type: ignore[no-untyped-call]
+            run_backend_tests.check_coverage(True)
 
     def test_failure_to_calculate_coverage_report_throws_error(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
         failed_process_output = MockProcessOutput()
         failed_process_output.returncode = 1
-        def mock_subprocess_run(
-            cmd: List[str], **unused_kwargs: str
-        ) -> MockProcessOutput:
+
+        def mock_subprocess_run(cmd: List[str], **_: str) -> MockProcessOutput:
             if cmd == self.coverage_combine_cmd:
                 return MockProcessOutput()
             elif cmd == self.coverage_check_cmd:
@@ -748,7 +782,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             '%s' % failed_process_output)
         with swap_subprocess_run, self.assertRaisesRegex(
                 RuntimeError, error_msg):
-            run_backend_tests.check_coverage(True) # type: ignore[no-untyped-call]
+            run_backend_tests.check_coverage(True)
 
     def test_coverage_is_calculated_correctly_for_specific_files(self) -> None:
         with self.swap_install_third_party_libs:
@@ -759,9 +793,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         coverage_report_output = 'TOTAL       283     36    112     10    86% '
         process = MockProcessOutput()
         process.stdout = coverage_report_output
-        def mock_subprocess_run(
-            cmd: List[str], **unused_kwargs: str
-        ) -> MockProcessOutput:
+
+        def mock_subprocess_run(cmd: List[str], **_: str) -> MockProcessOutput:
             if cmd == self.coverage_combine_cmd:
                 return MockProcessOutput()
             elif cmd == self.coverage_check_cmd:
@@ -772,7 +805,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
         with swap_subprocess_run:
-            returned_output, coverage = run_backend_tests.check_coverage( # type: ignore[no-untyped-call]
+            returned_output, coverage = run_backend_tests.check_coverage(
                 True, include=include_files)
 
         self.assertEqual(returned_output, coverage_report_output)
@@ -785,9 +818,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         coverage_report_output = 'TOTAL       283     36    112     10    86% '
         process = MockProcessOutput()
         process.stdout = coverage_report_output
-        def mock_subprocess_run(
-            cmd: List[str], **unused_kwargs: str
-        ) -> MockProcessOutput:
+
+        def mock_subprocess_run(cmd: List[str], **_: str) -> MockProcessOutput:
             if cmd == self.coverage_combine_cmd:
                 return MockProcessOutput()
             elif cmd == self.coverage_check_cmd:
@@ -798,7 +830,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
         with swap_subprocess_run:
-            returned_output, coverage = run_backend_tests.check_coverage( # type: ignore[no-untyped-call]
+            returned_output, coverage = run_backend_tests.check_coverage(
                 False, data_file=data_file)
 
         self.assertEqual(returned_output, coverage_report_output)
@@ -810,9 +842,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         coverage_report_output = 'No data to report.'
         process = MockProcessOutput()
         process.stdout = coverage_report_output
-        def mock_subprocess_run(
-            cmd: List[str], **unused_kwargs: str
-        ) -> MockProcessOutput:
+
+        def mock_subprocess_run(cmd: List[str], **_: str) -> MockProcessOutput:
             if cmd == self.coverage_combine_cmd:
                 return MockProcessOutput()
             elif cmd == self.coverage_check_cmd:
@@ -823,7 +854,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
         with swap_subprocess_run:
-            returned_output, coverage = run_backend_tests.check_coverage( # type: ignore[no-untyped-call]
+            returned_output, coverage = run_backend_tests.check_coverage(
                 True)
 
         self.assertEqual(returned_output, coverage_report_output)
@@ -833,24 +864,24 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        def mock_run_shell_cmd(*unused_args: str, **unused_kwargs: str) -> None:
+        def mock_run_shell_cmd(*_: str, **__: str) -> None:
             raise Exception('XYZ error.')
         swap_run_shell_cmd = self.swap(
             run_backend_tests, 'run_shell_cmd', mock_run_shell_cmd)
         swap_hostname = self.swap(socket, 'gethostname', lambda: 'IamEzio')
         swap_getpid = self.swap(os, 'getpid', lambda: 12345)
 
-        task = run_backend_tests.TestingTaskSpec( # type: ignore[no-untyped-call]
+        task = run_backend_tests.TestingTaskSpec(
             'scripts.run_backend_tests_test', False)
         with swap_run_shell_cmd, swap_hostname, swap_getpid:
             with self.assertRaisesRegex(Exception, 'XYZ error.'):
-                task.run() # type: ignore[no-untyped-call]
+                task.run()
 
     def test_tasks_run_again_if_race_condition_occurs(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        def mock_run_shell_cmd(*unused_args: str, **unused_kwargs: str) -> str:
+        def mock_run_shell_cmd(*_: str, **__: str) -> str:
             if self.call_count == 1:
                 return 'Task result'
             self.call_count = 1
@@ -863,11 +894,11 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00))
 
-        task = run_backend_tests.TestingTaskSpec( # type: ignore[no-untyped-call]
+        task = run_backend_tests.TestingTaskSpec(
             'scripts.run_backend_tests_test', True)
         with swap_run_shell_cmd, swap_hostname, swap_getpid:
             with swapcheck_coverage:
-                results = task.run() # type: ignore[no-untyped-call]
+                results = task.run()
 
         self.assertIn('Task result', results[0].messages)
         self.assertIn('Coverage report', results[0].messages)
@@ -876,7 +907,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        def mock_run_shell_cmd(*unused_args: str, **unused_kwargs: str) -> str:
+        def mock_run_shell_cmd(*_: str, **__: str) -> str:
             if self.call_count == 1:
                 return 'Task result'
             self.call_count = 1
@@ -886,10 +917,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         swap_hostname = self.swap(socket, 'gethostname', lambda: 'IamEzio')
         swap_getpid = self.swap(os, 'getpid', lambda: 12345)
 
-        task = run_backend_tests.TestingTaskSpec( # type: ignore[no-untyped-call]
+        task = run_backend_tests.TestingTaskSpec(
             'scripts.random_test', True)
         with swap_run_shell_cmd, swap_hostname, swap_getpid:
-            results = task.run() # type: ignore[no-untyped-call]
+            results = task.run()
 
         self.assertIn('Task result', results[0].messages)
         self.assertIn('', results[0].messages)
@@ -898,7 +929,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        def mock_run_shell_cmd(*unused_args: str, **unused_kwargs: str) -> str:
+        def mock_run_shell_cmd(*_: str, **__: str) -> str:
             if self.call_count == 1:
                 return 'Task result'
             self.call_count = 1
@@ -908,10 +939,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         swap_hostname = self.swap(socket, 'gethostname', lambda: 'IamEzio')
         swap_getpid = self.swap(os, 'getpid', lambda: 12345)
 
-        task = run_backend_tests.TestingTaskSpec( # type: ignore[no-untyped-call]
+        task = run_backend_tests.TestingTaskSpec(
             'scripts.random_test', False)
         with swap_run_shell_cmd, swap_hostname, swap_getpid:
-            results = task.run() # type: ignore[no-untyped-call]
+            results = task.run()
 
         self.assertIn('Task result', results[0].messages)
         self.assertEqual(len(results[0].messages), 1)
