@@ -115,7 +115,8 @@ describe('Blog Dashboard Tile Component', () => {
   it('should throw error if last updated value is undefined', fakeAsync(() => {
     sampleBlogPostSummary = {
       id: 'sampleId',
-      author_name: 'test_user',
+      author_username: 'test_username',
+      displayed_author_name: 'test_user',
       title: 'Title',
       summary: 'Hello World',
       tags: ['news'],
