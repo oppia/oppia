@@ -92,8 +92,7 @@ describe('Preferences Page Component', () => {
     }
 
     async updatePreferencesDataAsync(
-        updateType: string,
-        data: string | string[]
+        data: NonEmailPreferencesBackendDict
     ): Promise<NonEmailPreferencesBackendDict> {
       return Promise.resolve({
         preferred_language_codes: ['en'],
@@ -295,6 +294,19 @@ describe('Preferences Page Component', () => {
             bulk_email_signup_message_should_be_shown: true
           }));
       componentInstance.saveEmailPreferences(true, true, true, true);
+      tick();
+      expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+      expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+      expect(componentInstance.canReceiveEmailUpdates).toBeFalse();
+    }));
+
+    it('should not show bulk email messages', fakeAsync(() => {
+      spyOn(mockUserBackendApiService, 'updateEmailPreferencesAsync')
+        .and.returnValue(
+          Promise.resolve({
+            bulk_email_signup_message_should_be_shown: false
+          }));
+      componentInstance.saveEmailPreferences(false, false, true, true);
       tick();
       expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
       expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();

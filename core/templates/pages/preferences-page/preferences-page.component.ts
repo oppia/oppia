@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-import { EmailPreferencesBackendDict, SubscriptionSummary, UserBackendApiService } from 'services/user-backend-api.service';
+import { EmailPreferencesBackendDict, SubscriptionSummary, UserBackendApiService, NonEmailPreferencesBackendDict } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 require('cropperjs/dist/cropper.min.css');
@@ -94,21 +94,34 @@ export class PreferencesPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  PreferencesData(): NonEmailPreferencesBackendDict {
+    return {
+      user_bio: this.userBio,
+      subject_interests: this.subjectInterests,
+      preferred_site_language_code: this.preferredSiteLanguageCode,
+      preferred_audio_language_code: this.preferredAudioLanguageCode,
+      preferred_language_codes: this.preferredLanguageCodes,
+      default_dashboard: this.defaultDashboard,
+      subscription_list: this.subscriptionList
+    };
+  }
+
   private _saveDataItem(
-      updateType: string,
-      data: string | string[]
+      data: NonEmailPreferencesBackendDict
   ): void {
     this.preventPageUnloadEventService.addListener();
     this.userBackendApiService.updatePreferencesDataAsync(
-      updateType, data
-    ).then(() => {
+      data
+    ).then((returnData) => {
       this.preventPageUnloadEventService.removeListener();
       this.alertsService.addInfoMessage('Saved!', 1000);
     });
   }
 
   saveUserBio(userBio: string): void {
-    this._saveDataItem('user_bio', userBio);
+    let data = this.PreferencesData();
+    data.user_bio = userBio;
+    this._saveDataItem(data);
   }
 
   registerBioChanged(): void {
@@ -118,26 +131,34 @@ export class PreferencesPageComponent {
   onSubjectInterestsSelectionChange(subjectInterests: string): void {
     this.alertsService.clearWarnings();
     this.subjectInterestsChangeAtLeastOnce = true;
-    this._saveDataItem('subject_interests', subjectInterests);
+    let data = this.PreferencesData();
+    data.subject_interests = subjectInterests;
+    this._saveDataItem(data);
   }
 
   savePreferredSiteLanguageCodes(preferredSiteLanguageCode: string): void {
     this.i18nLanguageCodeService.setI18nLanguageCode(preferredSiteLanguageCode);
-    this._saveDataItem(
-      'preferred_site_language_code', preferredSiteLanguageCode);
+    let data = this.PreferencesData();
+    data.preferred_site_language_code = preferredSiteLanguageCode;
+    this._saveDataItem(data);
   }
 
   savePreferredAudioLanguageCode(preferredAudioLanguageCode: string): void {
-    this._saveDataItem(
-      'preferred_audio_language_code', preferredAudioLanguageCode);
+    let data = this.PreferencesData();
+    data.preferred_audio_language_code = preferredAudioLanguageCode;
+    this._saveDataItem(data);
   }
 
   savePreferredLanguageCodes(preferredLanguageCodes: string[]): void {
-    this._saveDataItem('preferred_language_codes', preferredLanguageCodes);
+    let data = this.PreferencesData();
+    data.preferred_language_codes = preferredLanguageCodes;
+    this._saveDataItem(data);
   }
 
   saveDefaultDashboard(defaultDashboard: string): void {
-    this._saveDataItem('default_dashboard', defaultDashboard);
+    let data = this.PreferencesData();
+    data.default_dashboard = defaultDashboard;
+    this._saveDataItem(data);
   }
 
 

@@ -153,9 +153,16 @@ describe('User Backend Api Service', () => {
   }));
 
   it('should update user bio', fakeAsync(() => {
-    let updateType = 'user_bio';
-    let data = '';
-    userBackendApiService.updatePreferencesDataAsync(updateType, data);
+    let samplePreferencesData: NonEmailPreferencesBackendDict = {
+      preferred_language_codes: ['en', 'hi'],
+      preferred_site_language_code: 'en',
+      preferred_audio_language_code: 'en',
+      default_dashboard: 'learner',
+      user_bio: '',
+      subject_interests: '',
+      subscription_list: []
+    };
+    userBackendApiService.updatePreferencesDataAsync(samplePreferencesData);
     const req = httpTestingController.expectOne(
       '/preferenceshandler/data'
     );

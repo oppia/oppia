@@ -183,7 +183,6 @@ class AndroidListSubscriptionHandler(base.BaseHandler):
         self.render_json({'status': status})
 
 
-
 class EmailPreferencesHandler(base.BaseHandler):
     """Handles requests for the email preferences."""
 
@@ -219,7 +218,6 @@ class EmailPreferencesHandler(base.BaseHandler):
             }
         }
     }
-
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -298,6 +296,87 @@ class ProfilePictureDataUrlHandler(base.BaseHandler):
 class PreferencesHandler(base.BaseHandler):
     """Provides data for the preferences page."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'data': {
+                'schema': {
+                    'type': 'dict',
+                    'properties': [{
+                        'name': 'preferred_language_codes',
+                        'schema': {
+                            'type': 'list',
+                            'items': {
+                                'type': 'unicode'
+                            }
+                        }
+                    }, {
+                        'name': 'preferred_site_language_code',
+                        'schema': {
+                            'type': 'unicode_or_none'
+                        }
+                    }, {
+                        'name': 'preferred_audio_language_code',
+                        'schema': {
+                            'type': 'unicode_or_none'
+                        }
+                    }, {
+                        'name': 'default_dashboard',
+                        'schema': {
+                            'type': 'unicode',
+                            'choices': [
+                                'learner',
+                                'creator'
+                            ]
+                        }
+                    }, {
+                        'name': 'user_bio',
+                        'schema': {
+                            'type': 'unicode',
+                            'validators': [{
+                                'id': 'has_length_at_most',
+                                'max_value': feconf.MAX_BIO_LENGTH_IN_CHARS
+                            }]
+                        }
+                    }, {
+                        'name': 'subject_interests',
+                        'schema': {
+                            'type': 'list',
+                            'items': {
+                                'type': 'unicode'
+                            }
+                        }
+                    }, {
+                        'name': 'subscription_list',
+                        'schema': {
+                            'type': 'list',
+                            'items': {
+                                'type': 'dict',
+                                'properties': [{
+                                    'name': 'creator_picture_data_url',
+                                    'schema': {
+                                        'type': 'unicode'
+                                    }
+                                }, {
+                                    'name': 'creator_username',
+                                    'schema': {
+                                        'type': 'unicode'
+                                    }
+                                }, {
+                                    'name': 'creator_impact',
+                                    'schema': {
+                                        'type': 'int'
+                                    }
+                                }]
+                            }
+                        }
+                    }]
+                }
+            }
+        }
+    }
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_manage_own_account
@@ -328,8 +407,6 @@ class PreferencesHandler(base.BaseHandler):
                 user_settings.preferred_site_language_code),
             'preferred_audio_language_code': (
                 user_settings.preferred_audio_language_code),
-            'preferred_translation_language_code': (
-                user_settings.preferred_translation_language_code),
             'default_dashboard': user_settings.default_dashboard,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
@@ -340,35 +417,20 @@ class PreferencesHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
-        update_type = self.payload.get('update_type')
-        data = self.payload.get('data')
+        data = self.normalized_payload.get('data')
         user_settings = user_services.get_user_settings(self.user_id)
 
-        if update_type == 'user_bio':
-            if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
-                raise self.InvalidInputException(
-                    'User bio exceeds maximum character limit: %s'
-                    % feconf.MAX_BIO_LENGTH_IN_CHARS)
-
-            user_services.update_user_bio(self.user_id, data)
-        elif update_type == 'subject_interests':
-            user_services.update_subject_interests(self.user_id, data)
-        elif update_type == 'preferred_language_codes':
-            user_services.update_preferred_language_codes(self.user_id, data)
-        elif update_type == 'preferred_site_language_code':
-            user_services.update_preferred_site_language_code(
-                self.user_id, data)
-        elif update_type == 'preferred_audio_language_code':
-            user_services.update_preferred_audio_language_code(
-                self.user_id, data)
-        elif update_type == 'preferred_translation_language_code':
-            user_services.update_preferred_translation_language_code(
-                self.user_id, data)
-        elif update_type == 'default_dashboard':
-            user_services.update_user_default_dashboard(self.user_id, data)
-        else:
-            raise self.InvalidInputException(
-                'Invalid update type: %s' % update_type)
+        user_services.update_user_bio(self.user_id, data['user_bio'])
+        user_services.update_subject_interests(
+            self.user_id, data['subject_interests'])
+        user_services.update_preferred_language_codes(
+            self.user_id, data['preferred_language_codes'])
+        user_services.update_preferred_site_language_code(
+            self.user_id, data['preferred_site_language_code'])
+        user_services.update_preferred_audio_language_code(
+            self.user_id, data['preferred_audio_language_code'])
+        user_services.update_user_default_dashboard(
+            self.user_id, data['default_dashboard'])
 
         self.render_json({
             'preferred_language_codes': user_settings.preferred_language_codes,
@@ -376,8 +438,6 @@ class PreferencesHandler(base.BaseHandler):
                 user_settings.preferred_site_language_code),
             'preferred_audio_language_code': (
                 user_settings.preferred_audio_language_code),
-            'preferred_translation_language_code': (
-                user_settings.preferred_translation_language_code),
             'default_dashboard': user_settings.default_dashboard,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests
