@@ -521,7 +521,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         rights_manager.release_ownership_of_exploration(
             self.system_user, '0')
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        
+
     def test_guest_can_not_upload(self):
         csrf_token = self.get_new_csrf_token()
 
