@@ -226,7 +226,9 @@ class ClassroomHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS
+        'classroom_id': {
+            'schema': SCHEMA_FOR_CLASSROOM_ID
+        }
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
@@ -242,10 +244,10 @@ class ClassroomHandler(
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self, classroom_url_fragment: str) -> None:
+    def get(self, classroom_id: str) -> None:
         """Handles GET requests."""
-        classroom = classroom_config_services.get_classroom_by_url_fragment(
-            classroom_url_fragment)
+        classroom = classroom_config_services.get_classroom_by_id(
+            classroom_id, strict=False)
         if classroom is None:
             raise self.PageNotFoundException(
                 'The classroom with the given id or url doesn\'t exist.')
@@ -256,29 +258,23 @@ class ClassroomHandler(
         self.render_json(self.values)
 
     @acl_decorators.can_access_admin_page
-    def put(self, classroom_url_fragment: str) -> None:
+    def put(self, classroom_id: str) -> None:
         """Updates properties of a given classroom."""
         assert self.normalized_payload is not None
-        classroom = self.normalized_payload.get('classroom_dict')
-        assert classroom is not None
-        if classroom_url_fragment != classroom.url_fragment:
+        classroom = self.normalized_payload['classroom_dict']
+        if classroom_id != classroom.classroom_id:
             raise self.InvalidInputException(
-                'Classroom URL fragment of the URL path argument must match '
-                'with the URL fragment given in the classroom payload dict.'
+                'Classroom ID of the URL path argument must match with the ID '
+                'given in the classroom payload dict.'
             )
 
         classroom_config_services.update_or_create_classroom_model(classroom)
         self.render_json(self.values)
 
     @acl_decorators.can_access_admin_page
-    def delete(self, classroom_url_fragment: str) -> None:
+    def delete(self, classroom_id: str) -> None:
         """Deletes classroom from the classroom admin page."""
-        classroom = classroom_config_services.get_classroom_by_url_fragment(
-            classroom_url_fragment)
-        if classroom is None:
-            raise self.InvalidInputException(
-                'A classroom with the given URL fragment does not exist.')
-        classroom_config_services.delete_classroom(classroom.classroom_id)
+        classroom_config_services.delete_classroom(classroom_id)
         self.render_json(self.values)
 
 

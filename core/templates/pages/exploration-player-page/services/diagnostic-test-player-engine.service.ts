@@ -222,6 +222,10 @@ export class DiagnosticTestPlayerEngineService {
         taggedSkillMisconceptionId, wasOldStateInitial, isFirstHit,
         isFinalQuestion, focusLabel
       );
+      this.diagnosticTestPlayerStatusService
+        .onDiagnosticTestSessionProgressChange.emit(
+          this.computeProgressPercentage()
+        );
     }, () => {
       // Test is finished.
       const recommendedTopicIds: string[] = this.getRecommendedTopicIds();
@@ -239,6 +243,10 @@ export class DiagnosticTestPlayerEngineService {
       let stateCard = this.createCard(question);
 
       successCallback(stateCard);
+      this.diagnosticTestPlayerStatusService
+        .onDiagnosticTestSessionProgressChange.emit(
+          this.computeProgressPercentage()
+        );
     }, () => {
       // Test is finished.
       const recommendedTopicIds: string[] = this.getRecommendedTopicIds();

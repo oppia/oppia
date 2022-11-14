@@ -40,7 +40,6 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   recommendedTopicSummaries: CreatorTopicSummary[] = [];
   recommendedTopicIds: string[] = [];
   progressPercentage: number = 0;
-
   componentSubscription = new Subscription();
 
   constructor(
@@ -52,7 +51,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
   ngOnInit(): void {
     this.preventPageUnloadEventService.addListener(() => {
-      return !(!this.diagnosticTestIsStarted || this.diagnosticTestIsFinished);
+      return (this.diagnosticTestIsStarted && !this.diagnosticTestIsFinished);
     });
 
     this.OPPIA_AVATAR_IMAGE_URL = (

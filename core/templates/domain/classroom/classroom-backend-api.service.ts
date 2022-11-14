@@ -180,12 +180,12 @@ export class ClassroomBackendApiService {
   }
 
   async getClassroomDataAsync(
-      classroomUrlFragment: string
+      classroomId: string
   ): Promise<ClassroomDataResponse> {
     return new Promise((resolve, reject) => {
       let classroomUrl = this.urlInterpolationService.interpolateUrl(
         ClassroomDomainConstants.CLASSROOM_HANDLER_URL_TEMPLATE, {
-          classroom_url_fragment: classroomUrlFragment
+          classroom_id: classroomId
         });
 
       this.http.get<FetchClassroomDataBackendDict>(

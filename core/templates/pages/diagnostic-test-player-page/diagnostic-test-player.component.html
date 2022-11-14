@@ -1,27 +1,27 @@
 <div class="diagnostic-test-container">
-  <div class="diagnostic-test-page-header">
+  <div class="oppia-diagnostic-test-page-header">
     <button class="btn oppia-back-to-classroom-button">
       <a class="oppia-anchor-tag-under-button" href="/learn/math">
         <span>
           <i class="fas fa-thin fa-arrow-left oppia-vcenter" aria-hidden="true"></i>
         </span>
-        <span class="back-button-text-class">Go back</span>
+        <span class="oppia-back-button-text-class">Go back</span>
       </a>
     </button>
     <div class="oppia-diagnostic-test-session">
       Learner Diagnostic Test
     </div>
   </div>
-  <mat-card class="introductory-card" *ngIf="!diagnosticTestIsStarted">
+  <mat-card class="oppia-introductory-card" *ngIf="!diagnosticTestIsStarted">
     <div class="oppia-introductory-container">
       <div class="oppia-image">
         <img class="oppia-otter-image" [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
       </div>
       <div>
-        <p class="test-introduction-text">
+        <p class="oppia-test-introduction-text">
           <span translate="I18N_DIAGNOSTIC_TEST_INTRO_TEXT_1"></span>
         </p>
-        <p class="test-introduction-text">
+        <p class="oppia-test-introduction-text">
           <span translate="I18N_DIAGNOSTIC_TEST_INTRO_TEXT_2"></span>
         </p>
       </div>
@@ -34,9 +34,9 @@
   <div *ngIf="diagnosticTestIsStarted && !diagnosticTestIsFinished">
     <div class="oppia-question-player-card">
       <div class="oppia-question-player-progress">
-        <div class="current-progress" [ngStyle]="{'width': progressPercentage + '%'}"></div>
+        <div class="oppia-current-progress" [ngStyle]="{'width': progressPercentage + '%'}"></div>
       </div>
-      <div class="progress-percentage-container">
+      <div class="oppia-progress-percentage-container">
         <span><i>Current progress: {{progressPercentage}}%</i></span>
       </div>
     </div>
@@ -44,14 +44,14 @@
     </oppia-conversation-skin>
   </div>
 
-  <div *ngIf="diagnosticTestIsFinished" class="result-page-container">
-    <mat-card class="recommendation-card">
+  <div *ngIf="diagnosticTestIsFinished" class="oppia-result-page-container">
+    <mat-card class="oppia-recommendation-card">
       <div *ngIf="recommendedTopicSummaries.length > 0">
-        <h3 class="recommendation-card-heading">Test complete. Well done!</h3>
-        <p *ngIf="recommendedTopicSummaries.length === 1" class="recommendation-card-text">
+        <h3 class="oppia-recommendation-card-heading">Test complete. Well done!</h3>
+        <p *ngIf="recommendedTopicSummaries.length === 1" class="oppia-recommendation-card-text">
           {{'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_FOR_ONE_TOPIC' | translate}}
         </p>
-        <p *ngIf="recommendedTopicSummaries.length === 2" class="recommendation-card-text">
+        <p *ngIf="recommendedTopicSummaries.length === 2" class="oppia-recommendation-card-text">
           {{'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_FOR_TWO_TOPICS' | translate}}
         </p>
 
@@ -62,8 +62,8 @@
                                       [classroomUrlFragment]="classroomUrlFragment"
                                       [isPublished]="topicSummary.isTopicPublished()">
             </oppia-topic-summary-tile>
-            <div class="start-button">
-              <button class="btn start-topic-button">
+            <div class="oppia-start-button">
+              <button class="btn oppia-start-topic-button">
                 <a class="oppia-anchor-tag-under-button"
                    [href]="getTopicUrlFromUrlFragment(topicSummary.getUrlFragment())">
                   {{getTopicButtonText(topicSummary.getName())}}
@@ -85,13 +85,13 @@
             Test complete. Well done!
           </h3>
         </div>
-        <p class="recommendation-card-text">
+        <p class="oppia-recommendation-card-text">
           {{'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_1_FOR_NO_TOPIC' | translate}}
         </p>
-        <p class="recommendation-card-text">
+        <p class="oppia-recommendation-card-text">
           {{'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_2_FOR_NO_TOPIC' | translate}}
         </p>
-        <div class="classroom-button-container">
+        <div class="oppia-classroom-button-container">
           <button class="btn oppia-goto-classroom-button">
             <a class="oppia-anchor-tag-under-button" href="/learn/math">
               Go to classroom
@@ -104,7 +104,7 @@
 </div>
 
 <style>
-  .diagnostic-test-page-header {
+  .oppia-diagnostic-test-page-header {
     align-items: center;
     display: flex;
     margin: 3%;
@@ -119,7 +119,7 @@
     position: absolute;
     text-transform: uppercase;
   }
-  .back-button-text-class {
+  .oppia-back-button-text-class {
     margin-left: 5px;
   }
   .oppia-anchor-tag-under-button {
@@ -135,7 +135,7 @@
     padding: 20px;
     width: 60%;
   }
-  .progress-percentage-container {
+  .oppia-progress-percentage-container {
     float: right;
     margin-right: 10px;
   }
@@ -153,11 +153,11 @@
     font-weight: bold;
     text-transform: uppercase;
   }
-  .current-progress {
+  .oppia-current-progress {
     background: #0d48a1;
     height: 16px;
   }
-  .classroom-button-container {
+  .oppia-classroom-button-container {
     float: right;
     margin-right: 5%;
   }
@@ -172,21 +172,21 @@
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 1.5em;
   }
-  .recommendation-card {
+  .oppia-recommendation-card {
     overflow: hidden;
     padding: 5%;
   }
-  .recommendation-card-heading {
+  .oppia-recommendation-card-heading {
     color: #00645c;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 1.5em;
     text-align: center;
   }
-  .recommendation-card-text {
+  .oppia-recommendation-card-text {
     font-size: 1.3em;
     margin: 5%;
   }
-  .start-button {
+  .oppia-start-button {
     margin: 20px 0;
     text-align: center;
   }
@@ -197,20 +197,15 @@
   .oppia-topic-summary-tile {
     width: 180px;
   }
-  .recommended-topics-container {
-    display: flex;
-  }
-  .recommended-topic {
-    width: 200px;
-  }
-  .start-topic-button {
+  .oppia-start-topic-button {
     background-color: #00645c;
     color: #fff;
     font-weight: bold;
+    height: 50px;
     text-transform: uppercase;
     width: 180px;
   }
-  .result-page-container {
+  .oppia-result-page-container {
     margin: auto;
     width: 600px;
   }
@@ -226,14 +221,14 @@
   .oppia-introductory-container {
     display: flex;
   }
-  .introductory-card {
+  .oppia-introductory-card {
     margin: auto;
     margin-top: 5vh;
     overflow: auto;
     padding: 60px;
     width: 704px;
   }
-  .test-introduction-text {
+  .oppia-test-introduction-text {
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 1.5em;
   }

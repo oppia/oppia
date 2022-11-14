@@ -44,12 +44,9 @@ import { TopicSummaryTileComponent } from 'components/summary-tile/topic-summary
 import { InteractiveDragAndDropSortInputComponent } from 'interactions/DragAndDropSortInput/directives/oppia-interactive-drag-and-drop-sort-input.component';
 import { InteractiveMultipleChoiceInputComponent } from 'interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component';
 import { ResponseMultipleChoiceInputComponent } from 'interactions/MultipleChoiceInput/directives/oppia-response-multiple-choice-input.component';
-import { AlgebraicExpressionInputExtensionsModule } from 'interactions/AlgebraicExpressionInput/algebraic-expression-input-interactions.module';
 import { ResponseAlgebraicExpressionInputComponent } from 'interactions/AlgebraicExpressionInput/directives/oppia-response-algebraic-expression-input.component';
 import { ShortResponseAlgebraicExpressionInputComponent } from 'interactions/AlgebraicExpressionInput/directives/oppia-short-response-algebraic-expression-input.component';
 import { AlgebraicExpressionInputInteractionComponent } from 'interactions/AlgebraicExpressionInput/directives/oppia-interactive-algebraic-expression-input.component';
-import { InteractiveCodeReplComponent } from 'interactions/CodeRepl/directives/oppia-interactive-code-repl.component';
-import { ShortResponseCodeRepl } from 'interactions/CodeRepl/directives/oppia-short-response-code-repl.component';
 import { OppiaInteractiveContinue } from 'interactions/Continue/directives/oppia-interactive-continue.component';
 import { OppiaResponseContinueComponent } from 'interactions/Continue/directives/oppia-response-continue.component';
 import { OppiaShortResponseContinueComponent } from 'interactions/Continue/directives/oppia-short-response-continue.component';
@@ -58,15 +55,9 @@ import { ShortResponseDragAndDropSortInputComponent } from 'interactions/DragAnd
 import { InteractiveFractionInputComponent } from 'interactions/FractionInput/directives/oppia-interactive-fraction-input.component';
 import { ResponseFractionInput } from 'interactions/FractionInput/directives/oppia-response-fraction-input.component';
 import { ShortResponseFractionInput } from 'interactions/FractionInput/directives/oppia-short-response-fraction-input.component';
-import { InteractiveGraphInput } from 'interactions/GraphInput/directives/oppia-interactive-graph-input.component';
-import { ResponseGraphInput } from 'interactions/GraphInput/directives/oppia-response-graph-input.component';
-import { ShortResponseGraphInput } from 'interactions/GraphInput/directives/oppia-short-response-graph-input.component';
 import { InteractiveImageClickInput } from 'interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component';
 import { ResponseImageClickInput } from 'interactions/ImageClickInput/directives/oppia-response-image-click-input.component';
 import { ShortResponseImageClickInput } from 'interactions/ImageClickInput/directives/oppia-short-response-image-click-input.component';
-import { InteractiveInteractiveMapComponent } from 'interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component';
-import { ResponseInteractiveMapComponent } from 'interactions/InteractiveMap/directives/oppia-response-interactive-map.component';
-import { ShortResponseInteractiveMapComponent } from 'interactions/InteractiveMap/directives/oppia-short-response-interactive-map.component';
 import { InteractiveItemSelectionInputComponent } from 'interactions/ItemSelectionInput/directives/oppia-interactive-item-selection-input.component';
 import { ResponseItemSelectionInputComponent } from 'interactions/ItemSelectionInput/directives/oppia-response-item-selection-input.component';
 import { ShortResponseItemSelectionInputComponent } from 'interactions/ItemSelectionInput/directives/oppia-short-response-item-selection-input.component';
@@ -118,14 +109,10 @@ declare var angular: ng.IAngularStatic;
   ],
   declarations: [
     AlgebraicExpressionInputInteractionComponent,
-    AlgebraicExpressionInputExtensionsModule,
     DiagnosticTestPlayerComponent,
-    InteractiveCodeReplComponent,
     InteractiveDragAndDropSortInputComponent,
     InteractiveFractionInputComponent,
-    InteractiveGraphInput,
     InteractiveImageClickInput,
-    InteractiveInteractiveMapComponent,
     InteractiveItemSelectionInputComponent,
     InteractiveMathEquationInput,
     InteractiveMultipleChoiceInputComponent,
@@ -144,9 +131,7 @@ declare var angular: ng.IAngularStatic;
     ResponseAlgebraicExpressionInputComponent,
     ResponseDragAndDropSortInputComponent,
     ResponseFractionInput,
-    ResponseGraphInput,
     ResponseImageClickInput,
-    ResponseInteractiveMapComponent,
     ResponseItemSelectionInputComponent,
     ResponseMathEquationInput,
     ResponseMultipleChoiceInputComponent,
@@ -159,12 +144,9 @@ declare var angular: ng.IAngularStatic;
     ResponseTextInputComponent,
     ShortResponePencilCodeEditor,
     ShortResponseAlgebraicExpressionInputComponent,
-    ShortResponseCodeRepl,
     ShortResponseDragAndDropSortInputComponent,
     ShortResponseFractionInput,
-    ShortResponseGraphInput,
     ShortResponseImageClickInput,
-    ShortResponseInteractiveMapComponent,
     ShortResponseItemSelectionInputComponent,
     ShortResponseMathEquationInput,
     ShortResponseMultipleChoiceInputComponent,
@@ -179,14 +161,10 @@ declare var angular: ng.IAngularStatic;
   ],
   entryComponents: [
     AlgebraicExpressionInputInteractionComponent,
-    AlgebraicExpressionInputExtensionsModule,
     DiagnosticTestPlayerComponent,
-    InteractiveCodeReplComponent,
     InteractiveDragAndDropSortInputComponent,
     InteractiveFractionInputComponent,
-    InteractiveGraphInput,
     InteractiveImageClickInput,
-    InteractiveInteractiveMapComponent,
     InteractiveItemSelectionInputComponent,
     InteractiveMathEquationInput,
     InteractiveMultipleChoiceInputComponent,
@@ -205,9 +183,7 @@ declare var angular: ng.IAngularStatic;
     ResponseAlgebraicExpressionInputComponent,
     ResponseDragAndDropSortInputComponent,
     ResponseFractionInput,
-    ResponseGraphInput,
     ResponseImageClickInput,
-    ResponseInteractiveMapComponent,
     ResponseItemSelectionInputComponent,
     ResponseMathEquationInput,
     ResponseMultipleChoiceInputComponent,
@@ -220,12 +196,9 @@ declare var angular: ng.IAngularStatic;
     ResponseTextInputComponent,
     ShortResponePencilCodeEditor,
     ShortResponseAlgebraicExpressionInputComponent,
-    ShortResponseCodeRepl,
     ShortResponseDragAndDropSortInputComponent,
     ShortResponseFractionInput,
-    ShortResponseGraphInput,
     ShortResponseImageClickInput,
-    ShortResponseInteractiveMapComponent,
     ShortResponseItemSelectionInputComponent,
     ShortResponseMathEquationInput,
     ShortResponseMultipleChoiceInputComponent,
