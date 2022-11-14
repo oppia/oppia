@@ -93,7 +93,7 @@ describe('Exploration Graph Modal Component', () => {
   it('should initialize component properties after Component is initialized',
     () => {
       expect(component.currentStateName).toBe(stateName);
-      expect(component.graphData).toEqual(null);
+      expect(component.graphData).toBeUndefined();
       expect(component.isEditable).toBe(isEditable);
     });
 

@@ -109,7 +109,11 @@ describe('Router Service', () => {
       $(document.createElement('div')));
     jQuerySpy.and.callThrough();
 
-    spyOn($.fn, 'fadeOut');
+    spyOn($.fn, 'fadeOut').and.callFake((cb) => {
+      cb();
+      setTimeout(() => {},);
+      return null;
+    });
 
     expect(routerService.getActiveTabName()).toBe('main');
     routerService.navigateToPreviewTab();

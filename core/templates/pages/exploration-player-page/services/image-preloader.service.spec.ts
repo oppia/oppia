@@ -22,7 +22,6 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
-import { InteractionAnswer } from 'interactions/answer-defs';
 import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
 import { ImagePreloaderService } from
   'pages/exploration-player-page/services/image-preloader.service';
@@ -32,7 +31,6 @@ import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 describe('Image preloader service', () => {
   let httpTestingController: HttpTestingController;
-  let interactionAnswer: InteractionAnswer[] = ['Ans1'];
 
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
@@ -54,31 +52,22 @@ describe('Image preloader service', () => {
   const initStateName = 'Introduction';
   const explorationDict: ExplorationBackendDict = {
     correctness_feedback_enabled: false,
-    draft_change_list_id: 1,
     draft_changes: [],
-    auto_tts_enabled: false,
-    version: 1,
     is_version_of_draft_valid: true,
     language_code: 'en',
     title: 'My Title',
-    init_state_name: 'Introduction',
+    draft_change_list_id: 0,
+    init_state_name: initStateName,
     states: {
       'State 1': {
         param_changes: [],
         content: {
-          content_id: 'content',
-          html: '<p>State 1 Content</p>'
+          html: '',
+          content_id: 'content'
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'en-2.mp3',
-                file_size_bytes: 120000,
-                needs_update: false,
-                duration_secs: 1.2
-              }
-            },
+            content: {},
             default_outcome: {}
           }
         },
@@ -92,14 +81,17 @@ describe('Image preloader service', () => {
             dest: 'State 3',
             dest_if_really_stuck: null,
             param_changes: [],
-            labelled_as_correct: false,
+            labelled_as_correct: null,
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
           },
           confirmed_unclassified_answers: [],
           customization_args: {
             buttonText: {
-              value: 'Continue'
+              value: {
+                unicode_str: 'Continue',
+                content_id: ''
+              }
             }
           },
           solution: null,
@@ -116,24 +108,17 @@ describe('Image preloader service', () => {
         },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: 0,
+        next_content_id_index: null,
       },
       'State 3': {
         param_changes: [],
         content: {
           content_id: 'content',
-          html: 'Congratulations, you have finished!',
+          html: 'Congratulations, you have finished!'
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'en-4.mp3',
-                file_size_bytes: 120000,
-                needs_update: false,
-                duration_secs: 1.2
-              }
-            }
+            content: {}
           }
         },
         interaction: {
@@ -158,96 +143,145 @@ describe('Image preloader service', () => {
         },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: 0,
+        next_content_id_index: null,
       },
-      'State 2': {
+      [initStateName]: {
+        classifier_model_id: null,
         param_changes: [],
         content: {
           content_id: 'content',
-          html: '<p>State 2 Content</p>'
+          html: 'Multiple Choice'
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'en-3.mp3',
-                file_size_bytes: 120000,
-                needs_update: false,
-                duration_secs: 1.2
-              }
-            },
-            default_outcome: {}
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
           }
         },
         interaction: {
-          id: 'Continue',
+          id: 'MultipleChoiceInput',
           default_outcome: {
+            dest: initStateName,
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: 'Try Again!'
             },
-            dest: 'State 3',
-            dest_if_really_stuck: null,
             param_changes: [],
-            labelled_as_correct: false,
+            labelled_as_correct: null,
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
           },
           confirmed_unclassified_answers: [],
           customization_args: {
-            buttonText: {
-              value: 'Continue'
-            }
+            choices: {
+              value: [{
+                html: '<p> Go to ItemSelection <oppia-noninteractive-image' +
+                ' filepath-with-value="&amp;quot;' +
+                'sIMChoice1_height_32_width_42.png&amp;' +
+                'quot;"></oppia-noninteractive-image></p>',
+                content_id: ''
+              }, {
+                html: '<p> Go to ImageAndRegion<oppia-noninteractive-image' +
+                ' filepath-with-value="&amp;quot;' +
+                'sIMChoice2_height_30_width_40.png&amp;' +
+                'quot;"></oppia-noninteractive-image></p>',
+                content_id: ''
+              }]
+            },
+            showChoicesInShuffledOrder: {value: false}
           },
-          solution: null,
-          answer_groups: [],
-          hints: []
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'State 6',
+                dest_if_really_stuck: null,
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: '<p>We are going to ItemSelection' +
+                  '<oppia-noninteractive-image filepath-with-value=' +
+                  '"&amp;quot;sIOFeedback_height_50_width_50.png' +
+                  '&amp;quot;"></oppia-noninteractive-image></p>'
+                },
+                param_changes: [],
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
+                labelled_as_correct: null,
+              },
+              rule_specs: [{
+                rule_type: 'Equals',
+                inputs: {x: 0}
+              }],
+              training_data: null,
+              tagged_skill_misconception_id: null,
+            },
+            {
+              outcome: {
+                dest: 'State 1',
+                dest_if_really_stuck: null,
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: "Let's go to state 1 ImageAndRegion"
+                },
+                param_changes: [],
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
+                labelled_as_correct: false,
+              },
+              rule_specs: [{
+                rule_type: 'Equals',
+                inputs: {x: 1}
+              }],
+              training_data: null,
+              tagged_skill_misconception_id: null,
+            }
+          ],
+          hints: [],
+          solution: null
         },
         solicit_answer_details: false,
-        card_is_checkpoint: false,
+        card_is_checkpoint: true,
         written_translations: {
           translations_mapping: {
             content: {},
-            default_outcome: {}
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
           }
         },
         linked_skill_id: null,
-        classifier_model_id: null,
-        next_content_id_index: 0,
+        next_content_id_index: null,
       },
-      Introduction: {
+      'State 6': {
         param_changes: [],
         content: {
           content_id: 'content',
-          html: '<p>Introduction Content</p>',
+          html: '<p>Text Input Content</p>'
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'en-1.mp3',
-                file_size_bytes: 120000,
-                needs_update: false,
-                duration_secs: 1.2
-              }
-            },
+            content: {},
             default_outcome: {},
-            feedback_1: {}
+            feedback_1: {},
+            feedback_2: {},
+            hint_1: {}
           }
         },
         interaction: {
           id: 'TextInput',
           default_outcome: {
-            dest: 'Introduction',
+            dest: 'State 6',
             dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
-              html: '<p>Try again.</p>'
+              html: ''
             },
             labelled_as_correct: false,
             param_changes: [],
             refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null,
+            missing_prerequisite_skill_id: null
           },
           confirmed_unclassified_answers: [],
           customization_args: {
@@ -255,10 +289,12 @@ describe('Image preloader service', () => {
               value: 1
             },
             placeholder: {
-              value: ''
+              value: {
+                unicode_str: '',
+                content_id: ''
+              }
             }
           },
-          solution: null,
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
@@ -277,9 +313,9 @@ describe('Image preloader service', () => {
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null,
+              missing_prerequisite_skill_id: null
             },
-            training_data: interactionAnswer,
+            training_data: null,
             tagged_skill_misconception_id: null,
           }, {
             rule_specs: [{
@@ -290,39 +326,49 @@ describe('Image preloader service', () => {
               }}
             }],
             outcome: {
-              dest: 'State 2',
+              dest: 'State 1',
               dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
-                html: "<p>Let's go to State 2</p>"
+                html: "<p>Let's go to State 1</p>"
               },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null,
+              missing_prerequisite_skill_id: null
             },
-            training_data: interactionAnswer,
+            training_data: null,
             tagged_skill_misconception_id: null,
           }],
-          hints: []
+          hints: [{
+            hint_content: {
+              content_id: 'hint_1',
+              html: '<p><oppia-noninteractive-image filepath-with-value="' +
+              '&amp;quot;s6Hint1_height_60_width_60.png&amp;quot;">' +
+              '</oppia-noninteractive-image></p>'
+            }
+          }],
+          solution: null,
         },
         solicit_answer_details: false,
-        card_is_checkpoint: true,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {
             content: {},
             default_outcome: {},
-            feedback_1: {}
+            feedback_1: {},
+            feedback_2: {},
+            hint_1: {}
           }
         },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: 0,
+        next_content_id_index: null,
       }
     },
     param_specs: {},
     param_changes: [],
-  };
+  } as unknown as ExplorationBackendDict;
   class mockReaderObject {
     result = null;
     onloadend: () => string;

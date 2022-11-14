@@ -85,6 +85,8 @@ describe('Exploration Property Service', () => {
   });
 
   it('should save the displayed value when init is not called', () => {
+    explorationPropertyService.propertyName = null;
+
     expect(() => {
       explorationPropertyService.saveDisplayedValue();
     }).toThrowError('Exploration property name cannot be null.');

@@ -160,12 +160,10 @@ export class ExplorationRightsService {
 
   saveModeratorChangeToBackendAsync(emailBody: string): Promise<void> {
     const version = this.explorationDataService.data.version;
-    if (version === undefined) {
-      throw new Error('Exploration version is undefined');
-    }
     return this.explorationRightsBackendApiService
       .saveModeratorChangeToBackendAsyncPutData(
-        this.explorationDataService.explorationId, version, emailBody).then(
+        this.explorationDataService.explorationId,
+        version as number, emailBody).then(
         (response: ExplorationRightsBackendData) => {
           this.alertsService.clearWarnings();
           this.init(
@@ -175,7 +173,7 @@ export class ExplorationRightsService {
             response.rights.community_owned, response.rights.viewable_if_private
           );
         }).catch((response) => {
-        this.alertsService.addWarning(response.error.error);
+        this.alertsService.addWarning('Failed to send email: ' + response);
       });
   }
 

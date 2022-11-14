@@ -211,12 +211,11 @@ export class TeachOppiaModalComponent
     this._explorationId = (
       this.contextService.getExplorationId());
     let stateName = this.stateEditorService.getActiveStateName();
-    if (!stateName) {
-      throw new Error('Cannot fetch unresolved answers without active state');
+    if (stateName) {
+      this._stateName = stateName;
+      this._state = this.explorationStatesService.getState(this._stateName);
+      this.interactionId = this.stateInteractionIdService.savedMemento;
     }
-    this._stateName = stateName;
-    this._state = this.explorationStatesService.getState(this._stateName);
-    this.interactionId = this.stateInteractionIdService.savedMemento;
 
     const rulesServiceName = (
       this.angularNameService.getNameOfInteractionRulesService(

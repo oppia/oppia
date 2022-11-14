@@ -151,7 +151,7 @@ describe('Learner Local Nav Component ', () => {
 
     // Pre-checks.
     expect(component.explorationId).toBeUndefined();
-    expect(component.canEdit).toBe(null);
+    expect(component.canEdit).toBeFalse();
 
     component.ngOnInit();
     tick();

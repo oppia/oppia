@@ -200,10 +200,9 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     this.solutionValidityService.init(['question']);
     const stateData = this.questionStateData;
     const outcome = stateData.interaction.defaultOutcome;
-    if (outcome === null) {
-      throw new Error('Default outcome cannot be null.');
+    if (outcome) {
+      outcome.setDestination(this.questionId);
     }
-    outcome.setDestination(this.questionId);
     if (stateData) {
       this.stateEditorService.onStateEditorInitialized.emit(stateData);
 

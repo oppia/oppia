@@ -112,7 +112,7 @@ describe('Exploration Graph Component', () => {
   it('should get null graph data from graph data service when it is not' +
     ' recomputed', () => {
     expect(component.isGraphShown()).toBe(false);
-    expect(component.getGraphData()).toBe(null);
+    expect(component.getGraphData()).toBeUndefined();
   });
 
   it('should evaluate if exploration graph is editable', () => {

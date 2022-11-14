@@ -77,19 +77,20 @@ describe('Compare versions service', () => {
     for (let stateName in statesDetails) {
       let stateDetail = statesDetails[
         stateName as keyof StatesData] as stateDetails;
-      let newStateData: StateBackendDict = {
+      let newStateData = {
         classifier_model_id: null,
         content: {
           content_id: 'content',
-          html: ''
+          html: stateDetail.contentStr
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
             content: {},
-            default_outcome: {}
+            default_outcome: {},
           }
         },
         interaction: {
+          id: 'EndExploration',
           answer_groups: [],
           confirmed_unclassified_answers: [],
           customization_args: {
@@ -98,20 +99,19 @@ describe('Compare versions service', () => {
             }
           },
           default_outcome: {
-            dest: 'End State',
+            dest: 'default',
             dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
             },
+            labelled_as_correct: false,
             param_changes: [],
-            labelled_as_correct: true,
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
           hints: [],
           solution: null,
-          id: 'Continue'
         },
         linked_skill_id: null,
         next_content_id_index: 0,
@@ -125,16 +125,17 @@ describe('Compare versions service', () => {
         },
         card_is_checkpoint: true
       };
+      // This throws "Argument of type 'null' is not assignable to parameter of
+      // type 'AnswerGroup[]'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
       newStateData.interaction.answer_groups =
           stateDetail.ruleDests.map(function(ruleDestName) {
             return {
               outcome: {
                 dest: ruleDestName,
                 dest_if_really_stuck: null,
-                feedback: {
-                  content_id: '',
-                  html: ''
-                },
+                feedback: [],
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null,

@@ -21,6 +21,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { VersionDiffVisualizationComponent } from './version-diff-visualization.component';
+import { State } from 'domain/state/StateObjectFactory';
 
 class MockNgbModal {
   open() {
@@ -94,8 +95,14 @@ describe('Version Diff Visualization Component', () => {
           originalStateName: 'F'
         },
       },
-      v2States: {},
-      v1States: {}
+      v2States: {
+        C: {} as State,
+        D: {} as State
+      },
+      v1States: {
+        A: {} as State,
+        B: {} as State,
+      }
     };
   });
 
@@ -120,11 +127,11 @@ describe('Version Diff Visualization Component', () => {
       5: '#1E90FF',
       6: 'beige'
     });
-    expect(component.v1InitStateId).toEqual('A');
+    expect(component.v1InitStateId).toEqual(0);
     expect(component.diffGraphData).toEqual(
       {
         nodes: { 1: 'A', 2: 'B', 3: 'B', 4: 'D', 5: 'E', 6: 'F' },
-        links: [], initStateId: 'B', finalStateIds: ['C', 'D']
+        links: [], initStateId: 1, finalStateIds: ['C', 'D']
       }
     );
     expect(component.legendGraph).toEqual({
@@ -223,12 +230,18 @@ describe('Version Diff Visualization Component', () => {
             originalStateName: 'B'
           }
         },
-        v2States: {},
-        v1States: {},
+        v2States: {
+          A: {} as State,
+          B: {} as State,
+        },
+        v1States: {
+          A: {} as State,
+          B: {} as State,
+        },
         finalStateIds: [],
         v2InitStateId: 0,
         links: [],
-        v1InitStateId: 1,
+        v1InitStateId: 0,
       }
     );
 

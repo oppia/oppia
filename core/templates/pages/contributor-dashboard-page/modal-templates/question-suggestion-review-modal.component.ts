@@ -154,43 +154,42 @@ export class QuestionSuggestionReviewModalComponent
   edit(): void {
     this.ngbActiveModal.dismiss();
     let skillId = this.suggestion.change.skill_id;
-    if (skillId === undefined) {
-      throw new Error('skillId is undefined');
-    }
-    this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
-      const modalRef = this.ngbModal.open(
-        QuestionSuggestionEditorModalComponent, {
-          size: 'lg',
-          backdrop: 'static',
-          keyboard: false,
-        });
+    if (skillId) {
+      this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
+        const modalRef = this.ngbModal.open(
+          QuestionSuggestionEditorModalComponent, {
+            size: 'lg',
+            backdrop: 'static',
+            keyboard: false,
+          });
 
-      modalRef.componentInstance.suggestionId = this.suggestionId;
-      modalRef.componentInstance.question = this.question;
-      modalRef.componentInstance.questionId = '';
-      modalRef.componentInstance.questionStateData = (
-        this.question.getStateData());
-      modalRef.componentInstance.skill = skillDict.skill;
-      modalRef.componentInstance.skillDifficulty = this.skillDifficulty;
+        modalRef.componentInstance.suggestionId = this.suggestionId;
+        modalRef.componentInstance.question = this.question;
+        modalRef.componentInstance.questionId = '';
+        modalRef.componentInstance.questionStateData = (
+          this.question.getStateData());
+        modalRef.componentInstance.skill = skillDict.skill;
+        modalRef.componentInstance.skillDifficulty = this.skillDifficulty;
 
-      modalRef.result.then(() => {
-        this.editSuggestionEmitter.emit(
-          {
+        modalRef.result.then(() => {
+          this.editSuggestionEmitter.emit(
+            {
+              suggestionId: this.suggestionId,
+              suggestion: this.suggestion,
+              reviewable: this.reviewable,
+              question: this.question
+            });
+        }, () => {
+          this.contextService.resetImageSaveDestination();
+          this.editSuggestionEmitter.emit({
             suggestionId: this.suggestionId,
             suggestion: this.suggestion,
             reviewable: this.reviewable,
-            question: this.question
+            question: undefined
           });
-      }, () => {
-        this.contextService.resetImageSaveDestination();
-        this.editSuggestionEmitter.emit({
-          suggestionId: this.suggestionId,
-          suggestion: this.suggestion,
-          reviewable: this.reviewable,
-          question: undefined
         });
       });
-    });
+    }
   }
 
   reject(): void {
@@ -232,16 +231,15 @@ export class QuestionSuggestionReviewModalComponent
     }
 
     let skillId = this.suggestion.change.skill_id;
-    if (skillId === undefined) {
-      throw new Error('skillId is undefined');
+    if (skillId) {
+      this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
+        let misconceptionsBySkill: Record<string, Misconception[]> = {};
+        const skill = skillDict.skill;
+        misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
+        this.misconceptionsBySkill = misconceptionsBySkill;
+        this.refreshContributionState();
+      });
     }
-    this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
-      let misconceptionsBySkill: Record<string, Misconception[]> = {};
-      const skill = skillDict.skill;
-      misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
-      this.misconceptionsBySkill = misconceptionsBySkill;
-      this.refreshContributionState();
-    });
   }
 
   goToNextItem(): void {

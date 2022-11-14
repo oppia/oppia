@@ -423,6 +423,79 @@ describe('ExplorationFooterComponent', () => {
       .toHaveBeenCalled();
   }));
 
+  it('should throw error if state name is empty', fakeAsync(() => {
+    const ngbModal = TestBed.inject(NgbModal);
+
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        checkpointCount: 0,
+        completedCheckpointsCount: 0,
+        explorationTitle: ''
+      },
+      result: Promise.resolve()
+    } as NgbModalRef);
+    spyOn(
+      editableExplorationBackendApiService, 'resetExplorationProgressAsync')
+      .and.returnValue(Promise.resolve());
+
+    const stateCard = new StateCard(
+      'End', '<p>Testing</p>', '', new Interaction(
+        [], [], {} as InteractionCustomizationArgs, null, [], 'EndExploration',
+        null), [], {} as RecordedVoiceovers, {} as WrittenTranslations,
+        'content', {} as AudioTranslationLanguageService);
+
+    const endState = {
+      classifier_model_id: null,
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {}
+        }
+      },
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {}
+        }
+      },
+      interaction: {
+        solution: null,
+        confirmed_unclassified_answers: [],
+        id: 'EndExploration',
+        hints: [],
+        customization_args: {
+          recommendedExplorationIds: {
+            value: ['recommendedExplorationId']
+          }
+        },
+        answer_groups: [],
+        default_outcome: null
+      },
+      param_changes: [],
+      next_content_id_index: 0,
+      card_is_checkpoint: false,
+      linked_skill_id: null,
+      content: {
+        content_id: 'content',
+        html: 'Congratulations, you have finished!'
+      }
+    };
+
+    component.expInfo = sampleExpInfo;
+    component.checkpointCount = 2;
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
+    spyOn(explorationEngineService, 'getStateCardByName')
+      .and.returnValue(stateCard);
+    spyOn(explorationEngineService, 'getState')
+      .and.returnValue(
+        stateObjectFactory.createFromBackendDict(null, endState));
+
+    expect(() => {
+      component.openProgressReminderModal();
+      tick();
+      fixture.detectChanges();
+    }).toThrowError();
+  }));
+
   it('should resume exploration if progress reminder modal is canceled',
     fakeAsync(() => {
       const ngbModal = TestBed.inject(NgbModal);
@@ -502,7 +575,11 @@ describe('ExplorationFooterComponent', () => {
   it('should handle error if backend call to learnerViewInfoBackendApiService' +
   ' fails while opening progress reminder modal', fakeAsync(() => {
     component.explorationId = 'expId';
-    component.expInfo = {} as LearnerExplorationSummaryBackendDict;
+    // This throws "Type 'null' is not assignable to parameter of
+    // type 'LearnerExplorationSummaryBackendDict'." We need to suppress this
+    // error because of the need to test validations.
+    // @ts-ignore
+    component.expInfo = null;
     spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
       .and.returnValue(Promise.reject());
     spyOn(component, 'getMostRecentlyReachedCheckpointIndex')
@@ -839,6 +916,313 @@ describe('ExplorationFooterComponent', () => {
     expect(component.completedCheckpointsCount).toEqual(2);
   }));
 
+  it('should throw error if state name is null', fakeAsync(() => {
+    let ngbModal = TestBed.inject(NgbModal);
+
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        numberofCheckpoints: 0,
+        completedWidth: 0,
+        contributorNames: [],
+        expInfo: null
+      },
+      result: {
+        then: (successCallback: () => void, errorCallback: () => void) => {
+          successCallback();
+          errorCallback();
+        }
+      }
+    } as NgbModalRef);
+
+    let sampleExpResponse: FetchExplorationBackendResponse = {
+      exploration_id: '0',
+      is_logged_in: true,
+      session_id: 'KERH',
+      draft_change_list_id: 0,
+      exploration: {
+        init_state_name: 'Introduction',
+        param_changes: [],
+        param_specs: {} as ParamSpecsBackendDict,
+        title: 'Exploration',
+        language_code: 'en',
+        correctness_feedback_enabled: true,
+        objective: 'To learn',
+        states: {
+          Start: {
+            classifier_model_id: null,
+            recorded_voiceovers: {
+              voiceovers_mapping: {
+                ca_placeholder_0: {},
+                feedback_1: {},
+                rule_input_2: {},
+                content: {},
+                default_outcome: {}
+              }
+            },
+            solicit_answer_details: false,
+            written_translations: {
+              translations_mapping: {
+                ca_placeholder_0: {},
+                feedback_1: {},
+                rule_input_2: {},
+                content: {},
+                default_outcome: {}
+              }
+            },
+            interaction: {
+              solution: null,
+              confirmed_unclassified_answers: [],
+              id: 'TextInput',
+              hints: [],
+              customization_args: {
+                rows: {
+                  value: 1
+                },
+                placeholder: {
+                  value: {
+                    unicode_str: '',
+                    content_id: 'ca_placeholder_0'
+                  }
+                }
+              },
+              answer_groups: [
+                {
+                  outcome: {
+                    missing_prerequisite_skill_id: null,
+                    refresher_exploration_id: null,
+                    labelled_as_correct: false,
+                    feedback: {
+                      content_id: 'feedback_1',
+                      html: '<p>Good Job</p>'
+                    },
+                    param_changes: [],
+                    dest_if_really_stuck: null,
+                    dest: 'Mid'
+                  },
+                  training_data: [],
+                  rule_specs: [
+                    {
+                      inputs: {
+                        x: {
+                          normalizedStrSet: [
+                            'answer'
+                          ],
+                          contentId: 'rule_input_2'
+                        }
+                      },
+                      rule_type: 'FuzzyEquals'
+                    }
+                  ],
+                  tagged_skill_misconception_id: null
+                }
+              ],
+              default_outcome: {
+                missing_prerequisite_skill_id: null,
+                refresher_exploration_id: null,
+                labelled_as_correct: false,
+                feedback: {
+                  content_id: 'default_outcome',
+                  html: '<p>Try again.</p>'
+                },
+                param_changes: [],
+                dest_if_really_stuck: null,
+                dest: 'Start'
+              }
+            },
+            param_changes: [],
+            next_content_id_index: 3,
+            card_is_checkpoint: true,
+            linked_skill_id: null,
+            content: {
+              content_id: 'content',
+              html: '<p>First Question</p>'
+            }
+          },
+          End: {
+            classifier_model_id: null,
+            recorded_voiceovers: {
+              voiceovers_mapping: {
+                content: {}
+              }
+            },
+            solicit_answer_details: false,
+            written_translations: {
+              translations_mapping: {
+                content: {}
+              }
+            },
+            interaction: {
+              solution: null,
+              confirmed_unclassified_answers: [],
+              id: 'EndExploration',
+              hints: [],
+              customization_args: {
+                recommendedExplorationIds: {
+                  value: ['recommnendedExplorationId']
+                }
+              },
+              answer_groups: [],
+              default_outcome: null
+            },
+            param_changes: [],
+            next_content_id_index: 0,
+            card_is_checkpoint: false,
+            linked_skill_id: null,
+            content: {
+              content_id: 'content',
+              html: 'Congratulations, you have finished!'
+            }
+          },
+          Mid: {
+            classifier_model_id: null,
+            recorded_voiceovers: {
+              voiceovers_mapping: {
+                ca_placeholder_0: {},
+                feedback_1: {},
+                rule_input_2: {},
+                content: {},
+                default_outcome: {}
+              }
+            },
+            solicit_answer_details: false,
+            written_translations: {
+              translations_mapping: {
+                ca_placeholder_0: {},
+                feedback_1: {},
+                rule_input_2: {},
+                content: {},
+                default_outcome: {}
+              }
+            },
+            interaction: {
+              solution: null,
+              confirmed_unclassified_answers: [],
+              id: 'TextInput',
+              hints: [],
+              customization_args: {
+                rows: {
+                  value: 1
+                },
+                placeholder: {
+                  value: {
+                    unicode_str: '',
+                    content_id: 'ca_placeholder_0'
+                  }
+                }
+              },
+              answer_groups: [
+                {
+                  outcome: {
+                    missing_prerequisite_skill_id: null,
+                    refresher_exploration_id: null,
+                    labelled_as_correct: false,
+                    feedback: {
+                      content_id: 'feedback_1',
+                      html: ' <p>Good Job</p>'
+                    },
+                    param_changes: [],
+                    dest_if_really_stuck: null,
+                    dest: 'End'
+                  },
+                  training_data: [],
+                  rule_specs: [
+                    {
+                      inputs: {
+                        x: {
+                          normalizedStrSet: [
+                            'answer'
+                          ],
+                          contentId: 'rule_input_2'
+                        }
+                      },
+                      rule_type: 'FuzzyEquals'
+                    }
+                  ],
+                  tagged_skill_misconception_id: null
+                }
+              ],
+              default_outcome: {
+                missing_prerequisite_skill_id: null,
+                refresher_exploration_id: null,
+                labelled_as_correct: false,
+                feedback: {
+                  content_id: 'default_outcome',
+                  html: '<p>try again.</p>'
+                },
+                param_changes: [],
+                dest_if_really_stuck: null,
+                dest: 'Mid'
+              }
+            },
+            param_changes: [],
+            next_content_id_index: 3,
+            card_is_checkpoint: true,
+            linked_skill_id: null,
+            content: {
+              content_id: 'content',
+              html: '<p>Second Question</p>'
+            }
+          }
+        }
+      },
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: true,
+        edits_allowed: true
+      },
+      version: 1,
+      can_edit: true,
+      preferred_audio_language_code: 'en',
+      preferred_language_codes: [],
+      auto_tts_enabled: true,
+      correctness_feedback_enabled: true,
+      record_playthrough_probability: 1,
+      has_viewed_lesson_info_modal_once: false,
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'Mid',
+      most_recently_reached_checkpoint_state_name: 'Mid',
+      most_recently_reached_checkpoint_exp_version: 1
+    };
+
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
+      .and.returnValue(Promise.resolve(sampleExpResponse));
+
+    component.checkpointCount = 2;
+
+    spyOn(component, 'getMostRecentlyReachedCheckpointIndex')
+      .and.returnValue(2);
+    spyOn(explorationEngineService, 'getState')
+      .and.returnValue(stateObjectFactory.createFromBackendDict(
+        null, sampleExpResponse.exploration.states.End
+      ));
+
+    let stateCard = new StateCard(
+      'End', '<p>Testing</p>', '', new Interaction(
+        [], [], {} as InteractionCustomizationArgs, null, [], 'EndExploration',
+        null), [], {} as RecordedVoiceovers, {} as WrittenTranslations,
+        'content', {} as AudioTranslationLanguageService);
+
+    spyOn(explorationEngineService, 'getStateCardByName')
+      .and.returnValue(stateCard);
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
+    expect(() => {
+      component.openInformationCardModal();
+      tick();
+      fixture.detectChanges();
+    }).toThrowError();
+  }));
+
   it('should display lesson information card', fakeAsync(() => {
     component.explorationId = 'exp1';
     component.expInfo = {} as LearnerExplorationSummaryBackendDict;
@@ -851,7 +1235,11 @@ describe('ExplorationFooterComponent', () => {
       }));
 
     expect(component.openInformationCardModal).toHaveBeenCalled();
-    component.expInfo = {} as LearnerExplorationSummaryBackendDict;
+    // This throws "Type 'null' is not assignable to parameter of
+    // type 'LearnerExplorationSummaryBackendDict'." We need to suppress this
+    // error because of the need to test validations.
+    // @ts-ignore
+    component.expInfo = null;
 
     component.showInformationCard();
     tick();
@@ -947,7 +1335,11 @@ describe('ExplorationFooterComponent', () => {
   'to learnerViewInfoBackendApiService fails', fakeAsync(() => {
     let explorationId = 'expId';
     component.explorationId = explorationId;
-    component.expInfo = {} as LearnerExplorationSummaryBackendDict;
+    // This throws "Type 'null' is not assignable to parameter of
+    // type 'LearnerExplorationSummaryBackendDict'." We need to suppress this
+    // error because of the need to test validations.
+    // @ts-ignore
+    component.expInfo = null;
 
     spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
       .and.returnValue(Promise.reject());

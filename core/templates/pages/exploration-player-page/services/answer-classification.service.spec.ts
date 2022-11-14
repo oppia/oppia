@@ -26,15 +26,14 @@ import { CamelCaseToHyphensPipe } from 'filters/string-utility-filters/camel-cas
 import { Classifier } from 'domain/classifier/classifier.model';
 import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
-import { OutcomeBackendDict, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
 import { AlertsService } from 'services/alerts.service';
 import { TextInputPredictionService } from 'interactions/TextInput/text-input-prediction.service';
-import { SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
 
 describe('Answer Classification Service', () => {
   const stateName = 'Test State';
@@ -68,7 +67,7 @@ describe('Answer Classification Service', () => {
   });
 
   describe('with string classifier disabled', () => {
-    let stateDict: StateBackendDict;
+    let stateDict;
     let expId = '0';
 
     beforeEach(() => {
@@ -86,26 +85,14 @@ describe('Answer Classification Service', () => {
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'myfile1.mp3',
-                file_size_bytes: 210000,
-                needs_update: false,
-                duration_secs: 4.3
-              },
-              'hi-en': {
-                filename: 'myfile3.mp3',
-                file_size_bytes: 430000,
-                needs_update: false,
-                duration_secs: 2.1
-              }
-            },
-            default_outcome: {}
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
           }
         },
         interaction: {
-          answer_groups: [],
-          confirmed_unclassified_answers: [],
+          id: 'TextInput',
           customization_args: {
             placeholder: {
               value: {
@@ -115,31 +102,91 @@ describe('Answer Classification Service', () => {
             },
             rows: { value: 1 }
           },
+          answer_groups: [{
+            outcome: {
+              dest: 'outcome 1',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {
+                x: {
+                  contentId: 'rule_input_0',
+                  normalizedStrSet: ['10']
+                }
+              }
+            }],
+          }, {
+            outcome: {
+              dest: 'outcome 2',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {
+                x: {
+                  contentId: 'rule_input_1',
+                  normalizedStrSet: ['5']
+                }
+              }
+            }, {
+              rule_type: 'Equals',
+              inputs: {
+                x: {
+                  contentId: 'rule_input_2',
+                  normalizedStrSet: ['6']
+                }
+              }
+            }, {
+              rule_type: 'FuzzyEquals',
+              inputs: {
+                x: {
+                  contentId: 'rule_input_3',
+                  normalizedStrSet: ['7']
+                }
+              }
+            }],
+          }],
           default_outcome: {
-            dest: 'new state',
+            dest: 'default',
             dest_if_really_stuck: null,
-            feedback: {} as SubtitledHtmlBackendDict,
-            param_changes: [],
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
             labelled_as_correct: false,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          hints: [],
-          id: 'TextInput',
-          solution: null
+          hints: []
         },
         param_changes: [],
         solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
             content: {},
-            default_outcome: {}
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
           }
-        },
-        classifier_model_id: null,
-        card_is_checkpoint: false,
-        linked_skill_id: null,
-        next_content_id_index: 1
+        }
       };
     });
 
@@ -149,11 +196,7 @@ describe('Answer Classification Service', () => {
 
       expect(
         () => answerClassificationService.getMatchingClassificationResult(
-          // This throws "Argument of type 'null' is not assignable to parameter
-          // of type 'InteractionRulesService'." We need to suppress this error
-          // because of the need to test validations.
-          // @ts-ignore
-          state.name as string, state.interaction, '0', null)
+          state.name, state.interaction, '0', null)
       ).toThrowError(
         'No interactionRulesService was available to classify the answer.');
     });
@@ -165,7 +208,7 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name as string, state.interaction, '10', textInputRulesService)
+          state.name, state.interaction, '10', textInputRulesService)
       ).toEqual(
         new AnswerClassificationResult(
           outcomeObjectFactory.createNew('outcome 1', 'feedback_1', '', []),
@@ -174,7 +217,7 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name as string, state.interaction, '5', textInputRulesService)
+          state.name, state.interaction, '5', textInputRulesService)
       ).toEqual(
         new AnswerClassificationResult(
           outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
@@ -183,7 +226,7 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name as string, state.interaction, '6', textInputRulesService)
+          state.name, state.interaction, '6', textInputRulesService)
       ).toEqual(
         new AnswerClassificationResult(
           outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
@@ -197,7 +240,7 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name as string, state.interaction, '777', textInputRulesService)
+          state.name, state.interaction, '777', textInputRulesService)
       ).toEqual(
         new AnswerClassificationResult(
           outcomeObjectFactory.createNew('default', 'default_outcome', '', []),
@@ -217,7 +260,7 @@ describe('Answer Classification Service', () => {
 
       expect(
         () => answerClassificationService.getMatchingClassificationResult(
-          state.name as string, state.interaction, 'abc', textInputRulesService)
+          state.name, state.interaction, 'abc', textInputRulesService)
       ).toThrowError(
         'No defaultOutcome was available to classify the answer.');
 
@@ -229,25 +272,43 @@ describe('Answer Classification Service', () => {
       'should fail if no answer group matches and no default rule is ' +
         'provided',
       () => {
-        stateDict.interaction.answer_groups = [];
+        stateDict.interaction.answer_groups = [{
+          outcome: {
+            dest: 'outcome 1',
+            dest_if_really_stuck: null,
+            feedback: {
+              content_id: 'feedback_1',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          },
+          rule_specs: [{
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                contentId: 'rule_input_0',
+                normalizedStrSet: ['10']
+              }
+            }
+          }],
+        }];
 
         const state = (
           stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
         expect(
           () => answerClassificationService.getMatchingClassificationResult(
-            // This throws "Argument of type 'null' is not assignable to
-            // parameter of type 'InteractionRulesService'." We need to
-            // suppress this error because of the need to test validations.
-            // @ts-ignore
-            state.name as string, state.interaction, '0', null)
+            state.name, state.interaction, '0', null)
         ).toThrowError(
           'No interactionRulesService was available to classify the answer.');
       });
   });
 
   describe('with string classifier enabled', () => {
-    let stateDict: StateBackendDict;
+    let stateDict;
     let expId = '0';
 
     beforeEach(() => {
@@ -305,26 +366,14 @@ describe('Answer Classification Service', () => {
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'myfile1.mp3',
-                file_size_bytes: 210000,
-                needs_update: false,
-                duration_secs: 4.3
-              },
-              'hi-en': {
-                filename: 'myfile3.mp3',
-                file_size_bytes: 430000,
-                needs_update: false,
-                duration_secs: 2.1
-              }
-            },
-            default_outcome: {}
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
           }
         },
         interaction: {
-          answer_groups: [],
-          confirmed_unclassified_answers: [],
+          id: 'TextInput',
           customization_args: {
             placeholder: {
               value: {
@@ -334,31 +383,84 @@ describe('Answer Classification Service', () => {
             },
             rows: { value: 1 }
           },
+          answer_groups: [{
+            outcome: {
+              dest: 'outcome 1',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {
+                x: {
+                  contentId: 'rule_input_0',
+                  normalizedStrSet: ['10']
+                }
+              }
+            }],
+          }, {
+            outcome: {
+              dest: 'outcome 2',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            rule_input_translations: {},
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {
+                x: {
+                  contentId: 'rule_input_1',
+                  normalizedStrSet: ['5']
+                }
+              }
+            }, {
+              rule_type: 'Equals',
+              inputs: {
+                x: {
+                  contentId: 'rule_input_2',
+                  normalizedStrSet: ['7']
+                }
+              }
+            }],
+          }],
           default_outcome: {
-            dest: 'new state',
+            dest: 'default',
             dest_if_really_stuck: null,
-            feedback: {} as SubtitledHtmlBackendDict,
-            param_changes: [],
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
             labelled_as_correct: false,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          hints: [],
-          id: 'TextInput',
-          solution: null
+          hints: []
         },
         param_changes: [],
         solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
             content: {},
-            default_outcome: {}
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
           }
-        },
-        classifier_model_id: null,
-        card_is_checkpoint: false,
-        linked_skill_id: null,
-        next_content_id_index: 1
+        }
       };
     });
 
@@ -373,7 +475,7 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name as string, state.interaction, '0', textInputRulesService)
+          state.name, state.interaction, '0', textInputRulesService)
       ).toEqual(
         new AnswerClassificationResult(
           state.interaction.answerGroups[1].outcome, 1, null,
@@ -393,7 +495,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name as string, state.interaction, '0', textInputRulesService)
+            state.name, state.interaction, '0', textInputRulesService)
         ).toEqual(
           new AnswerClassificationResult(
             outcomeObjectFactory.createNew(
@@ -414,7 +516,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name as string, state.interaction, '0', textInputRulesService)
+            state.name, state.interaction, '0', textInputRulesService)
         ).toEqual(
           new AnswerClassificationResult(
             outcomeObjectFactory.createNew(
@@ -427,7 +529,7 @@ describe('Answer Classification Service', () => {
   });
 
   describe('with training data classification', () => {
-    let stateDict: StateBackendDict;
+    let stateDict;
     let expId = '0';
 
     beforeEach(() => {
@@ -445,26 +547,14 @@ describe('Answer Classification Service', () => {
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'myfile1.mp3',
-                file_size_bytes: 210000,
-                needs_update: false,
-                duration_secs: 4.3
-              },
-              'hi-en': {
-                filename: 'myfile3.mp3',
-                file_size_bytes: 430000,
-                needs_update: false,
-                duration_secs: 2.1
-              }
-            },
-            default_outcome: {}
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
           }
         },
         interaction: {
-          answer_groups: [],
-          confirmed_unclassified_answers: [],
+          id: 'TextInput',
           customization_args: {
             placeholder: {
               value: {
@@ -474,31 +564,77 @@ describe('Answer Classification Service', () => {
             },
             rows: { value: 1 }
           },
+          answer_groups: [{
+            outcome: {
+              dest: 'outcome 1',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            training_data: ['abc', 'input'],
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {
+                x: {
+                  contentId: 'rule_input_0',
+                  normalizedStrSet: ['equal']
+                }
+              }
+            }],
+          }, {
+            outcome: {
+              dest: 'outcome 2',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            training_data: ['xyz'],
+            rule_specs: [{
+              rule_type: 'Contains',
+              inputs: {
+                x: {
+                  contentId: 'rule_input_5',
+                  normalizedStrSet: ['npu']
+                }
+              }
+            }],
+          }],
           default_outcome: {
-            dest: 'new state',
+            dest: 'default',
             dest_if_really_stuck: null,
-            feedback: {} as SubtitledHtmlBackendDict,
-            param_changes: [],
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
             labelled_as_correct: false,
+            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          hints: [],
-          id: 'TextInput',
-          solution: null
+          hints: []
         },
         param_changes: [],
         solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
             content: {},
-            default_outcome: {}
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
           }
-        },
-        classifier_model_id: null,
-        card_is_checkpoint: false,
-        linked_skill_id: null,
-        next_content_id_index: 1
+        }
       };
     });
 
@@ -511,8 +647,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name as string, state.interaction, 'abc',
-            textInputRulesService)
+            state.name, state.interaction, 'abc', textInputRulesService)
         ).toEqual(
           new AnswerClassificationResult(
             state.interaction.answerGroups[0].outcome, 0, null,
@@ -520,8 +655,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name as string, state.interaction, 'xyz',
-            textInputRulesService)
+            state.name, state.interaction, 'xyz', textInputRulesService)
         ).toEqual(
           new AnswerClassificationResult(
             state.interaction.answerGroups[1].outcome, 1, null,
@@ -537,8 +671,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name as string, state.interaction, 'input',
-            textInputRulesService)
+            state.name, state.interaction, 'input', textInputRulesService)
         ).toEqual(
           new AnswerClassificationResult(
             state.interaction.answerGroups[1].outcome, 1, 0,
@@ -553,14 +686,13 @@ describe('Answer Classification Service', () => {
       // Returns false when no answer group matches and
       // default outcome has destination equal to state name.
 
-      let outcome = stateDict.interaction.default_outcome as OutcomeBackendDict;
-      outcome.dest = stateName;
+      stateDict.interaction.default_outcome.dest = stateName;
       let state1 = (
         stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
       let res1 = (
         answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-          state1.name as string, state1, '777', textInputRulesService));
+          state1.name, state1, '777', textInputRulesService));
 
       expect(res1).toBeFalse();
       expect(
@@ -570,13 +702,13 @@ describe('Answer Classification Service', () => {
 
       // Returns true if any answer group matches.
 
-      outcome.dest = 'default';
+      stateDict.interaction.default_outcome.dest = 'default';
       let state2 = (
         stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
       let res2 = (
         answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-          state2.name as string, state2, 'equal', textInputRulesService));
+          state2.name, state2, 'equal', textInputRulesService));
 
       expect(res2).toBeTrue();
       expect(

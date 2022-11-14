@@ -64,9 +64,6 @@ export class SubtopicPreviewTab {
       this.topicEditorRoutingService.getSubtopicIdFromUrl());
     this.subtopic = (
       this.topic.getSubtopicById(this.subtopicId));
-    if (this.subtopic === null) {
-      throw new Error('Subtopic doesn\'t exist');
-    }
 
     if (this.topic.getId() && this.subtopic) {
       this.topicEditorStateService.loadSubtopicPage(

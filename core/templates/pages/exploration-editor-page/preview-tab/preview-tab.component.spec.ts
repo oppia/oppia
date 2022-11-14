@@ -188,7 +188,10 @@ describe('Preview Tab Component', () => {
       spyOn(explorationStatesService, 'init').and.stub();
       spyOn(explorationInitStateNameService, 'init').and.stub();
       spyOn(graphDataService, 'recompute').and.stub();
-      spyOn(explorationStatesService, 'getState').and.callThrough();
+      // This throws "Type 'null' is not assignable to type 'State'."
+      // We need to suppress this error because of the need to test validations.
+      // @ts-ignore
+      spyOn(explorationStatesService, 'getState').and.returnValue(null);
       spyOn(component, 'getManualParamChanges').and.returnValue(
         Promise.resolve([]));
       spyOn(component, 'loadPreviewState').and.stub();
@@ -217,7 +220,10 @@ describe('Preview Tab Component', () => {
       spyOn(explorationStatesService, 'init').and.stub();
       spyOn(explorationInitStateNameService, 'init').and.stub();
       spyOn(graphDataService, 'recompute').and.stub();
-      spyOn(explorationStatesService, 'getState').and.callThrough();
+      // This throws "Type 'null' is not assignable to type 'State'."
+      // We need to suppress this error because of the need to test validations.
+      // @ts-ignore
+      spyOn(explorationStatesService, 'getState').and.returnValue(null);
       spyOn(component, 'getManualParamChanges').and.returnValue(
         Promise.resolve([]));
       spyOn(component, 'loadPreviewState').and.stub();
@@ -300,7 +306,14 @@ describe('Preview Tab Component', () => {
     spyOn(component, 'loadPreviewState');
     explorationInitStateNameService.savedMemento = 'state';
     spyOn(numberAttemptsService, 'reset').and.stub();
-    spyOn(explorationEngineService, 'init');
+    spyOn(explorationEngineService, 'init').and.callFake(
+      (value, value1, value2, value3, value4, callback) => {
+        // This throws "Type 'null' is not assignable to type 'State'."
+        // We need to suppress this error because of the need to test
+        // validations.
+        // @ts-ignore
+        callback(null, null);
+      });
 
     // Get data from exploration data service and resolve promise in open
     // modal.

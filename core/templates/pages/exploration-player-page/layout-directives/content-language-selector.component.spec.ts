@@ -105,6 +105,7 @@ describe('Content language selector component', () => {
     }).compileComponents();
     contentTranslationLanguageService = TestBed.get(
       ContentTranslationLanguageService);
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
     writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);

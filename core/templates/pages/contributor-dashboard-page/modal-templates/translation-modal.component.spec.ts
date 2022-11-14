@@ -33,7 +33,10 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { TranslateTextService } from '../services/translate-text.service';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import { RteOutputDisplayComponent } from 'extensions/rich_text_components/rte-output-display.component';
+// This throws "TS2307". We need to
+// suppress this error because rte-text-components are not strictly typed yet.
+// @ts-ignore
+import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
 
 enum ExpansionTabType {
   CONTENT,

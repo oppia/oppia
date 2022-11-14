@@ -27,7 +27,7 @@ import { StateCard } from 'domain/state_card/state-card.model';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
-import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
@@ -41,11 +41,8 @@ import { AudioTranslationLanguageService } from
 export class QuestionPlayerEngineService {
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
-  // These properties are initialized using private method and we need to do
-  // non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  private currentIndex!: number;
-  private nextIndex!: number;
+  private currentIndex: number = null;
+  private nextIndex: number = null;
 
   constructor(
       private alertsService: AlertsService,
@@ -90,12 +87,8 @@ export class QuestionPlayerEngineService {
   private loadInitialQuestion(
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
-    const questionId = this.questions[0].getId();
-    if (questionId === null) {
-      throw new Error('The first question should have a valid id.');
-    }
     this.contextService.setCustomEntityContext(
-      AppConstants.ENTITY_TYPE.QUESTION, questionId);
+      AppConstants.ENTITY_TYPE.QUESTION, this.questions[0].getId());
     const initialState = this.questions[0].getStateData();
 
     const questionHtml = this.makeQuestion(initialState, []);
@@ -112,30 +105,19 @@ export class QuestionPlayerEngineService {
     const nextFocusLabel = this.focusManagerService.generateFocusLabel();
 
     const interactionId = interaction.id;
-    if (interactionId === null) {
-      throw new Error('Interaction ID cannot be null.');
-    }
+    let interactionHtml = null;
 
-    let interactionHtml = (
-      this.explorationHtmlFormatterService.getInteractionHtml(
+    if (interactionId) {
+      interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
         interactionId, interaction.customizationArgs, true, nextFocusLabel,
-        null));
-
-    const stateName = initialState.name;
-    if (stateName === null) {
-      throw new Error('Expected state to have a name.');
+        null);
     }
-
-    const contentId = initialState.content.contentId;
-    if (contentId === null) {
-      throw new Error('Expected state content to have a content id.');
-    }
-
     const initialCard =
       StateCard.createNewCard(
-        stateName, questionHtml, interactionHtml, interaction,
-        initialState.recordedVoiceovers, initialState.writtenTranslations,
-        contentId, this.audioTranslationLanguageService);
+        null, questionHtml, interactionHtml, interaction,
+        initialState.recordedVoiceovers,
+        initialState.writtenTranslations, initialState.content.contentId,
+        this.audioTranslationLanguageService);
     successCallback(initialCard, nextFocusLabel);
   }
 
@@ -149,9 +131,6 @@ export class QuestionPlayerEngineService {
 
   private getNextInteractionHtml(labelForFocusTarget: string): string {
     const interactionId = this.getNextStateData().interaction.id;
-    if (interactionId === null) {
-      throw new Error('Interaction ID cannot be null.');
-    }
     return this.explorationHtmlFormatterService.getInteractionHtml(
       interactionId,
       this.getNextStateData().interaction.customizationArgs,
@@ -163,7 +142,7 @@ export class QuestionPlayerEngineService {
   init(
       questionObjects: Question[],
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
-      errorCallback: () => void): void {
+      errorCallback?: () => void): void {
     this.contextService.setQuestionPlayerIsOpen();
     this.setAnswerIsBeingProcessed(false);
     let currentIndex = questionObjects.length;
@@ -189,12 +168,8 @@ export class QuestionPlayerEngineService {
 
   recordNewCardAdded(): void {
     this.currentIndex = this.nextIndex;
-    const questionId = this.getCurrentQuestionId();
-    if (questionId === null) {
-      throw new Error('The current question should have a valid id.');
-    }
     this.contextService.setCustomEntityContext(
-      AppConstants.ENTITY_TYPE.QUESTION, questionId);
+      AppConstants.ENTITY_TYPE.QUESTION, this.getCurrentQuestionId());
   }
 
   getCurrentIndex(): number {
@@ -209,7 +184,7 @@ export class QuestionPlayerEngineService {
     return this.questions[this.currentIndex];
   }
 
-  getCurrentQuestionId(): string | null {
+  getCurrentQuestionId(): string {
     return this.questions[this.currentIndex].getId();
   }
 
@@ -245,40 +220,29 @@ export class QuestionPlayerEngineService {
       answer: InteractionAnswer,
       interactionRulesService: InteractionRulesService,
       successCallback: (
-          // Null if the current card is terminal.
-          nextCard: StateCard | null,
+          nextCard: StateCard,
           refreshInteraction: boolean,
           feedbackHtml: string,
           feedbackAudioTranslations: BindableVoiceovers,
-          // Below property is null if no refresher exploration is available for
-          // the current state.
-          refresherExplorationId: string | null,
-          // Below property is null if no missing prerequisite skill is
-          // available for the current state.
-          missingPrerequisiteSkillId: string | null,
+          refresherExplorationId,
+          missingPrerequisiteSkillId,
           remainOnCurrentCard: boolean,
-          // Below property is null if no skill misconception is tagged to the
-          // current state.
-          taggedSkillMisconceptionId: string | null,
-          wasOldStateInitial: boolean,
-          isFirstHit: boolean,
+          taggedSkillMisconceptionId: string,
+          wasOldStateInitial,
+          isFirstHit,
           isFinalQuestion: boolean,
           focusLabel: string) => void): boolean {
     if (this.answerIsBeingProcessed) {
-      return false;
+      return;
     }
 
     const answerString = answer as string;
     this.setAnswerIsBeingProcessed(true);
     const oldState = this.getCurrentStateData();
     const recordedVoiceovers = oldState.recordedVoiceovers;
-    const oldStateName = oldState.name;
-    if (oldStateName === null) {
-      throw new Error('Expected state to have a name.');
-    }
     const classificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(
-        oldStateName, oldState.interaction, answer,
+        null, oldState.interaction, answer,
         interactionRulesService));
     const answerGroupIndex = classificationResult.answerGroupIndex;
     const answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
@@ -300,15 +264,12 @@ export class QuestionPlayerEngineService {
     const feedbackHtml =
       this.makeFeedback(outcome.feedback.html, [oldParams]);
     const feedbackContentId = outcome.feedback.contentId;
-    if (feedbackContentId === null) {
-      throw new Error('Expected feedback content id to be defined.');
-    }
     const feedbackAudioTranslations = (
       recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
     if (feedbackHtml === null) {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Feedback content should not be empty.');
-      return false;
+      return;
     }
 
     let newState = null;
@@ -324,7 +285,7 @@ export class QuestionPlayerEngineService {
     if (questionHtml === null) {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Question name should not be empty.');
-      return false;
+      return;
     }
     this.setAnswerIsBeingProcessed(false);
 
@@ -332,7 +293,7 @@ export class QuestionPlayerEngineService {
     const interactionIsInline = (
       !interactionId ||
       InteractionSpecsConstants.
-        INTERACTION_SPECS[interactionId as InteractionSpecsKey].display_mode ===
+        INTERACTION_SPECS[interactionId].display_mode ===
         AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
     const refreshInteraction = (
       answerIsCorrect || interactionIsInline);
@@ -348,23 +309,20 @@ export class QuestionPlayerEngineService {
 
       questionHtml = questionHtml + this.getRandomSuffix();
       nextInteractionHtml = nextInteractionHtml + this.getRandomSuffix();
-      const contentId = this.getNextStateData().content.contentId;
-      if (contentId === null) {
-        throw new Error('Expected content id to be defined.');
-      }
       nextCard = StateCard.createNewCard(
         'true', questionHtml, nextInteractionHtml,
         this.getNextStateData().interaction,
         this.getNextStateData().recordedVoiceovers,
         this.getNextStateData().writtenTranslations,
-        contentId, this.audioTranslationLanguageService
+        this.getNextStateData().content.contentId,
+        this.audioTranslationLanguageService
       );
     }
     successCallback(
       nextCard, refreshInteraction, feedbackHtml,
       feedbackAudioTranslations,
       null, null, onSameCard, taggedSkillMisconceptionId,
-      false, false, isFinalQuestion, _nextFocusLabel);
+      null, null, isFinalQuestion, _nextFocusLabel);
     return answerIsCorrect;
   }
 }

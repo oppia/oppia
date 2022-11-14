@@ -152,16 +152,15 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
       this.allQuestions += 1;
 
       // Calculate scores per skill.
-      if (!(questionData.linkedSkillIds)) {
-        continue;
-      }
-      for (let i = 0; i < questionData.linkedSkillIds.length; i++) {
-        let skillId = questionData.linkedSkillIds[i];
-        if (!(skillId in this.scorePerSkillMapping)) {
-          continue;
+      if (questionData.linkedSkillIds) {
+        for (let i = 0; i < questionData.linkedSkillIds.length; i++) {
+          let skillId = questionData.linkedSkillIds[i];
+          if (!(skillId in this.scorePerSkillMapping)) {
+            continue;
+          }
+          this.scorePerSkillMapping[skillId].score += questionScore;
+          this.scorePerSkillMapping[skillId].total += 1.0;
         }
-        this.scorePerSkillMapping[skillId].score += questionScore;
-        this.scorePerSkillMapping[skillId].total += 1.0;
       }
     }
     this.finalCorrect = this.totalScore;
@@ -216,31 +215,30 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
 
     for (let question in questionStateData) {
       let questionData = questionStateData[question];
-      if (!(questionData.linkedSkillIds)) {
-        continue;
-      }
-      let masteryChangePerQuestion =
-      this.createMasteryChangePerQuestion(questionData);
+      if (questionData.linkedSkillIds) {
+        let masteryChangePerQuestion =
+        this.createMasteryChangePerQuestion(questionData);
 
-      if (questionData.viewedSolution) {
-        for (let skillId in masteryChangePerQuestion) {
-          masteryChangePerQuestion[skillId] =
-          QuestionPlayerConstants.MAX_MASTERY_LOSS_PER_QUESTION;
-        }
-      } else {
-        if (questionData.usedHints) {
+        if (questionData.viewedSolution) {
           for (let skillId in masteryChangePerQuestion) {
-            masteryChangePerQuestion[skillId] -= (
-              questionData.usedHints.length *
-              QuestionPlayerConstants.VIEW_HINT_PENALTY_FOR_MASTERY);
+            masteryChangePerQuestion[skillId] =
+            QuestionPlayerConstants.MAX_MASTERY_LOSS_PER_QUESTION;
+          }
+        } else {
+          if (questionData.usedHints) {
+            for (let skillId in masteryChangePerQuestion) {
+              masteryChangePerQuestion[skillId] -= (
+                questionData.usedHints.length *
+                QuestionPlayerConstants.VIEW_HINT_PENALTY_FOR_MASTERY);
+            }
+          }
+          if (questionData.answers) {
+            masteryChangePerQuestion = this.getMasteryChangeForWrongAnswers(
+              questionData.answers, masteryChangePerQuestion);
           }
         }
-        if (questionData.answers) {
-          masteryChangePerQuestion = this.getMasteryChangeForWrongAnswers(
-            questionData.answers, masteryChangePerQuestion);
-        }
+        this.updateMasteryPerSkillMapping(masteryChangePerQuestion);
       }
-      this.updateMasteryPerSkillMapping(masteryChangePerQuestion);
     }
 
     this.skillMasteryBackendApiService.updateSkillMasteryDegreesAsync(

@@ -378,9 +378,21 @@ describe('Search bar component', () => {
     spyOn(component, 'onSearchQueryChangeExec');
     spyOn(component, 'updateSearchFieldsBasedOnUrlQuery');
     spyOn(searchService.onSearchBarLoaded, 'emit');
-    spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'subscribe');
-    spyOn(translateService.onLangChange, 'subscribe');
-    spyOn(classroomBackendApiService.onInitializeTranslation, 'subscribe');
+    spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'subscribe')
+      .and.callFake((callb: (arg0: string[]) => void) => {
+        callb(['en', 'es']);
+        callb(['en', 'es']);
+        return null;
+      });
+    spyOn(translateService.onLangChange, 'subscribe').and.callFake((callb) => {
+      callb();
+      return null;
+    });
+    spyOn(classroomBackendApiService.onInitializeTranslation, 'subscribe')
+      .and.callFake((callb: () => void) => {
+        callb();
+        return null;
+      });
     spyOn(urlService, 'getUrlParams').and.returnValue({ q: '' });
     component.searchQueryChanged = {
       pipe: (param1: string, parm2: string) => {

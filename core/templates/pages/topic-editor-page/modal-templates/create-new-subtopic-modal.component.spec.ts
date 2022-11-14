@@ -47,6 +47,11 @@ class MockActiveModal {
 }
 class MockTopicEditorStateService {
   getTopic() {
+    return new Topic(
+      '', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], '', '', {}, false, '', '', []
+    );
   }
 
   getClassroomUrlFragment() {
@@ -118,9 +123,9 @@ describe('create new subtopic modal', function() {
     subtopicValidationService = TestBed.inject(SubtopicValidationService);
 
     topic = new Topic(
-      'id', 'Topic name loading', 'Abbrev. name loading',
+      '', 'Topic name loading', 'Abbrev. name loading',
       'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+      [], [], [], 1, 1, [], '', '', {}, false, '', '', []
     );
     let subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     topic.getSubtopics = function() {
@@ -132,7 +137,7 @@ describe('create new subtopic modal', function() {
     topic.getNextSubtopicId = function() {
       return 1;
     };
-    spyOn(topicEditorStateService, 'getTopic');
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
 
     fixture.detectChanges();
   });

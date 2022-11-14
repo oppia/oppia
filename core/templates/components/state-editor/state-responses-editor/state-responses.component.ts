@@ -231,12 +231,11 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.stateSolicitAnswerDetailsService.saveDisplayedValue();
   }
 
-  isSelfLoopWithNoFeedback(outcome: Outcome): boolean {
+  isSelfLoopWithNoFeedback(outcome: Outcome): boolean | void {
     if (outcome && typeof outcome === 'object' && this.stateName &&
       outcome.constructor.name === 'Outcome') {
       return outcome.isConfusing(this.stateName);
     }
-    return false;
   }
 
   isSelfLoopThatIsMarkedCorrect(outcome: Outcome): boolean {
@@ -282,7 +281,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       interactionId) !== -1;
   }
 
-  isLinearWithNoFeedback(outcome: Outcome): boolean {
+  isLinearWithNoFeedback(outcome: Outcome): boolean | void {
     // Returns false if current interaction is linear and has no
     // feedback.
     if (outcome && typeof outcome === 'object' &&
@@ -290,7 +289,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       return this.isCurrentInteractionLinear() &&
         !outcome.hasNonemptyFeedback();
     }
-    return false;
   }
 
   getOutcomeTooltip(outcome: Outcome): string {

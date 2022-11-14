@@ -59,21 +59,18 @@ export class ParameterMetadataService {
             pc.name, this.PARAM_SOURCE_PARAM_CHANGES, String(i)));
         } else {
           const customizationArgsValue = pc.customizationArgs.value;
-          if (customizationArgsValue === undefined) {
-            throw new Error(
-              'Expected customizationArgsValue to be defined, but found ' +
-              'undefined');
+          if (customizationArgsValue) {
+            let paramsReferenced = (
+              this.expressionInterpolationService.getParamsFromString(
+                customizationArgsValue));
+            for (let j = 0; j < paramsReferenced.length; j++) {
+              result.push(ParamMetadata.createWithGetAction(
+                paramsReferenced[j],
+                this.PARAM_SOURCE_PARAM_CHANGES, String(i)));
+            }
+            result.push(ParamMetadata.createWithSetAction(
+              pc.name, this.PARAM_SOURCE_PARAM_CHANGES, String(i)));
           }
-          let paramsReferenced = (
-            this.expressionInterpolationService.getParamsFromString(
-              customizationArgsValue));
-          for (let j = 0; j < paramsReferenced.length; j++) {
-            result.push(ParamMetadata.createWithGetAction(
-              paramsReferenced[j], this.PARAM_SOURCE_PARAM_CHANGES, String(i)));
-          }
-
-          result.push(ParamMetadata.createWithSetAction(
-            pc.name, this.PARAM_SOURCE_PARAM_CHANGES, String(i)));
         }
       } else {
         // RandomSelector. Elements in the list of possibilities are treated

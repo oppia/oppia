@@ -131,19 +131,17 @@ export class NoninteractiveMath implements OnInit, OnChanges {
               mathExpressionContent.svg_filename))) {
           const imageData = this.imageLocalStorageService.getRawImageData(
             mathExpressionContent.svg_filename);
-          if (imageData === null) {
-            throw new Error('Image data not found in local storage.');
+          if (imageData) {
+            this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
+              imageData);
           }
-          this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
-            imageData);
         } else {
           const entityType = this.contextService.getEntityType();
-          if (entityType === undefined) {
-            throw new Error('Entity type cannot be undefined.');
+          if (entityType) {
+            this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
+              entityType, this.contextService.getEntityId(),
+              mathExpressionContent.svg_filename);
           }
-          this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
-            entityType, this.contextService.getEntityId(),
-            mathExpressionContent.svg_filename);
         }
       } catch (e) {
         const additionalInfo = (

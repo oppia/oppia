@@ -297,6 +297,8 @@ describe('StateTopAnswersStatsService', () => {
 
     expect(() => stateTopAnswersStatsService.getStateStats('Hola'))
       .toThrowError('Hola does not exist.');
+    expect(() => stateTopAnswersStatsService.onStateRenamed('Hola', 'Bonjour'))
+      .toThrowError('Hola does not exist.');
   }));
 
   it('should recognize newly resolved answers', fakeAsync(async() => {
@@ -422,6 +424,23 @@ describe('StateTopAnswersStatsService', () => {
       stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
     }).toThrowError('Hola does not exist.');
   }));
+
+  it('should throw error if Interaction id does not exist',
+    fakeAsync(async() => {
+      const states = makeStates();
+      spyOnBackendApiFetchStatsAsync(
+        'Hola', [{answer: 'adios', frequency: 3, is_addressed: false}]);
+      stateTopAnswersStatsService.initAsync(expId, states);
+      flushMicrotasks();
+      await stateTopAnswersStatsService.getInitPromiseAsync();
+
+      const updatedState = states.getState('Hola');
+      updatedState.interaction.id = null;
+
+      expect(() => {
+        stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
+      }).toThrowError('Interaction ID cannot be null.');
+    }));
 
   it('should getTopAnswersByStateNameAsync', fakeAsync(() => {
     const states = makeStates();

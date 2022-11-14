@@ -179,14 +179,13 @@ export class TopicEditorStateService {
       skillIdToRubricsObject: Record<string, RubricBackendDict[]>): void {
     for (let skillId in skillIdToRubricsObject) {
       // Skips deleted skills.
-      if (!skillIdToRubricsObject[skillId]) {
-        continue;
+      if (skillIdToRubricsObject[skillId]) {
+        let rubrics = skillIdToRubricsObject[skillId].map(
+          (rubric: RubricBackendDict) => {
+            return Rubric.createFromBackendDict(rubric);
+          });
+        this._skillIdToRubricsObject[skillId] = rubrics;
       }
-      let rubrics = skillIdToRubricsObject[skillId].map(
-        (rubric: RubricBackendDict) => {
-          return Rubric.createFromBackendDict(rubric);
-        });
-      this._skillIdToRubricsObject[skillId] = rubrics;
     }
   }
 

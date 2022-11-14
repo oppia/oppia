@@ -53,7 +53,8 @@ export class ExplorationPropertyService {
 
   // The backend name for this property. THIS MUST BE SPECIFIED BY
   // SUBCLASSES.
-  propertyName!: string;
+  // Null if this property is not saved to the backend.
+  propertyName: string | null = null;
 
   _explorationPropertyChangedEventEmitter = new EventEmitter();
   constructor(

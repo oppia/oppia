@@ -143,10 +143,9 @@ export class BlogPostEditorBackendApiService {
         thumbnail_filename: imagesData[0].filename,
       };
       let imageBlob = imagesData[0].imageBlob;
-      if (imageBlob === null) {
-        throw new Error('Image blob is null.');
+      if (imageBlob) {
+        body.append('image', imageBlob);
       }
-      body.append('image', imageBlob);
       body.append('payload', JSON.stringify(payload));
       this.http.post(blogPostDataUrl, body).toPromise().then(
         () => {

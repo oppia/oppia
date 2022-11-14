@@ -59,8 +59,10 @@ describe('Pie Chart component', () => {
       PieChartComponent);
     component = fixture.componentInstance;
 
-    mockedChart = new google.visualization.PieChart(
-      document.createElement('div'));
+    mockedChart = {
+      draw: () => { },
+      data: 1
+    } as unknown as google.visualization.PieChart;
 
     // This approach was choosen because spyOnProperty() doesn't work on
     // properties that doesn't have a get access type.
@@ -119,7 +121,7 @@ describe('Pie Chart component', () => {
     spyOnProperty(window, 'google').and.returnValue({
       visualization: {
         PieChart: class Mockdraw {
-          constructor() {}
+          constructor(value: string) {}
           draw() {}
         }
       },
@@ -132,7 +134,11 @@ describe('Pie Chart component', () => {
     component.pieChart = {
       nativeElement: null
     };
-    component.chart = {} as google.visualization.PieChart;
+    // This throws "Type 'null' is not assignable to
+    // parameter of type 'Piechart'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
+    component.chart = null;
     component.ngAfterViewInit();
     tick();
 
@@ -143,7 +149,7 @@ describe('Pie Chart component', () => {
     spyOnProperty(window, 'google').and.returnValue({
       visualization: {
         PieChart: class Mockdraw {
-          constructor() {}
+          constructor(value: string) {}
           draw() {}
         }
       },
@@ -166,7 +172,7 @@ describe('Pie Chart component', () => {
     spyOnProperty(window, 'google').and.returnValue({
       visualization: {
         PieChart: class Mockdraw {
-          constructor() {}
+          constructor(value: string) {}
           draw() {}
         }
       },

@@ -204,13 +204,9 @@ export class PreviewTabComponent
         let initStateNameForPreview = (
           this.stateEditorService.getActiveStateName());
 
-        if (initStateNameForPreview === null) {
-          throw new Error('Active state name cannot be null.');
-        }
-
         // Show a warning message if preview doesn't start from the first
         // state.
-        if (initStateNameForPreview !==
+        if (initStateNameForPreview && initStateNameForPreview !==
                 this.explorationInitStateNameService.savedMemento) {
           this.previewWarning =
                 'Preview started from \"' + initStateNameForPreview + '\"';
@@ -218,16 +214,17 @@ export class PreviewTabComponent
           this.previewWarning = '';
         }
 
-        // Prompt user to enter any unset parameters, then populate
-        // exploration.
-        this.getManualParamChanges(initStateNameForPreview).then(
-          (manualParamChanges) => {
-            if (initStateNameForPreview === null) {
-              throw new Error('Active state name cannot be null.');
-            }
-            this.loadPreviewState(
-              initStateNameForPreview, manualParamChanges);
-          });
+        if (initStateNameForPreview) {
+          // Prompt user to enter any unset parameters, then populate
+          // exploration.
+          this.getManualParamChanges(initStateNameForPreview).then(
+            (manualParamChanges) => {
+              if (initStateNameForPreview) {
+                this.loadPreviewState(
+                  initStateNameForPreview, manualParamChanges);
+              }
+            });
+        }
       });
   }
 

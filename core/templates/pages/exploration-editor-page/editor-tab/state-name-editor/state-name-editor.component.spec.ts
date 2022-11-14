@@ -354,4 +354,12 @@ describe('State Name Editor component', () => {
     mockExternalSaveEventEmitter.emit();
     expect(component.saveStateName).toHaveBeenCalledWith('SampleState');
   });
+
+  it('should throw error if state name is null', fakeAsync(() => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    expect(() => {
+      component.openStateNameEditor();
+      tick();
+    }).toThrowError();
+  }));
 });

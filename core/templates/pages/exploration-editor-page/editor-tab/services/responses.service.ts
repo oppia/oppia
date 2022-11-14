@@ -123,18 +123,15 @@ export class ResponsesService {
       stateSolutionSavedMemento &&
       stateSolutionSavedMemento.correctAnswer !== null);
 
-    if (interactionCanHaveSolution && solutionExists) {
+    const activeStateName = this.stateEditorService.getActiveStateName();
+    if (interactionCanHaveSolution && solutionExists && activeStateName) {
       const interaction = this.stateEditorService.getInteraction();
-      const activeStateName = this.stateEditorService.getActiveStateName();
-      if (activeStateName === null) {
-        throw new Error('Active state name is null');
-      }
-
       interaction.answerGroups = cloneDeep(this._answerGroups);
       interaction.defaultOutcome = cloneDeep(this._defaultOutcome);
       const solutionIsValid = this.solutionVerificationService.verifySolution(
         activeStateName, interaction, stateSolutionSavedMemento.correctAnswer
       );
+
 
       const solutionWasPreviouslyValid = (
         this.solutionValidityService.isSolutionValid(activeStateName));
@@ -339,15 +336,14 @@ export class ResponsesService {
         this._defaultOutcome = null;
       } else if (!this._defaultOutcome) {
         const stateName = this.stateEditorService.getActiveStateName();
-        if (!stateName) {
-          throw new Error('Cannot find active state name.');
+        if (stateName) {
+          this._defaultOutcome = this.outcomeObjectFactory.createNew(
+            stateName,
+            ExplorationEditorPageConstants.COMPONENT_NAME_DEFAULT_OUTCOME,
+            '',
+            []
+          );
         }
-        this._defaultOutcome = this.outcomeObjectFactory.createNew(
-          stateName,
-          ExplorationEditorPageConstants.COMPONENT_NAME_DEFAULT_OUTCOME,
-          '',
-          []
-        );
       }
     }
 

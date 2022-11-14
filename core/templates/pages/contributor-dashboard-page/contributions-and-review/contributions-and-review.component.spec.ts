@@ -33,13 +33,12 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UserInfo } from 'domain/user/user-info.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { AlertsService } from 'services/alerts.service';
-import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
-import { StateBackendDict } from 'domain/state/StateObjectFactory';
 
 
 class MockNgbModalRef {
-  componentInstance!: {
+  componentInstance: {
     suggestionIdToContribution: null;
     initialSuggestionId: null;
     reviewable: null;
@@ -58,7 +57,7 @@ class MockNgbModal {
 describe('Contributions and review component', () => {
   let component: ContributionsAndReview;
   let fixture: ComponentFixture<ContributionsAndReview>;
-  let ngbModal: NgbModal;
+  let ngbModal: NgbModal = null;
   var contextService: ContextService;
   var contributionAndReviewService: ContributionAndReviewService;
   var contributionOpportunitiesService: ContributionOpportunitiesService;
@@ -67,8 +66,9 @@ describe('Contributions and review component', () => {
   var translationTopicService: TranslationTopicService;
   var userService: UserService;
   let alertsService: AlertsService;
-  var getUserCreatedTranslationSuggestionsAsyncSpy: jasmine.Spy;
-  let getUserContributionRightsDataAsyncSpy: jasmine.Spy;
+  let questionObjectFactory: QuestionObjectFactory;
+  var getUserCreatedTranslationSuggestionsAsyncSpy = null;
+  let getUserContributionRightsDataAsyncSpy = null;
   let formatRtePreviewPipe: FormatRtePreviewPipe;
   const mockActiveTopicEventEmitter = new EventEmitter();
 
@@ -105,6 +105,7 @@ describe('Contributions and review component', () => {
     component = fixture.componentInstance;
 
     ngbModal = TestBed.inject(NgbModal);
+    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     alertsService = TestBed.inject(AlertsService);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
@@ -179,20 +180,18 @@ describe('Contributions and review component', () => {
         suggestionIdToDetails: {
           suggestion_1: {
             suggestion: {
-              target_type: '',
-              author_name: '',
-              last_updated_msecs: 0,
+              target_type: null,
+              author_name: null,
+              last_updated_msecs: null,
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'translate_content',
               change: {
-                state_name: '',
-                new_value: {
-                  html: 'newHtml'
-                },
-                old_value: {
-                  html: 'oldHtml'
-                },
+                state_name: null,
+                new_value: null,
+                old_value: null,
+                content_html: 'Translation',
+                translation_html: 'Tradução',
                 skill_id: 'skill_id'
               },
               status: 'review'
@@ -211,20 +210,16 @@ describe('Contributions and review component', () => {
         suggestionIdToDetails: {
           suggestion_1: {
             suggestion: {
-              target_type: '',
-              author_name: '',
-              last_updated_msecs: 0,
+              target_type: null,
+              author_name: null,
+              last_updated_msecs: null,
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'translate_content',
               change: {
-                state_name: '',
-                new_value: {
-                  html: 'newHtml'
-                },
-                old_value: {
-                  html: 'oldHtml'
-                },
+                state_name: null,
+                new_value: null,
+                old_value: null,
                 skill_id: 'skill1',
                 question_dict: {
                   id: '1',
@@ -237,7 +232,7 @@ describe('Contributions and review component', () => {
                       answer_groups: [{
                         outcome: {
                           dest: 'outcome 1',
-                          dest_if_really_stuck: false,
+                          dest_if_really_stuck: null,
                           feedback: {
                             content_id: 'content_5',
                             html: ''
@@ -259,14 +254,14 @@ describe('Contributions and review component', () => {
                         rows: { value: 1 }
                       },
                       default_outcome: {
-                        dest: '',
-                        dest_if_really_stuck: false,
+                        dest: null,
+                        dest_if_really_stuck: null,
                         feedback: {
                           html: 'Correct Answer',
                           content_id: 'content_2'
                         },
                         param_changes: [],
-                        labelled_as_correct: false
+                        labelled_as_correct: true
                       },
                       hints: [{
                         hint_content: {
@@ -298,7 +293,7 @@ describe('Contributions and review component', () => {
             },
             details: {
               skill_description: 'Skill description',
-              skill_id: '',
+              skill_id: null,
             }
           }
         },
@@ -310,20 +305,16 @@ describe('Contributions and review component', () => {
         suggestionIdToDetails: {
           suggestion_1: {
             suggestion: {
-              target_type: '',
-              author_name: '',
-              last_updated_msecs: 0,
+              target_type: null,
+              author_name: null,
+              last_updated_msecs: null,
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'add_question',
               change: {
-                state_name: '',
-                new_value: {
-                  html: 'newHtml'
-                },
-                old_value: {
-                  html: 'oldHtml'
-                },
+                state_name: null,
+                new_value: null,
+                old_value: null,
                 skill_id: 'skill1',
                 question_dict: {
                   id: '1',
@@ -336,7 +327,7 @@ describe('Contributions and review component', () => {
                       answer_groups: [{
                         outcome: {
                           dest: 'outcome 1',
-                          dest_if_really_stuck: false,
+                          dest_if_really_stuck: null,
                           feedback: {
                             content_id: 'content_5',
                             html: ''
@@ -358,8 +349,8 @@ describe('Contributions and review component', () => {
                         rows: { value: 1 }
                       },
                       default_outcome: {
-                        dest: '',
-                        dest_if_really_stuck: false,
+                        dest: null,
+                        dest_if_really_stuck: null,
                         feedback: {
                           html: 'Correct Answer',
                           content_id: 'content_2'
@@ -439,8 +430,8 @@ describe('Contributions and review component', () => {
             next_misconception_id: 0,
             superseding_skill_id: ''
           }),
-          assignedSkillTopicData: {},
-          groupedSkillSummaries: {}
+          assignedSkillTopicData: null,
+          groupedSkillSummaries: null
         }));
     spyOn(
       contributionAndReviewService,
@@ -449,20 +440,16 @@ describe('Contributions and review component', () => {
         suggestionIdToDetails: {
           suggestion_1: {
             suggestion: {
-              target_type: '',
-              author_name: '',
-              last_updated_msecs: 0,
+              target_type: null,
+              author_name: null,
+              last_updated_msecs: null,
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'translate_content',
               change: {
-                state_name: '',
-                new_value: {
-                  html: 'newHtml'
-                },
-                old_value: {
-                  html: 'oldHtml'
-                },
+                state_name: null,
+                new_value: null,
+                old_value: null,
                 content_html: 'Translation',
                 translation_html: 'Tradução',
                 skill_id: 'skill_id'
@@ -491,7 +478,13 @@ describe('Contributions and review component', () => {
     it('should open call openQuestionSuggestionModal', fakeAsync(() => {
       let eventEmitter = new EventEmitter();
 
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion');
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+        (_one, _two, _thre, _four, _five, _six, callBackfunction) => {
+          callBackfunction();
+          tick();
+          return null;
+        }
+      );
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: {
           authorName: null,
@@ -516,35 +509,150 @@ describe('Contributions and review component', () => {
       let suggestion = {
         change: {
           skill_id: 'skill1',
-          question_dict: {} as QuestionBackendDict,
-          skill_difficulty: [],
-          translation_html: ['suggestion_1', 'suggestion_2'],
-          content_html: '',
+          question_dict: null,
+          skill_difficulty: null,
+          translation_html: ['suggestion_1', 'suggestion_2']
         },
         target_id: 'string;,',
         suggestion_id: 'suggestion_id',
         author_name: 'string;',
-        status: 'string',
-        suggestion_type: 'string',
       };
       let contributionDetails = {
         skill_description: 'string',
-        skill_rubrics: [],
-        chapter_title: '',
-        story_title: '',
-        topic_name: '',
+        skill_rubrics: []
       };
+      let question = questionObjectFactory.createFromBackendDict(
+        {
+          question_state_data_schema_version: null,
+          id: 'question_1',
+          question_state_data: {
+            classifier_model_id: null,
+            card_is_checkpoint: null,
+            linked_skill_id: null,
+            next_content_id_index: null,
+            content: {
+              html: 'Question 1',
+              content_id: 'content_1'
+            },
+            interaction: {
+              answer_groups: [{
+                outcome: {
+                  missing_prerequisite_skill_id: null,
+                  dest: 'outcome 1',
+                  dest_if_really_stuck: null,
+                  feedback: {
+                    content_id: 'content_5',
+                    html: ''
+                  },
+                  labelled_as_correct: true,
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                training_data: null,
+                rule_specs: [{
+                  rule_type: 'Equals',
+                  inputs: {x: 10}
+                }],
+                tagged_skill_misconception_id: null
+              },
+              {
+                training_data: null,
+                outcome: {
+                  missing_prerequisite_skill_id: null,
+                  dest: 'outcome 1',
+                  dest_if_really_stuck: null,
+                  feedback: {
+                    content_id: 'content_5',
+                    html: ''
+                  },
+                  labelled_as_correct: false,
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [{
+                  rule_type: 'Equals',
+                  inputs: {x: 10}
+                }],
+                tagged_skill_misconception_id: 'abc-1'
+              }],
+              confirmed_unclassified_answers: [],
+              customization_args: {
+                placeholder: {
+                  value: {
+                    content_id: 'ca_placeholder_0',
+                    unicode_str: ''
+                  }
+                },
+                rows: { value: 1 }
+              },
+              default_outcome: {
+                dest: null,
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
+                dest_if_really_stuck: null,
+                feedback: {
+                  html: 'Correct Answer',
+                  content_id: 'content_2'
+                },
+                param_changes: [],
+                labelled_as_correct: false
+              },
+              hints: [
+                {
+                  hint_content: {
+                    html: 'Hint 1',
+                    content_id: 'content_3'
+                  }
+                }
+              ],
+              solution: {
+                correct_answer: 'This is the correct answer',
+                answer_is_exclusive: false,
+                explanation: {
+                  html: 'Solution explanation',
+                  content_id: 'content_4'
+                }
+              },
+              id: 'TextInput'
+            },
+            param_changes: [],
+            recorded_voiceovers: {
+              voiceovers_mapping: {
+                content_1: {},
+                content_2: {},
+                content_3: {},
+                content_4: {},
+                content_5: {}
+              }
+            },
+            written_translations: {
+              translations_mapping: {
+                content_1: {},
+                content_2: {},
+                content_3: {},
+                content_4: {},
+                content_5: {}
+              }
+            },
+            solicit_answer_details: false
+          },
+          language_code: 'en',
+          version: 1,
+          linked_skill_ids: ['abc'],
+          inapplicable_skill_misconception_ids: ['abc-2']
+        });
       spyOn(contextService, 'setCustomEntityContext').and.stub();
 
       component.contributions = {
         suggestion_id: {
-          details: contributionDetails,
-          suggestion: {} as Suggestion,
+          details: contributionDetails as ContributionDetails,
+          suggestion: null,
         }
       };
       component.openQuestionSuggestionModal(
-        'suggestion_id', suggestion,
-        false);
+        'suggestion_id', suggestion as Suggestion,
+        false,
+        question);
 
       let value = {
         suggestionId: null,
@@ -578,20 +686,17 @@ describe('Contributions and review component', () => {
 
       let suggestion = {
         change: {
-          skill_id: 'skill1',
-          question_dict: {} as QuestionBackendDict,
-          skill_difficulty: [],
-          translation_html: ['suggestion_1', 'suggestion_2'],
-          content_html: '',
+          skill_id: 'string',
+          question_dict: null,
+          skill_difficulty: null,
+          translation_html: ['suggestion_1', 'suggestion_2']
         },
         target_id: 'string;,',
-        suggestion_id: 'suggestion_id',
+        suggestion_id: 'string;',
         author_name: 'string;',
-        status: 'string',
-        suggestion_type: 'string',
       };
 
-      component.getTranslationSuggestionHeading(suggestion);
+      component.getTranslationSuggestionHeading(suggestion as Suggestion);
       component.resolveSuggestionSuccess('suggestion_id');
       tick();
 
@@ -611,18 +716,14 @@ describe('Contributions and review component', () => {
       component.SUGGESTION_TYPE_QUESTION = 'SUGGESTION';
       component.contributions = {
         SUGGESTION: {
-          details: {} as ContributionDetails,
+          details: null,
           suggestion: {
-            author_name: 'author',
             suggestion_type: 'SUGGESTION',
             suggestion_id: '',
             target_id: 'target_id',
             change: {
               content_html: '',
               translation_html: '',
-              skill_id: 'string',
-              question_dict: {} as QuestionBackendDict,
-              skill_difficulty: [],
             },
             status: '',
           }
@@ -635,7 +736,13 @@ describe('Contributions and review component', () => {
     it('should open question suggestion modal', fakeAsync(() => {
       let eventEmitter = new EventEmitter();
 
-      spyOn(contributionAndReviewService, 'reviewSkillSuggestion');
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+        (_one, _two, _thre, _four, _five, _six, callBackfunction) => {
+          callBackfunction();
+          tick();
+          return null;
+        }
+      );
       spyOn(component, 'openQuestionSuggestionModal').and.stub();
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: {
@@ -659,13 +766,13 @@ describe('Contributions and review component', () => {
       } as NgbModalRef);
 
       let questionDict = {
-        question_state_data_schema_version: 0,
+        question_state_data_schema_version: null,
         id: 'question_1',
         question_state_data: {
-          classifier_model_id: '',
-          card_is_checkpoint: false,
-          linked_skill_id: '',
-          next_content_id_index: 0,
+          classifier_model_id: null,
+          card_is_checkpoint: null,
+          linked_skill_id: null,
+          next_content_id_index: null,
           content: {
             html: 'Question 1',
             content_id: 'content_1'
@@ -684,7 +791,7 @@ describe('Contributions and review component', () => {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              training_data: [],
+              training_data: null,
               rule_specs: [{
                 rule_type: 'Equals',
                 inputs: {x: 10}
@@ -692,7 +799,7 @@ describe('Contributions and review component', () => {
               tagged_skill_misconception_id: null
             },
             {
-              training_data: [],
+              training_data: null,
               outcome: {
                 missing_prerequisite_skill_id: null,
                 dest: 'outcome 1',
@@ -722,7 +829,7 @@ describe('Contributions and review component', () => {
               rows: { value: 1 }
             },
             default_outcome: {
-              dest: '',
+              dest: null,
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest_if_really_stuck: null,
@@ -782,11 +889,11 @@ describe('Contributions and review component', () => {
         change: {
           skill_id: 'string',
           question_dict: questionDict,
-          skill_difficulty: [],
+          skill_difficulty: null,
           translation_html: ['suggestion_1', 'suggestion_2'],
-          content_html: '',
+          content_html: null,
         },
-        status: '',
+        status: null,
         target_id: 'string;,',
         suggestion_id: 'string;',
         author_name: 'string;',
@@ -796,40 +903,32 @@ describe('Contributions and review component', () => {
       let suggestionIdToContribution = {
         suggestion_1: {
           suggestion: {
-            exploration_content_html: 'html',
-            language_code: 'en',
-            target_type: '',
-            author_name: 'name',
-            last_updated_msecs: 0,
+            exploration_content_html: null,
+            language_code: null,
+            target_type: null,
+            author_name: null,
+            last_updated_msecs: null,
             suggestion_id: 'suggestion_1',
             target_id: '1',
             suggestion_type: 'translate_content',
             change: {
-              skill_difficulty: [],
-              cmd: '',
-              content_html: '',
-              content_id: '',
-              data_format: '',
+              cmd: null,
+              content_html: null,
+              content_id: null,
+              data_format: null,
               language_code: 'en',
-              translation_html: '',
-              skill_id: 'skill_id',
-              state_name: 'state_1',
-              new_value: { html: 'new suggestion content' },
-              old_value: { html: 'old suggestion content' },
+              translation_html: null,
+              state_name: null,
+              new_value: null,
+              old_value: null,
+              skill_id: 'skill1',
               question_dict: {
-                question_state_data_schema_version: 0,
-                language_code: 'en',
-                version: 0,
-                linked_skill_ids: [],
-                inapplicable_skill_misconception_ids: [],
                 id: '1',
                 question_state_data: {
                   content: {
                     html: 'Question 1',
                     content_id: 'content_1'
                   },
-                  classifier_model_id: null,
-                  param_changes: [],
                   interaction: {
                     answer_groups: [{
                       outcome: {
@@ -841,12 +940,9 @@ describe('Contributions and review component', () => {
                         },
                         labelled_as_correct: true,
                         param_changes: [],
-                        refresher_exploration_id: null,
-                        missing_prerequisite_skill_id: null
+                        refresher_exploration_id: null
                       },
                       rule_specs: [],
-                      training_data: [],
-                      tagged_skill_misconception_id: null,
                     }],
                     confirmed_unclassified_answers: [],
                     customization_args: {
@@ -859,16 +955,14 @@ describe('Contributions and review component', () => {
                       rows: { value: 1 }
                     },
                     default_outcome: {
-                      dest: '',
+                      dest: null,
                       dest_if_really_stuck: null,
                       feedback: {
                         html: 'Correct Answer',
                         content_id: 'content_2'
                       },
                       param_changes: [],
-                      labelled_as_correct: true,
-                      refresher_exploration_id: null,
-                      missing_prerequisite_skill_id: null,
+                      labelled_as_correct: true
                     },
                     hints: [{
                       hint_content: {
@@ -886,16 +980,13 @@ describe('Contributions and review component', () => {
                     },
                     id: 'TextInput'
                   },
+                  param_changes: [],
                   recorded_voiceovers: {
                     voiceovers_mapping: {}
                   },
                   written_translations: {
                     translations_mapping: {}
                   },
-                  solicit_answer_details: false,
-                  card_is_checkpoint: false,
-                  next_content_id_index: 0,
-                  linked_skill_id: null,
                 },
               }
             },
@@ -903,11 +994,10 @@ describe('Contributions and review component', () => {
           },
           details: {
             skill_description: 'Skill description',
-            skill_rubrics: [],
-            skill_id: 'id',
-            chapter_title: 'title',
-            story_title: 'title',
-            topic_name: 'name'
+            skill_id: null,
+            chapter_title: null,
+            story_title: null,
+            topic_name: null
           }
         }
       };
@@ -916,8 +1006,8 @@ describe('Contributions and review component', () => {
         suggestion,
         suggestionIdToContribution,
         false,
-        undefined,
-        {});
+        null,
+        null);
 
       let value = {
         suggestionId: null,
@@ -959,7 +1049,7 @@ describe('Contributions and review component', () => {
     });
 
     it('should load contributions correctly', () => {
-      component.loadContributions(false).then(({opportunitiesDicts, more}) => {
+      component.loadContributions(null).then(({opportunitiesDicts, more}) => {
         expect(Object.keys(component.contributions)).toContain('suggestion_1');
         expect(opportunitiesDicts).toEqual([{
           id: 'suggestion_1',
@@ -974,8 +1064,8 @@ describe('Contributions and review component', () => {
     });
 
     it('should return empty list if tab is not initialized', () => {
-      component.activeTabType = '';
-      component.loadContributions(false).then(({opportunitiesDicts, more}) => {
+      component.activeTabType = null;
+      component.loadContributions(null).then(({opportunitiesDicts, more}) => {
         expect(opportunitiesDicts).toEqual([]);
         expect(more).toEqual(false);
       });
@@ -983,10 +1073,8 @@ describe('Contributions and review component', () => {
 
     it('should return empty list if suggestion type is not initialized',
       () => {
-        component.activeTabType = '';
-        component.loadContributions(false).then((
-            {opportunitiesDicts, more}
-        ) => {
+        component.activeTabType = null;
+        component.loadContributions(null).then(({opportunitiesDicts, more}) => {
           expect(opportunitiesDicts).toEqual([]);
           expect(more).toEqual(false);
         });
@@ -1016,8 +1104,8 @@ describe('Contributions and review component', () => {
     it('should cover other code too', fakeAsync(() => {
       jasmine.createSpy('userReviewableSuggestionTypes.length')
         .and.returnValue(0);
-      component.SUGGESTION_TYPE_TRANSLATE = '';
-      component.SUGGESTION_TYPE_QUESTION = '';
+      component.SUGGESTION_TYPE_TRANSLATE = null;
+      component.SUGGESTION_TYPE_QUESTION = null;
       getUserContributionRightsDataAsyncSpy.and.returnValue(Promise.resolve({
         can_review_translation_for_language_codes: ['something', 'cool'],
         can_review_questions: false,
@@ -1035,8 +1123,8 @@ describe('Contributions and review component', () => {
     it('should cover other code too', fakeAsync(() => {
       jasmine.createSpy('userReviewableSuggestionTypes.length')
         .and.returnValue(0);
-      component.SUGGESTION_TYPE_TRANSLATE = '';
-      component.SUGGESTION_TYPE_QUESTION = '';
+      component.SUGGESTION_TYPE_TRANSLATE = null;
+      component.SUGGESTION_TYPE_QUESTION = null;
       getUserContributionRightsDataAsyncSpy.and.returnValue(Promise.resolve({
         can_review_translation_for_language_codes: [],
         can_review_questions: false,
@@ -1054,8 +1142,8 @@ describe('Contributions and review component', () => {
     it('should completely test onInIt', fakeAsync(() => {
       jasmine.createSpy('userReviewableSuggestionTypes.length')
         .and.returnValue(0);
-      component.SUGGESTION_TYPE_TRANSLATE = '';
-      component.SUGGESTION_TYPE_QUESTION = '';
+      component.SUGGESTION_TYPE_TRANSLATE = null;
+      component.SUGGESTION_TYPE_QUESTION = null;
       getUserContributionRightsDataAsyncSpy.and.returnValue(Promise.resolve({
         can_review_translation_for_language_codes: [],
         can_review_questions: false,
@@ -1160,23 +1248,21 @@ describe('Contributions and review component', () => {
               content_html: 'string',
               translation_html: 'html',
               question_dict: {
-                id: 'string',
-                question_state_data_schema_version: 0,
-                language_code: 'en',
-                version: 0,
-                linked_skill_ids: [],
-                inapplicable_skill_misconception_ids: [],
-                question_state_data: {} as StateBackendDict,
+                question_state_data: {
+                  content: {
+                    html: 'html'
+                  }
+                }
               },
-              skill_difficulty: [],
+              skill_difficulty: null,
             },
             target_id: 'string;,',
             suggestion_id: 'suggestion_id',
             author_name: 'string;',
             status: 'review',
             suggestion_type: 'string'
-          },
-          details: {} as ContributionDetails,
+          } as Suggestion,
+          details: null,
         }
       };
 
@@ -1190,7 +1276,7 @@ describe('Contributions and review component', () => {
       ' suggestion', () => {
       contributionOpportunitiesService
         .reloadOpportunitiesEventEmitter.subscribe(() => {
-          component.loadContributions(false).then(() => {
+          component.loadContributions(null).then(() => {
             spyOn(ngbModal, 'open').and.callThrough();
             component.onClickViewSuggestion('suggestion_1');
 
@@ -1203,18 +1289,18 @@ describe('Contributions and review component', () => {
     });
 
     it('should load new loadContributions', fakeAsync(() => {
-      spyOn(component, 'getContributionSummaries').and.returnValue([]);
+      spyOn(component, 'getContributionSummaries').and.returnValue(null);
 
       component.activeTabType = 'activeTabType';
       component.activeSuggestionType = 'activeSuggestionType';
       component.contributions = {
-        1: {} as SuggestionDetails,
-        2: {} as SuggestionDetails,
+        1: null,
+        2: null,
       };
 
       component.tabNameToOpportunityFetchFunction = {
         activeSuggestionType: {
-          activeTabType: () => {
+          activeTabType: (shouldResetOffset) => {
             return Promise.resolve({
               suggestionIdToDetails: {
                 1: {},
@@ -1273,27 +1359,20 @@ describe('Contributions and review component', () => {
       let suggestionIdToSuggestions = {
         suggestion: {
           suggestion: {
-            change: {
-              skill_id: 'string',
-              content_html: 'string',
-              translation_html: 'html',
-              question_dict: {
-                id: 'string',
-                question_state_data_schema_version: 0,
-                language_code: 'en',
-                version: 0,
-                linked_skill_ids: [],
-                inapplicable_skill_misconception_ids: [],
-                question_state_data: {} as StateBackendDict,
-              },
-              skill_difficulty: [],
-            },
-            target_id: '',
-            suggestion_id: '',
-            author_name: 'string;',
+            suggestion_type: null,
+            target_id: null,
+            suggestion_id: 'id',
             status: 'review',
-            suggestion_type: ''
-          },
+            change: {
+              question_dict: {
+                question_state_data: {
+                  content: {
+                    html: 'html'
+                  }
+                }
+              }
+            }
+          } as Suggestion,
           details: {
             skill_description: 'skill_description',
             topic_name: 'topic_name',
@@ -1307,7 +1386,7 @@ describe('Contributions and review component', () => {
       tick();
 
       expect(component.getQuestionContributionsSummary(
-        suggestionIdToSuggestions)
+        suggestionIdToSuggestions as Record<string, SuggestionDetails>)
       ).toEqual([{
         id: 'id',
         heading: 'heading',
@@ -1323,11 +1402,11 @@ describe('Contributions and review component', () => {
       spyOn(component, 'getQuestionContributionsSummary').and.stub();
 
       component.activeSuggestionType = component.SUGGESTION_TYPE_TRANSLATE;
-      component.getContributionSummaries({});
+      component.getContributionSummaries(null);
       tick();
 
       component.activeSuggestionType = component.SUGGESTION_TYPE_QUESTION;
-      component.getContributionSummaries({});
+      component.getContributionSummaries(null);
       tick();
 
       expect(component.getTranslationContributionsSummary)
@@ -1346,20 +1425,16 @@ describe('Contributions and review component', () => {
       );
       const removeSpy = spyOn(
         contributionOpportunitiesService.removeOpportunitiesEventEmitter,
-        'emit').and.returnValue();
+        'emit').and.returnValue(null);
       component.contributions = {
         suggestion_1: {
           suggestion: {
-            author_name: 'author',
             suggestion_id: 'suggestion_1',
             target_id: '1',
             suggestion_type: 'translate_content',
             change: {
               content_html: 'Translation',
-              translation_html: 'Tradução',
-              skill_id: 'string',
-              question_dict: {} as QuestionBackendDict,
-              skill_difficulty: [],
+              translation_html: 'Tradução'
             },
             status: 'review'
           },
@@ -1384,7 +1459,7 @@ describe('Contributions and review component', () => {
       () => {
         contributionOpportunitiesService
           .reloadOpportunitiesEventEmitter.subscribe(() => {
-            component.loadContributions(false).then(() => {
+            component.loadContributions(null).then(() => {
               spyOn(ngbModal, 'open').and.returnValue({
                 result: Promise.resolve({
                   action: 'add',
@@ -1405,7 +1480,7 @@ describe('Contributions and review component', () => {
       () => {
         contributionOpportunitiesService
           .reloadOpportunitiesEventEmitter.subscribe(() => {
-            component.loadContributions(false).then(() => {
+            component.loadContributions(null).then(() => {
               spyOn(ngbModal, 'open').and.returnValue({
                 result: Promise.reject()
               } as NgbModalRef);
@@ -1426,7 +1501,7 @@ describe('Contributions and review component', () => {
     'view suggestion', () => {
       contributionOpportunitiesService
         .reloadOpportunitiesEventEmitter.subscribe(() => {
-          component.loadContributions(false).then(() => {
+          component.loadContributions(null).then(() => {
             spyOn(ngbModal, 'open').and.returnValue({
               result: Promise.reject()
             } as NgbModalRef);
@@ -1455,7 +1530,7 @@ describe('Contributions and review component', () => {
     ' question suggestion', () => {
       spyOn(ngbModal, 'open').and.callThrough();
       component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
-      component.loadContributions(false).then(() => {
+      component.loadContributions(null).then(() => {
         component.onClickViewSuggestion('suggestion_1');
 
         expect(ngbModal.open).toHaveBeenCalled();
@@ -1469,7 +1544,7 @@ describe('Contributions and review component', () => {
       } as NgbModalRef);
 
       component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
-      component.loadContributions(false).then(() => {
+      component.loadContributions(null).then(() => {
         expect(Object.keys(component.contributions).length).toBe(1);
         component.onClickViewSuggestion('suggestion_1');
         flush();
@@ -1486,7 +1561,7 @@ describe('Contributions and review component', () => {
         result: Promise.reject({})
       } as NgbModalRef);
 
-      component.loadContributions(false).then(() => {
+      component.loadContributions(null).then(() => {
         component.onClickViewSuggestion('suggestion_1');
 
         expect(ngbModal.open).toHaveBeenCalled();
@@ -1541,10 +1616,7 @@ describe('Contributions and review component', () => {
         }
       };
       const clickEvent = {
-        // This throws "Type 'null' is not assignable to type 'Node'." We need
-        // to suppress this error because we need to set target to null.
-        // @ts-ignore
-        target: null as Node
+        target: null
       };
       const querySelectorSpy = spyOn(document, 'querySelector').and
         .returnValue(null);
@@ -1552,7 +1624,7 @@ describe('Contributions and review component', () => {
         .returnValue(true);
       component.dropdownShown = true;
 
-      component.closeDropdownWhenClickedOutside({} as { target: Node });
+      component.closeDropdownWhenClickedOutside(null);
       expect(querySelectorSpy).toHaveBeenCalled();
       expect(elementContainsSpy).not.toHaveBeenCalled();
       expect(component.dropdownShown).toBe(true);
@@ -1579,10 +1651,7 @@ describe('Contributions and review component', () => {
 
     it('should return back when user click is made outside', () => {
       const clickEvent = {
-        // This throws "Type 'null' is not assignable to type 'Node'." We need
-        // to suppress this error because we need to set target to null.
-        // @ts-ignore
-        target: null as Node
+        target: null
       };
       spyOn(document, 'querySelector').and.returnValue(null);
 

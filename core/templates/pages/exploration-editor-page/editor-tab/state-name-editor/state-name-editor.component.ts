@@ -79,11 +79,10 @@ export class StateNameEditorComponent
       return false;
     } else {
       let stateName = this.stateEditorService.getActiveStateName();
-      if (stateName === null) {
-        throw new Error('Cannot save state name for null state.');
+      if (stateName) {
+        this.explorationStatesService.renameState(
+          stateName, normalizedNewName);
       }
-      this.explorationStatesService.renameState(
-        stateName, normalizedNewName);
       this.stateNameService.setStateNameEditorVisibility(false);
       // Save the contents of other open fields.
       this.externalSaveService.onExternalSave.emit();

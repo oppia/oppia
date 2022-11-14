@@ -29,7 +29,7 @@ import { AngularNameService } from 'pages/exploration-editor-page/services/angul
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
 import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
-import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
+import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { TrainingDataService } from './training-data.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { InteractionAnswer } from 'interactions/answer-defs';
@@ -66,7 +66,7 @@ export const RULES_SERVICE_MAPPING = {
 
 interface classification {
   answerGroupIndex: number;
-  newOutcome: Outcome | null;
+  newOutcome: Outcome;
 }
 
 @Component({
@@ -75,29 +75,14 @@ interface classification {
 })
 export class TrainingModalComponent
   extends ConfirmOrCancelModal implements OnInit {
+  @Input() unhandledAnswer: InteractionAnswer;
   @Output() finishTrainingCallback: EventEmitter<void> =
     new EventEmitter();
-
-  // These properties below are initialized using Angular lifecycle hooks
-  // where we need to do non-null assertion. For more information see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() unhandledAnswer!: InteractionAnswer;
-  // The classification is an object with two keys:
-  //   -answerGroupIndex: This refers to which answer group the answer
-  //      being trained has been classified to (for displaying feedback
-  //      to the creator). If answerGroupIndex is equal to the number of
-  //      answer groups, then it represents the default outcome feedback.
-  //      This index is changed by the panel when the creator specifies
-  //      which feedback should be associated with the answer.
-  //   -newOutcome: This refers to an outcome structure (containing a
-  //      list of feedback and a destination state name) which is
-  //      non-null if, and only if, the creator has specified that a new
-  //      response should be created for the trained answer.
-  classification!: classification;
 
   trainingDataAnswer: InteractionAnswer | string = '';
   // See the training panel directive in ExplorationEditorTab for an
   // explanation on the structure of this object.
+  classification: classification;
   addingNewResponse: boolean = false;
 
   constructor(
@@ -120,7 +105,7 @@ export class TrainingModalComponent
   ngOnInit(): void {
     this.classification = {
       answerGroupIndex: 0,
-      newOutcome: null,
+      newOutcome: null
     };
     this.addingNewResponse = false;
 
@@ -134,15 +119,13 @@ export class TrainingModalComponent
     this.responsesService.save(
       answerGroups, this.responsesService.getDefaultOutcome(),
       (newAnswerGroups, newDefaultOutcome) => {
-        let stateName = this.stateEditorService.getActiveStateName();
-        if (stateName === null || newDefaultOutcome === null) {
-          throw new Error('Cannot save new answer group.');
-        }
         this.explorationStatesService.saveInteractionAnswerGroups(
-          stateName, cloneDeep(newAnswerGroups));
+          this.stateEditorService.getActiveStateName(),
+          cloneDeep(newAnswerGroups));
 
         this.explorationStatesService.saveInteractionDefaultOutcome(
-          stateName, cloneDeep(newDefaultOutcome));
+          this.stateEditorService.getActiveStateName(),
+          cloneDeep(newDefaultOutcome));
 
         this.graphDataService.recompute();
         this.explorationWarningsService.updateWarnings();
@@ -157,9 +140,6 @@ export class TrainingModalComponent
     let index = this.classification.answerGroupIndex;
     if (index > this.responsesService.getAnswerGroupCount()) {
       let newOutcome = this.classification.newOutcome;
-      if (newOutcome === null) {
-        throw new Error('Cannot save new answer group.');
-      }
       let newAnswerGroup = this.answerGroupObjectFactory.createNew(
         [], cloneDeep(newOutcome), [this.unhandledAnswer], null);
       this._saveNewAnswerGroup(newAnswerGroup);
@@ -181,9 +161,6 @@ export class TrainingModalComponent
   init(): void {
     let currentStateName =
       this.stateEditorService.getActiveStateName();
-    if (currentStateName === null) {
-      throw new Error('Cannot train on an un-named state.');
-    }
     let state = this.explorationStatesService.getState(currentStateName);
 
     // Retrieve the interaction ID.
@@ -195,9 +172,7 @@ export class TrainingModalComponent
 
     // Inject RulesService dynamically.
     let rulesService = (
-      this.injector.get(RULES_SERVICE_MAPPING[
-        rulesServiceName as keyof typeof RULES_SERVICE_MAPPING
-      ])) as InteractionRulesService;
+      this.injector.get(RULES_SERVICE_MAPPING[rulesServiceName]));
 
     let classificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(

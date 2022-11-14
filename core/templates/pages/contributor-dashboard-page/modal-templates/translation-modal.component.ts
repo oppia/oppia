@@ -207,13 +207,12 @@ export class TranslationModalComponent {
       });
     this.userService.getUserContributionRightsDataAsync().then(
       userContributionRights => {
-        if (userContributionRights === null) {
-          throw new Error('User contribution rights not found.');
-        }
-        const reviewableLanguageCodes = (
-          userContributionRights.can_review_translation_for_language_codes);
-        if (reviewableLanguageCodes.includes(this.activeLanguageCode)) {
-          this.isActiveLanguageReviewer = true;
+        if (userContributionRights) {
+          const reviewableLanguageCodes = (
+            userContributionRights.can_review_translation_for_language_codes);
+          if (reviewableLanguageCodes.includes(this.activeLanguageCode)) {
+            this.isActiveLanguageReviewer = true;
+          }
         }
       });
     this.HTML_SCHEMA = {
@@ -299,14 +298,8 @@ export class TranslationModalComponent {
       ruleType,
       interactionId
     } = translatableItem;
-    if (ruleType === undefined) {
-      throw new Error('Rule type is undefined.');
-    }
-    if (interactionId === undefined) {
-      throw new Error('Interaction id is undefined.');
-    }
     this.activeContentType = this.getFormattedContentType(
-      contentType, interactionId
+      contentType, interactionId as string
     );
     this.activeRuleDescription = this.getRuleDescription(
       ruleType, interactionId
@@ -389,7 +382,7 @@ export class TranslationModalComponent {
   }
 
   getFormattedContentType(
-      contentType: string, interactionId: string): string {
+      contentType: string, interactionId: string | null): string {
     if (contentType === 'interaction') {
       return interactionId + ' interaction';
     } else if (contentType === 'rule') {
@@ -398,7 +391,7 @@ export class TranslationModalComponent {
     return contentType;
   }
 
-  getRuleDescription(ruleType: string, interactionId: string): string {
+  getRuleDescription(ruleType?: string, interactionId?: string): string {
     if (!ruleType || !interactionId) {
       return '';
     }

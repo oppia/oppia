@@ -325,7 +325,7 @@ export class StateGraphVisualization
   }
 
   getNodeTitle(node: NodeTitle): string {
-    let warning = '';
+    let warning: string | null = '';
     if (node.reachable === false) {
       warning = 'Warning: this state is unreachable.';
     } else if (node.reachableFromEnd === false) {

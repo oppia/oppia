@@ -63,10 +63,15 @@ class MockWindowRef {
 
 class MockExplorationDataService1 {
   explorationId!: 0;
-  autosaveChangeListAsync(successCb: (arg0: {
-    changes_are_mergeable: boolean;
-    is_version_of_draft_valid: boolean;
-  }) => void) {
+  autosaveChangeListAsync(
+      changeList: string[],
+      successCb: (
+        arg0: {
+          changes_are_mergeable: boolean;
+          is_version_of_draft_valid: boolean;
+        }) => void,
+      errorCb: () => void
+  ) {
     successCb({
       changes_are_mergeable: true,
       is_version_of_draft_valid: false,
@@ -80,10 +85,15 @@ class MockExplorationDataService1 {
 
 class MockExplorationDataService2 {
   explorationId!: 0;
-  autosaveChangeListAsync(successCb: (arg0: {
-    changes_are_mergeable: boolean;
-    is_version_of_draft_valid: boolean;
-  }) => void) {
+  autosaveChangeListAsync(
+      changeList: string[],
+      successCb: (
+        arg0: {
+          changes_are_mergeable: boolean;
+          is_version_of_draft_valid: boolean;
+        }) => void,
+      errorCb: () => void
+  ) {
     successCb({
       changes_are_mergeable: false,
       is_version_of_draft_valid: false,
@@ -97,7 +107,11 @@ class MockExplorationDataService2 {
 
 class MockExplorationDataService3 {
   explorationId!: 0;
-  autosaveChangeListAsync(errorCb: () => void) {
+  autosaveChangeListAsync(
+      changeList: string[],
+      successCb: () => void,
+      errorCb: () => void
+  ) {
     errorCb();
   }
 

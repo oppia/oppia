@@ -101,15 +101,12 @@ export class TrainingDataService {
         answerGroups, this.responsesService.getDefaultOutcome(),
         (newAnswerGroups, newDefaultOutcome) => {
           let stateName = this.stateEditorService.getActiveStateName();
-          if (stateName === null) {
-            throw new Error('Active state name is null');
-          }
-          this.explorationStatesService.saveInteractionAnswerGroups(
-            stateName, cloneDeep(newAnswerGroups));
+          if (stateName) {
+            this.explorationStatesService.saveInteractionAnswerGroups(
+              stateName, cloneDeep(newAnswerGroups));
 
-          if (newDefaultOutcome) {
             this.explorationStatesService.saveInteractionDefaultOutcome(
-              stateName, cloneDeep(newDefaultOutcome));
+              stateName, cloneDeep(newDefaultOutcome) as Outcome);
           }
 
           this.graphDataService.recompute();
@@ -120,17 +117,15 @@ export class TrainingDataService {
       this.responsesService.updateConfirmedUnclassifiedAnswers(
         confirmedUnclassifiedAnswers);
       let stateName = this.stateEditorService.getActiveStateName();
-      if (stateName === null) {
-        throw new Error('Active state name is null');
+      if (stateName) {
+        // TODO(#13015): Remove use of unknown as a type.
+        // unknown has been used here becuase
+        // explorationStatesService.saveConfirmedUnclassifiedAnswers
+        // wants variable of type AnswerGroup[] but
+        // confirmedUnclassifiedAnswers is of InteractionAnswer[] type.
+        this.explorationStatesService.saveConfirmedUnclassifiedAnswers(
+          stateName, confirmedUnclassifiedAnswers as unknown as AnswerGroup[]);
       }
-
-      // TODO(#13015): Remove use of unknown as a type.
-      // unknown has been used here becuase
-      // explorationStatesService.saveConfirmedUnclassifiedAnswers
-      // wants variable of type AnswerGroup[] but
-      // confirmedUnclassifiedAnswers is of InteractionAnswer[] type.
-      this.explorationStatesService.saveConfirmedUnclassifiedAnswers(
-        stateName, confirmedUnclassifiedAnswers as unknown as AnswerGroup[]);
     }
   }
 
@@ -186,11 +181,10 @@ export class TrainingDataService {
       trainingData: answerGroup.trainingData
     } as AnswerGroup, (newAnswerGroups) => {
       let stateName = this.stateEditorService.getActiveStateName();
-      if (stateName === null) {
-        throw new Error('Active state name is null');
+      if (stateName) {
+        this.explorationStatesService.saveInteractionAnswerGroups(
+          stateName, newAnswerGroups);
       }
-      this.explorationStatesService.saveInteractionAnswerGroups(
-        stateName, newAnswerGroups);
 
       this.graphDataService.recompute();
     });
@@ -209,17 +203,15 @@ export class TrainingDataService {
       confirmedUnclassifiedAnswers);
 
     let stateName = this.stateEditorService.getActiveStateName();
-    if (stateName === null) {
-      throw new Error('Active state name is null');
+    if (stateName) {
+      // TODO(#13015): Remove use of unknown as a type.
+      // unknown has been used here becuase
+      // explorationStatesService.saveConfirmedUnclassifiedAnswers
+      // wants variable of type AnswerGroup[] but
+      // confirmedUnclassifiedAnswers is of InteractionAnswer[] type.
+      this.explorationStatesService.saveConfirmedUnclassifiedAnswers(
+        stateName, confirmedUnclassifiedAnswers as unknown as AnswerGroup[]);
     }
-
-    // TODO(#13015): Remove use of unknown as a type.
-    // unknown has been used here becuase
-    // explorationStatesService.saveConfirmedUnclassifiedAnswers
-    // wants variable of type AnswerGroup[] but
-    // confirmedUnclassifiedAnswers is of InteractionAnswer[] type.
-    this.explorationStatesService.saveConfirmedUnclassifiedAnswers(
-      stateName, confirmedUnclassifiedAnswers as unknown as AnswerGroup[]);
   }
 
   isConfirmedUnclassifiedAnswer(answer: InteractionAnswer): boolean {
@@ -246,11 +238,10 @@ export class TrainingDataService {
       trainingData: trainingData
     } as unknown as AnswerGroup, (newAnswerGroups) => {
       let stateName = this.stateEditorService.getActiveStateName();
-      if (stateName === null) {
-        throw new Error('Active state name is null');
+      if (stateName) {
+        this.explorationStatesService.saveInteractionAnswerGroups(
+          stateName, newAnswerGroups);
       }
-      this.explorationStatesService.saveInteractionAnswerGroups(
-        stateName, newAnswerGroups);
 
       this.graphDataService.recompute();
     });

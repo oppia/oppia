@@ -24,7 +24,7 @@ import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
-import { ActiveContributionDetailsDict, QuestionSuggestionReviewModalComponent } from './question-suggestion-review-modal.component';
+import { QuestionSuggestionReviewModalComponent } from './question-suggestion-review-modal.component';
 import { ThreadDataBackendApiService, ThreadMessages } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { Question } from 'domain/question/QuestionObjectFactory';
@@ -621,15 +621,21 @@ describe('Question Suggestion Review Modal component', () => {
       spyOn(component, 'cancel');
       let details1 = component.allContributions['1'].details;
       let details2 = component.allContributions['2'].details;
-      component.allContributions['2'].details = (
-        {} as ActiveContributionDetailsDict);
+      // This throws "Type 'null' is not assignable to type
+      // 'ActiveContributionDetailsDict'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+      component.allContributions['2'].details = null;
 
       component.goToNextItem();
       expect(component.cancel).toHaveBeenCalled();
       component.allContributions['2'].details = details2;
       component.goToNextItem();
-      component.allContributions['1'].details = (
-        {} as ActiveContributionDetailsDict);
+      // This throws "Type 'null' is not assignable to type
+      // 'ActiveContributionDetailsDict'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+      component.allContributions['1'].details = null;
 
       component.goToPreviousItem();
       expect(component.cancel).toHaveBeenCalledWith();

@@ -115,37 +115,27 @@ export class TranslationStatusService implements OnInit {
 
   _getContentAvailabilityStatus(
       stateName: string, contentId: string): AvailabilityStatus {
-    let availabilityStatus = {
-      available: false,
-      needsUpdate: false,
-    };
     this.langCode = this.translationLanguageService.getActiveLanguageCode();
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       let writtenTranslations = (
         this.explorationStatesService.getWrittenTranslationsMemento(stateName));
       return this._getTranslationStatus(writtenTranslations, contentId);
-    } else if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+    } else {
       let recordedVoiceovers = (
         this.explorationStatesService.getRecordedVoiceoversMemento(stateName));
       return this._getVoiceOverStatus(recordedVoiceovers, contentId);
     }
-    return availabilityStatus;
   }
 
   _getActiveStateContentAvailabilityStatus(
       contentId: string): AvailabilityStatus {
-    let availabilityStatus = {
-      available: false,
-      needsUpdate: false,
-    };
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       let writtenTranslations = this.stateWrittenTranslationsService.displayed;
       return this._getTranslationStatus(writtenTranslations, contentId);
-    } else if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+    } else {
       let recordedVoiceovers = this.stateRecordedVoiceoversService.displayed;
       return this._getVoiceOverStatus(recordedVoiceovers, contentId);
     }
-    return availabilityStatus;
   }
 
   _computeAllStatesStatus(): void {
@@ -274,23 +264,20 @@ export class TranslationStatusService implements OnInit {
       componentName, this._getAvailableContentIds());
     let availableAudioCount = 0;
 
-    if (contentIdList) {
-      contentIdList.forEach((contentId) => {
-        let availabilityStatus = this._getActiveStateContentAvailabilityStatus(
-          contentId);
-        if (availabilityStatus.available) {
-          availableAudioCount++;
-        }
-      });
-      if (contentIdList.length === availableAudioCount) {
-        return this.ALL_ASSETS_AVAILABLE_COLOR;
-      } else if (availableAudioCount === 0) {
-        return this.NO_ASSETS_AVAILABLE_COLOR;
-      } else {
-        return this.FEW_ASSETS_AVAILABLE_COLOR;
+    contentIdList.forEach((contentId) => {
+      let availabilityStatus = this._getActiveStateContentAvailabilityStatus(
+        contentId);
+      if (availabilityStatus.available) {
+        availableAudioCount++;
       }
+    });
+    if (contentIdList.length === availableAudioCount) {
+      return this.ALL_ASSETS_AVAILABLE_COLOR;
+    } else if (availableAudioCount === 0) {
+      return this.NO_ASSETS_AVAILABLE_COLOR;
+    } else {
+      return this.FEW_ASSETS_AVAILABLE_COLOR;
     }
-    return this.NO_ASSETS_AVAILABLE_COLOR;
   }
 
   _getAvailableContentIds(): string[] {
@@ -342,19 +329,17 @@ export class TranslationStatusService implements OnInit {
   _getExplorationContentRequiredCount(): number {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return this.explorationTranslationContentRequiredCount;
-    } else if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+    } else {
       return this.explorationVoiceoverContentRequiredCount;
     }
-    return 0;
   }
 
   _getExplorationContentNotAvailableCount(): number {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return this.explorationTranslationContentNotAvailableCount;
-    } else if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+    } else {
       return this.explorationVoiceoverContentNotAvailableCount;
     }
-    return 0;
   }
 
   refresh(): void {

@@ -80,29 +80,27 @@ export class AddAudioTranslationModalComponent
        let explorationId = (
          this.contextService.getExplorationId());
        let file = this.uploadedFile;
-       if (file === null) {
-         throw new Error('File cannot be null.');
-       }
-       Promise.resolve(
-         this.assetsBackendApiService.saveAudio(
-           explorationId, this.generatedFilename, file)
-       ).then((response) => {
-         if (file === null) {
-           throw new Error('File cannot be null.');
-         }
-         this.ngbActiveModal.close({
-           languageCode: this.languageCode,
-           filename: this.generatedFilename,
-           fileSizeBytes: file.size,
-           durationSecs: response.duration_secs
+       if (file) {
+         Promise.resolve(
+           this.assetsBackendApiService.saveAudio(
+             explorationId, this.generatedFilename, file)
+         ).then((response) => {
+           if (file) {
+             this.ngbActiveModal.close({
+               languageCode: this.languageCode,
+               filename: this.generatedFilename,
+               fileSizeBytes: file.size,
+               durationSecs: response.duration_secs
+             });
+           }
+         }, (errorResponse) => {
+           this.errorMessage = (
+             errorResponse.error || this.ERROR_MESSAGE_BAD_FILE_UPLOAD);
+           this.uploadedFile = null;
+           this.saveButtonText = this.BUTTON_TEXT_SAVE;
+           this.saveInProgress = false;
          });
-       }, (errorResponse) => {
-         this.errorMessage = (
-           errorResponse.error || this.ERROR_MESSAGE_BAD_FILE_UPLOAD);
-         this.uploadedFile = null;
-         this.saveButtonText = this.BUTTON_TEXT_SAVE;
-         this.saveInProgress = false;
-       });
+       }
      }
    }
 

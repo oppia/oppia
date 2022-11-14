@@ -47,13 +47,12 @@ import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { InteractionCustomizationArgs, NumberWithUnitsCustomizationArgsBackendDict } from 'interactions/customization-args-defs';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
 import { InteractionRulesRegistryService } from 'services/interaction-rules-registry.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { BaseTranslatableObject } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -161,13 +160,10 @@ export class ExplorationStatesService {
   };
 
   private _CONTENT_ID_EXTRACTORS = {
-    answer_groups: (answerGroups: AnswerGroup[]) => {
-      let contentIds: Set<string> = new Set();
+    answer_groups: (answerGroups) => {
+      let contentIds = new Set();
       answerGroups.forEach((answerGroup) => {
-        let contentId = answerGroup.outcome.feedback.contentId;
-        if (contentId !== null) {
-          contentIds.add(contentId);
-        }
+        contentIds.add(answerGroup.outcome.feedback.contentId);
         answerGroup.rules.forEach((rule) => {
           Object.keys(rule.inputs).forEach(inputName => {
             const ruleInput = rule.inputs[inputName];
@@ -175,66 +171,48 @@ export class ExplorationStatesService {
             // BaseTranslatableObject having dict structure with contentId
             // as a key.
             if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
-              let input = ruleInput as BaseTranslatableObject;
-              let contentId = input.contentId;
-              if (contentId !== null) {
-                contentIds.add(contentId);
-              }
+              contentIds.add(ruleInput.contentId);
             }
           });
         });
       });
       return contentIds;
     },
-    default_outcome: (defaultOutcome: Outcome) => {
-      let contentIds: Set<string> = new Set();
+    default_outcome: (defaultOutcome) => {
+      let contentIds = new Set();
       if (defaultOutcome) {
-        let contentId = defaultOutcome.feedback.contentId;
-        if (contentId !== null) {
-          contentIds.add(contentId);
-        }
+        contentIds.add(defaultOutcome.feedback.contentId);
       }
       return contentIds;
     },
-    hints: (hints: Hint[]) => {
-      let contentIds: Set<string> = new Set();
+    hints: (hints) => {
+      let contentIds = new Set();
       hints.forEach((hint) => {
-        let contentId = hint.hintContent.contentId;
-        if (contentId !== null) {
-          contentIds.add(contentId);
-        }
+        contentIds.add(hint.hintContent.contentId);
       });
       return contentIds;
     },
-    solution: (solution: Solution) => {
-      let contentIds: Set<string> = new Set();
-      let contentId = solution.explanation.contentId;
-      if (solution && contentId !== null) {
-        contentIds.add(contentId);
+    solution: (solution) => {
+      let contentIds = new Set();
+      if (solution) {
+        contentIds.add(solution.explanation.contentId);
       }
       return contentIds;
     },
-    widget_customization_args: (
-        customizationArgs: InteractionCustomizationArgs
-    ) => {
+    widget_customization_args: (customizationArgs) => {
       return new Set(
-        Interaction.getCustomizationArgContentIds(customizationArgs)
-      ) as Set<string>;
+        Interaction.getCustomizationArgContentIds(customizationArgs));
     }
   };
 
-  private _getElementsInFirstSetButNotInSecond(
-      setA: Set<string>, setB: Set<string>
-  ): string[] {
+  private _getElementsInFirstSetButNotInSecond(setA, setB): string[] {
     let diffList = Array.from(setA).filter((element) => {
       return !setB.has(element);
     });
     return diffList as string[];
   }
 
-  private _setState(
-      stateName: string, stateData: State, refreshGraph: boolean
-  ): void {
+  private _setState(stateName: string, stateData, refreshGraph: boolean): void {
     this._states.setState(stateName, cloneDeep(stateData));
     if (refreshGraph) {
       this._refreshGraphEventEmitter.emit();
@@ -279,14 +257,11 @@ export class ExplorationStatesService {
   getStatePropertyMemento(
       stateName: string, backendName: StatePropertyNames
   ): StatePropertyValues {
-    let accessorList = this.PROPERTY_REF_DATA[
-      backendName as keyof typeof this.PROPERTY_REF_DATA
-    ];
-    let propertyRef: State | string;
-    propertyRef = this._states.getState(stateName);
+    let accessorList = this.PROPERTY_REF_DATA[backendName];
+    let propertyRef = this._states.getState(stateName);
     try {
       accessorList.forEach((key: string) => {
-        propertyRef = propertyRef[key as keyof typeof propertyRef];
+        propertyRef = propertyRef[key];
       });
     } catch (e) {
       let additionalInfo = (
@@ -296,9 +271,7 @@ export class ExplorationStatesService {
         '\nChange list: ' + JSON.stringify(
           this.changeListService.getChangeList()) +
         '\nAll states names: ' + this._states.getStateNames());
-      if (e instanceof Error) {
-        e.message += additionalInfo;
-      }
+      e.message += additionalInfo;
       throw e;
     }
 
@@ -367,11 +340,9 @@ export class ExplorationStatesService {
 
     if (this._BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
       newBackendValue = (
-        this.convertToBackendRepresentation(newValue, backendName)
-      ) as StatePropertyValues;
+        this.convertToBackendRepresentation(newValue, backendName));
       oldBackendValue = (
-        this.convertToBackendRepresentation(oldValue, backendName)
-      ) as StatePropertyValues;
+        this.convertToBackendRepresentation(oldValue, backendName));
     }
 
     if (!isEqual(oldValue, newValue)) {
@@ -379,16 +350,11 @@ export class ExplorationStatesService {
         stateName, backendName, newBackendValue, oldBackendValue);
 
       let newStateData = this._states.getState(stateName);
-      let accessorList = this.PROPERTY_REF_DATA[
-        backendName as keyof typeof this.PROPERTY_REF_DATA
-      ];
+      let accessorList = this.PROPERTY_REF_DATA[backendName];
 
       if (this._CONTENT_ID_EXTRACTORS.hasOwnProperty(backendName)) {
-        let contentIds = this._CONTENT_ID_EXTRACTORS[
-          backendName as keyof typeof this._CONTENT_ID_EXTRACTORS
-        ];
-        let oldContentIds = contentIds(oldValue as keyof typeof contentIds);
-        let newContentIds = contentIds(newValue as keyof typeof contentIds);
+        let oldContentIds = this._CONTENT_ID_EXTRACTORS[backendName](oldValue);
+        let newContentIds = this._CONTENT_ID_EXTRACTORS[backendName](newValue);
         let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
           oldContentIds, newContentIds);
         let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
@@ -402,8 +368,7 @@ export class ExplorationStatesService {
           newStateData.writtenTranslations.addContentId(contentId);
         });
       }
-      let propertyRef: Record<string, string> | State;
-      propertyRef = newStateData;
+      let propertyRef = newStateData;
       for (let i = 0; i < accessorList.length - 1; i++) {
         propertyRef = propertyRef[accessorList[i]];
       }
@@ -423,11 +388,9 @@ export class ExplorationStatesService {
 
   convertToBackendRepresentation(
       frontendValue: StatePropertyValues, backendName: string
-  ): NumberWithUnitsCustomizationArgsBackendDict | null {
-    let conversionFunction = this._BACKEND_CONVERSIONS[
-      backendName as keyof typeof this._BACKEND_CONVERSIONS
-    ];
-    return conversionFunction(frontendValue as keyof typeof conversionFunction);
+  ): string {
+    let conversionFunction = this._BACKEND_CONVERSIONS[backendName];
+    return conversionFunction(frontendValue);
   }
 
   init(statesBackendDict: StateObjectsBackendDict): void {
@@ -439,10 +402,6 @@ export class ExplorationStatesService {
       let solution = this._states.getState(stateName).interaction.solution;
       if (solution) {
         let interactionId = this._states.getState(stateName).interaction.id;
-        if (interactionId === null) {
-          throw new Error(
-            'Cannot save a solution for an interaction with no ID.');
-        }
         let result = (
           this.answerClassificationService.getMatchingClassificationResult(
             stateName,

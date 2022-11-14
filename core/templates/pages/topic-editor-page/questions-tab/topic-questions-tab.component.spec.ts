@@ -75,12 +75,11 @@ const topicsAndSkillsDashboardData: TopicsAndSkillDashboardData = {
   ],
   totalSkillCount: 1,
   topicSummaries: [],
-  categorizedSkillsDict: {
-    topicName: {
-      uncategorized: [],
-      test: [],
-    },
-  }
+  // This throws "Argument of type 'null' is not assignable to parameter of
+  // type 'object'" We need to suppress this error because of the need to test
+  // validations.
+  // @ts-ignore
+  categorizedSkillsDict: categorizedSkillsDictData,
 };
 
 class MockTopicsAndSkillsDashboardBackendApiService {
@@ -130,9 +129,9 @@ describe('Topic questions tab', () => {
     topicReinitializedEventEmitter = new EventEmitter();
 
     topic = new Topic(
-      'id', 'Topic name loading', 'Abbrev. name loading',
+      '', 'Topic name loading', 'Abbrev. name loading',
       'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+      [], [], [], 1, 1, [], '', '', {}, false, '', '', []
     );
     subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic1.addSkill('skill1', 'subtopic1 skill');

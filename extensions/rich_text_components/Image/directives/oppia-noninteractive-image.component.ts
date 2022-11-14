@@ -136,39 +136,35 @@ export class NoninteractiveImage implements OnInit, OnChanges {
             this.imageLocalStorageService.isInStorage(this.filepath))) {
           const base64Url = this.imageLocalStorageService.getRawImageData(
             this.filepath);
-          if (base64Url === null) {
-            throw new Error('Base64 url is null');
-          }
-          const mimeType = base64Url.split(';')[0];
-          if (mimeType === AppConstants.SVG_MIME_TYPE) {
-            const svgResourceUrl = (
-              this.svgSanitizerService.getTrustedSvgResourceUrl(base64Url));
-            if (svgResourceUrl === null) {
-              throw new Error('SVG is invalid');
+          if (base64Url) {
+            const mimeType = base64Url.split(';')[0];
+            if (mimeType === AppConstants.SVG_MIME_TYPE) {
+              const svgResourceUrl = (
+                this.svgSanitizerService.getTrustedSvgResourceUrl(base64Url));
+              if (svgResourceUrl) {
+                this.imageUrl = svgResourceUrl;
+              }
+            } else {
+              this.imageUrl = base64Url;
             }
-            this.imageUrl = svgResourceUrl;
-          } else {
-            this.imageUrl = base64Url;
           }
         } else {
           const entityType = this.contextService.getEntityType();
-          if (entityType === undefined) {
-            throw new Error('Entity type is undefined');
+          if (entityType) {
+            this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
+              entityType, this.contextService.getEntityId(), this.filepath);
           }
-          this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
-            entityType, this.contextService.getEntityId(), this.filepath);
         }
       } catch (e: unknown) {
         const entityType = this.contextService.getEntityType();
-        if (entityType === undefined) {
-          throw new Error('Entity type is undefined');
-        }
-        const additionalInfo = (
-          '\nEntity type: ' + entityType +
-          '\nEntity ID: ' + this.contextService.getEntityId() +
-          '\nFilepath: ' + this.filepath);
-        if (e instanceof Error) {
-          e.message += additionalInfo;
+        if (entityType) {
+          const additionalInfo = (
+            '\nEntity type: ' + entityType +
+            '\nEntity ID: ' + this.contextService.getEntityId() +
+            '\nFilepath: ' + this.filepath);
+          if (e instanceof Error) {
+            e.message += additionalInfo;
+          }
         }
         throw e;
       }

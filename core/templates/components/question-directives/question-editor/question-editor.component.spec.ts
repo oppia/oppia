@@ -333,7 +333,7 @@ describe('Question Editor Component', () => {
     component.saveInteractionAnswerGroups([]);
 
     expect(stateEditorService.setInteractionAnswerGroups).toHaveBeenCalledWith(
-      null
+      []
     );
   });
 
@@ -390,11 +390,11 @@ describe('Question Editor Component', () => {
   });
 
   it('should save next content ID index when interaction is saved', () => {
-    expect(component.questionStateData.nextContentIdIndex).toBe(null);
+    expect(component.questionStateData.nextContentIdIndex).toEqual(0);
 
     component.saveNextContentIdIndex(2);
 
-    expect(component.questionStateData.nextContentIdIndex).toBe(2);
+    expect(component.questionStateData.nextContentIdIndex).toEqual(2);
   });
 
   it('should show mark all audio needing update modal and mark all unflagged' +

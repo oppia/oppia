@@ -129,10 +129,9 @@ export class BlogPostEditorComponent implements OnInit {
           this.maxAllowedTags = editorData.maxNumOfTags;
           this.title = this.blogPostData.title;
           let lastUpdated = this.blogPostData.lastUpdated;
-          if (lastUpdated === undefined) {
-            throw new Error('Last updated property is undefined');
+          if (lastUpdated) {
+            this.dateTimeLastSaved = this.getDateStringInWords(lastUpdated);
           }
-          this.dateTimeLastSaved = this.getDateStringInWords(lastUpdated);
           this.contentEditorIsActive = Boolean(
             this.blogPostData.content.length === 0);
           if (this.blogPostData.thumbnailFilename) {

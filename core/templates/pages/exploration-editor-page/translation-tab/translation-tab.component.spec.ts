@@ -440,6 +440,12 @@ describe('Translation tab component', () => {
 
   it('should not start tutorial', () => {
     component.tutorialInProgress = false;
+    // This throws "Type 'null' is not assignable to parameter of
+    // type '{ canVoiceover: boolean; }'." We need to suppress this
+    // error because of the need to test validations.
+    // @ts-ignore
+    component.permissions = null;
+    component.startTutorial();
     component.permissions = {
       canVoiceover: false,
     };

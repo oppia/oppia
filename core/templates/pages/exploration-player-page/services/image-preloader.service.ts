@@ -103,11 +103,10 @@ export class ImagePreloaderService {
       this.filenamesOfImageToBeDownloaded.length > 0
     ) {
       const imageFilename = this.filenamesOfImageToBeDownloaded.shift();
-      if (imageFilename === undefined) {
-        break;
+      if (imageFilename) {
+        this.filenamesOfImageCurrentlyDownloading.push(imageFilename);
+        this.loadImage(imageFilename);
       }
-      this.filenamesOfImageCurrentlyDownloading.push(imageFilename);
-      this.loadImage(imageFilename);
     }
   }
 
@@ -246,11 +245,8 @@ export class ImagePreloaderService {
   ): Promise<string | SafeResourceUrl | null> {
     return new Promise((resolve, reject) => {
       let entityType = this.contextService.getEntityType();
-      if (entityType === undefined) {
-        throw new Error('No image present for preview');
-      }
-      if (this.assetsBackendApiService.isCached(filename) ||
-          this.isInFailedDownload(filename)) {
+      if (entityType && (this.assetsBackendApiService.isCached(filename) ||
+          this.isInFailedDownload(filename))) {
         this.assetsBackendApiService.loadImage(
           entityType, this.contextService.getEntityId(), filename
         ).then(
@@ -293,20 +289,19 @@ export class ImagePreloaderService {
    */
   private getImageFilenamesInBfsOrder(sourceStateName: string): string[] {
     const explorationInitStateName = this.exploration.getInitialState().name;
-    if (explorationInitStateName === null) {
-      throw new Error('There is no initial state in the exploration.');
-    }
-    var stateNamesInBfsOrder = (
-      this.computeGraphService.computeBfsTraversalOfStates(
-        explorationInitStateName, this.exploration.getStates(),
-        sourceStateName));
     var imageFilenames: string[] = [];
+    if (explorationInitStateName) {
+      var stateNamesInBfsOrder = (
+        this.computeGraphService.computeBfsTraversalOfStates(
+          explorationInitStateName, this.exploration.getStates(),
+          sourceStateName));
 
-    stateNamesInBfsOrder.forEach(stateName => {
-      var state = this.exploration.states.getState(stateName);
-      this.ExtractImageFilenamesFromModelService.getImageFilenamesInState(state)
-        .forEach(filename => imageFilenames.push(filename));
-    });
+      stateNamesInBfsOrder.forEach(stateName => {
+        var state = this.exploration.states.getState(stateName);
+        this.ExtractImageFilenamesFromModelService.getImageFilenamesInState(
+          state).forEach(filename => imageFilenames.push(filename));
+      });
+    }
     return imageFilenames;
   }
 
@@ -323,11 +318,10 @@ export class ImagePreloaderService {
       1);
     if (this.filenamesOfImageToBeDownloaded.length > 0) {
       var nextImageFilename = this.filenamesOfImageToBeDownloaded.shift();
-      if (nextImageFilename === undefined) {
-        return;
+      if (nextImageFilename) {
+        this.filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
+        this.loadImage(nextImageFilename);
       }
-      this.filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
-      this.loadImage(nextImageFilename);
     }
   }
 

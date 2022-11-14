@@ -81,10 +81,15 @@ describe('Exploration save service ' +
         {
           provide: ExplorationDataService,
           useValue: {
-            save(successCb: (
-                arg0: boolean,
-                arg1: { cmd: string; state_name: string}[]
-            ) => void) {
+            save(
+                changeList: string[],
+                message: string,
+                successCb: (
+                  arg0: boolean,
+                  arg1: { cmd: string; state_name: string }[]
+                ) => void,
+                errorCb: () => void
+            ) {
               successCb(false, [
                 {
                   cmd: 'add_state',
@@ -243,7 +248,12 @@ describe('Exploration save service ' +
         {
           provide: ExplorationDataService,
           useValue: {
-            save(successCb: (arg0: boolean, arg1: []) => void) {
+            save(
+                changeList: string[],
+                message: string,
+                successCb: (arg0: boolean, arg1: string[]) => void,
+                errorCb: () => void
+            ) {
               successCb(true, []);
             }
           }
@@ -429,7 +439,9 @@ describe('Exploration save service ' +
             provide: ExplorationDataService,
             useValue: {
               save(
-                  successCb: (arg0: boolean, arg1: []) => void,
+                  changeList: string[],
+                  message: string,
+                  successCb: (arg0: boolean, arg1: string[]) => void,
                   errorCb: (arg0: { error: { error: string }}) => void
               ) {
                 successCb(true, []);
@@ -537,10 +549,10 @@ describe('Exploration save service ' +
 
   let statesBackendDict: StateObjectsBackendDict = {
     Hola: {
-      classifier_model_id: 'id',
+      classifier_model_id: '',
       solicit_answer_details: false,
       card_is_checkpoint: true,
-      linked_skill_id: 'skill_id',
+      linked_skill_id: '',
       next_content_id_index: 0,
       content: {
         content_id: 'content',
@@ -597,10 +609,10 @@ describe('Exploration save service ' +
       },
     },
     State: {
-      classifier_model_id: 'id',
+      classifier_model_id: '',
       solicit_answer_details: false,
       card_is_checkpoint: true,
-      linked_skill_id: 'skill_id',
+      linked_skill_id: '',
       next_content_id_index: 0,
       content: {
         content_id: 'content',
@@ -617,7 +629,7 @@ describe('Exploration save service ' +
         confirmed_unclassified_answers: [],
         customization_args: {},
         solution: null,
-        id: 'id',
+        id: null,
         answer_groups: [{
           rule_specs: [],
           training_data: [],
@@ -657,10 +669,10 @@ describe('Exploration save service ' +
       }
     },
     State2: {
-      classifier_model_id: 'id',
+      classifier_model_id: '',
       solicit_answer_details: false,
       card_is_checkpoint: true,
-      linked_skill_id: 'skill_id',
+      linked_skill_id: '',
       next_content_id_index: 0,
       content: {
         content_id: 'content',
@@ -677,7 +689,7 @@ describe('Exploration save service ' +
         confirmed_unclassified_answers: [],
         customization_args: {},
         solution: null,
-        id: 'id',
+        id: null,
         answer_groups: [{
           rule_specs: [],
           training_data: [],
@@ -717,10 +729,10 @@ describe('Exploration save service ' +
       }
     },
     State3: {
-      classifier_model_id: 'id',
+      classifier_model_id: '',
       solicit_answer_details: false,
       card_is_checkpoint: true,
-      linked_skill_id: 'skill_id',
+      linked_skill_id: '',
       next_content_id_index: 0,
       content: {
         content_id: 'content',
@@ -737,7 +749,7 @@ describe('Exploration save service ' +
         confirmed_unclassified_answers: [],
         customization_args: {},
         solution: null,
-        id: 'id',
+        id: null,
         answer_groups: [{
           rule_specs: [],
           training_data: [],
@@ -792,9 +804,14 @@ describe('Exploration save service ' +
               });
             },
             save(
-                successCb: (arg0: boolean, arg1: []) => void,
-                errorCb: (arg0: { error: { error: string }}) => void
-            ) {
+                changeList: string[],
+                message: string,
+                successCb: (
+                  arg0: boolean, arg1: string[]
+                ) => void,
+                errorCb: (
+                  arg0: { error: { error: string } }
+                ) => void) {
               successCb(true, []);
               errorCb({error: {error: 'errorMessage'}});
             },

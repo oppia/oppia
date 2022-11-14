@@ -193,10 +193,9 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     let userInfoPromise = this.userService.getUserInfoAsync();
     userInfoPromise.then(userInfo => {
       const username = userInfo.getUsername();
-      if (username === null) {
-        throw new Error('Username is null');
+      if (username) {
+        this.username = username;
       }
-      this.username = username;
     });
     this.homeImageUrl = this.getStaticImageUrl('/learner_dashboard/home.svg');
     this.todolistImageUrl = this.getStaticImageUrl(

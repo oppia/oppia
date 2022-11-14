@@ -47,8 +47,8 @@ class MockEditableStoryBackendApiService {
             version: 1,
             misconception_count: 0,
             worked_examples_count: 0,
-            skill_model_created_on: null,
-            skill_model_last_updated: null,
+            skill_model_created_on: 0,
+            skill_model_last_updated: 0,
           }],
           classroomUrlFragment: 'classroomUrlFragment',
           topicUrlFragment: 'topicUrlFragment'

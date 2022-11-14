@@ -18,7 +18,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AlertsService } from 'services/alerts.service';
@@ -982,4 +982,18 @@ describe('Responses Service', () => {
       initializeAnswerGroupsEventEmitter
     );
   });
+
+  it('should throw error if background image are empty', fakeAsync(() => {
+    const updatedDefaultOutcome = outcomeObjectFactory.createNew(
+      'Hola',
+      'new_id',
+      'This is a new feedback text',
+      []
+    );
+    const callbackSpy = jasmine.createSpy('callback');
+    interactionData.defaultOutcome = null;
+    responsesService.init(interactionData);
+    responsesService.updateDefaultOutcome(updatedDefaultOutcome, callbackSpy);
+    expect(callbackSpy).not.toHaveBeenCalled();
+  }));
 });

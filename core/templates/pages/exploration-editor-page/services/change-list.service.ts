@@ -402,10 +402,7 @@ export class ChangeListService {
       this.alertsService.addWarning('There are no changes to undo.');
       return;
     }
-    let lastChange = this.explorationChangeList.pop();
-    if (lastChange === undefined) {
-      throw new Error('The last change was undefined');
-    }
+    let lastChange = this.explorationChangeList.pop() as ExplorationChange;
     this.undoneChangeStack.push(lastChange);
     this.autosaveChangeListOnChange(this.explorationChangeList);
   }

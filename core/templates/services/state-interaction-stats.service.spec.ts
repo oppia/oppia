@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for state interaction stats service.
  */
 
-import { TestBed, flushMicrotasks, fakeAsync } from '@angular/core/testing';
+import { TestBed, flushMicrotasks, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 
@@ -181,6 +181,26 @@ describe('State Interaction Stats Service', () => {
       stateInteractionStatsService.stateSupportsImprovementsOverview(mockState)
     ).toBeTrue();
   });
+
+  it('should throw error if state name does not exist',
+    fakeAsync(async() => {
+      mockState.name = null;
+
+      expect(() => {
+        stateInteractionStatsService.computeStatsAsync(expId, mockState);
+        tick();
+      }).toThrowError();
+    }));
+
+  it('should throw error if interaction id does not exist',
+    fakeAsync(async() => {
+      mockState.interaction.id = null;
+
+      expect(() => {
+        stateInteractionStatsService.computeStatsAsync(expId, mockState);
+        tick();
+      }).toThrowError();
+    }));
 
   describe('when gathering stats from the backend', () => {
     it('should provide cached results after first call', fakeAsync(() => {

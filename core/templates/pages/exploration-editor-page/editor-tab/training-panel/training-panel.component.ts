@@ -89,11 +89,10 @@ export class TrainingPanelComponent
     let contentId = this.generateContentIdService.getNextStateId(
       AppConstants.COMPONENT_NAME_FEEDBACK);
     let currentStateName = this.stateEditorService.getActiveStateName();
-    if (currentStateName === null) {
-      throw new Error('Cannot add new response from a null state.');
+    if (currentStateName) {
+      this.classification.newOutcome = this.outcomeObjectFactory.createNew(
+        currentStateName, contentId, '', []);
     }
-    this.classification.newOutcome = this.outcomeObjectFactory.createNew(
-      currentStateName, contentId, '', []);
     this.addingNewResponse = true;
   }
 
@@ -123,12 +122,11 @@ export class TrainingPanelComponent
     this.addingNewResponse = false;
 
     let _stateName = this.stateEditorService.getActiveStateName();
-    if (_stateName === null) {
-      throw new Error('Cannot train from a null state.');
+    if (_stateName) {
+      let _state = this.explorationStatesService.getState(_stateName);
+      this.allOutcomes = this.trainingDataService.getAllPotentialOutcomes(
+        _state);
     }
-    let _state = this.explorationStatesService.getState(_stateName);
-    this.allOutcomes = this.trainingDataService.getAllPotentialOutcomes(
-      _state);
 
     this._updateAnswerTemplate();
     this.selectedAnswerGroupIndex = (

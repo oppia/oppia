@@ -188,14 +188,10 @@ export class ExplorationSaveService {
           this.saveIsInProgress = false;
           resolve();
           this.editabilityService.markEditable();
-          if (errorResponse instanceof HttpErrorResponse) {
-            const errorMessage = errorResponse.error.error;
-            this.alertsService.addWarning(
-              'Error! Changes could not be saved - ' + errorMessage);
-          } else {
-            this.alertsService.addWarning(
-              'Error! Changes could not be saved.');
-          }
+          let httpErrorResponse = errorResponse as HttpErrorResponse;
+          const errorMessage = httpErrorResponse.error.error;
+          this.alertsService.addWarning(
+            'Error! Changes could not be saved - ' + errorMessage);
         }
       );
     });

@@ -285,7 +285,14 @@ describe('State Responses Component', () => {
 
   it('should sort state responses properly', () => {
     component.answerGroups = answerGroups;
-    spyOn(responsesService, 'save');
+    spyOn(responsesService, 'save').and.callFake(
+      (value, values, callback) => {
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        callback(null, null);
+      });
     spyOn(component.onSaveNextContentIdIndex, 'emit').and.stub();
     spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
       .and.stub();
@@ -311,9 +318,9 @@ describe('State Responses Component', () => {
     spyOn(stateEditorService, 'getInapplicableSkillMisconceptionIds')
       .and.returnValue(['id1']);
 
-    expect(component.responseCardIsShown).toBeUndefined();
-    expect(component.enableSolicitAnswerDetailsFeature).toBeUndefined();
-    expect(component.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBeUndefined();
+    expect(component.responseCardIsShown).toBe(false);
+    expect(component.enableSolicitAnswerDetailsFeature).toBe(false);
+    expect(component.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(false);
     expect(component.stateName).toBeUndefined();
     expect(component.misconceptionsBySkill).toBeUndefined();
     expect(component.inapplicableSkillMisconceptionIds).toBeUndefined();
@@ -382,7 +389,14 @@ describe('State Responses Component', () => {
     spyOn(responsesService, 'getActiveAnswerGroupIndex').and.returnValue(0);
     spyOnProperty(stateInteractionIdService, 'onInteractionIdChanged')
       .and.returnValue(onInteractionIdChangedEmitter);
-    spyOn(responsesService, 'onInteractionIdChanged');
+    spyOn(responsesService, 'onInteractionIdChanged').and.callFake(
+      (options, callback) => {
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        callback(null, null);
+      });
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
     spyOn(responsesService, 'getDefaultOutcome').and.returnValue(
       defaultOutcome);
@@ -468,7 +482,15 @@ describe('State Responses Component', () => {
     let onHandleCustomArgsUpdateEmitter = new EventEmitter();
     spyOnProperty(stateEditorService, 'onHandleCustomArgsUpdate')
       .and.returnValue(onHandleCustomArgsUpdateEmitter);
-    spyOn(responsesService, 'handleCustomArgsUpdate');
+    spyOn(responsesService, 'handleCustomArgsUpdate').and.callFake(
+      (newAnswerChoices, callback) => {
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        callback(null);
+      }
+    );
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
     component.ngOnInit();
@@ -490,7 +512,7 @@ describe('State Responses Component', () => {
       });
 
     expect(component.misconceptionsBySkill).toBe(undefined);
-    expect(component.containsOptionalMisconceptions).toBe(undefined);
+    expect(component.containsOptionalMisconceptions).toBeFalse();
 
     component.ngOnInit();
     onStateEditorInitializedEmitter.emit();
@@ -885,7 +907,14 @@ describe('State Responses Component', () => {
   });
 
   it('should delete answer group after modal is opened', fakeAsync(() => {
-    spyOn(responsesService, 'deleteAnswerGroup');
+    spyOn(responsesService, 'deleteAnswerGroup').and.callFake(
+      (value, callback) => {
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        callback(null);
+      });
     spyOn(ngbModal, 'open').and.returnValue(
       {
         result: Promise.resolve()
@@ -918,7 +947,15 @@ describe('State Responses Component', () => {
   });
 
   it('should update active answer group for newly tagged misconception', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup');
+    spyOn(responsesService, 'updateActiveAnswerGroup').and.callFake(
+      (taggedSkillMisconceptionId, callback) => {
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        callback(null);
+      }
+    );
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
     component.saveTaggedMisconception(
@@ -932,7 +969,15 @@ describe('State Responses Component', () => {
   });
 
   it('should update active answer group when feedback is changed', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup');
+    spyOn(responsesService, 'updateActiveAnswerGroup').and.callFake(
+      (feedback, callback) => {
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        callback(null);
+      }
+    );
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
     component.saveActiveAnswerGroupFeedback(defaultOutcome);
@@ -941,7 +986,14 @@ describe('State Responses Component', () => {
   });
 
   it('should update active answer group when destination is changed', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup');
+    spyOn(responsesService, 'updateActiveAnswerGroup')
+      .and.callFake((dest, callback) => {
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        callback(null);
+      });
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
     component.saveActiveAnswerGroupDest(defaultOutcome);
@@ -950,7 +1002,14 @@ describe('State Responses Component', () => {
   });
 
   it('should update active answer group when destination is changed', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup');
+    spyOn(responsesService, 'updateActiveAnswerGroup')
+      .and.callFake((destIfReallyStuck, callback) => {
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        callback(null);
+      });
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
     component.saveActiveAnswerGroupDestIfStuck(defaultOutcome);
@@ -960,7 +1019,15 @@ describe('State Responses Component', () => {
 
   it('should update active answer group when correctness' +
     ' label is changed', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup');
+    spyOn(responsesService, 'updateActiveAnswerGroup').and.callFake(
+      (labelledAsCorrect, callback) => {
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        callback(null);
+      }
+    );
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
     component.saveActiveAnswerGroupCorrectnessLabel(defaultOutcome);
@@ -970,7 +1037,15 @@ describe('State Responses Component', () => {
 
 
   it('should update active answer group when answer rules are changed', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup');
+    spyOn(responsesService, 'updateActiveAnswerGroup').and.callFake(
+      (rules, callback) => {
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        callback(null);
+      }
+    );
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
     component.saveActiveAnswerGroupRules([new Rule('', {
@@ -988,7 +1063,15 @@ describe('State Responses Component', () => {
 
   it('should update default outcome when default' +
     ' outcome feedback is changed', () => {
-    spyOn(responsesService, 'updateDefaultOutcome');
+    spyOn(responsesService, 'updateDefaultOutcome').and.callFake(
+      ({feedback, dest}, callback) => {
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        callback(null);
+      }
+    );
     spyOn(component.onSaveInteractionDefaultOutcome, 'emit').and.stub();
 
     component.saveDefaultOutcomeFeedback(defaultOutcome);
@@ -998,7 +1081,14 @@ describe('State Responses Component', () => {
 
   it('should update default outcome when default' +
     ' outcome destination is changed', () => {
-    spyOn(responsesService, 'updateDefaultOutcome');
+    spyOn(responsesService, 'updateDefaultOutcome')
+      .and.callFake((dest, callback) => {
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        callback(null);
+      });
     spyOn(component.onSaveInteractionDefaultOutcome, 'emit').and.stub();
 
     component.saveDefaultOutcomeDest(defaultOutcome);
@@ -1008,7 +1098,14 @@ describe('State Responses Component', () => {
 
   it('should update default outcome when default' +
     ' outcome destination for stuck learner is changed', () => {
-    spyOn(responsesService, 'updateDefaultOutcome');
+    spyOn(responsesService, 'updateDefaultOutcome')
+      .and.callFake((destIfReallyStuck, callback) => {
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        callback(null);
+      });
     spyOn(component.onSaveInteractionDefaultOutcome, 'emit').and.stub();
 
     component.saveDefaultOutcomeDestIfStuck(defaultOutcome);
@@ -1018,7 +1115,15 @@ describe('State Responses Component', () => {
 
   it('should update default outcome when default' +
     ' outcome correctness label is changed', () => {
-    spyOn(responsesService, 'updateDefaultOutcome');
+    spyOn(responsesService, 'updateDefaultOutcome').and.callFake(
+      ({labelledAsCorrect}, callback) => {
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        callback(null);
+      }
+    );
     spyOn(component.onSaveInteractionDefaultOutcome, 'emit').and.stub();
 
     component.saveDefaultOutcomeCorrectnessLabel(defaultOutcome);

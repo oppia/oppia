@@ -108,9 +108,9 @@ describe('Topic Editor Navbar', () => {
     let skillSummary = ShortSkillSummary.create(
       'skill_1', 'Description 1');
     topic = new Topic(
-      'id', 'Topic name loading', 'Abbrev. name loading',
+      '', 'Topic name loading', 'Abbrev. name loading',
       'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+      [], [], [], 1, 1, [], '', '', {}, false, '', '', []
     );
     topic._uncategorizedSkillSummaries = [skillSummary];
     topic._subtopics = [subtopic];

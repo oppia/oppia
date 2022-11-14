@@ -149,10 +149,8 @@ export class StateTopAnswersStatsService {
       throw new Error(stateName + ' does not exist.');
     }
 
-    const stateStats = this.topAnswersStatsByStateName.get(stateName);
-    if (stateStats === undefined) {
-      throw new Error(stateName + ' does not exist.');
-    }
+    const stateStats = this.topAnswersStatsByStateName.get(
+      stateName) as AnswerStatsEntry;
 
     let interactionId = updatedState.interaction.id;
     if (interactionId === null) {

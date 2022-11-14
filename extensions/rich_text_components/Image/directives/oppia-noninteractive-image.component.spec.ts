@@ -230,6 +230,15 @@ describe('NoninteractiveImage', () => {
       expect(component.imageUrl).toBe(dataUrlSvg);
     }));
 
+  it('should throw error if image url is empty', fakeAsync(() => {
+    spyOn(imagePreloaderService, 'getImageUrlAsync')
+      .and.resolveTo(null);
+    expect(() => {
+      component.loadImage();
+      tick();
+    }).toThrowError();
+  }));
+
   it('should display \'Reload Image\' when the image cannot be loaded',
     fakeAsync(() => {
       spyOn(imagePreloaderService, 'getImageUrlAsync')
