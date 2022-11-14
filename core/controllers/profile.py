@@ -148,6 +148,10 @@ class BulkEmailWebhookEndpoint(
         }
     }
 
+    # Here, the 'secret' url_path_argument is not used in the function body
+    # because the actual usage of 'secret' lies within the 'is_source_mailchimp'
+    # decorator, and here we are getting 'secret' because the decorator always
+    # passes every url_path_args to HTTP methods.
     @acl_decorators.is_source_mailchimp
     def get(self, unused_secret: str) -> None:
         """Handles GET requests. This is just an empty endpoint that is
@@ -156,6 +160,10 @@ class BulkEmailWebhookEndpoint(
         """
         pass
 
+    # Here, the 'secret' url_path_argument is not used in the function body
+    # because the actual usage of 'secret' lies within the 'is_source_mailchimp'
+    # decorator, and here we are getting 'secret' because the decorator always
+    # passes every url_path_args to HTTP methods.
     @acl_decorators.is_source_mailchimp
     def post(self, unused_secret: str) -> None:
         """Handles POST requests."""
@@ -798,14 +806,18 @@ class UserInfoHandler(
     @acl_decorators.open_access
     def put(self) -> None:
         """Handles PUT requests."""
+        # In frontend, we are calling this put method iff the user is
+        # logged-in, so here we sure that self.user_id is never going
+        # to be None, but to narrow down the type and handle the None
+        # case gracefully, we are returning if self.user_id is None.
+        if self.user_id is None:
+            return self.render_json({})
         assert self.normalized_payload is not None
         user_has_viewed_lesson_info_modal_once = self.normalized_payload[
             'user_has_viewed_lesson_info_modal_once']
         if user_has_viewed_lesson_info_modal_once:
-            # Here we use MyPy ignore because .. confirm this part before
-            # merging the PR.
             user_services.set_user_has_viewed_lesson_info_modal_once(
-                self.user_id)  # type: ignore[arg-type]
+                self.user_id)
         self.render_json({'success': True})
 
 

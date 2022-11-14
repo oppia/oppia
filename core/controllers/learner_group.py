@@ -296,6 +296,11 @@ class LearnerGroupLearnerProgressHandler(
         }
     }
 
+    # TODO(#16539): Change the type of value that is rendered to JSON,
+    # because currently `render_json` can only accept Dict or TypedDict
+    # types of values but in this handler we are rendering List
+    # value. Also, once the value type is changed, please remove
+    # List[Mapping[str, Any]] from render_json's argument type.
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id: str) -> None:
         """Handles GET requests for users progress through learner
@@ -1073,6 +1078,11 @@ class LearnerStoriesChaptersProgressHandler(
         }
     }
 
+    # TODO(#16539): Change the type of value that is rendered to JSON,
+    # because currently `render_json` can only accept Dict or TypedDict
+    # types of values but in this handler we are rendering List
+    # value. Also, once the value type is changed, please remove
+    # List[Mapping[str, Any]] from render_json's argument type.
     @acl_decorators.can_access_learner_groups
     def get(self, username: str) -> None:
         """Handles GET requests."""

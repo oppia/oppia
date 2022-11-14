@@ -595,6 +595,9 @@ class BaseHandler(
         """
         return self.get(*args, **kwargs)
 
+    # TODO(#16539): Once all the places are fixed with the type of value
+    # that is rendered to JSON, then please remove Sequence[Mapping[str, Any]]
+    # from render_json's argument type.
     # Here we use type Any because the argument 'values' can accept various
     # kinds of dictionaries that needs to be sent as a JSON response.
     def render_json(
@@ -995,11 +998,11 @@ class OppiaMLVMHandler(
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    # Here we use type Any because the sub-classes of OppiaMLVMHandler ca
+    # Here we use type Any because the sub-classes of OppiaMLVMHandler can
     # contain different schemas with different types of values, like str,
     # complex Dicts and etc.
     URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Here we use type Any because the sub-classes of OppiaMLVMHandler ca
+    # Here we use type Any because the sub-classes of OppiaMLVMHandler can
     # contain different schemas with different types of values, like str,
     # complex Dicts and etc.
     HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {}

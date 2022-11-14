@@ -1546,9 +1546,16 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                 continue
 
             regex_pattern = r'<.*?>'
-            url_path_elements = [
-                keyword[1:-1] for keyword in re.findall(
-                    regex_pattern, route.name)]
+            url_path_elements = []
+            for keyword in re.findall(regex_pattern, route.name):
+                # In some cases, url_path_arguments are defined with specific
+                # acceptable values, e.g: /<asset_type:(image|audio|thumbnail)>.
+                # So, to separate the argument name from acceptable values, we
+                # have used ':' delimiter's index.
+                url_argument_delimiter_index = keyword.find(':')
+                url_path_elements.append(
+                    keyword[1:url_argument_delimiter_index]
+                )
             schema_keys = handler.URL_PATH_ARGS_SCHEMAS.keys()
 
             missing_schema_keys = set(url_path_elements) - set(schema_keys)

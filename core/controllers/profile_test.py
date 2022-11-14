@@ -1453,6 +1453,12 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_settings.has_viewed_lesson_info_modal_once, True)
 
+    def test_no_user_info_provided_if_user_is_not_logged_in(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+        self.put_json('/userinfohandler/data', {
+            'user_has_viewed_lesson_info_modal_once': True
+        }, csrf_token=csrf_token)
+
 
 class UrlHandlerTests(test_utils.GenericTestBase):
 
