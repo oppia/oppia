@@ -87,7 +87,7 @@ class TestGCSIoReadJob(base_jobs.JobBase):
         self.pipeline = pipeline
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        read_exp_file_from_gcs = (
+        read_files_from_gcs = (
             self.pipeline
             | 'Create PCollection of files that needs to be fetched' >> (
                 beam.Create(
@@ -100,14 +100,14 @@ class TestGCSIoReadJob(base_jobs.JobBase):
         )
 
         total_files_read = (
-            read_exp_file_from_gcs
+            read_files_from_gcs
             | 'Total number of files read from GCS' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'TOTAL FILES FETCHED'))
         )
 
         output_files = (
-            read_exp_file_from_gcs
+            read_files_from_gcs
             | 'Output the data' >> beam.Map(lambda data: (
                 job_run_result.JobRunResult.as_stderr(f'The data is {data}')
             ))
@@ -120,3 +120,38 @@ class TestGCSIoReadJob(base_jobs.JobBase):
             )
             | 'Combine results' >> beam.Flatten()
         )
+
+
+class TestGcsIoDeleteJob(base_jobs.JobBase):
+    """Delete dummy files from GCS."""
+
+    def __init__(
+        self,
+        pipeline: beam.Pipeline,
+        client: Optional[gcsio_test.FakeGcsClient] = None
+    ) -> None:
+        super().__init__(pipeline=pipeline)
+        self.client = client
+        self.pipeline = pipeline
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        delete_files_from_gcs = (
+            self.pipeline
+            | 'Create PCollection of files that needs to be deleted' >> (
+                beam.Create(
+                    [
+                        'dummy_folder/dummy_subfolder/dummy_file_1',
+                        'dummy_folder/dummy_subfolder/dummy_file_2'
+                    ]
+                ))
+            | 'Delete files from the GCS' >> gcs_io.DeleteFile(self.client)
+        )
+
+        total_files_deleted = (
+            delete_files_from_gcs
+            | 'Total number of files deleted from GCS' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL FILES DELETED'))
+        )
+
+        return total_files_deleted

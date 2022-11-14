@@ -96,3 +96,21 @@ class WriteFileTest(job_test_utils.PipelinedTestBase):
             | 'Write to GCS' >> gcs_io.WriteFile(client)
         )
         self.assert_pcoll_equal(filepath_p_collec, [7, 7])
+
+
+class DeleteFileTest(job_test_utils.PipelinedTestBase):
+    """Tests to check gcs_io.DeleteFile."""
+
+    def test_delete_files_in_gcs(self) -> None:
+        client = gcsio_test.FakeGcsClient()
+        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        file_name = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file'
+        string = b'testing'
+        insert_random_file(client, file_name, string)
+        file_paths = ['dummy_folder/dummy_subfolder/dummy_file']
+        filepath_p_collec = (
+            self.pipeline
+            | 'Create pcoll of filepaths' >> beam.Create(file_paths)
+            | 'Delete file from GCS' >> gcs_io.DeleteFile(client)
+        )
+        self.assert_pcoll_equal(filepath_p_collec, [None])

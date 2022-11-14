@@ -78,16 +78,17 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         """Helper function to read the contents of a file.
 
         Args:
-            file_path: Union[bytes, str]. The name of the file that will
-                be read.
+            file_path: str. The name of the file that will be read.
 
         Returns:
-            data: bytes. The file data.
+            data: Union[bytes, str]. The file data.
         """
         gcs = gcsio.GcsIO(self.client)
         bucket = app_identity_services.get_gcs_resource_bucket_name()
         gcs_filename = f'gs://{bucket}/{file_path}'
-        data = gcs.open(gcs_filename, mode=self.mode).read()
+        file = gcs.open(gcs_filename, mode=self.mode)
+        data = file.read()
+        file.close()
         return data
 
 
@@ -165,3 +166,77 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
         write_file = file.write(file_obj['data'])
         file.close()
         return write_file
+
+
+# TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
+class DeleteFile(beam.PTransform): # type: ignore[misc]
+    """Delete files from GCS."""
+
+    def __init__(
+        self,
+        client: Optional[gcsio_test.FakeGcsClient] = None,
+        label: Optional[str] = None
+    ) -> None:
+        """Initializes the DeleteFile PTransform.
+
+        Args:
+            client: Optional[gcsio_test.FakeGcsClient]. The GCS client to use
+                while testing. This will be None when testing on server.
+            label: Optional[str]. The label of the PTransform.
+        """
+        super().__init__(label=label)
+        self.client = client
+
+    def expand(self, file_paths: beam.PCollection) -> beam.pvalue.PDone:
+        """Deletes the files in given PCollection.
+
+        Args:
+            file_paths: PCollection. The collection of filenames that will
+                be deleted.
+
+        Returns:
+            PCollection. The PCollection of the file data.
+        """
+        return (
+            file_paths
+            | 'Delete the file' >> beam.Map(self._delete_file)
+        )
+
+    def _delete_file(self, file_path: str) -> None:
+        """Helper function to delete the file.
+
+        Args:
+            file_path: str. The name of the file that will be deleted.
+        """
+        gcs = gcsio.GcsIO(self.client)
+        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        gcs_filename = f'gs://{bucket}/{file_path}'
+        gcs.delete(gcs_filename)
+
+
+# TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
+class ModifyFileMimeType(beam.PTransform): # type: ignore[misc]
+    """Modify file mime type in GCS."""
+
+    def __init__(
+        self,
+        client: Optional[gcsio_test.FakeGcsClient] = None,
+        label: Optional[str] = None
+    ) -> None:
+        """Initializes the ModifyFileMimeType PTransform.
+
+        Args:
+            client: Optional[gcsio_test.FakeGcsClient]. The GCS client to use
+                while testing. This will be None when testing on server.
+            label: Optional[str]. The label of the PTransform.
+        """
+        super().__init__(label=label)
+        self.client = client
+
+    def expand()
