@@ -46,6 +46,8 @@ class QuestionsListHandler(
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    # TODO(#16538): Change the type of `comma_separated_skill_ids` url_path
+    # argument to `JsonEncodedInString`.
     URL_PATH_ARGS_SCHEMAS = {
         'comma_separated_skill_ids': {
             'schema': {
@@ -132,6 +134,8 @@ class QuestionCountDataHandler(
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    # TODO(#16538): Change the type of `comma_separated_skill_ids` url_path
+    # argument to `JsonEncodedInString`.
     URL_PATH_ARGS_SCHEMAS = {
         'comma_separated_skill_ids': {
             'schema': {
