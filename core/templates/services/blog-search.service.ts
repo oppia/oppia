@@ -76,11 +76,10 @@ export class BlogPostSearchService {
     const EXPECTED_PREFIX = '=("';
     const EXPECTED_SUFFIX = '")';
 
-    if (!itemCodes ||
+    if (!itemCodes || itemCodes.lastIndexOf(EXPECTED_PREFIX) === -1 ||
         itemCodes.indexOf(EXPECTED_PREFIX) !== 0 ||
         itemCodes.lastIndexOf(EXPECTED_SUFFIX) !==
-          itemCodes.length - EXPECTED_SUFFIX.length ||
-          itemCodes.lastIndexOf(EXPECTED_PREFIX) === -1) {
+          itemCodes.length - EXPECTED_SUFFIX.length) {
       throw new Error(
         'Invalid search query url fragment for ' +
         itemsType + ': ' + urlComponent);
