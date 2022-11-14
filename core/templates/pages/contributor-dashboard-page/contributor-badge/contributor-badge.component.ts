@@ -1,0 +1,300 @@
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import { UserService } from 'services/user.service';
+import { ContributionAndReviewStatsService } from '../services/contribution-and-review-stats.service';
+
+interface ContributionCounts {
+  language?: string;
+  submissions: number;
+  reviews: number;
+  corrections: number;
+}
+
+interface Badge {
+  contributionCount: number;
+  text: string;
+  language?: string;
+  isUnlocked: boolean;
+}
+
+@Component({
+  selector: 'contributor-badge',
+  templateUrl: './contributor-badge.component.html',
+  styleUrls: []
+})
+export class ContributorBadgeComponent {
+  @ViewChild('dropdown', {'static': false}) dropdownRef!: ElementRef;
+
+  @ViewChild(
+    'mobileDropdown', {'static': false}
+  ) mobileDropdownRef!: ElementRef;
+
+  @ViewChild(
+    'mobileBadgeTypeDropdown', {'static': false}
+  ) mobileBadgeTypeDropdownRef!: ElementRef;
+
+  totalTranslationStats: {[key: string]: ContributionCounts} = {};
+  translationBadges: {[key: string]: {[key: string]: Badge[]}} = {};
+  languages = [];
+  questionBadges: Badge[];
+  questionSubmissionBadges: Badge[];
+  questionReviewBadges: Badge[];
+  questionCorrectionBadges: Badge[];
+  totalQuestionStats: ContributionCounts = {
+    submissions: 0,
+    reviews: 0,
+    corrections: 0
+  };
+
+  dropdownShown = false;
+  mobileDropdownShown = false;
+  mobileBadgeTypeDropdownShown = false;
+  showMobileTranslationBadges = true;
+  selectedLanguage = '';
+  dataLoading = false;
+  userCanReviewTranslationSuggestion: boolean;
+  userCanReviewQuestionSuggestions: boolean;
+  userCanSuggestQuestions: boolean;
+  userHasQuestionRights: boolean;
+  reviewableLanguages = [];
+
+  constructor(
+    private readonly languageUtilService: LanguageUtilService,
+    private readonly contributionAndReviewStatsService:
+      ContributionAndReviewStatsService,
+    private readonly userService: UserService) {}
+
+  async ngOnInit(): Promise<void> {
+    this.dataLoading = true;
+    const userInfo = await this.userService.getUserInfoAsync();
+    const username = userInfo.getUsername();
+
+    if (username === null) {
+      throw new Error('Cannot fetch username.');
+    }
+
+    const userContributionRights =
+      await this.userService.getUserContributionRightsDataAsync();
+    userContributionRights.can_review_translation_for_language_codes.map(
+      (code) => {
+        const languageDescription = this.languageUtilService
+          .getAudioLanguageDescription(
+            code);
+        this.totalTranslationStats[languageDescription] = {
+          language: this.languageUtilService.getShortLanguageDescription(
+            languageDescription),
+          submissions: 0,
+          reviews: 0,
+          corrections: 0
+        };
+        this.reviewableLanguages.push(languageDescription);
+      });
+    this.userCanReviewQuestionSuggestions = (
+      userContributionRights.can_review_questions);
+    this.userCanSuggestQuestions = (
+      userContributionRights.can_suggest_questions);
+    this.userHasQuestionRights = (
+      this.userCanSuggestQuestions ||
+      this.userCanReviewQuestionSuggestions);
+
+    const response = await this.contributionAndReviewStatsService.fetchAllStats(
+      username);
+
+    if (response.translation_contribution_stats.length > 0) {
+      await response.translation_contribution_stats.map((stat) => {
+        const languageDescription =
+          this.languageUtilService.getAudioLanguageDescription(
+            stat.language_code);
+
+        // There can be languages that the contributor has translation
+        // contribution stats but not translation review stats. Hence we need to
+        // initialize TotalTranslationStats objects for those languages.
+        if (!this.totalTranslationStats[languageDescription]) {
+          this.totalTranslationStats[languageDescription] = {
+            language: this.languageUtilService.getShortLanguageDescription(
+              languageDescription),
+            submissions: stat.accepted_translations_count,
+            reviews: 0,
+            corrections: 0
+          };
+        } else {
+          this.totalTranslationStats[languageDescription].submissions += (
+            stat.accepted_translations_count);
+        }
+      });
+    }
+    if (response.translation_review_stats.length > 0) {
+      await response.translation_review_stats.map((stat) => {
+        const languageDescription =
+          this.languageUtilService.getAudioLanguageDescription(
+            stat.language_code);
+
+        this.totalTranslationStats[languageDescription].reviews += (
+          stat.reviewed_translations_count);
+        this.totalTranslationStats[languageDescription].corrections += (
+          stat.accepted_translations_with_reviewer_edits_count);
+      });
+    }
+    if (response.question_contribution_stats.length > 0) {
+      response.question_contribution_stats.map((stat) => {
+        this.totalQuestionStats.submissions = stat.accepted_questions_count;
+      });
+    }
+    if (response.question_review_stats.length > 0) {
+      response.question_review_stats.map((stat) => {
+        this.totalQuestionStats.reviews = stat.reviewed_questions_count;
+        this.totalQuestionStats.corrections = (
+          stat.accepted_questions_with_reviewer_edits_count);
+      });
+    }
+
+    for (let language in this.totalTranslationStats) {
+      this.translationBadges[language] = {};
+
+      this.translationBadges[language][
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION] =
+          this.getObtainedBadges(
+            this.totalTranslationStats[language].submissions,
+            AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION,
+            this.totalTranslationStats[language].language);
+      this.translationBadges[language][
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW] =
+          this.getObtainedBadges(
+            this.totalTranslationStats[language].reviews,
+            AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW,
+            this.totalTranslationStats[language].language);
+      this.translationBadges[language][
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION] =
+          this.getObtainedBadges(
+            this.totalTranslationStats[language].corrections,
+            AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION,
+            this.totalTranslationStats[language].language);
+    }
+
+    this.questionSubmissionBadges = this.getObtainedBadges(
+      this.totalQuestionStats.submissions,
+      AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION);
+    this.questionReviewBadges = this.getObtainedBadges(
+      this.totalQuestionStats.reviews,
+      AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW);
+    this.questionCorrectionBadges = this.getObtainedBadges(
+      this.totalQuestionStats.corrections,
+      AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION);
+
+    this.languages = Object.keys(this.totalTranslationStats);
+
+    if (this.languages.length > 0) {
+      this.selectedLanguage = this.languages[0];
+      this.userCanReviewTranslationSuggestion = (
+        this.reviewableLanguages.includes(this.selectedLanguage));
+    }
+    this.dataLoading = false;
+  }
+
+  getObtainedBadges(
+      contributionCount: number,
+      contributionSubType: string, language?: string): Badge[] {
+    const badges: Badge[] = [];
+    for (const value of AppConstants.CONTRIBUTOR_BADGE_INITIAL_LEVELS) {
+      if (contributionCount >= value) {
+        badges.push(
+          this.createBadgeObject(
+            value, contributionSubType, true, language)
+        );
+      } else {
+        badges.push(
+          this.createBadgeObject(
+            (value - contributionCount), contributionSubType, false, language)
+        );
+        break;
+      }
+    }
+
+    let level = 500;
+    while (contributionCount >= level) {
+      level += 500;
+      if (contributionCount >= level) {
+        badges.push(
+          this.createBadgeObject(
+            level, contributionSubType, true, language)
+        );
+      } else {
+        badges.push(
+          this.createBadgeObject(
+            (level - contributionCount), contributionSubType, false, language)
+        );
+        break;
+      }
+    }
+
+    return badges;
+  }
+
+  createBadgeObject(
+      contributionCount: number,
+      text: string,
+      isUnlocked: boolean,
+      language?: string): Badge {
+    const badge: Badge = {
+      contributionCount,
+      text,
+      isUnlocked,
+      language
+    };
+
+    return badge;
+  }
+
+  toggleLanguageDropdown(): void {
+    this.dropdownShown = !this.dropdownShown;
+  }
+
+  toggleMobileLanguageDropdown(): void {
+    this.mobileDropdownShown = !this.mobileDropdownShown;
+  }
+
+  toggleMobileBadgeTypeDropdown(): void {
+    this.mobileBadgeTypeDropdownShown = !this.mobileBadgeTypeDropdownShown;
+  }
+
+  selectLanguageOption(language: string): void {
+    this.selectedLanguage = language;
+    this.userCanReviewTranslationSuggestion = (
+      this.reviewableLanguages.includes(this.selectedLanguage));
+    this.dropdownShown = false;
+    this.mobileDropdownShown = false;
+  }
+
+  selectBadgeType(showMobileTranslationBadges: boolean): void {
+    this.showMobileTranslationBadges = showMobileTranslationBadges;
+    this.mobileBadgeTypeDropdownShown = false;
+  }
+
+  /**
+  * Close dropdown when outside elements are clicked
+  * @param event mouse click event
+  */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const targetElement = event.target as HTMLElement;
+    if (
+      targetElement &&
+       !this.dropdownRef.nativeElement.contains(targetElement)
+    ) {
+      this.dropdownShown = false;
+    }
+    if (
+      targetElement &&
+       !this.mobileDropdownRef.nativeElement.contains(targetElement)
+    ) {
+      this.mobileDropdownShown = false;
+    }
+    if (
+      targetElement &&
+       !this.mobileBadgeTypeDropdownRef.nativeElement.contains(targetElement)
+    ) {
+      this.mobileBadgeTypeDropdownShown = false;
+    }
+  }
+}

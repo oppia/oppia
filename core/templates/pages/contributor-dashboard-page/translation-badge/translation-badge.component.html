@@ -1,0 +1,55 @@
+<div *ngIf="isUnlocked === 'true'" class="badge-container">
+    <img class="translation-badge" src="/assets/images/contributor_dashboard/translation-{{type}}-badge.component.svg">
+    <div class="badge-value">
+        {{value}}
+    </div>
+    <div class="badge-caption">
+        {{contributionTypeText}}
+    </div>
+    <div class="badge-language" [ngStyle]="{'font-size': fontSize, 'line-height': lineHeight}">
+        {{language}}
+    </div>
+</div>
+<div *ngIf="isUnlocked === 'false'"  
+     ngbTooltip="{{value}} more {{contributionTypeText.toLowerCase()}} to achieve this"
+     class="locked-badge-container"
+     container="body"
+     placement="bottom">
+    <img class="translation-badge" src="/assets/images/contributor_dashboard/locked-badge.svg">
+</div>
+<style>
+    .locked-badge-container {
+        position: relative;
+        width: 90px;
+    }
+    .badge-container {
+        position: relative;
+        width: 100px;
+    }
+    .badge-value {
+        font-family: Capriola;
+        position: absolute;
+        top: 22%;
+        width: 100%;
+        text-align: center;
+    }
+    .badge-caption {
+        font-family: Capriola;
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        top: 46%;
+        font-size: 8px;
+    }
+    .badge-language {
+        position: absolute;
+        top: 71%;
+        width: 70px;
+        text-align: center;
+        color: white;
+        margin: auto;
+        left: 0;
+        right: 0;
+        height: 20px;
+    }
+</style>
