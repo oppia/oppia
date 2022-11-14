@@ -24,7 +24,7 @@ import apache_beam as beam
 from apache_beam.io.gcp import gcsio
 from apache_beam.io.gcp import gcsio_test
 
-from typing import Dict, Optional
+from typing import Dict, Optional, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -59,37 +59,43 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         self.client = client
         self.mode = mode
 
-    def expand(self, filenames: beam.PCollection) -> beam.PCollection:
+    def expand(self, file_paths: beam.PCollection) -> beam.PCollection:
         """Returns PCollection with file data.
 
         Args:
-            filenames: PCollection. The collection of filenames that will
+            file_paths: PCollection. The collection of filenames that will
                 be read.
 
         Returns:
             PCollection. The PCollection of the file data.
         """
         return (
-            filenames
+            file_paths
             | 'Read the file' >> beam.Map(self._read_file)
         )
 
-    def _read_file(self, filename: str) -> bytes:
+    def _read_file(self, file_path: str) -> Union[bytes, str]:
         """Helper function to read the contents of a file.
 
         Args:
-            filename: str. The name of the file that will be read.
+            file_path: Union[bytes, str]. The name of the file that will
+                be read.
 
         Returns:
             data: bytes. The file data.
         """
         gcs = gcsio.GcsIO(self.client)
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        gcs_filename = f'gs://{bucket}/{filename}'
+        gcs_filename = f'gs://{bucket}/{file_path}'
         data = gcs.open(gcs_filename, mode=self.mode).read()
-        # Ruling out the possibility of different types for mypy type checking.
-        assert isinstance(data, bytes)
         return data
+
+
+class FileObjectDict(TypedDict):
+    """Dictionary representing file object that will be written to GCS."""
+
+    filepath: str
+    data: Union[bytes, str]
 
 
 # TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
@@ -121,28 +127,28 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
         self.mode = mode
         self.mime_type = mime_type
 
-    def expand(self, filenames: beam.PCollection) -> beam.PCollection:
+    def expand(self, file_objects: beam.PCollection) -> beam.PCollection:
         """Returns the PCollection of files that have written to the GCS.
 
         Args:
-            filenames: PCollection. The collection of filenames and data
-                that will be write.
+            file_objects: PCollection. The collection of file paths and data
+                that will be written.
 
         Returns:
             PCollection. The PCollection of the number of bytes that has
             written to GCS.
         """
         return (
-            filenames
+            file_objects
             | 'Write files to GCS' >> beam.Map(self._write_file)
         )
 
-    def _write_file(self, filename: Dict[str, bytes]) -> int:
+    def _write_file(self, file_obj: FileObjectDict) -> int:
         """Helper function to write file to the GCS.
 
         Args:
-            filename: Dict[str, bytes]. The dictionary having file
-                name and file data.
+            file_obj: FileObjectDict. The dictionary having file
+                path and file data.
 
         Returns:
             write_file: int. Returns the number of bytes that has
@@ -150,14 +156,12 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
         """
         gcs = gcsio.GcsIO(self.client)
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        file_name = filename['file']
-        gcs_filename = 'gs://%s/%s' % (bucket, file_name)
+        filepath = file_obj['filepath']
+        gcs_url = 'gs://%s/%s' % (bucket, filepath)
         file = gcs.open(
-            filename=gcs_filename,
+            filename=gcs_url,
             mode=self.mode,
             mime_type=self.mime_type)
-        write_file = file.write(filename['data'])
-        # Ruling out the possibility of different types for mypy type checking.
-        assert isinstance(write_file, int)
+        write_file = file.write(file_obj['data'])
         file.close()
         return write_file

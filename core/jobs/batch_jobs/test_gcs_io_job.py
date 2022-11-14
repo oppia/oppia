@@ -31,8 +31,8 @@ from typing import Optional
 datastore_services = models.Registry.import_datastore_services()
 
 
-class TestGCSIoJob(base_jobs.JobBase):
-    """Read exploration files stored on GCS."""
+class TestGCSIoWriteJob(base_jobs.JobBase):
+    """Write dummy files to GCS."""
 
     def __init__(
         self,
@@ -44,14 +44,21 @@ class TestGCSIoJob(base_jobs.JobBase):
         self.pipeline = pipeline
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-
         write_files_to_gcs = (
             self.pipeline
             | 'Create PCollection having test bucket and test files' >> (
                 beam.Create(
                     [
-                        {'file': 'dummy_file_1', 'data': b'testing_1'},
-                        {'file': 'dummy_file_2', 'data': b'testing_2'}
+                        {
+                            'filepath': (
+                                'dummy_folder/dummy_subfolder/dummy_file_1'),
+                            'data': b'testing_1'
+                        },
+                        {
+                            'filepath': (
+                                'dummy_folder/dummy_subfolder/dummy_file_2'),
+                            'data': b'testing_2'
+                        }
                     ]
                 ))
             | 'Write files to GCS' >> gcs_io.WriteFile(self.client)
@@ -64,16 +71,32 @@ class TestGCSIoJob(base_jobs.JobBase):
                     'TOTAL FILES WRITTEN'))
         )
 
+        return total_files_write
+
+
+class TestGCSIoReadJob(base_jobs.JobBase):
+    """Read dummy files from GCS."""
+
+    def __init__(
+        self,
+        pipeline: beam.Pipeline,
+        client: Optional[gcsio_test.FakeGcsClient] = None
+    ) -> None:
+        super().__init__(pipeline=pipeline)
+        self.client = client
+        self.pipeline = pipeline
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         read_exp_file_from_gcs = (
             self.pipeline
             | 'Create PCollection of files that needs to be fetched' >> (
                 beam.Create(
                     [
-                        'dummy_file_1',
-                        'dummy_file_2'
+                        'dummy_folder/dummy_subfolder/dummy_file_1',
+                        'dummy_folder/dummy_subfolder/dummy_file_2'
                     ]
                 ))
-            | 'Read files from the GCS' >> gcs_io.ReadFile(self.client)
+            | 'Read files from the GCS' >> gcs_io.ReadFile(self.client, mode='rb')
         )
 
         total_files_read = (
@@ -92,7 +115,6 @@ class TestGCSIoJob(base_jobs.JobBase):
 
         return (
             (
-                total_files_write,
                 total_files_read,
                 output_files
             )

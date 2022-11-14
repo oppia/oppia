@@ -65,13 +65,13 @@ class ReadFileTest(job_test_utils.PipelinedTestBase):
         file_name = f'gs://{bucket}/dummy_file'
         string = b'testing'
         insert_random_file(client, file_name, string)
-        filenames = ['dummy_file']
-        filename_p_collec = (
+        filepaths = ['dummy_file']
+        filepath_p_collec = (
             self.pipeline
-            | 'Create pcoll of filenames' >> beam.Create(filenames)
+            | 'Create pcoll of filepaths' >> beam.Create(filepaths)
             | 'Read file from GCS' >> gcs_io.ReadFile(client)
         )
-        self.assert_pcoll_equal(filename_p_collec, [string])
+        self.assert_pcoll_equal(filepath_p_collec, [string])
 
 
 class WriteFileTest(job_test_utils.PipelinedTestBase):
@@ -80,13 +80,19 @@ class WriteFileTest(job_test_utils.PipelinedTestBase):
     def test_write_to_gcs(self) -> None:
         client = gcsio_test.FakeGcsClient()
         string = b'testing'
-        filenames = [
-            {'file': 'dummy_file_1', 'data': string},
-            {'file': 'dummy_file_2', 'data': string}
+        filepaths = [
+            {
+                'filepath': 'dummy_folder/dummy_subfolder/dummy_file_1',
+                'data': string
+            },
+            {
+                'filepath': 'dummy_folder/dummy_subfolder/dummy_file_2',
+                'data': string
+            }
         ]
-        filename_p_collec = (
+        filepath_p_collec = (
             self.pipeline
-            | 'Create pcoll of filenames' >> beam.Create(filenames)
+            | 'Create pcoll of filepaths' >> beam.Create(filepaths)
             | 'Write to GCS' >> gcs_io.WriteFile(client)
         )
-        self.assert_pcoll_equal(filename_p_collec, [7, 7])
+        self.assert_pcoll_equal(filepath_p_collec, [7, 7])
