@@ -531,7 +531,7 @@ describe('Translation contribution featured languages', () => {
   });
 });
 
-describe('Contributor dashboard accomplishments', function() {
+fdescribe('Contributor dashboard accomplishments', function() {
   const TOPIC_NAMES = [
     'Topic 0 for contribution', 'Topic 1 for contribution'];
   const SKILL_DESCRIPTIONS = [
