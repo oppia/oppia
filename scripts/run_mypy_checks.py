@@ -95,12 +95,6 @@ NOT_FULLY_COVERED_FILES: Final = [
     'core/controllers/voice_artist_test.py',
     'scripts/docstrings_checker.py',
     'scripts/docstrings_checker_test.py',
-    'scripts/install_python_prod_dependencies.py',
-    'scripts/install_python_prod_dependencies_test.py',
-    'scripts/install_third_party_libs.py',
-    'scripts/install_third_party_libs_test.py',
-    'scripts/install_third_party.py',
-    'scripts/install_third_party_test.py',
     'scripts/linters/pylint_extensions.py',
     'scripts/linters/pylint_extensions_test.py',
 ]
