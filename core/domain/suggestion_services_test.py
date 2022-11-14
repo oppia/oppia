@@ -1536,53 +1536,61 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self._create_question_suggestion_with_skill_id(question_2_skill_id)
 
         # Fetch submitted translation suggestions.
-        suggestions, offset = (
+        translatable_suggestions, offset = (
             suggestion_services.get_submitted_suggestions_by_offset(
                 user_id=self.author_id_1,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 limit=constants.OPPORTUNITIES_PAGE_SIZE,
                 offset=0))
 
-        self.assertEqual(len(suggestions), 2)
+        self.assertEqual(len(translatable_suggestions), 2)
         self.assertEqual(offset, 2)
-        self.assertEqual(suggestions[0].target_id, self.target_id_1)
         self.assertEqual(
-            suggestions[0].suggestion_type,
+            translatable_suggestions[0].target_id, self.target_id_1
+        )
+        self.assertEqual(
+            translatable_suggestions[0].suggestion_type,
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
         self.assertEqual(
-            suggestions[0].status,
+            translatable_suggestions[0].status,
             suggestion_models.STATUS_IN_REVIEW)
-        self.assertEqual(suggestions[1].target_id, self.target_id_1)
         self.assertEqual(
-            suggestions[1].suggestion_type,
+            translatable_suggestions[1].target_id, self.target_id_1
+        )
+        self.assertEqual(
+            translatable_suggestions[1].suggestion_type,
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
         self.assertEqual(
-            suggestions[1].status,
+            translatable_suggestions[1].status,
             suggestion_models.STATUS_IN_REVIEW)
 
         # Fetch submitted question suggestions.
-        suggestions, offset = (
+        question_suggestions, offset = (
             suggestion_services.get_submitted_suggestions_by_offset(
                 user_id=self.author_id_1,
                 suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
                 limit=constants.OPPORTUNITIES_PAGE_SIZE,
                 offset=0))
 
-        self.assertEqual(len(suggestions), 2)
+        self.assertEqual(len(question_suggestions), 2)
         self.assertEqual(offset, 2)
-        self.assertEqual(suggestions[0].target_id, question_2_skill_id)
         self.assertEqual(
-            suggestions[0].suggestion_type,
+            question_suggestions[0].target_id, question_2_skill_id
+        )
+        self.assertEqual(
+            question_suggestions[0].suggestion_type,
             feconf.SUGGESTION_TYPE_ADD_QUESTION)
         self.assertEqual(
-            suggestions[0].status,
+            question_suggestions[0].status,
             suggestion_models.STATUS_IN_REVIEW)
-        self.assertEqual(suggestions[1].target_id, question_1_skill_id)
         self.assertEqual(
-            suggestions[1].suggestion_type,
+            question_suggestions[1].target_id, question_1_skill_id
+        )
+        self.assertEqual(
+            question_suggestions[1].suggestion_type,
             feconf.SUGGESTION_TYPE_ADD_QUESTION)
         self.assertEqual(
-            suggestions[1].status,
+            question_suggestions[1].status,
             suggestion_models.STATUS_IN_REVIEW)
 
     def test_get_translation_suggestions_in_review_by_exploration(self) -> None:

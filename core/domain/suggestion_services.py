@@ -1196,8 +1196,8 @@ def get_translation_suggestions_in_review_by_exp_ids(
 
 
 def get_suggestions_with_translatable_explorations(
-    suggestions: Sequence[suggestion_registry.BaseSuggestion]
-) -> List[suggestion_registry.BaseSuggestion]:
+    suggestions: Sequence[suggestion_registry.SuggestionTranslateContent]
+) -> Sequence[suggestion_registry.SuggestionTranslateContent]:
     """Filters the supplied suggestions for those suggestions that have
     translatable exploration content. That is, the following are true:
     - The suggestion's change content corresponds to an existing exploration
@@ -1213,7 +1213,7 @@ def get_suggestions_with_translatable_explorations(
     """
 
     def _has_translatable_exploration(
-        suggestion: suggestion_registry.BaseSuggestion,
+        suggestion: suggestion_registry.SuggestionTranslateContent,
         suggestion_exp_id_to_exp: Dict[str, exp_domain.Exploration]
     ) -> bool:
         """Returns whether the supplied suggestion corresponds to a translatable
@@ -1498,9 +1498,37 @@ def get_submitted_suggestions(
     ])
 
 
+@overload
+def get_submitted_suggestions_by_offset(
+    user_id: str,
+    suggestion_type: Literal['add_question'],
+    limit: int,
+    offset: int
+) -> Tuple[
+    Sequence[suggestion_registry.SuggestionAddQuestion], int
+]: ...
+
+
+@overload
+def get_submitted_suggestions_by_offset(
+    user_id: str,
+    suggestion_type: Literal['translate_content'],
+    limit: int,
+    offset: int
+) -> Tuple[
+    Sequence[suggestion_registry.SuggestionTranslateContent], int
+]: ...
+
+
+@overload
 def get_submitted_suggestions_by_offset(
     user_id: str, suggestion_type: str, limit: int, offset: int
-) -> Tuple[List[suggestion_registry.BaseSuggestion], int]:
+) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]: ...
+
+
+def get_submitted_suggestions_by_offset(
+    user_id: str, suggestion_type: str, limit: int, offset: int
+) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]:
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
 

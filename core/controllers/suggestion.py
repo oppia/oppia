@@ -32,6 +32,7 @@ from core.domain import html_cleaner
 from core.domain import image_validation_services
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
+from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_registry
@@ -44,8 +45,17 @@ from typing import (
 # Note: These private type variables are only defined to implement the Generic
 # typing structure of SuggestionsProviderHandler. So, do not make them public
 # in the future.
-_NormalizedRequestDictType = TypeVar('_NormalizedRequestDictType')
-_NormalizedPayloadDictType = TypeVar('_NormalizedPayloadDictType')
+_SuggestionsProviderHandlerNormalizedRequestDictType = TypeVar(
+    '_SuggestionsProviderHandlerNormalizedRequestDictType')
+_SuggestionsProviderHandlerNormalizedPayloadDictType = TypeVar(
+    '_SuggestionsProviderHandlerNormalizedPayloadDictType'
+)
+
+
+class FrontendSkillOpportunityDict(opportunity_domain.SkillOpportunityDict):
+    """A dictionary representing SkillOpportunity domain object for frontend."""
+
+    skill_rubrics: List[skill_domain.RubricDict]
 
 
 class FrontendBaseSuggestionDict(TypedDict):
@@ -104,7 +114,7 @@ class SuggestionHandlerNormalizedPayloadDict(TypedDict):
     target_version_at_submission: int
     change: Mapping[str, change_domain.AcceptableChangeDictTypes]
     description: str
-    files: Optional[Dict[str, Union[bytes, str]]]
+    files: Optional[Dict[str, str]]
 
 
 class SuggestionHandler(
@@ -550,8 +560,8 @@ class SuggestionToSkillActionHandler(
 
 class SuggestionsProviderHandler(
     base.BaseHandler[
-        _NormalizedPayloadDictType,
-        _NormalizedRequestDictType
+        _SuggestionsProviderHandlerNormalizedPayloadDictType,
+        _SuggestionsProviderHandlerNormalizedRequestDictType
     ]
 ):
     """Provides suggestions for a user and given suggestion type."""
@@ -792,29 +802,54 @@ class UserSubmittedSuggestionsHandler(
         offset = self.normalized_request['offset']
         suggestions, next_offset = (
             suggestion_services.get_submitted_suggestions_by_offset(
-            self.user_id, suggestion_type, limit, offset))
+                self.user_id, suggestion_type, limit, offset
+            )
+        )
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-            translatable_suggestions = (
+            translatable_suggestions, next_offset = (
+                suggestion_services.get_submitted_suggestions_by_offset(
+                    self.user_id,
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    limit,
+                    offset
+                )
+            )
+            suggestions_with_translatable_exps = (
                 suggestion_services
                 .get_suggestions_with_translatable_explorations(
-                    suggestions))
+                    translatable_suggestions))
             while (
-                len(suggestions) > 0 and
-                len(translatable_suggestions) == 0
+                len(translatable_suggestions) > 0 and
+                len(suggestions_with_translatable_exps) == 0
             ):
                 # If all of the fetched suggestions are filtered out, then keep
                 # fetching until we have some suggestions to return or there
                 # are no more results.
-                suggestions, next_offset = (
+                translatable_suggestions, next_offset = (
                     suggestion_services.get_submitted_suggestions_by_offset(
-                    self.user_id, suggestion_type, limit, next_offset))
-                translatable_suggestions = (
+                        self.user_id,
+                        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                        limit,
+                        next_offset
+                    )
+                )
+                suggestions_with_translatable_exps = (
                     suggestion_services
                     .get_suggestions_with_translatable_explorations(
-                        suggestions))
-            suggestions = translatable_suggestions
+                        translatable_suggestions
+                    )
+                )
+            translatable_suggestions = suggestions_with_translatable_exps
 
-        self._render_suggestions(target_type, suggestions, next_offset)
+        self._render_suggestions(
+            target_type,
+            (
+                translatable_suggestions
+                if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                else suggestions
+            ),
+            next_offset
+        )
 
 
 class SuggestionListHandler(
@@ -1029,7 +1064,7 @@ def _get_target_id_to_exploration_opportunity_dict(
 
 def _get_target_id_to_skill_opportunity_dict(
     suggestions: Sequence[suggestion_registry.BaseSuggestion]
-) -> Dict[str, Optional[opportunity_domain.SkillOpportunityDict]]:
+) -> Dict[str, Optional[FrontendSkillOpportunityDict]]:
     """Returns a dict of target_id to skill opportunity summary dict.
 
     Args:
@@ -1040,8 +1075,14 @@ def _get_target_id_to_skill_opportunity_dict(
         dict. Dict mapping target_id to corresponding skill opportunity dict.
     """
     target_ids = set(s.target_id for s in suggestions)
-    opportunity_id_to_opportunity_dict = {
-        opp_id: (opp.to_dict() if opp is not None else None)
+    # Here we use MyPy ignore because we are explicitly changing
+    # the type from the Dict of 'SkillOpportunityDict' to the Dict of
+    # 'FrontendSkillOpportunityDict', and this is done because below we
+    # are adding new keys that are not defined on the 'SkillOpportunityDict'.
+    opportunity_id_to_opportunity_dict: Dict[
+        str, Optional[FrontendSkillOpportunityDict]
+    ] = {
+        opp_id: (opp.to_dict() if opp is not None else None)  # type: ignore[misc]
         for opp_id, opp in opportunity_services.get_skill_opportunities_by_ids(
             list(target_ids)).items()
     }
@@ -1056,11 +1097,7 @@ def _get_target_id_to_skill_opportunity_dict(
     for opp_id, skill in opportunity_id_to_skill.items():
         opportunity_dict = opportunity_id_to_opportunity_dict[opp_id]
         if skill is not None and opportunity_dict is not None:
-            # Here we use MyPy ignore because we are adding a new
-            # 'skill_rubrics' key on a well-defined TypedDict, and
-            # according to MyPy addition of a new key on TypedDict is
-            # prohibited.
-            opportunity_dict['skill_rubrics'] = [  # type: ignore[misc]
+            opportunity_dict['skill_rubrics'] = [
                 rubric.to_dict() for rubric in skill.rubrics
             ]
 
@@ -1114,7 +1151,7 @@ def _construct_exploration_suggestions(
 
 
 def _upload_suggestion_images(
-    files: Dict[str, Union[str, bytes]],
+    files: Dict[str, str],
     suggestion: suggestion_registry.BaseSuggestion,
     filenames: List[str]
 ) -> None:
@@ -1132,10 +1169,7 @@ def _upload_suggestion_images(
     # created.
     for filename in filenames:
         image = files[filename]
-        decoded_image = (
-            image if isinstance(image, bytes)
-            else base64.decodebytes(image.encode('utf-8'))
-        )
+        decoded_image = base64.decodebytes(image.encode('utf-8'))
         file_format = (
             image_validation_services.validate_image_and_filename(
                 decoded_image, filename))
