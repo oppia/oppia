@@ -55,7 +55,6 @@ import webtest
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
     from mypy_imports import secrets_services
 
 datastore_services = models.Registry.import_datastore_services()

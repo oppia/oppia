@@ -28,7 +28,7 @@ from core.platform import models
 import mailchimp3
 from mailchimp3 import mailchimpclient
 
-from typing import Any, Dict, Optional
+from typing import Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
