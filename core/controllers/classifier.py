@@ -295,7 +295,8 @@ class NextJobHandler(
         signature = self.normalized_payload['signature']
         vm_id = self.normalized_payload['vm_id']
         message: str = self.normalized_payload['message']
-        return classifier_domain.OppiaMLAuthInfo(message.encode('utf-8'), vm_id, signature)
+        return classifier_domain.OppiaMLAuthInfo(
+            message.encode('utf-8'), vm_id, signature)
 
     @acl_decorators.is_from_oppia_ml
     def post(self) -> None:
