@@ -1358,13 +1358,15 @@ def update_profile_picture_data_url(
     username = user_settings.username
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
     filename_png = 'profile_picture.png'
-    fs.commit(filename_png, profile_picture_data_url, mimetype='image/png')
+    png_binary = utils.convert_png_data_url_to_binary(profile_picture_data_url)
+    fs.commit(filename_png, png_binary, mimetype='image/png')
 
     profile_picture_webp = webptools.base64str2webp_base64str(
         base64str=profile_picture_data_url, image_type="png",
         option="-q 80",logging="-v")
+    webp_binary = utils.convert_webp_data_url_to_binary(profile_picture_webp)
     filename_webp = 'profile_picture.webp'
-    fs.commit(filename_webp, profile_picture_webp, mimetype='image/webp')
+    fs.commit(filename_webp, webp_binary, mimetype='image/webp')
 
 
 def update_user_bio(user_id: str, user_bio: str) -> None:

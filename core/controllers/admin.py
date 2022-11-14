@@ -1563,12 +1563,22 @@ class UpdateUsernameHandler(
             old_fs.delete('profile_picture.png')
             new_fs.commit(
                 'profile_picture.png', image_png, mimetype='image/png')
+        else:
+            raise Exception(
+                'The user with username %s does not have a '
+                'profile picture with png extension.' % (old_username)
+            )
 
         if old_fs.isfile('profile_picture.webp'):
             image_webp = old_fs.get('profile_picture.webp')
             old_fs.delete('profile_picture.webp')
             new_fs.commit(
                 'profile_picture.webp', image_webp, mimetype='image/webp')
+        else:
+            raise Exception(
+                'The user with username %s does not have a '
+                'profile picture with webp extension.' % (old_username)
+            )
 
         self.render_json({})
 
