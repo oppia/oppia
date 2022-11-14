@@ -1521,7 +1521,6 @@ def add_user_role(user_id: str, role: str) -> None:
         raise Exception('The role of a Mobile Learner cannot be changed.')
     if role in feconf.ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION:
         raise Exception('Adding a %s role is not allowed.' % role)
-
     user_settings.roles.append(role)
     role_services.log_role_query(
         user_id, feconf.ROLE_ACTION_ADD, role=role,
@@ -1771,7 +1770,7 @@ def update_email_preferences(
     if not bulk_email_db_already_updated and feconf.CAN_SEND_EMAILS:
         user_creation_successful = (
             bulk_email_services.add_or_update_user_status(
-                email, {}, 'Web',
+                email, {}, 'Account',
                 can_receive_email_updates=can_receive_email_updates))
         if not user_creation_successful:
             email_preferences_model.site_updates = False
@@ -2338,7 +2337,8 @@ def allow_user_to_review_translation_in_language(
     user_contribution_rights = get_user_contribution_rights(user_id)
     allowed_language_codes = set(
         user_contribution_rights.can_review_translation_for_language_codes)
-    allowed_language_codes.add(language_code)
+    if language_code is not None:
+        allowed_language_codes.add(language_code)
     user_contribution_rights.can_review_translation_for_language_codes = (
         sorted(list(allowed_language_codes)))
     _save_user_contribution_rights(user_contribution_rights)
@@ -2909,3 +2909,17 @@ def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
         exp_user_model.put()
 
     return exp_fetchers.get_exploration_user_data(user_id, exploration_id)
+
+
+def is_user_blog_post_author(user_id: str) -> bool:
+    """Checks whether user can write blog posts.
+
+    Args:
+        user_id: str. The user id of the user.
+
+    Returns:
+        bool. Whether the user can author blog posts.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    author_roles = [feconf.ROLE_ID_BLOG_ADMIN, feconf.ROLE_ID_BLOG_POST_EDITOR]
+    return any(role in author_roles for role in user_settings.roles)

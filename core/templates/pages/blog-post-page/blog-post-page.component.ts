@@ -26,6 +26,8 @@ import { BlogPostPageConstants } from './blog-post-page.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { BlogHomePageBackendApiService } from 'domain/blog/blog-homepage-backend-api.service';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { BlogPostPageService } from './services/blog-post-page.service';
 import dayjs from 'dayjs';
 
 import './blog-post-page.component.css';
@@ -46,6 +48,7 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
   blogPost!: BlogPostData;
   publishedDateString: string = '';
   authorProfilePicUrl!: string;
+  authorUsername!: string;
   DEFAULT_PROFILE_PICTURE_URL!: string;
   postsToRecommend: BlogPostSummary[] = [];
   blogPostLinkCopied: boolean = false;
@@ -62,13 +65,17 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
     private urlInterpolationService: UrlInterpolationService,
     private blogHomePageBackendApiService: BlogHomePageBackendApiService,
     private convertToPlainTextPipe: ConvertToPlainTextPipe,
+    private windowRef: WindowRef,
+    private blogPostPageService: BlogPostPageService,
   ) {}
 
   ngOnInit(): void {
     this.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST = (
       BlogPostPageConstants.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST);
     this.blogPostUrlFragment = this.urlService.getBlogPostUrlFromUrl();
+    this.authorUsername = this.blogPostPageData.authorUsername;
     this.blogPost = this.blogPostPageData.blogPostDict;
+    this.blogPostPageService.blogPostId = this.blogPostPageData.blogPostDict.id;
     this.postsToRecommend = this.blogPostPageData.summaryDicts;
     this.decodeAuthorProfilePicUrl(
       this.blogPostPageData.profilePictureDataUrl
@@ -185,6 +192,15 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
         this.activeTimeUserStayedOnPostInMinutes
       ) > (
         this.calculateEstimatedReadingTimeInMinutes() * 0.5
+      )
+    );
+  }
+
+  navigateToAuthorProfilePage(): void {
+    this.windowRef.nativeWindow.location.href = (
+      this.urlInterpolationService.interpolateUrl(
+        BlogPostPageConstants.BLOG_AUTHOR_PROFILE_PAGE_URL_TEMPLATE,
+        { author_username: this.authorUsername }
       )
     );
   }

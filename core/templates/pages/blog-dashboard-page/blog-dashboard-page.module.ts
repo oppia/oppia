@@ -44,6 +44,7 @@ import { BlogStatisticsTabComponent } from './statistics-tab/statistics-tab.comp
 import { UploadBlogPostThumbnailModalComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
 import { BlogCardPreviewModalComponent } from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
 import { UploadBlogPostThumbnailComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail.component';
+import { BlogAuthorDetailsEditorComponent } from './modal-templates/author-detail-editor-modal.component';
 import { BlogPostEditorNavbarPreLogoActionComponent } from 'pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
@@ -76,7 +77,8 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     BlogCardPreviewModalComponent,
     UploadBlogPostThumbnailComponent,
     BlogPostEditorNavbarPreLogoActionComponent,
-    BlogStatisticsTabComponent
+    BlogStatisticsTabComponent,
+    BlogAuthorDetailsEditorComponent
   ],
   entryComponents: [
     BlogDashboardNavbarBreadcrumbComponent,
@@ -89,7 +91,8 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     BlogCardPreviewModalComponent,
     UploadBlogPostThumbnailComponent,
     BlogPostEditorNavbarPreLogoActionComponent,
-    BlogStatisticsTabComponent
+    BlogStatisticsTabComponent,
+    BlogAuthorDetailsEditorComponent
   ],
   providers: [
     {
