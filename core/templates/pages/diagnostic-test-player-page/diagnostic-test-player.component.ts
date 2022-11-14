@@ -41,6 +41,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   recommendedTopicIds: string[] = [];
   progressPercentage: number = 0;
   componentSubscription = new Subscription();
+  classroomId: string = '';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -73,11 +74,15 @@ export class DiagnosticTestPlayerComponent implements OnInit {
             this.progressPercentage = progressPercentage;
           }
         ));
+    this.classroomBackendApiService.getClassroomIdAsync(
+      this.classroomUrlFragment).then(classroomId => {
+      this.classroomId = classroomId;
+    });
   }
 
   startDiagnosticTest(): void {
     this.classroomBackendApiService.getClassroomDataAsync(
-      this.classroomUrlFragment).then(response => {
+      this.classroomId).then(response => {
       this.diagnosticTestTopicTrackerModel = (
         new DiagnosticTestTopicTrackerModel(
           response.classroomDict.topicIdToPrerequisiteTopicIds));

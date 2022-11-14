@@ -298,7 +298,7 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
 
     def test_get_new_classroom_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        json_response = self.get_json(feconf.CLASSROOM_ID_HANDLER_URL)
+        json_response = self.get_json(feconf.NEW_CLASSROOM_ID_HANDLER_URL)
 
         self.assertFalse(
             json_response['classroom_id'] == self.math_classroom_id)
