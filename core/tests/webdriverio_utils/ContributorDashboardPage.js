@@ -310,10 +310,14 @@ var ContributorDashboardPage = function() {
   this.navigateToQuestionContributionStats = async function() {
     await action.click(
       'Stats tab button', navigateToStatsTab);
-    await action.click(
-      'Contribution type selector', contributionTypeSelectorContainer);
-    await action.click(
-      'Question contribution stats', navigateToQuestionContributionStatsOption);
+    await waitFor.elementToBeClickable(
+      contributionTypeSelectorContainer,
+      'Contribution type selector taking too long to become clickable.'
+    );
+    await waitFor.elementToBeClickable(
+      navigateToQuestionContributionStatsOption,
+      'Question contribution stats taking too long to become clickable.'
+    );
     await this.waitForStatsToLoad();
   };
 
