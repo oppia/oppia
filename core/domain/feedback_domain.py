@@ -20,8 +20,12 @@ import datetime
 import json
 
 from core import utils
+from core.constants import constants
+from core import feconf
 
 from typing import Dict, List, Optional, TypedDict
+
+import re
 
 
 class FeedbackThreadDict(TypedDict):
@@ -391,7 +395,43 @@ class FeedbackMessageReference:
 
     def validate(self) -> None:
         """Validates various properties of the FeedbackMessageReference."""
-        # Implement validation for object.
+
+        if not isinstance(self.entity_type, str):
+            raise utils.ValidationError(
+                'Expected entity type to be a string, received: %s.'
+                % self.entity_type)
+
+        if not isinstance(self.entity_id, str):
+            raise utils.ValidationError(
+                'Expected entity ID to be a string, received: %s.'
+                % self.entity_id)
+
+        if not isinstance(self.thread_id, str):
+            raise utils.ValidationError(
+                'Expected thread ID to be a string, received: %s.'
+                % self.thread_id)
+
+        if not isinstance(self.message_id, int):
+            raise utils.ValidationError(
+                'Expected message ID to be an integer, received: %s.'
+                % self.message_id)
+
+        if not re.match(constants.VALID_THREAD_ID_REGEX, self.thread_id):
+                raise utils.ValidationError(
+                    'Thread ID did not match expected pattern'
+                    ', received: \'%s\'' % self.thread_id)
+
+        if not re.match(constants.ENTITY_ID_REGEX, self.entity_id):
+                raise utils.ValidationError(
+                    'Entity ID is not a valid id'
+                    ', received: \'%s\'' % self.entity_id)
+        
+        if not self.entity_type in feconf.ALLOWED_ENTITY_TYPES:
+            raise utils.ValidationError(
+                    'Entity type is not in list of allowed types'
+                    ', received: \'%s\' and allowed types are: \'%s\'' 
+                    % self.entity_type
+                    % ', '.join(map(str, feconf.ALLOWED_ENTITY_TYPES)))
 
 
 class FeedbackThreadSummary:
