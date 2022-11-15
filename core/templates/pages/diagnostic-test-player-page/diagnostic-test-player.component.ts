@@ -25,6 +25,7 @@ import { DiagnosticTestTopicTrackerModel } from './diagnostic-test-topic-tracker
 import { Subscription } from 'rxjs';
 import { DiagnosticTestPlayerStatusService } from './diagnostic-test-player-status.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { TranslateService } from '@ngx-translate/core';
 
 
 @Component({
@@ -47,6 +48,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private classroomBackendApiService: ClassroomBackendApiService,
+    private translateService: TranslateService,
     private diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService
   ) {}
 
@@ -104,11 +106,17 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   }
 
   getTopicButtonText(topicName: string): string {
-    return 'Start ' + topicName;
+    return this.translateService.instant(
+      'I18N_DIAGNOSTIC_TEST_RESULT_START_TOPIC', {
+        topicName: topicName
+      });
   }
 
   getTopicUrlFromUrlFragment(urlFragment: string): string {
-    return '/learn/math/' + urlFragment;
+    return this.urlInterpolationService.interpolateUrl(
+      'learn/math/<topicUrlFragment>', {
+        topicUrlFragment: urlFragment
+      });
   }
 }
 

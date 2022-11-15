@@ -822,14 +822,12 @@ class AdminHandler(
             topic_id_3 = topic_fetchers.get_new_topic_id()
             topic_id_4 = topic_fetchers.get_new_topic_id()
             topic_id_5 = topic_fetchers.get_new_topic_id()
-            topic_id_6 = topic_fetchers.get_new_topic_id()
 
             skill_id_1 = skill_services.get_new_skill_id()
             skill_id_2 = skill_services.get_new_skill_id()
             skill_id_3 = skill_services.get_new_skill_id()
             skill_id_4 = skill_services.get_new_skill_id()
             skill_id_5 = skill_services.get_new_skill_id()
-            skill_id_6 = skill_services.get_new_skill_id()
 
             question_id_1 = question_services.get_new_question_id()
             question_id_2 = question_services.get_new_question_id()
@@ -942,10 +940,6 @@ class AdminHandler(
                     'dummy-subtopic-three')]
             topic_5.next_subtopic_id = 2
 
-            topic_6 = topic_domain.Topic.create_default_topic(
-                topic_id_6, 'Vector', 'vector', 'description', 'fragm')
-            topic_6.skill_ids_for_diagnostic_test = [skill_id_6]
-
             skill_1 = self._create_dummy_skill(
                 skill_id_1, 'Skill1', '<p>Dummy Explanation 1</p>')
             skill_2 = self._create_dummy_skill(
@@ -956,8 +950,6 @@ class AdminHandler(
                 skill_id_4, 'Skill4', '<p>Dummy Explanation 4</p>')
             skill_5 = self._create_dummy_skill(
                 skill_id_5, 'Skill5', '<p>Dummy Explanation 5</p>')
-            skill_6 = self._create_dummy_skill(
-                skill_id_6, 'Skill6', '<p>Dummy Explanation 6</p>')
 
             question_services.add_question(self.user_id, question_1)
             question_services.add_question(self.user_id, question_2)
@@ -980,9 +972,6 @@ class AdminHandler(
             skill_services.save_new_skill(self.user_id, skill_3)
             skill_services.save_new_skill(self.user_id, skill_4)
             skill_services.save_new_skill(self.user_id, skill_5)
-            skill_services.save_new_skill(self.user_id, skill_6)
-
-            topic_6.add_uncategorized_skill_id(skill_id_6)
 
             topic_services.save_new_topic(self.user_id, topic_1)
             topic_services.publish_topic(topic_id_1, self.user_id)
@@ -998,8 +987,6 @@ class AdminHandler(
 
             topic_services.save_new_topic(self.user_id, topic_5)
             topic_services.publish_topic(topic_id_5, self.user_id)
-
-            topic_services.save_new_topic(self.user_id, topic_6)
 
             question_services.create_new_question_skill_link(
                 self.user_id, question_id_1, skill_id_1, 0.5)
@@ -1033,13 +1020,10 @@ class AdminHandler(
                 self.user_id, question_id_15, skill_id_5, 0.5)
 
             classroom_id_1 = classroom_config_services.get_new_classroom_id()
-            classroom_id_2 = classroom_config_services.get_new_classroom_id()
 
             classroom_name_1 = 'Math'
-            classroom_name_2 = 'Physics'
 
             classroom_url_fragment_1 = 'math'
-            classroom_url_fragment_2 = 'physics'
 
             topic_dependency_for_classroom_1: Dict[str, list[str]] = {
                 topic_id_1: [],
@@ -1047,9 +1031,6 @@ class AdminHandler(
                 topic_id_3: [topic_id_1],
                 topic_id_4: [topic_id_2],
                 topic_id_5: [topic_id_2, topic_id_3]
-            }
-            topic_dependency_for_classroom_2: Dict[str, List[str]] = {
-                topic_id_6: []
             }
 
             classroom_dict_1: classroom_config_domain.ClassroomDict = {
@@ -1061,25 +1042,12 @@ class AdminHandler(
                 'topic_id_to_prerequisite_topic_ids': (
                     topic_dependency_for_classroom_1)
             }
-            classroom_dict_2: classroom_config_domain.ClassroomDict = {
-                'classroom_id': classroom_id_2,
-                'name': classroom_name_2,
-                'url_fragment': classroom_url_fragment_2,
-                'course_details': '',
-                'topic_list_intro': '',
-                'topic_id_to_prerequisite_topic_ids': (
-                    topic_dependency_for_classroom_2)
-            }
 
             classroom_1 = classroom_config_domain.Classroom.from_dict(
                 classroom_dict_1)
-            classroom_2 = classroom_config_domain.Classroom.from_dict(
-                classroom_dict_2)
 
             classroom_config_services.update_or_create_classroom_model(
                 classroom_1)
-            classroom_config_services.update_or_create_classroom_model(
-                classroom_2)
 
             classroom_pages_data = [{
                 'name': 'math',

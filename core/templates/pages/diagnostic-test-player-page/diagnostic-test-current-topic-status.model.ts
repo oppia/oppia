@@ -88,7 +88,11 @@ export class DiagnosticTestCurrentTopicStatusModel {
   }
 
   getNextSkill(): string {
-    return this._pendingSkillIdsToTest[0];
+    try {
+      return this._pendingSkillIdsToTest[0];
+    } catch {
+      return '';
+    }
   }
 
   getNextQuestion(skillId: string): Question {

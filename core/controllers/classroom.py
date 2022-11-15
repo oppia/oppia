@@ -323,7 +323,7 @@ class ClassroomIdHandler(
             classroom_url_fragment)
         if classroom is None:
             raise self.PageNotFoundException(
-                'The classroom with the given id or url doesn\'t exist.')
+                'The classroom with the given url doesn\'t exist.')
 
         self.render_json({
             'classroom_id': classroom.classroom_id
