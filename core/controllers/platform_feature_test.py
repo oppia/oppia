@@ -50,6 +50,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
         self.original_feature_name_set = feature_services.ALL_FEATURES_NAMES_SET
 
         param_names = ['parameter_a', 'parameter_b']
+        param_name_enums = [ParamNames.PARAMETER_A, ParamNames.PARAMETER_B]
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             param_names)
@@ -82,10 +83,10 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
 
         # Here we use MyPy ignore because the expected type of ALL_FEATURES_LIST
         # is a list of 'PARAM_NAMES' Enum, but here for testing purposes we are
-        # providing a list of str, which causes MyPy to throw an 'Incompatible
-        # types in assignment' error. Thus to avoid the error, we used ignore
-        # here.
-        feature_services.ALL_FEATURES_LIST = param_names  # type: ignore[assignment]
+        # providing a list of 'ParamNames' enums, which causes MyPy to throw an
+        # 'Incompatible types in assignment' error. Thus to avoid the error, we
+        # used ignore here.
+        feature_services.ALL_FEATURES_LIST = param_name_enums  # type: ignore[assignment]
         feature_services.ALL_FEATURES_NAMES_SET = set(param_names)
 
     def tearDown(self) -> None:
