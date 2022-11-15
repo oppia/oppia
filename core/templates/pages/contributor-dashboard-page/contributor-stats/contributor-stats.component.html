@@ -1,7 +1,7 @@
 <div class="stats-container">
   <div class="stats-contribution-type-mobile-container">
     <div class="dropdown-label">Type</div>
-    <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
+    <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-contribution-type-selector">
       <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleMobileDropdown()">
         {{selectedContributionType}}
         <span class="material-icons oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': mobileDropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
@@ -10,7 +10,7 @@
       </div>
 
       <div *ngIf="mobileDropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
-        <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
+        <div class="oppia-stats-type-selector-dropdown-option e2e-test-show-{{option.contributionType}}"
              (click)="selectOption(option.contributionType)"
              *ngFor="let option of options"
              [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
@@ -26,7 +26,7 @@
     Explore the impact of your contributions!
   </div>
   <div class="stats-contribution-type-container">
-    <div #dropdown class="oppia-stats-type-selector-container e2e-test-topic-selector">
+    <div #dropdown class="oppia-stats-type-selector-container e2e-test-contribution-type-selector">
       <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleDropdown()">
         {{selectedContributionType}}
         <span class="fas fa-caret-down oppia-stats-type-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
@@ -34,7 +34,7 @@
       </div>
 
       <div *ngIf="dropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
-        <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
+        <div class="oppia-stats-type-selector-dropdown-option e2e-test-show-{{option.contributionType}}"
              *ngFor="let option of options"
              (click)="selectOption(option.contributionType)"
              [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
@@ -44,7 +44,7 @@
     </div>
   </div>
   <div *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-cards-container">
-    <mat-card *ngFor="let page of statsData[type] | keyvalue" layout="row" class="list-view-item">
+    <mat-card *ngFor="let page of statsData[type] | keyvalue" layout="row" class="list-view-item e2e-test-stats-card">
       <div>
         {{selectedContributionType}} - {{page.value.language}}
       </div>
@@ -182,14 +182,14 @@
       </div>
     </mat-card>
     <mat-card *ngIf="(statsData[type] | json) === '{}'" layout="row" class="list-view-item oppia-contributions-required-message-container">
-      <div class="oppia-contributions-required-message">
+      <div class="oppia-contributions-required-message e2e-test-stats-loading-placeholder">
         Start contributing to see your stats!
       </div>
     </mat-card>
   </div>
 
   <div *ngIf="type == 'questionContribution' || type == 'questionReview'" class="stats-cards-container">
-    <mat-card *ngIf="(statsData[type] | json) !== '{}'" layout="row" class="list-view-item">
+    <mat-card *ngIf="(statsData[type] | json) !== '{}'" layout="row" class="list-view-item e2e-test-stats-card">
       <div>
         {{selectedContributionType}}
       </div>
@@ -308,7 +308,7 @@
       </div>
     </mat-card>
     <mat-card *ngIf="(statsData[type] | json) === '{}'" layout="row" class="list-view-item oppia-contributions-required-message-container">
-      <div class="oppia-contributions-required-message">
+      <div class="oppia-contributions-required-message e2e-test-stats-loading-placeholder">
         Start contributing to see your stats!
       </div>
     </mat-card>
