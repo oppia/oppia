@@ -23,7 +23,9 @@ from core import schema_utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Any, Dict, List, Optional, Sequence, TypedDict, Union
+from typing import (
+    Any, Dict, List, Literal, Optional, Sequence, TypedDict, Union, overload
+)
 
 from core.domain import caching_services  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
@@ -388,18 +390,48 @@ class Registry:
         """
         cls._config_registry[name] = instance
 
+    @overload
     @classmethod
-    def get_config_property(cls, name: str) -> Optional[ConfigProperty]:
+    def get_config_property(
+        cls, name: str
+    ) -> Optional[ConfigProperty]: ...
+
+    @overload
+    @classmethod
+    def get_config_property(
+        cls, name: str, *, strict: Literal[True]
+    ) -> ConfigProperty: ...
+
+    @overload
+    @classmethod
+    def get_config_property(
+        cls, name: str, *, strict: Literal[False]
+    ) -> Optional[ConfigProperty]: ...
+
+    @classmethod
+    def get_config_property(
+        cls, name: str, strict: bool = False
+    ) -> Optional[ConfigProperty]:
         """Returns the instance of the specified name of the configuration
         property.
 
         Args:
             name: str. The name of the configuration property.
+            strict: bool. Whether to fail noisily if no config property exist.
 
         Returns:
             instance. The instance of the specified configuration property.
+
+        Raises:
+            Exception. No config property exist for the given property name.
         """
-        return cls._config_registry.get(name)
+        config_property = cls._config_registry.get(name)
+        if strict and config_property is None:
+            raise Exception(
+                'No config property exists for the given property name: %s'
+                % name
+            )
+        return config_property
 
     @classmethod
     def get_config_property_schemas(cls) -> Dict[str, ConfigPropertySchemaDict]:
