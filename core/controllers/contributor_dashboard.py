@@ -283,7 +283,7 @@ class ReviewableOpportunitiesHandlerNormalizedRequestDict(TypedDict):
     """
 
     topic_name: Optional[str]
-    language: Optional[str]
+    language: str
 
 
 class ReviewableOpportunitiesHandler(
@@ -333,7 +333,7 @@ class ReviewableOpportunitiesHandler(
         self.render_json(self.values)
 
     def _get_reviewable_exploration_opportunity_summaries(
-        self, user_id: str, topic_name: Optional[str], language: Optional[str]
+        self, user_id: str, topic_name: Optional[str], language: str
     ) -> List[Optional[opportunity_domain.ExplorationOpportunitySummary]]:
         """Returns exploration opportunity summaries that have translation
         suggestions that are reviewable by the supplied user. The result is
