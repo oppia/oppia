@@ -178,6 +178,7 @@ export class DiagnosticTestPlayerEngineService {
         wasOldStateInitial: boolean,
         isFirstHit: boolean,
         isFinalQuestion: boolean,
+        nextCardIfReallyStuck: StateCard,
         focusLabel: string
       ) => void
   ): boolean {
@@ -199,6 +200,7 @@ export class DiagnosticTestPlayerEngineService {
     let wasOldStateInitial: boolean = false;
     let isFirstHit: boolean = true;
     let isFinalQuestion: boolean = false;
+    let nextCardIfReallyStuck = null;
     let focusLabel: string;
 
     this._numberOfAttemptedQuestions += 1;
@@ -220,7 +222,7 @@ export class DiagnosticTestPlayerEngineService {
         feedbackAudioTranslations, refresherExplorationId,
         missingPrerequisiteSkillId, remainOnCurrentCard,
         taggedSkillMisconceptionId, wasOldStateInitial, isFirstHit,
-        isFinalQuestion, focusLabel
+        isFinalQuestion, nextCardIfReallyStuck, focusLabel
       );
       this.diagnosticTestPlayerStatusService
         .onDiagnosticTestSessionProgressChange.emit(
