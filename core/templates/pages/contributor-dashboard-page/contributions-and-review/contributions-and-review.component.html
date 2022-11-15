@@ -79,18 +79,18 @@
       </div>
     </div>
   </div>
-  <div [ngClass]="!activeTabIsAccomplishments ? 'oppia-contributions-show-review-container' : 'oppia-contributor-accomplishments-container'">
+  <div [ngClass]="!isAccomplishmentsTabActive() ? 'oppia-contributions-show-review-container' : 'oppia-contributor-accomplishments-container'">
     <div class="oppia-login-required" *ngIf="!userDetailsLoading && !userIsLoggedIn">
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
-      <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !activeTabIsAccomplishments"
+      <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
                                 [labelRequired]="!activeReviewTab"
                                 [showOpportunityButton]="true">
       </oppia-opportunities-list>
-      <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab() && !activeTabIsAccomplishments">
+      <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab() && !isAccomplishmentsTabActive()">
         <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
           <button aria-label="Back to reviewable lessons"
                   (click)="onClickBackToReviewableLessons()"
@@ -107,7 +107,7 @@
                                   [showOpportunityButton]="false">
         </oppia-opportunities-list>
       </div>
-      <div *ngIf="accomplishmentsTabIsEnabled && activeTabIsAccomplishments && activeSubType === 'stats'">
+      <div *ngIf="accomplishmentsTabIsEnabled && isAccomplishmentsTabActive() && activeTabSubtype === 'stats'">
         <contributor-stats [type]="defaultContributionType">
         </contributor-stats>
       </div>

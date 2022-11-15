@@ -11,6 +11,7 @@
 
       <div *ngIf="mobileDropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
         <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
+             (click)="selectOption(option.contributionType)"
              *ngFor="let option of options"
              [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
             {{option.displayName}}
@@ -49,7 +50,7 @@
       </div>
       <table class="dashboard-table e2e-test-topics-table">
         <tr>
-          <th *ngFor="let column of COLUMNS[type] | keyvalue: getColumnSortDirection"
+          <th *ngFor="let column of COLUMNS[type] | keyvalue: provideOriginalOrder"
               class="dashboard-table-headings stats-data">
             <div class="stats-column-name-container">
               {{column.value}}
@@ -194,7 +195,7 @@
       </div>
       <table class="dashboard-table e2e-test-topics-table">
         <tr>
-          <th *ngFor="let column of COLUMNS[type] | keyvalue: getColumnSortDirection"
+          <th *ngFor="let column of COLUMNS[type] | keyvalue: provideOriginalOrder"
               class="dashboard-table-headings stats-data">
             <div class="stats-column-name-container">
               {{column.value}}

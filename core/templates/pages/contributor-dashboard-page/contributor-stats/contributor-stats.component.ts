@@ -31,9 +31,10 @@ interface Option {
   displayName: string;
 }
 
-interface StatsPage {
+interface PageableStats {
   language?: string;
   currentPageStartIndex: number;
+  // This is the index of the last item of the stats data of a given page.
   currentPageEndIndex: number;
   // eslint-disable-next-line max-len
   data: (TranslationContributionStats | TranslationReviewStats | QuestionContributionStats | QuestionReviewStats)[];
@@ -82,7 +83,6 @@ export class ContributorStatsComponent {
   mobileDropdownShown: boolean = false;
   selectedContributionType: string;
   username: string;
-  endPage: number;
   ITEMS_PER_PAGE: number = 5;
 
   userCanReviewTranslationSuggestions: boolean = false;
@@ -227,7 +227,7 @@ export class ContributorStatsComponent {
       response.translation_contribution_stats.map((stat) => {
         if (!this.statsData.translationContribution[stat.language_code]) {
           this.statsData.translationContribution[stat.language_code] = this
-            .createTranslationContributionStatsPage(stat);
+            .createTranslationContributionPageableStats(stat);
         } else {
           this.statsData.translationContribution[stat.language_code].data.push(
             this.createTranslationContributionStat(stat));
@@ -239,7 +239,7 @@ export class ContributorStatsComponent {
       response.translation_review_stats.map((stat) => {
         if (!this.statsData.translationReview[stat.language_code]) {
           this.statsData.translationReview[stat.language_code] = this
-            .createTranslationReviewStatsPage(stat);
+            .createTranslationReviewPageableStats(stat);
         } else {
           this.statsData.translationReview[stat.language_code].data.push(
             this.createTranslationReviewStat(stat));
@@ -249,18 +249,18 @@ export class ContributorStatsComponent {
 
     if (response.question_contribution_stats.length > 0) {
       this.statsData.questionContribution = this
-        .createQuestionContributionStatsPage(
+        .createQuestionContributionPageableStats(
           response.question_contribution_stats);
     }
 
     if (response.question_review_stats.length > 0) {
-      this.statsData.questionReview = this.createQuestionReviewStatsPage(
+      this.statsData.questionReview = this.createQuestionReviewPageableStats(
         response.question_review_stats);
     }
   }
 
-  createTranslationContributionStatsPage(
-      stat: TranslationContributionBackendDict): StatsPage {
+  createTranslationContributionPageableStats(
+      stat: TranslationContributionBackendDict): PageableStats {
     return {
       data: [this.createTranslationContributionStat(stat)],
       language: this.languageUtilService.getAudioLanguageDescription(
@@ -270,8 +270,8 @@ export class ContributorStatsComponent {
     };
   }
 
-  createTranslationReviewStatsPage(
-      stat: TranslationReviewBackendDict): StatsPage {
+  createTranslationReviewPageableStats(
+      stat: TranslationReviewBackendDict): PageableStats {
     return {
       data: [this.createTranslationReviewStat(stat)],
       language: this.languageUtilService.getAudioLanguageDescription(
@@ -281,8 +281,8 @@ export class ContributorStatsComponent {
     };
   }
 
-  createQuestionContributionStatsPage(
-      stats: QuestionContributionBackendDict[]): StatsPage {
+  createQuestionContributionPageableStats(
+      stats: QuestionContributionBackendDict[]): PageableStats {
     return {
       data: stats.map((stat) => {
         return this.createQuestionContributionStat(stat);
@@ -292,8 +292,8 @@ export class ContributorStatsComponent {
     };
   }
 
-  createQuestionReviewStatsPage(
-      stat: QuestionReviewBackendDict[]): StatsPage {
+  createQuestionReviewPageableStats(
+      stat: QuestionReviewBackendDict[]): PageableStats {
     return {
       data: stat.map((stat) => {
         return this.createQuestionReviewStat(stat);
@@ -350,17 +350,31 @@ export class ContributorStatsComponent {
     };
   }
 
-  goToNextPage(page: StatsPage): void {
+  goToNextPage(page: PageableStats): void {
+    if (
+      this.statsData[this.type].currentPageEndIndex >=
+      this.statsData[this.type].data.length) {
+      throw new Error('There are no more pages after this one.');
+    }
     page.currentPageStartIndex += this.ITEMS_PER_PAGE;
     page.currentPageEndIndex += this.ITEMS_PER_PAGE;
   }
 
-  goToPreviousPage(page: StatsPage): void {
+  goToPreviousPage(page: PageableStats): void {
+    if (
+      this.statsData[this.type].currentPageStartIndex === 0) {
+      throw new Error('There are no more pages before this one.');
+    }
     page.currentPageStartIndex -= this.ITEMS_PER_PAGE;
     page.currentPageEndIndex -= this.ITEMS_PER_PAGE;
   }
 
-  getColumnSortDirection(): number {
+  // This method gives the original order of the key value pairs that is
+  // displayed in the template. We could have used keyvalue: 0 instead of
+  // returning from this function, but it gives console errors.
+  // We need to give a constant number in order to preserve original column
+  // property order.
+  provideOriginalOrder(): number {
     return 0;
   }
 
