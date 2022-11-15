@@ -24,6 +24,7 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -36,7 +37,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List
+from typing import Dict, List, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -497,9 +498,18 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         # Create a translation suggestion for continue text.
         continue_state = exp_100.states['continue state']
-        content_id_of_continue_button_text = (
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to 'SubtitledUnicode' type, and this
+        # is done because here we are accessing 'buttontext' cust. arg whose
+        # value is always SubtitledUnicode.
+        subtitled_unicode_of_continue_button_text = cast(
+            state_domain.SubtitledUnicode,
             continue_state.interaction.customization_args[
-                'buttonText'].value.content_id)
+                'buttonText'].value
+        )
+        content_id_of_continue_button_text = (
+            subtitled_unicode_of_continue_button_text.content_id
+        )
         change_dict = {
             'cmd': 'add_translation',
             'content_id': content_id_of_continue_button_text,
@@ -582,9 +592,19 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         # Create a translation suggestion for the continue text.
         continue_state = exp_100.states['continue state']
-        content_id_of_continue_button_text = (
+        # Here we use cast because we are narrowing down type from various
+        # customization arg types to SubtitledUnicode, and here we are sure
+        # that type is always going to be SubtitledUnicode because here we
+        # are testing opportunities with buttontext customization arg and
+        # buttontext cust. arg always contain SubtitledUnicode type of value.
+        subtitled_unicode_of_continue_button_text = cast(
+            state_domain.SubtitledUnicode,
             continue_state.interaction.customization_args[
-                'buttonText'].value.content_id)
+                'buttonText'].value
+        )
+        content_id_of_continue_button_text = (
+            subtitled_unicode_of_continue_button_text.content_id
+        )
         change_dict = {
             'cmd': 'add_translation',
             'content_id': content_id_of_continue_button_text,

@@ -63,10 +63,12 @@ from core.domain import taskqueue_services
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
+from extensions import domain
 
 import deepdiff
 from typing import (
-    Dict, Final, List, Optional, Sequence, Tuple, Type, TypedDict, Union, cast)
+    Dict, Final, List, Optional, Sequence, Tuple, Type, TypedDict, Union, cast
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1954,9 +1956,16 @@ def validate_exploration_for_story(
             validation_error_messages.append(error_string)
 
         if state.interaction.id == 'EndExploration':
-            recommended_exploration_ids = (
+            # Here we use cast because we are narrowing down the type from
+            # various types of cust. arg values to List[str], and here
+            # we are sure that the type is always going to be List[str]
+            # because EndExploration customization arg object always contain
+            # values of type List[str].
+            recommended_exploration_ids = cast(
+                List[str],
                 state.interaction.customization_args[
-                    'recommendedExplorationIds'].value)
+                    'recommendedExplorationIds'].value
+            )
             if len(recommended_exploration_ids) != 0:
                 error_string = (
                     'Explorations in a story are not expected to contain '
@@ -1968,8 +1977,15 @@ def validate_exploration_for_story(
                 validation_error_messages.append(error_string)
 
         if state.interaction.id == 'MultipleChoiceInput':
-            choices = (
-                state.interaction.customization_args['choices'].value)
+            # Here we use cast because we are narrowing down the type from
+            # various types of cust. arg values to List[SubtitledHtml],
+            # and here we are sure that the type is always going to be
+            # List[SubtitledHtml] because MultipleChoiceInput customization
+            # arg object always contain values of type List[SubtitledHtml].
+            choices = cast(
+                List[state_domain.SubtitledHtml],
+                state.interaction.customization_args['choices'].value
+            )
             if len(choices) < 4:
                 error_string = (
                     'Exploration in a story having MultipleChoiceInput '
@@ -2809,11 +2825,15 @@ def get_image_filenames_from_exploration(
     filenames = []
     for state in exploration.states.values():
         if state.interaction.id == 'ImageClickInput':
-            image_paths = state.interaction.customization_args[
-                'imageAndRegions'].value
-            # Ruling out the possibility of any other type for mypy
-            # type checking.
-            assert isinstance(image_paths, dict)
+            # Here we use cast because we are narrowing down the type from
+            # various types of cust. arg values to ImageAndRegionDict,
+            # and here we are sure that the type is always going to be
+            # ImageAndRegionDict because ImageClickInput customization
+            # arg object always contain values of type ImageAndRegionDict.
+            image_paths = cast(
+                domain.ImageAndRegionDict,
+                state.interaction.customization_args['imageAndRegions'].value
+            )
             filenames.append(image_paths['imagePath'])
 
     html_list = exploration.get_all_html_content_strings()

@@ -38,9 +38,12 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
+from extensions import domain
 
 from typing import (
-    Any, Callable, Dict, List, Mapping, Optional, Set, Type, TypedDict, Union)
+    Any, Callable, Dict, List, Mapping, Optional, Set, Type, TypedDict, Union,
+    cast
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1044,17 +1047,18 @@ class SuggestionAddQuestion(BaseSuggestion):
         # Drop Sort have ck editor that includes the images of the interactions
         # so that references for those images are included as html strings.
         if question.question_state_data.interaction.id == 'ImageClickInput':
-            # TODO(#15982): Currently, we have broader type for interaction
-            # customization args and due to this we have to use assert to
-            # narrow down the type. So, once each customization_arg is defined
-            # explicitly, we can remove this todo.
-            assert isinstance(
+            # Here we use cast because we are narrowing down the type from
+            # various types of cust. arg values to ImageAndRegionDict, and
+            # here we are sure that the type is always going to be
+            # ImageAndRegionDict because imageAndRegions customization arg
+            # object always contain values of type ImageAndRegionDict.
+            customization_arg_image_dict = cast(
+                domain.ImageAndRegionDict,
                 question.question_state_data.interaction.customization_args[
-                    'imageAndRegions'].value, dict
+                    'imageAndRegions'].value
             )
             new_image_filenames.append(
-                question.question_state_data.interaction.customization_args[
-                    'imageAndRegions'].value['imagePath'])
+                customization_arg_image_dict['imagePath'])
         fs_services.copy_images(
             self.image_context, self.target_id, feconf.ENTITY_TYPE_QUESTION,
             question_dict['id'], new_image_filenames)

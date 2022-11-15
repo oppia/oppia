@@ -33,11 +33,13 @@ from core.constants import constants
 from core.domain import customization_args_util
 from core.domain import param_domain
 from core.domain import translation_domain
+from extensions import domain
 from extensions.objects.models import objects
 
 from typing import (
-    Any, Callable, Dict, Final, List, Literal, Mapping, Optional, Tuple,
-    Type, TypedDict, Union, cast, overload)
+    Any, Callable, Dict, Final, List, Literal, Mapping, Optional, Tuple, Type,
+    TypedDict, TypeVar, Union, cast, overload
+)
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
@@ -46,8 +48,9 @@ from core.domain import translatable_object_registry  # pylint: disable=invalid-
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from extensions import domain
     from extensions.interactions import base
+
+_GenericCustomizationArgType = TypeVar('_GenericCustomizationArgType')
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -67,12 +70,6 @@ AllowedRuleSpecInputTypes = Union[
         str, Union[str, List[str], int, bool, float, Dict[str, int], List[Any]]
     ],
 ]
-
-# TODO(#15982): Here we use type Any because `CustomizationArgsDictType` is a
-# type for customization_args dictionary, and we used Any type here because
-# it accepts the values of customization args and that values can be of type
-# str, int, bool, List and other types too.
-CustomizationArgsDictType = Dict[str, Dict[str, Any]]
 
 
 class TrainingDataDict(TypedDict):
@@ -1007,8 +1004,15 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
     def _validate_continue_interaction(self) -> None:
         """Validates Continue interaction."""
-        text_value = (
-            self.customization_args['buttonText'].value.unicode_str)
+        # Here we use cast because we are narrowing the down the type from
+        # various types of cust. args values, and here we sue that the type
+        # is always going to be SubtitledUnicode because 'buttontext' cust.
+        # arg objects always contain SubtitledUnicode types of values.
+        button_text_subtitled_unicode = cast(
+            SubtitledUnicode,
+            self.customization_args['buttonText'].value
+        )
+        text_value = button_text_subtitled_unicode.unicode_str
         if len(text_value) > 20:
             raise utils.ValidationError(
                 'The `continue` interaction text length should be atmost '
@@ -1017,8 +1021,15 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
     def _validate_end_interaction(self) -> None:
         """Validates End interaction."""
-        recc_exp_ids = (
-            self.customization_args['recommendedExplorationIds'].value)
+        # Here we use cast because we are narrowing the down the type from
+        # various types of cust. args values, and here we sue that the type
+        # is always going to be SubtitledUnicode because 'EndExploration' cust.
+        # arg objects always contain 'recommendedExplorationIds' key with
+        # List[str] types of values.
+        recc_exp_ids = cast(
+            List[str],
+            self.customization_args['recommendedExplorationIds'].value
+        )
         if len(recc_exp_ids) > 3:
             raise utils.ValidationError(
                 'The total number of recommended explorations inside End '
@@ -1558,7 +1569,15 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """
         rule_spec_till_now: List[RuleSpecDict] = []
 
-        choices = self.customization_args['choices'].value
+        # Here we use cast because we are narrowing the down the type from
+        # various types of cust. args values, and here we sue that the type
+        # is always going to be List[SubtitledHtml] because 'MultiChoiceInput'
+        # cust. arg objects always contain 'choices' key with List[
+        # SubtitledHtml] types of values.
+        choices = cast(
+            List[SubtitledHtml],
+            self.customization_args['choices'].value
+        )
         self._validates_choices_should_be_unique_and_nonempty(choices)
 
         for ans_group_index, answer_group in enumerate(self.answer_groups):
@@ -1590,13 +1609,35 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 selections.
             ValidationError. Answer choices are empty or duplicate.
         """
-        min_value = (
-            self.customization_args['minAllowableSelectionCount'].value)
-        max_value = (
-            self.customization_args['maxAllowableSelectionCount'].value)
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'int', and here we are sure
+        # that the type is always going to be int because 'ItemInputSelection'
+        # customization args always contains 'minAllowableSelectionCount' key
+        # with int type of values.
+        min_value = cast(
+            int,
+            self.customization_args['minAllowableSelectionCount'].value
+        )
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'int', and here we are sure
+        # that the type is always going to be int because 'ItemInputSelection'
+        # customization args always contains 'maxAllowableSelectionCount' key
+        # with int type of values.
+        max_value = cast(
+            int,
+            self.customization_args['maxAllowableSelectionCount'].value
+        )
         rule_spec_till_now: List[RuleSpecDict] = []
 
-        choices = self.customization_args['choices'].value
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'List[SubtitledHtml]',
+        # and here we are sure that the type is always going to be
+        # List[SubtitledHtml] because 'ItemInputSelection' customization
+        # args always contains 'choices' key with List[SubtitledHtml]
+        # type of values.
+        choices = cast(
+            List[SubtitledHtml], self.customization_args['choices'].value
+        )
         self._validates_choices_should_be_unique_and_nonempty(choices)
 
         # Minimum number of selections should be no greater than maximum
@@ -1678,7 +1719,16 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         rule_spec_till_now: List[RuleSpecDict] = []
         equal_ordering_one_at_incorec_posn = []
 
-        choices = self.customization_args['choices'].value
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'List[SubtitledHtml]',
+        # and here we are sure that the type is always going to be
+        # List[SubtitledHtml] because 'DragAndDrop' customization
+        # args always contains 'choices' key with List[SubtitledHtml]
+        # type of values.
+        choices = cast(
+            List[SubtitledHtml],
+            self.customization_args['choices'].value
+        )
         if len(choices) < 2:
             raise utils.ValidationError(
                 'There should be atleast 2 values inside DragAndDrop '
@@ -1852,7 +1902,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         seen_strings_contains: List[List[str]] = []
         seen_strings_startswith: List[List[str]] = []
 
-        rows_value = int(self.customization_args['rows'].value)
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'int', and here we are sure
+        # that the type is always going to be int because 'TextInput'
+        # customization args always contain 'rows' key with int type
+        # of values.
+        rows_value = cast(int, self.customization_args['rows'].value)
         if rows_value < 1 or rows_value > 10:
             raise utils.ValidationError(
                 'Rows value in Text interaction should be between 1 and 10.'
@@ -2338,13 +2393,9 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     SubtitledHtml dict or SubtitledUnicode dict.
     """
 
-    # Here we use type Any because values in schema dictionary can be of type
-    # str, List, Dict and other types too. We also use type Any for `value`
-    # because it can be of type SubtitledHtmlDict, SubtitledUnicodeDict
-    # and so on.
     def __init__(
         self,
-        value: Any,
+        value: UnionOfCustomizationArgsDictValues,
         schema: Dict[
             str, Union[SubtitledHtmlDict, SubtitledUnicodeDict, str]
         ]
@@ -2390,11 +2441,9 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
                 subtitled_unicode.unicode_str)
         return translatable_contents_collection
 
-    # Here we use type Any because this method returns the values of
-    # customization args and that values can be of type str, int, bool,
-    # List and other types too. So to make the return type generalize
-    # for every type of values, we used Any here.
-    def to_customization_arg_dict(self) -> Dict[str, Any]:
+    def to_customization_arg_dict(self) -> Dict[
+        str, UnionOfCustomizationArgsDictValues
+    ]:
         """Converts a InteractionCustomizationArgument domain object to a
         customization argument dictionary. This is done by
         traversing the customization argument schema, and converting
@@ -2443,7 +2492,9 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     # types too.
     @classmethod
     def from_customization_arg_dict(
-        cls, ca_dict: CustomizationArgsDictType, ca_schema: Dict[str, Any]
+        cls,
+        ca_dict: Dict[str, UnionOfCustomizationArgsDictValues],
+        ca_schema: Dict[str, Any]
     ) -> InteractionCustomizationArg:
         """Converts a customization argument dictionary to an
         InteractionCustomizationArgument domain object. This is done by
@@ -2581,17 +2632,15 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             validate_html
         )
 
-    # TODO(#15982): Here we use type Any because `value` argument can accept
-    # values of customization arg and that values can be of type Dict[Dict[..]],
-    # str, int, bool and other types too, and for argument `schema` we used Any
-    # type because values in schema dictionary can be of type str, List, Dict
-    # and other types too.
+    # Here we use type Any because the argument `schema` can accept
+    # schema dicts and those schema dictionaries can have nested dict
+    # structure.
     @staticmethod
     def traverse_by_schema_and_convert(
         schema: Dict[str, Any],
-        value: Any,
+        value: _GenericCustomizationArgType,
         conversion_fn: AcceptableConversionFnType
-    ) -> Any:
+    ) -> _GenericCustomizationArgType:
         """Helper function that recursively traverses an interaction
         customization argument spec to locate any SubtitledHtml or
         SubtitledUnicode objects, and applies a conversion function to the
@@ -2621,9 +2670,15 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
 
         if is_subtitled_html_spec or is_subtitled_unicode_spec:
-            value = conversion_fn(value, schema['obj_type'])
+            # Here we use MyPy ignore because here we are assigning
+            # Optional[str] type to generic type variable, and passing
+            # generic variable to conversion function.
+            value = conversion_fn(value, schema['obj_type'])  # type: ignore[assignment, arg-type]
         elif schema['type'] == schema_utils.SCHEMA_TYPE_LIST:
-            value = [
+            assert isinstance(value, list)
+            # Here we use MyPy ignore because here we are assigning List type
+            # to generic type variable.
+            value = [  # type: ignore[assignment]
                 InteractionCustomizationArg.traverse_by_schema_and_convert(
                     schema['items'],
                     value_element,
@@ -2631,6 +2686,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
                 ) for value_element in value
             ]
         elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
+            assert isinstance(value, dict)
             for property_spec in schema['properties']:
                 name = property_spec['name']
                 value[name] = (
@@ -4808,7 +4864,10 @@ class State(translation_domain.BaseTranslatableObject):
         self.linked_skill_id = linked_skill_id
 
     def update_interaction_customization_args(
-        self, customization_args_dict: CustomizationArgsDictType
+        self,
+        customization_args_dict: Mapping[
+            str, Mapping[str, UnionOfCustomizationArgsDictValues]
+        ]
     ) -> None:
         """Update the customization_args of InteractionInstance domain object.
 
@@ -4818,6 +4877,10 @@ class State(translation_domain.BaseTranslatableObject):
         Raises:
             Exception. The customization arguments are not unique.
         """
+        # Here we use assert so that the customization_arg_dict will become
+        # Dict type at the entry level so that we can use all the methods of
+        # Dict without MyPy complain.
+        assert isinstance(customization_args_dict, dict)
         customization_args = (
             InteractionInstance.
             convert_customization_args_dict_to_customization_args(
@@ -5438,13 +5501,18 @@ class State(translation_domain.BaseTranslatableObject):
             if interaction_customization_arg_has_html:
                 if 'choices' in (
                         state_dict['interaction']['customization_args'].keys()):
-                    state_dict['interaction']['customization_args'][
-                        'choices']['value'] = ([
-                            conversion_fn(html)
-                            for html in state_dict[
-                                'interaction']['customization_args'][
-                                    'choices']['value']
-                        ])
+                    # Here we use cast because the above 'if'
+                    # condition forces cust. args to have type
+                    # Dict[str, List[str]].
+                    html_choices_ca_dict = cast(
+                        Dict[str, List[str]],
+                        state_dict['interaction']['customization_args'][
+                            'choices']
+                    )
+                    html_choices_ca_dict['value'] = ([
+                        conversion_fn(html)
+                        for html in html_choices_ca_dict['value']
+                    ])
         else:
             ca_specs_dict = (
                 interaction_registry.Registry
@@ -5545,3 +5613,23 @@ class StateVersionHistory:
             state_version_history_dict['state_name_in_previous_version'],
             state_version_history_dict['committer_id']
         )
+
+
+UnionOfCustomizationArgsDictValues = Union[
+    str,
+    int,
+    bool,
+    List[str],
+    List[SubtitledHtml],
+    List[SubtitledHtmlDict],
+    SubtitledHtmlDict,
+    SubtitledUnicode,
+    SubtitledUnicodeDict,
+    domain.ImageAndRegionDict,
+    domain.GraphDict
+]
+
+
+CustomizationArgsDictType = Dict[
+    str, Dict[str, UnionOfCustomizationArgsDictValues]
+]

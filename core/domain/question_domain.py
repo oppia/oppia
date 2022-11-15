@@ -36,9 +36,9 @@ from core.domain import translation_domain
 from extensions import domain
 
 from pylatexenc import latex2text
-
 from typing import (
-    Dict, Final, List, Literal, Optional, Set, TypedDict, Union, cast, overload)
+    Dict, Final, List, Literal, Optional, Set, TypedDict, Union, cast, overload
+)
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -69,6 +69,16 @@ CMD_ADD_QUESTION_SKILL: Final = 'add_question_skill'
 CMD_REMOVE_QUESTION_SKILL: Final = 'remove_question_skill'
 
 CMD_CREATE_NEW: Final = 'create_new'
+
+
+UnalteredUnionOfCustomizationArgsDictValues = Union[
+    str,
+    int,
+    bool,
+    List[str],
+    domain.ImageAndRegionDict,
+    domain.GraphDict
+]
 
 
 class QuestionChange(change_domain.BaseChange):
@@ -809,10 +819,20 @@ class Question(translation_domain.BaseTranslatableObject):
                     state_domain.SubtitledUnicodeDict, ca_spec.default_value
                 )
                 new_value = copy.deepcopy(default_value)
+                # Here we use cast because in this _convert function we are
+                # converting older customization args dicts that contains
+                # unicode and html to newer versions of customization args dict
+                # that contain 'SubtitledUnicodeDict' and 'SubtitledHtmlDict',
+                # and by using cast here we are representing older cust. args
+                # dictionary.
+                older_version_unicode_ca_dict = cast(
+                    Dict[str, Dict[str, str]], ca_dict
+                )
 
                 # If available, assign value to html or unicode_str.
                 if ca_name in ca_dict:
-                    new_value['unicode_str'] = ca_dict[ca_name]['value']
+                    new_value['unicode_str'] = older_version_unicode_ca_dict[
+                        ca_name]['value']
 
                 # Assign content_id.
                 new_value['content_id'] = (
@@ -820,15 +840,38 @@ class Question(translation_domain.BaseTranslatableObject):
                     .generate_content_id(content_id_prefix)
                 )
 
-                ca_dict[ca_name] = {'value': new_value}
+                # Here we use cast because in this _convert function we are
+                # converting older customization args dicts that contains
+                # unicode and html to newer versions of customization args dict
+                # that contain 'SubtitledUnicodeDict' and 'SubtitledHtmlDict',
+                # and by using cast here we are representing newer cust. args
+                # dictionary.
+                updated_unicode_cust_arg_dict = cast(
+                    Dict[str, Dict[str, state_domain.SubtitledUnicodeDict]],
+                    ca_dict
+                )
+
+                updated_unicode_cust_arg_dict[ca_name] = {'value': new_value}
             elif is_subtitled_html_list_spec:
                 new_subtitled_html_list_value: (
                     List[state_domain.SubtitledHtmlDict]
                 ) = []
 
+                # Here we use cast because in this _convert function we are
+                # converting older customization args dicts that contains
+                # list of unicode and html to newer versions of customization
+                # args dict that contain list of 'SubtitledUnicodeDict' and
+                # 'SubtitledHtmlDict', and by using cast here we are
+                # representing older cust. args dictionary.
+                older_version_html_list_ca_dict = cast(
+                    Dict[str, Dict[str, List[str]]], ca_dict
+                )
+
                 if ca_name in ca_dict:
                     # Assign values to html fields.
-                    for html in ca_dict[ca_name]['value']:
+                    for html in older_version_html_list_ca_dict[
+                        ca_name
+                    ]['value']:
                         new_subtitled_html_list_value.append({
                             'html': html, 'content_id': ''
                         })
@@ -852,9 +895,29 @@ class Question(translation_domain.BaseTranslatableObject):
                         .generate_content_id(content_id_prefix)
                     )
 
-                ca_dict[ca_name] = {'value': new_subtitled_html_list_value}
+                # Here we use cast because in this _convert function we are
+                # converting older customization args dicts that contains
+                # list of unicode and html to newer versions of customization
+                # args dict that contain list of 'SubtitledUnicodeDict' and
+                # 'SubtitledHtmlDict', and by using cast here we are
+                # representing newer cust. args dictionary.
+                updated_html_list_ca_dict = cast(
+                    Dict[str, Dict[str, List[state_domain.SubtitledHtmlDict]]],
+                    ca_dict
+                )
+
+                updated_html_list_ca_dict[ca_name] = {
+                    'value': new_subtitled_html_list_value
+                }
             elif ca_name not in ca_dict:
-                ca_dict[ca_name] = {'value': ca_spec.default_value}
+                # Here we use cast because we are narrowing down to the types
+                # of customization arg values that are not altered by above
+                # if clauses.
+                ca_default_value = cast(
+                    UnalteredUnionOfCustomizationArgsDictValues,
+                    ca_spec.default_value
+                )
+                ca_dict[ca_name] = {'value': ca_default_value}
 
         (
             customization_args_util
@@ -1235,8 +1298,17 @@ class Question(translation_domain.BaseTranslatableObject):
         interaction_id = question_state_dict['interaction']['id']
         if interaction_id in ['DragAndDropSortInput', 'ItemSelectionInput']:
             solution = question_state_dict['interaction']['solution']
-            choices = question_state_dict['interaction'][
-                'customization_args']['choices']['value']
+            # Here we use cast because we are narrowing down the type from
+            # various allowed cust. arg types to 'List[SubtitledHtmlDict]',
+            # and here we are sure that the type is always going to be
+            # List[SubtitledHtmlDict] because 'DragAndDropSortInput' and
+            # 'ItemSelectionInput' customization args always contain choices
+            # with 'List[SubtitledHtmlDict]' values.
+            choices = cast(
+                List[state_domain.SubtitledHtmlDict],
+                question_state_dict['interaction']['customization_args'][
+                    'choices']['value']
+            )
 
             if interaction_id == 'ItemSelectionInput':
                 # The solution type will be migrated from SetOfHtmlString to

@@ -2087,9 +2087,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if len(self.states) != len(processed_queue):
             dead_end_states = list(
                 set(self.states.keys()) - set(processed_queue))
+            sorted_dead_end_states = sorted(dead_end_states)
             raise utils.ValidationError(
                 'It is impossible to complete the exploration from the '
-                'following states: %s' % ', '.join(dead_end_states))
+                'following states: %s' % ', '.join(sorted_dead_end_states))
 
     def get_content_html(self, state_name: str, content_id: str) -> str:
         """Return the content for a given content id of a state.
@@ -2658,8 +2659,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 continue
 
             solution = state_dict['interaction']['solution']
-            choices = state_dict['interaction']['customization_args'][
-                'choices']['value']
+            # Here we use cast because we are narrowing down the type from
+            # various allowed cust. arg types to 'List[SubtitledHtmlDict]',
+            # and here we are sure that the type is always going to be
+            # List[SubtitledHtmlDict] because 'DragAndDropSortInput' and
+            # 'ItemSelectionInput' customization args always contain choices
+            # with 'List[SubtitledHtmlDict]' values.
+            choices = cast(
+                List[state_domain.SubtitledHtmlDict],
+                state_dict['interaction']['customization_args']['choices'][
+                    'value']
+            )
             if interaction_id == 'ItemSelectionInput':
                 # The solution type will be migrated from SetOfHtmlString to
                 # SetOfTranslatableHtmlContentIds.
@@ -3600,10 +3610,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_dict: state_domain.StateDict. The state dictionary.
             language_code: str. The language code of the exploration.
         """
-        text_value = state_dict['interaction'][
-            'customization_args']['buttonText']['value']['unicode_str']
-        content_id = state_dict['interaction'][
-            'customization_args']['buttonText']['value']['content_id']
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'SubtitledUnicodeDict',
+        # and here we are sure that the type is always going to be
+        # SubtitledUnicodeDict because 'continue' customization args
+        # always contain SubtitledUnicodeDict type of values.
+        button_text_subtitled_unicode_dict = cast(
+            state_domain.SubtitledUnicodeDict,
+            state_dict['interaction']['customization_args']['buttonText'][
+                'value'
+            ]
+        )
+        text_value = button_text_subtitled_unicode_dict['unicode_str']
+        content_id = button_text_subtitled_unicode_dict['content_id']
         lang_code_to_unicode_str_dict = {
             'en': 'Continue',
             'es': 'Continuar',
@@ -3622,12 +3641,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         }
         if len(text_value) > 20:
             if language_code in lang_code_to_unicode_str_dict:
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = (
+                button_text_subtitled_unicode_dict['unicode_str'] = (
                         lang_code_to_unicode_str_dict[language_code])
             else:
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Continue'
+                button_text_subtitled_unicode_dict['unicode_str'] = 'Continue'
 
             continue_button_translations = state_dict['written_translations'][
                 'translations_mapping'][content_id]
@@ -3648,11 +3665,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Args:
             state_dict: state_domain.StateDict. The state dictionary.
         """
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'Dict[str, List[str]]',
+        # and here we are sure that the type is always going to be
+        # Dict[str, List[str]] because 'EndExploration' customization
+        # args always contain 'recommendedExplorationIds' key with
+        # Dict[str, List[str]] type of values.
+        recommendation_exp_ids_dict = cast(
+            Dict[str, List[str]], state_dict['interaction'][
+            'customization_args']['recommendedExplorationIds']
+        )
+        recc_exp_ids = recommendation_exp_ids_dict['value']
         # Should be at most 3 recommended explorations.
-        recc_exp_ids = state_dict['interaction'][
-            'customization_args']['recommendedExplorationIds']['value']
-        state_dict['interaction']['customization_args'][
-            'recommendedExplorationIds']['value'] = recc_exp_ids[:3]
+        recommendation_exp_ids_dict['value'] = recc_exp_ids[:3]
 
     @classmethod
     def _fix_numeric_input_interaction(
@@ -4029,10 +4054,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_name: str. The name of the state.
         """
         answer_groups = state_dict['interaction']['answer_groups']
-
-        choices: List[state_domain.SubtitledHtmlDict] = (
-            state_dict['interaction']['customization_args'][
-                'choices']['value']
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'List[SubtitledHtmlDict]',
+        # and here we are sure that the type is always going to be
+        # List[SubtitledHtmlDict] because 'MultipleChoiceInput' customization
+        # args always contain List[SubtitledHtmlDict] type of values.
+        choices = (
+            cast(
+                List[state_domain.SubtitledHtmlDict],
+                state_dict['interaction']['customization_args'][
+                    'choices']['value']
+            )
         )
         cls._choices_should_be_unique_and_non_empty(
             choices,
@@ -4068,17 +4100,42 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 to be fixed.
             state_name: str. The name of the state.
         """
-        min_value = (
-            state_dict['interaction']['customization_args']
-            ['minAllowableSelectionCount']['value']
-        )
-        max_value = (
-            state_dict['interaction']['customization_args']
-            ['maxAllowableSelectionCount']['value']
-        )
-        choices: List[state_domain.SubtitledHtmlDict] = (
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'Dict[str, int]',
+        # and here we are sure that the type is always going to be
+        # Dict[str, int] because 'ItemInputSelection' customization
+        # args always contains 'minAllowableSelectionCount' key with
+        # Dict[str, int] type of values.
+        min_allowable_selection_count_dict = cast(
+            Dict[str, int],
             state_dict['interaction']['customization_args'][
-                'choices']['value']
+                    'minAllowableSelectionCount']
+        )
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'Dict[str, int]',
+        # and here we are sure that the type is always going to be
+        # Dict[str, int] because 'ItemInputSelection' customization
+        # args always contains 'maxAllowableSelectionCount' key with
+        # Dict[str, int] type of values.
+        max_allowable_selection_count_dict = cast(
+            Dict[str, int],
+            state_dict['interaction']['customization_args'][
+                    'maxAllowableSelectionCount']
+        )
+        min_value = min_allowable_selection_count_dict['value']
+        max_value = max_allowable_selection_count_dict['value']
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'List[SubtitledHtml]',
+        # and here we are sure that the type is always going to be
+        # List[SubtitledHtml] because 'ItemInputSelection
+        # customization args always contains 'choices' key with
+        # List[SubtitledHtml] type of values.
+        choices = (
+            cast(
+                List[state_domain.SubtitledHtmlDict],
+                state_dict['interaction']['customization_args'][
+                    'choices']['value']
+            )
         )
         answer_groups = state_dict['interaction']['answer_groups']
 
@@ -4136,10 +4193,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for empty_ans_group in empty_ans_groups:
             answer_groups.remove(empty_ans_group)
 
-        state_dict['interaction']['customization_args'][
-            'minAllowableSelectionCount']['value'] = min_value
-        state_dict['interaction']['customization_args'][
-            'maxAllowableSelectionCount']['value'] = max_value
+        min_allowable_selection_count_dict['value'] = min_value
+        max_allowable_selection_count_dict['value'] = max_value
         state_dict['interaction']['customization_args']['choices'][
             'value'] = choices
         state_dict['interaction']['answer_groups'] = answer_groups
@@ -4238,9 +4293,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
         invalid_rules = []
         ele_x_at_y_rules: List[Dict[str, Union[str, int]]] = []
         off_by_one_rules: List[List[List[str]]] = []
-        choices_drag_drop: List[state_domain.SubtitledHtmlDict] = (
-            state_dict['interaction']['customization_args'][
-                'choices']['value']
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'List[SubtitledHtmlDict]',
+        # and here we are sure that the type is always going to be
+        # List[SubtitledHtmlDict] because 'DragAndDrop' customization
+        # args always contain List[SubtitledHtmlDict] type of values.
+        choices_drag_drop = (
+            cast(
+                List[state_domain.SubtitledHtmlDict],
+                state_dict['interaction']['customization_args'][
+                    'choices']['value']
+            )
         )
 
         if state_dict['interaction']['solution'] is not None:
@@ -4443,11 +4506,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
-        # Text input height shoule be >= 1 and <= 10.
-        rows_value = int(
-            state_dict['interaction']['customization_args'][
-                'rows']['value']
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'Dict[str, int]',
+        # and here we are sure that the type is always going to
+        # be Dict[str, int] because 'TextInput' customization
+        # args always contain 'rows' key with Dict[str, int]
+        # type of value.
+        input_interaction_rows_dict = cast(
+            Dict[str, int],
+            state_dict['interaction']['customization_args']['rows']
         )
+        # Text input height shoule be >= 1 and <= 10.
+        rows_value = input_interaction_rows_dict['value']
         if rows_value < 1:
             state_dict['interaction']['customization_args'][
                 'rows']['value'] = 1

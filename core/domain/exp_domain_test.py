@@ -35,7 +35,7 @@ from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Tuple, Union
+from typing import Dict, Final, List, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1563,8 +1563,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     def test_continue_interaction(self) -> None:
         """Tests Continue interaction."""
         self.set_interaction_for_state(self.state, 'Continue')
-        self.state.interaction.customization_args[
-          'buttonText'].value.unicode_str = 'Continueeeeeeeeeeeeeeeeee'
+        # Here we use cast because we are narrowing down the type from various
+        # types of values to 'SubtitledUnicode', and we are sure that the type
+        # is always going to be 'SubtitledUnicode' because here we are testing
+        # for continue interaction which contain continue cust. arg and this
+        # cust. arg always contain 'SubtitledUnicode' type of value.
+        subtitled_unicode_continue_ca_arg = cast(
+          state_domain.SubtitledUnicode,
+          self.state.interaction.customization_args[
+            'buttonText'].value
+        )
+        subtitled_unicode_continue_ca_arg.unicode_str = (
+          'Continueeeeeeeeeeeeeeeeee'
+        )
         self._assert_validation_error(
           self.new_exploration, (
             'The `continue` interaction text length should be atmost '
@@ -4215,7 +4226,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Please fix the following issues before saving this exploration: '
             '1. The following states are not reachable from the initial state: '
             'End 2. It is impossible to complete the exploration from the '
-            'following states: Stuck State, Introduction'):
+            'following states: Introduction, Stuck State'):
             exploration.validate(strict=True)
 
     def test_update_init_state_name_with_invalid_state(self) -> None:
@@ -4335,7 +4346,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             }
         }
         state_interaction_cust_args: Dict[
-            str, Dict[str, Union[Dict[str, str], int]]
+            str, Dict[str, Union[state_domain.SubtitledUnicodeDict, int]]
         ] = {
             'placeholder': {
                 'value': {
@@ -12737,65 +12748,69 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(state3, 'ItemSelectionInput')
         self.set_interaction_for_state(state4, 'DragAndDropSortInput')
 
+        ca_value_dict: state_domain.SubtitledUnicodeDict = {
+            'content_id': 'ca_placeholder_0',
+            'unicode_str': 'Enter here.'
+        }
         customization_args_dict1: Dict[
-            str, Dict[str, Union[Dict[str, str], int]]
+            str, Dict[str, Union[state_domain.SubtitledUnicodeDict, int]]
         ] = {
             'placeholder': {
-                'value': {
-                    'content_id': 'ca_placeholder_0',
-                    'unicode_str': 'Enter here.'
-                }
+                'value': ca_value_dict
             },
             'rows': {'value': 1}
         }
+        choices_subtitled_dict: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>This is value1 for MultipleChoice</p>'
+            },
+            {
+                'content_id': 'ca_choices_1',
+                'html': '<p>This is value2 for MultipleChoice</p>'
+            }
+        ]
         customization_args_dict2: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], bool]]
+            str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], bool]]
         ] = {
-            'choices': {'value': [
-                {
-                    'content_id': 'ca_choices_0',
-                    'html': '<p>This is value1 for MultipleChoice</p>'
-                },
-                {
-                    'content_id': 'ca_choices_1',
-                    'html': '<p>This is value2 for MultipleChoice</p>'
-                }
-            ]},
+            'choices': {'value': choices_subtitled_dict},
             'showChoicesInShuffledOrder': {'value': True}
         }
+        choices_subtitled_dict = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>This is value1 for ItemSelection</p>'
+            },
+            {
+                'content_id': 'ca_choices_1',
+                'html': '<p>This is value2 for ItemSelection</p>'
+            },
+            {
+                'content_id': 'ca_choices_2',
+                'html': '<p>This is value3 for ItemSelection</p>'
+            }
+        ]
         customization_args_dict3: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], int]]
+            str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], int]]
         ] = {
-            'choices': {'value': [
-                {
-                    'content_id': 'ca_choices_0',
-                    'html': '<p>This is value1 for ItemSelection</p>'
-                },
-                {
-                    'content_id': 'ca_choices_1',
-                    'html': '<p>This is value2 for ItemSelection</p>'
-                },
-                {
-                    'content_id': 'ca_choices_2',
-                    'html': '<p>This is value3 for ItemSelection</p>'
-                }
-            ]},
+            'choices': {'value': choices_subtitled_dict},
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 2}
         }
+        choices_subtitled_dict = [
+          {
+              'content_id': 'ca_choices_0',
+              'html': '<p>This is value1 for DragAndDropSortInput</p>'
+          },
+          {
+              'content_id': 'ca_choices_1',
+              'html': '<p>This is value2 for DragAndDropSortInput</p>'
+          }
+        ]
         customization_args_dict4: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], bool]]
+            str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], bool]]
         ] = {
-            'choices': {'value': [
-                {
-                    'content_id': 'ca_choices_0',
-                    'html': '<p>This is value1 for DragAndDropSortInput</p>'
-                },
-                {
-                    'content_id': 'ca_choices_1',
-                    'html': '<p>This is value2 for DragAndDropSortInput</p>'
-                }
-            ]},
+            'choices': {'value': choices_subtitled_dict},
             'allowMultipleItemsInSamePosition': {'value': True}
         }
 
