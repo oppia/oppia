@@ -135,12 +135,6 @@ class ChangeDomainTests(test_utils.GenericTestBase):
         change_object).to_dict(),
         expected_change_object_dict.to_dict())
 
-    def test_validate_function_returns_correctly(self) -> None:
-        change_object = change_domain.BaseChange({
-            'cmd': feconf.CMD_DELETE_COMMIT
-        })
-        self.assertEqual(change_object.validate(), None)
-
     def test_getattr_gets_attribute(self) -> None:
         change_object = change_domain.BaseChange({
             'cmd': feconf.CMD_DELETE_COMMIT
