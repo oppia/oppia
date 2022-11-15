@@ -449,7 +449,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
     def test_get_reviewable_translation_opportunities_filtering_language( # pylint: disable=line-too-long
         self
-    ):
+    ) -> None:
         # Create a translation suggestion for exploration 0.
         change_dict = {
             'cmd': 'add_translation',
