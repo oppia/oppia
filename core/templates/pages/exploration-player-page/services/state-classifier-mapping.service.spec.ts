@@ -123,7 +123,7 @@ describe('State classifier mapping service', () => {
         mappingService.init(expId, expVersion);
 
         mappingService.testOnlySetClassifierData(stateName, classifierData);
-        var retrievedClassifier = (
+        let retrievedClassifier = (
           mappingService.getClassifier(stateName) as Classifier);
 
         expect(retrievedClassifier.algorithmId).toEqual('TestClassifier');

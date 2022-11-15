@@ -193,7 +193,7 @@ describe('Editable collection backend API service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      var sampleCollectionBackendObject = {
+      let sampleCollectionBackendObject = {
         id: 'sample_collection_id',
         title: 'a title',
         objective: 'an objective',

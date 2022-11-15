@@ -29,7 +29,7 @@ import { fakeAsync, TestBed } from '@angular/core/testing';
 
 
 describe('Translation topic service', () => {
-  var $flushPendingTasks: () => void;
+  let $flushPendingTasks: () => void;
   let $q = null;
 
   let loggerService: LoggerService;

@@ -69,17 +69,17 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
     var inputs = rule.inputs;
     var finalDescription = description;
 
-    var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-    var iter = 0;
+    let PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+    let iter = 0;
     while (true) {
-      let match = description.match(PATTERN);
+      const match = description.match(PATTERN);
       if (!match || iter === 100) {
         break;
       }
       iter++;
 
-      var varName = match[1];
-      var varType = match[2];
+      let varName = match[1];
+      let varType = match[2];
       if (varType) {
         varType = varType.substring(1);
       }
@@ -93,7 +93,7 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
           const key = inputs[varName] as string[];
           const contentIds = choices.map(choice => choice.val);
 
-          for (var i = 0; i < key.length; i++) {
+          for (let i = 0; i < key.length; i++) {
             const choiceIndex = contentIds.indexOf(key[i]);
             if (choiceIndex === -1) {
               replacementText += 'INVALID';
@@ -155,8 +155,8 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
         replacementText += ']';
       } else if (varType === 'CoordTwoDim') {
         const key = inputs[varName] as Record<number, number>;
-        var latitude = key[0] || 0.0;
-        var longitude = key[1] || 0.0;
+        let latitude = key[0] || 0.0;
+        let longitude = key[1] || 0.0;
         replacementText = '(';
         replacementText += (
            key[0] >= 0.0 ?

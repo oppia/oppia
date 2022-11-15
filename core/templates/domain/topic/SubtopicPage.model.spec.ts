@@ -43,9 +43,9 @@ describe('Subtopic page Model', () => {
 
   it('should be able to set language code',
     () => {
-      var recordedVoiceovers = RecordedVoiceovers.createEmpty();
+      let recordedVoiceovers = RecordedVoiceovers.createEmpty();
       recordedVoiceovers.addContentId('content');
-      var subtopicPage = new SubtopicPage(
+      let subtopicPage = new SubtopicPage(
         'id', 'topic_id', SubtopicPageContents.createDefault(), 'en');
       expect(subtopicPage.getId()).toEqual('id');
       expect(subtopicPage.getTopicId()).toEqual('topic_id');

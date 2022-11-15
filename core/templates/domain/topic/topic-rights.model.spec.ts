@@ -67,7 +67,7 @@ describe('Topic rights model', () => {
   });
 
   it('should create an empty topic rights object', () => {
-    var emptyTopicRightsBackendObject = new TopicRights(false, false, false);
+    let emptyTopicRightsBackendObject = new TopicRights(false, false, false);
 
     expect(emptyTopicRightsBackendObject.isPublished()).toEqual(false);
     expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(false);
@@ -75,7 +75,7 @@ describe('Topic rights model', () => {
   });
 
   it('should make a copy from another topic rights', () => {
-    var emptyTopicRightsBackendObject = new TopicRights(false, false, false);
+    let emptyTopicRightsBackendObject = new TopicRights(false, false, false);
 
     emptyTopicRightsBackendObject.copyFromTopicRights(sampleTopicRights);
 
