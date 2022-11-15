@@ -25,23 +25,25 @@ from extensions import domain
 
 from typing import Dict, List, Mapping, Optional, Union
 
-AcceptableCustomizationArgsTypes = Union[
-    str,
-    int,
-    bool,
-    List[str],
-    domain.GraphDict,
-    Dict[str, Optional[str]],
-    List[state_domain.SubtitledHtml],
-    List[state_domain.SubtitledHtmlDict],
-    state_domain.SubtitledHtmlDict,
-    state_domain.SubtitledUnicodeDict,
-    state_domain.SubtitledUnicode,
-    domain.ImageAndRegionDict,
-    domain.CustomizationArgSubtitledUnicodeDefaultDict,
-    List[domain.CustomizationArgSubtitledUnicodeDefaultDict],
-    None
-]
+MYPY = False
+if MYPY:  # pragma: no cover
+    AcceptableCustomizationArgsTypes = Union[
+        str,
+        int,
+        bool,
+        List[str],
+        domain.GraphDict,
+        Dict[str, Optional[str]],
+        List[state_domain.SubtitledHtml],
+        List[state_domain.SubtitledHtmlDict],
+        state_domain.SubtitledHtmlDict,
+        state_domain.SubtitledUnicodeDict,
+        state_domain.SubtitledUnicode,
+        domain.ImageAndRegionDict,
+        domain.CustomizationArgSubtitledUnicodeDefaultDict,
+        List[domain.CustomizationArgSubtitledUnicodeDefaultDict],
+        None
+    ]
 
 
 def get_full_customization_args(
