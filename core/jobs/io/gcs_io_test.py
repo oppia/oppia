@@ -124,7 +124,6 @@ class DeleteFileTest(job_test_utils.PipelinedTestBase):
         bucket = app_identity_services.get_gcs_resource_bucket_name()
         gcs_url = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file'
         self.assertEqual(filepath, gcs_url)
-        return None
 
     def test_check_correct_files_are_passing(self) -> None:
         client = gcsio_test.FakeGcsClient()
@@ -178,7 +177,6 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
         bucket = app_identity_services.get_gcs_resource_bucket_name()
         file_path_prefix = f'gs://{bucket}/dummy_folder/dummy_subfolder'
         self.assertEqual(filepath, file_path_prefix)
-        return None
 
     def test_check_correct_filepath_is_passing(self) -> None:
         client = gcsio_test.FakeGcsClient()

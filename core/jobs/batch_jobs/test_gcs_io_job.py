@@ -25,8 +25,11 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from apache_beam.io.gcp import gcsio_test
 from typing import Optional
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from apache_beam.io.gcp import gcsio_test
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -96,7 +99,8 @@ class TestGCSIoReadJob(base_jobs.JobBase):
                         'dummy_folder/dummy_subfolder/dummy_file_2'
                     ]
                 ))
-            | 'Read files from the GCS' >> gcs_io.ReadFile(self.client, mode='r')
+            | 'Read files from the GCS' >> gcs_io.ReadFile(
+                self.client, mode='r')
         )
 
         total_files_read = (

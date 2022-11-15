@@ -22,13 +22,13 @@ from core.platform import models
 
 import apache_beam as beam
 from apache_beam.io.gcp import gcsio
-
 from typing import Dict, Optional, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from apache_beam.io.gcp import gcsio_test
     from mypy_imports import app_identity_services
+
+    from apache_beam.io.gcp import gcsio_test
 
 app_identity_services = models.Registry.import_app_identity_services()
 

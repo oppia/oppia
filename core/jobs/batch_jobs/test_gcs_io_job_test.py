@@ -18,11 +18,10 @@
 
 from __future__ import annotations
 
-from core.platform import models
-
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import test_gcs_io_job
 from core.jobs.types import job_run_result
+from core.platform import models
 
 from apache_beam.io.gcp import gcsio
 from apache_beam.io.gcp import gcsio_test
@@ -52,7 +51,12 @@ class TestGCSIoWriteJobTests(job_test_utils.JobTestBase):
         ])
 
 
-def write_files_to_gcs(client) -> None:
+def write_files_to_gcs(client: gcsio_test.FakeGcsClient) -> None:
+    """Write dummy files to GCS.
+
+    Args:
+        client: gcsio_test.FakeGcsClient. The fake GCS client.
+    """
     gcs = gcsio.GcsIO(client)
     bucket = app_identity_services.get_gcs_resource_bucket_name()
     fileobjects = [
