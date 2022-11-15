@@ -33,7 +33,11 @@ from typing import Dict, List, TypedDict, Union
 LEARNER_GROUP_SCHEMA = {
     'group_title': {
         'schema': {
-            'type': 'basestring'
+            'type': 'basestring',
+            'validators': [{
+                'id': 'has_length_at_most',
+                'max_value': constants.MAX_CHARS_IN_LEARNER_GROUP_TITLE
+            }]
         }
     },
     'group_description': {

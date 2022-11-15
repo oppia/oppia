@@ -368,7 +368,11 @@ class ExplorationHandler(
             ):
                 synced_exp_user_data = (
                     exp_services.sync_logged_out_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
-                        logged_out_user_data.exploration_id, unique_progress_url_id, strict=True)) # pylint: disable=line-too-long
+                        logged_out_user_data.exploration_id,
+                        unique_progress_url_id,
+                        strict=True
+                    )
+                )
             else:
                 synced_exp_user_data = logged_out_user_data
 
@@ -861,8 +865,7 @@ class StateHitEventHandler(
                         'id': 'has_length_at_most',
                         'max_value': constants.MAX_STATE_NAME_LENGTH
                     }]
-                },
-                'default_value': None
+                }
             },
             'client_time_spent_in_secs': {
                 'schema': {
@@ -909,13 +912,9 @@ class StateHitEventHandler(
             'client_time_spent_in_secs']
         old_params = self.normalized_payload['old_params']
 
-        # Record the state hit, if it is not the END state.
-        if new_state_name is not None:
-            event_services.StateHitEventHandler.record(
-                exploration_id, exploration_version, new_state_name,
-                session_id, old_params, feconf.PLAY_TYPE_NORMAL)
-        else:
-            logging.exception('Unexpected StateHit event for the END state.')
+        event_services.StateHitEventHandler.record(
+            exploration_id, exploration_version, new_state_name,
+            session_id, old_params, feconf.PLAY_TYPE_NORMAL)
         self.render_json({})
 
 
@@ -2003,8 +2002,8 @@ class QuestionPlayerHandlerNormalizedRequestDict(TypedDict):
     """
 
     skill_ids: str
-    question_count: str
-    fetch_by_difficulty: str
+    question_count: int
+    fetch_by_difficulty: bool
 
 
 class QuestionPlayerHandler(
@@ -2019,19 +2018,26 @@ class QuestionPlayerHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'skill_ids': {
-                'schema': {
-                    'type': 'basestring'
-                }
+            'schema': {
+                'type': 'object_dict',
+                'validation_method': domain_objects_validator.validate_skill_ids
+            }
             },
             'question_count': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }, {
+                        'id': 'is_at_most',
+                        'max_value': feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME
+                    }]
                 }
             },
             'fetch_by_difficulty': {
                 'schema': {
-                    'type': 'basestring',
-                    'choices': ['true', 'false']
+                    'type': 'bool'
                 }
             }
         }
@@ -2045,15 +2051,9 @@ class QuestionPlayerHandler(
         assert self.normalized_request is not None
         skill_ids = self.normalized_request['skill_ids'].split(',')
         question_count = self.normalized_request['question_count']
-        fetch_by_difficulty_value = self.normalized_request[
+        fetch_by_difficulty = self.normalized_request[
             'fetch_by_difficulty'
         ]
-
-        if not question_count.isdigit() or int(question_count) <= 0:
-            raise self.InvalidInputException(
-                'Question count has to be greater than 0')
-
-        fetch_by_difficulty = (fetch_by_difficulty_value == 'true')
 
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
             skill_ids = skill_services.filter_skills_by_mastery(

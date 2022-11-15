@@ -276,9 +276,9 @@ class EditableQuestionDataHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-            'question_id': {
-                'schema': SCHEMA_FOR_QUESTION_ID
-            }
+        'question_id': {
+            'schema': SCHEMA_FOR_QUESTION_ID
+        }
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},

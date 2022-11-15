@@ -123,8 +123,7 @@ class BulkEmailWebhookEndpoint(
             'data[list_id]': {
                 'schema': {
                     'type': 'basestring'
-                },
-                'default_value': None
+                }
             },
             'data[email]': {
                 'schema': {
@@ -133,8 +132,7 @@ class BulkEmailWebhookEndpoint(
                         'id': 'is_regex_matched',
                         'regex_pattern': constants.EMAIL_REGEX
                     }]
-                },
-                'default_value': None
+                }
             },
             'type': {
                 'schema': {
@@ -142,9 +140,8 @@ class BulkEmailWebhookEndpoint(
                     'choices': [
                         'subscribe', 'unsubscribe'
                     ]
-                },
-                'default_value': None
-            },
+                }
+            }
         }
     }
 
@@ -169,17 +166,13 @@ class BulkEmailWebhookEndpoint(
         """Handles POST requests."""
         assert self.normalized_request is not None
         if (
-            self.normalized_request.get('data[list_id]') !=
+            self.normalized_request['data[list_id]'] !=
             feconf.MAILCHIMP_AUDIENCE_ID
         ):
             self.render_json({})
             return
 
-        email = self.normalized_request.get('data[email]')
-        if email is None:
-            raise Exception(
-                'No email_id found.'
-            )
+        email = self.normalized_request['data[email]']
         user_settings = user_services.get_user_settings_from_email(email)
 
         # Ignore the request if the user does not exist in Oppia.
@@ -189,14 +182,14 @@ class BulkEmailWebhookEndpoint(
 
         user_id = user_settings.user_id
         user_email_preferences = user_services.get_email_preferences(user_id)
-        if self.normalized_request.get('type') == 'subscribe':
+        if self.normalized_request['type'] == 'subscribe':
             user_services.update_email_preferences(
                 user_id, True,
                 user_email_preferences.can_receive_editor_role_email,
                 user_email_preferences.can_receive_feedback_message_email,
                 user_email_preferences.can_receive_subscription_email,
                 bulk_email_db_already_updated=True)
-        elif self.normalized_request.get('type') == 'unsubscribe':
+        elif self.normalized_request['type'] == 'unsubscribe':
             user_services.update_email_preferences(
                 user_id, False,
                 user_email_preferences.can_receive_editor_role_email,

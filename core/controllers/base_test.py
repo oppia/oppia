@@ -1546,19 +1546,23 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                 continue
 
             regex_pattern = r'<.*?>'
-            url_path_elements = []
-            for keyword in re.findall(regex_pattern, route.name):
+            url_path_arg_names = []
+            for url_path_element in re.findall(regex_pattern, route.name):
+                url_path_keyword = url_path_element[1: -1]
                 # In some cases, url_path_arguments are defined with specific
                 # acceptable values, e.g: /<asset_type:(image|audio|thumbnail)>.
-                # So, to separate the argument name from acceptable values, we
-                # have used ':' delimiter's index.
-                url_argument_delimiter_index = keyword.find(':')
-                url_path_elements.append(
-                    keyword[1:url_argument_delimiter_index]
+                # So, to separate out the argument name from acceptable values,
+                # we have used ':' delimiter's index so that we can strip the
+                # part after ':'.
+                url_argument_delimiter_index = url_path_keyword.find(':')
+                url_path_arg_name = (
+                    url_path_keyword[:url_argument_delimiter_index]
+                    if url_argument_delimiter_index != -1 else url_path_keyword
                 )
+                url_path_arg_names.append(url_path_arg_name)
             schema_keys = handler.URL_PATH_ARGS_SCHEMAS.keys()
 
-            missing_schema_keys = set(url_path_elements) - set(schema_keys)
+            missing_schema_keys = set(url_path_arg_names) - set(schema_keys)
             if missing_schema_keys:
                 handlers_with_missing_url_schema_keys.append(handler_class_name)
                 self.log_line(

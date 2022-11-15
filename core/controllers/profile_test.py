@@ -1086,24 +1086,27 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
     def test_raises_error_if_audience_id_provided_without_email_id(
         self
     ) -> None:
-        with self.assertRaisesRegex(
-            Exception, 'No email_id found.'
-        ):
-            with self.swap_secret, self.swap_audience_id:
-                self.post_json(
-                    '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
-                    {
-                        'data[list_id]': 'audience_id'
-                    },
-                    use_payload=False
-                )
+        response = self.post_json(
+                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
+                {
+                    'data[list_id]': 'audience_id',
+                    'type': 'subscribe'
+                },
+                use_payload=False,
+                expected_status_int=400
+            )
+        self.assertEqual(
+            response['error'],
+            'Missing key in handler args: data[email].'
+        )
 
     def test_post_with_different_audience_id(self) -> None:
         with self.swap_secret, self.swap_audience_id:
             json_response = self.post_json(
                 '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
                     'data[list_id]': 'invalid_audience_id',
-                    'data[email]': self.EDITOR_EMAIL
+                    'data[email]': self.EDITOR_EMAIL,
+                    'type': 'subscribe'
                 }, use_payload=False)
             self.assertEqual(json_response, {})
 
@@ -1112,7 +1115,8 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
             json_response = self.post_json(
                 '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
                     'data[list_id]': 'audience_id',
-                    'data[email]': 'invalid_email@example.com'
+                    'data[email]': 'invalid_email@example.com',
+                    'type': 'subscribe'
                 }, use_payload=False)
             self.assertEqual(json_response, {})
 
@@ -1122,7 +1126,8 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
                 self.post_json(
                     '%s/invalid_secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
                         'data[list_id]': 'audience_id',
-                        'data[email]': self.EDITOR_EMAIL
+                        'data[email]': self.EDITOR_EMAIL,
+                        'type': 'subscribe'
                     }, use_payload=False, expected_status_int=404)
                 self.assertIn(
                     'Invalid Mailchimp webhook request received with secret: '

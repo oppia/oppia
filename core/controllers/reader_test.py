@@ -491,8 +491,11 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         # Call the handler.
         url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '1', 'invalid_skill_id', 'true')
-        json_response = self.get_json(url)
-        self.assertEqual(len(json_response['question_dicts']), 0)
+        json_response = self.get_json(url, expected_status_int=400)
+        self.assertEqual(
+            json_response['error'],
+            'Schema validation for \'skill_ids\' failed: Invalid skill id'
+        )
 
     def test_question_count_zero_raises_invalid_input_exception(self) -> None:
         # Call the handler.
@@ -2317,12 +2320,6 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
     def test_cannot_hit_new_state_with_no_new_state_name(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
-        observed_log_messages: List[str] = []
-
-        def _mock_logging_function(msg: str) -> None:
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg)
-
         # Load demo exploration.
         exp_id = '6'
         exp_services.delete_demo(exp_id)
@@ -2333,21 +2330,22 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
             stats_models.StateHitEventLogEntryModel.get_all())
         self.assertEqual(all_models.count(), 0)
 
-        with self.swap(logging, 'exception', _mock_logging_function):
-            self.post_json(
-                '/explorehandler/state_hit_event/%s' % exp_id,
-                {
-                    'new_state_name': None,
-                    'exploration_version': exploration_version,
-                    'client_time_spent_in_secs': 0,
-                    'session_id': 'session_id',
-                    'old_params': {}
-                }
-            )
+        response = self.post_json(
+            '/explorehandler/state_hit_event/%s' % exp_id,
+            {
+                'new_state_name': None,
+                'exploration_version': exploration_version,
+                'client_time_spent_in_secs': 0,
+                'session_id': 'session_id',
+                'old_params': {}
+            },
+            expected_status_int=400
+        )
 
         self.assertEqual(
-            observed_log_messages,
-            ['Unexpected StateHit event for the END state.'])
+            response['error'],
+            'Missing key in handler args: new_state_name.'
+        )
 
         self.logout()
 
