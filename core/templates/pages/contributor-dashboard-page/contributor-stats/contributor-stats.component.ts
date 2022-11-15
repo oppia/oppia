@@ -30,7 +30,6 @@ interface Option {
 }
 
 interface PageableStats {
-  language?: string;
   currentPageStartIndex: number;
   // This is the index of the last item of the stats data of a given page.
   currentPageEndIndex: number;
@@ -221,11 +220,13 @@ export class ContributorStatsComponent {
 
     if (response.translation_contribution_stats.length > 0) {
       response.translation_contribution_stats.map((stat) => {
-        if (!this.statsData.translationContribution[stat.language_code]) {
-          this.statsData.translationContribution[stat.language_code] = this
+        const language = this.languageUtilService.getAudioLanguageDescription(
+          stat.language_code);
+        if (!this.statsData.translationContribution[language]) {
+          this.statsData.translationContribution[language] = this
             .createTranslationContributionPageableStats(stat);
         } else {
-          this.statsData.translationContribution[stat.language_code].data.push(
+          this.statsData.translationContribution[language].data.push(
             this.createTranslationContributionStat(stat));
         }
       });
@@ -233,11 +234,13 @@ export class ContributorStatsComponent {
 
     if (response.translation_review_stats.length > 0) {
       response.translation_review_stats.map((stat) => {
-        if (!this.statsData.translationReview[stat.language_code]) {
-          this.statsData.translationReview[stat.language_code] = this
+        const language = this.languageUtilService.getAudioLanguageDescription(
+          stat.language_code);
+        if (!this.statsData.translationReview[language]) {
+          this.statsData.translationReview[language] = this
             .createTranslationReviewPageableStats(stat);
         } else {
-          this.statsData.translationReview[stat.language_code].data.push(
+          this.statsData.translationReview[language].data.push(
             this.createTranslationReviewStat(stat));
         }
       });
@@ -259,8 +262,6 @@ export class ContributorStatsComponent {
       stat: TranslationContributionBackendDict): PageableStats {
     return {
       data: [this.createTranslationContributionStat(stat)],
-      language: this.languageUtilService.getAudioLanguageDescription(
-        stat.language_code),
       currentPageStartIndex: 0,
       currentPageEndIndex: 5
     };
@@ -270,8 +271,6 @@ export class ContributorStatsComponent {
       stat: TranslationReviewBackendDict): PageableStats {
     return {
       data: [this.createTranslationReviewStat(stat)],
-      language: this.languageUtilService.getAudioLanguageDescription(
-        stat.language_code),
       currentPageStartIndex: 0,
       currentPageEndIndex: 5
     };
