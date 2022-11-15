@@ -145,7 +145,7 @@ export class ProgressNavComponent {
     );
   }
 
-  skipQuestionButton(): void {
+  skipCurrentQuestion(): void {
     this.skipQuestion.emit();
   }
 

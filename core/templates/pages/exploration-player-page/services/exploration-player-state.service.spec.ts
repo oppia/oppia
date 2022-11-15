@@ -401,6 +401,16 @@ describe('Exploration Player State Service', () => {
       questionObjects, successCallback, errorCallback);
   });
 
+  it('should be able to skip the current question', () => {
+    spyOn(diagnosticTestPlayerEngineService, 'skipCurrentQuestion');
+    let successCallback = () => {};
+
+    explorationPlayerStateService.skipCurrentQuestion(successCallback);
+
+    expect(diagnosticTestPlayerEngineService.skipCurrentQuestion)
+      .toHaveBeenCalledOnceWith(successCallback);
+  });
+
   it('should set exploration mode', () => {
     explorationPlayerStateService.setExplorationMode();
     expect(explorationPlayerStateService.explorationMode).toEqual(

@@ -25,7 +25,7 @@ import { GuestCollectionProgressService } from 'domain/collection/guest-collecti
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { BindableVoiceovers, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
@@ -78,6 +78,8 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { DiagnosticTestTopicTrackerModel } from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
+import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
+import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 class MockWindowRef {
   nativeWindow = {
@@ -157,6 +159,8 @@ describe('Conversation skin component', () => {
   let stateObjectFactory: StateObjectFactory;
   let platformFeatureService: PlatformFeatureService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
+  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
+  let audioTranslationLanguageService: AudioTranslationLanguageService;
 
   let displayedCard = new StateCard(
     null, null, null, new Interaction(
@@ -568,6 +572,11 @@ describe('Conversation skin component', () => {
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     learnerDashboardBackendApiService = TestBed.inject(
       LearnerDashboardBackendApiService);
+    writtenTranslationsObjectFactory = TestBed.inject(
+      WrittenTranslationsObjectFactory);
+    audioTranslationLanguageService = TestBed.inject(
+      AudioTranslationLanguageService);
+
     spyOn(
       readOnlyExplorationBackendApiService,
       'fetchCheckpointsFeatureIsEnabledStatus'
@@ -1999,4 +2008,139 @@ describe('Conversation skin component', () => {
     expect(componentInstance.submitButtonIsDisabled).toBeTrue();
     expect(componentInstance.isSubmitButtonDisabled).toHaveBeenCalled();
   });
+
+  it(
+    'should be able to set appropriate flags for the diagnostic test',
+    fakeAsync(() => {
+      let collectionId = 'id';
+      let expId = 'exp_id';
+      let isInPreviewMode = false;
+      let isIframed = true;
+      let collectionSummary = {
+        is_admin: true,
+        summaries: [],
+        user_email: '',
+        is_topic_manager: false,
+        username: true
+      };
+      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(new UserInfo(
+          [], false, false,
+          false, false, false, '', '', '', true)));
+      spyOn(urlService, 'getCollectionIdFromExplorationUrl')
+        .and.returnValues(collectionId, null);
+      spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+
+      spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+        .and.returnValue(Promise.resolve(new Collection(
+          '', '', '', '', [], null, '', 6, 8, [])));
+      spyOn(explorationEngineService, 'getExplorationId')
+        .and.returnValue(expId);
+      spyOn(explorationEngineService, 'isInPreviewMode')
+        .and.returnValue(isInPreviewMode);
+      spyOn(urlService, 'isIframed').and.returnValue(isIframed);
+      spyOn(loaderService, 'showLoadingScreen');
+      spyOn(urlInterpolationService, 'getStaticImageUrl')
+        .and.returnValue('oppia_avatar_url');
+      spyOn(explorationPlayerStateService, 'isInQuestionPlayerMode')
+        .and.returnValues(true, false);
+      spyOn(componentInstance, 'initializePage');
+      spyOn(collectionPlayerBackendApiService, 'fetchCollectionSummariesAsync')
+        .and.returnValue(Promise.resolve(collectionSummary));
+      spyOn(questionPlayerStateService, 'hintUsed');
+      spyOn(questionPlayerEngineService, 'getCurrentQuestion');
+      spyOn(questionPlayerStateService, 'solutionViewed');
+      spyOn(imagePreloaderService, 'onStateChange');
+      spyOn(componentInstance, 'fetchCompletedChaptersCount');
+      spyOn(statsReportingService, 'recordExplorationCompleted');
+      spyOn(statsReportingService, 'recordExplorationActuallyStarted');
+      spyOn(
+        guestCollectionProgressService,
+        'recordExplorationCompletedInCollection'
+      );
+      spyOn(componentInstance, 'doesCollectionAllowsGuestProgress')
+        .and.returnValue(true);
+      spyOn(statsReportingService, 'recordMaybeLeaveEvent');
+      spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('');
+      spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
+      spyOn(messengerService, 'sendMessage');
+      spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
+        .and.returnValue(Promise.resolve(explorationResponse));
+      spyOn(explorationEngineService, 'getShortestPathToState')
+        .and.returnValue(['Start', 'Mid']);
+      spyOn(
+        editableExplorationBackendApiService,
+        'recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner')
+        .and.returnValue(Promise.resolve(
+          {unique_progress_url_id: uniqueProgressIdResponse}));
+
+      let mockOnHintConsumed = new EventEmitter();
+      let mockOnSolutionViewedEventEmitter = new EventEmitter();
+      let mockOnPlayerStateChange = new EventEmitter();
+
+      spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
+        .and.returnValue(mockOnHintConsumed);
+      spyOnProperty(
+        hintsAndSolutionManagerService, 'onSolutionViewedEventEmitter')
+        .and.returnValue(mockOnSolutionViewedEventEmitter);
+      spyOnProperty(explorationPlayerStateService, 'onPlayerStateChange')
+        .and.returnValue(mockOnPlayerStateChange);
+
+      componentInstance.nextCard = new StateCard(
+        null, null, null, new Interaction(
+          [], [], null, null, [], 'EndExploration', null),
+        [], null, null, '', null);
+      componentInstance.isLoggedIn = false;
+      componentInstance.hasInteractedAtLeastOnce = true;
+      componentInstance.displayedCard = displayedCard;
+
+      componentInstance.ngOnInit();
+      tick();
+
+      expect(componentInstance.enableFeedback).toBeTrue();
+      expect(componentInstance.allowOnlySingleAttemptForAnswering).toBeFalse();
+      expect(componentInstance.showOnlyLastInputPairResponse).toBeFalse();
+      expect(componentInstance.enableNavigationThroughCardHistory).toBeTrue();
+
+      const topicIdToPrerequisiteTopicIds = {
+        topicId1: [],
+        topicId2: ['topicId1'],
+        topicId3: ['topicId2']
+      };
+
+      componentInstance.diagnosticTestTopicTrackerModel = (
+        new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds));
+
+      componentInstance.ngOnInit();
+      tick();
+
+      expect(componentInstance.enableFeedback).toBeFalse();
+      expect(componentInstance.allowOnlySingleAttemptForAnswering).toBeTrue();
+      expect(componentInstance.showOnlyLastInputPairResponse).toBeTrue();
+      expect(componentInstance.enableNavigationThroughCardHistory).toBeFalse();
+    }));
+
+  it('should be able to skip the current question', fakeAsync(() => {
+    let sampleCard = StateCard.createNewCard(
+      'State 2', '<p>Content</p>', '',
+      // Use unknown type conversion to test that the interaction is not
+      // required to be a string.
+      null as unknown as Interaction, null as unknown as RecordedVoiceovers,
+      writtenTranslationsObjectFactory.createEmpty(),
+      'content', audioTranslationLanguageService);
+
+    let callback = (successCallback: (nextCard: StateCard) => void) => {
+      successCallback(sampleCard);
+    };
+    spyOn(explorationPlayerStateService, 'skipCurrentQuestion')
+      .and.callFake(callback);
+    spyOn(componentInstance, 'showPendingCard');
+
+    componentInstance.skipCurrentQuestion();
+
+    expect(explorationPlayerStateService.skipCurrentQuestion)
+      .toHaveBeenCalled();
+    expect(componentInstance.showPendingCard).toHaveBeenCalled();
+  }));
 });

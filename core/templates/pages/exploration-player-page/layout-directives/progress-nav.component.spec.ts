@@ -246,6 +246,49 @@ describe('Progress nav component', () => {
     }).toThrowError('Target card index out of bounds.');
   });
 
+  it('should be able to skip the question', () => {
+    spyOn(componentInstance.skipQuestion, 'emit');
+
+    componentInstance.skipCurrentQuestion();
+
+    expect(componentInstance.skipQuestion.emit).toHaveBeenCalled();
+  });
+
+  it(
+    'should be able to show skip button based on card history visibility',
+    fakeAsync(() => {
+      let isIframed = true;
+      let mockOnHelpCardAvailableEventEmitter = (
+        new EventEmitter<HelpCardEventResponse>());
+      let mockSchemaFormSubmittedEventEmitter = new EventEmitter<void>();
+
+      spyOn(urlService, 'isIframed').and.returnValue(isIframed);
+      spyOn(componentInstance.submit, 'emit');
+      spyOnProperty(playerPositionService, 'onHelpCardAvailable')
+        .and.returnValue(mockOnHelpCardAvailableEventEmitter);
+      spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
+      spyOnProperty(schemaFormSubmittedService, 'onSubmittedSchemaBasedForm')
+        .and.returnValue(mockSchemaFormSubmittedEventEmitter);
+
+      componentInstance.enableNavigationThroughCardHistory = true;
+
+      componentInstance.ngOnInit();
+      mockOnHelpCardAvailableEventEmitter.emit({
+        hasContinueButton: true
+      } as HelpCardEventResponse);
+      mockSchemaFormSubmittedEventEmitter.emit();
+      tick();
+
+      expect(componentInstance.skipButtonIsShown).toBeFalse();
+
+      componentInstance.enableNavigationThroughCardHistory = false;
+
+      componentInstance.ngOnInit();
+      tick();
+
+      expect(componentInstance.skipButtonIsShown).toBeTrue();
+    }));
+
   it('should tell if interaction have submit nav button', () => {
     componentInstance.interactionId = 'ImageClickInput';
 

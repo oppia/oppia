@@ -175,7 +175,7 @@ export class ClassroomBackendApiService {
   async getNewClassroomIdAsync(): Promise<string> {
     return new Promise((resolve, reject) => {
       this.http.get<NewClassroomIdBackendDict>(
-        '/classroom_id_handler').toPromise().then(response => {
+        '/new_classroom_id_handler').toPromise().then(response => {
         resolve(response.classroom_id);
       }, errorResponse => {
         reject(errorResponse.error.error);

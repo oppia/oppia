@@ -17,12 +17,17 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { DiagnosticTestPlayerComponent } from './diagnostic-test-player.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { DiagnosticTestPlayerStatusService } from './diagnostic-test-player-status.service';
+import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { ClassroomData } from 'domain/classroom/classroom-data.model';
+import { DiagnosticTestTopicTrackerModel } from './diagnostic-test-topic-tracker.model';
 
 class MockWindowRef {
   _window = {
@@ -42,6 +47,8 @@ describe('Diagnostic test player component', () => {
   let fixture: ComponentFixture<DiagnosticTestPlayerComponent>;
   let windowRef: MockWindowRef;
   let preventPageUnloadEventService: PreventPageUnloadEventService;
+  let diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService;
+  let classroomBackendApiService: ClassroomBackendApiService;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -52,6 +59,7 @@ describe('Diagnostic test player component', () => {
       ],
       declarations: [
         DiagnosticTestPlayerComponent,
+        MockTranslatePipe
       ],
       providers: [
         PreventPageUnloadEventService,
@@ -66,14 +74,19 @@ describe('Diagnostic test player component', () => {
     component = fixture.componentInstance;
     preventPageUnloadEventService = TestBed.inject(
       PreventPageUnloadEventService);
+    diagnosticTestPlayerStatusService = TestBed.inject(
+      DiagnosticTestPlayerStatusService);
+    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
   });
 
   it('should listen to page unload events after initialization', () => {
-    spyOn(preventPageUnloadEventService, 'addListener').and.stub();
+    spyOn(preventPageUnloadEventService, 'addListener').and
+      .callFake((callback: () => boolean) => callback());
 
     component.ngOnInit();
 
-    expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+    expect(preventPageUnloadEventService.addListener)
+      .toHaveBeenCalledWith(jasmine.any(Function));
   });
 
   it(
@@ -90,4 +103,118 @@ describe('Diagnostic test player component', () => {
 
       expect(component.OPPIA_AVATAR_IMAGE_URL).toEqual(avatarImageLocation);
     });
+
+  it('should be able to subscribe event emitters after initialization', () => {
+    spyOn(preventPageUnloadEventService, 'addListener');
+    spyOn(
+      diagnosticTestPlayerStatusService.onDiagnosticTestSessionCompleted,
+      'subscribe'
+    ).and.callThrough();
+    spyOn(
+      diagnosticTestPlayerStatusService.onDiagnosticTestSessionProgressChange,
+      'subscribe'
+    ).and.callThrough();
+
+    component.ngOnInit();
+
+    expect(
+      diagnosticTestPlayerStatusService
+        .onDiagnosticTestSessionCompleted.subscribe
+    ).toHaveBeenCalled();
+
+    expect(
+      diagnosticTestPlayerStatusService
+        .onDiagnosticTestSessionProgressChange.subscribe
+    ).toHaveBeenCalled();
+  });
+
+  it(
+    'should be able to get the math classroom ID after initialization',
+    fakeAsync(() => {
+      spyOn(preventPageUnloadEventService, 'addListener');
+      spyOn(classroomBackendApiService, 'getClassroomIdAsync')
+        .and.returnValue(Promise.resolve('mathClassroomId'));
+      component.classroomUrlFragment = 'math';
+
+      expect(component.classroomId).toEqual('');
+
+      component.ngOnInit();
+      tick();
+
+      expect(component.classroomId).toEqual('mathClassroomId');
+    }));
+
+  it('should be able to get the topic button text', () => {
+    let topicName = 'Fraction';
+
+    expect(component.getTopicButtonText(topicName)).toEqual(
+      'Start ' + topicName);
+  });
+
+  it('should be able to get the topic URL from the URL fragment', () => {
+    let topicUrlFragment = 'subtraction';
+
+    expect(component.getTopicUrlFromUrlFragment(topicUrlFragment)).toEqual(
+      '/learn/math/' + topicUrlFragment);
+  });
+
+  it('should be able to get topic recommendations', fakeAsync(() => {
+    let cData1: CreatorTopicSummary = new CreatorTopicSummary(
+      'dummy', 'addition', 3, 3, 3, 3, 1,
+      'en', 'dummy', 1, 1, 1, 1, true,
+      true, 'math', 'public/img.webp', 'red', 'add');
+    let cData2: CreatorTopicSummary = new CreatorTopicSummary(
+      'dummy2', 'division', 2, 2, 3, 3, 0,
+      'es', 'dummy2', 1, 1, 1, 1, true,
+      true, 'math', 'public/img1.png', 'green', 'div');
+
+    let array: CreatorTopicSummary[] = [cData1, cData2];
+    let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
+
+    spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
+      .and.returnValue(Promise.resolve(classroomData));
+
+    expect(component.recommendedTopicSummaries).toEqual([]);
+
+    component.getRecommendedTopicSummaries(['dummy']);
+    tick();
+
+    expect(component.recommendedTopicSummaries).toEqual([cData1]);
+  }));
+
+  it(
+    'should be able to set topic tracker model after starting diagnostic test',
+    fakeAsync(() => {
+      // A linear graph with 3 nodes.
+      const topicIdToPrerequisiteTopicIds = {
+        topicId1: [],
+        topicId2: ['topicId1'],
+        topicId3: ['topicId2']
+      };
+
+      const diagnosticTestTopicTrackerModel = (
+        new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds));
+
+      let response = {
+        classroomDict: {
+          classroomId: 'classroomId',
+          name: 'math',
+          urlFragment: 'math',
+          courseDetails: '',
+          topicListIntro: '',
+          topicIdToPrerequisiteTopicIds: topicIdToPrerequisiteTopicIds
+        }
+      };
+
+      spyOn(classroomBackendApiService, 'getClassroomDataAsync')
+        .and.returnValue(Promise.resolve(response));
+
+      expect(component.diagnosticTestTopicTrackerModel).toEqual(undefined);
+
+      component.startDiagnosticTest();
+      tick();
+
+      expect(component.diagnosticTestTopicTrackerModel).toEqual(
+        diagnosticTestTopicTrackerModel);
+    }));
 });

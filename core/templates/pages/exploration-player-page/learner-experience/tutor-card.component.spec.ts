@@ -224,6 +224,49 @@ describe('Tutor card component', () => {
     expect(componentInstance.getInputResponsePairId).toHaveBeenCalled();
   }));
 
+  it(
+    'should be able to set celebration component flag to based on diagnostic' +
+    ' test data', fakeAsync(() => {
+      let mockOnActiveCardChangedEventEmitter = new EventEmitter<void>();
+      let mockOnOppiaFeedbackAvailableEventEmitter = new EventEmitter<void>();
+      let isIframed = false;
+      let profilePicture = 'profile_url';
+
+      spyOn(contextService, 'isInExplorationEditorPage').and.returnValues(
+        true, false);
+      spyOn(urlService, 'isIframed').and.returnValue(isIframed);
+      spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
+      spyOn(audioBarStatusService, 'isAudioBarExpanded').and.returnValue(true);
+      spyOn(urlInterpolationService, 'getStaticImageUrl')
+        .and.returnValues('avatar_url', 'profile_url', 'default image path');
+      spyOn(componentInstance, 'updateDisplayedCard');
+      spyOnProperty(playerPositionService, 'onActiveCardChanged')
+        .and.returnValue(mockOnActiveCardChangedEventEmitter);
+      spyOnProperty(explorationPlayerStateService, 'onOppiaFeedbackAvailable')
+        .and.returnValue(mockOnOppiaFeedbackAvailableEventEmitter);
+      spyOn(componentInstance, 'getInputResponsePairId')
+        .and.returnValue('hash');
+      spyOn(userService, 'getProfileImageDataUrlAsync').and.returnValue(
+        Promise.resolve(profilePicture));
+      componentInstance.displayedCard = mockDisplayedCard;
+
+      componentInstance.showOnlyLastInputPairResponse = true;
+
+      expect(componentInstance.celebrationComponentIsShown).toEqual(undefined);
+
+      componentInstance.ngOnInit();
+      tick();
+
+      expect(componentInstance.celebrationComponentIsShown).toBeFalse();
+
+      componentInstance.showOnlyLastInputPairResponse = false;
+
+      componentInstance.ngOnInit();
+      tick();
+
+      expect(componentInstance.celebrationComponentIsShown).toBeTrue();
+    }));
+
   it('should refresh displayed card on changes', fakeAsync(() => {
     let updateDisplayedCardSpy = spyOn(
       componentInstance, 'updateDisplayedCard');
