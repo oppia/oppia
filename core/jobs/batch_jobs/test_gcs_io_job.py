@@ -96,7 +96,7 @@ class TestGCSIoReadJob(base_jobs.JobBase):
                         'dummy_folder/dummy_subfolder/dummy_file_2'
                     ]
                 ))
-            | 'Read files from the GCS' >> gcs_io.ReadFile(self.client, mode='rb')
+            | 'Read files from the GCS' >> gcs_io.ReadFile(self.client, mode='r')
         )
 
         total_files_read = (
@@ -109,7 +109,7 @@ class TestGCSIoReadJob(base_jobs.JobBase):
         output_files = (
             read_files_from_gcs
             | 'Output the data' >> beam.Map(lambda data: (
-                job_run_result.JobRunResult.as_stderr(f'The data is {data}')
+                job_run_result.JobRunResult.as_stdout(f'The data is {data}')
             ))
         )
 
@@ -117,6 +117,49 @@ class TestGCSIoReadJob(base_jobs.JobBase):
             (
                 total_files_read,
                 output_files
+            )
+            | 'Combine results' >> beam.Flatten()
+        )
+
+
+class TestGcsIoGetFilesJob(base_jobs.JobBase):
+    """Get all files with a specefic prefix."""
+
+    def __init__(
+        self,
+        pipeline: beam.Pipeline,
+        client: Optional[gcsio_test.FakeGcsClient] = None
+    ) -> None:
+        super().__init__(pipeline=pipeline)
+        self.client = client
+        self.pipeline = pipeline
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        get_files_of_specefic_prefix_from_gcs = (
+            self.pipeline
+            | 'Create PCollection of prefix that needs to be fetched' >> (
+                beam.Create(['dummy_folder/dummy_subfolder']))
+            | 'Get files with prefix' >> gcs_io.GetFiles(self.client)
+        )
+
+        total_files_wirh_prefixes = (
+            get_files_of_specefic_prefix_from_gcs
+            | 'Total number of prefixes fetched from GCS' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL PREFIXES FETCHED'))
+        )
+
+        output = (
+            get_files_of_specefic_prefix_from_gcs
+            | 'Output the prefix data' >> beam.Map(lambda data: (
+                job_run_result.JobRunResult.as_stdout(f'The data is {data}')
+            ))
+        )
+
+        return (
+            (
+                total_files_wirh_prefixes,
+                output
             )
             | 'Combine results' >> beam.Flatten()
         )

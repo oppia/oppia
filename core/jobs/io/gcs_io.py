@@ -22,12 +22,12 @@ from core.platform import models
 
 import apache_beam as beam
 from apache_beam.io.gcp import gcsio
-from apache_beam.io.gcp import gcsio_test
 
 from typing import Dict, Optional, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from apache_beam.io.gcp import gcsio_test
     from mypy_imports import app_identity_services
 
 app_identity_services = models.Registry.import_app_identity_services()
@@ -221,15 +221,15 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
-class ModifyFileMimeType(beam.PTransform): # type: ignore[misc]
-    """Modify file mime type in GCS."""
+class GetFiles(beam.PTransform): # type: ignore[misc]
+    """Get all files with specefic prefix."""
 
     def __init__(
         self,
         client: Optional[gcsio_test.FakeGcsClient] = None,
         label: Optional[str] = None
     ) -> None:
-        """Initializes the ModifyFileMimeType PTransform.
+        """Initializes the GetFiles PTransform.
 
         Args:
             client: Optional[gcsio_test.FakeGcsClient]. The GCS client to use
@@ -239,4 +239,31 @@ class ModifyFileMimeType(beam.PTransform): # type: ignore[misc]
         super().__init__(label=label)
         self.client = client
 
-    def expand()
+    def expand(self, file_paths: beam.PCollection) -> beam.PCollection:
+        """Returns PCollection with file names.
+
+        Args:
+            file_paths: PCollection. The collection of filepath prefixes.
+
+        Returns:
+            PCollection. The PCollection of the file names.
+        """
+        return (
+            file_paths
+            | 'Get names of the files' >> beam.Map(self._get_file_with_prefix)
+        )
+
+    def _get_file_with_prefix(self, file_path: str) -> Dict[str, int]:
+        """Helper function to get file names with the prefix.
+
+        Args:
+            file_path: str. The prefix path of which we want to list
+                all the files.
+
+        Returns:
+            Dict[str, int]. The file name as key and size of file as value.
+        """
+        gcs = gcsio.GcsIO(self.client)
+        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        gcs_filename = f'gs://{bucket}/{file_path}'
+        return gcs.list_prefix(gcs_filename)

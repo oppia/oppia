@@ -71,7 +71,7 @@ def write_files_to_gcs(client) -> None:
         gcs_url = 'gs://%s/%s' % (bucket, filepath)
         file = gcs.open(
             filename=gcs_url,
-            mode='wb',
+            mode='w',
             mime_type='application/octet-stream')
         file.write(file_obj['data'])
         file.close()
@@ -90,7 +90,33 @@ class TestGCSIoReadJobTests(job_test_utils.JobTestBase):
     def test_to_fetch_filename(self) -> None:
         write_files_to_gcs(self.client)
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='TOTAL FETCHED SUCCESS: 2')
+            job_run_result.JobRunResult(
+                stdout='TOTAL FILES FETCHED SUCCESS: 2'),
+            job_run_result.JobRunResult(stdout='The data is b\'testing_1\''),
+            job_run_result.JobRunResult(stdout='The data is b\'testing_2\'')
+        ])
+
+
+class TestGCSIoGetFilesJobTests(job_test_utils.JobTestBase):
+
+    JOB_CLASS = test_gcs_io_job.TestGcsIoGetFilesJob
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.client = CLIENT
+        self.job = self.JOB_CLASS(self.pipeline, self.client)
+
+    def test_to_fetch_filename(self) -> None:
+        write_files_to_gcs(self.client)
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='TOTAL PREFIXES FETCHED SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='The data is {\'gs://dev-project-id-resources/'
+                'dummy_folder/dummy_subfolder/dummy_file_1\': 9, \'gs://'
+                'dev-project-id-resources/dummy_folder/dummy_subfolder/'
+                'dummy_file_2\': 9}')
         ])
 
 
@@ -109,6 +135,3 @@ class TestGCSIoDeleteJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='TOTAL FILES DELETED SUCCESS: 2')
         ])
-        print("***********************************")
-        print(self.client.objects.files)
-        print(abc)

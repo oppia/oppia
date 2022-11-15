@@ -114,3 +114,84 @@ class DeleteFileTest(job_test_utils.PipelinedTestBase):
             | 'Delete file from GCS' >> gcs_io.DeleteFile(client)
         )
         self.assert_pcoll_equal(filepath_p_collec, [None])
+
+    def _mock_delete(self, filepath: str) -> None:
+        """Mock function to check if files are passing correctly.
+
+        Args:
+            filepath: str. The filepath name.
+        """
+        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        file_name = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file'
+        self.assertEqual(filepath, file_name)
+        return None
+
+    def test_check_correct_files_are_passing(self) -> None:
+        client = gcsio_test.FakeGcsClient()
+        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        file_name = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file'
+        string = b'testing'
+        insert_random_file(client, file_name, string)
+        file_paths = ['dummy_folder/dummy_subfolder/dummy_file']
+        with self.swap(gcsio.GcsIO, 'delete', self._mock_delete):
+            filepath_p_collec = (
+                self.pipeline
+                | 'Create pcoll of filepaths' >> beam.Create(file_paths)
+                | 'Delete file from GCS' >> gcs_io.DeleteFile(client)
+            )
+            self.assert_pcoll_equal(filepath_p_collec, [None])
+
+
+class GetFilesTest(job_test_utils.PipelinedTestBase):
+    """Tests to check gcs_io.GetFiles."""
+
+    def test_get_files_with_specefic_prefix(self) -> None:
+        client = gcsio_test.FakeGcsClient()
+        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        file_name_1 = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file_1'
+        file_name_2 = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file_2'
+        string = b'testing'
+        insert_random_file(client, file_name_1, string)
+        insert_random_file(client, file_name_2, string)
+        file_paths = ['dummy_folder/dummy_subfolder']
+        filepath_p_collec = (
+            self.pipeline
+            | 'Create pcoll of filepaths' >> beam.Create(file_paths)
+            | 'Get files from GCS' >> gcs_io.GetFiles(client)
+        )
+        self.assert_pcoll_equal(
+            filepath_p_collec, [
+                {
+                    'gs://dev-project-id-resources/dummy_folder/'
+                    'dummy_subfolder/dummy_file_1': 7,
+                    'gs://dev-project-id-resources/dummy_folder/'
+                    'dummy_subfolder/dummy_file_2': 7
+                }
+            ])
+
+    def _mock_list_prefix(self, filepath: str) -> None:
+        """Mock function to check if files are passing correctly.
+
+        Args:
+            filepath: str. The filepath name.
+        """
+        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        file_path_prefix = f'gs://{bucket}/dummy_folder/dummy_subfolder'
+        self.assertEqual(filepath, file_path_prefix)
+        return None
+
+    def test_check_correct_filepath_is_passing(self) -> None:
+        client = gcsio_test.FakeGcsClient()
+        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        file_name_1 = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file_1'
+        string = b'testing'
+        insert_random_file(client, file_name_1, string)
+        file_paths = ['dummy_folder/dummy_subfolder']
+        with self.swap(gcsio.GcsIO, 'list_prefix', self._mock_list_prefix):
+            filepath_p_collec = (
+                self.pipeline
+                | 'Create pcoll of filepaths' >> beam.Create(file_paths)
+                | 'Delete file from GCS' >> gcs_io.GetFiles(client)
+            )
+            self.assert_pcoll_equal(
+                filepath_p_collec, [None])
