@@ -108,7 +108,8 @@ class ChangeDomainTests(test_utils.GenericTestBase):
             feconf.CMD_DELETE_COMMIT,
             valid_cmd_dict, actual_cmd_attributes)
 
-    def test_that_thing(self) -> None: #does not seem to work
+    def test_that_thing(self) -> None:
+        #does not seem to work
         change_domain.BaseChange.ALLOWED_COMMANDS = [{
         'name': 'CMD_CHANGE_PROPERTY_VALUE',
         'required_attribute_names': ['new_value'],
