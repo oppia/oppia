@@ -200,7 +200,6 @@ export class DiagnosticTestPlayerEngineService {
     let wasOldStateInitial: boolean = false;
     let isFirstHit: boolean = true;
     let isFinalQuestion: boolean = false;
-    let nextCardIfReallyStuck: StateCard;
     let focusLabel: string;
 
     this._numberOfAttemptedQuestions += 1;
