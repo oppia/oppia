@@ -157,6 +157,13 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
             user_model.profile_picture_data_url ==
             user_services.DEFAULT_IDENTICON_DATA_URL
         ):
+            user_model.profile_picture_data_url = (
+                user_services.fetch_gravatar(user_model.email))
+
+        if (
+            user_model.profile_picture_data_url ==
+            user_services.DEFAULT_IDENTICON_DATA_URL
+        ):
             return (user_model, False)
 
         return (user_model, True)
