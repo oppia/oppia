@@ -63,7 +63,7 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         """Returns PCollection with file data.
 
         Args:
-            file_paths: PCollection. The collection of filenames that will
+            file_paths: PCollection. The collection of filepaths that will
                 be read.
 
         Returns:
@@ -85,8 +85,8 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         """
         gcs = gcsio.GcsIO(self.client)
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        gcs_filename = f'gs://{bucket}/{file_path}'
-        file = gcs.open(gcs_filename, mode=self.mode)
+        gcs_url = f'gs://{bucket}/{file_path}'
+        file = gcs.open(gcs_url, mode=self.mode)
         data = file.read()
         file.close()
         return data
@@ -194,7 +194,7 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
         """Deletes the files in given PCollection.
 
         Args:
-            file_paths: PCollection. The collection of filenames that will
+            file_paths: PCollection. The collection of filepaths that will
                 be deleted.
 
         Returns:
@@ -213,8 +213,8 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
         """
         gcs = gcsio.GcsIO(self.client)
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        gcs_filename = f'gs://{bucket}/{file_path}'
-        gcs.delete(gcs_filename)
+        gcs_url = f'gs://{bucket}/{file_path}'
+        gcs.delete(gcs_url)
 
 
 # TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
@@ -265,5 +265,5 @@ class GetFiles(beam.PTransform): # type: ignore[misc]
         """
         gcs = gcsio.GcsIO(self.client)
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        gcs_filename = f'gs://{bucket}/{file_path}'
-        return gcs.list_prefix(gcs_filename)
+        gcs_url = f'gs://{bucket}/{file_path}'
+        return gcs.list_prefix(gcs_url)

@@ -62,9 +62,9 @@ class ReadFileTest(job_test_utils.PipelinedTestBase):
     def test_read_from_gcs(self) -> None:
         client = gcsio_test.FakeGcsClient()
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        file_name = f'gs://{bucket}/dummy_file'
+        gcs_url = f'gs://{bucket}/dummy_file'
         string = b'testing'
-        insert_random_file(client, file_name, string)
+        insert_random_file(client, gcs_url, string)
         filepaths = ['dummy_file']
         filepath_p_collec = (
             self.pipeline
@@ -104,9 +104,9 @@ class DeleteFileTest(job_test_utils.PipelinedTestBase):
     def test_delete_files_in_gcs(self) -> None:
         client = gcsio_test.FakeGcsClient()
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        file_name = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file'
+        gcs_url = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file'
         string = b'testing'
-        insert_random_file(client, file_name, string)
+        insert_random_file(client, gcs_url, string)
         file_paths = ['dummy_folder/dummy_subfolder/dummy_file']
         filepath_p_collec = (
             self.pipeline
@@ -122,16 +122,16 @@ class DeleteFileTest(job_test_utils.PipelinedTestBase):
             filepath: str. The filepath name.
         """
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        file_name = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file'
-        self.assertEqual(filepath, file_name)
+        gcs_url = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file'
+        self.assertEqual(filepath, gcs_url)
         return None
 
     def test_check_correct_files_are_passing(self) -> None:
         client = gcsio_test.FakeGcsClient()
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        file_name = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file'
+        gcs_url = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file'
         string = b'testing'
-        insert_random_file(client, file_name, string)
+        insert_random_file(client, gcs_url, string)
         file_paths = ['dummy_folder/dummy_subfolder/dummy_file']
         with self.swap(gcsio.GcsIO, 'delete', self._mock_delete):
             filepath_p_collec = (
@@ -148,11 +148,11 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
     def test_get_files_with_specefic_prefix(self) -> None:
         client = gcsio_test.FakeGcsClient()
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        file_name_1 = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file_1'
-        file_name_2 = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file_2'
+        gcs_url_1 = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file_1'
+        gcs_url_2 = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file_2'
         string = b'testing'
-        insert_random_file(client, file_name_1, string)
-        insert_random_file(client, file_name_2, string)
+        insert_random_file(client, gcs_url_1, string)
+        insert_random_file(client, gcs_url_2, string)
         file_paths = ['dummy_folder/dummy_subfolder']
         filepath_p_collec = (
             self.pipeline
@@ -183,9 +183,9 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
     def test_check_correct_filepath_is_passing(self) -> None:
         client = gcsio_test.FakeGcsClient()
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        file_name_1 = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file_1'
+        gcs_url_1 = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file_1'
         string = b'testing'
-        insert_random_file(client, file_name_1, string)
+        insert_random_file(client, gcs_url_1, string)
         file_paths = ['dummy_folder/dummy_subfolder']
         with self.swap(gcsio.GcsIO, 'list_prefix', self._mock_list_prefix):
             filepath_p_collec = (
