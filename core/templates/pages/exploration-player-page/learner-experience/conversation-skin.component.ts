@@ -1295,16 +1295,22 @@ export class ConversationSkinComponent {
             !remainOnCurrentCard,
             taggedSkillMisconceptionId);
         }
-        // Do not wait if the interaction is supplemental -- there's
-        // already a delay bringing in the help card.
-        let millisecsLeftToWait = (
-          !this.displayedCard.isInteractionInline() ? 1.0 :
-          Math.max(this.MIN_CARD_LOADING_DELAY_MSEC - (
-            new Date().getTime() - timeAtServerCall),
-          1.0));
 
-        if (this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()) {
+        let millisecsLeftToWait: number;
+        if (!this.displayedCard.isInteractionInline()) {
+          // Do not wait if the interaction is supplemental -- there's
+          // already a delay bringing in the help card.
           millisecsLeftToWait = 1.0;
+        } else if (
+          this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
+        ) {
+          // Do not wait if the player mode is the diagnostic test. Since no
+          // feedback will be presented after attempting a question so delaying
+          // is not required.
+          millisecsLeftToWait = 1.0;
+        } else {
+          millisecsLeftToWait = Math.max(this.MIN_CARD_LOADING_DELAY_MSEC - (
+            new Date().getTime() - timeAtServerCall), 1.0);
         }
 
         setTimeout(() => {
