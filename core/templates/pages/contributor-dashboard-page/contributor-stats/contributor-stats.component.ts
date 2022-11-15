@@ -23,7 +23,6 @@ import { ContributionAndReviewStatsService, QuestionContributionBackendDict, Que
 import { UserService } from 'services/user.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { AppConstants } from 'app.constants';
-import { stat } from 'fs';
 
 interface Option {
   contributionType: string;
@@ -33,9 +32,14 @@ interface Option {
 interface StatsPage {
   language?: string;
   currentPageStartIndex: number;
+  // This is exclusive and not actually the last index.
   currentPageEndIndex: number;
   // eslint-disable-next-line max-len
   data: (TranslationContributionStats | TranslationReviewStats | QuestionContributionStats | QuestionReviewStats)[];
+}
+
+enum Direction {
+  ORIGINAL = 0
 }
 
 interface Stat {
@@ -81,7 +85,6 @@ export class ContributorStatsComponent {
   mobileDropdownShown: boolean = false;
   selectedContributionType: string;
   username: string;
-  endPage: number;
   ITEMS_PER_PAGE: number = 5;
 
   userCanReviewTranslationSuggestions: boolean = false;
@@ -224,7 +227,7 @@ export class ContributorStatsComponent {
       response.translation_contribution_stats.map((stat) => {
         if (!this.statsData.translationContribution[stat.language_code]) {
           this.statsData.translationContribution[stat.language_code] = this
-            .createTranslationContributionStatsPage(stat);
+            .createInitialTranslationStatsRecord(stat, true);
         } else {
           this.statsData.translationContribution[stat.language_code].data.push(
             this.createTranslationContributionStat(stat));
@@ -236,7 +239,7 @@ export class ContributorStatsComponent {
       response.translation_review_stats.map((stat) => {
         if (!this.statsData.translationReview[stat.language_code]) {
           this.statsData.translationReview[stat.language_code] = this
-            .createTranslationReviewStatsPage(stat);
+            .createInitialTranslationStatsRecord(stat, false);
         } else {
           this.statsData.translationReview[stat.language_code].data.push(
             this.createTranslationReviewStat(stat));
@@ -246,57 +249,67 @@ export class ContributorStatsComponent {
 
     if (response.question_contribution_stats.length > 0) {
       this.statsData.questionContribution = this
-        .createQuestionContributionStatsPage(
-          response.question_contribution_stats);
+        .createAllQuestionStatsRecords(
+          response.question_contribution_stats, true);
     }
 
     if (response.question_review_stats.length > 0) {
-      this.statsData.questionReview = this.createQuestionReviewStatsPage(
-        response.question_review_stats);
+      this.statsData.questionReview = this.createAllQuestionStatsRecords(
+        response.question_review_stats, false);
     }
   }
 
-  createTranslationContributionStatsPage(
-      stat: TranslationContributionBackendDict): StatsPage {
+  createInitialTranslationStatsRecord(
+      stat: TranslationContributionBackendDict | TranslationReviewBackendDict,
+      isTranslationContribution: boolean
+  ): StatsPage {
+    const data = [];
+    if (isTranslationContribution) {
+      // We can confirm that if isTranslationContribution == true
+      // the type of stat object is TranslationContributionBackendDict.
+      data.push(this.createTranslationContributionStat(
+        stat as TranslationContributionBackendDict));
+    } else {
+      // We can confirm that if isTranslationContribution == false
+      // the type of stat object is TranslationReviewBackendDict.
+      data.push(this.createTranslationReviewStat(
+        stat as TranslationReviewBackendDict));
+    }
+
     return {
-      data: [this.createTranslationContributionStat(stat)],
+      data,
       language: this.languageUtilService.getAudioLanguageDescription(
         stat.language_code),
       currentPageStartIndex: 0,
-      currentPageEndIndex: 5
+      currentPageEndIndex: this.ITEMS_PER_PAGE
     };
   }
 
-  createTranslationReviewStatsPage(
-      stat: TranslationReviewBackendDict): StatsPage {
-    return {
-      data: [this.createTranslationReviewStat(stat)],
-      language: this.languageUtilService.getAudioLanguageDescription(
-        stat.language_code),
-      currentPageStartIndex: 0,
-      currentPageEndIndex: 5
-    };
-  }
+  createAllQuestionStatsRecords(
+      stats: (QuestionContributionBackendDict | QuestionReviewBackendDict)[],
+      isQuestionContribution: boolean
+  ): StatsPage {
+    let data = [];
+    if (isQuestionContribution) {
+      // We can confirm that if isQuestionContribution == true
+      // the type of stat object is QuestionContributionBackendDict.
+      data = stats.map((stat) => {
+        return this.createQuestionContributionStat(
+          stat as QuestionContributionBackendDict);
+      });
+    } else {
+      // We can confirm that if isQuestionContribution == false
+      // the type of stat object is QuestionReviewBackendDict.
+      data = stats.map((stat) => {
+        return this.createQuestionReviewStat(
+          stat as QuestionReviewBackendDict);
+      });
+    }
 
-  createQuestionContributionStatsPage(
-      stats: QuestionContributionBackendDict[]): StatsPage {
     return {
-      data: stats.map((stat) => {
-        return this.createQuestionContributionStat(stat);
-      }),
+      data,
       currentPageStartIndex: 0,
-      currentPageEndIndex: 5
-    };
-  }
-
-  createQuestionReviewStatsPage(
-      stat: QuestionReviewBackendDict[]): StatsPage {
-    return {
-      data: stat.map((stat) => {
-        return this.createQuestionReviewStat(stat);
-      }),
-      currentPageStartIndex: 0,
-      currentPageEndIndex: 5
+      currentPageEndIndex: this.ITEMS_PER_PAGE
     };
   }
 
@@ -348,17 +361,28 @@ export class ContributorStatsComponent {
   }
 
   goToNextPage(page: StatsPage): void {
+    if (
+      this.statsData[this.type].currentPageEndIndex >=
+      this.statsData[this.type].data.length) {
+      throw new Error('There are no more pages to go.');
+    }
     page.currentPageStartIndex += this.ITEMS_PER_PAGE;
     page.currentPageEndIndex += this.ITEMS_PER_PAGE;
   }
 
   goToPreviousPage(page: StatsPage): void {
+    if (
+      this.statsData[this.type].currentPageStartIndex === 0) {
+      throw new Error('There are no more pages to go back.');
+    }
     page.currentPageStartIndex -= this.ITEMS_PER_PAGE;
     page.currentPageEndIndex -= this.ITEMS_PER_PAGE;
   }
 
+  // This method gives the direction how the stats columns should be sorted.
   getColumnSortDirection(): number {
-    return 0;
+    // This preserves original column property order.
+    return Direction.ORIGINAL;
   }
 
   /**

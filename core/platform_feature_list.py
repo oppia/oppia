@@ -44,7 +44,6 @@ ParamNames = params.ParamNames
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
     params.ParamNames.DUMMY_FEATURE,
-    params.ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -59,6 +58,7 @@ PROD_FEATURES_LIST: List[ParamNames] = [
     params.ParamNames.CHECKPOINT_CELEBRATION,
     params.ParamNames.ANDROID_BETA_LANDING_PAGE,
     params.ParamNames.BLOG_PAGES,
+    params.ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are

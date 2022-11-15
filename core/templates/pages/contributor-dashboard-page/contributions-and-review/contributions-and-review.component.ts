@@ -116,9 +116,8 @@ export class ContributionsAndReview
   userDetailsLoading: boolean;
   userIsLoggedIn: boolean;
   activeTabType: string;
-  activeSubType: string;
+  activeTabSubtype: string;
   dropdownShown: boolean;
-  activeTabIsAccomplishments: boolean;
   activeDropdownTabChoice: string;
   reviewTabs: TabDetails[] = [];
   accomplishmentsTabs: TabDetails[] = [];
@@ -130,10 +129,10 @@ export class ContributionsAndReview
   };
 
   /**
-   * The feature flag state to gate the contributor stats and badges sections.
-   * @type {boolean}
-   * This keeps whether the contributor_dashboard_accomplishments feature is
-   * enabled.
+   * The feature flag state to gate the contributor_dashboard_accomplishments.
+   * @type {boolean} - contributor_dashboard_accomplishments - A boolean value.
+   * This determines whether the contributor_dashboard_accomplishments feature
+   * is enabled.
    */
   accomplishmentsTabIsEnabled: boolean = false;
   defaultContributionType: string = 'translationContribution';
@@ -329,13 +328,13 @@ export class ContributionsAndReview
   isActiveTab(tabType: string, subType: string): boolean {
     return (
       this.activeTabType === tabType &&
-      this.activeSubType === subType);
+      this.activeTabSubtype === subType);
   }
 
   isReviewTranslationsTab(): boolean {
     return (
       this.activeTabType === this.TAB_TYPE_REVIEWS &&
-      this.activeSubType === this.SUGGESTION_TYPE_TRANSLATE);
+      this.activeTabSubtype === this.SUGGESTION_TYPE_TRANSLATE);
   }
 
   openQuestionSuggestionModal(
@@ -387,9 +386,9 @@ export class ContributionsAndReview
   getContributionSummaries(
       suggestionIdToSuggestions: Record<string, SuggestionDetails>
   ): ContributionsSummary[] {
-    if (this.activeSubType === this.SUGGESTION_TYPE_TRANSLATE) {
+    if (this.activeTabSubtype === this.SUGGESTION_TYPE_TRANSLATE) {
       return this.getTranslationContributionsSummary(suggestionIdToSuggestions);
-    } else if (this.activeSubType === this.SUGGESTION_TYPE_QUESTION) {
+    } else if (this.activeTabSubtype === this.SUGGESTION_TYPE_QUESTION) {
       return this.getQuestionContributionsSummary(suggestionIdToSuggestions);
     }
   }
@@ -413,11 +412,8 @@ export class ContributionsAndReview
     this.activeDropdownTabChoice = this.getActiveDropdownTabChoice(
       tabType, subType);
 
-    this.activeSubType = subType;
-    if (tabType === this.TAB_TYPE_ACCOMPLISHMENTS) {
-      this.activeTabIsAccomplishments = true;
-    } else {
-      this.activeTabIsAccomplishments = false;
+    this.activeTabSubtype = subType;
+    if (!this.isAccomplishmentsActiveTab()) {
       this.contributionAndReviewService.setActiveTabType(tabType);
       this.contributionAndReviewService.setActiveSuggestionType(subType);
       this.activeExplorationId = null;
@@ -463,13 +459,13 @@ export class ContributionsAndReview
 
   loadContributions(shouldResetOffset: boolean):
     Promise<GetOpportunitiesResponse> {
-    if (!this.activeTabType || !this.activeSubType) {
+    if (!this.activeTabType || !this.activeTabSubtype) {
       return new Promise((resolve, reject) => {
         resolve({opportunitiesDicts: [], more: false});
       });
     }
     const fetchFunction = this.tabNameToOpportunityFetchFunction[
-      this.activeSubType][this.activeTabType];
+      this.activeTabSubtype][this.activeTabType];
 
     return fetchFunction(shouldResetOffset).then((response) => {
       Object.keys(response.suggestionIdToDetails).forEach(id => {
@@ -507,6 +503,10 @@ export class ContributionsAndReview
     this.dropdownShown = false;
   }
 
+  isAccomplishmentsActiveTab(): boolean {
+    return this.activeTabType === this.TAB_TYPE_ACCOMPLISHMENTS;
+  }
+
   ngOnInit(): void {
     this.SUGGESTION_TYPE_QUESTION = 'add_question';
     this.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
@@ -520,9 +520,8 @@ export class ContributionsAndReview
     this.userDetailsLoading = true;
     this.userIsLoggedIn = false;
     this.activeTabType = '';
-    this.activeSubType = '';
+    this.activeTabSubtype = '';
     this.dropdownShown = false;
-    this.activeTabIsAccomplishments = false;
     this.activeDropdownTabChoice = '';
     this.reviewTabs = [];
     this.accomplishmentsTabIsEnabled = (

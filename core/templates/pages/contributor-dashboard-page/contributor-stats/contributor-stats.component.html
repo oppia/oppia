@@ -11,6 +11,7 @@
 
       <div *ngIf="mobileDropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
         <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
+             (click)="selectOption(option.contributionType)"
              *ngFor="let option of options"
              [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
             {{option.displayName}}

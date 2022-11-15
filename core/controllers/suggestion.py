@@ -112,15 +112,13 @@ class SuggestionHandler(base.BaseHandler):
             self.normalized_payload.get('change'),
             self.normalized_payload.get('description'))
 
-        if platform_feature_services.is_feature_enabled(
-            platform_feature_list.ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS.value):
-            if suggestion.suggestion_type == (
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
-                suggestion_services.update_translation_contribution_stats_at_submission(suggestion)
+        if suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            suggestion_services.update_translation_contribution_stats_at_submission(suggestion)
 
-            elif suggestion.suggestion_type == (
-                feconf.SUGGESTION_TYPE_ADD_QUESTION):
-                suggestion_services.update_question_contribution_stats_at_submission(suggestion)
+        elif suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_ADD_QUESTION):
+            suggestion_services.update_question_contribution_stats_at_submission(suggestion)
 
         suggestion_change = suggestion.change
         if (
