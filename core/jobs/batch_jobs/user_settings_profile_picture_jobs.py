@@ -160,6 +160,10 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
             user_model.profile_picture_data_url = (
                 user_services.fetch_gravatar(user_model.email))
 
+        # Here we need to check for the default image again because there is a
+        # possibility that in the above check we are not able to generate the
+        # gravatar for the user having default image and we want to keep track
+        # of all the default images.
         if (
             user_model.profile_picture_data_url ==
             user_services.DEFAULT_IDENTICON_DATA_URL
