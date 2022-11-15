@@ -974,7 +974,7 @@ def get_reviewable_translation_suggestions_by_offset(
     opportunity_summary_exp_ids: Optional[List[str]],
     limit: Optional[int],
     offset: int,
-    language: str = ""
+    language: str = ''
 ) -> Tuple[List[suggestion_registry.SuggestionTranslateContent], int]:
     """Returns a list of translation suggestions matching the
      passed opportunity IDs which the user can review.
@@ -993,7 +993,7 @@ def get_reviewable_translation_suggestions_by_offset(
         offset: int. The number of results to skip from the beginning of all
             results matching the query.
         language: str. A language for which to filter. If it is None, all
-        available languages will be returned.
+            available languages will be returned.
 
     Returns:
         Tuple of (results, next_offset). Where:
