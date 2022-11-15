@@ -29,17 +29,13 @@ interface Option {
   displayName: string;
 }
 
-interface StatsPage {
+interface PageableStats {
   language?: string;
   currentPageStartIndex: number;
-  // This is exclusive and not actually the last index.
+  // This is the index of the last item of the stats data of a given page.
   currentPageEndIndex: number;
   // eslint-disable-next-line max-len
   data: (TranslationContributionStats | TranslationReviewStats | QuestionContributionStats | QuestionReviewStats)[];
-}
-
-enum Direction {
-  ORIGINAL = 0
 }
 
 interface Stat {
@@ -227,7 +223,7 @@ export class ContributorStatsComponent {
       response.translation_contribution_stats.map((stat) => {
         if (!this.statsData.translationContribution[stat.language_code]) {
           this.statsData.translationContribution[stat.language_code] = this
-            .createInitialTranslationStatsRecord(stat, true);
+            .createTranslationContributionPageableStats(stat);
         } else {
           this.statsData.translationContribution[stat.language_code].data.push(
             this.createTranslationContributionStat(stat));
@@ -239,7 +235,7 @@ export class ContributorStatsComponent {
       response.translation_review_stats.map((stat) => {
         if (!this.statsData.translationReview[stat.language_code]) {
           this.statsData.translationReview[stat.language_code] = this
-            .createInitialTranslationStatsRecord(stat, false);
+            .createTranslationReviewPageableStats(stat);
         } else {
           this.statsData.translationReview[stat.language_code].data.push(
             this.createTranslationReviewStat(stat));
@@ -249,67 +245,57 @@ export class ContributorStatsComponent {
 
     if (response.question_contribution_stats.length > 0) {
       this.statsData.questionContribution = this
-        .createAllQuestionStatsRecords(
-          response.question_contribution_stats, true);
+        .createQuestionContributionPageableStats(
+          response.question_contribution_stats);
     }
 
     if (response.question_review_stats.length > 0) {
-      this.statsData.questionReview = this.createAllQuestionStatsRecords(
-        response.question_review_stats, false);
+      this.statsData.questionReview = this.createQuestionReviewPageableStats(
+        response.question_review_stats);
     }
   }
 
-  createInitialTranslationStatsRecord(
-      stat: TranslationContributionBackendDict | TranslationReviewBackendDict,
-      isTranslationContribution: boolean
-  ): StatsPage {
-    const data = [];
-    if (isTranslationContribution) {
-      // We can confirm that if isTranslationContribution == true
-      // the type of stat object is TranslationContributionBackendDict.
-      data.push(this.createTranslationContributionStat(
-        stat as TranslationContributionBackendDict));
-    } else {
-      // We can confirm that if isTranslationContribution == false
-      // the type of stat object is TranslationReviewBackendDict.
-      data.push(this.createTranslationReviewStat(
-        stat as TranslationReviewBackendDict));
-    }
-
+  createTranslationContributionPageableStats(
+      stat: TranslationContributionBackendDict): PageableStats {
     return {
-      data,
+      data: [this.createTranslationContributionStat(stat)],
       language: this.languageUtilService.getAudioLanguageDescription(
         stat.language_code),
       currentPageStartIndex: 0,
-      currentPageEndIndex: this.ITEMS_PER_PAGE
+      currentPageEndIndex: 5
     };
   }
 
-  createAllQuestionStatsRecords(
-      stats: (QuestionContributionBackendDict | QuestionReviewBackendDict)[],
-      isQuestionContribution: boolean
-  ): StatsPage {
-    let data = [];
-    if (isQuestionContribution) {
-      // We can confirm that if isQuestionContribution == true
-      // the type of stat object is QuestionContributionBackendDict.
-      data = stats.map((stat) => {
-        return this.createQuestionContributionStat(
-          stat as QuestionContributionBackendDict);
-      });
-    } else {
-      // We can confirm that if isQuestionContribution == false
-      // the type of stat object is QuestionReviewBackendDict.
-      data = stats.map((stat) => {
-        return this.createQuestionReviewStat(
-          stat as QuestionReviewBackendDict);
-      });
-    }
-
+  createTranslationReviewPageableStats(
+      stat: TranslationReviewBackendDict): PageableStats {
     return {
-      data,
+      data: [this.createTranslationReviewStat(stat)],
+      language: this.languageUtilService.getAudioLanguageDescription(
+        stat.language_code),
       currentPageStartIndex: 0,
-      currentPageEndIndex: this.ITEMS_PER_PAGE
+      currentPageEndIndex: 5
+    };
+  }
+
+  createQuestionContributionPageableStats(
+      stats: QuestionContributionBackendDict[]): PageableStats {
+    return {
+      data: stats.map((stat) => {
+        return this.createQuestionContributionStat(stat);
+      }),
+      currentPageStartIndex: 0,
+      currentPageEndIndex: 5
+    };
+  }
+
+  createQuestionReviewPageableStats(
+      stat: QuestionReviewBackendDict[]): PageableStats {
+    return {
+      data: stat.map((stat) => {
+        return this.createQuestionReviewStat(stat);
+      }),
+      currentPageStartIndex: 0,
+      currentPageEndIndex: 5
     };
   }
 
@@ -360,29 +346,32 @@ export class ContributorStatsComponent {
     };
   }
 
-  goToNextPage(page: StatsPage): void {
+  goToNextPage(page: PageableStats): void {
     if (
       this.statsData[this.type].currentPageEndIndex >=
       this.statsData[this.type].data.length) {
-      throw new Error('There are no more pages to go.');
+      throw new Error('There are no more pages after this one.');
     }
     page.currentPageStartIndex += this.ITEMS_PER_PAGE;
     page.currentPageEndIndex += this.ITEMS_PER_PAGE;
   }
 
-  goToPreviousPage(page: StatsPage): void {
+  goToPreviousPage(page: PageableStats): void {
     if (
       this.statsData[this.type].currentPageStartIndex === 0) {
-      throw new Error('There are no more pages to go back.');
+      throw new Error('There are no more pages before this one.');
     }
     page.currentPageStartIndex -= this.ITEMS_PER_PAGE;
     page.currentPageEndIndex -= this.ITEMS_PER_PAGE;
   }
 
-  // This method gives the direction how the stats columns should be sorted.
-  getColumnSortDirection(): number {
-    // This preserves original column property order.
-    return Direction.ORIGINAL;
+  // This method gives the original order of the key value pairs that is
+  // displayed in the template. We could have used keyvalue: 0 instead of
+  // returning from this function, but it gives console errors.
+  // We need to give a constant number in order to preserve original column
+  // property order.
+  provideOriginalOrder(): number {
+    return 0;
   }
 
   /**

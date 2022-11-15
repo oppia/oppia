@@ -413,7 +413,7 @@ export class ContributionsAndReview
       tabType, subType);
 
     this.activeTabSubtype = subType;
-    if (!this.isAccomplishmentsActiveTab()) {
+    if (!this.isAccomplishmentsTabActive()) {
       this.contributionAndReviewService.setActiveTabType(tabType);
       this.contributionAndReviewService.setActiveSuggestionType(subType);
       this.activeExplorationId = null;
@@ -503,7 +503,7 @@ export class ContributionsAndReview
     this.dropdownShown = false;
   }
 
-  isAccomplishmentsActiveTab(): boolean {
+  isAccomplishmentsTabActive(): boolean {
     return this.activeTabType === this.TAB_TYPE_ACCOMPLISHMENTS;
   }
 

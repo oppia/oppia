@@ -50,7 +50,7 @@
       </div>
       <table class="dashboard-table e2e-test-topics-table">
         <tr>
-          <th *ngFor="let column of COLUMNS[type] | keyvalue: getColumnSortDirection"
+          <th *ngFor="let column of COLUMNS[type] | keyvalue: provideOriginalOrder"
               class="dashboard-table-headings stats-data">
             <div class="stats-column-name-container">
               {{column.value}}
@@ -195,7 +195,7 @@
       </div>
       <table class="dashboard-table e2e-test-topics-table">
         <tr>
-          <th *ngFor="let column of COLUMNS[type] | keyvalue: getColumnSortDirection"
+          <th *ngFor="let column of COLUMNS[type] | keyvalue: provideOriginalOrder"
               class="dashboard-table-headings stats-data">
             <div class="stats-column-name-container">
               {{column.value}}
