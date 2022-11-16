@@ -492,7 +492,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_request_invalid_asset_type(self) -> None:
-        """Test that requests for invalid asset type is rejected with a 400."""
+        """Test that requests for invalid asset type is rejected with a 404."""
         self.login(self.EDITOR_EMAIL)
 
         self.get_html_response(
