@@ -41,7 +41,9 @@ jobs:
       - name: filter-sarif
         uses: zbazztian/filter-sarif@master
         with:
+          # filter out all test files unless they contain a sql-injection vulnerability
           patterns: |
-            -core/tests/data.js
-        input: sarif-results/${{ matrix.language }}.sarif
-        output: sarif-results/${{ matrix.language }}.sarif
+            -**/*test*.js
+            +**/*test*.js:js/sql-injection
+          input: sarif-results/${{ matrix.language }}.sarif
+          output: sarif-results/${{ matrix.language }}.sarif
