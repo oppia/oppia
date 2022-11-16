@@ -27,6 +27,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { Subscription } from 'rxjs';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 export interface Testimonial {
   quote: string;
@@ -56,6 +57,10 @@ export class TeachPageComponent implements OnInit {
   isWindowNarrow: boolean = false;
   userIsLoggedIn: boolean = false;
   directiveSubscriptions = new Subscription();
+  androidPageIsEnabled: boolean = (
+    this.platformFeatureService.status.AndroidBetaLandingPage.isEnabled
+  );
+
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
@@ -63,6 +68,7 @@ export class TeachPageComponent implements OnInit {
     private windowRef: WindowRef,
     private userService: UserService,
     private loaderService: LoaderService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -130,6 +136,10 @@ export class TeachPageComponent implements OnInit {
       borderPresent: true,
       altText: 'Photo of Himanshu'
     }];
+  }
+
+  onClickAccessAndroidButton(): void {
+    this.windowRef.nativeWindow.location.href = '/android';
   }
 
   onClickStartLearningButton(): void {

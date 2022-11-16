@@ -23,8 +23,7 @@ from core.domain import email_manager
 from core.domain import user_query_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple, overload
-from typing_extensions import Literal
+from typing import Dict, List, Literal, Optional, Tuple, overload
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -189,7 +188,7 @@ def send_email_to_qualified_users(
     email_subject: str,
     email_body: str,
     email_intent: str,
-    max_recipients: int
+    max_recipients: Optional[int]
 ) -> None:
     """Send email to maximum 'max_recipients' qualified users.
 
@@ -198,7 +197,7 @@ def send_email_to_qualified_users(
         email_subject: str. Subject of the email to be sent.
         email_body: str. Body of the email to be sent.
         email_intent: str. Intent of the email.
-        max_recipients: int. Maximum number of recipients send emails to.
+        max_recipients: int|None. Maximum number of recipients send emails to.
     """
     user_query = get_user_query(query_id, strict=True)
     recipient_ids = user_query.user_ids

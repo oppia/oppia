@@ -29,8 +29,7 @@ from core.platform import models
 
 import apache_beam as beam
 
-from typing import Dict, List, Set, Tuple, Type, Union
-from typing_extensions import Final
+from typing import Dict, Final, List, Set, Tuple, Type, Union
 
 MYPY = False
 if MYPY:

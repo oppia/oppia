@@ -401,4 +401,52 @@ describe('Editable topic backend API service', () => {
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Error deleting topic 1.');
     }));
+
+  it('should sucessfully get topic id to topic name', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    editableTopicBackendApiService.getTopicIdToTopicNameAsync(
+      ['topicId']).then(successHandler, failHandler);
+    const topicIdToTopicName = {
+      topicId: 'topicName'
+    };
+
+    let req = httpTestingController.expectOne(
+      '/topic_id_to_topic_name_handler/?comma_separated_topic_ids=topicId');
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      topic_id_to_topic_name: topicIdToTopicName
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(topicIdToTopicName);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should use the rejection handler for getting topic id to topic name',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      editableTopicBackendApiService.getTopicIdToTopicNameAsync(
+        ['topicId']).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/topic_id_to_topic_name_handler/?comma_separated_topic_ids=topicId');
+      expect(req.request.method).toEqual('GET');
+
+      req.flush({
+        error: 'Error in fetching topic id to topic name count.'
+      }, {
+        status: 400, statusText: 'Invalid request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Error in fetching topic id to topic name count.');
+    }));
 });
