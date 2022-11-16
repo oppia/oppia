@@ -37,7 +37,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Final
+from typing import Final, List, Optional, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -46,6 +46,26 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 CAN_EDIT_STR = 'can_edit'
+
+
+class PreferencesDict(TypedDict):
+    """Dictionary that represents a sample preferences dictionary."""
+
+    preferred_language_codes: List[str]
+    preferred_site_language_code: Optional[str]
+    preferred_audio_language_code: Optional[str]
+    default_dashboard: str
+    user_bio: str
+    subject_interests: List[str]
+    subscription_list: List[SubscriptionListDict]
+
+
+class SubscriptionListDict(TypedDict):
+    """Dictionary that represents a sample subscription list dictionary."""
+
+    creator_picture_data_url: str
+    creator_username: str
+    creator_impact: int
 
 
 class OldLibraryRedirectPageTest(test_utils.GenericTestBase):
@@ -410,10 +430,22 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
+        preferences_dict: PreferencesDict = {
+            'preferred_language_codes': ['de'],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'default_dashboard': 'learner',
+            'user_bio': 'my bio',
+            'subject_interests': [],
+            'subscription_list': []
+        }
+
         # Change the user's preferred language to de.
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
-            {'update_type': 'preferred_language_codes', 'data': ['de']},
+            {
+                'data': preferences_dict
+            },
             csrf_token=csrf_token)
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
         self.assertDictContainsSubset({
@@ -542,9 +574,21 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
+        preferences_dict: PreferencesDict = {
+            'preferred_language_codes': ['de'],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'default_dashboard': 'learner',
+            'user_bio': 'my bio',
+            'subject_interests': [],
+            'subscription_list': []
+        }
+
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
-            {'update_type': 'preferred_language_codes', 'data': ['de']},
+            {
+                'data': preferences_dict
+            },
             csrf_token=csrf_token)
 
         response_dict = self.get_json(

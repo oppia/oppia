@@ -33,13 +33,35 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import List, Optional, TypedDict
+
 secrets_services = models.Registry.import_secrets_services()
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
 
+class PreferencesDict(TypedDict):
+    """Dictionary that represents a sample preferences dictionary."""
+
+    preferred_language_codes: List[str]
+    preferred_site_language_code: Optional[str]
+    preferred_audio_language_code: Optional[str]
+    default_dashboard: str
+    user_bio: str
+    subject_interests: List[str]
+    subscription_list: List[SubscriptionListDict]
+
+
+class SubscriptionListDict(TypedDict):
+    """Dictionary that represents a sample subscription list dictionary."""
+
+    creator_picture_data_url: str
+    creator_username: str
+    creator_impact: int
+
+
 class ProfilePageTests(test_utils.GenericTestBase):
 
-    preferencesDict = {
+    preferences_dict: PreferencesDict = {
         'preferred_language_codes': ['en'],
         'preferred_site_language_code': None,
         'preferred_audio_language_code': None,
@@ -67,19 +89,19 @@ class ProfilePageTests(test_utils.GenericTestBase):
             self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_new_csrf_token()
-            self.preferencesDict['user_bio'] = 'Bio data of the editor'
+            self.preferences_dict['user_bio'] = 'Bio data of the editor'
             self.put_json(
                 '/preferenceshandler/data',
                 {
-                    'data': self.preferencesDict
+                    'data': self.preferences_dict
                 },
                 csrf_token=csrf_token
             )
-            self.preferencesDict['subject_interests'] = ['editor', 'writing']
+            self.preferences_dict['subject_interests'] = ['editor', 'writing']
             self.put_json(
                 '/preferenceshandler/data',
                 {
-                    'data': self.preferencesDict
+                    'data': self.preferences_dict
                 },
                 csrf_token=csrf_token
             )
@@ -122,7 +144,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
 
-    preferencesDict = {
+    preferences_dict: PreferencesDict = {
         'preferred_language_codes': ['en'],
         'preferred_site_language_code': None,
         'preferred_audio_language_code': None,
@@ -141,25 +163,25 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
             ['en'], original_preferences['preferred_language_codes'])
         self.assertIsNone(original_preferences['preferred_site_language_code'])
         self.assertIsNone(original_preferences['preferred_audio_language_code'])
-        self.preferencesDict['preferred_site_language_code'] = 'en'
+        self.preferences_dict['preferred_site_language_code'] = 'en'
         self.put_json(
             '/preferenceshandler/data',
             {
-                'data': self.preferencesDict
+                'data': self.preferences_dict
             },
             csrf_token=csrf_token)
-        self.preferencesDict['preferred_audio_language_code'] = 'hi-en'
+        self.preferences_dict['preferred_audio_language_code'] = 'hi-en'
         self.put_json(
             '/preferenceshandler/data',
             {
-                'data': self.preferencesDict
+                'data': self.preferences_dict
             },
             csrf_token=csrf_token)
-        self.preferencesDict['preferred_language_codes'] = ['de']
+        self.preferences_dict['preferred_language_codes'] = ['de']
         self.put_json(
             '/preferenceshandler/data',
             {
-                'data': self.preferencesDict
+                'data': self.preferences_dict
             },
             csrf_token=csrf_token)
         new_preferences = self.get_json('/preferenceshandler/data')
@@ -172,18 +194,18 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.preferencesDict['user_bio'] = 'My new editor bio'
+        self.preferences_dict['user_bio'] = 'My new editor bio'
         self.put_json(
             '/preferenceshandler/data',
             {
-                'data': self.preferencesDict
+                'data': self.preferences_dict
             },
             csrf_token=csrf_token)
-        self.preferencesDict['subject_interests'] = ['editor', 'editing']
+        self.preferences_dict['subject_interests'] = ['editor', 'editing']
         self.put_json(
             '/preferenceshandler/data',
             {
-                'data': self.preferencesDict
+                'data': self.preferences_dict
             },
             csrf_token=csrf_token)
         self.logout()
@@ -191,18 +213,18 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.preferencesDict['user_bio'] = 'My new viewer bio'
+        self.preferences_dict['user_bio'] = 'My new viewer bio'
         self.put_json(
             '/preferenceshandler/data',
             {
-                'data': self.preferencesDict
+                'data': self.preferences_dict
             },
             csrf_token=csrf_token)
-        self.preferencesDict['subject_interests'] = ['viewer', 'viewing']
+        self.preferences_dict['subject_interests'] = ['viewer', 'viewing']
         self.put_json(
             '/preferenceshandler/data',
             {
-                'data': self.preferencesDict
+                'data': self.preferences_dict
             },
             csrf_token=csrf_token)
         self.logout()
@@ -364,7 +386,7 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
 class PreferencesHandlerTests(test_utils.GenericTestBase):
     EXP_ID = 'exp_id'
     EXP_TITLE = 'Exploration title'
-    preferencesDict = {
+    preferences_dict: PreferencesDict = {
         'preferred_language_codes': ['en'],
         'preferred_site_language_code': None,
         'preferred_audio_language_code': None,
@@ -425,12 +447,12 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         user_settings = user_services.get_user_settings(self.owner_id)
-        self.preferencesDict['default_dashboard'] = (
+        self.preferences_dict['default_dashboard'] = (
             constants.DASHBOARD_TYPE_CREATOR)
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
             {
-                'data': self.preferencesDict
+                'data': self.preferences_dict
             },
             csrf_token=csrf_token)
         user_settings = user_services.get_user_settings(self.owner_id)
@@ -444,7 +466,7 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
     EMAIL_A = 'a@example.com'
     USERNAME_B = 'b'
     EMAIL_B = 'b@example.com'
-    preferencesDict = {
+    preferences_dict: PreferencesDict = {
         'preferred_language_codes': ['en'],
         'preferred_site_language_code': None,
         'preferred_audio_language_code': None,
@@ -458,11 +480,11 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
         self.signup(self.EMAIL_A, self.USERNAME_A)
         self.login(self.EMAIL_A)
         csrf_token = self.get_new_csrf_token()
-        self.preferencesDict['user_bio'] = 'I am within 2000 char limit'
+        self.preferences_dict['user_bio'] = 'I am within 2000 char limit'
         self.put_json(
             '/preferenceshandler/data',
             {
-                'data': self.preferencesDict
+                'data': self.preferences_dict
             },
             csrf_token=csrf_token)
         preferences = self.get_json('/preferenceshandler/data')
@@ -475,18 +497,17 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
         self.signup(self.EMAIL_B, self.USERNAME_B)
         self.login(self.EMAIL_B)
         csrf_token = self.get_new_csrf_token()
-        self.preferencesDict['user_bio'] = (
+        self.preferences_dict['user_bio'] = (
             'I am not within 2000 char limit' * 200)
         user_bio_response = self.put_json(
             '/preferenceshandler/data',
             {
-                'data': self.preferencesDict
+                'data': self.preferences_dict
             },
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(user_bio_response['status_code'], 400)
         self.assertIn(
-            'Validation failed: has_length_at_most ({"max_value": 2000})'
-            'for object I am not within 2000 char limit',
+            'I am not within 2000 char limit',
             user_bio_response['error'])
         self.logout()
 
@@ -1374,7 +1395,7 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
 
 class SiteLanguageHandlerTests(test_utils.GenericTestBase):
 
-    preferencesDict = {
+    preferences_dict: PreferencesDict = {
         'preferred_language_codes': ['en'],
         'preferred_site_language_code': None,
         'preferred_audio_language_code': None,
@@ -1395,11 +1416,11 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
         """
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.preferencesDict['preferred_site_language_code'] = 'es'
+        self.preferences_dict['preferred_site_language_code'] = 'es'
         self.put_json(
             '/preferenceshandler/data',
             {
-                'data': self.preferencesDict
+                'data': self.preferences_dict
             },
             csrf_token=csrf_token)
 
