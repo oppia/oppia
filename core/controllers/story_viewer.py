@@ -138,6 +138,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         ordered_nodes: List[story_domain.StoryNode]
     ) -> Tuple[List[str], Optional[str], List[str]]:
         """Records node completion."""
+        assert self.user_id is not None
         if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
             raise self.PageNotFoundException
 
@@ -150,10 +151,8 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         next_exp_ids = []
         next_node_id = None
         if node_id not in completed_node_ids:
-            # Here we use MyPy ignore because ... confirm the behavior
-            # before merging the PR.
             story_services.record_completed_node_in_story_context(
-                self.user_id, story_id, node_id)  # type: ignore[arg-type]
+                self.user_id, story_id, node_id)
 
             completed_nodes = story_fetchers.get_completed_nodes_in_story(
                 self.user_id, story_id
@@ -170,7 +169,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     break
         return (next_exp_ids, next_node_id, completed_node_ids)
 
-    @acl_decorators.can_access_story_viewer_page
+    @acl_decorators.can_access_story_viewer_page_as_logged_in_user
     def get(self, story_id: str, node_id: str) -> None:
         """Handles GET requests."""
         (
@@ -216,7 +215,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         self.redirect(redirect_url)
 
-    @acl_decorators.can_access_story_viewer_page
+    @acl_decorators.can_access_story_viewer_page_as_logged_in_user
     def post(self, story_id: str, node_id: str) -> None:
         assert self.user_id is not None
         story = story_fetchers.get_story_by_id(story_id)

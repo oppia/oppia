@@ -277,6 +277,21 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
 
 class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
+    def test_cannot_access_story_progress_handler_if_user_is_not_logged_in(
+        self
+    ) -> None:
+        self.logout()
+        response = self.get_json(
+            '%s/staging/topic/%s/%s' % (
+                feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
+                self.NODE_ID_3),
+            expected_status_int=401
+        )
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.'
+        )
+
     def test_redirect_when_node_id_does_not_refer_to_the_first_node(
         self
     ) -> None:

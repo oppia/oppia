@@ -196,6 +196,18 @@ class MigrateStateSchemaToLatestVersion(QuestionChange):
     to_version: str
 
 
+class QuestionSuggestionChangeDict(TypedDict):
+    """Dictionary representing the QuestionSuggestionChange domain object."""
+
+    id: None
+    question_state_data: state_domain.StateDict
+    question_state_data_schema_version: int
+    language_code: str
+    version: int
+    linked_skill_ids: List[str]
+    inapplicable_skill_misconception_ids: List[str]
+
+
 class QuestionSuggestionChange(change_domain.BaseChange):
     """Domain object for changes made to question suggestion object.
 

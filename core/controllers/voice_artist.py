@@ -144,14 +144,12 @@ class StartedTranslationTutorialEventHandler(
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
-    @acl_decorators.can_play_exploration
+    @acl_decorators.can_play_exploration_as_logged_in_user
     def post(self, unused_exploration_id: str) -> None:
         """Handles POST requests."""
-        # Here we use MyPy ignore because here self.user_id can be None,
-        # and this is because decorator that allow any user to play
-        # exploration. So, confirm this behavior before merging.
+        assert self.user_id is not None
         user_services.record_user_started_state_translation_tutorial(
-            self.user_id)  # type: ignore[arg-type]
+            self.user_id)
         self.render_json({})
 
 

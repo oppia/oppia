@@ -1017,7 +1017,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion_change: Dict[
-            str, Union[str, question_domain.QuestionDict, float]
+            str, Union[str, question_domain.QuestionSuggestionChangeDict, float]
         ] = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
@@ -1028,7 +1028,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
                 'inapplicable_skill_misconception_ids': ['skillid12345-1'],
-                'id': '',
+                'id': None,
                 'version': 40
             },
             'skill_id': skill_id,
@@ -1096,7 +1096,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion_change: Dict[
-            str, Union[str, question_domain.QuestionDict, float]
+            str, Union[str, question_domain.QuestionSuggestionChangeDict, float]
         ] = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
@@ -1107,7 +1107,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
                 'inapplicable_skill_misconception_ids': ['skillid12345-1'],
-                'id': '',
+                'id': None,
                 'version': 40
             },
             'skill_id': skill_id,
@@ -1158,7 +1158,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion_change: Dict[
-            str, Union[str, question_domain.QuestionDict, float]
+            str, Union[str, question_domain.QuestionSuggestionChangeDict, float]
         ] = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
@@ -1169,7 +1169,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
                 'inapplicable_skill_misconception_ids': ['skillid12345-1'],
-                'id': '',
+                'id': None,
                 'version': 40
             },
             'skill_id': skill_id,
@@ -1219,7 +1219,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(
             skill_id, self.author_id, description='description')
         suggestion_change: Dict[
-            str, Union[str, question_domain.QuestionDict, float]
+            str, Union[str, question_domain.QuestionSuggestionChangeDict, float]
         ] = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
@@ -1230,7 +1230,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
                 'inapplicable_skill_misconception_ids': ['skillid12345-1'],
-                'id': '',
+                'id': None,
                 'version': 40
             },
             'skill_id': skill_id,
@@ -1281,7 +1281,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(
             skill_id, self.author_id, description='description')
         suggestion_change: Dict[
-            str, Union[str, question_domain.QuestionDict, float]
+            str, Union[str, question_domain.QuestionSuggestionChangeDict, float]
         ] = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
@@ -1292,7 +1292,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
                 'inapplicable_skill_misconception_ids': ['skillid12345-1'],
-                'id': '',
+                'id': None,
                 'version': 40
             },
             'skill_id': skill_id,
@@ -1350,7 +1350,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(
             skill_id, self.author_id, description='description')
         suggestion_change: Dict[
-            str, Union[str, question_domain.QuestionDict, float]
+            str, Union[str, question_domain.QuestionSuggestionChangeDict, float]
         ] = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
@@ -1361,7 +1361,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
                 'inapplicable_skill_misconception_ids': ['skillid12345-1'],
-                'id': '',
+                'id': None,
                 'version': 40
             },
             'skill_id': skill_id,
@@ -1563,7 +1563,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.save_new_skill(
             self.SKILL_ID, self.admin_id, description=self.SKILL_DESCRIPTION)
-        self.question_dict: question_domain.QuestionDict = {
+        self.question_dict: question_domain.QuestionSuggestionChangeDict = {
             'question_state_data': self._create_valid_question_data(
                 'default_state').to_dict(),
             'language_code': 'en',
@@ -1571,7 +1571,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [self.SKILL_ID],
             'inapplicable_skill_misconception_ids': ['skillid12345-1'],
-            'id': '',
+            'id': None,
             'version': 40
         }
         self.login(self.AUTHOR_EMAIL)
@@ -1789,18 +1789,18 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             },
             'next_content_id_index': 2
         }
-        question_dict: question_domain.QuestionDict = {
+        question_dict: question_domain.QuestionSuggestionChangeDict = {
             'question_state_data': question_state_dict,
             'language_code': 'en',
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [skill_id],
             'inapplicable_skill_misconception_ids': ['skillid12345-1'],
-            'id': '',
+            'id': None,
             'version': 40
         }
         suggestion_change: Dict[
-            str, Union[str, question_domain.QuestionDict, float]
+            str, Union[str, question_domain.QuestionSuggestionChangeDict, float]
         ] = {
             'cmd': (
                 question_domain
@@ -1903,7 +1903,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': ['skill_id2'],
             'inapplicable_skill_misconception_ids': [],
-            'id': '',
+            'id': None,
             'version': 40
         }
         self.login(self.AUTHOR_EMAIL)

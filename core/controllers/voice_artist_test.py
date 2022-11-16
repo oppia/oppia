@@ -320,6 +320,20 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
             % self.EXP_ID, {}, csrf_token=self.csrf_token,
             expected_status_int=200)
 
+    def test_cannot_start_translation_tutorial_if_user_is_not_logged_in(
+        self
+    ) -> None:
+        self.logout()
+        response = self.post_json(
+            '/createhandler/started_translation_tutorial_event/%s'
+            % self.EXP_ID, {}, csrf_token=self.get_new_csrf_token(),
+            expected_status_int=401
+        )
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.'
+        )
+
 
 class VoiceArtistManagementTests(test_utils.GenericTestBase):
 

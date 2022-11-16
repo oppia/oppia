@@ -39,12 +39,15 @@ from core.domain import suggestion_registry
 from core.domain import suggestion_services
 
 from typing import (
-    Any, Dict, List, Mapping, Optional, Sequence, TypedDict, TypeVar, Union
+    Dict, List, Mapping, Optional, Sequence, TypedDict, TypeVar, Union, cast
 )
 
-# Note: These private type variables are only defined to implement the Generic
-# typing structure of SuggestionsProviderHandler. So, do not make them public
-# in the future.
+# Note: These private type variables are only defined to implement
+# the Generic typing structure of SuggestionsProviderHandler, because
+# SuggestionsProviderHandler is a super-class of some other handlers
+# so to transfer the generic typing pattern of self.normalized_* to those
+# sub-handlers as well, we used generics here. So, do not make these
+# private type variables public in the future.
 _SuggestionsProviderHandlerNormalizedRequestDictType = TypeVar(
     '_SuggestionsProviderHandlerNormalizedRequestDictType')
 _SuggestionsProviderHandlerNormalizedPayloadDictType = TypeVar(
@@ -77,6 +80,26 @@ class FrontendBaseSuggestionDict(TypedDict):
     last_updated: float
     edited_by_reviewer: bool
     exploration_content_html: str
+
+
+SuggestionsProviderHandlerUrlPathArgsSchemaDictType = Dict[
+    str,
+    Dict[
+        str,
+        Union[Dict[str, str], List[str]]
+    ]
+]
+
+SuggestionsProviderHandlerArgsSchemaDictType = Dict[
+    str,
+    Dict[
+        str,
+        Dict[
+            str,
+            Optional[Dict[str, Union[str, List[Dict[str, Union[str, int]]]]]]
+        ]
+    ]
+]
 
 
 SCHEMA_FOR_SUBTITLED_HTML_DICT = {
@@ -567,14 +590,10 @@ class SuggestionsProviderHandler(
     """Provides suggestions for a user and given suggestion type."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    # Here we use type Any because the sub-classes of SuggestionsProviderHandler
-    # can contain different schemas with different types of values, like str,
-    # complex Dicts and etc.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Here we use type Any because the sub-classes of SuggestionsProviderHandler
-    # can contain different schemas with different types of values, like str,
-    # complex Dicts and etc.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {}
+    URL_PATH_ARGS_SCHEMAS: (
+        SuggestionsProviderHandlerUrlPathArgsSchemaDictType
+    ) = {}
+    HANDLER_ARGS_SCHEMAS: SuggestionsProviderHandlerArgsSchemaDictType = {}
 
     def _require_valid_suggestion_and_target_types(
         self, target_type: str, suggestion_type: str
@@ -806,13 +825,15 @@ class UserSubmittedSuggestionsHandler(
             )
         )
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-            translatable_suggestions, next_offset = (
-                suggestion_services.get_submitted_suggestions_by_offset(
-                    self.user_id,
-                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                    limit,
-                    offset
-                )
+            # Here we use cast because the above 'if' condition can only be
+            # true if suggestion_type is 'translate_content', and if the above
+            # condition is true then it guaranteed that the fetched suggestions
+            # will be of type 'SuggestionTranslateContent'. So, to narrow
+            # down the type from Sequence[BaseSuggestion] to Sequence[
+            # SuggestionTranslateContent], we have used cast here.
+            translatable_suggestions = cast(
+                Sequence[suggestion_registry.SuggestionTranslateContent],
+                suggestions
             )
             suggestions_with_translatable_exps = (
                 suggestion_services
@@ -839,17 +860,9 @@ class UserSubmittedSuggestionsHandler(
                         translatable_suggestions
                     )
                 )
-            translatable_suggestions = suggestions_with_translatable_exps
+            suggestions = suggestions_with_translatable_exps
 
-        self._render_suggestions(
-            target_type,
-            (
-                translatable_suggestions
-                if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-                else suggestions
-            ),
-            next_offset
-        )
+        self._render_suggestions(target_type, suggestions, next_offset)
 
 
 class SuggestionListHandler(
