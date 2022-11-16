@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 import logging
+import datetime
 
 from core import feconf
 from core.domain import blog_services
@@ -26,8 +27,11 @@ from core.tests import test_utils
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
+    from mypy_imports import blog_stats_models
+    from mypy_imports import blog_models
 
-(user_models,) = models.Registry.import_models([models.Names.USER])
+(user_models, blog_stats_models, blog_models) = models.Registry.import_models([
+    models.Names.USER, models.Names.BLOG_STATISTICS, models.Names.BLOG])
 
 
 class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
@@ -549,3 +553,302 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
         )
 
         self.logout()
+
+
+class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
+    """Tests for blog post stats event recording handlers."""
+
+    def setUp(self):
+        super().setUp()
+        self.signup(
+            self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        # Addition of blog admin role creates author aggregated stat models.
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.blog_admin_id = (
+            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+        self.login(self.BLOG_ADMIN_EMAIL)
+        # Publishing a blog post to create aggregated blog post stat models.
+        self.blog_post = (
+            blog_services.create_new_blog_post(self.blog_admin_id))
+
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'change_dict': {
+                'title': 'Sample Title',
+                'content': '<p>Hello<p>',
+                'tags': ['New lessons', 'Learners'],
+                'thumbnail_filename': 'file.svg'
+            },
+            'new_publish_status': True
+        }
+        self.put_json(
+            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
+            payload, csrf_token=csrf_token)
+
+        # Checking blog post is succesfully published.
+        blog_post_rights = blog_services.get_blog_post_rights(self.blog_post.id)
+        self.assertTrue(blog_post_rights.blog_post_is_published)
+
+        self.blog_post_url = (
+            blog_services.get_blog_post_by_id(self.blog_post.id)).url_fragment
+        self.logout()
+
+    def test_recording_blog_post_view_event(self) -> None:
+        self.post_json(
+            '%s/blog_post_viewed_event/%s' % 
+            (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
+        self.process_and_flush_pending_tasks()
+
+        # Check that the event model is created and aggregated stats models are
+        # updated.
+        event_models = (
+            blog_stats_models.BlogPostViewedEventLogEntryModel
+                .get_all_by_blog_post_id(self.blog_post.id))
+        self.assertEqual(len(event_models), 1)
+        aggregated_blog_stats_model = (
+            blog_stats_models.BlogPostViewsAggregatedStatsModel.get(
+                self.blog_post.id)
+        )
+        aggregated_author_stats_model = (
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
+                self.blog_admin_id)            
+        )
+        current_datetime = datetime.datetime.utcnow()
+        date_str = current_datetime.strftime('%Y-%m-%d')
+        hour_str = current_datetime.strftime('%H')
+
+        self.assertEqual(
+            aggregated_blog_stats_model.views_by_hour[date_str][hour_str], 1)
+        self.assertEqual(
+            aggregated_author_stats_model.views_by_hour[date_str][hour_str],
+            1
+        )
+        self.assertEqual(len(event_models), 1)
+
+        # Blog Post is viewed again.
+        self.post_json(
+            '%s/blog_post_viewed_event/%s' % 
+            (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
+        self.process_and_flush_pending_tasks()
+
+        # Check that the event model is created and aggregated stats models are
+        # updated.
+        event_models = (
+            blog_stats_models.BlogPostViewedEventLogEntryModel
+                .get_all_by_blog_post_id(self.blog_post.id))
+        self.assertEqual(len(event_models), 2)
+        aggregated_blog_stats_model = (
+            blog_stats_models.BlogPostViewsAggregatedStatsModel.get(
+                self.blog_post.id)
+        )
+        aggregated_author_stats_model = (
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
+                self.blog_admin_id)            
+        )
+        current_datetime = datetime.datetime.utcnow()
+        date_str = current_datetime.strftime('%Y-%m-%d')
+        hour_str = current_datetime.strftime('%H')
+
+        self.assertEqual(
+            aggregated_blog_stats_model.views_by_hour[date_str][hour_str], 2)
+        self.assertEqual(
+            aggregated_author_stats_model.views_by_hour[date_str][hour_str],
+            2
+        )
+
+    def test_record_blog_post_view_event_with_deleted_blog_post(self) -> None:
+        blog_post_model = blog_models.BlogPostModel.get(self.blog_post.id)
+        blog_post_model.deleted = True
+        blog_post_model.update_timestamps()
+        blog_post_model.put()
+    
+        self.post_json(
+            '%s/blog_post_viewed_event/%s' % 
+            (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url),
+            {},
+            expected_status_int=404)
+        self.process_and_flush_pending_tasks()
+
+    def test_record_blog_post_view_event_with_invalid_blog_post_id(
+        self
+    ) -> None:
+        self.post_json(
+            '%s/blog_post_viewed_event/%s' % 
+            (feconf.BLOG_HOMEPAGE_DATA_URL, 'invalidblogPostId'),
+            {},
+            expected_status_int=404)
+
+
+    def test_recording_blog_post_read_event(self) -> None:
+        self.post_json(
+            '%s/blog_post_read_event/%s' % 
+            (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
+        self.process_and_flush_pending_tasks()
+
+        # Check that the event model is created and aggregated stats models are
+        # updated.
+        event_models = (
+            blog_stats_models.BlogPostReadEventLogEntryModel
+                .get_all_by_blog_post_id(self.blog_post.id))
+        self.assertEqual(len(event_models), 1)
+        aggregated_blog_stats_model = (
+            blog_stats_models.BlogPostReadsAggregatedStatsModel.get(
+                self.blog_post.id)
+        )
+        aggregated_author_stats_model = (
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
+                self.blog_admin_id)            
+        )
+        current_datetime = datetime.datetime.utcnow()
+        date_str = current_datetime.strftime('%Y-%m-%d')
+        hour_str = current_datetime.strftime('%H')
+
+        self.assertEqual(
+            aggregated_blog_stats_model.reads_by_hour[date_str][hour_str], 1)
+        self.assertEqual(
+            aggregated_author_stats_model.reads_by_hour[date_str][hour_str],
+            1
+        )
+        self.assertEqual(len(event_models), 1)
+
+        # Blog Post is read again.
+        self.post_json(
+            '%s/blog_post_read_event/%s' % 
+            (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
+        self.process_and_flush_pending_tasks()
+
+        # Check that the event model is created and aggregated stats models are
+        # updated.
+        event_models = (
+            blog_stats_models.BlogPostReadEventLogEntryModel
+                .get_all_by_blog_post_id(self.blog_post.id))
+        self.assertEqual(len(event_models), 2)
+        aggregated_blog_stats_model = (
+            blog_stats_models.BlogPostReadsAggregatedStatsModel.get(
+                self.blog_post.id)
+        )
+        aggregated_author_stats_model = (
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
+                self.blog_admin_id)            
+        )
+        current_datetime = datetime.datetime.utcnow()
+        date_str = current_datetime.strftime('%Y-%m-%d')
+        hour_str = current_datetime.strftime('%H')
+
+        self.assertEqual(
+            aggregated_blog_stats_model.reads_by_hour[date_str][hour_str], 2)
+        self.assertEqual(
+            aggregated_author_stats_model.reads_by_hour[date_str][hour_str],
+            2
+        )
+
+    def test_record_blog_post_read_event_with_deleted_blog_post(self) -> None:
+        blog_post_model = blog_models.BlogPostModel.get(self.blog_post.id)
+        blog_post_model.deleted = True
+        blog_post_model.update_timestamps()
+        blog_post_model.put()
+    
+        self.post_json(
+            '%s/blog_post_read_event/%s' % 
+            (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url),
+            {},
+            expected_status_int=404)
+        self.process_and_flush_pending_tasks()
+
+    def test_record_blog_post_read_event_with_invalid_blog_post_id(
+        self
+    ) -> None:
+        self.post_json(
+            '%s/blog_post_read_event/%s' % 
+            (feconf.BLOG_HOMEPAGE_DATA_URL, 'invalidblogPostId'),
+            {},
+            expected_status_int=404)
+
+
+    def test_recording_blog_post_exited_event(self) -> None:
+        payload = {
+            'time_taken_to_read_blog_post': 3.07
+        }
+        self.post_json(
+            '%s/blog_post_exited_event/%s' % 
+            (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), payload)
+        self.process_and_flush_pending_tasks()
+
+        # Check that the event model is created and aggregated stats models are
+        # updated.
+        event_models = (
+            blog_stats_models.BlogPostExitedEventLogEntryModel
+                .get_all_by_blog_post_id(self.blog_post.id))
+        self.assertEqual(len(event_models), 1)
+        aggregated_blog_stats_model = (
+            blog_stats_models.BlogPostReadingTimeModel.get(
+                self.blog_post.id)
+        )
+        aggregated_author_stats_model = (
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
+                self.blog_admin_id)            
+        )
+
+        self.assertEqual(
+            aggregated_blog_stats_model.three_to_four_min, 1)
+        self.assertEqual(
+            aggregated_author_stats_model.three_to_four_min, 1)
+
+        # Blog Post is exited again.
+        payload = {
+            'time_taken_to_read_blog_post': 3.55
+        }
+        self.post_json(
+            '%s/blog_post_exited_event/%s' % 
+            (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), payload)
+        self.process_and_flush_pending_tasks()
+
+        # Check that the event model is created and aggregated stats models are
+        # updated.
+        event_models = (
+            blog_stats_models.BlogPostExitedEventLogEntryModel
+                .get_all_by_blog_post_id(self.blog_post.id))
+        self.assertEqual(len(event_models), 2)
+        aggregated_blog_stats_model = (
+            blog_stats_models.BlogPostReadingTimeModel.get(
+                self.blog_post.id)
+        )
+        aggregated_author_stats_model = (
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
+                self.blog_admin_id)            
+        )
+
+        self.assertEqual(
+            aggregated_blog_stats_model.three_to_four_min, 2)
+        self.assertEqual(
+            aggregated_author_stats_model.three_to_four_min, 2)
+
+    def test_record_blog_post_exited_event_with_deleted_blog_post(self) -> None:
+        payload = {
+            'time_taken_to_read_blog_post': 3.07
+        }
+        blog_post_model = blog_models.BlogPostModel.get(self.blog_post.id)
+        blog_post_model.deleted = True
+        blog_post_model.update_timestamps()
+        blog_post_model.put()
+    
+        self.post_json(
+            '%s/blog_post_exited_event/%s' % 
+            (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url),
+            payload,
+            expected_status_int=404)
+        self.process_and_flush_pending_tasks()
+
+    def test_record_blog_post_exited_event_with_invalid_blog_post_id(
+        self
+    ) -> None:
+        payload = {
+            'time_taken_to_read_blog_post': 3.07
+        }
+        self.post_json(
+            '%s/blog_post_exited_event/%s' % 
+            (feconf.BLOG_HOMEPAGE_DATA_URL, 'invalidblogPostId'),
+            payload,
+            expected_status_int=404
+        )

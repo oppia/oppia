@@ -27,6 +27,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import blog_domain
+from core.domain import blog_statistics_services
 from core.domain import html_cleaner
 from core.domain import role_services
 from core.domain import search_services
@@ -493,6 +494,13 @@ def publish_blog_post(blog_post_id: str) -> None:
         published_on = datetime.datetime.utcnow()
         blog_post.published_on = published_on
         blog_post_summary.published_on = published_on
+        (
+            blog_statistics_services
+                .create_aggregated_stats_models_for_newly_published_blog_post(
+                    blog_post_id
+                )
+        )
+
 
     save_blog_post_rights(blog_post_rights)
     _save_blog_post_summary(blog_post_summary)

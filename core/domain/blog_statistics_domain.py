@@ -20,8 +20,12 @@ from __future__ import annotations
 
 import datetime
 
+from core import utils
+
 from typing import List, Optional, TypedDict, Dict, Union
 
+# This is same as base_models.ID_Length.
+BLOG_POST_ID_LENGTH = 12
 
 def _repack_views_stats(
     stats: Union[
@@ -41,6 +45,7 @@ def _repack_views_stats(
         BlogPostViewsAggregatedStats | AuthorBlogPostViewsAggregatedStats. A
         repacked stats domain object with only necessary aggregated stats.
     """
+    print(stats)
     stats.views_by_date = {
         k: stats.views_by_date[k] for k in list(stats.views_by_date)[:3]
     }
@@ -93,20 +98,23 @@ def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
         dict. A dict with number of views keyed to hour('HH') in UTC fromat for
         the past twenty four hours.
     """
-    current_hour = datetime.datetime.utcnow().strftime('%H')
+    current_hour = datetime.datetime.utcnow().hour
     current_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
     yesterdays_date = (
         datetime.datetime.utcnow() - datetime.timedelta(days = 1)
     ).strftime('%Y-%m-%d')
     deficit_hours_in_current_date = 24 - current_hour - 1
-    yesterday_stats = stats.views_by_hour[yesterdays_date]
+    hourly_stats = {}
+    if yesterdays_date in stats.views_by_hour.keys():
+        yesterday_stats = stats.views_by_hour[yesterdays_date]
+        hourly_stats = {
+            k: yesterday_stats[k] for k in list(
+                yesterday_stats)[-deficit_hours_in_current_date:]
+        }
     todays_stats = stats.views_by_hour[current_date]
-    hourly_stats =  {
-        k: yesterday_stats[k] for k in list(
-            yesterday_stats)[-deficit_hours_in_current_date:]
-    } | {
-        k: todays_stats[k] for k in list(todays_stats)[current_hour+1]
-    }
+    hourly_stats.update({
+        k: todays_stats[k] for k in list(todays_stats)[:current_hour+1]
+    })
     return hourly_stats
 
 def _generate_past_week_views_stats_from_views_by_date(
@@ -127,7 +135,7 @@ def _generate_past_week_views_stats_from_views_by_date(
     """
     current_month_year = datetime.datetime.utcnow().strftime('%Y-%m')
     current_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
-    current_day = int(datetime.datetime.utcnow().strftime('%d'))
+    current_day = datetime.datetime.utcnow().day
     current_month_stats = stats.views_by_date[current_month_year]
     weekly_stats = {}
     if current_day < 7:
@@ -137,12 +145,17 @@ def _generate_past_week_views_stats_from_views_by_date(
         last_month_stats = stats.views_by_date[last_month_year]
         weekly_stats = { 
             k: last_month_stats[k] for k in list(
-                last_month_stats)[-(7-current_date):]
+                last_month_stats)[-(7-current_day):]
         }
-    weekly_stats = weekly_stats | {
+        weekly_stats.update({
         k: current_month_stats[k] for k in list(
             current_month_stats)[:current_day]
-    }
+        })
+    else:
+        weekly_stats.update({
+            k: current_month_stats[k] for k in list(
+                current_month_stats)[current_day-7:current_day]
+        })
     return weekly_stats
 
 
@@ -163,6 +176,7 @@ def _generate_monthly_views_from_views_by_date(
         the ongoing month.
     """
     current_month_year = datetime.datetime.utcnow().strftime('%Y-%m')
+    current_day = datetime.datetime.utcnow().day
     return stats.views_by_date[current_month_year]
 
 
@@ -203,20 +217,23 @@ def _generate_past_twenty_four_hour_reads_stats_from_reads_by_hour(
         dict. A dict with number of reads keyed to hour('HH') in UTC fromat for
         the past twenty four hours.
     """
-    current_hour = datetime.datetime.utcnow().strftime('%H')
+    current_hour = datetime.datetime.utcnow().hour
     current_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
     yesterdays_date = (
         datetime.datetime.utcnow() - datetime.timedelta(days = 1)
     ).strftime('%Y-%m-%d')
     deficit_hours_in_current_date = 24 - current_hour - 1
-    yesterday_stats = stats.reads_by_hour[yesterdays_date]
+    hourly_stats = {}
+    if yesterdays_date in stats.reads_by_hour.keys():
+        yesterday_stats = stats.reads_by_hour[yesterdays_date]
+        hourly_stats =  {
+            k: yesterday_stats[k] for k in list(
+                yesterday_stats)[-deficit_hours_in_current_date:]
+        }
     todays_stats = stats.reads_by_hour[current_date]
-    hourly_stats =  {
-        k: yesterday_stats[k] for k in list(
-            yesterday_stats)[-deficit_hours_in_current_date:]
-    } | {
-        k: todays_stats[k] for k in list(todays_stats)[current_hour+1]
-    }
+    hourly_stats.update({
+        k: todays_stats[k] for k in list(todays_stats)[:current_hour+1]
+    })
     return hourly_stats
 
 def _generate_past_week_reads_stats_from_reads_by_date(
@@ -237,7 +254,7 @@ def _generate_past_week_reads_stats_from_reads_by_date(
     """
     current_month_year = datetime.datetime.utcnow().strftime('%Y-%m')
     current_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
-    current_day = int(datetime.datetime.utcnow().strftime('%d'))
+    current_day = datetime.datetime.utcnow().day
     current_month_stats = stats.reads_by_date[current_month_year]
     weekly_stats = {}
     if current_day < 7:
@@ -249,10 +266,15 @@ def _generate_past_week_reads_stats_from_reads_by_date(
             k: last_month_stats[k] for k in list(
                 last_month_stats)[-(7-current_date):]
         }
-    weekly_stats = weekly_stats | {
-        k: current_month_stats[k] for k in list(
-            current_month_stats)[:current_day]
-    }
+        weekly_stats.update({
+            k: current_month_stats[k] for k in list(
+                current_month_stats)[:current_day]
+        })
+    else:
+        weekly_stats.update({
+            k: current_month_stats[k] for k in list(
+                current_month_stats)[current_day-7:current_day]
+        })
     return weekly_stats
 
 
@@ -273,6 +295,7 @@ def _generate_monthly_reads_from_reads_by_date(
         the ongoing month.
     """
     current_month_year = datetime.datetime.utcnow().strftime('%Y-%m')
+    current_day = datetime.datetime.utcnow().day
     return stats.reads_by_date[current_month_year]
 
 
@@ -404,7 +427,7 @@ class BlogPostViewsAggregatedStats:
         self.views_by_month = views_by_month
         self.created_on = created_on
 
-    @classmethod
+
     def repack_stats(self) -> BlogPostViewsAggregatedStats:
         """Repacks stats to contain only required aggregated stats removing old
         stats.
@@ -434,6 +457,26 @@ class BlogPostViewsAggregatedStats:
             'all_views': self.views_by_month,
         }
         return stats_dict
+
+
+    def validate(self) -> None:
+        """Checks whether the blog post id is a valid one.
+
+        Raises:
+            ValidationError. No blog_post_id specified
+            ValidationError. The blog_post_id is not a string.
+            ValidationError. The blog_post_id is invalid.
+        """
+        if not self.blog_post_id:
+            raise utils.ValidationError('No blog_post_id specified')
+
+        if not isinstance(self.blog_post_id, str):
+            raise utils.ValidationError(
+                'Blog Post ID must be a string, but got %r' % self.blog_post_id)
+
+        if len(self.blog_post_id) != BLOG_POST_ID_LENGTH:
+            raise utils.ValidationError(
+                'Blog ID %s is invalid' % self.blog_post_id)
 
 
 class BlogPostReadsAggregatedStats:
@@ -470,7 +513,7 @@ class BlogPostReadsAggregatedStats:
         self.reads_by_month = reads_by_month
         self.created_on = created_on
 
-    @classmethod
+
     def repack_stats(self) -> BlogPostReadsAggregatedStats:
         """Repacks stats to contain only required aggregated stats removing old
         stats.
@@ -501,6 +544,25 @@ class BlogPostReadsAggregatedStats:
         }
         return stats_dict
 
+
+    def validate(self) -> None:
+        """Checks whether the blog post id is a valid one.
+
+        Raises:
+            ValidationError. No blog_post_id specified
+            ValidationError. The blog_post_id is not a string.
+            ValidationError. The blog_post_id is invalid.
+        """
+        if not self.blog_post_id:
+            raise utils.ValidationError('No blog_post_id specified')
+
+        if not isinstance(self.blog_post_id, str):
+            raise utils.ValidationError(
+                'Blog Post ID must be a string, but got %r' % self.blog_post_id)
+
+        if len(self.blog_post_id) != BLOG_POST_ID_LENGTH:
+            raise utils.ValidationError(
+                'Blog ID %s is invalid' % self.blog_post_id)
 
 class BlogPostReadingTime:
     """Domain object representing blog post reading time model."""
@@ -548,17 +610,17 @@ class BlogPostReadingTime:
                 to read the blog post.
         """
         self.blog_post_id = blog_post_id
-        self.zero_to_one_min = zero_to_one_min,
-        self.one_to_two_min = one_to_two_min,
-        self.two_to_three_min = two_to_three_min,
-        self.three_to_four_min = three_to_four_min,
-        self.four_to_five_min = four_to_five_min,
-        self.five_to_six_min = five_to_six_min,
-        self.six_to_seven_min = six_to_seven_min,
-        self.seven_to_eight_min = seven_to_eight_min,
-        self.eight_to_nine_min = eight_to_nine_min,
-        self.nine_to_ten_min = nine_to_ten_min,
-        self.more_than_ten_min = more_than_ten_min,
+        self.zero_to_one_min = zero_to_one_min
+        self.one_to_two_min = one_to_two_min
+        self.two_to_three_min = two_to_three_min
+        self.three_to_four_min = three_to_four_min
+        self.four_to_five_min = four_to_five_min
+        self.five_to_six_min = five_to_six_min
+        self.six_to_seven_min = six_to_seven_min
+        self.seven_to_eight_min = seven_to_eight_min
+        self.eight_to_nine_min = eight_to_nine_min
+        self.nine_to_ten_min = nine_to_ten_min
+        self.more_than_ten_min = more_than_ten_min
 
     def to_frontend_dict(self) -> BlogPostReadingTimeDict:
         """Returns a dict representation of the domain object for use in the
@@ -582,6 +644,27 @@ class BlogPostReadingTime:
             'more_than_ten_min': self.more_than_ten_min,
         }
         return stats_dict
+
+
+    def validate(self) -> None:
+        """Checks whether the blog post id is a valid one.
+
+        Raises:
+            ValidationError. No blog_post_id specified
+            ValidationError. The blog_post_id is not a string.
+            ValidationError. The blog_post_id is invalid.
+        """
+        if not self.blog_post_id:
+            raise utils.ValidationError('No blog_post_id specified')
+
+        if not isinstance(self.blog_post_id, str):
+            raise utils.ValidationError(
+                'Blog Post ID must be a string, but got %r' % self.blog_post_id)
+
+        if len(self.blog_post_id) != BLOG_POST_ID_LENGTH:
+            raise utils.ValidationError(
+                'Blog ID %s is invalid' % self.blog_post_id)
+
 
 
 class AuthorBlogPostViewsAggregatedStats:
@@ -621,7 +704,6 @@ class AuthorBlogPostViewsAggregatedStats:
         self.views_by_month = views_by_month
         self.created_on = created_on
 
-    @classmethod
     def repack_stats(self) -> AuthorBlogPostViewsAggregatedStats:
         """Repacks stats to contain only required aggregated stats removing old
         stats.
@@ -649,6 +731,26 @@ class AuthorBlogPostViewsAggregatedStats:
             'all_views': self.views_by_month,
         }
         return stats_dict
+
+
+    def validate(self) -> None:
+        """Checks whether the blog post id is a valid one.
+
+        Raises:
+            ValidationError. No author_id specified
+            ValidationError. The author_id is not a string.
+            ValidationError. The author_id has invalid format.
+        """
+        if not self.author_id:
+            raise utils.ValidationError('No author_id specified')
+
+        if not isinstance(self.author_id, str):
+            raise utils.ValidationError(
+                'Author ID must be a string, but got %r' % self.author_id)
+
+        if not utils.is_user_id_valid(self.author_id):
+            raise utils.ValidationError(
+                'author_id=%r has the wrong format' % self.author_id)
 
 
 class AuthorBlogPostReadsAggregatedStats:
@@ -688,7 +790,6 @@ class AuthorBlogPostReadsAggregatedStats:
         self.reads_by_month = reads_by_month
         self.created_on = created_on
 
-    @classmethod
     def repack_stats(self) -> AuthorBlogPostReadsAggregatedStats:
         """Repacks stats to contain only required aggregated stats removing old
         stats.
@@ -722,6 +823,25 @@ class AuthorBlogPostReadsAggregatedStats:
         }
         return stats_dict
 
+
+    def validate(self) -> None:
+        """Checks whether the blog post id is a valid one.
+
+        Raises:
+            ValidationError. No author_id specified
+            ValidationError. The author_id is not a string.
+            ValidationError. The author_id has invalid format.
+        """
+        if not self.author_id:
+            raise utils.ValidationError('No author_id specified')
+
+        if not isinstance(self.author_id, str):
+            raise utils.ValidationError(
+                'Author ID must be a string, but got %r' % self.author_id)
+
+        if not utils.is_user_id_valid(self.author_id):
+            raise utils.ValidationError(
+                'author_id=%r has the wrong format' % self.author_id)
 
 class AuthorBlogPostsReadingTime:
     """Domain object representing author blog post reading time model."""
@@ -769,17 +889,17 @@ class AuthorBlogPostsReadingTime:
                 to read the blog posts written by the author.
         """
         self.author_id = author_id
-        self.zero_to_one_min = zero_to_one_min,
-        self.one_to_two_min = one_to_two_min,
-        self.two_to_three_min = two_to_three_min,
-        self.three_to_four_min = three_to_four_min,
-        self.four_to_five_min = four_to_five_min,
-        self.five_to_six_min = five_to_six_min,
-        self.six_to_seven_min = six_to_seven_min,
-        self.seven_to_eight_min = seven_to_eight_min,
-        self.eight_to_nine_min = eight_to_nine_min,
-        self.nine_to_ten_min = nine_to_ten_min,
-        self.more_than_ten_min = more_than_ten_min,
+        self.zero_to_one_min = zero_to_one_min
+        self.one_to_two_min = one_to_two_min
+        self.two_to_three_min = two_to_three_min
+        self.three_to_four_min = three_to_four_min
+        self.four_to_five_min = four_to_five_min
+        self.five_to_six_min = five_to_six_min
+        self.six_to_seven_min = six_to_seven_min
+        self.seven_to_eight_min = seven_to_eight_min
+        self.eight_to_nine_min = eight_to_nine_min
+        self.nine_to_ten_min = nine_to_ten_min
+        self.more_than_ten_min = more_than_ten_min
 
     def to_frontend_dict(self) -> AuthorBlogPostReadingTimeDict:
         """Returns a dict representation of the domain object for use in the
@@ -805,12 +925,21 @@ class AuthorBlogPostsReadingTime:
         return stats_dict
 
 
+    def validate(self) -> None:
+        """Checks whether the author id is a valid one.
 
+        Raises:
+            ValidationError. No author_id specified
+            ValidationError. The author_id is not a string.
+            ValidationError. The author_id has invalid format.
+        """
+        if not self.author_id:
+            raise utils.ValidationError('No author_id specified')
 
+        if not isinstance(self.author_id, str):
+            raise utils.ValidationError(
+                'Author ID must be a string, but got %r' % self.author_id)
 
-    
-
-
-
-
-
+        if not utils.is_user_id_valid(self.author_id):
+            raise utils.ValidationError(
+                'author_id=%r has the wrong format' % self.author_id)

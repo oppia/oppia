@@ -486,7 +486,7 @@ class BlogPostSearchHandler(
         self.render_json(self.values)
 
 
-class BlogPostViewsStatisticsDataHandler(base.BaseHandler):
+class BlogPostViewedEventHandler(base.BaseHandler):
     """Handles blog post viewed event coming in from the frontend."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
@@ -503,7 +503,9 @@ class BlogPostViewsStatisticsDataHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {}
+    }
 
     @acl_decorators.open_access
     def post(self, blog_post_url):
@@ -521,7 +523,7 @@ class BlogPostViewsStatisticsDataHandler(base.BaseHandler):
         self.render_json({})
 
 
-class BlogPostReadStatisticsDataHandler(base.BaseHandler):
+class BlogPostReadEventHandler(base.BaseHandler):
     """Handles blog post read event coming in from the frontend."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
@@ -538,8 +540,9 @@ class BlogPostReadStatisticsDataHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {}
-
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {}
+    }
     @acl_decorators.open_access
     def post(self, blog_post_url):
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
@@ -556,7 +559,7 @@ class BlogPostReadStatisticsDataHandler(base.BaseHandler):
         self.render_json({})
 
 
-class BlogPostExitedStatisticsDataHandler(base.BaseHandler):
+class BlogPostExitedEventHandler(base.BaseHandler):
     """Handles blog post exited event coming in from the frontend."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False

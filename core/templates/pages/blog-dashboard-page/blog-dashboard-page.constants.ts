@@ -25,7 +25,7 @@ export const BlogDashboardPageConstants = {
     '/blogdashboardhandler/stats/data/<blog_post_id>/<chart_type>'),
 
   AUTHOR_STATS_DATA_URL_TEMPLATE: (
-    '/blogdashboardhandler/stats/data/<chart_type>'),
+    '/blogdashboardhandler/authorstats/data/<chart_type>'),
 
   BLOG_DASHBOARD_TAB_URLS: {
     PUBLISHED: '#/published',
@@ -40,8 +40,28 @@ export const BlogDashboardPageConstants = {
   },
 
   STATS_CHART_TYPES: {
-    VIEWS_CHART: 'views_chart',
-    READS_CHART: 'reads_chart',
+    VIEWS_CHART: 'views',
+    READS_CHART: 'reads',
     READING_TIME: 'reading_time'
+  },
+
+  STATS_CHART_LABLES: {
+    VIEWS_CHART: 'views',
+    READS_CHART: 'reads',
+    READING_TIME: 'number Of users'
+  },
+
+  READING_TIME_BUCKET_KEYS_TO_DISPLAY: {
+    zeroToOneMin: '< 1',
+    oneToTwoMin: '1 to 2',
+    twoToThreeMin: '2 to 3',
+    threeToFourMin: '3 to 4',
+    fourToFiveMin: '4 to 5',
+    fiveToSixMin: '5 to 6',
+    sixToSevenMin: '6 to 7',
+    sevenToEightMin: '7 to 8',
+    eightToNineMin: '8 to 9',
+    nineToTenMin: '9 to 10',
+    moreThanTenMin: '10+',
   }
 } as const;

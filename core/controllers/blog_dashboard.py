@@ -371,8 +371,8 @@ class BlogDashboardBlogPostStatisticsHandler(base.BaseHandler):
             'schema': {
                 'type': 'basestring',
                 'choices': [
-                    'views_chart',
-                    'reads_chart',
+                    'views',
+                    'reads',
                     'reading_time'
                 ]
             }
@@ -385,14 +385,14 @@ class BlogDashboardBlogPostStatisticsHandler(base.BaseHandler):
     @acl_decorators.can_access_blog_dashboard
     def get(self, blog_post_id: str, chart_type: str) -> None:
         """Populates the data for generating statistics plot."""
-        if chart_type == 'views_chart':
+        if chart_type == 'views':
             stats = blog_statistics_services.get_blog_post_views_stats_by_id(
                 blog_post_id
             )
             blog_statistics_services.add_missing_stat_keys_with_default_values_in_views_stats( # pylint: disable=line-too-long
                 stats
             )
-        elif chart_type == 'reads_chart':
+        elif chart_type == 'reads':
             stats = blog_statistics_services.get_blog_post_reads_stats_by_id(
                 blog_post_id
             )
@@ -424,8 +424,8 @@ class BlogDashboardAuthorBlogPostsStatisticsHandler(base.BaseHandler):
             'schema': {
                 'type': 'basestring',
                 'choices': [
-                    'views_chart',
-                    'reads_chart',
+                    'views',
+                    'reads',
                     'reading_time'
                 ]
             }
@@ -439,7 +439,7 @@ class BlogDashboardAuthorBlogPostsStatisticsHandler(base.BaseHandler):
     def get(self, chart_type: str) -> None:
         """Populates the data for generating author statistics plot."""
         author_id = self.user_id
-        if chart_type == 'views_chart':
+        if chart_type == 'views':
             stats = (
                 blog_statistics_services.get_author_blog_post_views_stats_by_id(
                     author_id
@@ -448,7 +448,7 @@ class BlogDashboardAuthorBlogPostsStatisticsHandler(base.BaseHandler):
             blog_statistics_services.add_missing_stat_keys_with_default_values_in_views_stats( # pylint: disable=line-too-long
                 stats
             )
-        elif chart_type == 'reads_chart':
+        elif chart_type == 'reads':
             stats = (
                 blog_statistics_services.get_author_blog_post_reads_stats_by_id(
                     author_id

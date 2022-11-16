@@ -55,7 +55,7 @@
           <ng-template mat-tab-label>
             {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase }} ({{ blogDashboardData.numOfDraftBlogPosts }})
           </ng-template>
-          <div class="justify-content-end d-flex" *ngIf="!windowIsNarrow">
+          <div class="justify-content-end d-flex tiles-view-button-container" *ngIf="!windowIsNarrow">
             <button mat-icon-button (click)="activeView = 'gridView'" class="e2e-test-tiles-view-button">
               <i [ngClass]="{'view-active': activeView === 'gridView'}" class="fas fa-border-all blog-dashboard-grid-list-icon"></i>
             </button>
@@ -87,7 +87,7 @@
           <ng-template mat-tab-label class="e2e-test-publish-tab-button">
             {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase }} ({{ blogDashboardData.numOfPublishedBlogPosts }})
           </ng-template>
-          <div class="justify-content-end d-flex" *ngIf="!windowIsNarrow">
+          <div class="justify-content-end d-flex tiles-view-button-container" *ngIf="!windowIsNarrow">
             <button mat-icon-button (click)="activeView = 'gridView'" class="e2e-test-tiles-view-button">
               <i [ngClass]="{'view-active': activeView === 'gridView'}" class="fas fa-border-all blog-dashboard-grid-list-icon"></i>
             </button>
@@ -116,12 +116,14 @@
             </mat-list-item>
           </mat-list>
         </mat-tab>
-        <mat-tab class="blog-statistics-tab-container">
+        <mat-tab class="blog-statistics-tab-container" >
           <ng-template mat-tab-label>
             {{ 'I18N_BLOG_DASHBOARD_TAB_STATISTICS' | translate | uppercase }}
           </ng-template>
-          <oppia-blog-statistics-tab>
-          </oppia-blog-statistics-tab>
+          <ng-template matTabContent>
+            <oppia-blog-statistics-tab [publishedBlogPostList]="blogDashboardData.publishedBlogPostSummaryDicts">
+            </oppia-blog-statistics-tab>
+          </ng-template>
         </mat-tab>
       </mat-tab-group>
     </mat-card-content>
@@ -131,7 +133,7 @@
 </oppia-blog-post-editor>
 <style>
   .blog-dashboard-card {
-    max-width: 835px;
+    max-width: 970px;
     padding-bottom: 100px;
   }
 
@@ -291,6 +293,8 @@
 
   mat-card-header.blog-dashboard-header {
     margin: 3.75vw 3.438vw;
+    padding-right: 45px;
+    padding-left: 35px;
   }
 
   @media(max-width: 870px) {
@@ -343,10 +347,25 @@
     }
   }
 
-  @media(min-width: 880px) {
-    :host /deep/ .blog-statistics-tab-container .mat-tab-body-wrapper {
-    margin-left: -35px;
-    margin-right: -45px;
+  @media(min-width: 880px) {  
+    .mat-card.oppia-page-card {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    :host /deep/ .mat-tab-header {
+      margin-left: 35px;
+      margin-right: 45px;
+    }
+
+    .tiles-view-button-container {
+      padding-left: 35px;
+      padding-right: 45px;
+    }
+
+    .blog-dashboard-tiles-container {
+      padding-left: 35px;
+      padding-right: 45px;
     }
   }
 

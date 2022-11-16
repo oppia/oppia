@@ -406,11 +406,13 @@ def generate_stats_by_hour_dict() -> Dict[str, int]:
     Returns:
         dict. A dict containing hours in UTC format as keys with 0 as value.
     """
-    return {
+    intial_dict ={
         '0' +  str(i): 0 for i in range(0,10)
-    } | {
-        str(i): 0 for i in range(10, 25)
     }
+    intial_dict.update({
+        str(i): 0 for i in range(10, 24)
+    })
+    return intial_dict
 
 def generate_stats_by_month_dict() -> Dict[str, int]:
     """Generates default stats by month dict.
@@ -418,11 +420,13 @@ def generate_stats_by_month_dict() -> Dict[str, int]:
     Returns:
         dict. A dict containing months in UTC format as keys with 0 as value.
     """
-    return {
-        '0' +  str(i): 0 for i in range(0,10)
-    } | {
-        str(i): 0 for i in range(10, 13)
+    initial_dict = {
+        '0' +  str(i): 0 for i in range(1,10)
     }
+    initial_dict.update({
+        str(i): 0 for i in range(10, 13)
+    })
+    return initial_dict
 
 def generate_stats_by_date_dict(month: int, year: int) -> Dict[str, int]:
     """Generates default stats by date dict for the given month.
@@ -432,11 +436,14 @@ def generate_stats_by_date_dict(month: int, year: int) -> Dict[str, int]:
         with 0 as value.
     """
     num_of_days_in_given_month = calendar.monthrange(year, month)[1]
-    return {
-        '0' +  str(i): 0 for i in range(0,10)
-    } | {
-        str(i): 0 for i in range(10, num_of_days_in_given_month+1)
+    initial_dict  = {
+        '0' +  str(i): 0 for i in range(1,10)
     }
+    initial_dict.update({
+        str(i): 0 for i in range(10, num_of_days_in_given_month+1)
+    })
+    return initial_dict
+
 
 
 def update_views_stats(
@@ -516,22 +523,20 @@ def _update_views_stats_transactional(
         raise Exception(
             'AuthorBlogPostViewsStatsModel id="%s" does not exist' % (author_id)
         )
-
-    current_date = get_current_date_as_string()
-    current_datetime_obj = parse_date_from_datetime(
-        datetime.datetime.utcnow())
-    current_day = current_datetime_obj.day
-    current_hour = current_datetime_obj.hour
-    current_month =current_datetime_obj.month
-    current_year = current_datetime_obj.year
+    current_datetime = datetime.datetime.utcnow();
+    current_date = parse_date_as_string(current_datetime)
+    current_day = current_datetime.strftime('%d')
+    current_month = current_datetime.strftime('%m')
+    current_year = current_datetime.strftime('%Y')
     current_month_year = current_year + '-' + current_month
+    current_hour = current_datetime.strftime('%H')
 
     add_missing_stat_keys_with_default_values_in_views_stats(
         blog_post_views_stats
     )
     blog_post_views_stats.views_by_hour[current_date][current_hour] += 1
     blog_post_views_stats.views_by_date[current_month_year][current_day] += 1
-    blog_post_views_stats.views_by_month[current_year] += 1
+    blog_post_views_stats.views_by_month[current_year][current_month] += 1
 
     add_missing_stat_keys_with_default_values_in_views_stats(
         author_blog_post_views_stats
@@ -539,7 +544,8 @@ def _update_views_stats_transactional(
     author_blog_post_views_stats.views_by_hour[current_date][current_hour] += 1
     author_blog_post_views_stats.views_by_date[
         current_month_year][current_day] += 1
-    author_blog_post_views_stats.views_by_month[current_year] += 1
+    author_blog_post_views_stats.views_by_month[
+        current_year][current_month] += 1
     
     blog_post_views_stats.repack_stats()
     author_blog_post_views_stats.repack_stats()
@@ -578,28 +584,27 @@ def _update_reads_stats_transactional(
         raise Exception(
             'AuthorBlogPostReadsStatsModel id="%s" does not exist' % (author_id)
         )
-
-    current_date = get_current_date_as_string()
-    current_datetime_obj = parse_date_from_datetime(
-        datetime.datetime.utcnow())
-    current_day = current_datetime_obj.day
-    current_hour = current_datetime_obj.hour
-    current_month =current_datetime_obj.month
-    current_year = current_datetime_obj.year
+    current_datetime = datetime.datetime.utcnow();
+    current_date = parse_date_as_string(current_datetime)
+    current_day = current_datetime.strftime('%d')
+    current_month = current_datetime.strftime('%m')
+    current_year = current_datetime.strftime('%Y')
     current_month_year = current_year + '-' + current_month
+    current_hour = current_datetime.strftime('%H')
 
     add_missing_stat_keys_with_default_values_in_reads_stats(
         blog_post_reads_stats)
-    blog_post_reads_stats.views_by_hour[current_date][current_hour] += 1
-    blog_post_reads_stats.views_by_date[current_month_year][current_day] += 1
-    blog_post_reads_stats.views_by_month[current_year] += 1
+    blog_post_reads_stats.reads_by_hour[current_date][current_hour] += 1
+    blog_post_reads_stats.reads_by_date[current_month_year][current_day] += 1
+    blog_post_reads_stats.reads_by_month[current_year][current_month] += 1
 
     add_missing_stat_keys_with_default_values_in_reads_stats(
         author_blog_post_reads_stats)
-    author_blog_post_reads_stats.views_by_hour[current_date][current_hour] += 1
-    author_blog_post_reads_stats.views_by_date[
+    author_blog_post_reads_stats.reads_by_hour[current_date][current_hour] += 1
+    author_blog_post_reads_stats.reads_by_date[
         current_month_year][current_day] += 1
-    author_blog_post_reads_stats.views_by_month[current_year] += 1
+    author_blog_post_reads_stats.reads_by_month[
+        current_year][current_month] += 1
     
     blog_post_reads_stats.repack_stats()
     author_blog_post_reads_stats.repack_stats()
@@ -612,7 +617,7 @@ def _update_reads_stats_transactional(
 def _update_reading_time_stats_transactional(
     blog_post_id: str,
     author_id: str,
-    time_taken_to_read_post: str
+    time_taken: int
 ) -> None:
     """Updates Blog Post Reading Time Model and Author Blog Post Reading Time
     Model. The model GET and PUT must be done in a transaction to avoid loss of
@@ -621,7 +626,7 @@ def _update_reading_time_stats_transactional(
     Args:
         blog_post_id: str. ID of the blog post.
         author_id: str. ID of the author of the blog post.
-        time_taken_to_read_post: str. The time taken to read the blog post.
+        time_taken_to_read_post: int. The time taken to read the blog post.
 
     Raises:
         Exception. BlogPostReadingTimeModel and AuthorBlogPostReadingTimeModel
@@ -644,16 +649,47 @@ def _update_reading_time_stats_transactional(
             'exist' % (blog_post_id)
         )
 
-    blog_post_reading_time_stats[time_taken_to_read_post] += 1
-    author_blog_post_reading_time_stats[time_taken_to_read_post] += 1
+    _increment_reading_time_bucket_count(
+        blog_post_reading_time_stats, time_taken)
+    _increment_reading_time_bucket_count(
+        author_blog_post_reading_time_stats, time_taken)
 
     save_blog_post_reading_time_model(blog_post_reading_time_stats)
     save_author_blog_posts_aggregated_reading_time_model(
         author_blog_post_reading_time_stats
     )
 
+def _increment_reading_time_bucket_count(
+    stats: Union[
+        blog_statistics_domain.BlogPostReadingTime,
+        blog_statistics_domain.AuthorBlogPostsReadingTime
+    ],
+    time_taken: int
+) -> None:
+        if time_taken == 0:
+            stats.zero_to_one_min += 1
+        elif time_taken == 1:
+            stats.one_to_two_min += 1
+        elif time_taken == 2:
+            stats.two_to_three_min += 1
+        elif time_taken == 3:
+            stats.three_to_four_min += 1
+        elif time_taken == 4:
+            stats.four_to_five_min += 1
+        elif time_taken == 5:
+            stats.five_to_six_min += 1
+        elif time_taken == 6:
+            stats.six_to_seven_min += 1
+        elif time_taken == 7:
+            stats.seven_to_eight_min += 1
+        elif time_taken == 8:
+            stats.eight_to_nine_min += 1
+        elif time_taken == 9:
+            stats.nine_to_ten_min += 1
+        else:
+            stats.more_than_ten_min += 1
 
-def create_aggregated_blog_post_stats_models_for_newly_published_blog_post(
+def create_aggregated_stats_models_for_newly_published_blog_post(
     blog_post_id: str
 ) -> None:
     """Creates Blog Post Stats Models for a newly published blog post.
@@ -662,7 +698,7 @@ def create_aggregated_blog_post_stats_models_for_newly_published_blog_post(
         blog_post_id: str. ID of the blog post.
     """
     stats_model = blog_stats_models.BlogPostViewsAggregatedStatsModel.get(
-        blog_post_id)
+        blog_post_id, strict=False)
 
     if stats_model is None:
         blog_stats_models.BlogPostViewsAggregatedStatsModel.create(blog_post_id)
@@ -691,16 +727,6 @@ def create_aggregated_author_blog_post_stats_models(
             author_id)
 
 
-def get_current_date_as_string() -> str:
-    """Gets the current date.
-
-    Returns:
-        str. Current date as a string of format 'YYYY-MM-DD'.
-    """
-    return datetime.datetime.utcnow().strftime(
-        feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
-
-
 def parse_date_as_string(date: datetime.datetime) -> str:
     """Gets yesterays date.
 
@@ -720,12 +746,11 @@ def parse_date_from_datetime(date_time_obj: datetime.datetime) -> Dict[str, int]
     Returns:
         dict. Representing date with year, month, day, hour as keys.
     """
-    date_time_str = datetime.datetime.strptime(date_time_obj, '%Y-%m-%d-%H')
     return {
-        'year': date_time_str.year,
-        'month': date_time_str.month,
-        'day': date_time_str.day,
-        'hour': date_time_str.hour
+        'year': date_time_obj.year,
+        'month': date_time_obj.month,
+        'day': date_time_obj.day,
+        'hour': date_time_obj.hour
     }
 
 
@@ -750,20 +775,19 @@ def add_missing_stat_keys_with_default_values_in_views_stats(stats: Union[
         BlogPostViewsAggregatedStats | AuthorBlogPostViewsAggregatedStats. Stats
         domain object with added missing keys.
     """
-    current_date = get_current_date_as_string()
-    current_datetime_obj = parse_date_from_datetime(
-        datetime.datetime.utcnow()
-    )
-    current_month =current_datetime_obj.month
-    current_year = current_datetime_obj.year
-    current_month_year = current_year + '-' + current_month
+    current_datetime = datetime.datetime.utcnow()
+    current_date = parse_date_as_string(current_datetime)
+    current_datetime_obj = parse_date_from_datetime(current_datetime)
+    current_month = current_datetime_obj['month']
+    current_year = current_datetime_obj['year']
+    current_month_year = str(current_year) + '-' + str(current_month)
 
     yesterday_datetime = (
-        datetime.datetime.utcnow() - datetime.timedelta(days = 1))
+        current_datetime - datetime.timedelta(days = 1))
     yesterday_date = parse_date_as_string(yesterday_datetime)
 
     day_before_yesterday_datetime = (
-        datetime.datetime.utcnow() - datetime.timedelta(days = 2))
+        current_datetime - datetime.timedelta(days = 2))
     day_before_yesterday_date = parse_date_as_string(
         day_before_yesterday_datetime)
 
@@ -771,14 +795,14 @@ def add_missing_stat_keys_with_default_values_in_views_stats(stats: Union[
         stats.views_by_hour[current_date] = generate_stats_by_hour_dict()
         # Only if current_date is not present in views_by_hour, there is a
         # possibilty of missing yesterday_date key in views_by_hour.
-        if yesterday_datetime > stats.created_on:
+        if yesterday_datetime.date() >= stats.created_on.date():
             if yesterday_date not in stats.views_by_hour:
                 stats.views_by_hour[yesterday_date] = (
                     generate_stats_by_hour_dict()
                 )
             # Only if yesterdays_date is not present in views_by_hour, there is
             # a possibilty of missing yesterday_date key in views_by_hour.              
-            if day_before_yesterday_datetime > stats.created_on:
+            if day_before_yesterday_datetime.date() >= stats.created_on.date():
                 if day_before_yesterday_date not in stats.views_by_hour:
                     stats.views_by_hour[day_before_yesterday_date] = (
                         generate_stats_by_hour_dict()
@@ -786,11 +810,11 @@ def add_missing_stat_keys_with_default_values_in_views_stats(stats: Union[
 
 
     prev_month_year = (
-        datetime.datetime.utcnow().replace(day=1) - datetime.timedelta(days=1)
+        current_datetime.replace(day=1) - datetime.timedelta(days=1)
     )
     if current_month_year not in stats.views_by_date:
         stats.views_by_date[current_month_year] = (
-            generate_stats_by_date_dict(int(current_month), int(current_year))
+            generate_stats_by_date_dict(current_month, current_year)
         )
         # Only if current_month_year is not present in views_by_date, there is a
         # possibilty of missing prev_month_year key in views_by_date if blog
@@ -817,7 +841,7 @@ def add_missing_stat_keys_with_default_values_in_views_stats(stats: Union[
                     )
 
     if current_year not in stats.views_by_month:
-        stats.views_by_month[current_year] = generate_stats_by_month_dict()
+        stats.views_by_month[str(current_year)] = generate_stats_by_month_dict()
 
     return stats
     
@@ -843,20 +867,20 @@ def add_missing_stat_keys_with_default_values_in_reads_stats(stats: Union[
         BlogPostReadsAggregatedStats | AuthorBlogPostReadsAggregatedStats. Stats
         domain object with added missing keys.
     """
-    current_date = get_current_date_as_string()
+    current_datetime = datetime.datetime.utcnow()
+    current_date = parse_date_as_string(current_datetime)
     current_datetime_obj = parse_date_from_datetime(
-        datetime.datetime.utcnow()
+        current_datetime
     )
-    current_month =current_datetime_obj.month
-    current_year = current_datetime_obj.year
-    current_month_year = current_year + '-' + current_month
+    current_month = current_datetime_obj['month']
+    current_year = current_datetime_obj['year']
+    current_month_year = str(current_year) + '-' + str(current_month)
 
-    yesterday_datetime = (
-        datetime.datetime.utcnow() - datetime.timedelta(days = 1))
+    yesterday_datetime = (current_datetime - datetime.timedelta(days = 1))
     yesterday_date = parse_date_as_string(yesterday_datetime)
 
     day_before_yesterday_datetime = (
-        datetime.datetime.utcnow() - datetime.timedelta(days = 2))
+        current_datetime - datetime.timedelta(days = 2))
     day_before_yesterday_date = parse_date_as_string(
         day_before_yesterday_datetime)
 
@@ -864,14 +888,14 @@ def add_missing_stat_keys_with_default_values_in_reads_stats(stats: Union[
         stats.reads_by_hour[current_date] = generate_stats_by_hour_dict()
         # Only if current_date is not present in reads_by_hour, there is a
         # possibilty of missing yesterday_date key in reads_by_hour.
-        if yesterday_datetime > stats.created_on:
+        if yesterday_datetime.date() >= stats.created_on.date():
             if yesterday_date not in stats.reads_by_hour:
                 stats.reads_by_hour[yesterday_date] = (
                     generate_stats_by_hour_dict()
                 )
             # Only if yesterdays_date is not present in reads_by_hour, there is
             # a possibilty of missing yesterday_date key in reads_by_hour.              
-            if day_before_yesterday_datetime > stats.created_on:
+            if day_before_yesterday_datetime.date() > stats.created_on.date():
                 if day_before_yesterday_date not in stats.reads_by_hour:
                     stats.reads_by_hour[day_before_yesterday_date] = (
                         generate_stats_by_hour_dict()
@@ -879,11 +903,11 @@ def add_missing_stat_keys_with_default_values_in_reads_stats(stats: Union[
 
 
     prev_month_year = (
-        datetime.datetime.utcnow().replace(day=1) - datetime.timedelta(days=1)
+        current_datetime.replace(day=1) - datetime.timedelta(days=1)
     )
     if current_month_year not in stats.reads_by_date:
         stats.reads_by_date[current_month_year] = (
-            generate_stats_by_date_dict(int(current_month), int(current_year))
+            generate_stats_by_date_dict(current_month, current_year)
         )
         # Only if current_month_year is not present in reads_by_date, there is a
         # possibilty of missing prev_month_year key in reads_by_date if blog
@@ -910,7 +934,7 @@ def add_missing_stat_keys_with_default_values_in_reads_stats(stats: Union[
                     )
 
     if current_year not in stats.reads_by_month:
-        stats.reads_by_month[current_year] = generate_stats_by_month_dict()
+        stats.reads_by_month[str(current_year)] = generate_stats_by_month_dict()
 
     return stats
 
@@ -983,33 +1007,9 @@ class BlogPostExitedEventHandler(event_services.BaseEventHandler):
         blog_stats_models.BlogPostExitedEventLogEntryModel.create(
             blog_post_id, author_id, time_taken_to_read_blog_post
         )
-        time_taken = int(time_taken_to_read_blog_post)
-        if time_taken == 0:
-            time_bucket_to_read_blog_post = 'zero_to_one_min'
-        elif time_taken == 1:
-            time_bucket_to_read_blog_post = 'one_to_two_min'
-        elif time_taken == 2:
-            time_bucket_to_read_blog_post = 'two_to_three_min'
-        elif time_taken == 3:
-            time_bucket_to_read_blog_post = 'three_to_four_min'
-        elif time_taken == 4:
-            time_bucket_to_read_blog_post = 'four_to_five_min'
-        elif time_taken == 5:
-            time_bucket_to_read_blog_post = 'five_to_six_min'
-        elif time_taken == 6:
-            time_bucket_to_read_blog_post = 'six_to_seven_min'
-        elif time_taken == 7:
-            time_bucket_to_read_blog_post = 'seven_to_eight_min'
-        elif time_taken == 8:
-            time_bucket_to_read_blog_post = 'eight_to_nine_min'
-        elif time_taken == 9:
-            time_bucket_to_read_blog_post = 'nine_to_ten_min'
-        else:
-            time_bucket_to_read_blog_post = 'more_than_ten_min'
-
         update_reading_time_stats(
             blog_post_id,
             author_id,
-            time_bucket_to_read_blog_post
+            int(time_taken_to_read_blog_post)
         )
 

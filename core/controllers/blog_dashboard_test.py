@@ -21,6 +21,7 @@ import os
 from core import feconf
 from core import utils
 from core.domain import blog_services
+from core.domain import blog_statistics_services as stats_service
 from core.platform import models
 from core.tests import test_utils
 
@@ -560,4 +561,293 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
                 feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             expected_status_int=401)
 
+        self.logout()
+
+
+class BlogDashboardBlogPostStatisticsHandlerTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    def setUp(self) -> None:
+        """Completes the sign-up process for the various users."""
+        super().setUp()
+        self.signup(
+            self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.signup(
+            self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME,
+            feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.blog_admin_id = (
+            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+        self.blog_editor_id = (
+            self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
+
+        self.blog_post_id = 'sample_id'
+        stats_service.create_aggregated_stats_models_for_newly_published_blog_post( # pylint: disable=line-too-long
+        self.blog_post_id)
+        self.views_stats = stats_service.get_blog_post_views_stats_by_id(
+                self.blog_post_id
+            )
+        stats_service.add_missing_stat_keys_with_default_values_in_views_stats(
+            self.views_stats
+        )
+        self.reads_stats = stats_service.get_blog_post_reads_stats_by_id(
+                self.blog_post_id
+            )
+        stats_service.add_missing_stat_keys_with_default_values_in_reads_stats(
+            self.reads_stats
+        )
+
+
+    def test_get_blog_post_views_stats_data(self) -> None:
+        # Checks blog editor can load blog post stats data.
+        self.login(self.BLOG_EDITOR_EMAIL)
+        json_response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.BLOG_DASHBOARD_STATISTICS_DATA_URL,
+                self.blog_post_id,
+                'views'
+            ),
+        )
+        self.assertEqual(
+            self.blog_post_id, json_response['stats']['blog_post_id']
+        )
+        self.assertEqual(
+            'views', json_response['chart_type']
+        )
+        self.assertEqual(
+            self.views_stats.to_frontend_dict(), json_response['stats']
+        )
+        self.logout()
+
+
+        # Checks non-editors can not access blog editor.
+        self.login(self.user_email)
+        self.get_json(
+            '%s/%s/%s' % (
+                feconf.BLOG_DASHBOARD_STATISTICS_DATA_URL,
+                self.blog_post_id,
+                'views'
+            ),
+            expected_status_int=401)
+        self.logout()
+
+        self.set_curriculum_admins([self.username])
+        self.login(self.user_email)
+        self.get_json(
+            '%s/%s/%s' % (
+                feconf.BLOG_DASHBOARD_STATISTICS_DATA_URL,
+                self.blog_post_id,
+                'views'
+            ),
+            expected_status_int=401)
+        self.logout()
+
+
+    def test_get_blog_post_reads_stats_data(self) -> None:
+        # Checks blog editor can load blog post stats data.
+        self.login(self.BLOG_EDITOR_EMAIL)
+        json_response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.BLOG_DASHBOARD_STATISTICS_DATA_URL,
+                self.blog_post_id,
+                'reads'
+            ),
+        )
+        self.assertEqual(
+            self.blog_post_id, json_response['stats']['blog_post_id']
+        )
+        self.assertEqual(
+            'reads', json_response['chart_type']
+        )
+        self.assertEqual(
+            self.reads_stats.to_frontend_dict(), json_response['stats']
+        )
+        self.logout()
+
+    def test_get_blog_post_reading_stats_data(self) -> None:
+        # Checks blog editor can load blog post stats data.
+        self.login(self.BLOG_EDITOR_EMAIL)
+        json_response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.BLOG_DASHBOARD_STATISTICS_DATA_URL,
+                self.blog_post_id,
+                'reading_time'
+            ),
+        )
+        self.assertEqual(
+            self.blog_post_id, json_response['stats']['blog_post_id']
+        )
+        self.assertEqual(
+            'reading_time', json_response['chart_type']
+        )
+        expected_dict = {
+            'blog_post_id': self.blog_post_id,
+            'zero_to_one_min': 0,
+            'one_to_two_min': 0,
+            'two_to_three_min': 0,
+            'three_to_four_min': 0,
+            'four_to_five_min': 0,
+            'five_to_six_min': 0,
+            'six_to_seven_min': 0,
+            'seven_to_eight_min': 0,
+            'eight_to_nine_min': 0,
+            'nine_to_ten_min': 0,
+            'more_than_ten_min': 0,
+        }
+        self.assertEqual(
+            expected_dict, json_response['stats']
+        )
+        self.logout()
+
+    def test_get_blog_post_stats_with_invalid_chart_type(self) -> None:
+        self.login(self.BLOG_EDITOR_EMAIL)
+        self.get_json(
+            '%s/%s/%s' % (
+                feconf.BLOG_DASHBOARD_STATISTICS_DATA_URL,
+                self.blog_post_id,
+                'invalid_choice'
+            ),
+            expected_status_int=400
+        )
+        self.logout()
+
+
+class BlogDashboardAuthorBlogPostStatisticsHandlerTests(
+    test_utils.GenericTestBase
+):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    def setUp(self) -> None:
+        """Completes the sign-up process for the various users."""
+        super().setUp()
+        self.signup(
+            self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.signup(
+            self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.signup(self.user_email, self.username)
+        # Addition of blog admin role will create author stats models.
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        # Addition of blog editor role will create author stats models.
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME,
+            feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.blog_admin_id = (
+            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+        self.blog_editor_id = (
+            self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
+        self.views_stats = stats_service.get_author_blog_post_views_stats_by_id(
+                self.blog_admin_id
+            )
+        stats_service.add_missing_stat_keys_with_default_values_in_views_stats(
+            self.views_stats
+        )
+        self.reads_stats = stats_service.get_author_blog_post_reads_stats_by_id(
+                self.blog_editor_id
+            )
+        stats_service.add_missing_stat_keys_with_default_values_in_reads_stats(
+            self.reads_stats
+        )
+
+    def test_get_author_blog_post_views_stats_data(self) -> None:
+        # Checks blog admin can load blog post stats data.
+        self.login(self.BLOG_ADMIN_EMAIL)
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.BLOG_DASHBOARD_AUTHOR_STATISTICS_DATA_URL,
+                'views'
+            ),
+        )
+        self.assertEqual('views', json_response['chart_type'])
+        self.assertEqual(
+            self.views_stats.to_frontend_dict(), json_response['stats']
+        )
+        self.logout()
+
+
+        # Checks non-editors can not access blog editor.
+        self.login(self.user_email)
+        self.get_json(
+            '%s/%s' % (
+                feconf.BLOG_DASHBOARD_AUTHOR_STATISTICS_DATA_URL,
+                'views'
+            ),
+            expected_status_int=401)
+        self.logout()
+
+        self.set_curriculum_admins([self.username])
+        self.login(self.user_email)
+        self.get_json(
+            '%s/%s' % (
+                feconf.BLOG_DASHBOARD_AUTHOR_STATISTICS_DATA_URL,
+                'views'
+            ),
+            expected_status_int=401)
+        self.logout()
+
+
+    def test_get_blog_post_reads_stats_data(self) -> None:
+        # Checks blog editor can load blog post stats data.
+        self.login(self.BLOG_EDITOR_EMAIL)
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.BLOG_DASHBOARD_AUTHOR_STATISTICS_DATA_URL,
+                'reads'
+            ),
+        )
+        self.assertEqual(
+            'reads', json_response['chart_type']
+        )
+        self.assertEqual(
+            self.reads_stats.to_frontend_dict(), json_response['stats']
+        )
+        self.logout()
+
+    def test_get_blog_post_reading_stats_data(self) -> None:
+        # Checks blog editor can load blog post stats data.
+        self.login(self.BLOG_EDITOR_EMAIL)
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.BLOG_DASHBOARD_AUTHOR_STATISTICS_DATA_URL,
+                'reading_time'
+            ),
+        )
+        self.assertEqual(
+            'reading_time', json_response['chart_type']
+        )
+        expected_dict = {
+            'zero_to_one_min': 0,
+            'one_to_two_min': 0,
+            'two_to_three_min': 0,
+            'three_to_four_min': 0,
+            'four_to_five_min': 0,
+            'five_to_six_min': 0,
+            'six_to_seven_min': 0,
+            'seven_to_eight_min': 0,
+            'eight_to_nine_min': 0,
+            'nine_to_ten_min': 0,
+            'more_than_ten_min': 0,
+        }
+        self.assertEqual(
+            expected_dict, json_response['stats']
+        )
+        self.logout()
+
+    def test_get_author__with_invalid_chart_type(self) -> None:
+        self.login(self.BLOG_EDITOR_EMAIL)
+        self.get_json(
+            '%s/%s' % (
+                feconf.BLOG_DASHBOARD_AUTHOR_STATISTICS_DATA_URL,
+                'invalid_choice'
+            ),
+            expected_status_int=400
+        )
         self.logout()

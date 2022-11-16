@@ -517,15 +517,15 @@ URLS = [
     get_redirect_route(
         r'%s/blog_post_viewed_event/<blog_post_url>'
         % feconf.BLOG_HOMEPAGE_DATA_URL,
-        blog_homepage.BlogPostViewsStatisticsDataHandler),
+        blog_homepage.BlogPostViewedEventHandler),
     get_redirect_route(
         r'%s/blog_post_read_event/<blog_post_url>'
         % feconf.BLOG_HOMEPAGE_DATA_URL,
-        blog_homepage.BlogPostReadStatisticsDataHandler),
+        blog_homepage.BlogPostReadEventHandler),
     get_redirect_route(
         r'%s/blog_post_exited_event/<blog_post_url>'
         % feconf.BLOG_HOMEPAGE_DATA_URL,
-        blog_homepage.BlogPostExitedStatisticsDataHandler),
+        blog_homepage.BlogPostExitedEventHandler),
     get_redirect_route(
         r'%s/<author_username>' %
         feconf.BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_PREFIX,
@@ -990,6 +990,14 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
         blog_dashboard.BlogDashboardDataHandler),
+    get_redirect_route(
+        r'%s/<blog_post_id>/<chart_type>' % (
+            feconf.BLOG_DASHBOARD_STATISTICS_DATA_URL),
+        blog_dashboard.BlogDashboardBlogPostStatisticsHandler),
+    get_redirect_route(
+        r'%s/<chart_type>' % (
+            feconf.BLOG_DASHBOARD_AUTHOR_STATISTICS_DATA_URL),
+        blog_dashboard.BlogDashboardAuthorBlogPostsStatisticsHandler),
     get_redirect_route(
         r'%s' % feconf.BLOG_DASHBOARD_URL, blog_dashboard.BlogDashboardPage),
 
