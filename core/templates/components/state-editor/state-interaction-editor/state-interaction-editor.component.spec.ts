@@ -199,6 +199,9 @@ describe('State Interaction component', () => {
       },
       rows: {
         value: 0
+      },
+      catchMisspellings: {
+        value: false
       }
     };
     component.interactionEditorIsShown = true;

@@ -293,6 +293,9 @@ describe('Image preloader service', () => {
                 unicode_str: '',
                 content_id: ''
               }
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           answer_groups: [{

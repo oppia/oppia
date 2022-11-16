@@ -230,6 +230,9 @@ describe('State Responses Component', () => {
         placeholder: {
           value: 1,
         },
+        catchMisspellings: {
+          value: false
+        }
       },
       hints: [],
       solution: {

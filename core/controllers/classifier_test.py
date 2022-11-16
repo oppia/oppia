@@ -387,7 +387,10 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                             'unicode_str': ''
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {
+                        'value': False
+                    }
                 }
             })]
 

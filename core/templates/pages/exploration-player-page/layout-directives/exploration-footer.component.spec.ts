@@ -685,6 +685,9 @@ describe('ExplorationFooterComponent', () => {
                     unicode_str: '',
                     content_id: 'ca_placeholder_0'
                   }
+                },
+                catchMisspellings: {
+                  value: false
                 }
               },
               answer_groups: [
@@ -810,6 +813,9 @@ describe('ExplorationFooterComponent', () => {
                     unicode_str: '',
                     content_id: 'ca_placeholder_0'
                   }
+                },
+                catchMisspellings: {
+                  value: false
                 }
               },
               answer_groups: [

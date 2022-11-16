@@ -56,6 +56,9 @@ describe('ImprovementsService', () => {
                 unicode_str: 'Type your answer here.',
                 content_id: ''
               }
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           answer_groups: [],

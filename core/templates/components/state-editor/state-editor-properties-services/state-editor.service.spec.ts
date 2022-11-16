@@ -113,6 +113,9 @@ describe('Editor state service', () => {
         },
         rows: {
           value: 1
+        },
+        catchMisspellings: {
+          value: false
         }
       },
       hints: [],
@@ -473,6 +476,9 @@ describe('Editor state service', () => {
       },
       rows: {
         value: 1
+      },
+      catchMisspellings: {
+        value: false
       }
     });
     ecs.setInteractionCustomizationArgs(newCustomizationArgs);

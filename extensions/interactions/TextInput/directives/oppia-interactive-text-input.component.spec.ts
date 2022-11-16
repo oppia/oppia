@@ -41,6 +41,9 @@ describe('InteractiveTextInputComponent', () => {
         },
         rows: {
           value: attributes.rowsWithValue
+        },
+        catchMisspellings: {
+          value: attributes.catchMisspellingsWithValue
         }
       };
     }
@@ -80,6 +83,7 @@ describe('InteractiveTextInputComponent', () => {
 
     component.placeholderWithValue = 'Placeholder text';
     component.rowsWithValue = '2';
+    component.catchMisspellingsWithValue = 'false';
   });
 
   it('should initialise when the user saves the interaction', () => {
@@ -91,6 +95,7 @@ describe('InteractiveTextInputComponent', () => {
 
     expect(component.placeholder).toBe('Placeholder text');
     expect(component.rows).toBe('2');
+    expect(component.catchMisspellings).toBe('false');
     expect(component.answer).toBe('');
     expect(component.labelForFocusTarget).toBe('label');
     expect(component.schema).toEqual({
@@ -98,6 +103,7 @@ describe('InteractiveTextInputComponent', () => {
       ui_config: {
         rows: '2',
         placeholder: 'Placeholder text',
+        catchMisspellings: 'false'
       }
     });
     // We cannot test what functions are exactly passed since anonymous
@@ -121,6 +127,7 @@ describe('InteractiveTextInputComponent', () => {
       ui_config: {
         rows: 2,
         placeholder: 'Placeholder text',
+        catchMisspellings: false
       }
     };
 
@@ -129,6 +136,7 @@ describe('InteractiveTextInputComponent', () => {
       ui_config: {
         rows: 2,
         placeholder: 'Placeholder text',
+        catchMisspellings: false
       }
     });
   });

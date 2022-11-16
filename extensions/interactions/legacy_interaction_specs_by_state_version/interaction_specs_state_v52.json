@@ -1,0 +1,1002 @@
+{
+    "ImageClickInput": {
+      "can_have_solution": false,
+      "show_generic_submit_button": false,
+      "instructions": "Click on the image",
+      "is_trainable": false,
+      "narrow_instructions": "View image",
+      "description": "Allows learners to click on regions of an image.",
+      "needs_summary": false,
+      "name": "Image Region",
+      "answer_type": "ClickOnImage",
+      "is_linear": false,
+      "display_mode": "supplemental",
+      "id": "ImageClickInput",
+      "customization_arg_specs": [
+        {
+          "description": "Image",
+          "name": "imageAndRegions",
+          "schema": {
+            "obj_type": "ImageWithRegions",
+            "type": "custom"
+          },
+          "default_value": {
+            "imagePath": "",
+            "labeledRegions": []
+          }
+        },
+        {
+          "description": "Highlight regions when the learner hovers over them",
+          "name": "highlightRegionsOnHover",
+          "schema": {
+            "type": "bool"
+          },
+          "default_value": false
+        }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "IsInRegion": "is in the region {{x|UnicodeString}}"
+      }
+    },
+    "NumberWithUnits": {
+      "can_have_solution": true,
+      "show_generic_submit_button": true,
+      "instructions": null,
+      "is_trainable": false,
+      "narrow_instructions": null,
+      "description": "Allows learners to enter number with units.",
+      "needs_summary": false,
+      "name": "Number With Units",
+      "answer_type": "NumberWithUnits",
+      "is_linear": false,
+      "display_mode": "inline",
+      "id": "NumberWithUnits",
+      "customization_arg_specs": [],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "IsEqualTo": "is equal to {{f|NumberWithUnits}}",
+        "IsEquivalentTo": "is equivalent to {{f|NumberWithUnits}}"
+      }
+    },
+    "NumericExpressionInput": {
+      "can_have_solution": true,
+      "show_generic_submit_button": true,
+      "instructions": null,
+      "is_trainable": false,
+      "narrow_instructions": null,
+      "description": "Allows learners to enter numeric expressions.",
+      "needs_summary": false,
+      "name": "Numeric Expression Input",
+      "answer_type": "NumericExpression",
+      "is_linear": false,
+      "display_mode": "inline",
+      "id": "NumericExpressionInput",
+      "customization_arg_specs": [{
+        "description": "Placeholder text",
+        "name": "placeholder",
+        "schema": {
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
+        },
+        "default_value": {
+          "content_id": null,
+          "unicode_str": "Type an expression here, using only numbers."
+        }
+      }, {
+        "description": "Represent division using fractions (rather than ÷).",
+        "name": "useFractionForDivision",
+        "schema": {
+          "type": "bool"
+        },
+        "default_value": false
+      }],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "MatchesExactlyWith": "matches exactly with {{x|NumericExpression}}",
+        "IsEquivalentTo": "is equivalent to {{x|NumericExpression}}",
+        "ContainsSomeOf": "contains at least one of the terms present in {{x|NumericExpression}}",
+        "OmitsSomeOf": "omits at least one of the terms present in {{x|NumericExpression}}"
+      }
+    },
+    "NumericInput": {
+      "can_have_solution": true,
+      "show_generic_submit_button": true,
+      "instructions": null,
+      "is_trainable": false,
+      "narrow_instructions": null,
+      "description": "Allows learners to enter integers and floating point numbers.",
+      "needs_summary": false,
+      "name": "Number Input",
+      "answer_type": "Real",
+      "is_linear": false,
+      "display_mode": "inline",
+      "id": "NumericInput",
+      "customization_arg_specs": [],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "Equals": "is equal to {{x|Real}}",
+        "IsGreaterThanOrEqualTo": "is greater than or equal to {{x|Real}}",
+        "IsLessThanOrEqualTo": "is less than or equal to {{x|Real}}",
+        "IsLessThan": "is less than {{x|Real}}",
+        "IsWithinTolerance": "is within {{tol|Real}} of {{x|Real}}",
+        "IsGreaterThan": "is greater than {{x|Real}}",
+        "IsInclusivelyBetween": "is between {{a|Real}} and {{b|Real}}, inclusive"
+      }
+    },
+    "DragAndDropSortInput": {
+      "can_have_solution": true,
+      "show_generic_submit_button": true,
+      "instructions": "Drag and drop items",
+      "is_trainable": false,
+      "narrow_instructions": "Drag and drop items",
+      "description": "Allows learners to drag and drop items for sorting.",
+      "needs_summary": true,
+      "name": "Drag And Drop Sort",
+      "answer_type": "ListOfSetsOfHtmlStrings",
+      "is_linear": false,
+      "display_mode": "supplemental",
+      "id": "DragAndDropSortInput",
+      "customization_arg_specs": [
+        {
+          "description": "Items for drag and drop",
+          "name": "choices",
+          "schema": {
+            "items": {
+              "type": "custom",
+              "obj_type": "SubtitledHtml",
+              "replacement_ui_config": {
+                "html": {
+                  "hide_complex_extensions": true,
+                  "placeholder": "Enter an option for the learner to drag and drop."
+                }
+              }
+            },
+            "type": "list",
+            "validators": [
+              {
+                "min_value": 1,
+                "id": "has_length_at_least"
+              }
+            ],
+            "ui_config": {
+              "add_element_text": "Add a new item"
+            }
+          },
+          "default_value": [
+            {
+              "content_id": null,
+              "html": ""
+            }
+          ]
+        },
+        {
+          "description": "Allow multiple sort items in the same position",
+          "name": "allowMultipleItemsInSamePosition",
+          "schema": {
+            "type": "bool"
+          },
+          "default_value": false
+        }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "HasElementXAtPositionY": "has element {{x|DragAndDropHtmlString}} at position {{y|DragAndDropPositiveInt}}",
+        "IsEqualToOrdering": "is equal to ordering {{x|ListOfSetsOfHtmlStrings}}",
+        "HasElementXBeforeElementY": "has element {{x|DragAndDropHtmlString}} before element {{y|DragAndDropHtmlString}}",
+        "IsEqualToOrderingWithOneItemAtIncorrectPosition": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfHtmlStrings}}"
+      }
+    },
+    "ItemSelectionInput": {
+      "can_have_solution": false,
+      "show_generic_submit_button": false,
+      "instructions": null,
+      "is_trainable": false,
+      "narrow_instructions": null,
+      "description": "Allows learners to select various options.",
+      "needs_summary": false,
+      "name": "Item Selection",
+      "answer_type": "SetOfHtmlString",
+      "is_linear": false,
+      "display_mode": "inline",
+      "id": "ItemSelectionInput",
+      "customization_arg_specs": [
+        {
+          "description": "Minimum number of selections permitted.",
+          "name": "minAllowableSelectionCount",
+          "schema": {
+            "type": "int",
+            "validators": [
+              {
+                "min_value": 0,
+                "id": "is_at_least"
+              }
+            ]
+          },
+          "default_value": 1
+        },
+        {
+          "description": "Maximum number of selections permitted",
+          "name": "maxAllowableSelectionCount",
+          "schema": {
+            "type": "int",
+            "validators": [
+              {
+                "min_value": 1,
+                "id": "is_at_least"
+              }
+            ]
+          },
+          "default_value": 1
+        },
+        {
+          "description": "Items for selection",
+          "name": "choices",
+          "schema": {
+            "items": {
+              "type": "custom",
+              "obj_type": "SubtitledHtml",
+              "replacement_ui_config": {
+                "html": {
+                  "hide_complex_extensions": true,
+                  "placeholder": "Sample item answer"
+                }
+              }
+            },
+            "type": "list",
+            "ui_config": {
+              "add_element_text": "Add item for selection"
+            }
+          },
+          "default_value": [{"content_id": null, "html": ""}]
+        }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "DoesNotContainAtLeastOneOf": "omits at least one of {{x|SetOfHtmlString}}",
+        "IsProperSubsetOf": "is a proper subset of {{x|SetOfHtmlString}}",
+        "ContainsAtLeastOneOf": "contains at least one of {{x|SetOfHtmlString}}",
+        "Equals": "is equal to {{x|SetOfHtmlString}}"
+      }
+    },
+    "Continue": {
+      "can_have_solution": false,
+      "show_generic_submit_button": false,
+      "instructions": null,
+      "is_trainable": false,
+      "narrow_instructions": null,
+      "description": "A simple 'go to next state' button.",
+      "needs_summary": false,
+      "name": "Continue Button",
+      "answer_type": null,
+      "is_linear": true,
+      "display_mode": "inline",
+      "id": "Continue",
+      "customization_arg_specs": [
+        {
+          "description": "Button label",
+          "name": "buttonText",
+          "schema": {
+            "type": "custom",
+            "obj_type": "SubtitledUnicode"
+          },
+          "default_value": {
+            "content_id": null,
+            "unicode_str": "Continue"
+          }
+        }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": "When the button is clicked",
+      "rule_descriptions": {}
+    },
+    "GraphInput": {
+      "can_have_solution": true,
+      "show_generic_submit_button": true,
+      "instructions": "Create a graph",
+      "is_trainable": false,
+      "narrow_instructions": "View graph",
+      "description": "Allows learners to create and manipulate graphs.",
+      "needs_summary": true,
+      "name": "Graph Theory",
+      "answer_type": "Graph",
+      "is_linear": false,
+      "display_mode": "supplemental",
+      "id": "GraphInput",
+      "customization_arg_specs": [
+        {
+          "description": "Initial graph",
+          "name": "graph",
+          "schema": {
+            "obj_type": "Graph",
+            "type": "custom"
+          },
+          "default_value": {
+            "isWeighted": false,
+            "edges": [
+              {
+                "src": 0,
+                "dst": 1,
+                "weight": 1
+              },
+              {
+                "src": 1,
+                "dst": 2,
+                "weight": 1
+              }
+            ],
+            "isDirected": false,
+            "vertices": [
+              {
+                "x": 150.0,
+                "y": 50.0,
+                "label": ""
+              },
+              {
+                "x": 200.0,
+                "y": 50.0,
+                "label": ""
+              },
+              {
+                "x": 150.0,
+                "y": 100.0,
+                "label": ""
+              }
+            ],
+            "isLabeled": false
+          }
+        },
+        {
+          "description": "Allow learner to add vertices",
+          "name": "canAddVertex",
+          "schema": {
+            "type": "bool"
+          },
+          "default_value": false
+        },
+        {
+          "description": "Allow learner to delete vertices",
+          "name": "canDeleteVertex",
+          "schema": {
+            "type": "bool"
+          },
+          "default_value": false
+        },
+        {
+          "description": "Allow learner to move vertices",
+          "name": "canMoveVertex",
+          "schema": {
+            "type": "bool"
+          },
+          "default_value": true
+        },
+        {
+          "description": "Allow learner to edit vertex labels",
+          "name": "canEditVertexLabel",
+          "schema": {
+            "type": "bool"
+          },
+          "default_value": false
+        },
+        {
+          "description": "Allow learner to add edges",
+          "name": "canAddEdge",
+          "schema": {
+            "type": "bool"
+          },
+          "default_value": true
+        },
+        {
+          "description": "Allow learner to delete edges",
+          "name": "canDeleteEdge",
+          "schema": {
+            "type": "bool"
+          },
+          "default_value": true
+        },
+        {
+          "description": "Allow learner to edit edge weights",
+          "name": "canEditEdgeWeight",
+          "schema": {
+            "type": "bool"
+          },
+          "default_value": false
+        }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "IsIsomorphicTo": "is isomorphic to {{g|Graph}}, including matching labels"
+      }
+    },
+    "EndExploration": {
+      "can_have_solution": false,
+      "show_generic_submit_button": false,
+      "instructions": null,
+      "is_trainable": false,
+      "narrow_instructions": null,
+      "description": "Ends the exploration, and suggests recommendations for explorations to try next.",
+      "needs_summary": false,
+      "name": "End Exploration",
+      "answer_type": null,
+      "is_linear": false,
+      "display_mode": "inline",
+      "id": "EndExploration",
+      "customization_arg_specs": [
+        {
+          "description": "IDs of explorations to recommend to the learner (at most 3 are shown). The ID of an exploration is the string of characters appearing after '/explore/' in the URL bar.",
+          "name": "recommendedExplorationIds",
+          "schema": {
+            "items": {
+              "type": "unicode"
+            },
+            "type": "list",
+            "ui_config": {
+              "add_element_text": "Add exploration ID"
+            }
+          },
+          "default_value": []
+        }
+      ],
+      "is_terminal": true,
+      "default_outcome_heading": null,
+      "rule_descriptions": {}
+    },
+    "SetInput": {
+      "can_have_solution": true,
+      "show_generic_submit_button": true,
+      "instructions": null,
+      "is_trainable": false,
+      "narrow_instructions": null,
+      "description": "Allows learners to enter an unordered set of strings.",
+      "needs_summary": false,
+      "name": "Set Input",
+      "answer_type": "SetOfUnicodeString",
+      "is_linear": false,
+      "display_mode": "inline",
+      "id": "SetInput",
+      "customization_arg_specs": [
+        {
+          "description": "Label for the 'Add Item' button",
+          "name": "buttonText",
+          "schema": {
+            "type": "custom",
+            "obj_type": "SubtitledUnicode"
+          },
+          "default_value": {
+            "content_id": null,
+            "unicode_str": "Add Item"
+          }
+        }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "HasElementsNotIn": "has elements not in {{x|TranslatableSetOfUnicodeString}}",
+        "Equals": "is equal to {{x|TranslatableSetOfUnicodeString}}",
+        "IsSupersetOf": "is a proper superset of {{x|TranslatableSetOfUnicodeString}}",
+        "OmitsElementsIn": "omits some elements of {{x|TranslatableSetOfUnicodeString}}",
+        "HasElementsIn": "has elements in common with {{x|TranslatableSetOfUnicodeString}}",
+        "IsSubsetOf": "is a proper subset of {{x|TranslatableSetOfUnicodeString}}",
+        "IsDisjointFrom": "has no elements in common with {{x|TranslatableSetOfUnicodeString}}"
+      }
+    },
+    "CodeRepl": {
+      "can_have_solution": true,
+      "show_generic_submit_button": true,
+      "instructions": "Type code in the editor",
+      "is_trainable": true,
+      "narrow_instructions": "Go to code editor",
+      "description": "Allows learners to enter code and get it evaluated.",
+      "needs_summary": true,
+      "name": "Code Editor",
+      "answer_type": "CodeEvaluation",
+      "is_linear": false,
+      "display_mode": "supplemental",
+      "id": "CodeRepl",
+      "customization_arg_specs": [
+        {
+          "description": "Programming language",
+          "name": "language",
+          "schema": {
+            "type": "unicode",
+            "choices": [
+              "python"
+            ]
+          },
+          "default_value": "python"
+        },
+        {
+          "description": "Initial code displayed",
+          "name": "placeholder",
+          "schema": {
+            "type": "unicode",
+            "ui_config": {
+              "coding_mode": "none"
+            }
+          },
+          "default_value": "# Type your code here."
+        },
+        {
+          "description": "Code to prepend to the learner's submission",
+          "name": "preCode",
+          "schema": {
+            "type": "unicode",
+            "ui_config": {
+              "coding_mode": "none"
+            }
+          },
+          "default_value": ""
+        },
+        {
+          "description": "Code to append after the learner's submission",
+          "name": "postCode",
+          "schema": {
+            "type": "unicode",
+            "ui_config": {
+              "coding_mode": "none"
+            }
+          },
+          "default_value": ""
+        }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "OutputEquals": "has output equal to {{x|CodeString}}",
+        "CodeContains": "has code that contains {{x|CodeString}}",
+        "CodeEquals": "has code equal to {{x|CodeString}}",
+        "ResultsInError": "results in an error when run",
+        "ErrorContains": "has error message that contains {{x|UnicodeString}}",
+        "OutputContains": "has output that contains {{x|CodeString}}",
+        "CodeDoesNotContain": "has code that does not contain {{x|CodeString}}"
+      }
+    },
+    "MathEquationInput": {
+      "can_have_solution": true,
+      "show_generic_submit_button": true,
+      "instructions": null,
+      "is_trainable": false,
+      "narrow_instructions": null,
+      "description": "Allows learners to enter math equations.",
+      "needs_summary": false,
+      "name": "Math Equation Input",
+      "answer_type": "MathEquation",
+      "is_linear": false,
+      "display_mode": "inline",
+      "id": "MathEquationInput",
+      "customization_arg_specs": [
+        {
+          "description": "Represent division using fractions (rather than ÷).",
+          "name": "useFractionForDivision",
+          "schema": {
+            "type": "bool"
+          },
+          "default_value": false
+        }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "MatchesExactlyWith": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}",
+        "IsEquivalentTo": "is equivalent to {{x|MathEquation}}",
+        "ContainsSomeOf": "contains at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
+        "OmitsSomeOf": "omits at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
+        "MatchesWithGeneralForm": "matches the form of {{x|MathEquation}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
+      }
+    },
+    "MultipleChoiceInput": {
+      "can_have_solution": false,
+      "show_generic_submit_button": false,
+      "instructions": null,
+      "is_trainable": false,
+      "narrow_instructions": null,
+      "description": "Allows learners to select one of a list of multiple-choice options.",
+      "needs_summary": false,
+      "name": "Multiple Choice",
+      "answer_type": "NonnegativeInt",
+      "is_linear": false,
+      "display_mode": "inline",
+      "id": "MultipleChoiceInput",
+      "customization_arg_specs": [
+        {
+          "description": "Multiple Choice options",
+          "name": "choices",
+          "schema": {
+            "items": {
+              "type": "custom",
+              "obj_type": "SubtitledHtml",
+              "replacement_ui_config": {
+                "html": {
+                  "hide_complex_extensions": true,
+                  "placeholder": "Enter an option for the learner to select"
+                }
+              }
+            },
+            "type": "list",
+            "validators": [
+              {
+                "min_value": 1,
+                "id": "has_length_at_least"
+              }
+            ],
+            "ui_config": {
+              "add_element_text": "Add multiple choice option"
+            }
+          },
+          "default_value": [{
+            "content_id": null,
+            "html": ""
+          }]
+        }, {
+          "name": "showChoicesInShuffledOrder",
+          "description": "Shuffle answer choices",
+          "schema": {
+              "type": "bool"
+          },
+          "default_value": true
+      }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "Equals": "is equal to {{x|NonnegativeInt}}"
+      }
+    },
+    "PencilCodeEditor": {
+      "can_have_solution": true,
+      "show_generic_submit_button": false,
+      "instructions": "Edit the code. Click 'Play' to check it!",
+      "is_trainable": false,
+      "narrow_instructions": "Show code editor",
+      "description": "Allows learners to edit code in Pencil Code.",
+      "needs_summary": true,
+      "name": "Pencil Code Editor",
+      "answer_type": "CodeEvaluation",
+      "is_linear": false,
+      "display_mode": "supplemental",
+      "id": "PencilCodeEditor",
+      "customization_arg_specs": [
+        {
+          "description": "The initial code",
+          "name": "initialCode",
+          "schema": {
+            "type": "unicode",
+            "ui_config": {
+              "coding_mode": "coffeescript"
+            }
+          },
+          "default_value": "# Add the initial code snippet here."
+        }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "OutputEquals": "has output equal to {{x|CodeString}}",
+        "CodeContains": "has code that contains {{x|CodeString}}",
+        "CodeEquals": "has code equal to {{x|CodeString}}",
+        "ResultsInError": "results in an error when run",
+        "ErrorContains": "has error message that contains {{x|UnicodeString}}",
+        "OutputRoughlyEquals": "has output equal to {{x|CodeString}}, ignoring spacing and case",
+        "CodeDoesNotContain": "has code that does not contain {{x|CodeString}}"
+      }
+    },
+    "TextInput": {
+      "can_have_solution": true,
+      "show_generic_submit_button": true,
+      "instructions": null,
+      "is_trainable": true,
+      "narrow_instructions": null,
+      "description": "Allows learners to enter arbitrary text strings.",
+      "needs_summary": false,
+      "name": "Text Input",
+      "answer_type": "NormalizedString",
+      "is_linear": false,
+      "display_mode": "inline",
+      "id": "TextInput",
+      "customization_arg_specs": [
+        {
+          "description": "Placeholder text (optional)",
+          "name": "placeholder",
+          "schema": {
+            "type": "custom",
+            "obj_type": "SubtitledUnicode"
+          },
+          "default_value": {
+            "content_id": null,
+            "unicode_str": ""
+          }
+        },
+        {
+          "description": "Height (in rows)",
+          "name": "rows",
+          "schema": {
+            "type": "int",
+            "validators": [
+              {
+                "min_value": 1,
+                "id": "is_at_least"
+              },
+              {
+                "max_value": 200,
+                "id": "is_at_most"
+              }
+            ]
+          },
+          "default_value": 1
+        }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "StartsWith": "starts with at least one of {{x|TranslatableSetOfNormalizedString}}",
+        "Contains": "contains at least one of {{x|TranslatableSetOfNormalizedString}}",
+        "Equals": "is equal to at least one of {{x|TranslatableSetOfNormalizedString}}, without taking case into account",
+        "FuzzyEquals": "is equal to at least one of {{x|TranslatableSetOfNormalizedString}}, misspelled by at most one character"
+      }
+    },
+    "InteractiveMap": {
+      "can_have_solution": false,
+      "show_generic_submit_button": false,
+      "instructions": "Click on the map",
+      "is_trainable": false,
+      "narrow_instructions": "View map",
+      "description": "Allows learners to specify a position on a world map.",
+      "needs_summary": true,
+      "name": "World Map",
+      "answer_type": "CoordTwoDim",
+      "is_linear": false,
+      "display_mode": "supplemental",
+      "id": "InteractiveMap",
+      "customization_arg_specs": [
+        {
+          "description": "Starting center latitude (-90 to 90)",
+          "name": "latitude",
+          "schema": {
+            "type": "float",
+            "validators": [
+              {
+                "min_value": -90.0,
+                "id": "is_at_least"
+              },
+              {
+                "max_value": 90.0,
+                "id": "is_at_most"
+              }
+            ]
+          },
+          "default_value": 0.0
+        },
+        {
+          "description": "Starting center longitude (-180 to 180)",
+          "name": "longitude",
+          "schema": {
+            "type": "float",
+            "validators": [
+              {
+                "min_value": -180.0,
+                "id": "is_at_least"
+              },
+              {
+                "max_value": 180.0,
+                "id": "is_at_most"
+              }
+            ]
+          },
+          "default_value": 0.0
+        },
+        {
+          "description": "Starting zoom level (0 shows the entire earth)",
+          "name": "zoom",
+          "schema": {
+            "type": "float"
+          },
+          "default_value": 0.0
+        }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "Within": "is within {{d|Real}} km of {{p|CoordTwoDim}}",
+        "NotWithin": "is not within {{d|Real}} km of {{p|CoordTwoDim}}"
+      }
+    },
+    "MusicNotesInput": {
+      "can_have_solution": true,
+      "show_generic_submit_button": true,
+      "instructions": "Drag notes to the staff to form a sequence",
+      "is_trainable": false,
+      "narrow_instructions": "Show music staff",
+      "description": "Allows learners to drag and drop notes onto the lines of a music staff.",
+      "needs_summary": true,
+      "name": "Music Notes Input",
+      "answer_type": "MusicPhrase",
+      "is_linear": false,
+      "display_mode": "supplemental",
+      "id": "MusicNotesInput",
+      "customization_arg_specs": [
+        {
+          "description": "Correct sequence of notes",
+          "name": "sequenceToGuess",
+          "schema": {
+            "obj_type": "MusicPhrase",
+            "type": "custom"
+          },
+          "default_value": []
+        },
+        {
+          "description": "Starting notes on the staff",
+          "name": "initialSequence",
+          "schema": {
+            "obj_type": "MusicPhrase",
+            "type": "custom"
+          },
+          "default_value": []
+        }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "Equals": "is equal to {{x|MusicPhrase}}",
+        "IsEqualToExceptFor": "is equal to {{x|MusicPhrase}} except for {{k|NonnegativeInt}} notes",
+        "IsTranspositionOfExceptFor": "is a transposition of {{x|MusicPhrase}} by {{y|Int}} semitones except for {{k|NonnegativeInt}} notes",
+        "IsLongerThan": "has more than {{k|NonnegativeInt}} notes",
+        "IsTranspositionOf": "is a transposition of {{x|MusicPhrase}} by {{y|Int}} semitones",
+        "HasLengthInclusivelyBetween": "has between {{a|NonnegativeInt}} and {{b|NonnegativeInt}} notes, inclusive"
+      }
+    },
+    "AlgebraicExpressionInput": {
+      "can_have_solution": true,
+      "show_generic_submit_button": true,
+      "instructions": null,
+      "is_trainable": false,
+      "narrow_instructions": null,
+      "description": "Allows learners to enter algebraic expressions.",
+      "needs_summary": false,
+      "name": "Algebraic Expression Input",
+      "answer_type": "AlgebraicExpression",
+      "is_linear": false,
+      "display_mode": "inline",
+      "id": "AlgebraicExpressionInput",
+      "customization_arg_specs": [
+        {
+          "description": "Represent division using fractions (rather than ÷).",
+          "name": "useFractionForDivision",
+          "schema": {
+            "type": "bool"
+          },
+          "default_value": false
+        }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "MatchesExactlyWith": "matches exactly with {{x|AlgebraicExpression}}",
+        "IsEquivalentTo": "is equivalent to {{x|AlgebraicExpression}}",
+        "ContainsSomeOf": "contains at least one of the terms present in {{x|AlgebraicExpression}}",
+        "OmitsSomeOf": "omits at least one of the terms present in {{x|AlgebraicExpression}}",
+        "MatchesWithGeneralForm": "matches the form of {{x|AlgebraicExpression}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
+      }
+    },
+    "FractionInput": {
+      "can_have_solution": true,
+      "show_generic_submit_button": true,
+      "instructions": null,
+      "is_trainable": false,
+      "narrow_instructions": null,
+      "description": "Allows learners to enter integers and fractions.",
+      "needs_summary": false,
+      "name": "Fraction Input",
+      "answer_type": "Fraction",
+      "is_linear": false,
+      "display_mode": "inline",
+      "id": "FractionInput",
+      "customization_arg_specs": [
+        {
+          "description": "Require the learner's answer to be in simplest form",
+          "name": "requireSimplestForm",
+          "schema": {
+            "type": "bool"
+          },
+          "default_value": false
+        },
+        {
+          "description": "Allow improper fractions in the learner's answer",
+          "name": "allowImproperFraction",
+          "schema": {
+            "type": "bool"
+          },
+          "default_value": true
+        },
+        {
+          "description": "Allow the answer to contain an integer part",
+          "name": "allowNonzeroIntegerPart",
+          "schema": {
+            "type": "bool"
+          },
+          "default_value": true
+        },
+        {
+          "description": "Custom placeholder text (optional)",
+          "name": "customPlaceholder",
+          "schema": {
+            "type": "custom",
+            "obj_type": "SubtitledUnicode"
+          },
+          "default_value": {
+            "content_id": null,
+            "unicode_str": ""
+          }
+        }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "HasNoFractionalPart": "has no fractional part",
+        "HasFractionalPartExactlyEqualTo": "has fractional part exactly equal to {{f|Fraction}}",
+        "IsEquivalentToAndInSimplestForm": "is equivalent to {{f|Fraction}} and in simplest form",
+        "IsExactlyEqualTo": "exactly matches {{f|Fraction}}",
+        "HasNumeratorEqualTo": "has numerator equal to {{x|Int}}",
+        "IsLessThan": "is less than {{f|Fraction}}",
+        "IsGreaterThan": "is greater than {{f|Fraction}}",
+        "HasIntegerPartEqualTo": "has integer part equal to {{x|Int}}",
+        "IsEquivalentTo": "is equivalent to {{f|Fraction}}",
+        "HasDenominatorEqualTo": "has denominator equal to {{x|NonnegativeInt}}"
+      }
+    },
+    "RatioExpressionInput": {
+      "can_have_solution": true,
+      "show_generic_submit_button": true,
+      "instructions": null,
+      "is_trainable": false,
+      "narrow_instructions": null,
+      "description": "Allow learners to enter ratios.",
+      "needs_summary": false,
+      "name": "Ratio Expression Input",
+      "answer_type": "RatioExpression",
+      "is_linear": false,
+      "display_mode": "inline",
+      "id": "RatioExpressionInput",
+      "customization_arg_specs": [
+        {
+          "description": "Custom placeholder text (optional)",
+          "name": "placeholder",
+          "schema": {
+            "type": "custom",
+            "obj_type": "SubtitledUnicode"
+          },
+          "default_value": {
+            "content_id": null,
+            "unicode_str": ""
+          }
+        },
+        {
+          "description": "The number of elements that the answer must have. If set to 0, a ratio of any length will be accepted.",
+          "name": "numberOfTerms",
+          "schema": {
+            "type": "int",
+            "validators": [
+              {
+                "min_value": 0,
+                "id": "is_at_least"
+              }
+            ]
+          },
+          "default_value": 0
+        }
+      ],
+      "is_terminal": false,
+      "default_outcome_heading": null,
+      "rule_descriptions": {
+        "Equals": "is equal to {{x|RatioExpression}}",
+        "IsEquivalent": "is equivalent to {{x|RatioExpression}}",
+        "HasNumberOfTermsEqualTo": "has number of terms equal to {{y|NonnegativeInt}}"
+      }
+    }
+}

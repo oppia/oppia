@@ -116,6 +116,9 @@ describe('Pretest question backend API service', function() {
                 unicode_str: '',
                 content_id: 'ca_placeholder_0'
               }
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           confirmed_unclassified_answers: [],
