@@ -2087,9 +2087,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if len(self.states) != len(processed_queue):
             dead_end_states = list(
                 set(self.states.keys()) - set(processed_queue))
+            sorted_dead_end_states = sorted(dead_end_states)
             raise utils.ValidationError(
                 'It is impossible to complete the exploration from the '
-                'following states: %s' % ', '.join(dead_end_states))
+                'following states: %s' % ', '.join(sorted_dead_end_states)
+            )
 
     def get_content_html(self, state_name: str, content_id: str) -> str:
         """Return the content for a given content id of a state.
