@@ -42,6 +42,6 @@ jobs:
         uses: zbazztian/filter-sarif@master
         with:
           patterns: |
-            -core/tests/data*.js
+            -core/tests/data.js
         input: sarif-results/${{ matrix.language }}.sarif
         output: sarif-results/${{ matrix.language }}.sarif
