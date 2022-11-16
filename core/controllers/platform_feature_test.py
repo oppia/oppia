@@ -82,8 +82,9 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
         )
 
         # Here we use MyPy ignore because the expected type of ALL_FEATURES_LIST
-        # is a list of 'PARAM_NAMES' Enum, but here for testing purposes we are
-        # providing a list of 'ParamNames' enums, which causes MyPy to throw an
+        # is a list of 'platform_feature_list.ParamNames' Enum, but here for
+        # testing purposes we are providing a list of custom 'ParamNames' enums
+        # for mocking the actual behavior, which causes MyPy to throw an
         # 'Incompatible types in assignment' error. Thus to avoid the error, we
         # used ignore here.
         feature_services.ALL_FEATURES_LIST = param_name_enums  # type: ignore[assignment]
