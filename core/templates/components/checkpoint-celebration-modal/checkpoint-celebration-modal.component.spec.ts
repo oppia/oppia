@@ -332,6 +332,9 @@ describe('Checkpoint celebration modal component', function() {
           },
           placeholder: {
             value: 1,
+          },
+          catchMisspellings: {
+            value: false
           }
         },
         hints: [],
