@@ -24,6 +24,9 @@ import {
   BlogDashboardBackendApiService,
   BlogDashboardBackendResponse,
   BlogDashboardData,
+  BlogPostViewsStats,
+  BlogPostViewsStatsBackendDict,
+  HourlyStats,
 } from 'domain/blog/blog-dashboard-backend-api.service';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogPostSummary, BlogPostSummaryBackendDict } from 'domain/blog/blog-post-summary.model';
@@ -78,6 +81,35 @@ describe('Blog Dashboard backend api service', () => {
   };
   let blogPostSummaryObject = BlogPostSummary.createFromBackendDict(
     blogPostSummary);
+
+  let hourlyStats: HourlyStats = {
+    '00': 1,
+    '01': 2,
+    '02': 1,
+    '03': 4,
+    '04': 5,
+    '05': 1,
+    '06': 7,
+    '07': 8,
+    '09': 1,
+    '10': 8,
+    '11': 0,
+    '12': 0,
+    '13': 0,
+  }
+  let weeklyStats: WeeklyStats = {
+    
+  }
+  let blogPostViewsStats: BlogPostViewsStatsBackendDict = {
+    blog_post_id: 'sample_id',
+    hourly_views: {
+      '00':
+    };
+    weekly_views: WeeklyStats;
+    monthly_views: MonthlyStats;
+    yearly_views: YearlyStats;
+    all_views: AllStats;
+  }
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
@@ -222,4 +254,27 @@ describe('Blog Dashboard backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith(
         'Some error in the backend.');
     }));
+
+  it('should fetch the blog post views stats for the given blog post id',
+    fakeAsync(() => {
+      blogDashboardBackendResponse.published_blog_post_summary_dicts = [
+        blogPostSummary];
+      blogDashboardBackendResponse.draft_blog_post_summary_dicts = [
+        blogPostSummary];
+      blogDashboardDataObject.publishedBlogPostSummaryDicts = [
+        blogPostSummaryObject];
+      blogDashboardDataObject.draftBlogPostSummaryDicts = [
+        blogPostSummaryObject];
+      bdbas.fetchBlogDashboardDataAsync().then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE);
+      expect(req.request.method).toEqual('GET');
+      req.flush(blogDashboardBackendResponse);
+
+      flushMicrotasks();
+      expect(successHandler).toHaveBeenCalledWith(blogDashboardDataObject);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 });

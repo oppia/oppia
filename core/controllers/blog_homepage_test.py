@@ -15,8 +15,8 @@
 """Tests for the blog homepage page."""
 
 from __future__ import annotations
-import logging
 import datetime
+import logging
 
 from core import feconf
 from core.domain import blog_services
@@ -26,9 +26,9 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import user_models
-    from mypy_imports import blog_stats_models
     from mypy_imports import blog_models
+    from mypy_imports import blog_stats_models
+    from mypy_imports import user_models
 
 (user_models, blog_stats_models, blog_models) = models.Registry.import_models([
     models.Names.USER, models.Names.BLOG_STATISTICS, models.Names.BLOG])
@@ -596,7 +596,7 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
 
     def test_recording_blog_post_view_event(self) -> None:
         self.post_json(
-            '%s/blog_post_viewed_event/%s' % 
+            '%s/blog_post_viewed_event/%s' %
             (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
         self.process_and_flush_pending_tasks()
 
@@ -612,7 +612,7 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
         )
         aggregated_author_stats_model = (
             blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
-                self.blog_admin_id)            
+                self.blog_admin_id)
         )
         current_datetime = datetime.datetime.utcnow()
         date_str = current_datetime.strftime('%Y-%m-%d')
@@ -628,7 +628,7 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
 
         # Blog Post is viewed again.
         self.post_json(
-            '%s/blog_post_viewed_event/%s' % 
+            '%s/blog_post_viewed_event/%s' %
             (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
         self.process_and_flush_pending_tasks()
 
@@ -644,7 +644,7 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
         )
         aggregated_author_stats_model = (
             blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
-                self.blog_admin_id)            
+                self.blog_admin_id)
         )
         current_datetime = datetime.datetime.utcnow()
         date_str = current_datetime.strftime('%Y-%m-%d')
@@ -662,9 +662,9 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
         blog_post_model.deleted = True
         blog_post_model.update_timestamps()
         blog_post_model.put()
-    
+
         self.post_json(
-            '%s/blog_post_viewed_event/%s' % 
+            '%s/blog_post_viewed_event/%s' %
             (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url),
             {},
             expected_status_int=404)
@@ -674,15 +674,14 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
         self
     ) -> None:
         self.post_json(
-            '%s/blog_post_viewed_event/%s' % 
+            '%s/blog_post_viewed_event/%s' %
             (feconf.BLOG_HOMEPAGE_DATA_URL, 'invalidblogPostId'),
             {},
             expected_status_int=404)
 
-
     def test_recording_blog_post_read_event(self) -> None:
         self.post_json(
-            '%s/blog_post_read_event/%s' % 
+            '%s/blog_post_read_event/%s' %
             (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
         self.process_and_flush_pending_tasks()
 
@@ -698,7 +697,7 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
         )
         aggregated_author_stats_model = (
             blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
-                self.blog_admin_id)            
+                self.blog_admin_id)
         )
         current_datetime = datetime.datetime.utcnow()
         date_str = current_datetime.strftime('%Y-%m-%d')
@@ -714,7 +713,7 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
 
         # Blog Post is read again.
         self.post_json(
-            '%s/blog_post_read_event/%s' % 
+            '%s/blog_post_read_event/%s' %
             (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
         self.process_and_flush_pending_tasks()
 
@@ -730,7 +729,7 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
         )
         aggregated_author_stats_model = (
             blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
-                self.blog_admin_id)            
+                self.blog_admin_id)
         )
         current_datetime = datetime.datetime.utcnow()
         date_str = current_datetime.strftime('%Y-%m-%d')
@@ -748,9 +747,9 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
         blog_post_model.deleted = True
         blog_post_model.update_timestamps()
         blog_post_model.put()
-    
+
         self.post_json(
-            '%s/blog_post_read_event/%s' % 
+            '%s/blog_post_read_event/%s' %
             (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url),
             {},
             expected_status_int=404)
@@ -760,18 +759,17 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
         self
     ) -> None:
         self.post_json(
-            '%s/blog_post_read_event/%s' % 
+            '%s/blog_post_read_event/%s' %
             (feconf.BLOG_HOMEPAGE_DATA_URL, 'invalidblogPostId'),
             {},
             expected_status_int=404)
-
 
     def test_recording_blog_post_exited_event(self) -> None:
         payload = {
             'time_taken_to_read_blog_post': 3.07
         }
         self.post_json(
-            '%s/blog_post_exited_event/%s' % 
+            '%s/blog_post_exited_event/%s' %
             (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), payload)
         self.process_and_flush_pending_tasks()
 
@@ -787,7 +785,7 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
         )
         aggregated_author_stats_model = (
             blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
-                self.blog_admin_id)            
+                self.blog_admin_id)
         )
 
         self.assertEqual(
@@ -800,7 +798,7 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
             'time_taken_to_read_blog_post': 3.55
         }
         self.post_json(
-            '%s/blog_post_exited_event/%s' % 
+            '%s/blog_post_exited_event/%s' %
             (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), payload)
         self.process_and_flush_pending_tasks()
 
@@ -816,7 +814,7 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
         )
         aggregated_author_stats_model = (
             blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
-                self.blog_admin_id)            
+                self.blog_admin_id)
         )
 
         self.assertEqual(
@@ -832,9 +830,9 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
         blog_post_model.deleted = True
         blog_post_model.update_timestamps()
         blog_post_model.put()
-    
+
         self.post_json(
-            '%s/blog_post_exited_event/%s' % 
+            '%s/blog_post_exited_event/%s' %
             (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url),
             payload,
             expected_status_int=404)
@@ -847,7 +845,7 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
             'time_taken_to_read_blog_post': 3.07
         }
         self.post_json(
-            '%s/blog_post_exited_event/%s' % 
+            '%s/blog_post_exited_event/%s' %
             (feconf.BLOG_HOMEPAGE_DATA_URL, 'invalidblogPostId'),
             payload,
             expected_status_int=404

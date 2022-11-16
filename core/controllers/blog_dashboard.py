@@ -23,7 +23,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import blog_domain
-from core.domain import blog_statistics_domain
 from core.domain import blog_services
 from core.domain import blog_statistics_services
 from core.domain import config_domain
@@ -359,7 +358,7 @@ class BlogPostHandler(
 
 class BlogDashboardBlogPostStatisticsHandler(base.BaseHandler):
     """Handler for blog dashboard statistics tab for blog post."""
-    
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'blog_post_id': {
@@ -417,7 +416,7 @@ class BlogDashboardBlogPostStatisticsHandler(base.BaseHandler):
 
 class BlogDashboardAuthorBlogPostsStatisticsHandler(base.BaseHandler):
     """Handler for blog dashboard statistics tab for author"""
-    
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'chart_type': {

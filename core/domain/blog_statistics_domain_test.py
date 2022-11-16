@@ -23,9 +23,10 @@ import datetime
 
 from core import feconf
 from core import utils
+
 from core.domain import blog_statistics_domain
-from core.platform import models
 from core.domain import event_services
+from core.platform import models
 from core.tests import test_utils
 
 
@@ -107,7 +108,8 @@ class AuthorBlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
         # Validate with invalid format.
         self.stats_obj.author_id = 1234
         self._assert_valid_reading_time_stats_domain_obj(
-            'Author ID must be a string, but got 1234')
+            'Author ID must be a string, but got 1234'
+        )
 
 
 class BlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
@@ -172,12 +174,14 @@ class BlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
         # Validate with invalid format.
         self.stats_obj.blog_post_id = 'invalidBlogPostId'
         self._assert_valid_reading_time_stats_domain_obj(
-            'Blog ID invalidBlogPostId is invalid')
+            'Blog ID invalidBlogPostId is invalid'
+        )
 
         # Validate with invalid format.
         self.stats_obj.blog_post_id = 1234
         self._assert_valid_reading_time_stats_domain_obj(
-            'Blog Post ID must be a string, but got 1234')
+            'Blog Post ID must be a string, but got 1234'
+        )
 
 
 class AuthorBlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
@@ -242,9 +246,11 @@ class AuthorBlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
         # Validate with invalid format.
         self.stats_obj.blog_post_id = 'invalidBlogPostId'
         self._assert_valid_reading_time_stats_domain_obj(
-            'Blog ID invalidBlogPostId is invalid')
+            'Blog ID invalidBlogPostId is invalid'
+        )
 
         # Validate with invalid format.
         self.stats_obj.blog_post_id = 1234
         self._assert_valid_reading_time_stats_domain_obj(
-            'Blog Post ID must be a string, but got 1234')
+            'Blog Post ID must be a string, but got 1234'
+        )

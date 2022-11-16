@@ -25,9 +25,9 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_domain
 from core.domain import blog_services
+from core.domain import blog_statistics_services
 from core.domain import config_domain
 from core.domain import user_services
-from core.domain import blog_statistics_services
 
 from typing import Dict, Final, List, Optional, Tuple, TypedDict
 
@@ -516,7 +516,7 @@ class BlogPostViewedEventHandler(base.BaseHandler):
                     'The blog post page with the given url doesn\'t exist.'
                 )
             )
-        
+
         blog_statistics_services.BlogPostViewedEventHandler.record(
             blog_post.id, blog_post.author_id)
 
@@ -543,6 +543,7 @@ class BlogPostReadEventHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'POST': {}
     }
+
     @acl_decorators.open_access
     def post(self, blog_post_url):
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
@@ -552,7 +553,7 @@ class BlogPostReadEventHandler(base.BaseHandler):
                     'The blog post page with the given url doesn\'t exist.'
                 )
             )
-        
+
         blog_statistics_services.BlogPostReadEventHandler.record(
             blog_post.id, blog_post.author_id)
 
@@ -601,7 +602,7 @@ class BlogPostExitedEventHandler(base.BaseHandler):
                     'The blog post page with the given url doesn\'t exist.'
                 )
             )
-        
+
         blog_statistics_services.BlogPostExitedEventHandler.record(
             blog_post.id, blog_post.author_id, time_taken_to_read_blog_post)
 

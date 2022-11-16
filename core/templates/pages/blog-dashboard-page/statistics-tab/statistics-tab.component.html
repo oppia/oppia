@@ -45,7 +45,7 @@
           </div>
         </mat-button-toggle>
         <mat-button-toggle (click)="showReadsChartStats(); selectedChartType = 'READS_CHART'"
-                           value="READS_CHART" 
+                           value="READS_CHART"
                            class="statistics-chart-toggle-button">
           <div class="mt-4 mx-1 statistics-chart-toggle-button-heading">
             {{ 'I18N_BLOG_DASHBOARD_STATISTICS_READS_CHART_HEADING' | translate }}
@@ -83,7 +83,7 @@
   </div>
 </div>
 <style>
-  @media(min-width: 880px) {  
+  @media(min-width: 880px) {
     .blog-stats {
       height: 320px;
       width: 550px;
@@ -91,12 +91,12 @@
   }
 
   .statistics-chart-heading {
-    text-align: left;
+    color: #333;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 24px;
     letter-spacing: 0px;
-    color: #333333;
     opacity: 1;
+    text-align: left;
   }
 
   .statistics-chart-container /deep/ .mat-button-toggle {
@@ -108,29 +108,29 @@
   }
 
   .statistics-chart-toggle-button {
-    width: 33.33%;
     text-align: left;
+    width: 33.33%;
   }
   .statistics-chart-toggle-button-heading {
-    text-align: left;
+    color: #00645c;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 20px;
     font-weight: 500;
-    line-height: 22px;
     letter-spacing: 0px;
-    color: #00645C;
+    line-height: 22px;
     opacity: 1;
+    text-align: left;
   }
 
   .statistics-chart-toggle-button-description {
-    text-align: left;
+    color: #00645c;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 16px;
     font-weight: 500;
-    line-height: 14px;
     letter-spacing: 0px;
-    color: #00645C;
+    line-height: 14px;
     opacity: 1;
+    text-align: left;
   }
 
   .statistics-plot-heading {
@@ -153,26 +153,22 @@
     opacity: 1;
     text-align: left;
   }
-  
+
   .blog-dashboard-statistics-container {
+    background-color: #e8e7e3;
     border: 1px solid #333;
     border-radius: 2px;
-    opacity: 1;
-    background-color: #e8e7e3;
-    max-width: 928px;
-    width: 100%;
     height: 644px;
-  }
-
-  .statistics-plot-container {
-
+    max-width: 928px;
+    opacity: 1;
+    width: 100%;
   }
 
   .statistics-chart-container{
     background: #FFF padding-box;
     border: 1px solid #707070;
-    opacity: 1;
     height: 500px;
+    opacity: 1;
   }
 
   .blog-post-list {

@@ -22,10 +22,11 @@ import datetime
 
 from core import utils
 
-from typing import List, Optional, TypedDict, Dict, Union
+from typing import Dict, TypedDict, Union
 
 # This is same as base_models.ID_Length.
 BLOG_POST_ID_LENGTH = 12
+
 
 def _repack_views_stats(
     stats: Union[
@@ -45,7 +46,6 @@ def _repack_views_stats(
         BlogPostViewsAggregatedStats | AuthorBlogPostViewsAggregatedStats. A
         repacked stats domain object with only necessary aggregated stats.
     """
-    print(stats)
     stats.views_by_date = {
         k: stats.views_by_date[k] for k in list(stats.views_by_date)[:3]
     }
@@ -53,6 +53,7 @@ def _repack_views_stats(
         k: stats.views_by_hour[k] for k in list(stats.views_by_hour)[:3]
     }
     return stats
+
 
 def _repack_reads_stats(
     stats: Union[
@@ -81,6 +82,7 @@ def _repack_reads_stats(
     }
     return stats
 
+
 def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
     stats: Union[
         BlogPostViewsAggregatedStats,
@@ -98,8 +100,8 @@ def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
         dict. A dict with number of views keyed to hour('HH') in UTC fromat for
         the past twenty four hours.
     """
-    current_hour = datetime.datetime.utcnow().hour
-    current_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
+    current_hour=datetime.datetime.utcnow().hour
+    current_date=datetime.datetime.utcnow().strftime('%Y-%m-%d')
     yesterdays_date = (
         datetime.datetime.utcnow() - datetime.timedelta(days = 1)
     ).strftime('%Y-%m-%d')
@@ -113,9 +115,10 @@ def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
         }
     todays_stats = stats.views_by_hour[current_date]
     hourly_stats.update({
-        k: todays_stats[k] for k in list(todays_stats)[:current_hour+1]
+        k: todays_stats[k] for k in list(todays_stats)[:current_hour + 1]
     })
     return hourly_stats
+
 
 def _generate_past_week_views_stats_from_views_by_date(
     stats: Union[
@@ -134,7 +137,6 @@ def _generate_past_week_views_stats_from_views_by_date(
         the past week(past seven days).
     """
     current_month_year = datetime.datetime.utcnow().strftime('%Y-%m')
-    current_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
     current_day = datetime.datetime.utcnow().day
     current_month_stats = stats.views_by_date[current_month_year]
     weekly_stats = {}
@@ -143,7 +145,7 @@ def _generate_past_week_views_stats_from_views_by_date(
             datetime.datetime.utcnow() - datetime.timedelta(days=7)
         ).strftime('%Y-%m')
         last_month_stats = stats.views_by_date[last_month_year]
-        weekly_stats = { 
+        weekly_stats = {
             k: last_month_stats[k] for k in list(
                 last_month_stats)[-(7-current_day):]
         }
@@ -217,9 +219,9 @@ def _generate_past_twenty_four_hour_reads_stats_from_reads_by_hour(
         dict. A dict with number of reads keyed to hour('HH') in UTC fromat for
         the past twenty four hours.
     """
-    current_hour = datetime.datetime.utcnow().hour
-    current_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
-    yesterdays_date = (
+    current_hour=datetime.datetime.utcnow().hour
+    current_date.=adatetime.datetime.utcnow().strftime('%Y-%m-%d')
+    yesedays_date = (
         datetime.datetime.utcnow() - datetime.timedelta(days = 1)
     ).strftime('%Y-%m-%d')
     deficit_hours_in_current_date = 24 - current_hour - 1
@@ -262,7 +264,7 @@ def _generate_past_week_reads_stats_from_reads_by_date(
             datetime.datetime.utcnow() - datetime.timedelta(days=7)
         ).strftime('%Y-%m')
         last_month_stats = stats.reads_by_date[last_month_year]
-        weekly_stats = { 
+        weekly_stats = {
             k: last_month_stats[k] for k in list(
                 last_month_stats)[-(7-current_date):]
         }

@@ -18,22 +18,16 @@
 
 from __future__ import annotations
 
-import datetime
-import types
-
-from core import feconf
-from core import utils
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List
+from typing import Final
 
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import blog_stats_models
-    from mypy_imports import user_models
 
 (base_models, blog_stats_models, user_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.BLOG_STATISTICS, models.Names.USER
@@ -496,9 +490,9 @@ class BlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
             Exception,
             'A blog post views stats model with the given blog post ID'
             'exists already.'):
-                blog_stats_models.BlogPostViewsAggregatedStatsModel.create(
-                    self.BLOG_POST_TWO_ID
-                )
+            blog_stats_models.BlogPostViewsAggregatedStatsModel.create(
+                 self.BLOG_POST_TWO_ID
+            )
 
 
     def test_get_model_association_to_user(self) -> None:
@@ -569,9 +563,9 @@ class BlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
             Exception,
             'A blog post reads stats model with the given blog post ID'
             'exists already.'):
-                blog_stats_models.BlogPostReadsAggregatedStatsModel.create(
-                    self.BLOG_POST_TWO_ID
-                )
+            blog_stats_models.BlogPostReadsAggregatedStatsModel.create(
+                self.BLOG_POST_TWO_ID
+            )
 
 
     def test_get_model_association_to_user(self) -> None:
@@ -650,9 +644,9 @@ class BlogPostReadingTimeModelUnitTests(test_utils.GenericTestBase):
             Exception,
             'A blog post reading time model with the given blog post ID'
             'exists already.'):
-                blog_stats_models.BlogPostReadingTimeModel.create(
-                    self.BLOG_POST_TWO_ID
-                )
+            blog_stats_models.BlogPostReadingTimeModel.create(
+                self.BLOG_POST_TWO_ID
+            )
 
 
     def test_get_model_association_to_user(self) -> None:
@@ -686,7 +680,9 @@ class BlogPostReadingTimeModelUnitTests(test_utils.GenericTestBase):
         )
 
 
-class AuthorBlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
+class AuthorBlogPostReadsAggregatedStatsModelUnitTests(
+    test_utils.GenericTestBase
+):
     """Test the BlogPostReadsAggregatedStatsModel class."""
 
     AUTHOR_ONE_ID: Final = 'author_one'
@@ -721,8 +717,11 @@ class AuthorBlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBas
         blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.create(
             self.AUTHOR_TWO_ID
         )
-        stats_model = blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
-            self.AUTHOR_TWO_ID)
+        stats_model = (
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
+                self.AUTHOR_TWO_ID
+            )
+        )
 
         self.assertEqual(stats_model.id, self.AUTHOR_TWO_ID)
 
@@ -732,9 +731,8 @@ class AuthorBlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBas
             Exception,
             'A author blog post reads stats model with the given author ID'
             ' exists already.'):
-                blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.create( 
-                    self.AUTHOR_TWO_ID
-                )
+                (blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel
+                    .create(self.AUTHOR_TWO_ID))
 
 
     def test_get_model_association_to_user(self) -> None:
@@ -768,7 +766,9 @@ class AuthorBlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBas
                 .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
 
 
-class AuthorBlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
+class AuthorBlogPostViewsAggregatedStatsModelUnitTests(
+    test_utils.GenericTestBase
+):
     """Test the BlogPostViewsAggregatedStatsModel class."""
 
     AUTHOR_ONE_ID: Final = 'author_one'
@@ -814,9 +814,9 @@ class AuthorBlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBas
             Exception,
             'A author blog post views stats model with the given author ID'
             ' exists already.'):
-                blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create( 
-                    self.AUTHOR_TWO_ID
-                )
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
+                self.AUTHOR_TWO_ID
+            )
 
 
     def test_get_model_association_to_user(self) -> None:
@@ -893,8 +893,11 @@ class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
         blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
             self.AUTHOR_TWO_ID
         )
-        stats_model = blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
-            self.AUTHOR_TWO_ID)
+        stats_model = (
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
+                self.AUTHOR_TWO_ID
+            )
+        )
 
         self.assertEqual(stats_model.id, self.AUTHOR_TWO_ID)
 
@@ -904,9 +907,9 @@ class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
             Exception,
             'A author blog post reading time model with the given author ID'
             ' exists already.'):
-                blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
-                    self.AUTHOR_TWO_ID
-                )
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
+                self.AUTHOR_TWO_ID
+            )
 
 
     def test_get_model_association_to_user(self) -> None:

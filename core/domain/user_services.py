@@ -46,11 +46,11 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import audit_models
     from mypy_imports import auth_models
+    from mypy_imports import blog_stats_models
     from mypy_imports import bulk_email_services
     from mypy_imports import suggestion_models
     from mypy_imports import transaction_services
     from mypy_imports import user_models
-    from mypy_imports import blog_stats_models
 
 (
     auth_models,
@@ -1531,12 +1531,14 @@ def add_user_role(user_id: str, role: str) -> None:
 
     save_user_settings(user_settings)
 
+
 def create_blog_post_author_statistics_models(author_id: str) -> None:
     """Creates author aggregated statistics model when a user either becomes
     blog admin or blog editor.
 
     Args:
-        user_id: str. The unique ID of the user whose role is to be updated.
+        author_id: str. The unique ID of the blog post author for whom the
+            aggregated statistics models are to be created.
     """
     model = blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get_by_id(
         author_id)

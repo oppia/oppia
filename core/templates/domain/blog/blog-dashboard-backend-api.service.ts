@@ -41,11 +41,11 @@ interface NewBlogPostBackendResponse {
   'blog_post_id': string;
 }
 
-interface HourlyStats {
+export interface HourlyStats {
   [hourKey: string]: number;
 }
 
-interface WeeklyStats {
+export interface WeeklyStats {
   [dateKey: string]: number;
 }
 
@@ -78,7 +78,7 @@ interface ReadsStatsBackendDict {
   'all_reads': AllStats;
 }
 
-interface BlogPostViewsStatsBackendDict {
+export interface BlogPostViewsStatsBackendDict {
   'blog_post_id': string;
   'hourly_views': HourlyStats;
   'weekly_views': WeeklyStats;
