@@ -111,3 +111,38 @@
   padding: 10px;
   width: max-content;
 }
+
+@media screen and (max-width: 940px) {
+  .oppia-learner-group-overview {
+    width: 90%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-learner-group-overview {
+    margin-top: 0;
+    width: 100%;
+  }
+
+  .oppia-learner-group-overview .progress-summary-header {
+    display: grid;
+    gap: 10px;
+  }
+
+  .oppia-learner-group-overview .progress-summary-title {
+    font-size: 16px;
+  }
+
+  .oppia-learner-group-overview .learner-group-summary-card {
+    margin-top: 0;
+    padding: 20px;
+  }
+
+  .oppia-learner-group-overview .overview-tab-sections {
+    padding: 20px;
+  }
+
+  .oppia-learner-group-overview .oppia-learner-group-learners-progress-overview {
+    margin-top: 0;
+  }
+}

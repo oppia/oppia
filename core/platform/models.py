@@ -385,6 +385,16 @@ class _Gae(Platform):
             from core.platform.storage import cloud_storage_services
             return cloud_storage_services
 
+    @classmethod
+    def import_secrets_services(cls) -> ModuleType:
+        """Imports and returns cloud_secrets_services module.
+
+        Returns:
+            module. The cloud_secrets_services module.
+        """
+        from core.platform.secrets import cloud_secrets_services
+        return cloud_secrets_services
+
     NAME = 'gae'
 
 
@@ -547,3 +557,12 @@ class Registry:
             module. The storage_services module.
         """
         return cls._get().import_storage_services()
+
+    @classmethod
+    def import_secrets_services(cls) -> ModuleType:
+        """Imports and returns secrets_services module.
+
+        Returns:
+            module. The secrets_services module.
+        """
+        return cls._get().import_secrets_services()

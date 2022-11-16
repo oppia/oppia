@@ -43,9 +43,7 @@ import yaml
 
 from typing import ( # isort:skip
     Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Mapping,
-    Optional, TextIO, Tuple, TypeVar, Union, cast, overload)
-from typing_extensions import Literal # isort:skip
-
+    Literal, Optional, TextIO, Tuple, TypeVar, Union, cast, overload)
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
@@ -385,6 +383,18 @@ def get_random_choice(alist: List[T]) -> T:
     )
     index = get_random_int(len(alist))
     return alist[index]
+
+
+def get_url_scheme(url: str) -> str:
+    """Gets the url scheme used by a link.
+
+    Args:
+        url: str. The URL.
+
+    Returns:
+        str. Returns the URL scheme.
+    """
+    return urllib.parse.urlparse(url).scheme
 
 
 def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
@@ -1367,3 +1377,53 @@ def url_open(
     # check is refactored.
     context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
     return urllib.request.urlopen(source_url, context=context)
+
+
+def escape_html(unescaped_html_data: str) -> str:
+    """This functions escapes an unescaped HTML string.
+
+    Args:
+        unescaped_html_data: str. Unescaped HTML string to be escaped.
+
+    Returns:
+        str. Escaped HTML string.
+    """
+    # Replace list to escape html strings.
+    replace_list_for_escaping = [
+        ('&', '&amp;'),
+        ('"', '&quot;'),
+        ('\'', '&#39;'),
+        ('<', '&lt;'),
+        ('>', '&gt;')
+    ]
+    escaped_html_data = unescaped_html_data
+    for replace_tuple in replace_list_for_escaping:
+        escaped_html_data = escaped_html_data.replace(
+            replace_tuple[0], replace_tuple[1])
+
+    return escaped_html_data
+
+
+def unescape_html(escaped_html_data: str) -> str:
+    """This function unescapes an escaped HTML string.
+
+    Args:
+        escaped_html_data: str. Escaped HTML string to be unescaped.
+
+    Returns:
+        str. Unescaped HTML string.
+    """
+    # Replace list to unescape html strings.
+    replace_list_for_unescaping = [
+        ('&quot;', '"'),
+        ('&#39;', '\''),
+        ('&lt;', '<'),
+        ('&gt;', '>'),
+        ('&amp;', '&')
+    ]
+    unescaped_html_data = escaped_html_data
+    for replace_tuple in replace_list_for_unescaping:
+        unescaped_html_data = unescaped_html_data.replace(
+            replace_tuple[0], replace_tuple[1])
+
+    return unescaped_html_data

@@ -926,16 +926,20 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_webdriverio(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
-        self.exit_stack.enter_context(servers.managed_webdriverio_server())
+        self.exit_stack.enter_context(
+            servers.managed_webdriverio_server(chrome_version='104.0.5112.79'))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+        self.assertEqual(
+            popen_calls[0].kwargs,
+            {'shell': True, 'stdout': subprocess.PIPE}
+        )
         program_args = popen_calls[0].program_args
         self.assertIn(
-            '%s --unhandled-rejections=strict %s %s' % (
+            '%s --unhandled-rejections=strict %s %s --suite full %s' % (
                 common.NPX_BIN_PATH, common.NODEMODULES_WDIO_BIN_PATH,
-                common.WEBDRIVERIO_CONFIG_FILE_PATH),
+                common.WEBDRIVERIO_CONFIG_FILE_PATH, '104.0.5112.79'),
             program_args)
         self.assertNotIn('DEBUG=true', program_args)
         self.assertIn('--suite full', program_args)
