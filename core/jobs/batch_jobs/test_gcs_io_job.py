@@ -100,7 +100,7 @@ class TestGCSIoReadJob(base_jobs.JobBase):
                     ]
                 ))
             | 'Read files from the GCS' >> gcs_io.ReadFile(
-                self.client, mode='r')
+                self.client)
         )
 
         total_files_read = (
@@ -146,7 +146,7 @@ class TestGcsIoGetFilesJob(base_jobs.JobBase):
             | 'Get files with prefix' >> gcs_io.GetFiles(self.client)
         )
 
-        total_files_wirh_prefixes = (
+        total_files_with_prefixes = (
             get_files_of_specefic_prefix_from_gcs
             | 'Total number of prefixes fetched from GCS' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
@@ -162,7 +162,7 @@ class TestGcsIoGetFilesJob(base_jobs.JobBase):
 
         return (
             (
-                total_files_wirh_prefixes,
+                total_files_with_prefixes,
                 output
             )
             | 'Combine results' >> beam.Flatten()

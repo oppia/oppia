@@ -40,10 +40,12 @@ app_identity_services = models.Registry.import_app_identity_services()
 class ReadFile(beam.PTransform): # type: ignore[misc]
     """Read files form the GCS."""
 
+    # Here we pass FakeGcsClient when we want to test the functionality locally.
+    # This ensures that our code will work fine while interacting with GCS.
     def __init__(
         self,
         client: Optional[gcsio_test.FakeGcsClient] = None,
-        mode: str = 'r',
+        mode_is_binary: bool = False,
         label: Optional[str] = None
     ) -> None:
         """Initializes the ReadFile PTransform.
@@ -51,13 +53,18 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         Args:
             client: Optional[gcsio_test.FakeGcsClient]. The GCS client to use
                 while testing. This will be None when testing on server.
-            mode: str. The mode in which the file will be read, can be
-                'r' and 'rb'.
+            mode_is_binary: bool. True, when the mode needs to be 'rb' and
+                False when mode needs to be 'r'. Represents to read the file
+                in binary or not.
             label: Optional[str]. The label of the PTransform.
         """
         super().__init__(label=label)
         self.client = client
-        self.mode = mode
+        self.gcs = gcsio.GcsIO(self.client)
+        if mode_is_binary:
+            self.mode = 'rb'
+        else:
+            self.mode = 'r'
 
     def expand(self, file_paths: beam.PCollection) -> beam.PCollection:
         """Returns PCollection with file data.
@@ -83,10 +90,9 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         Returns:
             data: Union[bytes, str]. The file data.
         """
-        gcs = gcsio.GcsIO(self.client)
         bucket = app_identity_services.get_gcs_resource_bucket_name()
         gcs_url = f'gs://{bucket}/{file_path}'
-        file = gcs.open(gcs_url, mode=self.mode)
+        file = self.gcs.open(gcs_url, mode=self.mode)
         data = file.read()
         file.close()
         return data
@@ -106,10 +112,12 @@ class FileObjectDict(TypedDict):
 class WriteFile(beam.PTransform): # type: ignore[misc]
     """Write files to GCS."""
 
+    # Here we pass FakeGcsClient when we want to test the functionality locally.
+    # This ensures that our code will work fine while interacting with GCS.
     def __init__(
         self,
         client: Optional[gcsio_test.FakeGcsClient] = None,
-        mode: str = 'w',
+        mode_is_binary: bool = False,
         mime_type: str = 'application/octet-stream',
         label: Optional[str] = None
     ) -> None:
@@ -118,15 +126,20 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
         Args:
             client: Optional[gcsio_test.FakeGcsClient]. The GCS client to use
                 while testing. This will be None when testing on server.
-            mode: str. The mode in which the file will be write, can be
-                'w' and 'wb'.
+            mode_is_binary: bool. True, when the mode needs to be 'wb' and
+                False when mode needs to be 'w'. Represents to write the file
+                in binary or not.
             mime_type: str. The mime_type to assign to the file.
             label: Optional[str]. The label of the PTransform.
         """
         super().__init__(label=label)
         self.client = client
-        self.mode = mode
         self.mime_type = mime_type
+        self.gcs = gcsio.GcsIO(self.client)
+        if mode_is_binary:
+            self.mode = 'wb'
+        else:
+            self.mode = 'w'
 
     def expand(self, file_objects: beam.PCollection) -> beam.PCollection:
         """Returns the PCollection of files that have written to the GCS.
@@ -155,11 +168,10 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
             write_file: int. Returns the number of bytes that has
             been written to GCS.
         """
-        gcs = gcsio.GcsIO(self.client)
         bucket = app_identity_services.get_gcs_resource_bucket_name()
         filepath = file_obj['filepath']
         gcs_url = 'gs://%s/%s' % (bucket, filepath)
-        file = gcs.open(
+        file = self.gcs.open(
             filename=gcs_url,
             mode=self.mode,
             mime_type=self.mime_type)
@@ -175,6 +187,8 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
 class DeleteFile(beam.PTransform): # type: ignore[misc]
     """Delete files from GCS."""
 
+    # Here we pass FakeGcsClient when we want to test the functionality locally.
+    # This ensures that our code will work fine while interacting with GCS.
     def __init__(
         self,
         client: Optional[gcsio_test.FakeGcsClient] = None,
@@ -189,6 +203,7 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
         """
         super().__init__(label=label)
         self.client = client
+        self.gcs = gcsio.GcsIO(self.client)
 
     def expand(self, file_paths: beam.PCollection) -> beam.pvalue.PDone:
         """Deletes the files in given PCollection.
@@ -210,11 +225,14 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
 
         Args:
             file_path: str. The name of the file that will be deleted.
+
+        Returns:
+            delete_result: None. Returns None or error.
         """
-        gcs = gcsio.GcsIO(self.client)
         bucket = app_identity_services.get_gcs_resource_bucket_name()
         gcs_url = f'gs://{bucket}/{file_path}'
-        gcs.delete(gcs_url)
+        delete_result = self.gcs.delete(gcs_url)
+        return delete_result
 
 
 # TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
@@ -224,6 +242,8 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
 class GetFiles(beam.PTransform): # type: ignore[misc]
     """Get all files with specefic prefix."""
 
+    # Here we pass FakeGcsClient when we want to test the functionality locally.
+    # This ensures that our code will work fine while interacting with GCS.
     def __init__(
         self,
         client: Optional[gcsio_test.FakeGcsClient] = None,
@@ -238,32 +258,32 @@ class GetFiles(beam.PTransform): # type: ignore[misc]
         """
         super().__init__(label=label)
         self.client = client
+        self.gcs = gcsio.GcsIO(self.client)
 
-    def expand(self, file_paths: beam.PCollection) -> beam.PCollection:
+    def expand(self, prefixes: beam.PCollection) -> beam.PCollection:
         """Returns PCollection with file names.
 
         Args:
-            file_paths: PCollection. The collection of filepath prefixes.
+            prefixes: PCollection. The collection of filepath prefixes.
 
         Returns:
             PCollection. The PCollection of the file names.
         """
         return (
-            file_paths
+            prefixes
             | 'Get names of the files' >> beam.Map(self._get_file_with_prefix)
         )
 
-    def _get_file_with_prefix(self, file_path: str) -> Dict[str, int]:
+    def _get_file_with_prefix(self, prefix: str) -> Dict[str, int]:
         """Helper function to get file names with the prefix.
 
         Args:
-            file_path: str. The prefix path of which we want to list
+            prefix: str. The prefix path of which we want to list
                 all the files.
 
         Returns:
             Dict[str, int]. The file name as key and size of file as value.
         """
-        gcs = gcsio.GcsIO(self.client)
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        gcs_url = f'gs://{bucket}/{file_path}'
-        return gcs.list_prefix(gcs_url)
+        gcs_url = f'gs://{bucket}/{prefix}'
+        return self.gcs.list_prefix(gcs_url)
