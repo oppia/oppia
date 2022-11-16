@@ -8,7 +8,7 @@ import { AppConstants } from 'app.constants';
 })
 export class QuestionBadgeComponent {
   @Input() type!: string;
-  @Input() value: number;
+  @Input() contributionCount: number;
   @Input() isUnlocked: boolean;
   contributionTypeText: string;
 
@@ -27,7 +27,7 @@ export class QuestionBadgeComponent {
       throw new Error('Invalid contribution type.');
     }
 
-    if (this.value > 1) {
+    if (this.contributionCount > 1) {
       this.contributionTypeText += 's';
     }
   }

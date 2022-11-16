@@ -47,7 +47,7 @@ describe('Translation badge component', () => {
   describe('when a submission badge is passed ', () => {
     it('should show submission badges', fakeAsync(() => {
       component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
-      component.value = 1;
+      component.contributionCount = 1;
       component.language = 'Hindi';
 
       fixture.detectChanges();
@@ -58,7 +58,7 @@ describe('Translation badge component', () => {
 
     it('should show review badges', fakeAsync(() => {
       component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW;
-      component.value = 1;
+      component.contributionCount = 1;
       component.language = 'Hindi';
 
       fixture.detectChanges();
@@ -69,7 +69,7 @@ describe('Translation badge component', () => {
 
     it('should show correction badges', fakeAsync(() => {
       component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION;
-      component.value = 1;
+      component.contributionCount = 1;
       component.language = 'Hindi';
 
       fixture.detectChanges();
@@ -80,7 +80,7 @@ describe('Translation badge component', () => {
 
     it('should show multiple badges', fakeAsync(() => {
       component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
-      component.value = 10;
+      component.contributionCount = 10;
       component.language = 'Hindi';
 
       fixture.detectChanges();
@@ -93,7 +93,7 @@ describe('Translation badge component', () => {
   describe('when a long language text is given ', () => {
     it('should decrease the font size', fakeAsync(() => {
       component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
-      component.value = 1;
+      component.contributionCount = 1;
       component.language = 'Netherlands';
 
       fixture.detectChanges();
@@ -104,7 +104,7 @@ describe('Translation badge component', () => {
 
     it('should decrease the line height', fakeAsync(() => {
       component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
-      component.value = 1;
+      component.contributionCount = 1;
       component.language = 'Bahasa Indonesia';
 
       fixture.detectChanges();

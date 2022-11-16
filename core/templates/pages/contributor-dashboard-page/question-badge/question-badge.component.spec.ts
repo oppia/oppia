@@ -51,7 +51,7 @@ describe('Question badge component', () => {
   describe('when a submission badge is passed ', () => {
     it('should show submission badges', fakeAsync(() => {
       component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
-      component.value = 1;
+      component.contributionCount = 1;
 
       component.ngOnInit();
 
@@ -60,7 +60,7 @@ describe('Question badge component', () => {
 
     it('should show review badges', fakeAsync(() => {
       component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW;
-      component.value = 1;
+      component.contributionCount = 1;
 
       component.ngOnInit();
 
@@ -69,7 +69,7 @@ describe('Question badge component', () => {
 
     it('should show correction badges', fakeAsync(() => {
       component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION;
-      component.value = 1;
+      component.contributionCount = 1;
 
       component.ngOnInit();
 
@@ -78,7 +78,7 @@ describe('Question badge component', () => {
 
     it('should show multiple badges', fakeAsync(() => {
       component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
-      component.value = 10;
+      component.contributionCount = 10;
 
       component.ngOnInit();
 

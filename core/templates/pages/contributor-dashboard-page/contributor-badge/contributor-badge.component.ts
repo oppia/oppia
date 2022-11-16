@@ -98,11 +98,11 @@ export class ContributorBadgeComponent {
       this.userCanSuggestQuestions ||
       this.userCanReviewQuestionSuggestions);
 
-    const response = await this.contributionAndReviewStatsService.fetchAllStats(
-      username);
+    const allContributionStats = await this
+      .contributionAndReviewStatsService.fetchAllStats(username);
 
-    if (response.translation_contribution_stats.length > 0) {
-      await response.translation_contribution_stats.map((stat) => {
+    if (allContributionStats.translation_contribution_stats.length > 0) {
+      await allContributionStats.translation_contribution_stats.map((stat) => {
         const languageDescription =
           this.languageUtilService.getAudioLanguageDescription(
             stat.language_code);
@@ -124,8 +124,8 @@ export class ContributorBadgeComponent {
         }
       });
     }
-    if (response.translation_review_stats.length > 0) {
-      await response.translation_review_stats.map((stat) => {
+    if (allContributionStats.translation_review_stats.length > 0) {
+      await allContributionStats.translation_review_stats.map((stat) => {
         const languageDescription =
           this.languageUtilService.getAudioLanguageDescription(
             stat.language_code);
@@ -136,15 +136,15 @@ export class ContributorBadgeComponent {
           stat.accepted_translations_with_reviewer_edits_count);
       });
     }
-    if (response.question_contribution_stats.length > 0) {
-      response.question_contribution_stats.map((stat) => {
-        this.totalQuestionStats.submissions = stat.accepted_questions_count;
+    if (allContributionStats.question_contribution_stats.length > 0) {
+      allContributionStats.question_contribution_stats.map((stat) => {
+        this.totalQuestionStats.submissions += stat.accepted_questions_count;
       });
     }
-    if (response.question_review_stats.length > 0) {
-      response.question_review_stats.map((stat) => {
-        this.totalQuestionStats.reviews = stat.reviewed_questions_count;
-        this.totalQuestionStats.corrections = (
+    if (allContributionStats.question_review_stats.length > 0) {
+      allContributionStats.question_review_stats.map((stat) => {
+        this.totalQuestionStats.reviews += stat.reviewed_questions_count;
+        this.totalQuestionStats.corrections += (
           stat.accepted_questions_with_reviewer_edits_count);
       });
     }
@@ -196,18 +196,29 @@ export class ContributorBadgeComponent {
       contributionCount: number,
       contributionSubType: string, language?: string): Badge[] {
     const badges: Badge[] = [];
-    for (const value of AppConstants.CONTRIBUTOR_BADGE_INITIAL_LEVELS) {
-      if (contributionCount >= value) {
+    for (const level of AppConstants.CONTRIBUTOR_BADGE_INITIAL_LEVELS) {
+      console.log(contributionCount);
+      if (contributionCount >= level) {
         badges.push(
-          this.createBadgeObject(
-            value, contributionSubType, true, language)
+          {
+            contributionCount: level,
+            text: contributionSubType,
+            isUnlocked: true,
+            language
+          }
         );
       } else {
+        // From this block, we are adding locked badge(in predefined range)
+        // which will be achieved next.
         badges.push(
-          this.createBadgeObject(
-            (value - contributionCount), contributionSubType, false, language)
+          {
+            contributionCount: level - contributionCount,
+            text: contributionSubType,
+            isUnlocked: false,
+            language
+          }
         );
-        break;
+        return badges;
       }
     }
 
@@ -216,34 +227,27 @@ export class ContributorBadgeComponent {
       level += 500;
       if (contributionCount >= level) {
         badges.push(
-          this.createBadgeObject(
-            level, contributionSubType, true, language)
+          {
+            contributionCount: level,
+            text: contributionSubType,
+            isUnlocked: true,
+            language
+          }
         );
       } else {
+        // From this block, we are adding locked badge(in non-predefined range)
+        // which will be achieved next.
         badges.push(
-          this.createBadgeObject(
-            (level - contributionCount), contributionSubType, false, language)
+          {
+            contributionCount: level - contributionCount,
+            text: contributionSubType,
+            isUnlocked: false,
+            language
+          }
         );
-        break;
+        return badges;
       }
     }
-
-    return badges;
-  }
-
-  createBadgeObject(
-      contributionCount: number,
-      text: string,
-      isUnlocked: boolean,
-      language?: string): Badge {
-    const badge: Badge = {
-      contributionCount,
-      text,
-      isUnlocked,
-      language
-    };
-
-    return badge;
   }
 
   toggleLanguageDropdown(): void {

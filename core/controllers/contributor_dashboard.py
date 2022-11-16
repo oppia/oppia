@@ -964,8 +964,7 @@ class ContributorAllStatsSummariesHandler(
                 stats.question_contribution_stats)
 
         if stats.question_review_stats is not None:
-            response['question_review_stats'] = _get_client_side_stats(
-                stats.question_review_stats)
+            response['question_review_stats'] = []
 
         self.render_json(response)
 

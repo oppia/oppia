@@ -8,7 +8,7 @@ import { AppConstants } from 'app.constants';
 })
 export class TranslationBadgeComponent {
   @Input() type!: string;
-  @Input() value: number;
+  @Input() contributionCount: number;
   @Input() language!: string;
   @Input() isUnlocked: boolean;
   contributionTypeText: string;
@@ -19,6 +19,8 @@ export class TranslationBadgeComponent {
   constructor() {}
 
   ngOnInit(): void {
+    console.log(this.isUnlocked);
+    console.log(typeof this.isUnlocked);
     if (this.type === AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION) {
       this.contributionTypeText = 'Submission';
     } else if (this.type === AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW) {
@@ -31,7 +33,7 @@ export class TranslationBadgeComponent {
       throw new Error('Invalid contribution type.');
     }
 
-    if (this.value > 1) {
+    if (this.contributionCount > 1) {
       this.contributionTypeText += 's';
     }
 

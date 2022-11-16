@@ -73,23 +73,23 @@
         <div *ngIf="!dataLoading && (languages.length > 0)">
             <mat-card layout="row" class="list-view-item oppia-contributions-required-message-container">
                 <div class="badge-box">
-                    <div>Submission</div>
+                    <div>Submissions</div>
                     <div class="badge-container">
-                      <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].submission" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.contributionCount}}">
+                      <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].submission" [isUnlocked]="badge.isUnlocked" type="{{badge.text}}" language="{{badge.language}}" contributionCount="{{badge.contributionCount}}">
                       </translation-badge>
                     </div>
                 </div>
                 <div *ngIf="userCanReviewTranslationSuggestion" class="badge-box">
-                    <div>Review</div>
+                    <div>Reviews</div>
                     <div class="badge-container">
-                        <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].review" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.contributionCount}}">
+                        <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].review" [isUnlocked]="badge.isUnlocked" type="{{badge.text}}" language="{{badge.language}}" contributionCount="{{badge.contributionCount}}">
                         </translation-badge>
                     </div>
                 </div>
                 <div *ngIf="userCanReviewTranslationSuggestion" class="badge-box">
-                    <div>Correction</div>
+                    <div>Corrections</div>
                     <div class="badge-container">
-                        <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].correction" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.contributionCount}}">
+                        <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].correction" [isUnlocked]="badge.isUnlocked" type="{{badge.text}}" language="{{badge.language}}" contributionCount="{{badge.contributionCount}}">
                         </translation-badge>
                     </div>
                 </div>
@@ -99,23 +99,23 @@
         <div *ngIf="!dataLoading && userHasQuestionRights">
             <mat-card layout="row" class="list-view-item oppia-contributions-required-message-container">
                 <div *ngIf="userCanSuggestQuestions" class="badge-box">
-                    <div>Submission</div>
+                    <div>Submissions</div>
                     <div class="badge-container">
-                        <question-badge class="badge-item" *ngFor="let badge of questionSubmissionBadges" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" value="{{badge.contributionCount}}">
+                        <question-badge class="badge-item" *ngFor="let badge of questionSubmissionBadges" [isUnlocked]="badge.isUnlocked" type="{{badge.text}}" contributionCount="{{badge.contributionCount}}">
                         </question-badge>
                     </div>
                 </div>
                 <div *ngIf="userCanReviewQuestionSuggestions" class="badge-box">
-                    <div>Review</div>
+                    <div>Reviews</div>
                     <div class="badge-container">
-                        <question-badge class="badge-item" *ngFor="let badge of questionReviewBadges" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" value="{{badge.contributionCount}}">
+                        <question-badge class="badge-item" *ngFor="let badge of questionReviewBadges" [isUnlocked]="badge.isUnlocked" type="{{badge.text}}" contributionCount="{{badge.contributionCount}}">
                         </question-badge>
                     </div>
                 </div>
                 <div *ngIf="userCanReviewQuestionSuggestions" class="badge-box">
-                    <div>Correction</div>
+                    <div>Corrections</div>
                     <div class="badge-container">
-                        <question-badge class="badge-item" *ngFor="let badge of questionCorrectionBadges" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" value="{{badge.contributionCount}}">
+                        <question-badge class="badge-item" *ngFor="let badge of questionCorrectionBadges" [isUnlocked]="badge.isUnlocked" type="{{badge.text}}" contributionCount="{{badge.contributionCount}}">
                         </question-badge>
                     </div>
                 </div>
@@ -130,23 +130,23 @@
             <div *ngIf="!dataLoading && (languages.length > 0)">
                 <mat-card layout="row" class="list-view-item oppia-contributions-required-message-container">
                     <div class="badge-box">
-                        <div>Submission</div>
+                        <div>Submissions</div>
                         <div class="badge-container">
-                            <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].submission" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.contributionCount}}">
+                            <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].submission" [isUnlocked]="badge.isUnlocked" type="{{badge.text}}" language="{{badge.language}}" contributionCount="{{badge.contributionCount}}">
                             </translation-badge>
                         </div>
                     </div>
                     <div *ngIf="userCanReviewTranslationSuggestion" class="badge-box">
-                        <div>Review</div>
+                        <div>Reviews</div>
                         <div class="badge-container">
-                            <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].review" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.contributionCount}}">
+                            <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].review" [isUnlocked]="badge.isUnlocked" type="{{badge.text}}" language="{{badge.language}}" contributionCount="{{badge.contributionCount}}">
                             </translation-badge>
                         </div>
                     </div>
                     <div *ngIf="userCanReviewTranslationSuggestion" class="badge-box">
-                        <div>Correction</div>
+                        <div>Corrections</div>
                         <div class="badge-container">
-                            <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].correction" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" language="{{badge.language}}" value="{{badge.contributionCount}}">
+                            <translation-badge class="badge-item" *ngFor="let badge of translationBadges[selectedLanguage].correction" [isUnlocked]="badge.isUnlocked" type="{{badge.text}}" language="{{badge.language}}" contributionCount="{{badge.contributionCount}}">
                             </translation-badge>
                         </div>
                     </div>
@@ -158,23 +158,23 @@
             <div *ngIf="!dataLoading && userHasQuestionRights">
                 <mat-card layout="row" class="list-view-item oppia-contributions-required-message-container">
                     <div *ngIf="userCanSuggestQuestions" class="badge-box">
-                        <div>Submission</div>
+                        <div>Submissions</div>
                         <div class="badge-container">
-                            <question-badge class="badge-item" *ngFor="let badge of questionSubmissionBadges" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" value="{{badge.contributionCount}}">
+                            <question-badge class="badge-item" *ngFor="let badge of questionSubmissionBadges" [isUnlocked]="badge.isUnlocked" type="{{badge.text}}" contributionCount="{{badge.contributionCount}}">
                             </question-badge>
                         </div>
                     </div>
                     <div *ngIf="userCanReviewQuestionSuggestions" class="badge-box">
-                        <div>Review</div>
+                        <div>Reviews</div>
                         <div class="badge-container">
-                            <question-badge class="badge-item" *ngFor="let badge of questionReviewBadges" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" value="{{badge.contributionCount}}">
+                            <question-badge class="badge-item" *ngFor="let badge of questionReviewBadges" [isUnlocked]="badge.isUnlocked" type="{{badge.text}}" contributionCount="{{badge.contributionCount}}">
                             </question-badge>
                         </div>
                     </div>
                     <div *ngIf="userCanReviewQuestionSuggestions" class="badge-box">
-                        <div>Correction</div>
+                        <div>Corrections</div>
                         <div class="badge-container">
-                            <question-badge class="badge-item" *ngFor="let badge of questionCorrectionBadges" isUnlocked="{{badge.isUnlocked}}" type="{{badge.text}}" value="{{badge.contributionCount}}">
+                            <question-badge class="badge-item" *ngFor="let badge of questionCorrectionBadges" [isUnlocked]="badge.isUnlocked" type="{{badge.text}}" contributionCount="{{badge.contributionCount}}">
                             </question-badge>
                         </div>
                     </div>

@@ -27,12 +27,6 @@ import { ContributorBadgeComponent } from './contributor-badge.component';
 
 describe('Contributor badge component', () => {
   let fetchAllContributionAndReviewStatsAsync: jasmine.Spy;
-  const userContributionRights = {
-    can_review_translation_for_language_codes: ['es', 'pt', 'hi'],
-    can_review_voiceover_for_language_codes: ['es', 'pt', 'hi'],
-    can_review_questions: true,
-    can_suggest_questions: true,
-  };
   const akanFirstTopicTranslationContributionStat = {
     language_code: 'ak',
     topic_name: 'first_topic',
@@ -180,18 +174,6 @@ describe('Contributor badge component', () => {
     languageUtilService = TestBed.inject(LanguageUtilService);
     userService = TestBed.inject(UserService);
 
-    fetchAllContributionAndReviewStatsAsync = spyOn(
-      contributionAndReviewStatsService,
-      'fetchAllStats');
-    fetchAllContributionAndReviewStatsAsync.and.returnValue(
-      Promise.resolve(fetchAllStatsResponse));
-    spyOn(
-      languageUtilService, 'getAudioLanguageDescription')
-      .and.returnValues('Spanish', 'português', 'Hindi', 'Akan');
-    spyOn(
-      languageUtilService, 'getShortLanguageDescription')
-      .and.returnValue('Language');
-
     fixture.detectChanges();
   }));
 
@@ -200,67 +182,125 @@ describe('Contributor badge component', () => {
   });
 
   describe('when user navigates to contributor badge page ', () => {
-    beforeEach(waitForAsync(() => {
-      spyOn(userService, 'getUserInfoAsync')
-        .and.returnValue(Promise.resolve({
-          isLoggedIn: () => true,
-          getUsername: () => 'user'
-        } as UserInfo));
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
-      component.ngOnInit();
-    }));
-    it('should create translation badges', fakeAsync(() => {
-      expect(component.translationBadges).not.toBeNull();
-    }));
+    describe('when user has translation badges and question rights ', () => {
+      const userContributionRights = {
+        can_review_translation_for_language_codes: ['es', 'pt', 'hi'],
+        can_review_voiceover_for_language_codes: ['es', 'pt', 'hi'],
+        can_review_questions: true,
+        can_suggest_questions: true,
+      };
 
-    it('should create question badges', fakeAsync(() => {
-      expect(component.questionBadges).not.toBeNull();
-    }));
-
-    it('should toggle language dropdown when user clicks on it', fakeAsync(
-      () => {
-        component.dropdownShown = false;
-
-        component.toggleLanguageDropdown();
-
-        expect(component.dropdownShown).toBeTrue();
+      beforeEach(waitForAsync(() => {
+        fetchAllContributionAndReviewStatsAsync = spyOn(
+          contributionAndReviewStatsService,
+          'fetchAllStats');
+        fetchAllContributionAndReviewStatsAsync.and.returnValue(
+          Promise.resolve(fetchAllStatsResponse));
+        spyOn(
+          languageUtilService, 'getAudioLanguageDescription')
+          .and.returnValues('Spanish', 'português', 'Hindi', 'Akan');
+        spyOn(
+          languageUtilService, 'getShortLanguageDescription')
+          .and.returnValue('Language');
+        spyOn(userService, 'getUserInfoAsync')
+          .and.returnValue(Promise.resolve({
+            isLoggedIn: () => true,
+            getUsername: () => 'user'
+          } as UserInfo));
+        spyOn(userService, 'getUserContributionRightsDataAsync')
+          .and.returnValue(Promise.resolve(userContributionRights));
+        component.ngOnInit();
       }));
 
-    it('should toggle mobile language dropdown when user clicks on it',
-      fakeAsync(() => {
-        component.mobileDropdownShown = false;
-
-        component.toggleMobileLanguageDropdown();
-
-        expect(component.mobileDropdownShown).toBeTrue();
+      it('should create translation badges', fakeAsync(() => {
+        expect(component.translationBadges).not.toBeNull();
       }));
 
-    it('should should toggle mobile badge type dropdown', fakeAsync(() => {
-      component.mobileBadgeTypeDropdownShown = false;
+      it('should create question badges', fakeAsync(() => {
+        expect(component.questionBadges).not.toBeNull();
+      }));
 
-      component.toggleMobileBadgeTypeDropdown();
+      it('should toggle language dropdown when user clicks on it', fakeAsync(
+        () => {
+          component.dropdownShown = false;
 
-      expect(component.mobileBadgeTypeDropdownShown).toBeTrue();
-    }));
+          component.toggleLanguageDropdown();
 
-    it('should show badges in selected language', fakeAsync(() => {
-      component.selectLanguageOption('Hindi');
+          expect(component.dropdownShown).toBeTrue();
+        }));
 
-      expect(component.selectedLanguage).toBe('Hindi');
-    }));
+      it('should toggle mobile language dropdown when user clicks on it',
+        fakeAsync(() => {
+          component.mobileDropdownShown = false;
 
-    it('should show show translation badges type in mobile', fakeAsync(() => {
-      component.selectBadgeType(true);
+          component.toggleMobileLanguageDropdown();
 
-      expect(component.showMobileTranslationBadges).toBeTrue();
-    }));
+          expect(component.mobileDropdownShown).toBeTrue();
+        }));
 
-    it('should show show question badges type in mobile', fakeAsync(() => {
-      component.selectBadgeType(false);
+      it('should should toggle mobile badge type dropdown', fakeAsync(() => {
+        component.mobileBadgeTypeDropdownShown = false;
 
-      expect(component.showMobileTranslationBadges).toBeFalse();
-    }));
+        component.toggleMobileBadgeTypeDropdown();
+
+        expect(component.mobileBadgeTypeDropdownShown).toBeTrue();
+      }));
+
+      it('should show badges in selected language', fakeAsync(() => {
+        component.selectLanguageOption('Hindi');
+
+        expect(component.selectedLanguage).toBe('Hindi');
+      }));
+
+      it('should show show translation badges type in mobile', fakeAsync(() => {
+        component.selectBadgeType(true);
+
+        expect(component.showMobileTranslationBadges).toBeTrue();
+      }));
+
+      it('should show show question badges type in mobile', fakeAsync(() => {
+        component.selectBadgeType(false);
+
+        expect(component.showMobileTranslationBadges).toBeFalse();
+      }));
+    });
+
+    describe(
+      'when user has no translation badges and no question rights ', () => {
+        const userContributionRights = {
+          can_review_translation_for_language_codes: [],
+          can_review_voiceover_for_language_codes: [],
+          can_review_questions: false,
+          can_suggest_questions: false,
+        };
+
+        beforeEach(waitForAsync(() => {
+          fetchAllContributionAndReviewStatsAsync = spyOn(
+            contributionAndReviewStatsService,
+            'fetchAllStats');
+          fetchAllContributionAndReviewStatsAsync.and.returnValue(
+            Promise.resolve({}));
+          spyOn(
+            languageUtilService, 'getAudioLanguageDescription')
+            .and.returnValues('Spanish', 'português', 'Hindi', 'Akan');
+          spyOn(
+            languageUtilService, 'getShortLanguageDescription')
+            .and.returnValue('Language');
+          spyOn(userService, 'getUserInfoAsync')
+            .and.returnValue(Promise.resolve({
+              isLoggedIn: () => true,
+              getUsername: () => 'user'
+            } as UserInfo));
+          spyOn(userService, 'getUserContributionRightsDataAsync')
+            .and.returnValue(Promise.resolve(userContributionRights));
+          component.ngOnInit();
+        }));
+
+        it('should create translation badges', fakeAsync(() => {
+          expect(component.translationBadges).toBeNull();
+          expect(component.questionBadges).toBeNull();
+        }));
+      });
   });
 
   describe('when user navigates to contributor stats page without login',
