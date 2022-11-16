@@ -33,6 +33,7 @@ from typing import Dict, Final, List, Optional, Set, Tuple
 from . import common
 
 MismatchType = Dict[str, Tuple[Optional[str], Optional[str]]]
+ValidatedMismatchType = Dict[str, Tuple[str, Optional[str]]]
 
 # This is the version that is set in install_prerequisites.sh.
 GIT_DIRECT_URL_REQUIREMENT_PATTERN: Final = (
@@ -192,7 +193,8 @@ def _get_third_party_python_libs_directory_contents() -> Dict[str, str]:
     """
     direct_url_packages, standard_packages = utils.partition(
         pkg_resources.find_distributions(common.THIRD_PARTY_PYTHON_LIBS_DIR),
-        predicate=_dist_has_meta_data, enumerated=False)
+        predicate=_dist_has_meta_data
+    )
 
     installed_packages = {
         pkg.project_name: pkg.version for pkg in standard_packages
@@ -292,17 +294,22 @@ def _rectify_third_party_directory(
     # library that the developer did not catch. The only way to enforce the
     # removal of a library is to clean out the folder and reinstall everything
     # from scratch.
-    if any(required is None for required, _ in mismatches.values()):
-        if os.path.isdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
-            shutil.rmtree(common.THIRD_PARTY_PYTHON_LIBS_DIR)
-        _reinstall_all_dependencies()
-        return
+
+    validated_mismatches: ValidatedMismatchType = {}
+    for library_name, versions in mismatches.items():
+        requirements_version, directory_version = versions
+        if requirements_version is None:
+            if os.path.isdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
+                shutil.rmtree(common.THIRD_PARTY_PYTHON_LIBS_DIR)
+            _reinstall_all_dependencies()
+            return
+        validated_mismatches[library_name] = (
+            requirements_version, directory_version
+        )
 
     git_mismatches, pip_mismatches = (
         utils.partition(
-            mismatches.items(),
-            predicate=_is_git_url_mismatch,
-            enumerated=False
+            validated_mismatches.items(), predicate=_is_git_url_mismatch
         )
     )
 
@@ -335,11 +342,11 @@ def _rectify_third_party_directory(
 
 
 def _is_git_url_mismatch(
-    mismatch_item: Tuple[str, Tuple[Optional[str], Optional[str]]]
+    mismatch_item: Tuple[str, ValidatedMismatchType]
 ) -> bool:
     """Returns whether the given mismatch item is for a GitHub URL."""
     _, (required, _) = mismatch_item
-    return required.startswith('git') if required else False
+    return required.startswith('git')
 
 
 def _install_direct_url(library_name: str, direct_url: str) -> None:

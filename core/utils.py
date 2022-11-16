@@ -1315,10 +1315,7 @@ def partition(
 def partition(
     iterable: Iterable[T],
     predicate: Callable[..., bool] = bool,
-    enumerated: bool = False
-) -> Tuple[
-        Iterable[Union[T, Tuple[int, T]]],
-        Iterable[Union[T, Tuple[int, T]]]]:
+) -> Tuple[Iterable[T], Iterable[T]]:
     ...
 
 
