@@ -107,7 +107,7 @@
   <div class="oppia-page-card mt-0 mb-0 bg-white">
     <div class="container">
       <div class="row">
-        <div class="donate-page-section-heading oppia-donate-page-text-color">
+        <div class="donate-page-section-heading oppia-donate-page-text-color donate-page-spending-explanation-heading">
           Where does your money go?
         </div>
       </div>
@@ -158,57 +158,124 @@
     </div>
   </div>
   <div class="oppia-page-card mt-0 mb-0 oppia-donate-page-section-gray-bg">
-    <ngb-carousel>
-      <ng-template ngbSlide>
-        <div class="oppia-donate-page-carousel-img-wrapper">
-          <picture>
-            <source type="image/webp" [srcset]="getImageSet('/splash/Gaurav', 'webp')">
-            <source type="image/png" [srcset]="getImageSet('/splash/Gaurav', 'png')">
-            <img [src]="getStaticImageUrl('/splash/Gaurav', 'png')"
-                width="200px"
-                alt="Logo of Oppia containing photos of contributors">
-          </picture>
+    <div class="row justify-content-center">
+      <div class="donate-page-section-heading">Where Our Learners are Saying</div>
+    </div>
+    <div id="donate-page-learner-carousel" class="carousel slide" data-ride="carousel">
+      <ol class="carousel-indicators">
+        <li data-target="#donate-page-learner-carousel" data-slide-to="0" class="active"></li>
+        <li data-target="#donate-page-learner-carousel" data-slide-to="1"></li>
+        <li data-target="#donate-page-learner-carousel" data-slide-to="2"></li>
+      </ol>
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <div class="container">
+            <div class="row justify-content-center pt-5">
+              <div class="oppia-donate-page-carousel-img-wrapper">
+                <picture>
+                  <source type="image/webp" [srcset]="getImageSet('/splash/Gaurav', 'webp')">
+                  <source type="image/png" [srcset]="getImageSet('/splash/Gaurav', 'png')">
+                  <img [src]="getStaticImageUrl('/splash/Gaurav', 'png')"
+                        class="rounded-circle"
+                        width="200px"
+                        alt="Logo of Oppia containing photos of contributors">
+                </picture>
+              </div>
+            </div>
+            <div class="row">
+              <div class="carousel-caption text-dark mb-5">
+                <h3 class="text-center">From Khanpur, India</h3>
+                <p class="text-center oppia-donate-student-feedback-text">“I liked learning the lessons on mobile because we get very good questions and if we get something wrong we are told how to correct it and we are not scared when we are doing this I really liked this app.”</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="carousel-caption text-dark">
-          <h3>From Khanpur, India</h3>
-          <p>“I liked learning the lessons on mobile because we get very good questions and if we get something wrong we are told how to correct it and we are not scared when we are doing this I really liked this app.”</p>
+        <div class="carousel-item">
+          <div class="container">
+            <div class="row justify-content-center pt-5">
+              <div class="oppia-donate-page-carousel-img-wrapper">
+                <picture>
+                  <source type="image/webp" [srcset]="getImageSet('/splash/mira', 'webp')">
+                  <source type="image/png" [srcset]="getImageSet('/splash/mira', 'png')">
+                  <img [src]="getStaticImageUrl('/splash/mira', 'png')"
+                        class="rounded-circle"
+                        width="200px"
+                        alt="Logo of Oppia containing photos of contributors">
+                </picture>
+              </div>
+            </div>
+            <div class="row">
+              <div class="carousel-caption text-dark mb-5">
+                <h3 class="text-center">From Palestine</h3>
+                <p class="text-center oppia-donate-student-feedback-text">“I enjoyed playing the lesson a lot, I did not feel bored and I feel like I master the negative numbers now.”</p>
+              </div>
+            </div>
+          </div>
         </div>
-      </ng-template>
-      <ng-template ngbSlide>
-        <div class="oppia-donate-page-carousel-img-wrapper">
-          <picture>
-            <source type="image/webp" [srcset]="getImageSet('/splash/mira', 'webp')">
-            <source type="image/png" [srcset]="getImageSet('/splash/mira', 'png')">
-            <img [src]="getStaticImageUrl('/splash/mira', 'png')"
-                width="200px"
-                alt="Logo of Oppia containing photos of contributors">
-          </picture>
+        <div class="carousel-item">
+          <div class="container">
+            <div class="row justify-content-center pt-5">
+              <div class="oppia-donate-page-carousel-img-wrapper">
+                <picture>
+                  <source type="image/webp" [srcset]="getImageSet('/splash/Dheeraj', 'webp')">
+                  <source type="image/png" [srcset]="getImageSet('/splash/Dheeraj', 'png')">
+                  <img [src]="getStaticImageUrl('/splash/Dheeraj', 'png')"
+                        class="rounded-circle"
+                        width="200px"
+                        alt="Logo of Oppia containing photos of contributors">
+                </picture>
+              </div>
+            </div>
+            <div class="row">
+              <div class="carousel-caption text-dark mb-5">
+                <h3 class="text-center">From India</h3>
+                <p class="text-center oppia-donate-student-feedback-text">
+                  “I really had fun while solving the questions because they had many colorful shapes and images. 
+                  The images made it easier to understand the topics as well!”
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="carousel-caption text-dark">
-          <h3>From Palestine</h3>
-          <p>“I enjoyed playing the lesson a lot, I did not feel bored and I feel like I master the negative numbers now.”</p>
-        </div>
-      </ng-template>
-      <ng-template ngbSlide>
-        <div class="oppia-donate-page-carousel-img-wrapper">
-          <picture>
-            <source type="image/webp" [srcset]="getImageSet('/splash/Dheeraj', 'webp')">
-            <source type="image/png" [srcset]="getImageSet('/splash/Dheeraj', 'png')">
-            <img [src]="getStaticImageUrl('/splash/Dheeraj', 'png')"
-                width="200px"
-                alt="Logo of Oppia containing photos of contributors">
-          </picture>
-        </div>
-        <div class="carousel-caption text-dark">
-          <h3>From India</h3>
-          <p>“I really had fun while solving the questions because they had many colorful shapes and images. 
-            The images made it easier to understand the topics as well!”</p>
-        </div>
-      </ng-template>
-    </ngb-carousel>
+      </div>
+      <div class="carousel-control-prev" type="button" data-target="#donate-page-learner-carousel" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </div>
+      <div class="carousel-control-next" type="button" data-target="#donate-page-learner-carousel" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </div>
+    </div>
   </div>
 </div>
 <style>
+  .oppia-donate-page .carousel-control-prev-icon,
+  .oppia-donate-page .carousel-control-next-icon {
+    height: 40px;
+    width: 40px;
+    background-size: 100%, 100%;
+    border-radius: 50%;
+    background-color: #094142;
+    background-image: none;
+  }
+
+  .oppia-donate-page .carousel-control-next-icon:after {
+    content: '>';
+    font-size: 25px;
+    color: #fff;
+  }
+
+  .oppia-donate-page .carousel-control-prev-icon:after {
+    content: '<';
+    font-size: 25px;
+    color: #fff;
+  }
+
+  .oppia-donate-student-feedback-text {
+    margin: 0 auto;
+    max-width: 800px;
+  }
   .oppia-donate-page-banner {
     background: #879AA1;
     height: 350px;
@@ -297,6 +364,9 @@
   }
   .oppia-donate-page-feature-text-container {
     height: 50px;
+  }
+  .donate-page-spending-explanation-heading {
+    padding-left: 30px;
   }
   .oppia-donate-page-hr {
     background-color: #E74040;

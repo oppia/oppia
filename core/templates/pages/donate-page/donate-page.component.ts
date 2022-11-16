@@ -28,7 +28,8 @@ import { UrlInterpolationService } from
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-
+import 'popper.js';
+import 'bootstrap';
 
 @Component({
   selector: 'donate-page',
