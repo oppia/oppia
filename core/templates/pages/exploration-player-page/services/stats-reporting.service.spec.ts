@@ -266,8 +266,12 @@ describe('Stats reporting service ', () => {
   it('should record stats for curated exp when state is changed', () => {
     let recordStateHitSpy = spyOn(
       statsReportingBackendApiService, 'recordStateHitAsync')
-      .and.returnValue(Promise.resolve({classroom_url_fragment: 'classroom'}));
-    spyOn(urlService, 'getUrlParams').and.returnValue({});
+      .and.returnValue(Promise.resolve({}));
+    spyOn(urlService, 'getUrlParams').and.returnValue(
+      {
+        classroom_url_fragment: 'classroom'
+      }
+    );
 
     expect(statsReportingService.statesVisited.size).toBe(0);
     // First transition.

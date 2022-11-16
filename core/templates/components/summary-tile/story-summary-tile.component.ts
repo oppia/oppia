@@ -93,8 +93,9 @@ export class StorySummaryTileComponent implements OnInit {
         this.topicUrlFragment,
         this.nodeTitles[this.nodeCount - 1],
         this.nodeCount.toString(),
-        this.storySummary.getAllNodes()[this.nodeCount - 1].getExplorationId()
-        || 'NA'
+        this.storySummary.getAllNodes()[
+          this.nodeCount - 1
+        ].getExplorationId() || 'NA'
       );
     }
   }
