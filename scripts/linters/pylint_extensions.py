@@ -831,8 +831,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             accept_no_param_doc=node_allow_no_param)
 
     def check_docstring_style(
-        self,
-        node: astroid.nodes.FunctionDef,
+        self, node: astroid.nodes.FunctionDef
     ) -> None:
         """It fetches a function node and extract the class node from function
         node if it is inside a class body and passes it to
@@ -884,8 +883,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                 blank_line_counter = 0
 
     def check_docstring_structure(
-        self,
-        node: astroid.NodeNG,
+        self, node: astroid.NodeNG
     ) -> None:
         """Checks whether the docstring has the correct structure i.e.
         do not have space at the beginning and have a period at the end of
@@ -921,8 +919,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                     self.add_message('no-period-used', node=node)
 
     def check_docstring_section_indentation(
-        self,
-        node: astroid.nodes.FunctionDef,
+        self, node: astroid.nodes.FunctionDef
     ) -> None:
         """Checks whether the function argument definitions ("Args": section,
         "Returns": section, "Yield": section, "Raises: section) are indented
@@ -1175,8 +1172,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                 node=node)
 
     def visit_raise(
-        self,
-        node: astroid.nodes.FunctionDef,
+        self, node: astroid.nodes.FunctionDef
     ) -> None:
         """Visits a function node that raises an exception and verifies that all
         exceptions raised in the function definition are documented.
@@ -1212,8 +1208,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         self._add_raise_message(missing_excs, func_node)
 
     def visit_return(
-        self,
-        node: astroid.nodes.FunctionDef,
+        self, node: astroid.nodes.FunctionDef
     ) -> None:
         """Visits a function node that contains a return statement and verifies
         that the return value and the return type are documented.
@@ -1248,8 +1243,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             )
 
     def visit_yield(
-        self,
-        node: astroid.nodes.FunctionDef,
+        self, node: astroid.nodes.FunctionDef
     ) -> None:
         """Visits a function node that contains a yield statement and verifies
         that the yield value and the yield type are documented.
@@ -1280,8 +1274,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             )
 
     def visit_yieldfrom(
-        self,
-        node: astroid.nodes.FunctionDef,
+        self, node: astroid.nodes.FunctionDef
     ) -> None:
         """Visits a function node that contains a yield from statement and
         verifies that the yield from value and the yield from type are
@@ -2238,13 +2231,12 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
 
                     comment_line_number = line_num
 
-                if re.search(r'(\s*type:\s*ignore\[)', line):
-
-                    error_matches = re.search(
-                        r'(\s*type:\s*ignore)\[([a-z-\s\,]*)\]', line
-                    )
+                specific_type_ignore_matches = re.search(
+                    r'(\s*type:\s*ignore)\[([a-z-\s\,]*)\]', line
+                )
+                if specific_type_ignore_matches:
                     error_codes = (
-                        error_matches.group(2) if error_matches else ''
+                        specific_type_ignore_matches.group(2)
                     )
 
                     encountered_error_codes = []
