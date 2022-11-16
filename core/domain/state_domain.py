@@ -1778,13 +1778,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             ele_element = ele['element']
 
                             if ele_position > len(rule_spec.inputs['x']):
-                                raise utils.ValidationError(
-                                    f'Rule - {rule_spec_index} of '
-                                    f'answer group {ans_group_index} '
-                                    f'does not have the enough position '
-                                    f'to match for the '
-                                    f'HasElementXAtPositionY rule above.'
-                                )
+                                continue
 
                             rule_choice = rule_spec.inputs['x'][
                                 ele_position - 1]
