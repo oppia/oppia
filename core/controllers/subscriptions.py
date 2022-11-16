@@ -62,13 +62,8 @@ class SubscribeHandler(
         assert self.normalized_payload is not None
         creator_username = self.normalized_payload['creator_username']
         creator_id = user_services.get_user_id_from_username(
-            creator_username
+            creator_username, strict=True
         )
-        if creator_id is None:
-            raise Exception(
-                'No creator user_id found for the given creator username: %s' %
-                creator_username
-            )
         subscription_services.subscribe_to_creator(self.user_id, creator_id)
         self.render_json(self.values)
 

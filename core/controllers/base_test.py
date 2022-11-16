@@ -1312,7 +1312,7 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
         # methods in base_test.py do not.
         def get(self) -> None:  # type: ignore[override]
             assert self.normalized_request is not None
-            iframe_restriction = self.normalized_request.get('iframe_restriction', None)
+            iframe_restriction = self.normalized_request.get('iframe_restriction')
             self.render_template(
                 'oppia-root.mainpage.html',
                 iframe_restriction=iframe_restriction)

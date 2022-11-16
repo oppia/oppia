@@ -1095,7 +1095,7 @@ def _get_target_id_to_skill_opportunity_dict(
     opportunity_id_to_opportunity_dict: Dict[
         str, Optional[FrontendSkillOpportunityDict]
     ] = {
-        opp_id: (opp.to_dict() if opp is not None else None)  # type: ignore[misc]
+        opp_id: opp.to_dict() if opp is not None else None  # type: ignore[misc]
         for opp_id, opp in opportunity_services.get_skill_opportunities_by_ids(
             list(target_ids)).items()
     }

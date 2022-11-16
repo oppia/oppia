@@ -253,6 +253,8 @@ class ValidateExplorationsHandlerNormalizedRequestDict(TypedDict):
     comma_separated_exp_ids: str
 
 
+# TODO(#16538): Change the type of `comma_separated_exp_ids` handler
+# argument to `JsonEncodedInString`.
 class ValidateExplorationsHandler(
     base.BaseHandler[
         Dict[str, str],

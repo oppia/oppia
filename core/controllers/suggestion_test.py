@@ -320,7 +320,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
-                self.author_id))['suggestions'][0]
+                self.author_id
+            )
+        )['suggestions'][0]
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_accept['suggestion_id'])

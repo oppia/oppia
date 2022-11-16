@@ -74,7 +74,7 @@ class SubscriptionTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response['error'],
-            'No creator user_id found for the given creator username: invalid'
+            'No user_id found for the given username: invalid'
         )
 
     def test_invalid_creator_username_raises_error_while_unsubscribing(
