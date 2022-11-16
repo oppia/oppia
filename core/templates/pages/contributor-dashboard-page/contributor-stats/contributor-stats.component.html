@@ -44,9 +44,9 @@
     </div>
   </div>
   <div *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-cards-container">
-    <mat-card *ngFor="let page of statsData[type] | keyvalue" layout="row" class="list-view-item">
+    <mat-card *ngFor="let translationStatByLanguageAndTopic of statsData[type] | keyvalue" layout="row" class="list-view-item">
       <div>
-        {{selectedContributionType}} - {{page.value.language}}
+        {{selectedContributionType}} - {{translationStatByLanguageAndTopic.key}}
       </div>
       <table class="dashboard-table e2e-test-topics-table">
         <tr>
@@ -57,35 +57,35 @@
             </div>
           </th>
         </tr>
-        <tr *ngFor="let row of page.value.data.slice(page.value.currentPageStartIndex, page.value.currentPageEndIndex)" class="stats-row">
+        <tr *ngFor="let translationStat of translationStatByLanguageAndTopic.value.data.slice(translationStatByLanguageAndTopic.value.currentPageStartIndex, translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE)" class="stats-row">
           <td class="stats-data">
-            {{row.firstContributionDate}} - {{row.lastContributionDate}}
+            {{translationStat.firstContributionDate}} - {{translationStat.lastContributionDate}}
           </td>
           <td class="stats-data">
-            {{row.topicName}}
+            {{translationStat.topicName}}
           </td>
           <td *ngIf="type == 'translationReview'" class="stats-data">
-            {{row.reviewedCards}}
+            {{translationStat.reviewedCards}}
           </td>
           <td *ngIf="type == 'translationReview'" class="stats-data">
-            {{row.reviewedWordCount}}
+            {{translationStat.reviewedWordCount}}
           </td>
           <td *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-data">
-            {{row.acceptedCards}}
+            {{translationStat.acceptedCards}}
           </td>
           <td *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-data">
-            {{row.acceptedWordCount}}
+            {{translationStat.acceptedWordCount}}
           </td>
         </tr>
       </table>
       <div *ngIf="type == 'translationContribution'" class="mobile-stats-page">
-        <div class="mobile-stats-data-container" *ngFor="let row of page.value.data.slice(page.value.currentPageStartIndex, page.value.currentPageEndIndex)">
+        <div class="mobile-stats-data-container" *ngFor="let translationStat of translationStatByLanguageAndTopic.value.data.slice(translationStatByLanguageAndTopic.value.currentPageStartIndex, translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE)">
           <div class="mobile-stats-row">
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].months}}</b>
             </div>
             <div>
-              {{row.firstContributionDate}} - {{row.lastContributionDate}}
+              {{translationStat.firstContributionDate}} - {{translationStat.lastContributionDate}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -93,7 +93,7 @@
               <b>{{COLUMNS[type].topicNames}}</b>
             </div>
             <div>
-              {{row.topicName}}
+              {{translationStat.topicName}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -101,7 +101,7 @@
               <b>{{COLUMNS[type].acceptedCards}}</b>
             </div>
             <div>
-              {{row.acceptedCards}}
+              {{translationStat.acceptedCards}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -109,19 +109,19 @@
               <b>{{COLUMNS[type].acceptedWordCount}}</b>
             </div>
             <div>
-              {{row.acceptedWordCount}}
+              {{translationStat.acceptedWordCount}}
             </div>
           </div>
         </div>
       </div>
       <div *ngIf="type == 'translationReview'" class="mobile-stats-page">
-        <div class="mobile-stats-data-container" *ngFor="let row of page.value.data.slice(page.value.currentPageStartIndex, page.value.currentPageEndIndex)">
+        <div class="mobile-stats-data-container" *ngFor="let translationStat of translationStatByLanguageAndTopic.value.data.slice(translationStatByLanguageAndTopic.value.currentPageStartIndex, translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE)">
           <div class="mobile-stats-row">
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].months}}</b>
             </div>
             <div>
-              {{row.firstContributionDate}} - {{row.lastContributionDate}}
+              {{translationStat.firstContributionDate}} - {{translationStat.lastContributionDate}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -129,7 +129,7 @@
               <b>{{COLUMNS[type].topicNames}}</b>
             </div>
             <div>
-              {{row.topicName}}
+              {{translationStat.topicName}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -137,7 +137,7 @@
               <b>{{COLUMNS[type].reviewedCards}}</b>
             </div>
             <div>
-              {{row.reviewedCards}}
+              {{translationStat.reviewedCards}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -145,7 +145,7 @@
               <b>{{COLUMNS[type].reviewedWordCount}}</b>
             </div>
             <div>
-              {{row.reviewedWordCount}}
+              {{translationStat.reviewedWordCount}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -153,7 +153,7 @@
               <b>{{COLUMNS[type].acceptedCards}}</b>
             </div>
             <div>
-              {{row.acceptedCards}}
+              {{translationStat.acceptedCards}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -161,7 +161,7 @@
               <b>{{COLUMNS[type].acceptedWordCount}}</b>
             </div>
             <div>
-              {{row.acceptedWordCount}}
+              {{translationStat.acceptedWordCount}}
             </div>
           </div>
         </div>
@@ -169,14 +169,14 @@
       <div class="oppia-pagination-container">
         <button type="button"
                 class="oppia-pagination-button"
-                (click)="goToPreviousPage(page.value)"
-                [disabled]="page.value.currentPageStartIndex === 0">
+                (click)="goToPreviousPage(translationStatByLanguageAndTopic.value)"
+                [disabled]="translationStatByLanguageAndTopic.value.currentPageStartIndex === 0">
           <span class="material-icons">navigate_before</span>Previous
         </button>
         <button type="button"
                 class="oppia-pagination-button"
-                (click)="goToNextPage(page.value)"
-                [disabled]="page.value.currentPageEndIndex >= page.value.data.length">
+                (click)="goToNextPage(translationStatByLanguageAndTopic.value)"
+                [disabled]="translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE >= translationStatByLanguageAndTopic.value.data.length">
           Next<span class="material-icons">navigate_next</span>
         </button>
       </div>
@@ -189,7 +189,7 @@
   </div>
 
   <div *ngIf="type == 'questionContribution' || type == 'questionReview'" class="stats-cards-container">
-    <mat-card *ngIf="(statsData[type] | json) !== '{}'" layout="row" class="list-view-item">
+    <mat-card *ngIf="statsData[type]" layout="row" class="list-view-item">
       <div>
         {{selectedContributionType}}
       </div>
@@ -202,32 +202,32 @@
             </div>
           </th>
         </tr>
-        <tr *ngFor="let row of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageEndIndex)" class="stats-row">
+        <tr *ngFor="let questionStat of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageStartIndex + ITEMS_PER_PAGE)" class="stats-row">
           <td class="stats-data">
-            {{row.firstContributionDate}} - {{row.lastContributionDate}}
+            {{questionStat.firstContributionDate}} - {{questionStat.lastContributionDate}}
           </td>
           <td class="stats-data">
-            {{row.topicName}}
+            {{questionStat.topicName}}
           </td>
           <td *ngIf="type == 'questionReview'" class="stats-data">
-            {{row.reviewedQuestions}}
+            {{questionStat.reviewedQuestions}}
           </td>
           <td class="stats-data">
-            {{row.acceptedQuestions}}
+            {{questionStat.acceptedQuestions}}
           </td>
           <td *ngIf="type == 'questionContribution'" class="stats-data">
-            {{row.acceptedQuestionsWithoutEdits}}
+            {{questionStat.acceptedQuestionsWithoutEdits}}
           </td>
         </tr>
       </table>
       <div *ngIf="type == 'questionContribution'" class="mobile-stats-page">
-        <div class="mobile-stats-data-container" *ngFor="let row of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageEndIndex)">
+        <div class="mobile-stats-data-container" *ngFor="let questionStat of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageStartIndex + ITEMS_PER_PAGE)">
           <div class="mobile-stats-row">
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].months}}</b>
             </div>
             <div>
-              {{row.firstContributionDate}} - {{row.lastContributionDate}}
+              {{questionStat.firstContributionDate}} - {{questionStat.lastContributionDate}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -235,7 +235,7 @@
               <b>{{COLUMNS[type].topicNames}}</b>
             </div>
             <div>
-              {{row.topicName}}
+              {{questionStat.topicName}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -243,7 +243,7 @@
               <b>{{COLUMNS[type].acceptedQuestions}}</b>
             </div>
             <div>
-              {{row.acceptedQuestions}}
+              {{questionStat.acceptedQuestions}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -251,19 +251,19 @@
               <b>{{COLUMNS[type].acceptedQuestionsWithoutEdits}}</b>
             </div>
             <div>
-              {{row.acceptedQuestionsWithoutEdits}}
+              {{questionStat.acceptedQuestionsWithoutEdits}}
             </div>
           </div>
         </div>
       </div>
       <div *ngIf="type == 'questionReview'" class="mobile-stats-page">
-        <div class="mobile-stats-data-container" *ngFor="let row of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageEndIndex)">
+        <div class="mobile-stats-data-container" *ngFor="let questionStat of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageStartIndex + ITEMS_PER_PAGE)">
           <div class="mobile-stats-row">
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].months}}</b>
             </div>
             <div>
-              {{row.firstContributionDate}} - {{row.lastContributionDate}}
+              {{questionStat.firstContributionDate}} - {{questionStat.lastContributionDate}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -271,7 +271,7 @@
               <b>{{COLUMNS[type].topicNames}}</b>
             </div>
             <div>
-              {{row.topicName}}
+              {{questionStat.topicName}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -279,7 +279,7 @@
               <b>{{COLUMNS[type].reviewedQuestions}}</b>
             </div>
             <div>
-              {{row.reviewedQuestions}}
+              {{questionStat.reviewedQuestions}}
             </div>
           </div>
           <div class="mobile-stats-row">
@@ -287,7 +287,7 @@
               <b>{{COLUMNS[type].acceptedQuestions}}</b>
             </div>
             <div>
-              {{row.acceptedQuestions}}
+              {{questionStat.acceptedQuestions}}
             </div>
           </div>
         </div>
@@ -302,12 +302,12 @@
         <button type="button"
                 class="oppia-pagination-button"
                 (click)="goToNextPage(statsData[type])"
-                [disabled]="statsData[type].currentPageEndIndex >= statsData[type].data.length">
+                [disabled]="statsData[type].currentPageStartIndex + ITEMS_PER_PAGE >= statsData[type].data.length">
           Next<span class="material-icons">navigate_next</span>
         </button>
       </div>
     </mat-card>
-    <mat-card *ngIf="(statsData[type] | json) === '{}'" layout="row" class="list-view-item oppia-contributions-required-message-container">
+    <mat-card *ngIf="!statsData[type]" layout="row" class="list-view-item oppia-contributions-required-message-container">
       <div class="oppia-contributions-required-message">
         Start contributing to see your stats!
       </div>

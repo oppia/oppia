@@ -31,8 +31,6 @@ interface Option {
 
 interface PageableStats {
   currentPageStartIndex: number;
-  // This is the index of the last item of the stats data of a given page.
-  currentPageEndIndex: number;
   // eslint-disable-next-line max-len
   data: (TranslationContributionStats | TranslationReviewStats | QuestionContributionStats | QuestionReviewStats)[];
 }
@@ -148,12 +146,12 @@ export class ContributorStatsComponent {
     this.translationContributionOption
   ];
 
-  statsData = {
-    translationContribution: {},
-    translationReview: {},
-    questionContribution: {},
-    questionReview: {},
-  };
+  statsData: {
+    translationContribution?: {[key: string]: PageableStats};
+    translationReview?: {[key: string]: PageableStats};
+    questionContribution?: PageableStats;
+    questionReview?: PageableStats;
+  } = {};
 
   constructor(
     private readonly languageUtilService: LanguageUtilService,
@@ -163,6 +161,8 @@ export class ContributorStatsComponent {
   }
 
   async ngOnInit(): Promise<void> {
+    this.statsData.translationContribution = {};
+    this.statsData.translationReview = {};
     const userInfo = await this.userService.getUserInfoAsync();
     const username = userInfo.getUsername();
 
@@ -222,7 +222,7 @@ export class ContributorStatsComponent {
       response.translation_contribution_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        if (!this.statsData.translationContribution[language]) {
+        if (!this.statsData?.translationContribution[language]) {
           this.statsData.translationContribution[language] = this
             .createTranslationContributionPageableStats(stat);
         } else {
@@ -262,8 +262,7 @@ export class ContributorStatsComponent {
       stat: TranslationContributionBackendDict): PageableStats {
     return {
       data: [this.createTranslationContributionStat(stat)],
-      currentPageStartIndex: 0,
-      currentPageEndIndex: 5
+      currentPageStartIndex: 0
     };
   }
 
@@ -271,8 +270,7 @@ export class ContributorStatsComponent {
       stat: TranslationReviewBackendDict): PageableStats {
     return {
       data: [this.createTranslationReviewStat(stat)],
-      currentPageStartIndex: 0,
-      currentPageEndIndex: 5
+      currentPageStartIndex: 0
     };
   }
 
@@ -282,8 +280,7 @@ export class ContributorStatsComponent {
       data: stats.map((stat) => {
         return this.createQuestionContributionStat(stat);
       }),
-      currentPageStartIndex: 0,
-      currentPageEndIndex: 5
+      currentPageStartIndex: 0
     };
   }
 
@@ -293,8 +290,7 @@ export class ContributorStatsComponent {
       data: stat.map((stat) => {
         return this.createQuestionReviewStat(stat);
       }),
-      currentPageStartIndex: 0,
-      currentPageEndIndex: 5
+      currentPageStartIndex: 0
     };
   }
 
@@ -347,28 +343,28 @@ export class ContributorStatsComponent {
 
   goToNextPage(page: PageableStats): void {
     if (
-      this.statsData[this.type].currentPageEndIndex >=
-      this.statsData[this.type].data.length) {
+      page.currentPageStartIndex + this.ITEMS_PER_PAGE >=
+      page.data.length) {
       throw new Error('There are no more pages after this one.');
     }
     page.currentPageStartIndex += this.ITEMS_PER_PAGE;
-    page.currentPageEndIndex += this.ITEMS_PER_PAGE;
   }
 
   goToPreviousPage(page: PageableStats): void {
     if (
-      this.statsData[this.type].currentPageStartIndex === 0) {
+      page.currentPageStartIndex === 0) {
       throw new Error('There are no more pages before this one.');
     }
     page.currentPageStartIndex -= this.ITEMS_PER_PAGE;
-    page.currentPageEndIndex -= this.ITEMS_PER_PAGE;
   }
 
   // This method gives the original order of the key value pairs that is
   // displayed in the template. We could have used keyvalue: 0 instead of
   // returning from this function, but it gives console errors.
-  // We need to give a constant number in order to preserve original column
-  // property order.
+  // Reference: https://stackoverflow.com/a/52794221
+  // We need to return a non-negative constant number in order to preserve
+  // original column property order. There is no specific reason to return 0
+  // any other positive value should also give the preferred order.
   provideOriginalOrder(): number {
     return 0;
   }

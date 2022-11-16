@@ -393,7 +393,7 @@ export class ContributionsAndReview
     }
   }
 
-  getActiveDropdownTabChoice(tabType: string, subType: string): string {
+  getActiveDropdownTabText(tabType: string, subType: string): string {
     const tabs = this.contributionTabs.concat(
       this.reviewTabs, this.accomplishmentsTabs);
     const tab = tabs.find(
@@ -409,7 +409,7 @@ export class ContributionsAndReview
   switchToTab(tabType: string, subType: string): void {
     this.activeTabType = tabType;
     this.dropdownShown = false;
-    this.activeDropdownTabChoice = this.getActiveDropdownTabChoice(
+    this.activeDropdownTabChoice = this.getActiveDropdownTabText(
       tabType, subType);
 
     this.activeTabSubtype = subType;
