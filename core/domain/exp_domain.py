@@ -2031,12 +2031,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     all_outcomes = curr_state.interaction.get_all_outcomes()
                     for outcome in all_outcomes:
                         dest_state = outcome.dest
+                        dest_if_stuck_state = outcome.dest_if_really_stuck
                         if (
                             dest_state is not None and
                             dest_state not in curr_queue and
                             dest_state not in processed_queue
                         ):
                             curr_queue.append(dest_state)
+                        if (
+                            dest_if_stuck_state is not None and
+                            dest_if_stuck_state not in curr_queue and
+                            dest_if_stuck_state not in processed_queue
+                        ):
+                            curr_queue.append(dest_if_stuck_state)
 
         if len(self.states) != len(processed_queue):
             unseen_states = list(
@@ -3338,7 +3345,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if state_dict['interaction']['solution'] is not None:
             solution = state_dict['interaction']['solution']['correct_answer']
             if isinstance(solution, list) and any(
-                invalid_choice['html'] in solution for invalid_choice in
+                invalid_choice['content_id'] in solution for invalid_choice in
                 choices_to_remove
             ):
                 state_dict['interaction']['solution'] = None
@@ -4353,7 +4360,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             ele_element = ele_x_at_y_rule['element']
                             assert isinstance(ele_position, int)
                             if ele_position > len(rule_spec_val_x):
-                                invalid_rules.append(rule_spec)
                                 continue
                             rule_choice = rule_spec_val_x[ele_position - 1]
 
@@ -4891,7 +4897,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         html = cls._fix_rte_tags(
             html, is_tags_nested_inside_tabs_or_collapsible=False)
         html = cls._fix_tabs_and_collapsible_tags(html)
-        return html
+        return html.replace('\xa0', '&nbsp;')
 
     @classmethod
     def _update_state_rte(
