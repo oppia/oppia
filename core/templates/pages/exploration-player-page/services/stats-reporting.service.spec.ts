@@ -76,12 +76,12 @@ describe('Stats reporting service ', () => {
       .and.callThrough();
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-    spyOn(urlService, 'getUrlParams')
-      .and.returnValue({classroom_url_fragment: 'classroom'});
     statsReportingService.stateStopwatch = Stopwatch.create();
   });
 
   it('should create default aggregated stats when initialized', () => {
+    spyOn(urlService, 'getUrlParams')
+      .and.returnValue({classroom_url_fragment: 'classroom'});
     let defaultValues: AggregatedStats = {
       num_starts: 0,
       num_completions: 0,
@@ -94,6 +94,8 @@ describe('Stats reporting service ', () => {
 
   it('should set session properties when calling ' +
     '\'initSession\'', fakeAsync(() => {
+    spyOn(urlService, 'getUrlParams')
+      .and.returnValue({classroom_url_fragment: 'classroom'});
     // Prechecks.
     expect(statsReportingService.explorationId).toBeUndefined();
     expect(statsReportingService.explorationTitle).toBeUndefined();
@@ -116,6 +118,8 @@ describe('Stats reporting service ', () => {
   }));
 
   it('should record exploration\'s stats when it is about to start', () => {
+    spyOn(urlService, 'getUrlParams')
+      .and.returnValue({classroom_url_fragment: 'classroom'});
     let recordExplorationStartedSpy = spyOn(
       statsReportingBackendApiService, 'recordExpStartedAsync')
       .and.returnValue(Promise.resolve({}));
@@ -146,6 +150,8 @@ describe('Stats reporting service ', () => {
 
   it('should not again record exploration\'s stats when ' +
     'it is about to start and already recorded', () => {
+    spyOn(urlService, 'getUrlParams')
+      .and.returnValue({classroom_url_fragment: 'classroom'});
     let recordExplorationStartedSpy = spyOn(
       statsReportingBackendApiService, 'recordExpStartedAsync')
       .and.returnValue(Promise.resolve({}));
@@ -158,6 +164,8 @@ describe('Stats reporting service ', () => {
 
   it('should not send request to backend when an exploration ' +
     'it is about to start and already recorded', () => {
+    spyOn(urlService, 'getUrlParams')
+      .and.returnValue({classroom_url_fragment: 'classroom'});
     let postStatsSpy = spyOn(statsReportingBackendApiService, 'postsStatsAsync')
       .and.returnValue(Promise.resolve({}));
     spyOn(statsReportingBackendApiService, 'recordExpStartedAsync')
@@ -176,6 +184,8 @@ describe('Stats reporting service ', () => {
   });
 
   it('should record exploration\'s stats when it is actually started', () => {
+    spyOn(urlService, 'getUrlParams')
+      .and.returnValue({classroom_url_fragment: 'classroom'});
     let recordExplorationActuallyStartedSpy = spyOn(
       statsReportingBackendApiService, 'recordExplorationActuallyStartedAsync')
       .and.returnValue(Promise.resolve({}));
@@ -191,6 +201,8 @@ describe('Stats reporting service ', () => {
 
   it('should not again record exploration\'s stats when ' +
     'it is actually started and already recorded', () => {
+    spyOn(urlService, 'getUrlParams')
+      .and.returnValue({classroom_url_fragment: 'classroom'});
     let recordExplorationActuallyStartedSpy = spyOn(
       statsReportingBackendApiService, 'recordExplorationActuallyStartedAsync')
       .and.returnValue(Promise.resolve({}));
@@ -201,6 +213,8 @@ describe('Stats reporting service ', () => {
   });
 
   it('should record stats status of solution', () => {
+    spyOn(urlService, 'getUrlParams')
+      .and.returnValue({classroom_url_fragment: 'classroom'});
     let recordSolutionHitSpy = spyOn(
       statsReportingBackendApiService, 'recordSolutionHitAsync')
       .and.returnValue(Promise.resolve({}));
@@ -210,6 +224,8 @@ describe('Stats reporting service ', () => {
   });
 
   it('should record stats when refresher exploration is opened', () => {
+    spyOn(urlService, 'getUrlParams')
+      .and.returnValue({classroom_url_fragment: 'classroom'});
     let recordLeaveForRefresherExpSpy = spyOn(
       statsReportingBackendApiService, 'recordLeaveForRefresherExpAsync')
       .and.returnValue(Promise.resolve({}));
@@ -221,28 +237,61 @@ describe('Stats reporting service ', () => {
     expect(recordLeaveForRefresherExpSpy).toHaveBeenCalled();
   });
 
-  it('should record stats when state is changed', () => {
+  it('should record stats for community exp when state is changed', () => {
     let recordStateHitSpy = spyOn(
       statsReportingBackendApiService, 'recordStateHitAsync')
       .and.returnValue(Promise.resolve({}));
+    spyOn(urlService, 'getUrlParams').and.returnValue({});
+
     expect(statsReportingService.statesVisited.size).toBe(0);
     // First transition.
     statsReportingService.recordStateTransition(
-      'firstState', 'secondState', 'answer', {}, true);
+      'firstState', 'secondState', 'answer', {}, true,
+      '1', '2', 'en');
 
     // Second transition.
     statsReportingService.recordStateTransition(
-      'secondState', 'thirdState', 'answer', {}, true);
+      'secondState', 'thirdState', 'answer', {}, true,
+      '1', '2', 'en');
 
     // Third transition.
     statsReportingService.recordStateTransition(
-      'thirdState', 'fourthState', 'answer', {}, true);
+      'thirdState', 'fourthState', 'answer', {}, true,
+      '1', '2', 'en');
+
+    expect(recordStateHitSpy).toHaveBeenCalled();
+    expect(statsReportingService.statesVisited.size).toBe(3);
+  });
+
+  it('should record stats for curated exp when state is changed', () => {
+    let recordStateHitSpy = spyOn(
+      statsReportingBackendApiService, 'recordStateHitAsync')
+      .and.returnValue(Promise.resolve({classroom_url_fragment: 'classroom'}));
+    spyOn(urlService, 'getUrlParams').and.returnValue({});
+
+    expect(statsReportingService.statesVisited.size).toBe(0);
+    // First transition.
+    statsReportingService.recordStateTransition(
+      'firstState', 'secondState', 'answer', {}, true,
+      '1', '2', 'en');
+
+    // Second transition.
+    statsReportingService.recordStateTransition(
+      'secondState', 'thirdState', 'answer', {}, true,
+      '1', '2', 'en');
+
+    // Third transition.
+    statsReportingService.recordStateTransition(
+      'thirdState', 'fourthState', 'answer', {}, true,
+      '1', '2', 'en');
 
     expect(recordStateHitSpy).toHaveBeenCalled();
     expect(statsReportingService.statesVisited.size).toBe(3);
   });
 
   it('should record stats when a card in exploration is finished', () => {
+    spyOn(urlService, 'getUrlParams')
+      .and.returnValue({classroom_url_fragment: 'classroom'});
     let recordStateCompletedSpy = spyOn(
       statsReportingBackendApiService, 'recordStateCompletedAsync')
       .and.returnValue(Promise.resolve({}));
@@ -254,6 +303,8 @@ describe('Stats reporting service ', () => {
   });
 
   it('should record stats when an exploration is finished', () => {
+    spyOn(urlService, 'getUrlParams')
+      .and.returnValue({classroom_url_fragment: 'classroom'});
     let recordExplorationCompletedSpy = spyOn(
       statsReportingBackendApiService, 'recordExplorationCompletedAsync')
       .and.returnValue(Promise.resolve({}));
@@ -261,7 +312,8 @@ describe('Stats reporting service ', () => {
       .and.returnValue(Promise.resolve({}));
     expect(statsReportingService.explorationIsComplete).toBe(false);
 
-    statsReportingService.recordExplorationCompleted('firstState', {});
+    statsReportingService.recordExplorationCompleted(
+      'firstState', {}, '1', '2', 'en');
 
     expect(recordExplorationCompletedSpy).toHaveBeenCalled();
     expect(statsReportingService.explorationIsComplete).toBe(true);
@@ -269,6 +321,8 @@ describe('Stats reporting service ', () => {
   });
 
   it('should record stats when a leave event is triggered', () => {
+    spyOn(urlService, 'getUrlParams')
+      .and.returnValue({classroom_url_fragment: 'classroom'});
     let recordMaybeLeaveEventSpy = spyOn(
       statsReportingBackendApiService, 'recordMaybeLeaveEventAsync')
       .and.returnValue(Promise.resolve({}));
@@ -282,6 +336,8 @@ describe('Stats reporting service ', () => {
   });
 
   it('should record stats when an answer submit button is clicked', () => {
+    spyOn(urlService, 'getUrlParams')
+      .and.returnValue({classroom_url_fragment: 'classroom'});
     let recordAnswerSubmitActionSpy = spyOn(
       playthroughService, 'recordAnswerSubmitAction')
       .and.callThrough();
@@ -292,6 +348,8 @@ describe('Stats reporting service ', () => {
   });
 
   it('should record stats when an answer is actually submitted', () => {
+    spyOn(urlService, 'getUrlParams')
+      .and.returnValue({classroom_url_fragment: 'classroom'});
     let recordAnswerSubmittedSpy = spyOn(
       statsReportingBackendApiService, 'recordAnswerSubmittedAsync')
       .and.returnValue(Promise.resolve({}));
@@ -302,6 +360,8 @@ describe('Stats reporting service ', () => {
   });
 
   it('should set topic name', () => {
+    spyOn(urlService, 'getUrlParams')
+      .and.returnValue({classroom_url_fragment: 'classroom'});
     expect(statsReportingService.topicName).toBeUndefined();
     statsReportingService.setTopicName('newTopic');
 

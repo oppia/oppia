@@ -625,5 +625,114 @@ describe('Site Analytics Service', () => {
         event_label: 'ClickOnClassroom'
       });
     });
+
+    it('should register community lesson completed event', () => {
+      sas.registerCommunityLessonCompleted('exp_id');
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event', 'community_lesson_completed',
+        {
+          exploration_id: 'exp_id'
+        }
+      );
+    });
+
+    it('should register community lesson started event', () => {
+      sas.registerCommunityLessonStarted('exp_id');
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event', 'community_lesson_started',
+        {
+          exploration_id: 'exp_id'
+        }
+      );
+    });
+
+    it('should register audio play event', () => {
+      sas.registerStartAudioPlayedEvent('exp_id', 0);
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event', 'audio_played',
+        {
+          exploration_id: 'exp_id',
+          card_number: 0
+        }
+      );
+    });
+
+    it('should register practice session start event', () => {
+      sas.registerPracticeSessionStartEvent('math', 'topic', '1,2,3');
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event', 'practice_session_start',
+        {
+          classroom_name: 'math',
+          topic_name: 'topic',
+          practice_session_id: '1,2,3'
+        }
+      );
+    });
+
+    it('should register practice session end event', () => {
+      sas.registerPracticeSessionEndEvent(
+        'math', 'topic', '1,2,3', 10, 10);
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event', 'practice_session_end',
+        {
+          classroom_name: 'math',
+          topic_name: 'topic',
+          practice_session_id: '1,2,3',
+          questions_answered: 10,
+          total_score: 10
+        }
+      );
+    });
+
+    it('should register search results viewed event', () => {
+      sas.registerSearchResultsViewedEvent();
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event', 'view_search_results', {}
+      );
+    });
+
+    it('should register homepage start learning button click event', () => {
+      sas.registerClickHomePageStartLearningButtonEvent();
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event', 'discovery_start_learning', {}
+      );
+    });
+
+    it('should register topic start event', () => {
+      sas.registerTopicStartEvent(
+        'math', 'Fractions', 'ch1', '2', 'exp_id');
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event', 'topic_start', {
+          classroom_name: 'math',
+          topic_name: 'Fractions',
+          chapter_name: 'ch1',
+          topic_chapter_count: '2',
+          exploration_id: 'exp_id'
+        }
+      );
+    });
+
+    it('should register topic end event', () => {
+      sas.registerTopicEndEvent(
+        'math', 'Fractions', 'ch1', '2', 'exp_id');
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event', 'topic_end', {
+          classroom_name: 'math',
+          topic_name: 'Fractions',
+          chapter_name: 'ch1',
+          topic_chapter_count: '2',
+          exploration_id: 'exp_id'
+        }
+      );
+    });
   });
 });
