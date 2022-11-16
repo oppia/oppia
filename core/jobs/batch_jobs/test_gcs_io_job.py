@@ -113,7 +113,8 @@ class TestGCSIoReadJob(base_jobs.JobBase):
         output_files = (
             read_files_from_gcs
             | 'Output the data' >> beam.Map(lambda data: (
-                job_run_result.JobRunResult.as_stdout(f'The data is {data}')
+                job_run_result.JobRunResult.as_stdout(
+                    f'The data for file \'{data[0]}\' is "{data[1]}"')
             ))
         )
 

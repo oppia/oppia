@@ -22,7 +22,7 @@ from core.platform import models
 
 import apache_beam as beam
 from apache_beam.io.gcp import gcsio
-from typing import Dict, Optional, TypedDict, Union
+from typing import Dict, Optional, Tuple, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -61,6 +61,7 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         super().__init__(label=label)
         self.client = client
         self.gcs = gcsio.GcsIO(self.client)
+        self.bucket = app_identity_services.get_gcs_resource_bucket_name()
         if mode_is_binary:
             self.mode = 'rb'
         else:
@@ -81,7 +82,7 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
             | 'Read the file' >> beam.Map(self._read_file)
         )
 
-    def _read_file(self, file_path: str) -> Union[bytes, str]:
+    def _read_file(self, file_path: str) -> Tuple[str, Union[bytes, str]]:
         """Helper function to read the contents of a file.
 
         Args:
@@ -90,12 +91,11 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         Returns:
             data: Union[bytes, str]. The file data.
         """
-        bucket = app_identity_services.get_gcs_resource_bucket_name()
-        gcs_url = f'gs://{bucket}/{file_path}'
+        gcs_url = f'gs://{self.bucket}/{file_path}'
         file = self.gcs.open(gcs_url, mode=self.mode)
         data = file.read()
         file.close()
-        return data
+        return (file_path, data)
 
 
 class FileObjectDict(TypedDict):
@@ -136,6 +136,7 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
         self.client = client
         self.mime_type = mime_type
         self.gcs = gcsio.GcsIO(self.client)
+        self.bucket = app_identity_services.get_gcs_resource_bucket_name()
         if mode_is_binary:
             self.mode = 'wb'
         else:
@@ -168,9 +169,8 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
             write_file: int. Returns the number of bytes that has
             been written to GCS.
         """
-        bucket = app_identity_services.get_gcs_resource_bucket_name()
         filepath = file_obj['filepath']
-        gcs_url = 'gs://%s/%s' % (bucket, filepath)
+        gcs_url = 'gs://%s/%s' % (self.bucket, filepath)
         file = self.gcs.open(
             filename=gcs_url,
             mode=self.mode,
@@ -204,6 +204,7 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
         super().__init__(label=label)
         self.client = client
         self.gcs = gcsio.GcsIO(self.client)
+        self.bucket = app_identity_services.get_gcs_resource_bucket_name()
 
     def expand(self, file_paths: beam.PCollection) -> beam.pvalue.PDone:
         """Deletes the files in given PCollection.
@@ -229,8 +230,7 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
         Returns:
             delete_result: None. Returns None or error.
         """
-        bucket = app_identity_services.get_gcs_resource_bucket_name()
-        gcs_url = f'gs://{bucket}/{file_path}'
+        gcs_url = f'gs://{self.bucket}/{file_path}'
         delete_result = self.gcs.delete(gcs_url)
         return delete_result
 
@@ -259,6 +259,7 @@ class GetFiles(beam.PTransform): # type: ignore[misc]
         super().__init__(label=label)
         self.client = client
         self.gcs = gcsio.GcsIO(self.client)
+        self.bucket = app_identity_services.get_gcs_resource_bucket_name()
 
     def expand(self, prefixes: beam.PCollection) -> beam.PCollection:
         """Returns PCollection with file names.
@@ -284,6 +285,5 @@ class GetFiles(beam.PTransform): # type: ignore[misc]
         Returns:
             Dict[str, int]. The file name as key and size of file as value.
         """
-        bucket = app_identity_services.get_gcs_resource_bucket_name()
-        gcs_url = f'gs://{bucket}/{prefix}'
+        gcs_url = f'gs://{self.bucket}/{prefix}'
         return self.gcs.list_prefix(gcs_url)

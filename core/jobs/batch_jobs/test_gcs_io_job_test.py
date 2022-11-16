@@ -96,8 +96,12 @@ class TestGCSIoReadJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout='TOTAL FILES FETCHED SUCCESS: 2'),
-            job_run_result.JobRunResult(stdout='The data is b\'testing_1\''),
-            job_run_result.JobRunResult(stdout='The data is b\'testing_2\'')
+            job_run_result.JobRunResult(
+                stdout='The data for file \'dummy_folder/dummy_subfolder/'
+                'dummy_file_1\' is "b\'testing_1\'"'),
+            job_run_result.JobRunResult(
+                stdout='The data for file \'dummy_folder/dummy_subfolder/'
+                'dummy_file_2\' is "b\'testing_2\'"')
         ])
 
 

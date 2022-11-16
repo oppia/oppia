@@ -72,7 +72,7 @@ class ReadFileTest(job_test_utils.PipelinedTestBase):
             | 'Create pcoll of filepaths' >> beam.Create(filepaths)
             | 'Read file from GCS' >> gcs_io.ReadFile(client)
         )
-        self.assert_pcoll_equal(filepath_p_collec, [string])
+        self.assert_pcoll_equal(filepath_p_collec, [('dummy_file', string)])
 
 
 class WriteFileTest(job_test_utils.PipelinedTestBase):
