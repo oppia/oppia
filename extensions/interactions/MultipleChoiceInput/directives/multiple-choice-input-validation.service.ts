@@ -50,16 +50,18 @@ export class MultipleChoiceInputValidationService {
     var seenChoices = [];
     var numChoices = customizationArgs.choices.value.length;
 
-    if (numChoices < 4) {
+    const minChoices = (
+      AppConstants.MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_REGULAR_EXP);
+    if (numChoices < minChoices) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'Please enter at least four choices.'
+        message: `Please enter at least ${minChoices} choices.`
       });
     }
 
     for (var i = 0; i < customizationArgs.choices.value.length; i++) {
       var choice = customizationArgs.choices.value[i].html;
-      if (choice.trim().length === 0) {
+      if (this.baseInteractionValidationServiceInstance.isHTMLEmpty(choice)) {
         areAnyChoicesEmpty = true;
       }
       if (seenChoices.indexOf(choice) !== -1) {

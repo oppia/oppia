@@ -105,10 +105,6 @@ export const AppConstants = {
     UNICODE_STRING: 'UnicodeString',
   },
 
-  // Flag to toggle the support for a new state to direct the learners
-  // to if they get stuck.
-  DEST_IF_REALLY_STUCK_FEAT_ENABLED: false,
-
   // The maximum number of nodes to show in a row of the state graph.
   MAX_NODES_PER_ROW: 4,
   // The following variable must be at least 3. It represents the maximum
@@ -209,11 +205,11 @@ export const AppConstants = {
   CONTRIBUTION_STATS_SUBTYPE_REVIEW: 'review',
   CONTRIBUTION_STATS_SUBTYPE_CORRECTION: 'correction',
   CONTRIBUTION_STATS_TYPES: {
-    TRANSALTION_CONTRIBUTION: {
+    TRANSLATION_CONTRIBUTION: {
       NAME: 'translationContribution',
       DISPLAY_NAME: 'Translation Contributions'
     },
-    TRANSALTION_REVIEW: {
+    TRANSLATION_REVIEW: {
       NAME: 'translationReview',
       DISPLAY_NAME: 'Translation Reviews'
     },

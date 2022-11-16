@@ -28,6 +28,7 @@ export enum FeatureNames {
   CheckpointCelebration = 'checkpoint_celebration',
   ContributorDashboardAccomplishments = 'contributor_dashboard_accomplishments',
   AndroidBetaLandingPage = 'android_beta_landing_page',
+  BlogPages = 'blog_pages',
 }
 
 export interface FeatureStatusSummaryBackendDict {

@@ -36,6 +36,7 @@ class ParamNames(enum.Enum):
     CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
     CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS = 'contributor_dashboard_accomplishments'
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
+    BLOG_PAGES = 'blog_pages'
 
 
 # Platform parameters should all be defined below.
@@ -67,10 +68,16 @@ Registry.create_feature_flag(
 Registry.create_feature_flag(
     ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
     'This flag is for the contributor dashboard accomplishments feature.',
-    platform_parameter_domain.FeatureStages.DEV,
+    platform_parameter_domain.FeatureStages.PROD,
 )
 
 Registry.create_feature_flag(
     ParamNames.ANDROID_BETA_LANDING_PAGE,
     'This flag is for Android beta promo landing page.',
+    platform_parameter_domain.FeatureStages.PROD)
+
+Registry.create_feature_flag(
+    ParamNames.BLOG_PAGES,
+    'This flag is for blog home page, blog author profile page and blog post' +
+    ' page.',
     platform_parameter_domain.FeatureStages.PROD)

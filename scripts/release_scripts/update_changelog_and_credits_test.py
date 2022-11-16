@@ -33,8 +33,7 @@ from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import update_changelog_and_credits
 
-from typing import List, Union
-from typing_extensions import Final
+from typing import Final, List, Union
 import github  # isort:skip pylint: disable=wrong-import-position
 
 RELEASE_TEST_DIR: Final = os.path.join('core', 'tests', 'release_sources', '')
@@ -150,8 +149,10 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         self.getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
     def test_get_previous_release_version_without_hotfix(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'v2.0.6\nv2.0.7\n'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'v2.0.6\nv2.0.7\n'
         with self.swap(subprocess, 'check_output', mock_check_output):
             self.assertEqual(
                 update_changelog_and_credits.get_previous_release_version(
@@ -162,8 +163,10 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             )
 
     def test_get_previous_release_version_with_hotfix(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'v2.0.6\nv2.0.7\nv2.0.8\n'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'v2.0.6\nv2.0.7\nv2.0.8\n'
         with self.swap(subprocess, 'check_output', mock_check_output):
             self.assertEqual(
                 update_changelog_and_credits.get_previous_release_version(
@@ -176,8 +179,10 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
     def test_get_previous_release_version_with_invalid_branch_type(
         self
     ) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'v2.0.6\nv2.0.7\nv2.0.8\n'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'v2.0.6\nv2.0.7\nv2.0.8\n'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
@@ -188,8 +193,10 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
     def test_get_previous_release_version_with_repeated_previous_version(
         self
     ) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'v2.0.7\nv2.0.8\n'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'v2.0.7\nv2.0.8\n'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
@@ -222,8 +229,10 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
     def test_update_changelog_with_current_version_changelog_present(
         self
     ) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'v1.0.0\nv1.0.1\n'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'v1.0.0\nv1.0.1\n'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         try:
@@ -247,8 +256,10 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             write_to_file(MOCK_CHANGELOG_FILEPATH, changelog_filelines)
 
     def test_update_changelog_with_hotfix_branch(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'v1.0.0\nv1.0.1\nv1.0.2\n'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'v1.0.0\nv1.0.1\nv1.0.2\n'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         try:

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for contributionsAndReview.
+ * @fileoverview Unit tests for ContributorStatsComponent.
  */
 
 import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
@@ -85,6 +85,7 @@ describe('Contributor stats component', () => {
   let contributionAndReviewStatsService: ContributionAndReviewStatsService;
   let languageUtilService: LanguageUtilService;
   let userService: UserService;
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -99,6 +100,7 @@ describe('Contributor stats component', () => {
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
+
   beforeEach(waitForAsync(() => {
     fixture = TestBed.createComponent(ContributorStatsComponent);
     component = fixture.componentInstance;
@@ -137,6 +139,7 @@ describe('Contributor stats component', () => {
         .and.returnValue(Promise.resolve(userContributionRights));
       component.ngOnInit();
     }));
+
     it('should show translation contribution stats', fakeAsync(() => {
       component.selectOption('translationContribution');
 
@@ -170,7 +173,7 @@ describe('Contributor stats component', () => {
     }));
 
     it('should page stats', fakeAsync(() => {
-      let pagedStats = {
+      const pagedStats = {
         language: 'hi',
         currentPage: 2,
         totalPages: 3,
@@ -190,10 +193,10 @@ describe('Contributor stats component', () => {
         ]
       };
 
-      component.nextPage(pagedStats);
+      component.goToNextPage(pagedStats);
       expect(pagedStats.currentPage).toBe(3);
 
-      component.previousPage(pagedStats);
+      component.goToPreviousPage(pagedStats);
       expect(pagedStats.currentPage).toBe(2);
     }));
   });
@@ -233,8 +236,10 @@ describe('Contributor stats component', () => {
             fakeClickAwayEvent,
             'target',
             {value: document.createElement('div')});
+
           component.onDocumentClick(fakeClickAwayEvent);
           fixture.detectChanges();
+
           expect(component.dropdownShown).toBe(false);
           expect(getDropdownOptionsContainer()).toBeFalsy();
         }));

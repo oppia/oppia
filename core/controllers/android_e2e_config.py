@@ -42,15 +42,19 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 
+from typing import Dict, List
 
-class InitializeAndroidTestDataHandler(base.BaseHandler):
+
+class InitializeAndroidTestDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler to initialize android specific structures."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'POST': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.open_access
-    def post(self):
+    def post(self) -> None:
         """Generates structures for Android end-to-end tests.
 
         This handler generates structures for Android end-to-end tests in
@@ -79,11 +83,13 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
 
         if not constants.DEV_MODE:
             raise Exception('Cannot load new structures data in production.')
-        if topic_services.does_topic_with_name_exist(
-                'Android test'):
-            topic = topic_fetchers.get_topic_by_name('Android test')
+        if topic_services.does_topic_with_name_exist('Android test'):
+            topic = topic_fetchers.get_topic_by_name(
+                'Android test', strict=True
+            )
             topic_rights = topic_fetchers.get_topic_rights(
-                topic.id, strict=False)
+                topic.id, strict=True
+            )
             if topic_rights.topic_is_published:
                 raise self.InvalidInputException(
                     'The topic is already published.')
@@ -224,11 +230,10 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         self._upload_thumbnail(story_id, feconf.ENTITY_TYPE_STORY)
         self.render_json({})
 
-    def _upload_thumbnail(self, structure_id, structure_type):
+    def _upload_thumbnail(self, structure_id: str, structure_type: str) -> None:
         """Uploads images to the local datastore to be fetched using the
         AssetDevHandler.
         """
-
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
@@ -238,7 +243,11 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
                 image_content, 'thumbnail', False)
 
     def _create_dummy_question(
-            self, question_id, question_content, linked_skill_ids):
+        self,
+        question_id: str,
+        question_content: str,
+        linked_skill_ids: List[str]
+    ) -> question_domain.Question:
         """Creates a dummy question object with the given question ID.
 
         Args:
@@ -301,7 +310,9 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids, [])
         return question
 
-    def _create_dummy_skill(self, skill_id, skill_description, explanation):
+    def _create_dummy_skill(
+        self, skill_id: str, skill_description: str, explanation: str
+    ) -> skill_domain.Skill:
         """Creates a dummy skill object with the given values.
 
         Args:

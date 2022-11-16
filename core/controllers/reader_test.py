@@ -2218,7 +2218,9 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
                 'session_id': 'session_id'
             }, expected_status_int=400
         )
-        self.assertEqual(response['error'], 'NONE EXP VERSION: State Complete')
+
+        error_msg = 'Missing key in handler args: exp_version.'
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -3270,16 +3272,21 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'b'
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                'new_state_name': 'a'
-            })
-        ], 'A commit message.')
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'b'
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_state_name': 'a'
+                })
+            ],
+            'A commit message.'
+        )
 
     def test_raises_error_when_version_history_does_not_exist(self):
         self.login(self.OWNER_EMAIL)
@@ -3354,13 +3361,18 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'New title'
-            })
-        ], 'A commit message.')
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID,
+                [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })
+            ],
+            'A commit message.'
+        )
 
     def test_raises_error_when_version_history_does_not_exist(self):
         self.login(self.OWNER_EMAIL)

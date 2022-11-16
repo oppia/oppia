@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the list view of opportunities.
+ * @fileoverview Component for the contribution stats view.
  */
 
 import { Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
@@ -29,49 +29,36 @@ interface Option {
   displayName: string;
 }
 
-interface PagedStats {
-  language?: string;
-  currentPage: number;
-  totalPages: number;
-  pagedStats: Stats[];
-}
-
-interface Stats {
-  pageNumber?: number;
+interface PageableStats {
+  currentPageStartIndex: number;
   // eslint-disable-next-line max-len
-  stats: TranslationContributionStats[] | TranslationReviewStats[] | QuestionContributionStats[] | QuestionReviewStats[];
+  data: (TranslationContributionStats | TranslationReviewStats | QuestionContributionStats | QuestionReviewStats)[];
 }
 
-interface TranslationContributionStats {
+interface Stat {
+  topicName: string;
   firstContributionDate: string;
   lastContributionDate: string;
-  topicName: string;
+}
+
+interface TranslationContributionStats extends Stat {
   acceptedCards: number;
   acceptedWordCount: number;
 }
 
-interface TranslationReviewStats {
-  firstContributionDate: string;
-  lastContributionDate: string;
-  topicName: string;
+interface TranslationReviewStats extends Stat {
   acceptedCards: number;
   acceptedWordCount: number;
   reviewedCards: number;
   reviewedWordCount: number;
 }
 
-interface QuestionContributionStats {
-  firstContributionDate: string;
-  lastContributionDate: string;
-  topicName: string;
+interface QuestionContributionStats extends Stat {
   acceptedQuestions: number;
   acceptedQuestionsWithoutEdits: number;
 }
 
-interface QuestionReviewStats {
-  firstContributionDate: string;
-  lastContributionDate: string;
-  topicName: string;
+interface QuestionReviewStats extends Stat {
   reviewedQuestions: number;
   acceptedQuestions: number;
 }
@@ -91,101 +78,54 @@ export class ContributorStatsComponent {
   mobileDropdownShown: boolean = false;
   selectedContributionType: string;
   username: string;
-  endPage: number;
   ITEMS_PER_PAGE: number = 5;
 
   userCanReviewTranslationSuggestions: boolean = false;
   userCanReviewQuestionSuggestions: boolean = false;
   userCanSuggestQuestions: boolean = false;
 
-  translationContributions: Stats[] = [];
-  translationReviews: Stats[] = [];
-  questionContributions: Stats[] = [];
-  questionReviews: Stats[] = [];
-
-  translationContributionPagedStats: PagedStats[] = [];
-  translationReviewPagedStats: PagedStats[] = [];
-  questionContributionPagedStats: PagedStats[] = [];
-  questionReviewPagedStats: PagedStats[] = [];
-
   COLUMNS = {
-    translationContribution: [
-      {
-        name: 'Months',
-      },
-      {
-        name: 'Topic Names',
-      },
-      {
-        name: 'Accepted Cards',
-      },
-      {
-        name: 'Accepted Word Count',
-      }
-    ],
-    translationReview: [
-      {
-        name: 'Months',
-      },
-      {
-        name: 'Topic Names',
-      },
-      {
-        name: 'Reviewed Cards',
-      },
-      {
-        name: 'Reviewed Word Count',
-      },
-      {
-        name: 'Accepted Cards',
-      },
-      {
-        name: 'Accepted Word Count',
-      }
-    ],
-    questionContribution: [
-      {
-        name: 'Months',
-      },
-      {
-        name: 'Topic Names',
-      },
-      {
-        name: 'Accepted Questions',
-      },
-      {
-        name: 'Accepted Questions WIthout Edits',
-      }
-    ],
-    questionReview: [
-      {
-        name: 'Months',
-      },
-      {
-        name: 'Topic Names',
-      },
-      {
-        name: 'Reviewed Questions',
-      },
-      {
-        name: 'Accepted Questions',
-      }
-    ],
+    translationContribution: {
+      months: 'Months',
+      topicNames: 'Topic Names',
+      acceptedCards: 'Accepted Cards',
+      acceptedWordCount: 'Accepted Word Count'
+    },
+    translationReview: {
+      months: 'Months',
+      topicNames: 'Topic Names',
+      reviewedCards: 'Reviewed Cards',
+      reviewedWordCount: 'Reviewed Word Count',
+      acceptedCards: 'Accepted Cards',
+      acceptedWordCount: 'Accepted Word Count'
+    },
+    questionContribution: {
+      months: 'Months',
+      topicNames: 'Topic Names',
+      acceptedQuestions: 'Accepted Questions',
+      acceptedQuestionsWithoutEdits: 'Accepted Questions Without Edits'
+    },
+    questionReview: {
+      months: 'Months',
+      topicNames: 'Topic Names',
+      reviewedQuestions: 'Reviewed Questions',
+      acceptedQuestions: 'Accepted Questions'
+    }
   };
 
   translationContributionOption: Option = {
     displayName:
       AppConstants.CONTRIBUTION_STATS_TYPES
-        .TRANSALTION_CONTRIBUTION.DISPLAY_NAME,
+        .TRANSLATION_CONTRIBUTION.DISPLAY_NAME,
     contributionType:
-     AppConstants.CONTRIBUTION_STATS_TYPES.TRANSALTION_CONTRIBUTION.NAME
+     AppConstants.CONTRIBUTION_STATS_TYPES.TRANSLATION_CONTRIBUTION.NAME
   };
 
   translationReviewOption: Option = {
     displayName:
-      AppConstants.CONTRIBUTION_STATS_TYPES.TRANSALTION_REVIEW.DISPLAY_NAME,
+      AppConstants.CONTRIBUTION_STATS_TYPES.TRANSLATION_REVIEW.DISPLAY_NAME,
     contributionType:
-     AppConstants.CONTRIBUTION_STATS_TYPES.TRANSALTION_REVIEW.NAME
+     AppConstants.CONTRIBUTION_STATS_TYPES.TRANSLATION_REVIEW.NAME
   };
 
   questionContributionOption: Option = {
@@ -206,17 +146,12 @@ export class ContributorStatsComponent {
     this.translationContributionOption
   ];
 
-  translationContribution: Stats[] = [];
-  translationReview: Stats[] = [];
-  questionContribution: Stats[] = [];
-  questionReview: Stats[] = [];
-
-  statsData = {
-    translationContribution: this.translationContributionPagedStats,
-    translationReview: this.translationReviewPagedStats,
-    questionContribution: this.questionContributionPagedStats,
-    questionReview: this.questionReviewPagedStats,
-  };
+  statsData: {
+    translationContribution?: {[key: string]: PageableStats};
+    translationReview?: {[key: string]: PageableStats};
+    questionContribution?: PageableStats;
+    questionReview?: PageableStats;
+  } = {};
 
   constructor(
     private readonly languageUtilService: LanguageUtilService,
@@ -226,6 +161,8 @@ export class ContributorStatsComponent {
   }
 
   async ngOnInit(): Promise<void> {
+    this.statsData.translationContribution = {};
+    this.statsData.translationReview = {};
     const userInfo = await this.userService.getUserInfoAsync();
     const username = userInfo.getUsername();
 
@@ -233,9 +170,9 @@ export class ContributorStatsComponent {
       throw new Error('Cannot fetch username.');
     }
     this.username = username;
-    const currentOption = this.options.filter(
+    const currentOption = this.options.find(
       (option) => option.contributionType === this.type);
-    this.selectedContributionType = currentOption[0].displayName;
+    this.selectedContributionType = currentOption.displayName;
 
     const userContributionRights =
       await this.userService.getUserContributionRightsDataAsync();
@@ -270,113 +207,91 @@ export class ContributorStatsComponent {
 
   async selectOption(contributionType: string): Promise<void> {
     this.type = contributionType;
-    const currentOption = this.options.filter(
+    const currentOption = this.options.find(
       (option) => option.contributionType === contributionType);
-    this.selectedContributionType = currentOption[0].displayName;
+    this.selectedContributionType = currentOption.displayName;
     this.dropdownShown = false;
     this.mobileDropdownShown = false;
   }
 
   async fetchStats(): Promise<void> {
-    this.translationContributions = [];
-    this.translationReviews = [];
-    this.questionContributions = [];
-    this.questionReviews = [];
     const response = await this.contributionAndReviewStatsService.fetchAllStats(
       this.username);
 
     if (response.translation_contribution_stats.length > 0) {
-      const translationContributionLanguages = this.fetchLanguagesFromStats(
-        response.translation_contribution_stats);
-      translationContributionLanguages.forEach((language: string) => {
-        const translationContributionsStats:
-        TranslationContributionStats[] = [];
-        response.translation_contribution_stats.map((stat) => {
-          if (stat.language_code === language) {
-            translationContributionsStats.push(
-              this.createTranslationContributionStat(stat)
-            );
-          }
-        });
-
-        const translationContributionSlicedStats: Stats[] =
-          this.sliceStatsIntoPage(translationContributionsStats);
-
-        this.translationContributionPagedStats.push(
-          this.generatePagedStats(
-            translationContributionSlicedStats, language));
+      response.translation_contribution_stats.map((stat) => {
+        const language = this.languageUtilService.getAudioLanguageDescription(
+          stat.language_code);
+        if (!this.statsData?.translationContribution[language]) {
+          this.statsData.translationContribution[language] = this
+            .createTranslationContributionPageableStats(stat);
+        } else {
+          this.statsData.translationContribution[language].data.push(
+            this.createTranslationContributionStat(stat));
+        }
       });
-
-      this.statsData.translationContribution = (
-        this.translationContributionPagedStats);
     }
 
     if (response.translation_review_stats.length > 0) {
-      const translationReviewLanguages = this.fetchLanguagesFromStats(
-        response.translation_review_stats);
-      translationReviewLanguages.forEach((language: string) => {
-        const translationReviewStats:
-            TranslationReviewStats[] = [];
-        response.translation_review_stats.map((stat) => {
-          if (stat.language_code === language) {
-            translationReviewStats.push(
-              this.createTranslationReviewStat(stat)
-            );
-          }
-        });
-
-        const translationReviewSlicedStats: Stats[] = this.sliceStatsIntoPage(
-          translationReviewStats);
-
-        this.translationReviewPagedStats.push(
-          this.generatePagedStats(translationReviewSlicedStats, language));
+      response.translation_review_stats.map((stat) => {
+        const language = this.languageUtilService.getAudioLanguageDescription(
+          stat.language_code);
+        if (!this.statsData.translationReview[language]) {
+          this.statsData.translationReview[language] = this
+            .createTranslationReviewPageableStats(stat);
+        } else {
+          this.statsData.translationReview[language].data.push(
+            this.createTranslationReviewStat(stat));
+        }
       });
-
-      this.statsData.translationReview = this.translationReviewPagedStats;
     }
 
     if (response.question_contribution_stats.length > 0) {
-      const questionContributionStats:
-        QuestionContributionStats[] = response.
-          question_contribution_stats.map((stat) => {
-            return this.createQuestionContributionStat(stat);
-          });
-
-      const questionContributionSlicedStats: Stats[] = this.sliceStatsIntoPage(
-        questionContributionStats);
-
-      this.questionContributionPagedStats.push(
-        this.generatePagedStats(questionContributionSlicedStats));
-
-      this.statsData.questionContribution = this.questionContributionPagedStats;
+      this.statsData.questionContribution = this
+        .createQuestionContributionPageableStats(
+          response.question_contribution_stats);
     }
 
     if (response.question_review_stats.length > 0) {
-      const questionReviewStats: QuestionReviewStats[] = response.
-        question_review_stats.map((stat) => {
-          return this.createQuestionReviewStat(stat);
-        });
-
-      const questionReviewSlicedStats: Stats[] = this.sliceStatsIntoPage(
-        questionReviewStats);
-
-      this.questionReviewPagedStats.push(
-        this.generatePagedStats(questionReviewSlicedStats));
-
-      this.statsData.questionReview = this.questionReviewPagedStats;
+      this.statsData.questionReview = this.createQuestionReviewPageableStats(
+        response.question_review_stats);
     }
   }
 
-  fetchLanguagesFromStats(
-      stats:
-        TranslationContributionBackendDict[] |
-        TranslationReviewBackendDict[]): Set<string> {
-    const languages = new Set<string>();
-    stats.map((stat) => {
-      languages.add(stat.language_code);
-    });
+  createTranslationContributionPageableStats(
+      stat: TranslationContributionBackendDict): PageableStats {
+    return {
+      data: [this.createTranslationContributionStat(stat)],
+      currentPageStartIndex: 0
+    };
+  }
 
-    return languages;
+  createTranslationReviewPageableStats(
+      stat: TranslationReviewBackendDict): PageableStats {
+    return {
+      data: [this.createTranslationReviewStat(stat)],
+      currentPageStartIndex: 0
+    };
+  }
+
+  createQuestionContributionPageableStats(
+      stats: QuestionContributionBackendDict[]): PageableStats {
+    return {
+      data: stats.map((stat) => {
+        return this.createQuestionContributionStat(stat);
+      }),
+      currentPageStartIndex: 0
+    };
+  }
+
+  createQuestionReviewPageableStats(
+      stat: QuestionReviewBackendDict[]): PageableStats {
+    return {
+      data: stat.map((stat) => {
+        return this.createQuestionReviewStat(stat);
+      }),
+      currentPageStartIndex: 0
+    };
   }
 
   createTranslationContributionStat(
@@ -426,48 +341,32 @@ export class ContributorStatsComponent {
     };
   }
 
-  sliceStatsIntoPage(
-      statsForPage: TranslationContributionStats[] |
-        TranslationReviewStats[] |
-        QuestionContributionStats[] |
-        QuestionReviewStats[]): Stats[] {
-    let slicedStats: Stats[] = [];
-    const iterations: number = Math.floor(
-      statsForPage.length / this.ITEMS_PER_PAGE);
-
-    for (let i = 0; i <= iterations; i++) {
-      slicedStats.push({
-        pageNumber: i + 1,
-        stats: statsForPage.slice(
-          (i * this.ITEMS_PER_PAGE),
-          (i * this.ITEMS_PER_PAGE) + this.ITEMS_PER_PAGE)
-      });
+  goToNextPage(page: PageableStats): void {
+    if (
+      page.currentPageStartIndex + this.ITEMS_PER_PAGE >=
+      page.data.length) {
+      throw new Error('There are no more pages after this one.');
     }
-
-    return slicedStats;
+    page.currentPageStartIndex += this.ITEMS_PER_PAGE;
   }
 
-  generatePagedStats(slicedStats: Stats[], language?: string): PagedStats {
-    let pagedStats: PagedStats = {
-      currentPage: 1,
-      totalPages: slicedStats.length,
-      pagedStats: slicedStats
-    };
-
-    if (language) {
-      pagedStats.language =
-        this.languageUtilService.getAudioLanguageDescription(language);
+  goToPreviousPage(page: PageableStats): void {
+    if (
+      page.currentPageStartIndex === 0) {
+      throw new Error('There are no more pages before this one.');
     }
-
-    return pagedStats;
+    page.currentPageStartIndex -= this.ITEMS_PER_PAGE;
   }
 
-  nextPage(block: PagedStats): void {
-    block.currentPage += 1;
-  }
-
-  previousPage(block: PagedStats): void {
-    block.currentPage -= 1;
+  // This method gives the original order of the key value pairs that is
+  // displayed in the template. We could have used keyvalue: 0 instead of
+  // returning from this function, but it gives console errors.
+  // Reference: https://stackoverflow.com/a/52794221
+  // We need to return a non-negative constant number in order to preserve
+  // original column property order. There is no specific reason to return 0
+  // any other positive value should also give the preferred order.
+  provideOriginalOrder(): number {
+    return 0;
   }
 
   /**

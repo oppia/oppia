@@ -1608,23 +1608,23 @@ describe('Contributions and review component', () => {
       component.activeTabType = component.TAB_TYPE_REVIEWS;
       component.activeSuggestionType = 'add_question';
 
-      expect(component.getActiveDropdownTabChoice()).toBe('Review Questions');
+      expect(component.getActiveDropdownTabText()).toBe('Review Questions');
 
       component.activeTabType = component.TAB_TYPE_REVIEWS;
       component.activeSuggestionType = 'translate_content';
 
-      expect(component.getActiveDropdownTabChoice())
+      expect(component.getActiveDropdownTabText())
         .toBe('Review Translations');
 
       component.activeTabType = component.TAB_TYPE_CONTRIBUTIONS;
       component.activeSuggestionType = 'add_question';
 
-      expect(component.getActiveDropdownTabChoice()).toBe('Questions');
+      expect(component.getActiveDropdownTabText()).toBe('Questions');
 
       component.activeTabType = component.TAB_TYPE_CONTRIBUTIONS;
       component.activeSuggestionType = 'translate_content';
 
-      expect(component.getActiveDropdownTabChoice()).toBe('Translations');
+      expect(component.getActiveDropdownTabText()).toBe('Translations');
     });
 
     it('should close dropdown when a click is made outside', () => {

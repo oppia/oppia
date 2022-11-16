@@ -108,6 +108,18 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
                 config_domain.Registry.get_all_config_property_names()):
             schema_utils_test.validate_schema(schemas[property_name]['schema'])
 
+    def test_raises_error_if_invalid_config_property_fetched_with_strict(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No config property exists for the given property '
+            'name: Invalid_config_name'
+        ):
+            config_domain.Registry.get_config_property(
+                'Invalid_config_name', strict=True
+            )
+
     def test_get_exception_creating_new_config_property_with_existing_name(
         self
     ) -> None:

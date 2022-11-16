@@ -27,7 +27,7 @@ from core.domain import improvements_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing_extensions import Final
+from typing import Final
 
 MYPY = False
 if MYPY: # pragma: no cover

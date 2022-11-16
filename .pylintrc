@@ -88,6 +88,26 @@ disallowed-functions-and-replacements-regex=
 
 [SIMILARITIES]
 
+allowed-type-ignore-error-codes=
+    attr-defined,
+    union-attr,
+    call-overload,
+    override,
+    return,
+    assignment,
+    list-item,
+    dict-item,
+    typeddict-item,
+    func-returns-value,
+    misc,
+    arg-type,
+    type-arg,
+    no-untyped-def,
+    no-untyped-call,
+    no-any-return,
+    call-arg,
+    index
+
 ignore-imports=yes
 
 [MESSAGES CONTROL]
@@ -111,6 +131,8 @@ disable=abstract-method,
         not-context-manager,
         redefined-variable-type,
         redundant-returns-doc,
+# TODO(#12912): Python interpreter migration to 3.8.12 causing failing lint check. Fix it later.
+        redundant-u-string-prefix,
         too-many-arguments,
         too-many-boolean-expressions,
         too-many-branches,

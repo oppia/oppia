@@ -43,8 +43,7 @@ import json
 import re
 import subprocess
 
-from typing import List, Optional, Pattern, Tuple
-from typing_extensions import Final
+from typing import Final, List, Optional, Pattern, Tuple
 
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
@@ -108,13 +107,15 @@ def verify_target_branch_does_not_already_exist(
     """
 
     git_branch_output = subprocess.check_output(
-        ['git', 'branch']).decode().split('\n')
+        ['git', 'branch'], encoding='utf-8'
+    ).split('\n')
     if new_branch_name in git_branch_output:
         raise Exception(
             'ERROR: The target branch name already exists locally. '
             'Run "git branch -D %s" to delete it.' % new_branch_name)
     git_ls_remote_output = subprocess.check_output(
-        ['git', 'ls-remote', '--heads', remote_alias]).decode().split('\n')
+        ['git', 'ls-remote', '--heads', remote_alias], encoding='utf-8'
+    ).split('\n')
     remote_branch_ref = 'refs/heads/%s' % new_branch_name
     if remote_branch_ref in git_ls_remote_output:
         raise Exception(
@@ -197,8 +198,9 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
         Exception. The difference between two continuous hotfix numbers
             is not one.
     """
-    all_branches = subprocess.check_output([
-        'git', 'branch', '-a']).decode().split('\n')
+    all_branches = subprocess.check_output(
+        ['git', 'branch', '-a'], encoding='utf-8'
+    ).split('\n')
 
     last_hotfix_number = 0
     release_branch_exists = False
