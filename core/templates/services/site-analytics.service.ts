@@ -356,11 +356,62 @@ export class SiteAnalyticsService {
       'VisitOppiaFromIframe', 'click', explorationId);
   }
 
-  registerNewCard(cardNum: number): void {
+  registerNewCard(cardNum: number, explorationId: string): void {
     if (cardNum <= 10 || cardNum % 10 === 0) {
       this._sendEventToLegacyGoogleAnalytics(
         'PlayerNewCard', 'click', cardNum.toString());
+      this._sendEventToGoogleAnalytics(
+        'new_card_load',
+        {
+          exploration_id: explorationId,
+          card_number: cardNum
+        }
+      );
     }
+  }
+
+  registerStartAudioPlayedEvent(
+      explorationId: string,
+      cardIndex: number
+  ): void {
+    this._sendEventToGoogleAnalytics(
+      'audio_played', {
+        exploration_id: explorationId,
+        card_number: cardIndex
+      }
+    );
+  }
+
+  registerPracticeSessionStartEvent(
+      classroomName: string,
+      topicName: string,
+      stringifiedSubtopicIds: string
+  ): void {
+    this._sendEventToGoogleAnalytics(
+      'practice_session_start', {
+        classroom_name: classroomName,
+        topic_name: topicName,
+        practice_session_id: stringifiedSubtopicIds
+      }
+    );
+  }
+
+  registerPracticeSessionEndEvent(
+      classroomName: string,
+      topicName: string,
+      stringifiedSubtopicIds: string,
+      questionsAnswered: number,
+      totalScore: number
+  ): void {
+    this._sendEventToGoogleAnalytics(
+      'practice_session_end', {
+        classroom_name: classroomName,
+        topic_name: topicName,
+        practice_session_id: stringifiedSubtopicIds,
+        questions_answered: questionsAnswered,
+        total_score: totalScore
+      }
+    );
   }
 
   registerOpenCollectionFromLandingPageEvent(collectionId: string): void {
@@ -426,17 +477,33 @@ export class SiteAnalyticsService {
   registerStartExploration(explorationId: string): void {
     this._sendEventToLegacyGoogleAnalytics(
       'PlayerStartExploration', 'engage', explorationId);
+    this._sendEventToGoogleAnalytics(
+      'lesson_started', {
+        exploration_id: explorationId
+      }
+    );
   }
 
   registerFinishExploration(explorationId: string): void {
     this._sendEventToLegacyGoogleAnalytics(
       'PlayerFinishExploration', 'engage', explorationId);
+    this._sendEventToGoogleAnalytics(
+      'lesson_completed', {
+        exploration_id: explorationId
+      }
+    );
   }
 
   registerCuratedLessonStarted(
       topicName: string, explorationId: string): void {
     this._sendEventToLegacyGoogleAnalytics(
       'CuratedLessonStarted', `start ${topicName}`, explorationId);
+    this._sendEventToGoogleAnalytics(
+      'classroom_lesson_started', {
+        topic_name: topicName,
+        exploration_id: explorationId
+      }
+    );
   }
 
   registerCuratedLessonCompleted(
@@ -451,7 +518,7 @@ export class SiteAnalyticsService {
     this._sendEventToLegacyGoogleAnalytics(
       'CuratedLessonCompleted', `start ${topicName}`, explorationId);
     this._sendEventToGoogleAnalytics(
-      'classroom_exploration_end', {
+      'classroom_lesson_completed', {
         classroom_name: classroomName,
         topic_name: topicName,
         chapter_name: chapterName,
@@ -463,7 +530,23 @@ export class SiteAnalyticsService {
     );
   }
 
-  registerClassroomLessonActiveUse(
+  registerCommunityLessonStarted(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'community_lesson_started', {
+        exploration_id: explorationId
+      }
+    );
+  }
+
+  registerCommunityLessonCompleted(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'community_lesson_completed', {
+        exploration_id: explorationId
+      }
+    );
+  }
+
+  registerClassroomLessonEngagedWithEvent(
       classroomName: string,
       topicName: string,
       chapterName: string,
@@ -477,13 +560,37 @@ export class SiteAnalyticsService {
       `start ${topicName}`,
       explorationId);
     this._sendEventToGoogleAnalytics(
-      'classroom_exploration_start', {
+      'classroom_lesson_engaged_with', {
         classroom_name: classroomName,
         topic_name: topicName,
         chapter_name: chapterName,
         exploration_id: explorationId,
         chapter_number: chapterNumber,
         chapter_card_count: chapterCardCount,
+        exploration_language: explorationLanguage
+      }
+    );
+  }
+
+  registerCommunityLessonEngagedWithEvent(
+      explorationId: string,
+      explorationLanguage: string
+  ): void {
+    this._sendEventToGoogleAnalytics(
+      'community_lesson_engaged_with', {
+        exploration_id: explorationId,
+        exploration_language: explorationLanguage
+      }
+    );
+  }
+
+  registerLessonEngagedWithEvent(
+      explorationId: string,
+      explorationLanguage: string
+  ): void {
+    this._sendEventToGoogleAnalytics(
+      'lesson_engaged_with', {
+        exploration_id: explorationId,
         exploration_language: explorationLanguage
       }
     );

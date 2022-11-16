@@ -426,7 +426,7 @@ describe('Site Analytics Service', () => {
 
     it('should register new card when card number is less than 10', () => {
       const cardNumber = 1;
-      sas.registerNewCard(cardNumber);
+      sas.registerNewCard(cardNumber, 'abc1');
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'PlayerNewCard',
@@ -437,7 +437,7 @@ describe('Site Analytics Service', () => {
     it('should register new card when card number is greather than 10 and' +
       ' it\'s a multiple of 10', () => {
       const cardNumber = 20;
-      sas.registerNewCard(cardNumber);
+      sas.registerNewCard(cardNumber, 'abc1');
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'PlayerNewCard',
@@ -447,7 +447,7 @@ describe('Site Analytics Service', () => {
 
     it('should not register new card', () => {
       const cardNumber = 35;
-      sas.registerNewCard(cardNumber);
+      sas.registerNewCard(cardNumber, 'abc1');
 
       expect(gtagSpy).not.toHaveBeenCalled();
     });
@@ -471,7 +471,15 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register finish curated lesson event', () => {
-      sas.registerCuratedLessonCompleted('Fractions', '123');
+      sas.registerCuratedLessonCompleted(
+        'math',
+        'Fractions',
+        'ch1',
+        '123',
+        '2',
+        '3',
+        'en'
+      );
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'start Fractions', {
         event_category: 'CuratedLessonCompleted',
@@ -591,16 +599,17 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register classroom page viewed', () => {
-      spyOn(sas, '_sendEventToGoogleAnalytics');
+      spyOn(sas, '_sendEventToLegacyGoogleAnalytics');
 
       sas.registerClassroomPageViewed();
-      expect(sas._sendEventToGoogleAnalytics).toHaveBeenCalledWith(
+      expect(sas._sendEventToLegacyGoogleAnalytics).toHaveBeenCalledWith(
         'ClassroomEngagement', 'impression', 'ViewClassroom');
     });
 
     it('should register active classroom lesson usage', () => {
       let explorationId = '123';
-      sas.registerClassroomLessonActiveUse('Fractions', explorationId);
+      sas.registerClassroomLessonEngagedWithEvent(
+        'math', 'Fractions', 'ch1', explorationId, '2', '3', 'en');
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'start Fractions', {
         event_category: 'ClassroomActiveUserStartAndSawCards',

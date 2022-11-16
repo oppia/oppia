@@ -202,7 +202,7 @@ export class StatsReportingService {
       });
 
     this.statesVisited.add(stateName);
-    this.siteAnalyticsService.registerNewCard(1);
+    this.siteAnalyticsService.registerNewCard(1, this.explorationId);
 
     this.stateStopwatch.reset();
     this.explorationStarted = true;
@@ -317,19 +317,29 @@ export class StatsReportingService {
     if (!this.statesVisited.has(newStateName)) {
       this.statesVisited.add(newStateName);
       this.siteAnalyticsService.registerNewCard(
-        this.statesVisited.size);
+        this.statesVisited.size,
+        this.explorationId);
     }
     let numberOfStatesVisited = this.statesVisited.size;
     if (numberOfStatesVisited === this.MINIMUM_NUMBER_OF_VISITED_STATES) {
       let urlParams = this.urlService.getUrlParams();
+      this.siteAnalyticsService.registerLessonEngagedWithEvent(
+        this.explorationId,
+        language
+      );
       if (urlParams.hasOwnProperty('classroom_url_fragment')) {
-        this.siteAnalyticsService.registerClassroomLessonActiveUse(
+        this.siteAnalyticsService.registerClassroomLessonEngagedWithEvent(
           urlParams.classroom_url_fragment,
           this.topicName,
           this.explorationTitle,
           this.explorationId,
           chapterNumber,
           cardCount,
+          language
+        );
+      } else {
+        this.siteAnalyticsService.registerCommunityLessonEngagedWithEvent(
+          this.explorationId,
           language
         );
       }
