@@ -4202,7 +4202,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Please fix the following issues before saving this exploration: '
             '1. The following states are not reachable from the initial state: '
             'End 2. It is impossible to complete the exploration from the '
-            'following states: Stuck State, Introduction'):
+            'following states: Introduction, Stuck State'):
             exploration.validate(strict=True)
 
     def test_update_init_state_name_with_invalid_state(self) -> None:
