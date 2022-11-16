@@ -85,7 +85,7 @@ export class StorySummaryTileComponent implements OnInit {
         this.topicUrlFragment,
         this.nodeTitles[0],
         this.nodeCount.toString(),
-        this.storySummary.getAllNodes()[0].getExplorationId()
+        this.storySummary.getAllNodes()[0].getExplorationId() || 'NA'
       );
     } else if (index === this.nodeCount - 1) {
       this.siteAnalyticsService.registerTopicEndEvent(
@@ -94,6 +94,7 @@ export class StorySummaryTileComponent implements OnInit {
         this.nodeTitles[this.nodeCount - 1],
         this.nodeCount.toString(),
         this.storySummary.getAllNodes()[this.nodeCount - 1].getExplorationId()
+        || 'NA'
       );
     }
   }
