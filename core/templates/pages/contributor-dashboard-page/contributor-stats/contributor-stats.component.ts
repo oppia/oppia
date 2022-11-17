@@ -88,7 +88,7 @@ export class ContributorStatsComponent {
   username: string = '';
   ITEMS_PER_PAGE: number = 5;
 
-  userCanReviewTranslationSuggestions: boolean = false;
+  userCanReviewTranslationSuggestions: boolean | undefined = false;
   userCanReviewQuestionSuggestions: boolean | undefined = false;
   userCanSuggestQuestions: boolean | undefined = false;
 
