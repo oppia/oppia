@@ -207,6 +207,7 @@ describe('Stats reporting service ', () => {
       statsReportingBackendApiService, 'recordExplorationActuallyStartedAsync')
       .and.returnValue(Promise.resolve({}));
     statsReportingService.explorationActuallyStarted = true;
+
     statsReportingService.recordExplorationActuallyStarted('firstState');
 
     expect(recordExplorationActuallyStartedSpy).not.toHaveBeenCalled();
@@ -218,6 +219,7 @@ describe('Stats reporting service ', () => {
     let recordSolutionHitSpy = spyOn(
       statsReportingBackendApiService, 'recordSolutionHitAsync')
       .and.returnValue(Promise.resolve({}));
+
     statsReportingService.recordSolutionHit('firstState');
 
     expect(recordSolutionHitSpy).toHaveBeenCalled();
@@ -230,6 +232,7 @@ describe('Stats reporting service ', () => {
       statsReportingBackendApiService, 'recordLeaveForRefresherExpAsync')
       .and.returnValue(Promise.resolve({}));
     expect(statsReportingService.nextExpId).toBeUndefined();
+
     statsReportingService.recordLeaveForRefresherExp(
       'firstState', 'refresherExp');
 
@@ -300,6 +303,7 @@ describe('Stats reporting service ', () => {
       statsReportingBackendApiService, 'recordStateCompletedAsync')
       .and.returnValue(Promise.resolve({}));
     expect(statsReportingService.currentStateName).toBeUndefined();
+
     statsReportingService.recordStateCompleted('firstState');
 
     expect(recordStateCompletedSpy).toHaveBeenCalled();
@@ -345,6 +349,7 @@ describe('Stats reporting service ', () => {
     let recordAnswerSubmitActionSpy = spyOn(
       playthroughService, 'recordAnswerSubmitAction')
       .and.callThrough();
+
     statsReportingService.recordAnswerSubmitAction(
       'oldState', 'newState', 'expId', 'answer', 'feedback');
 
@@ -357,6 +362,7 @@ describe('Stats reporting service ', () => {
     let recordAnswerSubmittedSpy = spyOn(
       statsReportingBackendApiService, 'recordAnswerSubmittedAsync')
       .and.returnValue(Promise.resolve({}));
+
     statsReportingService.recordAnswerSubmitted(
       'firstState', {}, 'answer', 0, 0, 'category', true);
 
@@ -367,6 +373,7 @@ describe('Stats reporting service ', () => {
     spyOn(urlService, 'getUrlParams')
       .and.returnValue({classroom_url_fragment: 'classroom'});
     expect(statsReportingService.topicName).toBeUndefined();
+
     statsReportingService.setTopicName('newTopic');
 
     expect(statsReportingService.topicName).toBe('newTopic');

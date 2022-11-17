@@ -144,7 +144,9 @@ describe('Splash Page', () => {
     spyOn(
       siteAnalyticsService, 'registerClickHomePageStartLearningButtonEvent')
       .and.callThrough();
+
     component.onClickStartLearningButton();
+
     expect(siteAnalyticsService.registerClickHomePageStartLearningButtonEvent)
       .toHaveBeenCalled();
   });
