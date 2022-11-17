@@ -201,6 +201,9 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
                             'unicode_str': '',
                             'content_id': 'ca_placeholder_0'
                         }
+                    },
+                    'catchMisspellings': {
+                        'value': False
                     }
                 },
                 'confirmed_unclassified_answers': [],
