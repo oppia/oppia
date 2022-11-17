@@ -500,8 +500,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         continue_state = exp_100.states['continue state']
         # Here we use cast because we are narrowing down the type from various
         # customization args value types to 'SubtitledUnicode' type, and this
-        # is done because here we are accessing 'buttontext' cust. arg whose
-        # value is always SubtitledUnicode.
+        # is done because here we are accessing 'buttontext' key from continue
+        # customization arg whose value is always of SubtitledUnicode type.
         subtitled_unicode_of_continue_button_text = cast(
             state_domain.SubtitledUnicode,
             continue_state.interaction.customization_args[
@@ -592,11 +592,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         # Create a translation suggestion for the continue text.
         continue_state = exp_100.states['continue state']
-        # Here we use cast because we are narrowing down type from various
-        # customization arg types to SubtitledUnicode, and here we are sure
-        # that type is always going to be SubtitledUnicode because here we
-        # are testing opportunities with buttontext customization arg and
-        # buttontext cust. arg always contain SubtitledUnicode type of value.
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to 'SubtitledUnicode' type, and this
+        # is done because here we are accessing 'buttontext' key from continue
+        # customization arg whose value is always of SubtitledUnicode type.
         subtitled_unicode_of_continue_button_text = cast(
             state_domain.SubtitledUnicode,
             continue_state.interaction.customization_args[
