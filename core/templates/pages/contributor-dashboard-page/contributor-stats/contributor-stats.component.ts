@@ -184,11 +184,12 @@ export class ContributorStatsComponent {
 
     const userContributionRights =
       await this.userService.getUserContributionRightsDataAsync();
+    const reviewableLanguageCodes = (
+      userContributionRights.can_review_translation_for_language_codes);
     this.userCanReviewTranslationSuggestions = (
-      userContributionRights?.
-        can_review_translation_for_language_codes.length > 0);
+      reviewableLanguageCodes.length > 0);
     this.userCanReviewQuestionSuggestions = (
-      userContributionRights?.can_review_questions);
+      userContributionRights.can_review_questions);
     this.userCanSuggestQuestions = (
       userContributionRights?.can_suggest_questions);
 
