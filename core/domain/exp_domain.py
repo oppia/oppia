@@ -2087,9 +2087,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if len(self.states) != len(processed_queue):
             dead_end_states = list(
                 set(self.states.keys()) - set(processed_queue))
+            sorted_dead_end_states = sorted(dead_end_states)
             raise utils.ValidationError(
                 'It is impossible to complete the exploration from the '
-                'following states: %s' % ', '.join(dead_end_states))
+                'following states: %s' % ', '.join(sorted_dead_end_states)
+            )
 
     def get_content_html(self, state_name: str, content_id: str) -> str:
         """Return the content for a given content id of a state.
@@ -3217,6 +3219,35 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         # Update state RTE validations.
         states_dict = cls._update_state_rte(states_dict)
+
+        return states_dict
+
+    @classmethod
+    def _convert_states_v53_dict_to_v54_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
+        """Converts from version 53 to 54. Version 54 adds
+        catchMisspellings customization arg to TextInput
+        interaction which allows creators to detect misspellings.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'TextInput':
+                customization_args = state_dict['interaction'][
+                    'customization_args']
+                customization_args.update({
+                    'catchMisspellings': {
+                        'value': False
+                    }
+                })
 
         return states_dict
 
@@ -5020,7 +5051,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 58
+    CURRENT_EXP_SCHEMA_VERSION = 59
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -5319,6 +5350,29 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v58_dict_to_v59_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
+        """Converts a v58 exploration dict into a v59 exploration dict.
+        Version 59 adds a new customization arg to TextInput allowing
+        creators to catch misspellings.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v58.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v59.
+        """
+        exploration_dict['schema_version'] = 59
+        exploration_dict['states'] = cls._convert_states_v53_dict_to_v54_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 54
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
         cls, yaml_content: str
     ) -> VersionedExplorationDict:
@@ -5419,6 +5473,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v57_dict_to_v58_dict(
                 exploration_dict)
             exploration_schema_version = 58
+
+        if exploration_schema_version == 58:
+            exploration_dict = cls._convert_v58_dict_to_v59_dict(
+                exploration_dict)
+            exploration_schema_version = 59
 
         return exploration_dict
 
