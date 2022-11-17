@@ -477,7 +477,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'unicode_str': ''
                 }
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {'value': False}
         }
 
         state.update_next_content_id_index(3)
@@ -1451,7 +1452,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'unicode_str': 'Placeholder'
                 }
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {'value': False}
         }
         init_state.update_interaction_customization_args(
             state_interaction_cust_args)
@@ -2631,6 +2633,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'content_id': 'ca_placeholder_0',
                             'unicode_str': ''
                         }
+                    },
+                    'catchMisspellings': {
+                        'value': False
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -2698,6 +2703,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'content_id': 'ca_placeholder_0',
                             'unicode_str': ''
                         }
+                    },
+                    'catchMisspellings': {
+                        'value': False
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -4728,7 +4736,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'unicode_str': 'Translatable cust args.'
                 }
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {'value': False}
         }
         state.update_interaction_id('TextInput')
         state.update_interaction_customization_args(state_interaction_cust_args)

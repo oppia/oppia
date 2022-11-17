@@ -84,7 +84,10 @@ describe('Exploration object factory', () => {
               unicode_str: ''
             }
           },
-          rows: { value: 1 }
+          rows: { value: 1 },
+          catchMisspellings: {
+            value: false
+          }
         },
         default_outcome: {
           dest: 'new state',
@@ -269,6 +272,9 @@ describe('Exploration object factory', () => {
         },
         rows: {
           value: 1
+        },
+        catchMisspellings: {
+          value: false
         }
       });
     expect(exploration.getInteractionCustomizationArgs('second state'))

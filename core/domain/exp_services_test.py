@@ -1933,6 +1933,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: Introduction
         dest_if_really_stuck: null
@@ -2510,6 +2512,8 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
@@ -2553,6 +2557,8 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
@@ -2621,6 +2627,8 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
@@ -2664,6 +2672,8 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
@@ -2749,7 +2759,8 @@ title: A title
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {'value': False}
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -2842,7 +2853,8 @@ title: A title
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {'value': False}
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -2930,7 +2942,8 @@ title: A title
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -3011,6 +3024,8 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
@@ -3058,6 +3073,8 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
@@ -3106,6 +3123,8 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
@@ -3182,7 +3201,8 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {'value': False}
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -3236,7 +3256,8 @@ written_translations:
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -3719,7 +3740,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': ''
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }),
             'Add state name')
 
@@ -3764,7 +3786,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': ''
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }),
             'Add state name')
 
@@ -4046,7 +4069,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': 'placeholder'
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }),
             'Add Customization Args')
 
@@ -4209,7 +4233,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': 'placeholder'
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }),
             'Add Customization Args')
 
@@ -4388,7 +4413,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': 'placeholder'
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }),
             'Add Customization Args')
 
@@ -5077,7 +5103,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         })]
         exp_services.update_exploration(
@@ -5170,7 +5197,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         })]
         exp_services.update_exploration(
@@ -5245,7 +5273,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         })]
         exp_services.update_exploration(
@@ -5284,7 +5313,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         }, {
             'cmd': exp_domain.CMD_DELETE_STATE,
@@ -8047,7 +8077,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
 
         migration_change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': 52,
+            'from_version': 53,
             'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         })]
         exp_services.update_exploration(
@@ -8314,7 +8344,8 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {'value': False}
                     }
                 })
             ], 'Edited interaction'
@@ -8642,6 +8673,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: Introduction
         feedback:
@@ -8993,6 +9026,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: Introduction
         feedback:

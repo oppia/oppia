@@ -78,6 +78,9 @@ describe('TextInputValidationService', () => {
       },
       rows: {
         value: 1
+      },
+      catchMisspellings: {
+        value: false
       }
     };
 
