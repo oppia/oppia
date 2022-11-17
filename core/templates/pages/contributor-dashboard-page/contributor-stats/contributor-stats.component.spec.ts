@@ -279,7 +279,7 @@ describe('Contributor stats component', () => {
               getUsername: () => 'user'
             } as UserInfo));
           spyOn(userService, 'getUserContributionRightsDataAsync')
-            .and.returnValue(Promise.resolve(undefined));
+            .and.returnValue(Promise.resolve(null));
 
           expect(() => {
             component.ngOnInit();
