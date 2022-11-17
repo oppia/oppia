@@ -12,52 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// import { Injectable } from '@angular/core';
-
 /**
  * @fileoverview Utility functions for strings.
  */
 
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class StringUtilityService {
-  export function camelCaseFromHyphen(str: string): string {
-    const newStr = str.replace(/[\])}[{(]/g, '');
-    return newStr.replace(
-      /-([a-z])/g,
-      function(g) {
-        return g[1].toUpperCase();
-      });
-  }
-
-  export function checkEditDistance(
-      inputString: string,
-      matchString: string,
-      requiredEditDistance: number
-  ): boolean {
-    if (inputString === matchString) {
-      return true;
-    }
-    var editDistance = [];
-    for (var i = 0; i <= inputString.length; i++) {
-      editDistance.push([i]);
-    }
-    for (var j = 1; j <= matchString.length; j++) {
-      editDistance[0].push(j);
-    }
-    for (var i = 1; i <= inputString.length; i++) {
-      for (var j = 1; j <= matchString.length; j++) {
-        if (inputString.charAt(i - 1) === matchString.charAt(j - 1)) {
-          editDistance[i][j] = editDistance[i - 1][j - 1];
-        } else {
-          editDistance[i][j] = Math.min(
-            editDistance[i - 1][j - 1], editDistance[i][j - 1],
-            editDistance[i - 1][j]) + 1;
-        }
-      }
-    }
-    return (
-      editDistance[inputString.length][matchString.length] <=
-      requiredEditDistance);
-  }
+export default function camelCaseFromHyphen(str: string): string {
+  const newStr = str.replace(/[\])}[{(]/g, '');
+  return newStr.replace(
+    /-([a-z])/g,
+    function(g) {
+      return g[1].toUpperCase();
+    });
+}
