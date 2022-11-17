@@ -48,13 +48,21 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import audit_models
     from mypy_imports import auth_models
+    from mypy_imports import blog_stats_models
     from mypy_imports import user_models
 
 datastore_services = models.Registry.import_datastore_services()
-(auth_models, user_models, audit_models) = (models.Registry.import_models([
+(
+    auth_models,
+    user_models,
+    audit_models,
+    blog_stats_models
+) = (
+    models.Registry.import_models([
     models.Names.AUTH,
     models.Names.USER,
-    models.Names.AUDIT
+    models.Names.AUDIT,
+    models.Names.BLOG_STATISTICS
 ]))
 bulk_email_services = models.Registry.import_bulk_email_services()
 
@@ -1153,6 +1161,51 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_user_roles_from_id(user_id), [
                 feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_COLLECTION_EDITOR])
+
+    def test_add_addition_of_blog_author_roles(self) -> None:
+        auth_id = 'test_id'
+        author_name = 'testname'
+        author_email = 'test@email.com'
+
+        author_id = user_services.create_new_user(auth_id, author_email).user_id
+        user_services.set_username(author_id, author_name)
+
+        self.assertIsNone(
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
+                author_id, strict=False
+            )
+        )
+        self.assertIsNone(
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
+                author_id, strict=False
+            )
+        )
+        self.assertIsNone(
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
+                author_id, strict=False
+            )
+        )
+
+        user_services.add_user_role(author_id, feconf.ROLE_ID_BLOG_ADMIN)
+
+        self.assertEqual(
+            user_services.get_user_roles_from_id(author_id), [
+                feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_BLOG_ADMIN])
+        self.assertIsNotNone(
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
+                author_id, strict=False
+            )
+        )
+        self.assertIsNotNone(
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
+                author_id, strict=False
+            )
+        )
+        self.assertIsNotNone(
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
+                author_id, strict=False
+            )
+        )
 
     def test_adding_other_roles_to_full_user_updates_roles(self) -> None:
         auth_id = 'test_id'
@@ -4082,3 +4135,41 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         user_contribution_rights = (
             user_services.get_user_contribution_rights(user_id))
         self.assertFalse(user_contribution_rights.can_submit_questions)
+
+    def test_create_aggregated_author_blog_post_stats_models(self) -> None:
+        author_id = 'sample_id'
+        self.assertIsNone(
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
+                author_id, strict=False
+            )
+        )
+        self.assertIsNone(
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
+                author_id, strict=False
+            )
+        )
+        self.assertIsNone(
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
+                author_id, strict=False
+            )
+        )
+
+        user_services.create_aggregated_author_blog_post_stats_models(
+            author_id
+        )
+
+        self.assertIsNotNone(
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
+                author_id, strict=False
+            )
+        )
+        self.assertIsNotNone(
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
+                author_id, strict=False
+            )
+        )
+        self.assertIsNotNone(
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
+                author_id, strict=False
+            )
+        )

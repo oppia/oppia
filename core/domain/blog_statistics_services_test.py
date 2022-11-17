@@ -42,7 +42,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
 
     MOCK_DATE: Final = datetime.datetime(2021, 9, 20)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         with self.mock_datetime_utcnow(self.MOCK_DATE):
@@ -103,7 +103,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_blog_post_aggregated_views_stats_by_id(self):
+    def test_get_blog_post_aggregated_views_stats_by_id(self) -> None:
         stats_model = blog_stats_models.BlogPostViewsAggregatedStatsModel.get(
             self.blog_post.id
         )
@@ -129,7 +129,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
             ).to_frontend_dict()
         )
 
-    def test_get_blog_post_aggregated_reads_stats_by_id(self):
+    def test_get_blog_post_aggregated_reads_stats_by_id(self) -> None:
         stats_model = blog_stats_models.BlogPostReadsAggregatedStatsModel.get(
             self.blog_post.id
         )
@@ -155,7 +155,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
             ).to_frontend_dict()
         )
 
-    def test_get_blog_post_aggregated_reading_time_stats_by_id(self):
+    def test_get_blog_post_aggregated_reading_time_stats_by_id(self) -> None:
         stats_model = blog_stats_models.BlogPostReadingTimeModel.get(
             self.blog_post.id
         )
@@ -182,7 +182,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
             ).to_frontend_dict()
         )
 
-    def test_get_author_blog_post_aggregated_views_stats_by_id(self):
+    def test_get_author_blog_post_aggregated_views_stats_by_id(self) -> None:
         stats_model = (
             blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
                 self.blog_admin_id
@@ -210,7 +210,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
             ).to_frontend_dict()
         )
 
-    def test_get_author_blog_post_aggregated_reads_stats_by_id(self):
+    def test_get_author_blog_post_aggregated_reads_stats_by_id(self) -> None:
         stats_model = (
             blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
                 self.blog_admin_id
@@ -238,7 +238,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
             ).to_frontend_dict()
         )
 
-    def test_get_author_aggregated_reading_time_stats_by_id(self):
+    def test_get_author_aggregated_reading_time_stats_by_id(self) -> None:
         stats_model = (
             blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
                 self.blog_admin_id
@@ -270,7 +270,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
             )
         )
 
-    def test_generate_stats_by_hour_dict(self):
+    def test_generate_stats_by_hour_dict(self) -> None:
         expected_dict = {
             '00': 0,
             '01': 0,
@@ -302,7 +302,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
             blog_statistics_services.generate_stats_by_hour_dict()
         )
 
-    def test_generate_stats_by_month_dict(self):
+    def test_generate_stats_by_month_dict(self) -> None:
         expected_dict = {
             '01': 0,
             '02': 0,
@@ -322,7 +322,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
             blog_statistics_services.generate_stats_by_month_dict()
         )
 
-    def test_generate_stats_by_date_dict(self):
+    def test_generate_stats_by_date_dict(self) -> None:
         expected_dict = {
             '01': 0,
             '02': 0,
@@ -358,7 +358,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
             blog_statistics_services.generate_stats_by_date_dict(2, 2022)
         )
 
-    def test_create_aggregated_stats_model_for_newly_published_blog_post(self):
+    def test_create_aggregated_stats_model_for_newly_published_blog_post(self) -> None:
         blog_post_id = 'sample_id'
         self.assertIsNone(
             blog_stats_models.BlogPostViewsAggregatedStatsModel.get(
@@ -399,48 +399,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
             )
         )
 
-    def test_create_aggregated_author_blog_post_stats_models(self):
-        author_id = 'sample_id'
-        self.assertIsNone(
-            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
-                author_id, strict=False
-            )
-        )
-        self.assertIsNone(
-            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
-                author_id, strict=False
-            )
-        )
-        self.assertIsNone(
-            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
-                author_id, strict=False
-            )
-        )
-
-        (
-            blog_statistics_services
-            .create_aggregated_author_blog_post_stats_models(
-                author_id
-            )
-        )
-
-        self.assertIsNotNone(
-            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
-                author_id, strict=False
-            )
-        )
-        self.assertIsNotNone(
-            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
-                author_id, strict=False
-            )
-        )
-        self.assertIsNotNone(
-            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
-                author_id, strict=False
-            )
-        )
-
-    def test_parse_datetime_into_date_dict(self):
+    def test_parse_datetime_into_date_dict(self) -> None:
         self.assertEqual(
             blog_statistics_services.parse_datetime_into_date_dict(
                 self.MOCK_DATE
@@ -453,7 +412,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
             ),
             {'year': 2018, 'hour': 0, 'month': 1, 'day': 5})
 
-    def test_parse_date_as_string(self):
+    def test_parse_date_as_string(self) -> None:
         self.assertEqual(
             blog_statistics_services.parse_date_as_string(
                 self.MOCK_DATE
@@ -467,7 +426,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
             ),
             '2018-01-05')
 
-    def test_update_reads_stats(self):
+    def test_update_reads_stats(self) -> None:
         curr_date = self.current_datetime.strftime('%Y-%m-%d')
         current_month = self.current_datetime.strftime('%m')
         current_year = self.current_datetime.strftime('%Y')
@@ -561,7 +520,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
             2
         )
 
-    def test_update_views_stats(self):
+    def test_update_views_stats(self) -> None:
         curr_date = self.current_datetime.strftime('%Y-%m-%d')
         current_month = self.current_datetime.strftime('%m')
         current_year = self.current_datetime.strftime('%Y')
@@ -655,7 +614,7 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
             2
         )
 
-    def test_update_reading_time_stats(self):
+    def test_update_reading_time_stats(self) -> None:
 
         pre_updated_blog_stats_model = (
             blog_stats_models.BlogPostReadingTimeModel.get(self.blog_post.id)
@@ -773,7 +732,7 @@ class BlogPostEventHandlersTests(test_utils.GenericTestBase):
 
     MOCK_DATE: Final = datetime.datetime(2021, 9, 20)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         with self.mock_datetime_utcnow(self.MOCK_DATE):
             self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
@@ -816,7 +775,7 @@ class BlogPostEventHandlersTests(test_utils.GenericTestBase):
             blog_services.get_blog_post_by_id(self.blog_post.id)).url_fragment
         self.logout()
 
-    def test_blog_post_viewed_event_handler(self):
+    def test_blog_post_viewed_event_handler(self) -> None:
         current_datetime = self.MOCK_DATE + datetime.timedelta(days=1)
         with self.mock_datetime_utcnow(current_datetime):
             self.post_json(
@@ -883,7 +842,7 @@ class BlogPostEventHandlersTests(test_utils.GenericTestBase):
             2
         )
 
-    def test_blog_post_read_event_handler(self):
+    def test_blog_post_read_event_handler(self) -> None:
         current_datetime = self.MOCK_DATE + datetime.timedelta(days=1)
         with self.mock_datetime_utcnow(current_datetime):
             self.post_json(
@@ -952,7 +911,7 @@ class BlogPostEventHandlersTests(test_utils.GenericTestBase):
             2
         )
 
-    def test_blog_post_exited_event_handler(self):
+    def test_blog_post_exited_event_handler(self) -> None:
         payload = {
                     'time_taken_to_read_blog_post': 3.4
                 }

@@ -27,7 +27,7 @@ from core.domain import blog_statistics_domain
 from core.domain import event_services
 from core.platform import models
 
-from typing import Dict, Union
+from typing import Dict, Union, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -670,6 +670,17 @@ def _update_reading_time_stats_transactional(
         author_blog_post_reading_time_stats
     )
 
+@overload
+def _increment_reading_time_bucket_count(
+    stats: blog_statistics_domain.BlogPostReadingTime,
+    time_taken: int
+) -> None: ...
+
+@overload
+def _increment_reading_time_bucket_count(
+    stats: blog_statistics_domain.AuthorBlogPostsReadingTime,
+    time_taken: int
+) -> None: ...
 
 def _increment_reading_time_bucket_count(
     stats: Union[
@@ -727,27 +738,6 @@ def create_aggregated_stats_models_for_newly_published_blog_post(
         blog_stats_models.BlogPostReadingTimeModel.create(blog_post_id)
 
 
-def create_aggregated_author_blog_post_stats_models(
-    author_id: str
-) -> None:
-    """Creates Author Blog Post Aggreagted Stats Models for a new blog post
-    author.
-
-    Args:
-        author_id: str. User ID of the author.
-    """
-    stats_model = blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
-        author_id, strict=False)
-
-    if stats_model is None:
-        blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
-            author_id)
-        blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.create(
-            author_id)
-        blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
-            author_id)
-
-
 def parse_date_as_string(date: datetime.datetime) -> str:
     """Parses given datetime object into 'YYYY-MM-DD' format.
 
@@ -778,6 +768,16 @@ def parse_datetime_into_date_dict(
         'day': date_time_obj.day,
         'hour': date_time_obj.hour
     }
+
+@overload
+def add_missing_stat_keys_with_default_values_in_views_stats(
+    stats: blog_statistics_domain.BlogPostViewsAggregatedStats
+) -> blog_statistics_domain.BlogPostViewsAggregatedStats: ...
+
+@overload
+def add_missing_stat_keys_with_default_values_in_views_stats(
+    stats: blog_statistics_domain.AuthorBlogPostViewsAggregatedStats
+) -> blog_statistics_domain.AuthorBlogPostViewsAggregatedStats: ...
 
 
 def add_missing_stat_keys_with_default_values_in_views_stats(stats: Union[
@@ -871,6 +871,15 @@ def add_missing_stat_keys_with_default_values_in_views_stats(stats: Union[
 
     return stats
 
+@overload
+def add_missing_stat_keys_with_default_values_in_reads_stats(
+    stats: blog_statistics_domain.BlogPostReadsAggregatedStats
+) -> blog_statistics_domain.BlogPostReadsAggregatedStats: ...
+
+@overload
+def add_missing_stat_keys_with_default_values_in_reads_stats(
+    stats: blog_statistics_domain.AuthorBlogPostReadsAggregatedStats
+) -> blog_statistics_domain.AuthorBlogPostReadsAggregatedStats: ...
 
 def add_missing_stat_keys_with_default_values_in_reads_stats(stats: Union[
     blog_statistics_domain.BlogPostReadsAggregatedStats,

@@ -29,7 +29,6 @@ import { BlogPostViewsStats,
 } from 'domain/blog/blog-dashboard-backend-api.service';
 import { BlogDashboardPageConstants } from '../blog-dashboard-page.constants';
 import { BlogDashboardPageService } from '../services/blog-dashboard-page.service';
-import dayjs from 'dayjs';
 import { Subscription } from 'rxjs';
 
 interface BlogPostStatsDict {

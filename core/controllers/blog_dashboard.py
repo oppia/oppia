@@ -30,7 +30,7 @@ from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import user_services
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, Union, Optional, TypedDict
 
 
 class BlogCardSummaryDict(TypedDict):
@@ -356,7 +356,9 @@ class BlogPostHandler(
         self.render_json(self.values)
 
 
-class BlogDashboardBlogPostStatisticsHandler(base.BaseHandler):
+class BlogDashboardBlogPostStatisticsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for blog dashboard statistics tab for blog post."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -377,13 +379,14 @@ class BlogDashboardBlogPostStatisticsHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] =  {
         'GET': {}
     }
 
     @acl_decorators.can_access_blog_dashboard
     def get(self, blog_post_id: str, chart_type: str) -> None:
         """Populates the data for generating statistics plot."""
+
         if chart_type == 'views':
             stats = blog_statistics_services.get_blog_post_views_stats_by_id(
                 blog_post_id
@@ -408,7 +411,9 @@ class BlogDashboardBlogPostStatisticsHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class BlogDashboardAuthorBlogPostsStatisticsHandler(base.BaseHandler):
+class BlogDashboardAuthorBlogPostsStatisticsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for blog dashboard statistics tab for author"""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -424,7 +429,7 @@ class BlogDashboardAuthorBlogPostsStatisticsHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] =  {
         'GET': {}
     }
 
@@ -450,6 +455,7 @@ class BlogDashboardAuthorBlogPostsStatisticsHandler(base.BaseHandler):
                     author_id
                 )
             )
+
         stats_dict = stats.to_frontend_dict()
 
         self.values.update({

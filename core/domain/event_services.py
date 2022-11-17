@@ -75,6 +75,7 @@ class BaseEventHandler:
                 '_handle_event() method, using explicit arguments '
                 '(no *args or **kwargs).'
             )
+
         cls._handle_event(*args, **kwargs)
 
 

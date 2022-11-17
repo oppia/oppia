@@ -103,7 +103,7 @@ class AuthorBlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_reading_time_stats_domain_obj('wrong format')
 
         # Validate with invalid format.
-        self.stats_obj.author_id = 1234
+        self.stats_obj.author_id = 1234 # type: ignore[assignment]
         self._assert_valid_reading_time_stats_domain_obj(
             'Author ID must be a string, but got 1234'
         )
@@ -176,7 +176,7 @@ class BlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
         )
 
         # Validate with invalid format.
-        self.stats_obj.blog_post_id = 1234
+        self.stats_obj.blog_post_id = 1234 # type: ignore[assignment]
         self._assert_valid_reading_time_stats_domain_obj(
             'Blog Post ID must be a string, but got 1234'
         )
@@ -300,7 +300,7 @@ class AuthorBlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_author_blog_post_reads_domain_obj('wrong format')
 
         # Validate with invalid format.
-        self.author_stats.author_id = 1234
+        self.author_stats.author_id = 1234 # type: ignore[assignment]
         self._assert_valid_author_blog_post_reads_domain_obj(
             'Author ID must be a string, but got 1234'
         )
@@ -470,7 +470,7 @@ class AuthorBlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_author_blog_post_views_domain_obj('wrong format')
 
         # Validate with invalid format.
-        self.author_stats.author_id = 1234
+        self.author_stats.author_id = 1234  # type: ignore[assignment]
         self._assert_valid_author_blog_post_views_domain_obj(
             'Author ID must be a string, but got 1234'
         )
@@ -638,7 +638,7 @@ class BlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
         )
 
         # Validate with invalid format.
-        self.blog_stats.blog_post_id = 1234
+        self.blog_stats.blog_post_id = 1234  # type: ignore[assignment]
         self._assert_valid_blog_post_reads_domain_obj(
             'Blog Post ID must be a string, but got 1234'
         )
@@ -808,7 +808,7 @@ class BlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
         )
 
         # Validate with invalid format.
-        self.blog_stats.blog_post_id = 1234
+        self.blog_stats.blog_post_id = 1234  # type: ignore[assignment]
         self._assert_valid_blog_post_views_domain_obj(
             'Blog Post ID must be a string, but got 1234'
         )

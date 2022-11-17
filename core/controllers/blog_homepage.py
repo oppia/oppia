@@ -486,7 +486,9 @@ class BlogPostSearchHandler(
         self.render_json(self.values)
 
 
-class BlogPostViewedEventHandler(base.BaseHandler):
+class BlogPostViewedEventHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles blog post viewed event coming in from the frontend."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
@@ -503,12 +505,12 @@ class BlogPostViewedEventHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'POST': {}
     }
 
     @acl_decorators.open_access
-    def post(self, blog_post_url):
+    def post(self, blog_post_url: str) -> None:
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
         if not blog_post:
             raise self.PageNotFoundException(
@@ -523,7 +525,9 @@ class BlogPostViewedEventHandler(base.BaseHandler):
         self.render_json({})
 
 
-class BlogPostReadEventHandler(base.BaseHandler):
+class BlogPostReadEventHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles blog post read event coming in from the frontend."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
@@ -540,12 +544,12 @@ class BlogPostReadEventHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'POST': {}
     }
 
     @acl_decorators.open_access
-    def post(self, blog_post_url):
+    def post(self, blog_post_url:str) -> None:
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
         if not blog_post:
             raise self.PageNotFoundException(
@@ -560,7 +564,9 @@ class BlogPostReadEventHandler(base.BaseHandler):
         self.render_json({})
 
 
-class BlogPostExitedEventHandler(base.BaseHandler):
+class BlogPostExitedEventHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles blog post exited event coming in from the frontend."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
@@ -592,7 +598,7 @@ class BlogPostExitedEventHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def post(self, blog_post_url):
+    def post(self, blog_post_url: str) -> None:
         time_taken_to_read_blog_post = self.normalized_payload.get(
             'time_taken_to_read_blog_post')
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)

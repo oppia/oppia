@@ -22,17 +22,27 @@ import datetime
 
 from core import utils
 
-from typing import Dict, TypedDict, Union
+from typing import Dict, TypedDict, Union, overload
 
 # This is same as base_models.ID_Length.
 BLOG_POST_ID_LENGTH = 12
 
 
+@overload
+def _repack_views_stats(
+    stats: BlogPostViewsAggregatedStats,
+) -> None: ...
+
+@overload
+def _repack_views_stats(
+    stats: AuthorBlogPostViewsAggregatedStats,
+) -> None: ...
+
 def _repack_views_stats(
     stats: Union[
         BlogPostViewsAggregatedStats, AuthorBlogPostViewsAggregatedStats
     ]
-) -> Union[BlogPostViewsAggregatedStats, AuthorBlogPostViewsAggregatedStats]:
+) -> None:
     """Repacks aggregated stats domain object to contain necessary keys removing
     older stats. We will only maintain views_by_hour for past 3 days
     (including the ongoing day) and views_by_date keyed to 3 months and delete
@@ -41,10 +51,6 @@ def _repack_views_stats(
     Args:
         stats: BlogPostViewsAggregatedStats|AuthorBlogPostViewsAggregatedStats.
             The stats domain object for which hourly views are to be generated.
-
-    Returns:
-        BlogPostViewsAggregatedStats|AuthorBlogPostViewsAggregatedStats. A
-        repacked stats domain object with only necessary aggregated stats.
     """
     stats.views_by_date = {
         k: stats.views_by_date[k] for k in list(stats.views_by_date)[:3]
@@ -52,15 +58,24 @@ def _repack_views_stats(
     stats.views_by_hour = {
         k: stats.views_by_hour[k] for k in list(stats.views_by_hour)[:3]
     }
-    return stats
 
+
+@overload
+def _repack_reads_stats(
+    stats: BlogPostReadsAggregatedStats,
+) -> None: ...
+
+@overload
+def _repack_reads_stats(
+    stats: AuthorBlogPostReadsAggregatedStats,
+) -> None: ...
 
 def _repack_reads_stats(
     stats: Union[
         BlogPostReadsAggregatedStats,
         AuthorBlogPostReadsAggregatedStats
     ]
-) -> Union[BlogPostReadsAggregatedStats, AuthorBlogPostReadsAggregatedStats]:
+) -> None:
     """Repacks aggregated stats domain object to contain necessary keys removing
     older stats. We will only maintain reads_by_hour for past 3 days
     (including the ongoing day) and reads_by_date keyed to 3 months and delete
@@ -69,10 +84,6 @@ def _repack_reads_stats(
     Args:
         stats: BlogPostReadsAggregatedStats|AuthorBlogPostReadsAggregatedStats.
             The stats domain object for which hourly reads are to be generated.
-
-    Returns:
-        BlogPostReadsAggregatedStats|AuthorBlogPostReadsAggregatedStats. A
-        repacked stats domain object with only necessary aggregated stats.
     """
     stats.reads_by_date = {
         k: stats.reads_by_date[k] for k in list(stats.reads_by_date)[:3]
@@ -82,6 +93,16 @@ def _repack_reads_stats(
     }
     return stats
 
+
+@overload
+def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
+    stats: BlogPostViewsAggregatedStats,
+) -> None: ...
+
+@overload
+def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
+    stats: AuthorBlogPostViewsAggregatedStats,
+) -> None: ...
 
 def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
     stats: Union[
@@ -119,6 +140,16 @@ def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
     })
     return hourly_stats
 
+
+@overload
+def _generate_past_week_views_stats_from_views_by_date(
+    stats: BlogPostViewsAggregatedStats,
+) -> None: ...
+
+@overload
+def _generate_past_week_views_stats_from_views_by_date(
+    stats: AuthorBlogPostViewsAggregatedStats,
+) -> None: ...
 
 def _generate_past_week_views_stats_from_views_by_date(
     stats: Union[
@@ -161,6 +192,16 @@ def _generate_past_week_views_stats_from_views_by_date(
     return weekly_stats
 
 
+@overload
+def _generate_monthly_views_from_views_by_date(
+    stats: BlogPostViewsAggregatedStats,
+) -> None: ...
+
+@overload
+def _generate_monthly_views_from_views_by_date(
+    stats: AuthorBlogPostViewsAggregatedStats,
+) -> None: ...
+
 def _generate_monthly_views_from_views_by_date(
     stats: Union[
         BlogPostViewsAggregatedStats,
@@ -181,6 +222,16 @@ def _generate_monthly_views_from_views_by_date(
     return stats.views_by_date[current_month_year]
 
 
+@overload
+def _generate_yearly_views_from_views_by_month(
+    stats: BlogPostViewsAggregatedStats,
+) -> None: ...
+
+@overload
+def _generate_yearly_views_from_views_by_month(
+    stats: AuthorBlogPostViewsAggregatedStats,
+) -> None: ...
+
 def _generate_yearly_views_from_views_by_month(
     stats: Union[
         BlogPostViewsAggregatedStats,
@@ -200,6 +251,16 @@ def _generate_yearly_views_from_views_by_month(
     current_year = datetime.datetime.utcnow().strftime('%Y')
     return stats.views_by_month[current_year]
 
+
+@overload
+def _generate_past_twenty_four_hour_reads_stats_from_reads_by_hour(
+    stats: BlogPostReadsAggregatedStats,
+) -> Dict[str, int]: ...
+
+@overload
+def _generate_past_twenty_four_hour_reads_stats_from_reads_by_hour(
+    stats: AuthorBlogPostReadsAggregatedStats,
+) -> Dict[str, int]: ...
 
 def _generate_past_twenty_four_hour_reads_stats_from_reads_by_hour(
     stats: Union[
@@ -237,6 +298,16 @@ def _generate_past_twenty_four_hour_reads_stats_from_reads_by_hour(
     })
     return hourly_stats
 
+
+@overload
+def _generate_past_week_reads_stats_from_reads_by_date(
+    stats: BlogPostReadsAggregatedStats,
+) -> Dict[str, int]: ...
+
+@overload
+def _generate_past_week_reads_stats_from_reads_by_date(
+    stats: AuthorBlogPostReadsAggregatedStats,
+) -> Dict[str, int]: ...
 
 def _generate_past_week_reads_stats_from_reads_by_date(
     stats: Union[
@@ -279,6 +350,16 @@ def _generate_past_week_reads_stats_from_reads_by_date(
     return weekly_stats
 
 
+@overload
+def _generate_monthly_reads_from_reads_by_date(
+    stats: BlogPostReadsAggregatedStats,
+) -> Dict[str, int]: ...
+
+@overload
+def _generate_monthly_reads_from_reads_by_date(
+    stats: AuthorBlogPostReadsAggregatedStats,
+) -> Dict[str, int]: ...
+
 def _generate_monthly_reads_from_reads_by_date(
     stats: Union[
         BlogPostReadsAggregatedStats,
@@ -298,6 +379,16 @@ def _generate_monthly_reads_from_reads_by_date(
     current_month_year = datetime.datetime.utcnow().strftime('%Y-%m')
     return stats.reads_by_date[current_month_year]
 
+
+@overload
+def _generate_yearly_reads_from_reads_by_month(
+    stats: BlogPostReadsAggregatedStats,
+) -> Dict[str, int]: ...
+
+@overload
+def _generate_yearly_reads_from_reads_by_month(
+    stats: AuthorBlogPostReadsAggregatedStats,
+) -> Dict[str, int]: ...
 
 def _generate_yearly_reads_from_reads_by_month(
     stats: Union[
@@ -327,7 +418,7 @@ class BlogPostViewsAggregatedStatsFrontendDict(TypedDict):
     weekly_views: Dict[str, int]
     monthly_views: Dict[str, int]
     yearly_views: Dict[str, int]
-    all_views: Dict[str, int]
+    all_views: Dict[str, Dict[str, int]]
 
 
 class BlogPostReadsAggregatedStatsFrontendDict(TypedDict):
@@ -338,7 +429,7 @@ class BlogPostReadsAggregatedStatsFrontendDict(TypedDict):
     weekly_reads: Dict[str, int]
     monthly_reads: Dict[str, int]
     yearly_reads: Dict[str, int]
-    all_reads: Dict[str, int]
+    all_reads: Dict[str, Dict[str, int]]
 
 
 class AuthorBlogPostReadsAggregatedStatsDict(TypedDict):
@@ -348,7 +439,7 @@ class AuthorBlogPostReadsAggregatedStatsDict(TypedDict):
     weekly_reads: Dict[str, int]
     monthly_reads: Dict[str, int]
     yearly_reads: Dict[str, int]
-    all_reads: Dict[str, int]
+    all_reads: Dict[str, Dict[str, int]]
 
 
 class AuthorBlogPostViewsAggregatedStatsDict(TypedDict):
@@ -358,7 +449,7 @@ class AuthorBlogPostViewsAggregatedStatsDict(TypedDict):
     weekly_views: Dict[str, int]
     monthly_views: Dict[str, int]
     yearly_views: Dict[str, int]
-    all_views: Dict[str, int]
+    all_views: Dict[str, Dict[str, int]]
 
 
 class BlogPostReadingTimeDict(TypedDict):
@@ -428,16 +519,11 @@ class BlogPostViewsAggregatedStats:
         self.views_by_month = views_by_month
         self.created_on = created_on
 
-    def repack_stats(self) -> BlogPostViewsAggregatedStats:
+    def repack_stats(self) -> None:
         """Repacks stats to contain only required aggregated stats removing old
         stats.
-
-        Returns:
-            BlogPostViewsAggregatedStats. Repacked
-            BlogPostViewsAggregatedStats domain object which contains only
-            necessary data required for generating graphs.
         """
-        return _repack_views_stats(self)
+        _repack_views_stats(self)
 
     def to_frontend_dict(self) -> BlogPostViewsAggregatedStatsFrontendDict:
         """Returns a dict representation of the domain object for use in the
@@ -517,16 +603,11 @@ class BlogPostReadsAggregatedStats:
         self.reads_by_month = reads_by_month
         self.created_on = created_on
 
-    def repack_stats(self) -> BlogPostReadsAggregatedStats:
+    def repack_stats(self) -> None:
         """Repacks stats to contain only required aggregated stats removing old
         stats.
-
-        Returns:
-            BlogPostReadsAggregatedStats. Repacked
-            BlogPostReadsAggregatedStats domain object which contains only
-            necessary data required for generating graphs.
         """
-        return _repack_reads_stats(self)
+        _repack_reads_stats(self)
 
     def to_frontend_dict(self) -> BlogPostReadsAggregatedStatsFrontendDict:
         """Returns a dict representation of the domain object for use in the
@@ -709,16 +790,11 @@ class AuthorBlogPostViewsAggregatedStats:
         self.views_by_month = views_by_month
         self.created_on = created_on
 
-    def repack_stats(self) -> AuthorBlogPostViewsAggregatedStats:
+    def repack_stats(self):
         """Repacks stats to contain only required aggregated stats removing old
         stats.
-
-        Returns:
-            AuthorBlogPostViewsAggregatedStats. Repacked
-            AuthorBlogPostViewsAggregatedStats domain object which contains only
-            necessary data required for generating graphs.
         """
-        return _repack_views_stats(self)
+        _repack_views_stats(self)
 
     def to_frontend_dict(self) -> AuthorBlogPostViewsAggregatedStatsDict:
         """Returns a dict representation of the domain object for use in the
@@ -799,16 +875,11 @@ class AuthorBlogPostReadsAggregatedStats:
         self.reads_by_month = reads_by_month
         self.created_on = created_on
 
-    def repack_stats(self) -> AuthorBlogPostReadsAggregatedStats:
+    def repack_stats(self):
         """Repacks stats to contain only required aggregated stats removing old
         stats.
-
-        Returns:
-            AuthorBlogPostReadsAggregatedStats. Repacked
-            AuthorBlogPostReadsAggregatedStats domain object which contains only
-            necessary data required for generating graphs.
         """
-        return _repack_reads_stats(self)
+        _repack_reads_stats(self)
 
     def to_frontend_dict(self) -> AuthorBlogPostReadsAggregatedStatsDict:
         """Returns a dict representation of the domain object for use in the
