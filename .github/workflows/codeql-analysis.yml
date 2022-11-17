@@ -43,7 +43,6 @@ jobs:
         with:
           # filter out all test files unless they contain a sql-injection vulnerability
           patterns: |
-            -**/*test*.js
-            +**/*test*.js:js/sql-injection
+            -core/tests/data/third_party/js/third_party.js
           input: sarif-results/${{ matrix.language }}.sarif
           output: sarif-results/${{ matrix.language }}.sarif
