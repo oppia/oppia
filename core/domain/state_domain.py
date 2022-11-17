@@ -1778,13 +1778,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             ele_element = ele['element']
 
                             if ele_position > len(rule_spec.inputs['x']):
-                                raise utils.ValidationError(
-                                    f'Rule - {rule_spec_index} of '
-                                    f'answer group {ans_group_index} '
-                                    f'does not have the enough position '
-                                    f'to match for the '
-                                    f'HasElementXAtPositionY rule above.'
-                                )
+                                continue
 
                             rule_choice = rule_spec.inputs['x'][
                                 ele_position - 1]
@@ -4341,7 +4335,7 @@ class State(translation_domain.BaseTranslatableObject):
 
     def validate(
         self,
-        exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
+        exp_param_specs_dict: Optional[Dict[str, param_domain.ParamSpec]],
         allow_null_interaction: bool,
         *,
         tagged_skill_misconception_id_required: bool = False,
@@ -4365,6 +4359,10 @@ class State(translation_domain.BaseTranslatableObject):
             ValidationError. One or more attributes of the State are invalid.
         """
         self.content.validate()
+        if exp_param_specs_dict:
+            param_specs_dict = exp_param_specs_dict
+        else:
+            param_specs_dict = {}
 
         if not isinstance(self.param_changes, list):
             raise utils.ValidationError(
@@ -4378,7 +4376,7 @@ class State(translation_domain.BaseTranslatableObject):
                 'This state does not have any interaction specified.')
         if self.interaction.id is not None:
             self.interaction.validate(
-                exp_param_specs_dict,
+                param_specs_dict,
                 tagged_skill_misconception_id_required=(
                     tagged_skill_misconception_id_required),
                 strict=strict)

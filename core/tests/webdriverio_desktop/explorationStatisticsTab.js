@@ -124,7 +124,6 @@ describe('Statistics tab', function() {
     await explorationPlayerPage.submitAnswer('TextInput', '2');
     await explorationPlayerPage.viewHint();
     await explorationPlayerPage.submitAnswer('TextInput', '3');
-    await explorationPlayerPage.viewSolution();
     await explorationPlayerPage.submitAnswer('TextInput', 'Two');
     await explorationPlayerPage.clickThroughToNextCard();
     await explorationPlayerPage.expectExplorationToNotBeOver();

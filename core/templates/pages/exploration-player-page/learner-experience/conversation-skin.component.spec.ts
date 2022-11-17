@@ -80,6 +80,8 @@ import { EditableExplorationBackendApiService } from 'domain/exploration/editabl
 import { TranslateService } from '@ngx-translate/core';
 import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
+import { ConceptCardManagerService } from '../services/concept-card-manager.service';
+import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 
 class MockWindowRef {
   nativeWindow = {
@@ -163,6 +165,9 @@ describe('Conversation skin component', () => {
   let platformFeatureService: PlatformFeatureService;
   let translateService: TranslateService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
+  let conceptCardManagerService: ConceptCardManagerService;
+  let solutionObjectFactory: SolutionObjectFactory;
+
 
   let displayedCard = new StateCard(
     null, null, null, new Interaction(
@@ -206,6 +211,9 @@ describe('Conversation skin component', () => {
                 unicode_str: '',
                 content_id: 'ca_placeholder_0'
               }
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           answer_groups: [
@@ -331,6 +339,9 @@ describe('Conversation skin component', () => {
                 unicode_str: '',
                 content_id: 'ca_placeholder_0'
               }
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           answer_groups: [
@@ -499,6 +510,7 @@ describe('Conversation skin component', () => {
         MockTranslatePipe
       ],
       providers: [
+        SolutionObjectFactory,
         {
           provide: WindowRef,
           useClass: MockWindowRef
@@ -569,6 +581,7 @@ describe('Conversation skin component', () => {
       RefresherExplorationConfirmationModalService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     statsReportingService = TestBed.inject(StatsReportingService);
+    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
@@ -580,6 +593,7 @@ describe('Conversation skin component', () => {
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
+    conceptCardManagerService = TestBed.inject(ConceptCardManagerService);
     translateService = TestBed.inject(TranslateService);
     learnerDashboardBackendApiService = TestBed.inject(
       LearnerDashboardBackendApiService);
@@ -668,7 +682,19 @@ describe('Conversation skin component', () => {
     let mockOnHintConsumed = new EventEmitter();
     let mockOnSolutionViewedEventEmitter = new EventEmitter();
     let mockOnPlayerStateChange = new EventEmitter();
+    let mockOnNewCardOpened = new EventEmitter();
+    let mockOnHintsExhausted = new EventEmitter();
+    let mockOnLearnerReallyStuck = new EventEmitter();
+    let mockOnLearnerGetsReallyStuck = new EventEmitter();
 
+    spyOnProperty(playerPositionService, 'onNewCardOpened')
+      .and.returnValue(mockOnNewCardOpened);
+    spyOnProperty(hintsAndSolutionManagerService, 'onHintsExhausted')
+      .and.returnValue(mockOnHintsExhausted);
+    spyOnProperty(conceptCardManagerService, 'onLearnerGetsReallyStuck')
+      .and.returnValue(mockOnLearnerGetsReallyStuck);
+    spyOnProperty(hintsAndSolutionManagerService, 'onLearnerReallyStuck')
+      .and.returnValue(mockOnLearnerReallyStuck);
     spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
       .and.returnValue(mockOnHintConsumed);
     spyOnProperty(
@@ -688,6 +714,10 @@ describe('Conversation skin component', () => {
     componentInstance.ngOnInit();
     windowRef.nativeWindow.onresize(null);
 
+    mockOnNewCardOpened.emit(componentInstance.nextCard);
+    mockOnHintsExhausted.emit();
+    mockOnLearnerGetsReallyStuck.emit();
+    mockOnLearnerReallyStuck.emit();
     mockOnHintConsumed.emit();
     mockOnSolutionViewedEventEmitter.emit();
     mockOnPlayerStateChange.emit();
@@ -767,7 +797,19 @@ describe('Conversation skin component', () => {
     let mockOnHintConsumed = new EventEmitter();
     let mockOnSolutionViewedEventEmitter = new EventEmitter();
     let mockOnPlayerStateChange = new EventEmitter();
+    let mockOnNewCardOpened = new EventEmitter();
+    let mockOnHintsExhausted = new EventEmitter();
+    let mockOnLearnerReallyStuck = new EventEmitter();
+    let mockOnLearnerGetsReallyStuck = new EventEmitter();
 
+    spyOnProperty(playerPositionService, 'onNewCardOpened')
+      .and.returnValue(mockOnNewCardOpened);
+    spyOnProperty(hintsAndSolutionManagerService, 'onHintsExhausted')
+      .and.returnValue(mockOnHintsExhausted);
+    spyOnProperty(conceptCardManagerService, 'onLearnerGetsReallyStuck')
+      .and.returnValue(mockOnLearnerGetsReallyStuck);
+    spyOnProperty(hintsAndSolutionManagerService, 'onLearnerReallyStuck')
+      .and.returnValue(mockOnLearnerReallyStuck);
     spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
       .and.returnValue(mockOnHintConsumed);
     spyOnProperty(
@@ -860,7 +902,19 @@ describe('Conversation skin component', () => {
     let mockOnHintConsumed = new EventEmitter();
     let mockOnSolutionViewedEventEmitter = new EventEmitter();
     let mockOnPlayerStateChange = new EventEmitter();
+    let mockOnNewCardOpened = new EventEmitter();
+    let mockOnHintsExhausted = new EventEmitter();
+    let mockOnLearnerReallyStuck = new EventEmitter();
+    let mockOnLearnerGetsReallyStuck = new EventEmitter();
 
+    spyOnProperty(playerPositionService, 'onNewCardOpened')
+      .and.returnValue(mockOnNewCardOpened);
+    spyOnProperty(hintsAndSolutionManagerService, 'onHintsExhausted')
+      .and.returnValue(mockOnHintsExhausted);
+    spyOnProperty(conceptCardManagerService, 'onLearnerGetsReallyStuck')
+      .and.returnValue(mockOnLearnerGetsReallyStuck);
+    spyOnProperty(hintsAndSolutionManagerService, 'onLearnerReallyStuck')
+      .and.returnValue(mockOnLearnerReallyStuck);
     spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
       .and.returnValue(mockOnHintConsumed);
     spyOnProperty(
@@ -950,7 +1004,19 @@ describe('Conversation skin component', () => {
     let mockOnHintConsumed = new EventEmitter();
     let mockOnSolutionViewedEventEmitter = new EventEmitter();
     let mockOnPlayerStateChange = new EventEmitter();
+    let mockOnNewCardOpened = new EventEmitter();
+    let mockOnHintsExhausted = new EventEmitter();
+    let mockOnLearnerReallyStuck = new EventEmitter();
+    let mockOnLearnerGetsReallyStuck = new EventEmitter();
 
+    spyOnProperty(playerPositionService, 'onNewCardOpened')
+      .and.returnValue(mockOnNewCardOpened);
+    spyOnProperty(hintsAndSolutionManagerService, 'onHintsExhausted')
+      .and.returnValue(mockOnHintsExhausted);
+    spyOnProperty(conceptCardManagerService, 'onLearnerGetsReallyStuck')
+      .and.returnValue(mockOnLearnerGetsReallyStuck);
+    spyOnProperty(hintsAndSolutionManagerService, 'onLearnerReallyStuck')
+      .and.returnValue(mockOnLearnerReallyStuck);
     spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
       .and.returnValue(mockOnHintConsumed);
     spyOnProperty(
@@ -1022,6 +1088,78 @@ describe('Conversation skin component', () => {
     expect(componentInstance.isSubmitButtonDisabled()).toBeTrue();
     expect(componentInstance.isSubmitButtonDisabled()).toBeFalse();
   });
+
+  it('should release solution when the learner gets stuck' +
+  ' if no stuck state exists after a predetermined time', fakeAsync(() => {
+    // Release solution if stuck state is null.
+    componentInstance.nextCardIfStuck = null;
+    let solutionSpy = spyOn(hintsAndSolutionManagerService, 'releaseSolution');
+    let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
+    componentInstance.solutionForState = solutionObjectFactory.createNew(
+      true, 'answer', 'Html', 'XyzID');
+    componentInstance.numberOfIncorrectSubmissions = 3;
+    componentInstance.triggerIfLearnerStuckAction();
+    tick(
+      ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
+    tick(ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
+    expect(solutionSpy).toHaveBeenCalled();
+    expect(redirectionSpy).not.toHaveBeenCalled();
+    flush();
+  }));
+
+  it('should direct the learner to the stuck' +
+  ' when the learner gets stuck and such a state exists after a' +
+  ' predetermined time', fakeAsync(() => {
+    spyOn(componentInstance, 'showPendingCard');
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(playerTranscriptService, 'addNewResponse');
+
+    componentInstance.nextCardIfStuck = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'EndExploration', null),
+      [], null, null, '', null);
+    componentInstance.triggerIfLearnerStuckAction();
+    tick(
+      ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
+    tick(ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE');
+    expect(componentInstance.nextCard).toEqual(
+      componentInstance.nextCardIfStuck);
+    flush();
+  }));
+
+  it('should immediately release solution when the learner gets stuck' +
+  ' if no stuck state exists', fakeAsync(() => {
+    // Release solution if stuck state is null.
+    componentInstance.nextCardIfStuck = null;
+    let solutionSpy = spyOn(hintsAndSolutionManagerService, 'releaseSolution');
+    let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
+    componentInstance.solutionForState = solutionObjectFactory.createNew(
+      true, 'answer', 'Html', 'XyzID');
+    componentInstance.numberOfIncorrectSubmissions = 3;
+    componentInstance.triggerIfLearnerStuckActionDirectly();
+    expect(solutionSpy).toHaveBeenCalled();
+    expect(redirectionSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should immediately direct the learner to the stuck' +
+  ' when the learner gets stuck and such a state exists', fakeAsync(() => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(componentInstance, 'showPendingCard');
+    spyOn(playerTranscriptService, 'addNewResponse');
+
+    componentInstance.nextCardIfStuck = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'EndExploration', null),
+      [], null, null, '', null);
+    componentInstance.triggerIfLearnerStuckActionDirectly();
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE');
+    tick(10000);
+    expect(componentInstance.nextCard).toEqual(
+      componentInstance.nextCardIfStuck);
+  }));
 
   it('should fetch completed chapters count if user is logged in',
     fakeAsync(() => {
@@ -1846,6 +1984,7 @@ describe('Conversation skin component', () => {
         wasOldStateInitial: boolean,
         isFirstHit: boolean,
         isFinalQuestion: boolean,
+        nextCardIfReallyStuck: StateCard | null,
         focusLabel: string
       ) => void
     ) => {
@@ -1855,26 +1994,26 @@ describe('Conversation skin component', () => {
         [], null, null, '', null);
       successCallback(
         stateCard, true, 'feedback', null, 'refresherId', '', false, '', true,
-        false, true, '');
+        false, true, null, '');
       successCallback(
         stateCard, true, '', null, 'refresherId', '', false, '', true,
-        false, true, '');
+        false, true, null, '');
       successCallback(
         stateCard, true, 'feedback', null, 'refresherId', '', false, '', true,
-        false, false, '');
+        false, false, null, '');
       successCallback(
         stateCard, true, '', null, 'refresherId', '', false, '', true,
-        false, false, '');
+        false, false, null, '');
       successCallback(
         stateCard, true, 'feedback', null, '', 'skill_id', true, '', true,
-        false, false, '');
+        false, false, null, '');
       componentInstance.displayedCard = new StateCard(
         null, null, null, new Interaction(
           [], [], null, null, [], 'ImageClickInput', null),
         [], null, null, '', null);
       successCallback(
         stateCard, true, 'feedback', null, 'refresherId', 'skill_id', true,
-        '', true, false, false, '');
+        '', true, false, false, null, '');
       return false;
     };
     spyOn(answerClassificationService, 'isAnswerOnlyMisspelled').

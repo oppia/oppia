@@ -14,7 +14,7 @@ body:
   - type: textarea
     id: problem
     attributes:
-      label: A clear and concise description of what you want to happen.
+      label: Is your feature request related to a problem? Please describe.
       description: A clear and concise description of what the problem is. **Example:** "I'm always frustrated when [...]"
     validations:
       required: true
