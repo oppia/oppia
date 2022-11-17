@@ -322,7 +322,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             failing to use the merge action.
         """
         jobs_without_merge = []
-        if 'jobs' not in workflow_dict:
+        if 'jobs' in workflow_dict:
             for job, job_dict in workflow_dict['jobs'].items():
                 if MERGE_STEP not in job_dict['steps']:
                     jobs_without_merge.append(job)
