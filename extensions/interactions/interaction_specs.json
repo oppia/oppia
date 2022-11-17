@@ -769,6 +769,13 @@
           ]
         },
         "default_value": 1
+    }, {
+      "description": "Catch Misspellings (Detect if answer is misspelled and nudge the learner to correct the misspelling)",
+      "name": "catchMisspellings",
+      "schema": {
+        "type": "bool"
+      },
+     "default_value": false
     }],
     "is_terminal": false,
     "default_outcome_heading": null,
