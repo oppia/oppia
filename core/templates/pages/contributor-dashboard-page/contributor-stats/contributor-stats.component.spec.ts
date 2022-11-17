@@ -275,6 +275,10 @@ describe('Contributor stats component', () => {
         component.goToPreviousPage(pagedStats);
       }).toThrowError('There are no more pages before this one.');
     }));
+
+    it('should provide 0 to get original order of keyvaluea', fakeAsync(() => {
+      expect(component.provideOriginalOrder()).toEqual(0);
+    }));
   });
 
   describe('when user navigates to contributor stats page without login',
