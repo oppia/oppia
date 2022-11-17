@@ -1,4 +1,7 @@
 name: "Custom CodeQL Config"
 
+paths:
+  - assets
+
 paths-ignore:
-  - "core/tests/data.js"
+  - assets/scripts
