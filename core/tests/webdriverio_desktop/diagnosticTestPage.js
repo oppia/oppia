@@ -21,17 +21,14 @@ var users = require('../webdriverio_utils/users.js');
 
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var ClassroomPage = require('../webdriverio_utils/ClassroomPage.js');
-var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
 describe('Diagnostic test page functionality', function() {
   var classroomPage = null;
-  var libraryPage = null;
   var adminPage = null;
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
-    libraryPage = new LibraryPage.LibraryPage();
 
     await users.createAndLoginCurriculumAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
@@ -44,7 +41,6 @@ describe('Diagnostic test page functionality', function() {
   });
 
   it('should be able to start diagnostic test', async function() {
-    await browser.debug();
     await classroomPage.get('math');
     await classroomPage.takeDiagnosticTest();
   });
