@@ -38,11 +38,5 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
-      - name: filter-sarif
-        uses: zbazztian/filter-sarif@master
-        with:
-          # filter out all test files unless they contain a sql-injection vulnerability
-          patterns: |
-            -core/tests/data/third_party/js/third_party.js
-          input: sarif-results/${{ matrix.language }}.sarif
-          output: sarif-results/${{ matrix.language }}.sarif
+paths-ignore:
+  - "core/tests/data.js"
