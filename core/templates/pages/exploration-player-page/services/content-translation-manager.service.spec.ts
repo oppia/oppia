@@ -123,7 +123,10 @@ describe('Content translation manager service', () => {
             unicode_str: 'en placeholder'
           }
         },
-        rows: { value: 1 }
+        rows: { value: 1 },
+        catchMisspellings: {
+          value: false
+        }
       },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
@@ -220,7 +223,10 @@ describe('Content translation manager service', () => {
           content_id: 'ca_placeholder_0'
         })
       },
-      rows: {value: 1}
+      rows: {value: 1},
+      catchMisspellings: {
+        value: false
+      }
     };
 
     expect(card.contentHtml).toBe('<p>fr content</p>');
@@ -249,7 +255,10 @@ describe('Content translation manager service', () => {
           content_id: 'ca_placeholder_0'
         })
       },
-      rows: {value: 1}
+      rows: {value: 1},
+      catchMisspellings: {
+        value: false
+      }
     };
 
     writtenTranslations.toggleNeedsUpdateAttribute('hint_0', 'fr');
@@ -283,7 +292,10 @@ describe('Content translation manager service', () => {
           content_id: 'ca_placeholder_0'
         })
       },
-      rows: {value: 1}
+      rows: {value: 1},
+      catchMisspellings: {
+        value: false
+      }
     };
 
     expect(card.contentHtml).toBe('<p>en content</p>');
@@ -454,7 +466,10 @@ describe('Content translation manager service', () => {
             unicode_str: 'en placeholder'
           }
         },
-        rows: { value: 1 }
+        rows: { value: 1 },
+        catchMisspellings: {
+          value: false
+        }
       },
       default_outcome: null,
       hints: [],
