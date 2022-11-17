@@ -144,7 +144,8 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
             )
 
     def test_get_multi_throws_error_on_failure(
-            self) -> None:
+        self
+    ) -> None:
         dummy_keys = [
             ndb.Key('model1', 'id1'),
             ndb.Key('model2', 'id2'),
