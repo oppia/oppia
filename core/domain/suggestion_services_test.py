@@ -3303,13 +3303,20 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             [('author_id', self.author_id), ('target_id', self.EXP_ID)])
         self.assertEqual(len(suggestions), 1)
 
+        translatable_suggestions = []
+        for suggestion in suggestions:
+            assert isinstance(
+                suggestion, suggestion_registry.SuggestionTranslateContent
+            )
+            translatable_suggestions.append(suggestion)
+
         # Should return the created translation suggestion.
-        translatable_suggestions = (
+        filtered_translatable_suggestions = (
             suggestion_services.get_suggestions_with_translatable_explorations(
-                suggestions
+                translatable_suggestions
             )
         )
-        self.assertEqual(len(translatable_suggestions), 1)
+        self.assertEqual(len(filtered_translatable_suggestions), 1)
 
         # Delete the exploration state corresponding to the translation
         # suggestion.
@@ -3336,12 +3343,12 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         # The suggestion no longer corresponds to an existing exploration state,
         # so it should not be returned.
-        translatable_suggestions = (
+        filtered_translatable_suggestions = (
             suggestion_services.get_suggestions_with_translatable_explorations(
-                suggestions
+                translatable_suggestions
             )
         )
-        self.assertEqual(len(translatable_suggestions), 0)
+        self.assertEqual(len(filtered_translatable_suggestions), 0)
 
 
 class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
