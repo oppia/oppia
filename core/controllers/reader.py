@@ -904,7 +904,7 @@ class StateHitEventHandler(
             exploration_id: str. The ID of the exploration.
         """
         assert self.normalized_payload is not None
-        new_state_name = self.normalized_payload.get('new_state_name')
+        new_state_name = self.normalized_payload['new_state_name']
         exploration_version = self.normalized_payload['exploration_version']
         session_id = self.normalized_payload['session_id']
         # TODO(sll): Why do we not record the value of this anywhere?

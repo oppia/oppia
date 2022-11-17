@@ -867,6 +867,9 @@ class LearnerGroupLearnersInfoHandler(
         })
 
 
+# TODO(#16566): Restrict the type of 'progress_sharing_permission' and
+# 'is_invitation_accepted' field to only one type, currently they are
+# accepting two types of values str and bool.
 class LearnerGroupLearnerInvitationHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of LearnerGroupLearnerInvitationHandler's
     normalized_payload dictionary.
@@ -1158,6 +1161,8 @@ class LearnerDashboardLearnerGroupsHandler(
         })
 
 
+# TODO(#16566): Restrict the type of `progress_sharing_permission` field to
+# only one type, currently it is accepting two types of values str and bool.
 class LearnerGroupProgressSharingPermissionHandlerNormalizedPayloadDict(
     TypedDict
 ):
