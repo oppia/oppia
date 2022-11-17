@@ -33,9 +33,9 @@ describe('Contributor stats component', () => {
     can_review_questions: true,
     can_suggest_questions: true,
   };
-  const translationContributionStat = {
+  const translationContributionStatTopic1 = {
     language_code: 'es',
-    topic_name: 'published_topic_name',
+    topic_name: 'topic_1',
     submitted_translations_count: 2,
     submitted_translation_word_count: 100,
     accepted_translations_count: 1,
@@ -46,9 +46,33 @@ describe('Contributor stats component', () => {
     first_contribution_date: 'Mar 2021',
     last_contribution_date: 'Mar 2021'
   };
-  const translationReviewStat = {
+  const translationContributionStatTopic2 = {
     language_code: 'es',
-    topic_name: 'published_topic_name',
+    topic_name: 'topic_2',
+    submitted_translations_count: 2,
+    submitted_translation_word_count: 100,
+    accepted_translations_count: 1,
+    accepted_translations_without_reviewer_edits_count: 0,
+    accepted_translation_word_count: 50,
+    rejected_translations_count: 0,
+    rejected_translation_word_count: 0,
+    first_contribution_date: 'Mar 2021',
+    last_contribution_date: 'Mar 2021'
+  };
+  const translationReviewStatTopic1 = {
+    language_code: 'es',
+    topic_name: 'topic_2',
+    reviewed_translations_count: 1,
+    reviewed_translation_word_count: 1,
+    accepted_translations_count: 1,
+    accepted_translations_with_reviewer_edits_count: 0,
+    accepted_translation_word_count: 1,
+    first_contribution_date: 'Mar 2021',
+    last_contribution_date: 'Mar 2021'
+  };
+  const translationReviewStatTopic2 = {
+    language_code: 'es',
+    topic_name: 'topic_2',
     reviewed_translations_count: 1,
     reviewed_translation_word_count: 1,
     accepted_translations_count: 1,
@@ -75,8 +99,10 @@ describe('Contributor stats component', () => {
   };
 
   const fetchAllStatsResponse = {
-    translation_contribution_stats: [translationContributionStat],
-    translation_review_stats: [translationReviewStat],
+    translation_contribution_stats: [
+      translationContributionStatTopic1, translationContributionStatTopic2],
+    translation_review_stats: [
+      translationReviewStatTopic1, translationReviewStatTopic1],
     question_contribution_stats: [questionContributionStat],
     question_review_stats: [questionReviewStat]
   };
