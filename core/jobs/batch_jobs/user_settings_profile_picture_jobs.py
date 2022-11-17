@@ -144,10 +144,12 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
             UserSettingsModel.
         """
         profile_picture_data = user_model.profile_picture_data_url
+        width, height = 0, 0
 
         try:
             imgdata = utils.convert_png_data_url_to_binary(profile_picture_data)
-            Image.open(io.BytesIO(imgdata))
+            image = Image.open(io.BytesIO(imgdata))
+            width, height = image.size
         except Exception:
             logging.exception('ERRORED EXCEPTION MIGRATION')
             user_model.profile_picture_data_url = (
@@ -155,7 +157,8 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
 
         if (
             user_model.profile_picture_data_url ==
-            user_services.DEFAULT_IDENTICON_DATA_URL
+            user_services.DEFAULT_IDENTICON_DATA_URL or (
+                width == 76 and height == 76)
         ):
             user_model.profile_picture_data_url = (
                 user_services.fetch_gravatar(user_model.email))
