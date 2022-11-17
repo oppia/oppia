@@ -102,7 +102,7 @@ describe('Contributor stats component', () => {
     translation_contribution_stats: [
       translationContributionStatTopic1, translationContributionStatTopic2],
     translation_review_stats: [
-      translationReviewStatTopic1, translationReviewStatTopic1],
+      translationReviewStatTopic1, translationReviewStatTopic2],
     question_contribution_stats: [questionContributionStat],
     question_review_stats: [questionReviewStat]
   };
