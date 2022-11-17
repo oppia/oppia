@@ -44,8 +44,8 @@ from typing import (
 
 # Note: These private type variables are only defined to implement
 # the Generic typing structure of SuggestionsProviderHandler, because
-# SuggestionsProviderHandler is a super-class of some other handlers
-# so to transfer the generic typing pattern of self.normalized_* to those
+# SuggestionsProviderHandler is a super-class of some other handlers.
+# So, to transfer the generic typing pattern of self.normalized_* to those
 # sub-handlers as well, we used generics here. So, do not make these
 # private type variables public in the future.
 _SuggestionsProviderHandlerNormalizedRequestDictType = TypeVar(
