@@ -27,7 +27,7 @@ from core.platform import models
 import apache_beam as beam
 from apache_beam.io.gcp import gcsio
 from apache_beam.io.gcp import gcsio_test
-from typing import Dict, Tuple
+from typing import Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
