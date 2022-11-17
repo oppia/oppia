@@ -272,11 +272,11 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertIsInstance(random_string, str)
         self.assertEqual(len(random_string), 12)
 
-    def test_convert_png_data_url_to_binary_with_incorrect_prefix(self) -> None:
+    def test_convert_png_or_webp_data_url_to_binary_with_incorrect_prefix(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'The given string does not represent a PNG data URL'
         ):
-            utils.convert_png_data_url_to_binary('data:image/jpg;base64,')
+            utils.convert_png_or_webp_data_url_to_binary('data:image/jpg;base64,')
 
     def test_get_thumbnail_icon_url_for_category(self) -> None:
         self.assertEqual(
@@ -805,16 +805,16 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(list(errors), [(0, 'ERROR: foo'), (3, 'ERROR: fie')])
         self.assertEqual(list(others), [(1, 'INFO: bar'), (2, 'INFO: fee')])
 
-    def test_convert_png_data_url_to_binary(self) -> None:
+    def test_convert_png_or_webp_data_url_to_binary(self) -> None:
         image_data_url = '%s%s' % (
             utils.PNG_DATA_URL_PREFIX,
             urllib.parse.quote(base64.b64encode(b'test123'))
         )
 
         self.assertEqual(
-            utils.convert_png_data_url_to_binary(image_data_url), b'test123')
+            utils.convert_png_or_webp_data_url_to_binary(image_data_url), b'test123')
 
-    def test_convert_png_data_url_to_binary_raises_if_prefix_is_missing(
+    def test_convert_png_or_webp_data_url_to_binary_raises_if_prefix_is_missing(
             self
     ) -> None:
         image_data_url = urllib.parse.quote(base64.b64encode(b'test123'))
@@ -822,7 +822,7 @@ class UtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'The given string does not represent a PNG data URL.'
         ):
-            utils.convert_png_data_url_to_binary(image_data_url)
+            utils.convert_png_or_webp_data_url_to_binary(image_data_url)
 
     def test_quoted_string(self) -> None:
         self.assertEqual(utils.quoted('a"b\'c'), '"a\\"b\'c"')
