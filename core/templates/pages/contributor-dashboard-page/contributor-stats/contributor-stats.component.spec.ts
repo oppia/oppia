@@ -172,32 +172,82 @@ describe('Contributor stats component', () => {
         'Question Reviews');
     }));
 
-    it('should page stats', fakeAsync(() => {
+    it('should be able to page stats', fakeAsync(() => {
       const pagedStats = {
-        language: 'hi',
-        currentPage: 2,
-        totalPages: 3,
-        pagedStats: [
+        currentPageStartIndex: 0,
+        data: [
           {
-            pageNumber: 1,
-            stats: [
-              {
-                firstContributionDate: 'Mar 2020',
-                lastContributionDate: 'Mar 2022',
-                topicName: 'Dummy Topic',
-                acceptedCards: 1,
-                acceptedWordCount: 1
-              }
-            ]
-          }
+            firstContributionDate: 'Mar 2020',
+            lastContributionDate: 'Mar 2022',
+            topicName: 'Dummy Topic',
+            acceptedCards: 1,
+            acceptedWordCount: 1
+          },
+          {
+            firstContributionDate: 'Mar 2020',
+            lastContributionDate: 'Mar 2022',
+            topicName: 'Dummy Topic',
+            acceptedCards: 1,
+            acceptedWordCount: 1
+          },
+          {
+            firstContributionDate: 'Mar 2020',
+            lastContributionDate: 'Mar 2022',
+            topicName: 'Dummy Topic',
+            acceptedCards: 1,
+            acceptedWordCount: 1
+          },
+          {
+            firstContributionDate: 'Mar 2020',
+            lastContributionDate: 'Mar 2022',
+            topicName: 'Dummy Topic',
+            acceptedCards: 1,
+            acceptedWordCount: 1
+          },
+          {
+            firstContributionDate: 'Mar 2020',
+            lastContributionDate: 'Mar 2022',
+            topicName: 'Dummy Topic',
+            acceptedCards: 1,
+            acceptedWordCount: 1
+          },
+          {
+            firstContributionDate: 'Mar 2020',
+            lastContributionDate: 'Mar 2022',
+            topicName: 'Dummy Topic',
+            acceptedCards: 1,
+            acceptedWordCount: 1
+          },
         ]
       };
 
       component.goToNextPage(pagedStats);
-      expect(pagedStats.currentPage).toBe(3);
+      expect(pagedStats.currentPageStartIndex).toBe(5);
 
       component.goToPreviousPage(pagedStats);
-      expect(pagedStats.currentPage).toBe(2);
+      expect(pagedStats.currentPageStartIndex).toBe(0);
+    }));
+
+    it('should throw errors when there are no more pages', fakeAsync(() => {
+      const pagedStats = {
+        currentPageStartIndex: 0,
+        data: [
+          {
+            firstContributionDate: 'Mar 2020',
+            lastContributionDate: 'Mar 2022',
+            topicName: 'Dummy Topic',
+            acceptedCards: 1,
+            acceptedWordCount: 1
+          }
+        ]
+      };
+
+      expect(() => {
+        component.goToNextPage(pagedStats);
+      }).toThrowError('There are no more pages after this one.');
+      expect(() => {
+        component.goToPreviousPage(pagedStats);
+      }).toThrowError('There are no more pages before this one.');
     }));
   });
 

@@ -21,7 +21,6 @@ from __future__ import annotations
 import base64
 
 from core import feconf
-from core import platform_feature_list
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -31,7 +30,6 @@ from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import image_validation_services
 from core.domain import opportunity_services
-from core.domain import platform_feature_services
 from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_services
@@ -113,12 +111,18 @@ class SuggestionHandler(base.BaseHandler):
             self.normalized_payload.get('description'))
 
         if suggestion.suggestion_type == (
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
-            suggestion_services.update_translation_contribution_stats_at_submission(suggestion)
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        ):
+            (
+                suggestion_services
+            ).update_translation_contribution_stats_at_submission(suggestion)
 
         elif suggestion.suggestion_type == (
-            feconf.SUGGESTION_TYPE_ADD_QUESTION):
-            suggestion_services.update_question_contribution_stats_at_submission(suggestion)
+            feconf.SUGGESTION_TYPE_ADD_QUESTION
+        ):
+            (
+                suggestion_services
+            ).update_question_contribution_stats_at_submission(suggestion)
 
         suggestion_change = suggestion.change
         if (

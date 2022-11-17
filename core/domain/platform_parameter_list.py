@@ -34,7 +34,8 @@ class ParamNames(enum.Enum):
 
     END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
     CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
-    CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS = 'contributor_dashboard_accomplishments'
+    CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS = (
+        'contributor_dashboard_accomplishments')
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
     BLOG_PAGES = 'blog_pages'
 
