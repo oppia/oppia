@@ -438,14 +438,18 @@ def managed_webpack_compiler(
             common.WEBPACK_DEV_CONFIG)
 
     compiler_args = [
-        common.NODE_BIN_PATH, common.WEBPACK_BIN_PATH, '--config', config_path,
+        common.NODE_BIN_PATH,
+        common.WEBPACK_BIN_PATH,
+        '--config', config_path,
+        '--progress',
+        '--color'
     ]
     if max_old_space_size:
         # NOTE: --max-old-space-size is a flag for Node.js, not the Webpack
         # compiler, so we insert it immediately after NODE_BIN_PATH.
         compiler_args.insert(1, '--max-old-space-size=%d' % max_old_space_size)
     if watch_mode:
-        compiler_args.extend(['--color', '--watch', '--progress'])
+        compiler_args.extend(['--watch'])
 
     with contextlib.ExitStack() as exit_stack:
         # OK to use shell=True here because we are passing string literals and
