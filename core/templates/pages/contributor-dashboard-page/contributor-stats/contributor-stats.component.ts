@@ -187,7 +187,7 @@ export class ContributorStatsComponent {
     const reviewableLanguageCodes = (
       userContributionRights?.can_review_translation_for_language_codes);
     this.userCanReviewTranslationSuggestions = (
-      reviewableLanguageCodes.length > 0);
+      reviewableLanguageCodes?.length > 0);
     this.userCanReviewQuestionSuggestions = (
       userContributionRights?.can_review_questions);
     this.userCanSuggestQuestions = (
@@ -231,12 +231,31 @@ export class ContributorStatsComponent {
       response.translation_contribution_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        if (
-          typeof this.statsData.translationContribution[
-            language] === 'undefined') {
+        // This throws "Object is possibly 'undefined'.".
+        // We are checking whether there exists translation contribution stats
+        // data for a given language. If there are no stats data or it is
+        // undefined, we are setting it here. Hence we can ignore the ts check
+        // here. We need to suppress this error because of strict type checking.
+        // @ts-ignore
+        if (!this.statsData.translationContribution[language]) {
+          // This throws "Object is possibly 'undefined'.".
+          // We are checking whether there exists translation contribution stats
+          // data for a given language. If there are no stats data or it is
+          // undefined, we are setting it here. Hence we can ignore the ts check
+          // here. We need to suppress this error because of strict type
+          // checking.
+          // @ts-ignore
           this.statsData.translationContribution[language] = this
             .createTranslationContributionPageableStats(stat);
         } else {
+          // This throws "Object is possibly 'undefined'.".
+          // In the previous if block, we are checking whether
+          // statsData.translationContribution[language] is undefined. Hence we
+          // can confirm that statsData.translationContribution[language] is not
+          // undefined in this block. Hence we can ignore the ts check
+          // here. We need to suppress this error because of strict type
+          // checking.
+          // @ts-ignore
           this.statsData.translationContribution[language].data.push(
             this.createTranslationContributionStat(stat));
         }
@@ -247,11 +266,32 @@ export class ContributorStatsComponent {
       response.translation_review_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        if (typeof this.statsData.translationReview[language] === 'undefined') {
+        // This throws "Object is possibly 'undefined'.".
+        // We are checking whether there exists translation review stats
+        // data for a given language. If there are no stats data or it is
+        // undefined, we are setting it here. Hence we can ignore the ts check
+        // here. We need to suppress this error because of strict type checking.
+        // @ts-ignore
+        if (!this.statsData.translationReview[language]) {
+          // This throws "Object is possibly 'undefined'.".
+          // We are checking whether there exists translation review stats
+          // data for a given language. If there are no stats data or it is
+          // undefined, we are setting it here. Hence we can ignore the ts check
+          // here. We need to suppress this error because of strict type
+          // checking.
+          // @ts-ignore
           this.statsData.translationReview[language] = this
             .createTranslationReviewPageableStats(stat);
         } else {
-          this.statsData.translationReview[language].data.push(
+          // This throws "Object is possibly 'undefined'.".
+          // In the previous if block, we are checking whether
+          // statsData.translationReview[language] is undefined. Hence we can
+          // confirm that statsData.translationReview[language] is not undefined
+          // in this block. Hence we can ignore the ts check
+          // here. We need to suppress this error because of strict type
+          // checking.
+          // @ts-ignore
+          this.statsData?.translationReview[language].data.push(
             this.createTranslationReviewStat(stat));
         }
       });
