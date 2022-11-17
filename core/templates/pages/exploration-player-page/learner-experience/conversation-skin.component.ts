@@ -1272,18 +1272,18 @@ export class ConversationSkinComponent {
             let oldStateCard: StateCard = this.playerTranscriptService.
               getLastCard();
             let oldInteractionId = oldStateCard.getInteractionId();
-            let oldInteractionArgs = oldStateCard.
-              getInteractionCustomizationArgs() as TextInputCustomizationArgs;
-            if (oldInteractionId === AppConstants.
-              INTERACTION_NAMES.TEXT_INPUT &&
-              oldInteractionArgs.catchMisspellings) {
+            // let oldInteractionArgs = oldStateCard.
+            //   getInteractionCustomizationArgs() as TextInputCustomizationArgs;
+            // if (oldInteractionId === AppConstants.
+            //   INTERACTION_NAMES.TEXT_INPUT &&
+            //   oldInteractionArgs.catchMisspellings) {
               let answerIsOnlyMisspelled = this.answerClassificationService.
                 isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
               if (answerIsOnlyMisspelled) {
                 // Change the feedbackHtml.
                 feedbackHtml = this.getFeedbackHtmlWhenAnswerMisspelled();
               }
-            }
+            //}
             this.numberOfIncorrectSubmissions++;
             this.hintsAndSolutionManagerService.recordWrongAnswer();
             this.conceptCardManagerService.recordWrongAnswer();
