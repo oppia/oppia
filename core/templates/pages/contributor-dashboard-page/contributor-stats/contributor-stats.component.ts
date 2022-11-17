@@ -84,13 +84,13 @@ export class ContributorStatsComponent {
 
   dropdownShown: boolean = false;
   mobileDropdownShown: boolean = false;
-  selectedContributionType: string = '';
+  selectedContributionType: string | undefined = '';
   username: string = '';
   ITEMS_PER_PAGE: number = 5;
 
   userCanReviewTranslationSuggestions: boolean = false;
-  userCanReviewQuestionSuggestions: boolean = false;
-  userCanSuggestQuestions: boolean = false;
+  userCanReviewQuestionSuggestions: boolean | undefined = false;
+  userCanSuggestQuestions: boolean | undefined = false;
 
   COLUMNS = {
     translationContribution: {
@@ -185,11 +185,11 @@ export class ContributorStatsComponent {
     const userContributionRights =
       await this.userService.getUserContributionRightsDataAsync();
     const reviewableLanguageCodes = (
-      userContributionRights.can_review_translation_for_language_codes);
+      userContributionRights?.can_review_translation_for_language_codes);
     this.userCanReviewTranslationSuggestions = (
       reviewableLanguageCodes.length > 0);
     this.userCanReviewQuestionSuggestions = (
-      userContributionRights.can_review_questions);
+      userContributionRights?.can_review_questions);
     this.userCanSuggestQuestions = (
       userContributionRights?.can_suggest_questions);
 
@@ -231,7 +231,9 @@ export class ContributorStatsComponent {
       response.translation_contribution_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        if (!this.statsData?.translationContribution[language]) {
+        if (
+          typeof this.statsData.translationContribution[
+            language] === 'undefined') {
           this.statsData.translationContribution[language] = this
             .createTranslationContributionPageableStats(stat);
         } else {
@@ -245,7 +247,7 @@ export class ContributorStatsComponent {
       response.translation_review_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        if (this.statsData && !this.statsData.translationReview[language]) {
+        if (typeof this.statsData.translationReview[language] === 'undefined') {
           this.statsData.translationReview[language] = this
             .createTranslationReviewPageableStats(stat);
         } else {
