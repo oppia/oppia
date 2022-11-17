@@ -25,6 +25,7 @@ import { AppConstants } from 'app.constants';
 describe('Translation badge component', () => {
   let component: TranslationBadgeComponent;
   let fixture: ComponentFixture<TranslationBadgeComponent>;
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -35,6 +36,7 @@ describe('Translation badge component', () => {
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
+
   beforeEach(waitForAsync(() => {
     fixture = TestBed.createComponent(TranslationBadgeComponent);
     component = fixture.componentInstance;
@@ -78,7 +80,7 @@ describe('Translation badge component', () => {
       expect(component.language).toEqual('Hindi');
     }));
 
-    it('should show multiple badges', fakeAsync(() => {
+    it('should show the plural form of badge text', fakeAsync(() => {
       component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
       component.contributionCount = 10;
       component.language = 'Hindi';

@@ -19,8 +19,6 @@ export class TranslationBadgeComponent {
   constructor() {}
 
   ngOnInit(): void {
-    console.log(this.isUnlocked);
-    console.log(typeof this.isUnlocked);
     if (this.type === AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION) {
       this.contributionTypeText = 'Submission';
     } else if (this.type === AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW) {

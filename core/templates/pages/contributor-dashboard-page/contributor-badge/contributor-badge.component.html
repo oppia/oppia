@@ -3,27 +3,27 @@
         <div class="dropdown-label">Badge Type</div>
         <div #mobileBadgeTypeDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
             <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleMobileBadgeTypeDropdown()">
-              {{showMobileTranslationBadges ? 'Translation' : 'Question'}}
-              <span class="material-icons oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': showMobileTranslationBadges ? 'scaleY(-1)' : 'scaleY(1)' }">
+              {{mobileBadgeTypeSelected}}
+              <span class="material-icons oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': mobileBadgeTypeSelected === 'Translation' ? 'scaleY(-1)' : 'scaleY(1)' }">
                 arrow_drop_down
               </span>
             </div>
           
             <div *ngIf="mobileBadgeTypeDropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
               <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
-                    (click)="selectBadgeType(true)"
-                    [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : showMobileTranslationBadges}">
+                    (click)="selectBadgeType('Translation')"
+                    [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : mobileBadgeTypeSelected === 'Translation'}">
                   Translation
               </div>
               <div *ngIf="userHasQuestionRights" class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
-                    (click)="selectBadgeType(false)"
-                    [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : !showMobileTranslationBadges}">
+                    (click)="selectBadgeType('Question')"
+                    [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : mobileBadgeTypeSelected === 'Question'}">
                   Question
               </div>
             </div>
         </div>
     </div>
-    <div class="badges-type-mobile-container" [hidden]="!showMobileTranslationBadges || languages.length === 0">
+    <div class="badges-type-mobile-container" [hidden]="mobileBadgeTypeSelected === 'Question' || languages.length === 0">
         <div class="dropdown-label">Language</div>
         <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
             <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleMobileLanguageDropdown()">
@@ -123,7 +123,7 @@
         </div>
     </div>
     <div class="mobile-badge-container">
-        <div [hidden]="!showMobileTranslationBadges">
+        <div [hidden]="mobileBadgeTypeSelected === 'Question' ">
             <div [hidden]="dataLoading || (languages.length === 0)" class="badges-header-container">
                 <div class="badge-type-text">Translations</div>
             </div>
@@ -153,7 +153,7 @@
                 </mat-card>
             </div>
         </div>
-        <div [hidden]="showMobileTranslationBadges">
+        <div [hidden]="mobileBadgeTypeSelected === 'Translation' ">
             <div [hidden]="dataLoading || (!userCanSuggestQuestions && !userCanReviewQuestionSuggestions)" class="badge-type-text">Questions</div>
             <div *ngIf="!dataLoading && userHasQuestionRights">
                 <mat-card layout="row" class="list-view-item oppia-contributions-required-message-container">
@@ -182,7 +182,7 @@
             </div>
         </div>
     </div>
-    <mat-card [hidden]="dataLoading" *ngIf="(showMobileTranslationBadges && !translationBadges[selectedLanguage])" layout="row" class="contributions-required-container mobile-badge-container list-view-item">
+    <mat-card [hidden]="dataLoading" *ngIf="(mobileBadgeTypeSelected === 'Translation' && !translationBadges[selectedLanguage])" layout="row" class="contributions-required-container mobile-badge-container list-view-item">
       <div class="oppia-contributions-required-message">
         Start contributing to see your badges!
       </div>

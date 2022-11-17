@@ -25,6 +25,7 @@ import { QuestionBadgeComponent } from './question-badge.component';
 describe('Question badge component', () => {
   let component: QuestionBadgeComponent;
   let fixture: ComponentFixture<QuestionBadgeComponent>;
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -35,6 +36,7 @@ describe('Question badge component', () => {
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
+
   beforeEach(waitForAsync(() => {
     fixture = TestBed.createComponent(QuestionBadgeComponent);
     component = fixture.componentInstance;
@@ -48,7 +50,7 @@ describe('Question badge component', () => {
     fixture.destroy();
   });
 
-  describe('when a submission badge is passed ', () => {
+  describe('when valid badge details are passed ', () => {
     it('should show submission badges', fakeAsync(() => {
       component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
       component.contributionCount = 1;
@@ -76,7 +78,7 @@ describe('Question badge component', () => {
       expect(component.contributionTypeText).toEqual('Correction');
     }));
 
-    it('should show multiple badges', fakeAsync(() => {
+    it('should show the plural form of badge text', fakeAsync(() => {
       component.type = AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
       component.contributionCount = 10;
 

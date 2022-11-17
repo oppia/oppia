@@ -24,6 +24,7 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { ContributionAndReviewStatsService } from '../services/contribution-and-review-stats.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { ContributorBadgeComponent } from './contributor-badge.component';
+import { MobileBadgeType } from './contributor-badge.component';
 
 describe('Contributor badge component', () => {
   let fetchAllContributionAndReviewStatsAsync: jasmine.Spy;
@@ -238,7 +239,7 @@ describe('Contributor badge component', () => {
           expect(component.mobileDropdownShown).toBeTrue();
         }));
 
-      it('should should toggle mobile badge type dropdown', fakeAsync(() => {
+      it('should toggle mobile badge type dropdown', fakeAsync(() => {
         component.mobileBadgeTypeDropdownShown = false;
 
         component.toggleMobileBadgeTypeDropdown();
@@ -252,16 +253,18 @@ describe('Contributor badge component', () => {
         expect(component.selectedLanguage).toBe('Hindi');
       }));
 
-      it('should show show translation badges type in mobile', fakeAsync(() => {
-        component.selectBadgeType(true);
+      it('should show translation badges type in mobile', fakeAsync(() => {
+        component.selectBadgeType(MobileBadgeType.Translation);
 
-        expect(component.showMobileTranslationBadges).toBeTrue();
+        expect(component.mobileBadgeTypeSelected).toBe(
+          MobileBadgeType.Translation);
       }));
 
-      it('should show show question badges type in mobile', fakeAsync(() => {
-        component.selectBadgeType(false);
+      it('should show question badges type in mobile', fakeAsync(() => {
+        component.selectBadgeType(MobileBadgeType.Question);
 
-        expect(component.showMobileTranslationBadges).toBeFalse();
+        expect(component.mobileBadgeTypeSelected).toBe(
+          MobileBadgeType.Question);
       }));
     });
 
@@ -296,7 +299,7 @@ describe('Contributor badge component', () => {
           component.ngOnInit();
         }));
 
-        it('should create translation badges', fakeAsync(() => {
+        it('should display translation badges', fakeAsync(() => {
           expect(component.translationBadges).toBeNull();
           expect(component.questionBadges).toBeNull();
         }));

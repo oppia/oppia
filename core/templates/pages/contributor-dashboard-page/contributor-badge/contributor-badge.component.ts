@@ -18,6 +18,11 @@ interface Badge {
   isUnlocked: boolean;
 }
 
+export enum MobileBadgeType {
+  Question = 'Question',
+  Translation = 'Translation',
+}
+
 @Component({
   selector: 'contributor-badge',
   templateUrl: './contributor-badge.component.html',
@@ -50,7 +55,7 @@ export class ContributorBadgeComponent {
   dropdownShown = false;
   mobileDropdownShown = false;
   mobileBadgeTypeDropdownShown = false;
-  showMobileTranslationBadges = true;
+  mobileBadgeTypeSelected = MobileBadgeType.Translation;
   selectedLanguage = '';
   dataLoading = false;
   userCanReviewTranslationSuggestion: boolean;
@@ -77,10 +82,10 @@ export class ContributorBadgeComponent {
     const userContributionRights =
       await this.userService.getUserContributionRightsDataAsync();
     userContributionRights.can_review_translation_for_language_codes.map(
-      (code) => {
+      (languageCode) => {
         const languageDescription = this.languageUtilService
           .getAudioLanguageDescription(
-            code);
+            languageCode);
         this.totalTranslationStats[languageDescription] = {
           language: this.languageUtilService.getShortLanguageDescription(
             languageDescription),
@@ -196,35 +201,16 @@ export class ContributorBadgeComponent {
       contributionCount: number,
       contributionSubType: string, language?: string): Badge[] {
     const badges: Badge[] = [];
-    for (const level of AppConstants.CONTRIBUTOR_BADGE_INITIAL_LEVELS) {
-      console.log(contributionCount);
-      if (contributionCount >= level) {
-        badges.push(
-          {
-            contributionCount: level,
-            text: contributionSubType,
-            isUnlocked: true,
-            language
-          }
-        );
-      } else {
-        // From this block, we are adding locked badge(in predefined range)
-        // which will be achieved next.
-        badges.push(
-          {
-            contributionCount: level - contributionCount,
-            text: contributionSubType,
-            isUnlocked: false,
-            language
-          }
-        );
-        return badges;
-      }
-    }
-
-    let level = 500;
+    let level = 0;
+    let index = 0;
     while (contributionCount >= level) {
-      level += 500;
+      if (AppConstants.CONTRIBUTOR_BADGE_INITIAL_LEVELS.length > index) {
+        level = AppConstants.CONTRIBUTOR_BADGE_INITIAL_LEVELS[index];
+        index += 1;
+      } else {
+        level += 500;
+      }
+
       if (contributionCount >= level) {
         badges.push(
           {
@@ -235,8 +221,7 @@ export class ContributorBadgeComponent {
           }
         );
       } else {
-        // From this block, we are adding locked badge(in non-predefined range)
-        // which will be achieved next.
+        // Add a locked badge for the next unachieved milestone.
         badges.push(
           {
             contributionCount: level - contributionCount,
@@ -270,8 +255,8 @@ export class ContributorBadgeComponent {
     this.mobileDropdownShown = false;
   }
 
-  selectBadgeType(showMobileTranslationBadges: boolean): void {
-    this.showMobileTranslationBadges = showMobileTranslationBadges;
+  selectBadgeType(mobileBadgeType: MobileBadgeType): void {
+    this.mobileBadgeTypeSelected = mobileBadgeType;
     this.mobileBadgeTypeDropdownShown = false;
   }
 
