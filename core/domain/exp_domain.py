@@ -3644,7 +3644,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # Here we use cast because we are narrowing down the type from various
         # customization args value types to SubtitledUnicodeDict type, and this
         # is done because here we are accessing 'buttontext' key from continue
-        # customization arg whose value is always of SubtitledUnicode type.
+        # customization arg whose value is always of SubtitledUnicodeDict type.
         button_text_subtitled_unicode_dict = cast(
             state_domain.SubtitledUnicodeDict,
             state_dict['interaction']['customization_args']['buttonText'][
@@ -4089,8 +4089,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # Here we use cast because we are narrowing down the type from various
         # customization args value types to List[SubtitledHtmlDict] type,
         # and this done because here we are accessing 'choices' key from
-        # MultiChoiceInput customization arg whose value is always of List[
-        # SubtitledHtmlDict] type.
+        # MultipleChoiceInput customization arg whose value is always of
+        # List[SubtitledHtmlDict] type.
         choices = (
             cast(
                 List[state_domain.SubtitledHtmlDict],
