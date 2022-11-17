@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 
 from core import android_validation_constants
+from core.domain import app_feedback_report_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -33,7 +34,7 @@ if MYPY: # pragma: no cover
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.Names.APP_FEEDBACK_REPORT])
 
-REPORT_JSON = {
+REPORT_JSON: app_feedback_report_domain.AndroidFeedbackReportDict = {
     'platform_type': 'android',
     'android_report_info_schema_version': 1,
     'app_context': {
@@ -116,8 +117,9 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             datetime.datetime.fromtimestamp(1615519337))
 
     def test_incoming_report_with_invalid_headers_raises_exception(
-            self) -> None:
-        token = self.get_new_csrf_token() # type: ignore[no-untyped-call]
+        self
+    ) -> None:
+        token = self.get_new_csrf_token()
         # Webtest requires explicit str-types headers.
         invalid_headers = {
             'api_key': str('bad_key'), # pylint: disable=disallowed-function-calls
@@ -125,7 +127,7 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             'app_version_name': str('bad_version_name'), # pylint: disable=disallowed-function-calls
             'app_version_code': str('bad_version_code'), # pylint: disable=disallowed-function-calls
         }
-        response = self.post_json( # type: ignore[no-untyped-call]
+        response = self.post_json(
             android_validation_constants.INCOMING_ANDROID_FEEDBACK_REPORT_URL,
             self.payload, headers=invalid_headers, csrf_token=token,
             expected_status_int=401)
@@ -134,15 +136,20 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             'The incoming request is not a valid Oppia Android request.')
 
     def test_incoming_report_with_no_headers_raises_exception(self) -> None:
-        token = self.get_new_csrf_token() # type: ignore[no-untyped-call]
-        self.post_json( # type: ignore[no-untyped-call]
+        token = self.get_new_csrf_token()
+        self.post_json(
             android_validation_constants.INCOMING_ANDROID_FEEDBACK_REPORT_URL,
             self.payload, csrf_token=token, expected_status_int=500)
 
+    # Here we use type Any because this method can return JSON response Dict
+    # whose values can contain different types of values, like int, bool,
+    # str and other types too.
     def _post_json_with_test_headers(
             self,
-            payload: Dict[str, Any],
-            headers: Dict[str, Any],
+            payload: Dict[
+                str, app_feedback_report_domain.AndroidFeedbackReportDict
+            ],
+            headers: Dict[str, str],
             expected_status: int=200
     ) -> Dict[str, Any]:
         """Sends a post request usint str-type representations of the header
@@ -160,15 +167,17 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         """
         # Webapp requires the header values to be str-types, so they must have
         # parity for the tests to correctly check these fields.
-        token = self.get_new_csrf_token() # type: ignore[no-untyped-call]
+        token = self.get_new_csrf_token()
         with self.swap(
             android_validation_constants, 'ANDROID_API_KEY',
             ANDROID_API_KEY_STRING):
             with self.swap(
                 android_validation_constants, 'ANDROID_APP_PACKAGE_NAME',
                 ANDROID_APP_PACKAGE_NAME_STRING):
-                return ( # type: ignore[no-any-return]
-                    self.post_json( # type: ignore[no-untyped-call]
+                return (
+                    self.post_json(
                         android_validation_constants.INCOMING_ANDROID_FEEDBACK_REPORT_URL, # pylint: disable=line-too-long
                         payload, headers=headers, csrf_token=token,
-                        expected_status_int=expected_status))
+                        expected_status_int=expected_status
+                    )
+                )
