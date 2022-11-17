@@ -49,6 +49,7 @@ if MYPY:  # pragma: no cover
         str, Mapping[str, AcceptableCustomizationArgsTypes]
     ]
 
+
 def get_full_customization_args(
     customization_args: CustomizationArgsDictType,
     ca_specs: List[domain.CustomizationArgSpec]
