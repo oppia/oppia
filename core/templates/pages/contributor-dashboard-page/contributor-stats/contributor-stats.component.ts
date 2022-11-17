@@ -230,7 +230,7 @@ export class ContributorStatsComponent {
       response.translation_contribution_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        if (!this.statsData.translationContribution[language] !== undefined) {
+        if (!this.statsData?.translationContribution[language]) {
           this.statsData.translationContribution[language] = this
             .createTranslationContributionPageableStats(stat);
         } else {
@@ -244,7 +244,7 @@ export class ContributorStatsComponent {
       response.translation_review_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        if (this.statsData.translationReview[language] !== undefined) {
+        if (this.statsData && !this.statsData.translationReview[language]) {
           this.statsData.translationReview[language] = this
             .createTranslationReviewPageableStats(stat);
         } else {
