@@ -93,6 +93,11 @@ Installation script for Oppia third-party libraries.
 """)
 
 
+# Here we use total=False since some fields in this dict
+# is optional/not required. There are possibilities that some fields
+# can be present or not. In some cases, either one of the 2 fields
+# should be present. However, we do have validation for this in code over
+# here in test_dependencies_syntax() function.
 class DependencyDict(TypedDict, total=False):
     """Dict representation of dependency."""
 
