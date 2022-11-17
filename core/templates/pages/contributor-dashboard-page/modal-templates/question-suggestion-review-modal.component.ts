@@ -108,13 +108,13 @@ export class QuestionSuggestionReviewModalComponent
   @Input() misconceptionsBySkill!: MisconceptionSkillMap;
   reviewMessage!: string;
   questionStateData!: State;
-  // Question id is null when it is not used in the backend.
+  // Question ID is null when it is not used in the backend.
   questionId!: string | null;
   canEditQuestion!: boolean;
   skillDifficultyLabel!: string;
   skillRubricExplanations!: string | string[];
   suggestionIsRejected!: boolean;
-  // Below property is null if their is no error.
+  // Below property is null if there is no error.
   validationError!: string | null;
   allContributions!: Record<string, ActiveContributionDict>;
   suggestion!: ActiveSuggestionDict;
@@ -153,7 +153,7 @@ export class QuestionSuggestionReviewModalComponent
 
   edit(): void {
     this.ngbActiveModal.dismiss();
-    let skillId = this.suggestion.change.skill_id;
+    const skillId = this.suggestion.change.skill_id;
     if (skillId) {
       this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
         const modalRef = this.ngbModal.open(
@@ -230,7 +230,7 @@ export class QuestionSuggestionReviewModalComponent
       return;
     }
 
-    let skillId = this.suggestion.change.skill_id;
+    const skillId = this.suggestion.change.skill_id;
     if (skillId) {
       this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
         let misconceptionsBySkill: Record<string, Misconception[]> = {};
@@ -249,8 +249,11 @@ export class QuestionSuggestionReviewModalComponent
     this.showQuestion = false;
     this.skippedContributionIds.push(this.currentSuggestionId);
 
-    this.currentSuggestionId = (
-      this.remainingContributionIdStack.pop() as string);
+    let CurrentSuggestionId = this.remainingContributionIdStack.pop();
+    if (CurrentSuggestionId === undefined) {
+      throw new Error('CurrentSuggestionId should not be undefined.');
+    }
+    this.currentSuggestionId = CurrentSuggestionId;
 
     this.refreshActiveContributionState();
   }

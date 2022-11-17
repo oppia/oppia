@@ -113,25 +113,26 @@ export class StateInteractionStatsService {
     const statsPromise = (
       this.stateInteractionStatsBackendApiService.getStatsAsync(
         expId,
-        stateName)).then(vizInfo => ({
-          explorationId: expId,
-          stateName: stateName,
-          visualizationsInfo: vizInfo.map(info => ({
-            addressedInfoIsSupported: info.addressedInfoIsSupported,
-            data: info.data.map(datum => ({
-              answer: this.getReadableAnswerString(state, datum.answer),
-              frequency: datum.frequency,
-              isAddressed: (
-                info.addressedInfoIsSupported ?
-                this.answerClassificationService
-                  .isClassifiedExplicitlyOrGoesToNewState(
-                    stateName, state, datum.answer, interactionRulesService) :
-                undefined)
-            }) as AnswerData),
-            id: info.id,
-            options: info.options
-          }) as VisualizationInfo),
-        }) as StateInteractionStats);
+        stateName
+      )).then(vizInfo => ({
+        explorationId: expId,
+        stateName: stateName,
+        visualizationsInfo: vizInfo.map(info => ({
+          addressedInfoIsSupported: info.addressedInfoIsSupported,
+          data: info.data.map(datum => ({
+            answer: this.getReadableAnswerString(state, datum.answer),
+            frequency: datum.frequency,
+            isAddressed: (
+              info.addressedInfoIsSupported ?
+              this.answerClassificationService
+                .isClassifiedExplicitlyOrGoesToNewState(
+                  stateName, state, datum.answer, interactionRulesService) :
+              undefined)
+          }) as AnswerData),
+          id: info.id,
+          options: info.options
+        }) as VisualizationInfo),
+      }) as StateInteractionStats);
     this.statsCache.set(stateName, statsPromise);
     return statsPromise;
   }

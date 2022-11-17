@@ -616,6 +616,13 @@ describe('Question Suggestion Review Modal component', () => {
     expect(component.isFirstItem).toBeTrue();
   }));
 
+  it('should throw Error if selection is null', fakeAsync(() => {
+    component.remainingContributionIdStack = [];
+    expect(() => {
+      component.goToNextItem();
+    }).toThrowError();
+  }));
+
   it('should not navigate if the corresponding opportunity is deleted',
     function() {
       spyOn(component, 'cancel');

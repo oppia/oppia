@@ -44,9 +44,6 @@ export class ContributorDashboardPageComponent
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   defaultHeaderVisible!: boolean;
   profilePictureDataUrl!: SafeUrl | string;
-  // The following is property is set to null when the
-  // user is not logged in.
-  username!: string | null;
   userInfoIsLoading!: boolean;
   userIsLoggedIn!: boolean;
   userIsReviewer!: boolean;
@@ -58,6 +55,9 @@ export class ContributorDashboardPageComponent
   languageCode!: string;
   topicName!: string;
   activeTabName!: string;
+  // The following property is set to null when the
+  // user is not logged in.
+  username: string | null = null;
 
   constructor(
     private contributionAndReviewService: ContributionAndReviewService,
