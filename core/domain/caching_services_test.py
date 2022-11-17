@@ -95,6 +95,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                                 'content_id': 'ca_placeholder_3',
                                 'unicode_str': '😍😍😍😍'
                             }
+                        },
+                        'catchMisspellings': {
+                            'value': False
                         }
                     },
                     'default_outcome': {
@@ -166,7 +169,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'd": null, "labelled_as_correct": false}, "customization_args": {"rows"'
         ': {"value": 1}, "placeholder": {"value": {"unicode_str": "\\ud83d\\ude'
         '0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d", "content_id": "ca_place'
-        'holder_3"}}}, "confirmed_unclassified_answers": [], "id": "TextInput",'
+        'holder_3"}}, "catchMisspellings": {"value": false}}, "confirmed_unclassified_answers": [], "id": "TextInput",'
         ' "hints": [{"hint_content": {"content_id": "hint_5", "html": "<p>This '
         'is a copyright character \\u00a9.</p>"}}]}, "linked_skill_id": null, "'
         'recorded_voiceovers": {"voiceovers_mapping": {"feedback_4": {}, "rule_'

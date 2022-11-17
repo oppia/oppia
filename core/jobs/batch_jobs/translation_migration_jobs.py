@@ -68,7 +68,7 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
             lang_code_to_translation = {}
             (old_content_id_to_new_content_id, _) = (
                 state_domain.State
-                .generate_old_content_id_to_new_content_id_in_v53_states(
+                .generate_old_content_id_to_new_content_id_in_v54_states(
                     exploration.states))
             for state_name in exploration.states:
                 translations_mapping = exploration.states[state_name][

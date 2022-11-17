@@ -277,7 +277,10 @@ class InitializeAndroidTestDataHandler(
                     'unicode_str': ''
                 }
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {
+                'value': False
+            }
         })
 
         state.update_linked_skill_id(None)

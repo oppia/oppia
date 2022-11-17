@@ -184,6 +184,9 @@ describe('Exploration Player State Service', () => {
               unicode_str: '',
               content_id: 'ca_placeholder_0'
             }
+          },
+          catchMisspellings: {
+            value: false
           }
         },
         confirmed_unclassified_answers: [],

@@ -4135,7 +4135,8 @@ title: Title
                     'unicode_str': 'Enter text here',
                 },
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {'value': False}
         })
         # Here, state is a State domain object and it is created using
         # 'create_default_state' method. So, 'state' is a default_state

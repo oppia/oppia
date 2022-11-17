@@ -124,7 +124,10 @@ describe('ExplorationStatesService', () => {
                 unicode_str: ''
               }
             },
-            rows: { value: 1 }
+            rows: { value: 1 },
+            catchMisspellings: {
+              value: false
+            }
           },
           default_outcome: {
             dest: 'Me Llamo',

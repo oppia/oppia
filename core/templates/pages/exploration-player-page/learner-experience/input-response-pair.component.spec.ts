@@ -127,6 +127,9 @@ describe('InputResponsePairComponent', () => {
             placeholder: {
               value: 1,
             },
+            catchMisspellings: {
+              value: false
+            }
           },
           hints: [],
           solution: {

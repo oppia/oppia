@@ -71,7 +71,7 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
         """
         old_to_new_content_id_mapping, _ = (
             state_domain.State
-            .generate_old_content_id_to_new_content_id_in_v53_states(
+            .generate_old_content_id_to_new_content_id_in_v54_states(
                 exp_model.states
             )
         )

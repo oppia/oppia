@@ -122,6 +122,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           solution: null,
@@ -452,6 +455,9 @@ describe('Exploration Warnings Service', () => {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             hints: [],
@@ -519,6 +525,9 @@ describe('Exploration Warnings Service', () => {
               },
               placeholder: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             solution: {
@@ -672,6 +681,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -733,6 +745,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           solution: {
@@ -798,6 +813,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           solution: {
@@ -903,6 +921,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           solution: null,
@@ -1013,6 +1034,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1160,6 +1184,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1206,6 +1233,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1252,6 +1282,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1298,6 +1331,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1344,6 +1380,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1390,6 +1429,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1436,6 +1478,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1482,6 +1527,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1645,6 +1693,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1691,6 +1742,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1737,6 +1791,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1783,6 +1840,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1829,6 +1889,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1875,6 +1938,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1932,6 +1998,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],
@@ -1994,6 +2063,9 @@ describe('Exploration Warnings Service', () => {
             },
             placeholder: {
               value: 1
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           hints: [],

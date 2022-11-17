@@ -251,7 +251,10 @@ describe('Contributions and review component', () => {
                             unicode_str: ''
                           }
                         },
-                        rows: { value: 1 }
+                        rows: { value: 1 },
+                        catchMisspellings: {
+                          value: false
+                        }
                       },
                       default_outcome: {
                         dest: null,
@@ -343,7 +346,10 @@ describe('Contributions and review component', () => {
                             unicode_str: ''
                           }
                         },
-                        rows: { value: 1 }
+                        rows: { value: 1 },
+                        catchMisspellings: {
+                          value: false
+                        }
                       },
                       default_outcome: {
                         dest: null,
@@ -576,7 +582,10 @@ describe('Contributions and review component', () => {
                     unicode_str: ''
                   }
                 },
-                rows: { value: 1 }
+                rows: { value: 1 },
+                catchMisspellings: {
+                  value: false
+                }
               },
               default_outcome: {
                 dest: null,
@@ -810,7 +819,10 @@ describe('Contributions and review component', () => {
                   unicode_str: ''
                 }
               },
-              rows: { value: 1 }
+              rows: { value: 1 },
+              catchMisspellings: {
+                value: false
+              }
             },
             default_outcome: {
               dest: null,
@@ -928,7 +940,10 @@ describe('Contributions and review component', () => {
                           unicode_str: ''
                         }
                       },
-                      rows: { value: 1 }
+                      rows: { value: 1 },
+                      catchMisspellings: {
+                        value: false
+                      }
                     },
                     default_outcome: {
                       dest: null,

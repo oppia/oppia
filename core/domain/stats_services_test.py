@@ -1853,7 +1853,8 @@ class AnswerEventTests(test_utils.GenericTestBase):
                             'unicode_str': 'Enter here'
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
@@ -1898,7 +1899,8 @@ class AnswerEventTests(test_utils.GenericTestBase):
                             'unicode_str': 'Enter here'
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

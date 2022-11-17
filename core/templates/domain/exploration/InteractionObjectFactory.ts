@@ -358,6 +358,9 @@ export class InteractionObjectFactory {
       placeholder: {
         value: this.subtitledUnicodeFactory.createFromBackendDict(
           placeholder.value)
+      },
+      catchMisspellings: {
+        value: false
       }
     };
   }

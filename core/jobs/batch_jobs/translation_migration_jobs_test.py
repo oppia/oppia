@@ -251,7 +251,7 @@ class EntityTranslationsModelGenerationOneOffJobTests(
         self.assertEqual(len(entity_translation_models), 0)
         raise_swap = self.swap_to_always_raise(
             state_domain.State,
-            'generate_old_content_id_to_new_content_id_in_v53_states'
+            'generate_old_content_id_to_new_content_id_in_v54_states'
         )
         with raise_swap:
             self.assert_job_output_is([

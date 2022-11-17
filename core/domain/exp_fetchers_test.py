@@ -173,10 +173,10 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                     self.EXP_1_ID,
                     '1',
                     feconf.CURRENT_STATE_SCHEMA_VERSION,
-                    '60'
+                    '61'
                 )
         )
-        with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 60):
+        with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 61):
             with self.assertRaisesRegex(Exception, error_regex):
                 (
                 exp_fetchers
@@ -550,6 +550,8 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_5

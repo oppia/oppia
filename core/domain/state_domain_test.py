@@ -305,7 +305,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'unicode_str': ''
                 }
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {'value': False}
         }
 
         state.update_content(
@@ -1919,6 +1920,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'content_id': 'ca_placeholder_0',
                             'unicode_str': ''
                         }
+                    },
+                    'catchMisspellings': {
+                        'value': False
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -1982,6 +1986,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'content_id': 'ca_placeholder_0',
                             'unicode_str': ''
                         }
+                    },
+                    'catchMisspellings': {
+                        'value': False
                     }
                 },
                 'confirmed_unclassified_answers': [],

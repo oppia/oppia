@@ -184,7 +184,10 @@ describe('Translation tab component', () => {
               content_id: 'ca_placeholder',
               unicode_str: ''
             }},
-            rows: {value: 1}
+            rows: {value: 1},
+            catchMisspellings: {
+              value: false
+            }
           },
           answer_groups: [{
             rule_specs: [],

@@ -596,6 +596,9 @@ describe('Extracting Image file names in the state service', () => {
                   content_id: 'ca_placeholder_3',
                   unicode_str: ''
                 }
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             answer_groups: [{

@@ -1676,10 +1676,36 @@ class Question(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _convert_state_v53_dict_to_v54_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
+        """Converts from version 53 to 54. Version 54 adds
+        catchMisspellings customization arg to TextInput
+        interaction which allows creators to detect misspellings.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'TextInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'catchMisspellings': {
+                    'value': False
+                }
+            })
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v54_dict_to_v55_dict(
         cls,
         question_state_dict: state_domain.StateDict
     ) -> Tuple[state_domain.StateDict, int]:
-        """Converts from v53 to v54. Version 54 removes next_content_id_index
+        """Converts from v54 to v55. Version 55 removes next_content_id_index
         and WrittenTranslation from State. This version also updates the
         content-ids for each translatable field in the state with its new
         content-id.
@@ -1700,7 +1726,7 @@ class Question(translation_domain.BaseTranslatableObject):
         del question_state_dict['written_translations'] # type: ignore[misc]
         states_dict, next_content_id_index = (
             state_domain.State
-            .update_old_content_id_to_new_content_id_in_v53_states({
+            .update_old_content_id_to_new_content_id_in_v54_states({
                 'question_state': question_state_dict
             })
         )
