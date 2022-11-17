@@ -84,8 +84,8 @@ export class ContributorStatsComponent {
 
   dropdownShown: boolean = false;
   mobileDropdownShown: boolean = false;
-  selectedContributionType: string;
-  username: string;
+  selectedContributionType: string = '';
+  username: string = '';
   ITEMS_PER_PAGE: number = 5;
 
   userCanReviewTranslationSuggestions: boolean = false;
@@ -180,17 +180,17 @@ export class ContributorStatsComponent {
     this.username = username;
     const currentOption = this.options.find(
       (option) => option.contributionType === this.type);
-    this.selectedContributionType = currentOption.displayName;
+    this.selectedContributionType = currentOption?.displayName;
 
     const userContributionRights =
       await this.userService.getUserContributionRightsDataAsync();
     this.userCanReviewTranslationSuggestions = (
-      userContributionRights
-        .can_review_translation_for_language_codes.length > 0);
+      userContributionRights?.
+        can_review_translation_for_language_codes.length > 0);
     this.userCanReviewQuestionSuggestions = (
-      userContributionRights.can_review_questions);
+      userContributionRights?.can_review_questions);
     this.userCanSuggestQuestions = (
-      userContributionRights.can_suggest_questions);
+      userContributionRights?.can_suggest_questions);
 
     if (this.userCanReviewTranslationSuggestions) {
       this.options.push(this.translationReviewOption);
@@ -217,7 +217,7 @@ export class ContributorStatsComponent {
     this.type = contributionType;
     const currentOption = this.options.find(
       (option) => option.contributionType === contributionType);
-    this.selectedContributionType = currentOption.displayName;
+    this.selectedContributionType = currentOption?.displayName;
     this.dropdownShown = false;
     this.mobileDropdownShown = false;
   }
