@@ -97,17 +97,17 @@
   max-width: 400px;
   width: 15vw;
 }
-.classroom-page-guidance-tile-container {
+.oppia-classroom-page-guidance-tile-container {
   display: flex;
   justify-content: space-evenly;
   margin: 20px 0;
 }
-.classroom-page-guidance-tile {
+.oppia-classroom-page-guidance-tile {
   border: 1px solid;
   border-radius: 10px;
   padding: 20px;
 }
-.classroom-page-tile-button-text {
+.oppia-classroom-page-tile-button-text {
   color: #094142;
   text-transform: uppercase;
 }
