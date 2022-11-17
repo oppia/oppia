@@ -38,6 +38,3 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
-
-paths-ignore:
-  - "core/tests/data.js"
