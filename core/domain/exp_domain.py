@@ -2029,6 +2029,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 all_outcomes = curr_state.interaction.get_all_outcomes()
                 for outcome in all_outcomes:
                     dest_state = outcome.dest
+                    dest_if_stuck_state = outcome.dest_if_really_stuck
                     if (
                         dest_state is not None and
                         dest_state not in curr_queue and
