@@ -3658,15 +3658,16 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'choices'].value,
             list
         )
-        # Here we use cast because we are narrowing down the type from various
-        # types of cust. arg values to List[SubtitledHtml], and here we are
-        # sure that the type is always going to be List[SubtitledHtml] because
-        # MultipleChoiceInput customization arg object always contain 'choices'
-        # attribute with List[SubtitledHtml] type of value.
+        # Here we use cast because we are narrowing down the type from
+        # various customization args value types to List[SubtitledHtml]
+        # type, and this is done because here we are accessing 'choices'
+        # key from MultipleChoiceInput customization arg whose value is
+        # always of List[SubtitledHtml] type.
         choices = cast(
             List[state_domain.SubtitledHtml],
             exploration.init_state.interaction.customization_args[
-            'choices'].value
+                'choices'
+            ].value
         )
         self.assertEqual(choices[0].html, '<p>Option A</p>')
         self.assertEqual(choices[0].content_id, 'ca_choices_0')
@@ -3706,10 +3707,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         customization_args = (
             exploration.init_state.interaction.customization_args)
         # Here we use cast because we are narrowing down the type from various
-        # types of cust. arg values to SubtitledUnicode, and here we are
-        # sure that the type is always going to be SubtitledUnicode because
-        # buttonText customization arg object always contain values of type
-        # List[SubtitledHtml].
+        # customization args value types to 'SubtitledUnicode' type, and this
+        # is done because here we are accessing 'buttontext' key from continue
+        # customization arg whose value is always of SubtitledUnicode type.
         button_text_subtitle_unicode = cast(
             state_domain.SubtitledUnicode,
             customization_args['buttonText'].value
@@ -7965,7 +7965,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
-        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+        choices_subtitled_html_dicts: List[state_domain.SubtitledHtmlDict] = [
             {
                 'content_id': 'ca_choices_0',
                 'html': '<p>state customization arg html 1</p>'
@@ -7987,7 +7987,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             str, Dict[str, Union[int, List[state_domain.SubtitledHtmlDict]]]
         ] = {
             'choices': {
-                'value': choices_subtitled_dicts
+                'value': choices_subtitled_html_dicts
             },
             'maxAllowableSelectionCount': {
                 'value': 1

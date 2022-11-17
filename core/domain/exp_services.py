@@ -1956,15 +1956,16 @@ def validate_exploration_for_story(
             validation_error_messages.append(error_string)
 
         if state.interaction.id == 'EndExploration':
-            # Here we use cast because we are narrowing down the type from
-            # various types of cust. arg values to List[str], and here
-            # we are sure that the type is always going to be List[str]
-            # because EndExploration customization arg object always contain
-            # values of type List[str].
+            # Here we use cast because we are narrowing down the type
+            # from various customization args value types to List[str]
+            # type, and this is done because here we are accessing
+            # 'recommendedExplorationIds' key from EndExploration
+            # customization arg whose value is always of List[str] type.
             recommended_exploration_ids = cast(
                 List[str],
                 state.interaction.customization_args[
-                    'recommendedExplorationIds'].value
+                    'recommendedExplorationIds'
+                ].value
             )
             if len(recommended_exploration_ids) != 0:
                 error_string = (
@@ -1978,10 +1979,10 @@ def validate_exploration_for_story(
 
         if state.interaction.id == 'MultipleChoiceInput':
             # Here we use cast because we are narrowing down the type from
-            # various types of cust. arg values to List[SubtitledHtml],
-            # and here we are sure that the type is always going to be
-            # List[SubtitledHtml] because MultipleChoiceInput customization
-            # arg object always contain values of type List[SubtitledHtml].
+            # various customization args value types to List[SubtitledHtml]
+            # type, and this is done because here we are accessing 'choices'
+            # key from MultipleChoiceInput customization arg whose value is
+            # always of List[SubtitledHtml] type.
             choices = cast(
                 List[state_domain.SubtitledHtml],
                 state.interaction.customization_args['choices'].value
@@ -2826,10 +2827,10 @@ def get_image_filenames_from_exploration(
     for state in exploration.states.values():
         if state.interaction.id == 'ImageClickInput':
             # Here we use cast because we are narrowing down the type from
-            # various types of cust. arg values to ImageAndRegionDict,
-            # and here we are sure that the type is always going to be
-            # ImageAndRegionDict because ImageClickInput customization
-            # arg object always contain values of type ImageAndRegionDict.
+            # various customization args value types to ImageAndRegionDict
+            # type, and this is done because here we are accessing
+            # 'imageAndRegions' key from ImageClickInput customization arg
+            # whose values is always of ImageAndRegionDict type.
             image_paths = cast(
                 domain.ImageAndRegionDict,
                 state.interaction.customization_args['imageAndRegions'].value

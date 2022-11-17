@@ -1816,7 +1816,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_solution_dict
         )
 
-        ca_choices_dict: List[state_domain.SubtitledHtmlDict] = [
+        ca_choices_dicts = [
             {'html': 'correct_value', 'content_id': 'content_id_1'},
         ]
 
@@ -1825,7 +1825,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_value['state']['interaction']['solution'] = test_solution_dict
         test_value['state']['interaction']['customization_args'] = {
             'choices': {
-                'value': ca_choices_dict
+                'value': ca_choices_dicts
             }
         }
         test_value['state']['interaction']['answer_groups'] = [{

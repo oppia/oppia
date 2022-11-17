@@ -571,6 +571,11 @@ def get_updated_exp_issues_models_for_new_exp_version(
         if 'state_names' in playthrough.issue_customization_args:
             state_names = (
                 playthrough.issue_customization_args['state_names']['value'])
+            # Here we used assert to narrow down the type from various allowed
+            # issue customization arg types to List[str] type, and here we sure
+            # that the type is always going to be List[str] because above 'if'
+            # condition forces 'state_names' issue customization arg to have
+            # values of type List[str].
             assert isinstance(state_names, list)
             playthrough.issue_customization_args['state_names']['value'] = [
                 state_name if state_name not in old_to_new_state_names else
@@ -580,6 +585,11 @@ def get_updated_exp_issues_models_for_new_exp_version(
         if 'state_name' in playthrough.issue_customization_args:
             state_name = (
                 playthrough.issue_customization_args['state_name']['value'])
+            # Here we used assert to narrow down the type from various allowed
+            # issue customization arg types to str type, and here we sure
+            # that the type is always going to be str because above 'if'
+            # condition forces 'state_name' issue customization arg to have
+            # values of type str.
             assert isinstance(state_name, str)
             playthrough.issue_customization_args['state_name']['value'] = (
                 state_name if state_name not in old_to_new_state_names else
@@ -590,6 +600,11 @@ def get_updated_exp_issues_models_for_new_exp_version(
 
             if 'state_name' in action_customization_args:
                 state_name = action_customization_args['state_name']['value']
+                # Here we used assert to narrow down the type from various
+                # allowed action customization arg types to str type, and here
+                # we sure that the type is always going to be str because above
+                # 'if' condition forces 'state_name' action customization arg to
+                # have values of type str.
                 assert isinstance(state_name, str)
                 action_customization_args['state_name']['value'] = (
                     state_name if state_name not in old_to_new_state_names else
@@ -598,6 +613,11 @@ def get_updated_exp_issues_models_for_new_exp_version(
             if 'dest_state_name' in action_customization_args:
                 dest_state_name = (
                     action_customization_args['dest_state_name']['value'])
+                # Here we used assert to narrow down the type from various
+                # allowed action customization arg types to str type, and here
+                # we sure that the type is always going to be str because above
+                # 'if' condition forces 'dest_state_name' action customization
+                # arg to have values of type str.
                 assert isinstance(dest_state_name, str)
                 action_customization_args['dest_state_name']['value'] = (
                     dest_state_name
@@ -616,6 +636,11 @@ def get_updated_exp_issues_models_for_new_exp_version(
         if 'state_names' in exp_issue.issue_customization_args:
             state_names = (
                 exp_issue.issue_customization_args['state_names']['value'])
+            # Here we used assert to narrow down the type from various allowed
+            # issue customization arg types to List[str] type, and here we sure
+            # that the type is always going to be List[str] because above 'if'
+            # condition forces 'state_names' issue customization arg to have
+            # values of type List[str].
             assert isinstance(state_names, list)
 
             if any(name in deleted_state_names for name in state_names):
@@ -631,6 +656,11 @@ def get_updated_exp_issues_models_for_new_exp_version(
             state_name = (
                 exp_issue.issue_customization_args['state_name']['value'])
 
+            # Here we used assert to narrow down the type from various allowed
+            # issue customization arg types to str type, and here we sure
+            # that the type is always going to be str because above 'if'
+            # condition forces 'state_name' issue customization arg to have
+            # values of type str.
             assert isinstance(state_name, str)
             if state_name in deleted_state_names:
                 exp_issue.is_valid = False

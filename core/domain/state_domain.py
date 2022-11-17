@@ -1004,10 +1004,10 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
     def _validate_continue_interaction(self) -> None:
         """Validates Continue interaction."""
-        # Here we use cast because we are narrowing the down the type from
-        # various types of cust. args values, and here we sue that the type
-        # is always going to be SubtitledUnicode because 'buttontext' cust.
-        # arg objects always contain SubtitledUnicode types of values.
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to 'SubtitledUnicode' type, and this
+        # is done because here we are accessing 'buttontext' key from continue
+        # customization arg whose value is always of SubtitledUnicode type.
         button_text_subtitled_unicode = cast(
             SubtitledUnicode,
             self.customization_args['buttonText'].value
@@ -1021,11 +1021,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
     def _validate_end_interaction(self) -> None:
         """Validates End interaction."""
-        # Here we use cast because we are narrowing the down the type from
-        # various types of cust. args values, and here we sue that the type
-        # is always going to be SubtitledUnicode because 'EndExploration' cust.
-        # arg objects always contain 'recommendedExplorationIds' key with
-        # List[str] types of values.
+        # Here we use cast because we are narrowing down the type
+        # from various customization args value types to List[str]
+        # type, and this is done because here we are accessing
+        # 'recommendedExplorationIds' key from EndExploration
+        # customization arg whose value is always of List[str] type.
         recc_exp_ids = cast(
             List[str],
             self.customization_args['recommendedExplorationIds'].value
@@ -1569,11 +1569,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """
         rule_spec_till_now: List[RuleSpecDict] = []
 
-        # Here we use cast because we are narrowing the down the type from
-        # various types of cust. args values, and here we sue that the type
-        # is always going to be List[SubtitledHtml] because 'MultiChoiceInput'
-        # cust. arg objects always contain 'choices' key with List[
-        # SubtitledHtml] types of values.
+        # Here we use cast because we are narrowing the down the
+        # type from various types of cust. args values, and here
+        # we sure that the type is always going to be List[SubtitledHtml]
+        # because 'MultipleChoiceInput' cust. arg objects always contain
+        # 'choices' key with List[SubtitledHtml] types of values.
         choices = cast(
             List[SubtitledHtml],
             self.customization_args['choices'].value
@@ -4871,9 +4871,14 @@ class State(translation_domain.BaseTranslatableObject):
         Raises:
             Exception. The customization arguments are not unique.
         """
-        # Here we use assert so that the customization_arg_dict will become
-        # Dict type at the entry level so that we can use all the methods of
-        # Dict without MyPy complain.
+        # For argument 'customization_args_dict' we have used Mapping type
+        # because we want to allow 'update_interaction_customization_args'
+        # method to accept different subtypes of customization_arg dictionaries,
+        # but the problem with Mapping is that the Mapping does not allow to
+        # update(or set) values because Mapping is a read-only type. To overcome
+        # this issue, we narrowed down the type from Mapping to Dict by using
+        # assert so that while updating or setting a new value MyPy will not
+        # throw any error.
         assert isinstance(customization_args_dict, dict)
         customization_args = (
             InteractionInstance.
@@ -5494,9 +5499,10 @@ class State(translation_domain.BaseTranslatableObject):
 
             if interaction_customization_arg_has_html:
                 if 'choices' in (
-                        state_dict['interaction']['customization_args'].keys()):
-                    # Here we use cast because the above 'if'
-                    # condition forces cust. args to have type
+                    state_dict['interaction']['customization_args'].keys()
+                ):
+                    # Here we use cast because the above 'if' condition
+                    # forces every cust. args' 'choices' key to have type
                     # Dict[str, List[str]].
                     html_choices_ca_dict = cast(
                         Dict[str, List[str]],

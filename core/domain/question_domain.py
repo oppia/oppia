@@ -71,16 +71,6 @@ CMD_REMOVE_QUESTION_SKILL: Final = 'remove_question_skill'
 CMD_CREATE_NEW: Final = 'create_new'
 
 
-UnalteredUnionOfCustomizationArgsDictValues = Union[
-    str,
-    int,
-    bool,
-    List[str],
-    domain.ImageAndRegionDict,
-    domain.GraphDict
-]
-
-
 class QuestionChange(change_domain.BaseChange):
     """Domain object for changes made to question object.
 
@@ -820,11 +810,11 @@ class Question(translation_domain.BaseTranslatableObject):
                 )
                 new_value = copy.deepcopy(default_value)
                 # Here we use cast because in this _convert function we are
-                # converting older customization args dicts that contains
-                # unicode and html to newer versions of customization args dict
-                # that contain 'SubtitledUnicodeDict' and 'SubtitledHtmlDict',
-                # and by using cast here we are representing older cust. args
-                # dictionary.
+                # converting older versions of customization arg dicts that
+                # contains Unicode and Html to newer versions of customization
+                # arg dicts that contains 'SubtitledUnicodeDict' and
+                # 'SubtitledHtmlDict', and by using cast here we are
+                # representing an older version of customization arg dictionary.
                 older_version_unicode_ca_dict = cast(
                     Dict[str, Dict[str, str]], ca_dict
                 )
@@ -832,7 +822,8 @@ class Question(translation_domain.BaseTranslatableObject):
                 # If available, assign value to html or unicode_str.
                 if ca_name in ca_dict:
                     new_value['unicode_str'] = older_version_unicode_ca_dict[
-                        ca_name]['value']
+                        ca_name
+                    ]['value']
 
                 # Assign content_id.
                 new_value['content_id'] = (
@@ -841,11 +832,11 @@ class Question(translation_domain.BaseTranslatableObject):
                 )
 
                 # Here we use cast because in this _convert function we are
-                # converting older customization args dicts that contains
-                # unicode and html to newer versions of customization args dict
-                # that contain 'SubtitledUnicodeDict' and 'SubtitledHtmlDict',
-                # and by using cast here we are representing newer cust. args
-                # dictionary.
+                # converting older versions of customization arg dicts that
+                # contains Unicode and Html to newer versions of customization
+                # arg dicts that contains 'SubtitledUnicodeDict' and
+                # 'SubtitledHtmlDict', and by using cast here we are
+                # representing an newer version of customization arg dictionary.
                 updated_unicode_cust_arg_dict = cast(
                     Dict[str, Dict[str, state_domain.SubtitledUnicodeDict]],
                     ca_dict
@@ -858,11 +849,12 @@ class Question(translation_domain.BaseTranslatableObject):
                 ) = []
 
                 # Here we use cast because in this _convert function we are
-                # converting older customization args dicts that contains
-                # list of unicode and html to newer versions of customization
-                # args dict that contain list of 'SubtitledUnicodeDict' and
-                # 'SubtitledHtmlDict', and by using cast here we are
-                # representing older cust. args dictionary.
+                # converting older versions of customization arg dicts that
+                # contains list of Unicode and Html to newer versions of
+                # customization arg dicts that contains list of
+                # 'SubtitledUnicodeDict' and 'SubtitledHtmlDict', and by using
+                # cast here we are representing an older version of
+                # customization arg dictionary.
                 older_version_html_list_ca_dict = cast(
                     Dict[str, Dict[str, List[str]]], ca_dict
                 )
@@ -896,11 +888,12 @@ class Question(translation_domain.BaseTranslatableObject):
                     )
 
                 # Here we use cast because in this _convert function we are
-                # converting older customization args dicts that contains
-                # list of unicode and html to newer versions of customization
-                # args dict that contain list of 'SubtitledUnicodeDict' and
-                # 'SubtitledHtmlDict', and by using cast here we are
-                # representing newer cust. args dictionary.
+                # converting older versions of customization arg dicts that
+                # contains list of Unicode and Html to newer versions of
+                # customization arg dicts that contains list of
+                # 'SubtitledUnicodeDict' and 'SubtitledHtmlDict', and
+                # by using cast here we are representing an newer version
+                # of customization arg dictionary.
                 updated_html_list_ca_dict = cast(
                     Dict[str, Dict[str, List[state_domain.SubtitledHtmlDict]]],
                     ca_dict
@@ -914,7 +907,7 @@ class Question(translation_domain.BaseTranslatableObject):
                 # of customization arg values that are not altered by above
                 # if clauses.
                 ca_default_value = cast(
-                    UnalteredUnionOfCustomizationArgsDictValues,
+                    state_domain.UnionOfCustomizationArgsDictValues,
                     ca_spec.default_value
                 )
                 ca_dict[ca_name] = {'value': ca_default_value}
@@ -1299,11 +1292,11 @@ class Question(translation_domain.BaseTranslatableObject):
         if interaction_id in ['DragAndDropSortInput', 'ItemSelectionInput']:
             solution = question_state_dict['interaction']['solution']
             # Here we use cast because we are narrowing down the type from
-            # various allowed cust. arg types to 'List[SubtitledHtmlDict]',
-            # and here we are sure that the type is always going to be
-            # List[SubtitledHtmlDict] because 'DragAndDropSortInput' and
-            # 'ItemSelectionInput' customization args always contain choices
-            # with 'List[SubtitledHtmlDict]' values.
+            # various customization args value types to List[SubtitledHtmlDict]
+            # type, and this is done because here we are accessing 'choices' key
+            # over 'DragAndDropSortInput' and 'ItemSelectionInput' customization
+            # args and in these customization args 'choices' key will only have
+            # values of type List[SubtitledHtmlDict].
             choices = cast(
                 List[state_domain.SubtitledHtmlDict],
                 question_state_dict['interaction']['customization_args'][

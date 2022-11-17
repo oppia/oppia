@@ -2664,7 +2664,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             # various customization args value types to List[SubtitledHtmlDict]
             # type, and this is done because here we are accessing 'choices' key
             # over 'DragAndDropSortInput' and 'ItemSelectionInput' customization
-            # args and in these customization args 'choices' key will have
+            # args and in these customization args 'choices' key will only have
             # values of type List[SubtitledHtmlDict].
             choices = cast(
                 List[state_domain.SubtitledHtmlDict],

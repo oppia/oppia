@@ -150,15 +150,15 @@ def get_image_filenames_from_html_strings(html_strings: List[str]) -> List[str]:
     for rte_comp in all_rte_components:
         if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-image':
             # Here we use cast because the above 'if' condition forces
-            # customization_args to have type str.
+            # 'filepath' customization arg to have type str.
             filename = cast(
                 str, rte_comp['customization_args']['filepath-with-value']
             )
             filenames.append(filename)
         elif ('id' in rte_comp and
               rte_comp['id'] == 'oppia-noninteractive-math'):
-            # Here we use cast because the above 'if' condition forces
-            # customization_args to have type Dict[str, str].
+            # Here we use cast because the above 'elif' condition forces
+            # 'math_content' customization arg to have type Dict[str, str].
             content_to_filename_dict = cast(
                 Dict[str, str],
                 rte_comp['customization_args']['math_content-with-value']

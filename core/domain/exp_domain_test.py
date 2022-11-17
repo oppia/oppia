@@ -1564,17 +1564,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         """Tests Continue interaction."""
         self.set_interaction_for_state(self.state, 'Continue')
         # Here we use cast because we are narrowing down the type from various
-        # types of values to 'SubtitledUnicode', and we are sure that the type
-        # is always going to be 'SubtitledUnicode' because here we are testing
-        # for continue interaction which contain continue cust. arg and this
-        # cust. arg always contain 'SubtitledUnicode' type of value.
+        # customization args value types to 'SubtitledUnicode' type, and this
+        # is done because here we are accessing 'buttontext' key from continue
+        # customization arg whose value is always of SubtitledUnicode type.
         subtitled_unicode_continue_ca_arg = cast(
-          state_domain.SubtitledUnicode,
-          self.state.interaction.customization_args[
-            'buttonText'].value
+            state_domain.SubtitledUnicode,
+            self.state.interaction.customization_args[
+                'buttonText'
+            ].value
         )
         subtitled_unicode_continue_ca_arg.unicode_str = (
-          'Continueeeeeeeeeeeeeeeeee'
+            'Continueeeeeeeeeeeeeeeeee'
         )
         self._assert_validation_error(
           self.new_exploration, (
@@ -13051,7 +13051,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(state3, 'ItemSelectionInput')
         self.set_interaction_for_state(state4, 'DragAndDropSortInput')
 
-        ca_value_dict: state_domain.SubtitledUnicodeDict = {
+        ca_placeholder_value_dict: state_domain.SubtitledUnicodeDict = {
             'content_id': 'ca_placeholder_0',
             'unicode_str': 'Enter here.'
         }
@@ -13059,14 +13059,15 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             str, Dict[str, Union[state_domain.SubtitledUnicodeDict, int]]
         ] = {
             'placeholder': {
-                'value': ca_value_dict
+                'value': ca_placeholder_value_dict
             },
             'rows': {'value': 1},
             'catchMisspellings': {
                 'value': False
             }
         }
-        choices_subtitled_dict: List[state_domain.SubtitledHtmlDict] = [
+
+        choices_subtitled_html_dicts: List[state_domain.SubtitledHtmlDict] = [
             {
                 'content_id': 'ca_choices_0',
                 'html': '<p>This is value1 for MultipleChoice</p>'
@@ -13079,10 +13080,11 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         customization_args_dict2: Dict[
             str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], bool]]
         ] = {
-            'choices': {'value': choices_subtitled_dict},
+            'choices': {'value': choices_subtitled_html_dicts},
             'showChoicesInShuffledOrder': {'value': True}
         }
-        choices_subtitled_dict = [
+
+        choices_subtitled_html_dicts = [
             {
                 'content_id': 'ca_choices_0',
                 'html': '<p>This is value1 for ItemSelection</p>'
@@ -13099,11 +13101,12 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         customization_args_dict3: Dict[
             str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], int]]
         ] = {
-            'choices': {'value': choices_subtitled_dict},
+            'choices': {'value': choices_subtitled_html_dicts},
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 2}
         }
-        choices_subtitled_dict = [
+
+        choices_subtitled_html_dicts = [
           {
               'content_id': 'ca_choices_0',
               'html': '<p>This is value1 for DragAndDropSortInput</p>'
@@ -13116,7 +13119,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         customization_args_dict4: Dict[
             str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], bool]]
         ] = {
-            'choices': {'value': choices_subtitled_dict},
+            'choices': {'value': choices_subtitled_html_dicts},
             'allowMultipleItemsInSamePosition': {'value': True}
         }
 
