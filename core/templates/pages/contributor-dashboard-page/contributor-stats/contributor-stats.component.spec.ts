@@ -229,6 +229,7 @@ describe('Contributor stats component', () => {
             '.oppia-stats-type-selector-dropdown-container');
         };
       });
+
       it('should correctly show and hide when clicked away',
         fakeAsync(() => {
           let fakeClickAwayEvent = new MouseEvent('click');

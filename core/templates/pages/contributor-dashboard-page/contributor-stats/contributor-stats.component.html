@@ -4,8 +4,7 @@
     <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
       <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleMobileDropdown()">
         {{selectedContributionType}}
-        <span class="material-icons oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': mobileDropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
-          arrow_drop_down
+        <span class="fas fa-sort-down oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': mobileDropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
         </span>
       </div>
 

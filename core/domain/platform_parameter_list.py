@@ -67,7 +67,8 @@ Registry.create_feature_flag(
 
 Registry.create_feature_flag(
     ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
-    'This flag is for the contributor dashboard accomplishments feature.',
+    'This flag enables showing per-contributor accomplishments on the' +
+    ' contributor dashboard.',
     platform_parameter_domain.FeatureStages.PROD,
 )
 
