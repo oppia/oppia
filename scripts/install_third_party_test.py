@@ -64,17 +64,17 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'rename_is_called': True,
             'extractall_is_called': True
         }
-        def mock_ensure_directory_exists(_: str) -> None:
+        def mock_ensure_directory_exists(_path: str) -> None:
             pass
-        def mock_exists(_: str) -> bool:
+        def mock_exists(_path: str) -> bool:
             return True
-        def mock_remove(_: str) -> None:
+        def mock_remove(_path: str) -> None:
             self.check_function_calls['remove_is_called'] = True
-        def mock_rename(_: str, __: str) -> None:
+        def mock_rename(_path1: str, _path2: str) -> None:
             self.check_function_calls['rename_is_called'] = True
-        def mock_url_retrieve(_: str, filename: str) -> None:  # pylint: disable=unused-argument
+        def mock_url_retrieve(_url: str, filename: str) -> None:  # pylint: disable=unused-argument
             pass
-        def mock_extractall(_: zipfile.ZipFile, path: str) -> None:  # pylint: disable=unused-argument
+        def mock_extractall(_self: zipfile.ZipFile, path: str) -> None:  # pylint: disable=unused-argument
             self.check_function_calls['extractall_is_called'] = True
 
         self.unzip_swap = self.swap(
@@ -113,7 +113,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             if path == 'target_dir/file1':
                 return True
             return False
-        def mock_url_retrieve(_: str, filename: str) -> None:
+        def mock_url_retrieve(_url: str, filename: str) -> None:
             check_file_downloads[filename] = True
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
@@ -128,7 +128,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         exists_arr = []
         self.check_function_calls['url_open_is_called'] = False
         self.expected_check_function_calls['url_open_is_called'] = False
-        def mock_exists(_: str) -> bool:
+        def mock_exists(_path: str) -> bool:
             exists_arr.append(False)
             return False
 
@@ -154,7 +154,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             exists_arr.append(False)
             return False
 
-        def mock_url_open(_: str) -> BinaryIO:
+        def mock_url_open(_url: str) -> BinaryIO:
             self.check_function_calls['url_open_is_called'] = True
             # The function is used as follows: utils.url_open(req).read()
             # So, the mock returns a file object as a mock so that the read
@@ -175,10 +175,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
     def test_download_and_untar_files(self) -> None:
         exists_arr = []
-        def mock_exists(_: str) -> bool:
+        def mock_exists(_path: str) -> bool:
             exists_arr.append(False)
             return False
-        def mock_extractall(_: zipfile.ZipFile, __: str) -> None:
+        def mock_extractall(_self: zipfile.ZipFile, _path: str) -> None:
             self.check_function_calls['extractall_is_called'] = True
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
@@ -280,7 +280,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'invalid for tar file format.' in print_arr)
 
     def test_validate_dependencies_with_correct_syntax(self) -> None:
-        def mock_return_json(_: str) -> install_third_party.DependenciesDict:
+        def mock_return_json(
+            _path: str
+        ) -> install_third_party.DependenciesDict:
             return {
                 'dependencies': {
                     'frontend': {
@@ -301,7 +303,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             install_third_party.validate_dependencies('filepath')
 
     def test_validate_dependencies_with_missing_download_format(self) -> None:
-        def mock_return_json(__: str) -> install_third_party.DependenciesDict:
+        def mock_return_json(
+            _path: str
+        ) -> install_third_party.DependenciesDict:
             return {
                 'dependencies': {
                     'frontend': {
@@ -340,7 +344,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'download_and_untar_files_is_called': True,
             'install_python_prod_dependencies_is_called': True
         }
-        def mock_return_json(__: str) -> install_third_party.DependenciesDict:
+        def mock_return_json(
+            _path: str
+        ) -> install_third_party.DependenciesDict:
             return {
                 'dependencies': {
                     'oppiaTools': {
@@ -377,7 +383,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 }
             }
 
-        def mock_validate_dependencies(_: str) -> None:
+        def mock_validate_dependencies(_path: str) -> None:
             check_function_calls['validate_dependencies_is_called'] = True
         def mock_download_files(
             unused_source_url_root: str,
@@ -456,7 +462,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         ) -> None:
             check_function_calls['download_and_untar_files_is_called'] = True
 
-        def mock_call(unused_cmd_tokens: List[str], **kwargs: int) -> Ret:  # pylint: disable=unused-argument
+        def mock_call(unused_cmd_tokens: List[str], **kwargs: str) -> Ret:  # pylint: disable=unused-argument
             check_function_calls['subprocess_call_is_called'] = True
 
             # The first subprocess.call() in install_redis_cli needs to throw an
@@ -501,7 +507,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         ) -> None:
             check_function_calls['download_and_unzip_files_is_called'] = True
 
-        def mock_call(unused_cmd_tokens: List[str], **_: int) -> Ret:
+        def mock_call(unused_cmd_tokens: List[str], **_args: int) -> Ret:
             check_function_calls['subprocess_call_is_called'] = True
 
             # The first subprocess.call() needs to throw an

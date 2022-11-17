@@ -259,9 +259,9 @@ def return_json(filepath: str) -> DependenciesDict:
             https://docs.python.org/3/library/json.html#encoders-and-decoders.
     """
     response = get_file_contents(filepath)
-    # Here we use cast because we are narrowing down the type
-    # since we know the type of dependencies as it is the content
-    # of the file dependencies.json.
+    # Here we use cast because we are narrowing down the type from to
+    # DependenciesDict since we know the type of dependencies
+    # as it is the content of the file dependencies.json.
     return cast(
         DependenciesDict,
         json.loads(response)
@@ -276,7 +276,7 @@ def test_dependencies_syntax(
     Display warning message when there is an error and terminate the program.
 
     Args:
-        dependency_type: str. Dependency download format.
+        dependency_type: DownloadFormatType. Dependency download format.
         dependency_dict: dict. A dependencies.json dependency dict.
     """
     keys = list(dependency_dict.keys())

@@ -167,9 +167,7 @@ def _get_requirements_file_contents() -> Dict[str, str]:
     return requirements_contents
 
 
-def _dist_has_meta_data(
-    dist: pkg_resources.Distribution
-) -> bool:
+def _dist_has_meta_data(dist: pkg_resources.Distribution) -> bool:
     """Checks if the Distribution has meta-data.
 
     Args:
@@ -256,9 +254,7 @@ def _remove_metadata(library_name: str, version_string: str) -> None:
             shutil.rmtree(path_to_delete)
 
 
-def _rectify_third_party_directory(
-    mismatches: MismatchType
-) -> None:
+def _rectify_third_party_directory(mismatches: MismatchType) -> None:
     """Rectifies the 'third_party/python_libs' directory state to reflect the
     current 'requirements.txt' file requirements. It takes a list of mismatches
     and corrects those mismatches by installing or uninstalling packages.
@@ -535,8 +531,7 @@ def pip_install(
 
 
 def _pip_install_requirements(
-    install_path: str,
-    requirements_path: str
+    install_path: str, requirements_path: str
 ) -> None:
     """Installs third party libraries from requirements files with pip.
 
