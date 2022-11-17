@@ -3928,9 +3928,10 @@ def can_access_story_viewer_page_as_logged_in_user(
                     story_is_published = reference.story_is_published
 
         if (
-                (story_is_published and topic_is_published) or
-                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in
-                user_actions_info.actions):
+            (story_is_published and topic_is_published) or
+            role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in
+            user_actions_info.actions
+        ):
             return handler(self, story_id, *args, **kwargs)
         else:
             raise self.PageNotFoundException

@@ -83,11 +83,7 @@ class FrontendBaseSuggestionDict(TypedDict):
 
 
 SuggestionsProviderHandlerUrlPathArgsSchemaDictType = Dict[
-    str,
-    Dict[
-        str,
-        Union[Dict[str, str], List[str]]
-    ]
+    str, Dict[str, Union[Dict[str, str], List[str]]]
 ]
 
 SuggestionsProviderHandlerArgsSchemaDictType = Dict[
@@ -245,7 +241,7 @@ class SuggestionHandler(
         # is not good, since when the user cancels a question suggestion after
         # adding an image, there is no method to remove the uploaded image.
         # See more - https://github.com/oppia/oppia/issues/14298
-        if suggestion_type != (feconf.SUGGESTION_TYPE_ADD_QUESTION):
+        if suggestion_type != feconf.SUGGESTION_TYPE_ADD_QUESTION:
             files = self.normalized_payload.get('files')
             new_image_filenames = (
                 suggestion.get_new_image_filenames_added_in_suggestion()

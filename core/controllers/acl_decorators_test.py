@@ -633,6 +633,99 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class PlayExplorationAsLoggedInUserTests(test_utils.GenericTestBase):
+    """Tests for can_play_exploration_as_logged_in_user decorator."""
+
+    user_email = 'user@example.com'
+    username = 'user'
+    published_exp_id = 'exp_id_1'
+    private_exp_id = 'exp_id_2'
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_play_exploration_as_logged_in_user
+        def get(self, exploration_id: str) -> None:
+            self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration/<exploration_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+
+    def test_cannot_access_explorations_with_disabled_exploration_ids(
+        self
+    ) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                (
+                    '/mock_play_exploration/%s' %
+                    feconf.DISABLED_EXPLORATION_IDS[0]
+                ),
+                expected_status_int=404
+            )
+        self.logout()
+
+    def test_moderator_user_can_access_private_exploration(self) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_play_exploration/%s' % self.private_exp_id
+            )
+        self.assertEqual(response['exploration_id'], self.private_exp_id)
+        self.logout()
+
+    def test_exp_owner_can_access_private_exploration(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_play_exploration/%s' % self.private_exp_id
+            )
+        self.assertEqual(response['exploration_id'], self.private_exp_id)
+        self.logout()
+
+    def test_logged_in_user_cannot_access_not_owned_exploration(self) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_play_exploration/%s' % self.private_exp_id,
+                expected_status_int=404
+            )
+        self.logout()
+
+    def test_invalid_exploration_id_raises_error(self) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_play_exploration/%s' % 'invalid_exp_id',
+                expected_status_int=404
+            )
+        self.logout()
+
+
 class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
     """Tests for play collection decorator."""
 
