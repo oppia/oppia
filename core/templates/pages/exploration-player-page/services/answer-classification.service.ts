@@ -31,8 +31,10 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { State } from 'domain/state/StateObjectFactory';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { InteractionRuleInputs, TranslatableSetOfNormalizedString } from 'interactions/rule-input-defs';
-import { StringUtilityService } from 'utility/string-utility';
+import { InteractionRuleInputs, TextInputRuleInputs } from 'interactions/rule-input-defs';
+import { checkEditDistance } from 'utility/string-utility';
+// import { InteractionRuleInputs, TranslatableSetOfNormalizedString } from 'interactions/rule-input-defs';
+// import { StringUtilityService } from 'utility/string-utility';
 
 
 export interface InteractionRulesService {
@@ -46,7 +48,7 @@ export class AnswerClassificationService {
       private alertsService: AlertsService,
       private appService: AppService,
       private interactionSpecsService: InteractionSpecsService,
-      private stringUtilityService: StringUtilityService,
+      // private stringUtilityService: StringUtilityService,
       private predictionAlgorithmRegistryService:
         PredictionAlgorithmRegistryService,
       private stateClassifierMappingService: StateClassifierMappingService) {}
@@ -195,7 +197,7 @@ export class AnswerClassificationService {
     const normalizedInput = inputStrings.map(
       input => input.toLowerCase());
     return normalizedInput.some(
-      input => this.stringUtilityService.checkEditDistance(
+      input => checkEditDistance(
         input, normalizedAnswer,
         ExplorationPlayerConstants.THRESHOLD_EDIT_DISTANCE_FOR_MISSPELLINGS));
   }

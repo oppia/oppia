@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Injectable } from '@angular/core';
+// import { Injectable } from '@angular/core';
 
 /**
  * @fileoverview Utility functions for strings.
  */
 
-@Injectable({
-  providedIn: 'root'
-})
-export class StringUtilityService {
-  camelCaseFromHyphen(str: string): string {
+// @Injectable({
+//   providedIn: 'root'
+// })
+// export class StringUtilityService {
+  export function camelCaseFromHyphen(str: string): string {
     const newStr = str.replace(/[\])}[{(]/g, '');
     return newStr.replace(
       /-([a-z])/g,
@@ -31,7 +31,7 @@ export class StringUtilityService {
       });
   }
 
-  checkEditDistance(
+  export function checkEditDistance(
       inputString: string,
       matchString: string,
       requiredEditDistance: number
@@ -61,4 +61,3 @@ export class StringUtilityService {
       editDistance[inputString.length][matchString.length] <=
       requiredEditDistance);
   }
-}
