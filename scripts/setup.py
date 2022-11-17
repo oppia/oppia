@@ -50,24 +50,24 @@ def create_directory(directory_path: str) -> None:
 # if it does not match the expected prefix.
 def test_python_version() -> None:
     running_python_version = '{0[0]}.{0[1]}.{0[2]}'.format(sys.version_info)
-    if running_python_version != '3.8.12':
-        print('Please use Python 3.8.12. Exiting...')
-        # If OS is Windows, print helpful error message about adding Python to
-        # path.
-        if common.is_windows_os():
-            common.print_each_string_after_two_new_lines([
-                'It looks like you are using Windows. If you have Python '
-                'installed,',
-                'make sure it is in your PATH and that PYTHONPATH is set.',
-                'If you have two versions of Python (ie, Python 2.7 and 3), '
-                'specify 2.7 before other versions of Python when setting the '
-                'PATH.',
-                'Here are some helpful articles:',
-                'http://docs.python-guide.org/en/latest/starting/install/win/',
-                'https://stackoverflow.com/questions/3701646/how-to-add-to-the-'
-                'pythonpath-in-windows-7'])
-        # Exit when no suitable Python environment can be found.
-        raise Exception('No suitable python version found.')
+    # if running_python_version != '3.8.12':
+    #     print('Please use Python 3.8.12. Exiting...')
+    #     # If OS is Windows, print helpful error message about adding Python to
+    #     # path.
+    #     if common.is_windows_os():
+    #         common.print_each_string_after_two_new_lines([
+    #             'It looks like you are using Windows. If you have Python '
+    #             'installed,',
+    #             'make sure it is in your PATH and that PYTHONPATH is set.',
+    #             'If you have two versions of Python (ie, Python 2.7 and 3), '
+    #             'specify 2.7 before other versions of Python when setting the '
+    #             'PATH.',
+    #             'Here are some helpful articles:',
+    #             'http://docs.python-guide.org/en/latest/starting/install/win/',
+    #             'https://stackoverflow.com/questions/3701646/how-to-add-to-the-'
+    #             'pythonpath-in-windows-7'])
+    #     # Exit when no suitable Python environment can be found.
+    #     raise Exception('No suitable python version found.')
 
     # Verify that Python 2 is available. Python 2 is needed for the
     # app_devserver. See the Google Cloud docs:
