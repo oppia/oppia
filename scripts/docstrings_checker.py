@@ -172,7 +172,7 @@ def docstringify(docstring: str) -> _check_docs_utils.Docstring:
     return _check_docs_utils.Docstring(docstring)
 
 
-# TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
