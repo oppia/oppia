@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import datetime
-from timeit import repeat
 
 from core import utils
 from core.platform import models
@@ -125,7 +124,7 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
 
         Args:
             author_id: str. ID of the author of the blog posts for which the
-            event models are to be fetched.
+                event models are to be fetched.
 
         Returns:
             list(BlogPostViewedEventLogEntryModel). The list of
@@ -143,7 +142,7 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
 
         Args:
             blog_post_id: str. ID of the blog post for which the event models
-            are to be fetched.
+                are to be fetched.
 
         Returns:
             list(BlogPostViewedEventLogEntryModel). The list of
@@ -244,7 +243,7 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
 
         Args:
             author_id: str. ID of the author of the blog posts for which the
-            event models are to be fetched.
+                event models are to be fetched.
 
         Returns:
             list(BlogPostReadEventLogEntryModel). The list of
@@ -262,7 +261,7 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
 
         Args:
             blog_post_id: str. ID of the blog post for which the event models
-            are to be fetched.
+                are to be fetched.
 
         Returns:
             list(BlogPostReadEventLogEntryModel). The list of
@@ -369,7 +368,7 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
 
         Args:
             author_id: str. ID of the author of the blog posts for which the
-            event models are to be fetched.
+                event models are to be fetched.
 
         Returns:
             list(BlogPostExitedEventLogEntryModel). The list of
@@ -387,7 +386,7 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
 
         Args:
             blog_post_id: str. ID of the blog post for which the event models
-            are to be fetched.
+                are to be fetched.
 
         Returns:
             list(BlogPostExitedEventLogEntryModel). The list of
@@ -451,7 +450,7 @@ class BlogPostViewsAggregatedStatsModel(base_models.BaseModel):
 
         Args:
             blog_post_id: str. Blog Post ID of the newly-published blog post for
-            which the stats model has to be created.
+                which the stats model has to be created.
 
         Returns:
             BlogPostViewsAggregatedStatsModel. The newly created
@@ -459,7 +458,7 @@ class BlogPostViewsAggregatedStatsModel(base_models.BaseModel):
 
         Raises:
             Exception. A views stats model with the given blog post ID exists
-            already.
+                already.
         """
         if cls.get_by_id(blog_post_id):
             raise Exception(
@@ -532,7 +531,7 @@ class BlogPostReadsAggregatedStatsModel(base_models.BaseModel):
 
         Args:
             blog_post_id: str. Blog Post ID of the newly-published blog post for
-            which the stats model has to be created.
+                which the stats model has to be created.
 
         Returns:
             BlogPostReadsAggregatedStatsModel. The newly created
@@ -540,7 +539,7 @@ class BlogPostReadsAggregatedStatsModel(base_models.BaseModel):
 
         Raises:
             Exception. A reads stats model with the given blog post ID exists
-            already.
+                already.
         """
         if cls.get_by_id(blog_post_id):
             raise Exception(
@@ -638,7 +637,7 @@ class BlogPostReadingTimeModel(base_models.BaseModel):
 
         Args:
             blog_post_id: str. Blog Post ID of the newly-published blog post for
-            which the stats model has to be created.
+                which the stats model has to be created.
 
         Returns:
             BlogPostReadingTimeModel. The newly created BlogPostReadingTimeModel
@@ -646,7 +645,7 @@ class BlogPostReadingTimeModel(base_models.BaseModel):
 
         Raises:
             Exception. A reading time model with the given blog post ID exists
-            already.
+                already.
         """
         if cls.get_by_id(blog_post_id):
             raise Exception(
@@ -708,7 +707,8 @@ class AuthorBlogPostViewsAggregatedStatsModel(base_models.BaseModel):
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """Model does not contain neccessary information for user for takeout.
+        """Model does not contain neccessary information for user for
+        takeout.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -728,7 +728,7 @@ class AuthorBlogPostViewsAggregatedStatsModel(base_models.BaseModel):
         """Creates a new AuthorBlogPostViewsAggregatedStatsModel entry.
 
         Args:
-            author_id: str. user ID of the author.
+            author_id: str. User ID of the author.
 
         Returns:
             AuthorBlogPostViewsAggregatedStatsModel. The newly created
@@ -736,7 +736,7 @@ class AuthorBlogPostViewsAggregatedStatsModel(base_models.BaseModel):
 
         Raises:
             Exception. A views stats model with the given author ID exists
-            already.
+                already.
         """
 
         if cls.get_by_id(author_id):
@@ -819,7 +819,8 @@ class AuthorBlogPostAggregatedReadingTimeModel(base_models.BaseModel):
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """Model does not contain neccessary information for user for takeout.
+        """Model does not contain neccessary information for user for
+        takeout.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -861,7 +862,7 @@ class AuthorBlogPostAggregatedReadingTimeModel(base_models.BaseModel):
         """Creates a new AuthorBlogPostAggregatedReadingTimeModel entry.
 
         Args:
-            author_id: str. user ID of the author.
+            author_id: str. User ID of the author.
 
         Returns:
             AuthorBlogPostAggregatedReadingTimeModel. The newly created
@@ -869,7 +870,7 @@ class AuthorBlogPostAggregatedReadingTimeModel(base_models.BaseModel):
 
         Raises:
             Exception. A reading time model with the given author ID exists
-            already.
+                already.
         """
         if cls.get_by_id(author_id):
             raise Exception(
@@ -932,7 +933,8 @@ class AuthorBlogPostReadsAggregatedStatsModel(base_models.BaseModel):
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """Model does not contain neccessary information for user for takeout.
+        """Model does not contain neccessary information for user for
+        takeout.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -952,7 +954,7 @@ class AuthorBlogPostReadsAggregatedStatsModel(base_models.BaseModel):
         """Creates a new AuthorBlogPostReadsAggregatedStatsModel entry.
 
         Args:
-            author_id: str. user ID of author.
+            author_id: str. User ID of author.
 
         Returns:
             AuthorBlogPostReadsAggregatedStatsModel. The newly created
@@ -960,7 +962,7 @@ class AuthorBlogPostReadsAggregatedStatsModel(base_models.BaseModel):
 
         Raises:
             Exception. A reads stats model with the given author ID exists
-            already.
+                already.
         """
         if cls.get_by_id(author_id):
             raise Exception(

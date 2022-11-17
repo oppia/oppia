@@ -33,6 +33,7 @@ if MYPY: # pragma: no cover
     models.Names.BASE_MODEL, models.Names.BLOG_STATISTICS, models.Names.USER
 ])
 
+
 class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the BlogPostViewedEventLogEntryModel class."""
 
@@ -49,10 +50,12 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         """
         super().setUp()
 
-        self.event_model_one = blog_stats_models.BlogPostViewedEventLogEntryModel(
-            id='event_model_1',
-            author_id=self.USER_ONE_ID,
-            blog_post_id=self.BLOG_POST_ONE_ID
+        self.event_model_one = (
+            blog_stats_models.BlogPostViewedEventLogEntryModel(
+                id='event_model_1',
+                author_id=self.USER_ONE_ID,
+                blog_post_id=self.BLOG_POST_ONE_ID
+            )
         )
         self.event_model_one.update_timestamps()
         self.event_model_one.put()
@@ -292,7 +295,6 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             [self.event_model_four]
         )
 
-
     def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
             blog_stats_models.BlogPostReadEventLogEntryModel
@@ -313,8 +315,8 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     BLOG_POST_TWO_ID: Final = 'blog_post_two'
 
     def setUp(self) -> None:
-        """Set up blog post exited event log entry models in datastore for use in
-        testing.
+        """Set up blog post exited event log entry models in datastore for use
+        in testing.
         """
         super().setUp()
 
@@ -452,17 +454,17 @@ class BlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
     BLOG_POST_TWO_ID: Final = 'blog_post_two'
 
     def setUp(self) -> None:
-        """Set up blog post exited event log entry models in datastore for use in
-        testing.
+        """Set up blog post exited event log entry models in datastore for use
+        in testing.
         """
         super().setUp()
 
         self.model_one = (
             blog_stats_models.BlogPostViewsAggregatedStatsModel(
                 id=self.BLOG_POST_ONE_ID,
-                views_by_hour = {},
-                views_by_date = {},
-                views_by_month = {}
+                views_by_hour={},
+                views_by_date={},
+                views_by_month={}
             )
         )
         self.model_one.update_timestamps()
@@ -493,7 +495,6 @@ class BlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
             blog_stats_models.BlogPostViewsAggregatedStatsModel.create(
                  self.BLOG_POST_TWO_ID
             )
-
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -533,9 +534,9 @@ class BlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
         self.model_one = (
             blog_stats_models.BlogPostReadsAggregatedStatsModel(
                 id=self.BLOG_POST_ONE_ID,
-                reads_by_hour = {},
-                reads_by_date = {},
-                reads_by_month = {}
+                reads_by_hour={},
+                reads_by_date={},
+                reads_by_month={}
             )
         )
         self.model_one.update_timestamps()
@@ -566,7 +567,6 @@ class BlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
             blog_stats_models.BlogPostReadsAggregatedStatsModel.create(
                 self.BLOG_POST_TWO_ID
             )
-
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -648,7 +648,6 @@ class BlogPostReadingTimeModelUnitTests(test_utils.GenericTestBase):
                 self.BLOG_POST_TWO_ID
             )
 
-
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
             blog_stats_models.BlogPostReadingTimeModel
@@ -698,9 +697,9 @@ class AuthorBlogPostReadsAggregatedStatsModelUnitTests(
         self.model_one = (
             blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel(
                 id=self.AUTHOR_ONE_ID,
-                reads_by_hour = {},
-                reads_by_date = {},
-                reads_by_month = {}
+                reads_by_hour={},
+                reads_by_date={},
+                reads_by_month={}
             )
         )
         self.model_one.update_timestamps()
@@ -731,9 +730,10 @@ class AuthorBlogPostReadsAggregatedStatsModelUnitTests(
             Exception,
             'A author blog post reads stats model with the given author ID'
             ' exists already.'):
-                (blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel
-                    .create(self.AUTHOR_TWO_ID))
-
+            (
+                blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel
+                    .create(self.AUTHOR_TWO_ID)
+            )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -784,9 +784,9 @@ class AuthorBlogPostViewsAggregatedStatsModelUnitTests(
         self.model_one = (
             blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel(
                 id=self.AUTHOR_ONE_ID,
-                views_by_hour = {},
-                views_by_date = {},
-                views_by_month = {}
+                views_by_hour={},
+                views_by_date={},
+                views_by_month={}
             )
         )
         self.model_one.update_timestamps()
@@ -803,8 +803,11 @@ class AuthorBlogPostViewsAggregatedStatsModelUnitTests(
         blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
             self.AUTHOR_TWO_ID
         )
-        stats_model = blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
-            self.AUTHOR_TWO_ID)
+        stats_model = (
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
+                self.AUTHOR_TWO_ID
+            )
+        )
 
         self.assertEqual(stats_model.id, self.AUTHOR_TWO_ID)
 
@@ -817,7 +820,6 @@ class AuthorBlogPostViewsAggregatedStatsModelUnitTests(
             blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
                 self.AUTHOR_TWO_ID
             )
-
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -910,7 +912,6 @@ class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
             blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
                 self.AUTHOR_TWO_ID
             )
-
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(

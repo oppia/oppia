@@ -388,15 +388,9 @@ class BlogDashboardBlogPostStatisticsHandler(base.BaseHandler):
             stats = blog_statistics_services.get_blog_post_views_stats_by_id(
                 blog_post_id
             )
-            blog_statistics_services.add_missing_stat_keys_with_default_values_in_views_stats( # pylint: disable=line-too-long
-                stats
-            )
         elif chart_type == 'reads':
             stats = blog_statistics_services.get_blog_post_reads_stats_by_id(
                 blog_post_id
-            )
-            blog_statistics_services.add_missing_stat_keys_with_default_values_in_reads_stats( # pylint: disable=line-too-long
-                stats
             )
         else:
             stats = (
@@ -444,17 +438,11 @@ class BlogDashboardAuthorBlogPostsStatisticsHandler(base.BaseHandler):
                     author_id
                 )
             )
-            blog_statistics_services.add_missing_stat_keys_with_default_values_in_views_stats( # pylint: disable=line-too-long
-                stats
-            )
         elif chart_type == 'reads':
             stats = (
                 blog_statistics_services.get_author_blog_post_reads_stats_by_id(
                     author_id
                 )
-            )
-            blog_statistics_services.add_missing_stat_keys_with_default_values_in_reads_stats( # pylint: disable=line-too-long
-                stats
             )
         else:
             stats = (

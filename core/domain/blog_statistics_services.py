@@ -35,9 +35,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import transaction_services
 
 (blog_stats_models,) = models.Registry.import_models(
-    [models.Names.BLOG_STATISTICS,]
-)
+    [models.Names.BLOG_STATISTICS, ])
 transaction_services = models.Registry.import_transaction_services()
+
 
 def get_blog_post_views_stats_by_id(
     blog_post_id: str
@@ -52,6 +52,8 @@ def get_blog_post_views_stats_by_id(
     """
     stats_model = blog_stats_models.BlogPostViewsAggregatedStatsModel.get(
         blog_post_id, strict=True)
+    add_missing_stat_keys_with_default_values_in_views_stats(
+        stats_model)
     return blog_statistics_domain.BlogPostViewsAggregatedStats(
         blog_post_id,
         stats_model.views_by_hour,
@@ -74,6 +76,8 @@ def get_blog_post_reads_stats_by_id(
     """
     stats_model = blog_stats_models.BlogPostReadsAggregatedStatsModel.get(
         blog_post_id, strict=True)
+    add_missing_stat_keys_with_default_values_in_reads_stats(
+        stats_model)
     return blog_statistics_domain.BlogPostReadsAggregatedStats(
         blog_post_id,
         stats_model.reads_by_hour,
@@ -126,6 +130,8 @@ def get_author_blog_post_views_stats_by_id(
     """
     stats_model = blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
         author_id, strict=True)
+    add_missing_stat_keys_with_default_values_in_views_stats(
+        stats_model)
     return blog_statistics_domain.AuthorBlogPostViewsAggregatedStats(
         author_id,
         stats_model.views_by_hour,
@@ -141,7 +147,7 @@ def get_author_blog_post_reads_stats_by_id(
     """Retrieves the AuthorBlogPostReadsAggregatedStats domain instance.
 
     Args:
-        author_id: str. user ID of the author.
+        author_id: str. User ID of the author.
 
     Returns:
         AuthorBlogPostReadsAggregatedStats. The author blog posts read stats
@@ -149,6 +155,8 @@ def get_author_blog_post_reads_stats_by_id(
     """
     stats_model = blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
         author_id, strict=True)
+    add_missing_stat_keys_with_default_values_in_reads_stats(
+        stats_model)
     return blog_statistics_domain.AuthorBlogPostReadsAggregatedStats(
         author_id,
         stats_model.reads_by_hour,
@@ -164,7 +172,7 @@ def get_author_blog_posts_reading_time_stats_by_id(
     """Retrieves the AuthorBlogPostsReadingTime domain instance.
 
     Args:
-        author_id: str. user ID of the author.
+        author_id: str. User ID of the author.
 
     Returns:
         AuthorBlogPostsReadingTime. The author blog post reading time stats
@@ -203,7 +211,7 @@ def save_blog_post_views_stats_model(
 
     Raises:
         Exception. No blog post views stats model exists for the given
-        blog_post_id.
+            blog_post_id.
     """
     blog_post_views_aggregated_stats = (
         blog_stats_models.BlogPostViewsAggregatedStatsModel.get(
@@ -235,7 +243,7 @@ def save_blog_post_reads_stats_model(
 
     Raises:
         Exception. No blog post reads stats model exists for the given
-        blog_post_id.
+            blog_post_id.
     """
     blog_post_reads_aggregated_stats = (
         blog_stats_models.BlogPostReadsAggregatedStatsModel.get(
@@ -267,7 +275,7 @@ def save_blog_post_reading_time_model(
 
     Raises:
         Exception. No blog post reading time model exists for the given
-        blog_post_id.
+            blog_post_id.
     """
     reading_time_model = (
         blog_stats_models.BlogPostReadingTimeModel.get(
@@ -286,7 +294,9 @@ def save_blog_post_reading_time_model(
     reading_time_model.four_to_five_min = reading_time_stats.four_to_five_min
     reading_time_model.five_to_six_min = reading_time_stats.five_to_six_min
     reading_time_model.six_to_seven_min = reading_time_stats.six_to_seven_min
-    reading_time_model.seven_to_eight_min = reading_time_stats.seven_to_eight_min
+    reading_time_model.seven_to_eight_min = (
+        reading_time_stats.seven_to_eight_min
+    )
     reading_time_model.eight_to_nine_min = reading_time_stats.eight_to_nine_min
     reading_time_model.nine_to_ten_min = reading_time_stats.nine_to_ten_min
     reading_time_model.more_than_ten_min = reading_time_stats.more_than_ten_min
@@ -307,7 +317,7 @@ def save_author_blog_post_views_stats_model(
 
     Raises:
         Exception. No author blog post views stats model exists for the given
-        author_id.
+            author_id.
     """
     author_views_aggregated_stats = (
         blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
@@ -340,7 +350,7 @@ def save_author_blog_post_reads_stats_model(
 
     Raises:
         Exception. No author blog post reads stats model exists for the given
-        author_id.
+            author_id.
     """
     author_reads_aggregated_stats = (
         blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
@@ -373,7 +383,7 @@ def save_author_blog_posts_aggregated_reading_time_model(
 
     Raises:
         Exception. No author blog posts aggregated reading time model exists for
-        the given author_id.
+            the given author_id.
     """
     reading_time_model = (
         blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
@@ -393,7 +403,9 @@ def save_author_blog_posts_aggregated_reading_time_model(
     reading_time_model.four_to_five_min = reading_time_stats.four_to_five_min
     reading_time_model.five_to_six_min = reading_time_stats.five_to_six_min
     reading_time_model.six_to_seven_min = reading_time_stats.six_to_seven_min
-    reading_time_model.seven_to_eight_min = reading_time_stats.seven_to_eight_min
+    reading_time_model.seven_to_eight_min = (
+        reading_time_stats.seven_to_eight_min
+    )
     reading_time_model.eight_to_nine_min = reading_time_stats.eight_to_nine_min
     reading_time_model.nine_to_ten_min = reading_time_stats.nine_to_ten_min
     reading_time_model.more_than_ten_min = reading_time_stats.more_than_ten_min
@@ -408,13 +420,14 @@ def generate_stats_by_hour_dict() -> Dict[str, int]:
     Returns:
         dict. A dict containing hours in UTC format as keys with 0 as value.
     """
-    intial_dict ={
-        '0' +  str(i): 0 for i in range(0,10)
+    intial_dict = {
+        '0' + str(i): 0 for i in range(0, 10)
     }
     intial_dict.update({
         str(i): 0 for i in range(10, 24)
     })
     return intial_dict
+
 
 def generate_stats_by_month_dict() -> Dict[str, int]:
     """Generates default stats by month dict.
@@ -423,29 +436,35 @@ def generate_stats_by_month_dict() -> Dict[str, int]:
         dict. A dict containing months in UTC format as keys with 0 as value.
     """
     initial_dict = {
-        '0' +  str(i): 0 for i in range(1,10)
+        '0' + str(i): 0 for i in range(1, 10)
     }
     initial_dict.update({
         str(i): 0 for i in range(10, 13)
     })
     return initial_dict
 
+
 def generate_stats_by_date_dict(month: int, year: int) -> Dict[str, int]:
     """Generates default stats by date dict for the given month.
+
+    Args:
+        month: int. The month for which the stats_by_date dict has to be
+            generated.
+        year: int. The year for which the stats_by_date dict has to be
+            generated.
 
     Returns:
         dict. A dict containing all dates of the mmonth in UTC format as keys
         with 0 as value.
     """
     num_of_days_in_given_month = calendar.monthrange(year, month)[1]
-    initial_dict  = {
-        '0' +  str(i): 0 for i in range(1,10)
+    initial_dict = {
+        '0' + str(i): 0 for i in range(1, 10)
     }
     initial_dict.update({
-        str(i): 0 for i in range(10, num_of_days_in_given_month+1)
+        str(i): 0 for i in range(10, num_of_days_in_given_month + 1)
     })
     return initial_dict
-
 
 
 def update_views_stats(
@@ -481,7 +500,7 @@ def update_reads_stats(
 def update_reading_time_stats(
     blog_post_id: str,
     author_id: str,
-    time_taken_to_read_post: str,
+    time_taken_to_read_post: int,
 ) -> None:
     """Updates Blog Post Reading Time Model and Author Blog Post Reading Time
     Model.
@@ -489,7 +508,7 @@ def update_reading_time_stats(
     Args:
         blog_post_id: str. ID of the blog post.
         author_id: str. ID of the author of the blog post.
-        time_taken_to_read_post: str. The time taken to read the blog post.
+        time_taken_to_read_post: int. The time taken to read the blog post.
     """
     _update_reading_time_stats_transactional(
         blog_post_id, author_id, time_taken_to_read_post)
@@ -510,7 +529,7 @@ def _update_views_stats_transactional(
 
     Raises:
         Exception. BlogPostViewsStatsModel and AuthorBlogPostViewsModel does not
-        exist.
+            exist.
     """
     blog_post_views_stats = get_blog_post_views_stats_by_id(blog_post_id)
     if blog_post_views_stats is None:
@@ -525,7 +544,7 @@ def _update_views_stats_transactional(
         raise Exception(
             'AuthorBlogPostViewsStatsModel id="%s" does not exist' % (author_id)
         )
-    current_datetime = datetime.datetime.utcnow();
+    current_datetime = datetime.datetime.utcnow()
     current_date = parse_date_as_string(current_datetime)
     current_day = current_datetime.strftime('%d')
     current_month = current_datetime.strftime('%m')
@@ -533,16 +552,10 @@ def _update_views_stats_transactional(
     current_month_year = current_year + '-' + current_month
     current_hour = current_datetime.strftime('%H')
 
-    add_missing_stat_keys_with_default_values_in_views_stats(
-        blog_post_views_stats
-    )
     blog_post_views_stats.views_by_hour[current_date][current_hour] += 1
     blog_post_views_stats.views_by_date[current_month_year][current_day] += 1
     blog_post_views_stats.views_by_month[current_year][current_month] += 1
 
-    add_missing_stat_keys_with_default_values_in_views_stats(
-        author_blog_post_views_stats
-    )
     author_blog_post_views_stats.views_by_hour[current_date][current_hour] += 1
     author_blog_post_views_stats.views_by_date[
         current_month_year][current_day] += 1
@@ -571,7 +584,7 @@ def _update_reads_stats_transactional(
 
     Raises:
         Exception. BlogPostReadsStatsModel and AuthorBlogPostReadsModel does not
-        exist.
+            exist.
     """
     blog_post_reads_stats = get_blog_post_reads_stats_by_id(blog_post_id)
     if blog_post_reads_stats is None:
@@ -586,7 +599,7 @@ def _update_reads_stats_transactional(
         raise Exception(
             'AuthorBlogPostReadsStatsModel id="%s" does not exist' % (author_id)
         )
-    current_datetime = datetime.datetime.utcnow();
+    current_datetime = datetime.datetime.utcnow()
     current_date = parse_date_as_string(current_datetime)
     current_day = current_datetime.strftime('%d')
     current_month = current_datetime.strftime('%m')
@@ -594,14 +607,10 @@ def _update_reads_stats_transactional(
     current_month_year = current_year + '-' + current_month
     current_hour = current_datetime.strftime('%H')
 
-    add_missing_stat_keys_with_default_values_in_reads_stats(
-        blog_post_reads_stats)
     blog_post_reads_stats.reads_by_hour[current_date][current_hour] += 1
     blog_post_reads_stats.reads_by_date[current_month_year][current_day] += 1
     blog_post_reads_stats.reads_by_month[current_year][current_month] += 1
 
-    add_missing_stat_keys_with_default_values_in_reads_stats(
-        author_blog_post_reads_stats)
     author_blog_post_reads_stats.reads_by_hour[current_date][current_hour] += 1
     author_blog_post_reads_stats.reads_by_date[
         current_month_year][current_day] += 1
@@ -619,7 +628,7 @@ def _update_reads_stats_transactional(
 def _update_reading_time_stats_transactional(
     blog_post_id: str,
     author_id: str,
-    time_taken: int
+    time_taken_to_read_post: int
 ) -> None:
     """Updates Blog Post Reading Time Model and Author Blog Post Reading Time
     Model. The model GET and PUT must be done in a transaction to avoid loss of
@@ -632,7 +641,7 @@ def _update_reading_time_stats_transactional(
 
     Raises:
         Exception. BlogPostReadingTimeModel and AuthorBlogPostReadingTimeModel
-        does not exist.
+            does not exist.
     """
     blog_post_reading_time_stats = (
         get_blog_post_reading_time_stats_by_id(blog_post_id)
@@ -647,19 +656,20 @@ def _update_reading_time_stats_transactional(
     )
     if author_blog_post_reading_time_stats is None:
         raise Exception(
-            'AuthorBlogPostsAggregatedReadingTimeModel id="%s" does not' +
-            'exist' % (blog_post_id)
+            'AuthorBlogPostsAggregatedReadingTimeModel for the given id does'
+            'not exist.'
         )
 
     _increment_reading_time_bucket_count(
-        blog_post_reading_time_stats, time_taken)
+        blog_post_reading_time_stats, time_taken_to_read_post)
     _increment_reading_time_bucket_count(
-        author_blog_post_reading_time_stats, time_taken)
+        author_blog_post_reading_time_stats, time_taken_to_read_post)
 
     save_blog_post_reading_time_model(blog_post_reading_time_stats)
     save_author_blog_posts_aggregated_reading_time_model(
         author_blog_post_reading_time_stats
     )
+
 
 def _increment_reading_time_bucket_count(
     stats: Union[
@@ -668,6 +678,14 @@ def _increment_reading_time_bucket_count(
     ],
     time_taken: int
 ) -> None:
+    """Increments the value of the time bucket corresponding to time taken by
+    user to read the blog post.
+
+    Args:
+        stats: BlogPostReadsAggregatedStats|AuthorBlogPostReadsAggregatedStats.
+            The stats domain object for which weekly reads are to be generated.
+        time_taken: int. Time taken by the user to read the blog post.
+    """
     if time_taken == 0:
         stats.zero_to_one_min += 1
     elif time_taken == 1:
@@ -691,6 +709,7 @@ def _increment_reading_time_bucket_count(
     else:
         stats.more_than_ten_min += 1
 
+
 def create_aggregated_stats_models_for_newly_published_blog_post(
     blog_post_id: str
 ) -> None:
@@ -712,13 +731,13 @@ def create_aggregated_author_blog_post_stats_models(
     author_id: str
 ) -> None:
     """Creates Author Blog Post Aggreagted Stats Models for a new blog post
-    author
+    author.
 
     Args:
-        author_id: str. user ID of the author.
+        author_id: str. User ID of the author.
     """
     stats_model = blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
-        author_id)
+        author_id, strict=False)
 
     if stats_model is None:
         blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
@@ -730,22 +749,25 @@ def create_aggregated_author_blog_post_stats_models(
 
 
 def parse_date_as_string(date: datetime.datetime) -> str:
-    """Gets yesterays date.
+    """Parses given datetime object into 'YYYY-MM-DD' format.
+
+    Args:
+        date: datetime.datetime. The datetime obj that needs to parsed.
 
     Returns:
-        str. Yesterdays date as a string of format 'YYYY-MM-DD'.
+        str. Date as a string of format 'YYYY-MM-DD'.
     """
     return date.strftime(feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
 
 
-def parse_date_from_datetime(
+def parse_datetime_into_date_dict(
     date_time_obj: datetime.datetime
 ) -> Dict[str, int]:
     """Parses the given string, and returns the year, month, date, day and
     hour of the date that it represents.
 
     Args:
-        date_time_obj: datetime.datetime. date time obj that needs to parsed.
+        date_time_obj: datetime.datetime. The datetime obj that needs to parsed.
 
     Returns:
         dict. Representing date with year, month, day, hour as keys.
@@ -772,19 +794,20 @@ def add_missing_stat_keys_with_default_values_in_views_stats(stats: Union[
     viewed the blog post on that day or month), we add it to the domain object.
 
     Args:
-        stats: BlogPostViewsAggregatedStats | AuthorBlogPostViewsAggregatedStats
+        stats: BlogPostViewsAggregatedStats|AuthorBlogPostViewsAggregatedStats.
             The stats domain object for which missing keys are to be added.
 
     Returns:
-        BlogPostViewsAggregatedStats | AuthorBlogPostViewsAggregatedStats. Stats
+        BlogPostViewsAggregatedStats|AuthorBlogPostViewsAggregatedStats. Stats
         domain object with added missing keys.
     """
     current_datetime = datetime.datetime.utcnow()
     current_date = parse_date_as_string(current_datetime)
-    current_datetime_obj = parse_date_from_datetime(current_datetime)
+    current_datetime_obj = parse_datetime_into_date_dict(current_datetime)
     current_month = current_datetime_obj['month']
+    current_month_str = datetime.datetime.utcnow().strftime('%m')
     current_year = current_datetime_obj['year']
-    current_month_year = str(current_year) + '-' + str(current_month)
+    current_month_year = str(current_year) + '-' + current_month_str
 
     yesterday_datetime = (
         current_datetime - datetime.timedelta(days=1))
@@ -811,7 +834,6 @@ def add_missing_stat_keys_with_default_values_in_views_stats(stats: Union[
                     stats.views_by_hour[day_before_yesterday_date] = (
                         generate_stats_by_hour_dict()
                     )
-
 
     prev_month_year = (
         current_datetime.replace(day=1) - datetime.timedelta(days=1)
@@ -844,7 +866,7 @@ def add_missing_stat_keys_with_default_values_in_views_stats(stats: Union[
                         )
                     )
 
-    if current_year not in stats.views_by_month:
+    if str(current_year) not in stats.views_by_month:
         stats.views_by_month[str(current_year)] = generate_stats_by_month_dict()
 
     return stats
@@ -864,21 +886,22 @@ def add_missing_stat_keys_with_default_values_in_reads_stats(stats: Union[
     viewed the blog post on that day or month), we add it to the domain object.
 
     Args:
-        stats: BlogPostreadsAggregatedStats | AuthorBlogPostreadsAggregatedStats
+        stats: BlogPostreadsAggregatedStats|AuthorBlogPostreadsAggregatedStats.
             The stats domain object for which missing keys are to be added.
 
     Returns:
-        BlogPostReadsAggregatedStats | AuthorBlogPostReadsAggregatedStats. Stats
+        BlogPostReadsAggregatedStats|AuthorBlogPostReadsAggregatedStats. Stats
         domain object with added missing keys.
     """
     current_datetime = datetime.datetime.utcnow()
     current_date = parse_date_as_string(current_datetime)
-    current_datetime_obj = parse_date_from_datetime(
+    current_datetime_obj = parse_datetime_into_date_dict(
         current_datetime
     )
     current_month = current_datetime_obj['month']
+    current_month_str = datetime.datetime.utcnow().strftime('%m')
     current_year = current_datetime_obj['year']
-    current_month_year = str(current_year) + '-' + str(current_month)
+    current_month_year = str(current_year) + '-' + current_month_str
 
     yesterday_datetime = (current_datetime - datetime.timedelta(days=1))
     yesterday_date = parse_date_as_string(yesterday_datetime)
@@ -936,7 +959,7 @@ def add_missing_stat_keys_with_default_values_in_reads_stats(stats: Union[
                         )
                     )
 
-    if current_year not in stats.reads_by_month:
+    if str(current_year) not in stats.reads_by_month:
         stats.reads_by_month[str(current_year)] = generate_stats_by_month_dict()
 
     return stats
@@ -957,7 +980,7 @@ class BlogPostViewedEventHandler(event_services.BaseEventHandler):
 
         Args:
             blog_post_id: str. ID of the blog post that was viewed.
-            author_id: str. user ID of the author of the blog post
+            author_id: str. User ID of the author of the blog post.
         """
         blog_stats_models.BlogPostViewedEventLogEntryModel.create(
             blog_post_id, author_id
@@ -980,7 +1003,7 @@ class BlogPostReadEventHandler(event_services.BaseEventHandler):
 
         Args:
             blog_post_id: str. ID of the blog post that was resd.
-            author_id: str. user ID of the author of the blog post
+            author_id: str. User ID of the author of the blog post.
         """
         blog_stats_models.BlogPostReadEventLogEntryModel.create(
             blog_post_id, author_id
@@ -1004,7 +1027,7 @@ class BlogPostExitedEventHandler(event_services.BaseEventHandler):
 
         Args:
             blog_post_id: str. ID of the blog post that was exited.
-            author_id: str. user ID of the author of the blog post.
+            author_id: str. User ID of the author of the blog post.
             time_taken_to_read_blog_post: float. Amount of time user stayed on
                 the blog post to read it.
         """

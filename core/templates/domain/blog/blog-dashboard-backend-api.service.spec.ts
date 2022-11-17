@@ -24,9 +24,6 @@ import {
   BlogDashboardBackendApiService,
   BlogDashboardBackendResponse,
   BlogDashboardData,
-  BlogPostViewsStats,
-  BlogPostViewsStatsBackendDict,
-  HourlyStats,
 } from 'domain/blog/blog-dashboard-backend-api.service';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogPostSummary, BlogPostSummaryBackendDict } from 'domain/blog/blog-post-summary.model';
@@ -81,35 +78,6 @@ describe('Blog Dashboard backend api service', () => {
   };
   let blogPostSummaryObject = BlogPostSummary.createFromBackendDict(
     blogPostSummary);
-
-  let hourlyStats: HourlyStats = {
-    '00': 1,
-    '01': 2,
-    '02': 1,
-    '03': 4,
-    '04': 5,
-    '05': 1,
-    '06': 7,
-    '07': 8,
-    '09': 1,
-    '10': 8,
-    '11': 0,
-    '12': 0,
-    '13': 0,
-  }
-  let weeklyStats: WeeklyStats = {
-    
-  }
-  let blogPostViewsStats: BlogPostViewsStatsBackendDict = {
-    blog_post_id: 'sample_id',
-    hourly_views: {
-      '00':
-    };
-    weekly_views: WeeklyStats;
-    monthly_views: MonthlyStats;
-    yearly_views: YearlyStats;
-    all_views: AllStats;
-  }
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]

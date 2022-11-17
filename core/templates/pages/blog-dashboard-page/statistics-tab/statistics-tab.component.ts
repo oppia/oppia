@@ -154,10 +154,10 @@ export class BlogStatisticsTabComponent implements OnInit {
 
   showAuthorStats(): void {
     this.authorAggregatedStatsShown = true;
-    setTimeout(() => {
-      this._createSvg();
-      this._drawBars(this.data);
-    })
+    // SetTimeout(() => {
+    //   this._createSvg();
+    //   this._drawBars(this.data);
+    // })
     // this.showViewsChartStats();
   }
 
@@ -273,7 +273,7 @@ export class BlogStatisticsTabComponent implements OnInit {
     this.loadingChartSpinnerShown = true;
     let utcKeyedToLocaleHourDict = {};
     let data = (this._dataForActiveChart as Stats).hourlyStats;
-    let statsKeys = Object.keys(data)
+    let statsKeys = Object.keys(data);
     let hourOffset = statsKeys.length;
     statsKeys.map(key => {
       utcKeyedToLocaleHourDict[key] = (
@@ -289,7 +289,7 @@ export class BlogStatisticsTabComponent implements OnInit {
   showMonthlyStats(): void {
     this.loadingChartSpinnerShown = true;
     let data = (this._dataForActiveChart as Stats).monthlyStats;
-    let statsKeys = Object.keys(data)
+    let statsKeys = Object.keys(data);
     let dayOffset = statsKeys.length;
     let utcKeyedToLocaleDayDict = {};
     statsKeys.map(key => {
@@ -298,14 +298,15 @@ export class BlogStatisticsTabComponent implements OnInit {
       );
       dayOffset -= 1;
     });
-    this.blogDashboardPageService.renameKeysInDict(utcKeyedToLocaleDayDict, data);
+    this.blogDashboardPageService.renameKeysInDict(
+      utcKeyedToLocaleDayDict, data);
     this.plotStatsGraph(data);
   }
 
   showWeeklyStats(): void {
     this.loadingChartSpinnerShown = true;
     let data = (this._dataForActiveChart as Stats).weeklyStats;
-    let statsKeys = Object.keys(data)
+    let statsKeys = Object.keys(data);
     let dayOffset = statsKeys.length;
     let utcKeyedToLocaleDayDict = {};
     statsKeys.map(key => {
@@ -314,14 +315,15 @@ export class BlogStatisticsTabComponent implements OnInit {
       );
       dayOffset -= 1;
     });
-    this.blogDashboardPageService.renameKeysInDict(utcKeyedToLocaleDayDict, data);
+    this.blogDashboardPageService.renameKeysInDict(
+      utcKeyedToLocaleDayDict, data);
     this.plotStatsGraph(data);
   }
 
   showYearlyStats(): void {
     this.loadingChartSpinnerShown = true;
     let data = (this._dataForActiveChart as Stats).yearlyStats;
-    let statsKeys = Object.keys(data)
+    let statsKeys = Object.keys(data);
     let monthOffset = statsKeys.length;
     let utcKeyedToLocaleMonthDict = {};
     statsKeys.map(key => {
@@ -329,7 +331,8 @@ export class BlogStatisticsTabComponent implements OnInit {
         this.blogDashboardPageService.getPastMonthString(monthOffset));
       monthOffset -= 1;
     });
-    this.blogDashboardPageService.renameKeysInDict(utcKeyedToLocaleMonthDict, data);
+    this.blogDashboardPageService.renameKeysInDict(
+      utcKeyedToLocaleMonthDict, data);
     this.plotStatsGraph(data);
   }
 
@@ -346,7 +349,7 @@ export class BlogStatisticsTabComponent implements OnInit {
     setTimeout(() => {
       this._createSvg();
       this._drawBars(this._dataForActiveChart);
-    })
+    });
   }
 
   addStatsToLoadedBlogPostStats(
@@ -408,9 +411,9 @@ export class BlogStatisticsTabComponent implements OnInit {
 
   private _drawBars(data): void {
     let plotData = d3.entries(data);
-    let label = (
-      BlogDashboardPageConstants.STATS_CHART_LABLES[this.selectedChartType]
-    );
+    // Let label = (
+    //   BlogDashboardPageConstants.STATS_CHART_LABLES[this.selectedChartType]
+    // );
     // Create the X-axis band scale.
     const x = d3.scaleBand()
       .range([0, this._width])
@@ -422,11 +425,11 @@ export class BlogStatisticsTabComponent implements OnInit {
       .attr('transform', 'translate(0,' + this._height + ')')
       .call(d3.axisBottom(x).tickSize(0))
       .selectAll('text')
-      .style('text-anchor', 'end')
+      .style('text-anchor', 'end');
 
     // Create the Y-axis band scale.
     const y = d3.scaleLinear()
-      .domain([0, d3.max<number>(plotData, d => d.value))
+      .domain([0, d3.max(plotData, d => d.value)])
       .range([this._height, 0]);
 
     // Draw the Y-axis on the DOM.

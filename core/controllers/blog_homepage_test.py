@@ -24,6 +24,8 @@ from core.domain import config_domain
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Final
+
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
@@ -558,33 +560,42 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
 class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
     """Tests for blog post stats event recording handlers."""
 
+    MOCK_DATE: Final = datetime.datetime(2020, 6, 15)
+
     def setUp(self):
         super().setUp()
-        self.signup(
-            self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
-        # Addition of blog admin role creates author aggregated stat models.
-        self.add_user_role(
-            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
-        self.blog_admin_id = (
-            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
-        self.login(self.BLOG_ADMIN_EMAIL)
-        # Publishing a blog post to create aggregated blog post stat models.
-        self.blog_post = (
-            blog_services.create_new_blog_post(self.blog_admin_id))
+        with self.mock_datetime_utcnow(self.MOCK_DATE):
+            self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+            # Addition of blog admin role creates author aggregated stat models.
+            self.add_user_role(
+                self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+            self.blog_admin_id = (
+                self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+            self.login(self.BLOG_ADMIN_EMAIL)
+            # Publishing a blog post to create aggregated blog post stat models.
+            self.blog_post = (
+                blog_services.create_new_blog_post(self.blog_admin_id))
 
-        csrf_token = self.get_new_csrf_token()
-        payload = {
-            'change_dict': {
-                'title': 'Sample Title',
-                'content': '<p>Hello<p>',
-                'tags': ['New lessons', 'Learners'],
-                'thumbnail_filename': 'file.svg'
-            },
-            'new_publish_status': True
-        }
-        self.put_json(
-            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
-            payload, csrf_token=csrf_token)
+        with self.mock_datetime_utcnow(
+            self.MOCK_DATE + datetime.timedelta(minutes=2)
+        ):
+            csrf_token = self.get_new_csrf_token()
+            payload = {
+                'change_dict': {
+                    'title': 'Sample Title',
+                    'content': '<p>Hello<p>',
+                    'tags': ['New lessons', 'Learners'],
+                    'thumbnail_filename': 'file.svg'
+                },
+                'new_publish_status': True
+            }
+            self.put_json(
+                '%s/%s' % (
+                    feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id
+                ),
+                payload,
+                csrf_token=csrf_token
+            )
 
         # Checking blog post is succesfully published.
         blog_post_rights = blog_services.get_blog_post_rights(self.blog_post.id)
@@ -595,10 +606,12 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
         self.logout()
 
     def test_recording_blog_post_view_event(self) -> None:
-        self.post_json(
-            '%s/blog_post_viewed_event/%s' %
-            (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
-        self.process_and_flush_pending_tasks()
+        current_datetime = self.MOCK_DATE + datetime.timedelta(days=1)
+        with self.mock_datetime_utcnow(current_datetime):
+            self.post_json(
+                '%s/blog_post_viewed_event/%s' %
+                (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
+            self.process_and_flush_pending_tasks()
 
         # Check that the event model is created and aggregated stats models are
         # updated.
@@ -614,10 +627,9 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
             blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
                 self.blog_admin_id)
         )
-        current_datetime = datetime.datetime.utcnow()
+
         date_str = current_datetime.strftime('%Y-%m-%d')
         hour_str = current_datetime.strftime('%H')
-
         self.assertEqual(
             aggregated_blog_stats_model.views_by_hour[date_str][hour_str], 1)
         self.assertEqual(
@@ -627,10 +639,14 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
         self.assertEqual(len(event_models), 1)
 
         # Blog Post is viewed again.
-        self.post_json(
-            '%s/blog_post_viewed_event/%s' %
-            (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
-        self.process_and_flush_pending_tasks()
+        current_datetime = (
+            self.MOCK_DATE + datetime.timedelta(days=1, minutes=5)
+        )
+        with self.mock_datetime_utcnow(current_datetime):
+            self.post_json(
+                '%s/blog_post_viewed_event/%s' %
+                (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
+            self.process_and_flush_pending_tasks()
 
         # Check that the event model is created and aggregated stats models are
         # updated.
@@ -646,10 +662,9 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
             blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
                 self.blog_admin_id)
         )
-        current_datetime = datetime.datetime.utcnow()
+
         date_str = current_datetime.strftime('%Y-%m-%d')
         hour_str = current_datetime.strftime('%H')
-
         self.assertEqual(
             aggregated_blog_stats_model.views_by_hour[date_str][hour_str], 2)
         self.assertEqual(
@@ -680,10 +695,12 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
             expected_status_int=404)
 
     def test_recording_blog_post_read_event(self) -> None:
-        self.post_json(
-            '%s/blog_post_read_event/%s' %
-            (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
-        self.process_and_flush_pending_tasks()
+        current_datetime = self.MOCK_DATE + datetime.timedelta(days=1)
+        with self.mock_datetime_utcnow(current_datetime):
+            self.post_json(
+                '%s/blog_post_read_event/%s' %
+                (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
+            self.process_and_flush_pending_tasks()
 
         # Check that the event model is created and aggregated stats models are
         # updated.
@@ -699,10 +716,9 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
             blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
                 self.blog_admin_id)
         )
-        current_datetime = datetime.datetime.utcnow()
+
         date_str = current_datetime.strftime('%Y-%m-%d')
         hour_str = current_datetime.strftime('%H')
-
         self.assertEqual(
             aggregated_blog_stats_model.reads_by_hour[date_str][hour_str], 1)
         self.assertEqual(
@@ -711,11 +727,16 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
         )
         self.assertEqual(len(event_models), 1)
 
-        # Blog Post is read again.
-        self.post_json(
-            '%s/blog_post_read_event/%s' %
-            (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
-        self.process_and_flush_pending_tasks()
+        # Blog Post is viewed again.
+        current_datetime = (
+            self.MOCK_DATE + datetime.timedelta(days=1, minutes=5)
+        )
+        with self.mock_datetime_utcnow(current_datetime):
+            # Blog Post is read again.
+            self.post_json(
+                '%s/blog_post_read_event/%s' %
+                (feconf.BLOG_HOMEPAGE_DATA_URL, self.blog_post_url), {})
+            self.process_and_flush_pending_tasks()
 
         # Check that the event model is created and aggregated stats models are
         # updated.
@@ -731,7 +752,7 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
             blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
                 self.blog_admin_id)
         )
-        current_datetime = datetime.datetime.utcnow()
+
         date_str = current_datetime.strftime('%Y-%m-%d')
         hour_str = current_datetime.strftime('%H')
 

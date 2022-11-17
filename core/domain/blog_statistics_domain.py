@@ -39,11 +39,11 @@ def _repack_views_stats(
     the rest for these fields.
 
     Args:
-        stats: BlogPostViewsAggregatedStats | AuthorBlogPostViewsAggregatedStats
+        stats: BlogPostViewsAggregatedStats|AuthorBlogPostViewsAggregatedStats.
             The stats domain object for which hourly views are to be generated.
 
     Returns:
-        BlogPostViewsAggregatedStats | AuthorBlogPostViewsAggregatedStats. A
+        BlogPostViewsAggregatedStats|AuthorBlogPostViewsAggregatedStats. A
         repacked stats domain object with only necessary aggregated stats.
     """
     stats.views_by_date = {
@@ -67,11 +67,11 @@ def _repack_reads_stats(
     the rest for these fields.
 
     Args:
-        stats: BlogPostReadsAggregatedStats | AuthorBlogPostReadsAggregatedStats
+        stats: BlogPostReadsAggregatedStats|AuthorBlogPostReadsAggregatedStats.
             The stats domain object for which hourly reads are to be generated.
 
     Returns:
-        BlogPostReadsAggregatedStats | AuthorBlogPostReadsAggregatedStats. A
+        BlogPostReadsAggregatedStats|AuthorBlogPostReadsAggregatedStats. A
         repacked stats domain object with only necessary aggregated stats.
     """
     stats.reads_by_date = {
@@ -93,17 +93,17 @@ def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
     hours.
 
     Args:
-        stats: BlogPostViewsAggregatedStats | AuthorBlogPostViewsAggregatedStats
+        stats: BlogPostViewsAggregatedStats|AuthorBlogPostViewsAggregatedStats.
             The stats domain object for which hourly views are to be generated.
 
     Returns:
         dict. A dict with number of views keyed to hour('HH') in UTC fromat for
         the past twenty four hours.
     """
-    current_hour=datetime.datetime.utcnow().hour
-    current_date=datetime.datetime.utcnow().strftime('%Y-%m-%d')
+    current_hour = datetime.datetime.utcnow().hour
+    current_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
     yesterdays_date = (
-        datetime.datetime.utcnow() - datetime.timedelta(days = 1)
+        datetime.datetime.utcnow() - datetime.timedelta(days=1)
     ).strftime('%Y-%m-%d')
     deficit_hours_in_current_date = 24 - current_hour - 1
     hourly_stats = {}
@@ -129,7 +129,7 @@ def _generate_past_week_views_stats_from_views_by_date(
     """Returns a dict with number of views date wise for the past seven days.
 
     Args:
-        stats: BlogPostViewsAggregatedStats | AuthorBlogPostViewsAggregatedStats
+        stats: BlogPostViewsAggregatedStats|AuthorBlogPostViewsAggregatedStats.
             The stats domain object for which weekly views are to be generated.
 
     Returns:
@@ -147,7 +147,7 @@ def _generate_past_week_views_stats_from_views_by_date(
         last_month_stats = stats.views_by_date[last_month_year]
         weekly_stats = {
             k: last_month_stats[k] for k in list(
-                last_month_stats)[-(7-current_day):]
+                last_month_stats)[- (7 - current_day):]
         }
         weekly_stats.update({
         k: current_month_stats[k] for k in list(
@@ -156,7 +156,7 @@ def _generate_past_week_views_stats_from_views_by_date(
     else:
         weekly_stats.update({
             k: current_month_stats[k] for k in list(
-                current_month_stats)[current_day-7:current_day]
+                current_month_stats)[(current_day - 7):current_day]
         })
     return weekly_stats
 
@@ -170,7 +170,7 @@ def _generate_monthly_views_from_views_by_date(
     """Returns a dict with number of reads date wise for the ongoing month.
 
     Args:
-        stats: BlogPostReadsAggregatedStats | AuthorBlogPostReadsAggregatedStats
+        stats: BlogPostReadsAggregatedStats|AuthorBlogPostReadsAggregatedStats.
             The stats domain object for which monthly reads are to be generated.
 
     Returns:
@@ -178,7 +178,6 @@ def _generate_monthly_views_from_views_by_date(
         the ongoing month.
     """
     current_month_year = datetime.datetime.utcnow().strftime('%Y-%m')
-    current_day = datetime.datetime.utcnow().day
     return stats.views_by_date[current_month_year]
 
 
@@ -191,7 +190,7 @@ def _generate_yearly_views_from_views_by_month(
     """Returns a dict with number of views month wise for the ongoing year.
 
     Args:
-        stats: BlogPostViewsAggregatedStats | AuthorBlogPostViewsAggregatedStats
+        stats: BlogPostViewsAggregatedStats|AuthorBlogPostViewsAggregatedStats.
             The stats domain object for which yearly views are to be generated.
 
     Returns:
@@ -212,31 +211,32 @@ def _generate_past_twenty_four_hour_reads_stats_from_reads_by_hour(
     hours.
 
     Args:
-        stats: BlogPostReadsAggregatedStats | AuthorBlogPostReadsAggregatedStats
+        stats: BlogPostReadsAggregatedStats|AuthorBlogPostReadsAggregatedStats.
             The stats domain object for which hourly reads are to be generated.
 
     Returns:
         dict. A dict with number of reads keyed to hour('HH') in UTC fromat for
         the past twenty four hours.
     """
-    current_hour=datetime.datetime.utcnow().hour
-    current_date.=adatetime.datetime.utcnow().strftime('%Y-%m-%d')
-    yesedays_date = (
-        datetime.datetime.utcnow() - datetime.timedelta(days = 1)
+    current_hour = datetime.datetime.utcnow().hour
+    current_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
+    yesterdays_date = (
+        datetime.datetime.utcnow() - datetime.timedelta(days=1)
     ).strftime('%Y-%m-%d')
     deficit_hours_in_current_date = 24 - current_hour - 1
     hourly_stats = {}
     if yesterdays_date in stats.reads_by_hour.keys():
         yesterday_stats = stats.reads_by_hour[yesterdays_date]
-        hourly_stats =  {
+        hourly_stats = {
             k: yesterday_stats[k] for k in list(
-                yesterday_stats)[-deficit_hours_in_current_date:]
+                yesterday_stats)[- deficit_hours_in_current_date:]
         }
     todays_stats = stats.reads_by_hour[current_date]
     hourly_stats.update({
-        k: todays_stats[k] for k in list(todays_stats)[:current_hour+1]
+        k: todays_stats[k] for k in list(todays_stats)[:current_hour + 1]
     })
     return hourly_stats
+
 
 def _generate_past_week_reads_stats_from_reads_by_date(
     stats: Union[
@@ -247,7 +247,7 @@ def _generate_past_week_reads_stats_from_reads_by_date(
     """Returns a dict with number of reads date wise for the past seven days.
 
     Args:
-        stats: BlogPostReadsAggregatedStats | AuthorBlogPostReadsAggregatedStats
+        stats: BlogPostReadsAggregatedStats|AuthorBlogPostReadsAggregatedStats.
             The stats domain object for which weekly reads are to be generated.
 
     Returns:
@@ -255,7 +255,6 @@ def _generate_past_week_reads_stats_from_reads_by_date(
         the past week(past seven days).
     """
     current_month_year = datetime.datetime.utcnow().strftime('%Y-%m')
-    current_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
     current_day = datetime.datetime.utcnow().day
     current_month_stats = stats.reads_by_date[current_month_year]
     weekly_stats = {}
@@ -266,7 +265,7 @@ def _generate_past_week_reads_stats_from_reads_by_date(
         last_month_stats = stats.reads_by_date[last_month_year]
         weekly_stats = {
             k: last_month_stats[k] for k in list(
-                last_month_stats)[-(7-current_date):]
+                last_month_stats)[- (7 - current_day):]
         }
         weekly_stats.update({
             k: current_month_stats[k] for k in list(
@@ -275,7 +274,7 @@ def _generate_past_week_reads_stats_from_reads_by_date(
     else:
         weekly_stats.update({
             k: current_month_stats[k] for k in list(
-                current_month_stats)[current_day-7:current_day]
+                current_month_stats)[(current_day - 7):current_day]
         })
     return weekly_stats
 
@@ -289,7 +288,7 @@ def _generate_monthly_reads_from_reads_by_date(
     """Returns a dict with number of reads date wise for the ongoing month.
 
     Args:
-        stats: BlogPostReadsAggregatedStats | AuthorBlogPostReadsAggregatedStats
+        stats: BlogPostReadsAggregatedStats|AuthorBlogPostReadsAggregatedStats.
             The stats domain object for which monthly reads are to be generated.
 
     Returns:
@@ -297,7 +296,6 @@ def _generate_monthly_reads_from_reads_by_date(
         the ongoing month.
     """
     current_month_year = datetime.datetime.utcnow().strftime('%Y-%m')
-    current_day = datetime.datetime.utcnow().day
     return stats.reads_by_date[current_month_year]
 
 
@@ -310,7 +308,7 @@ def _generate_yearly_reads_from_reads_by_month(
     """Returns a dict with number of reads month wise for the ongoing year.
 
     Args:
-        stats: BlogPostReadsAggregatedStats | AuthorBlogPostReadsAggregatedStats
+        stats: BlogPostReadsAggregatedStats|AuthorBlogPostReadsAggregatedStats.
             The stats domain object for which yearly reads are to be generated.
 
     Returns:
@@ -319,6 +317,7 @@ def _generate_yearly_reads_from_reads_by_month(
     """
     current_year = datetime.datetime.utcnow().strftime('%Y')
     return stats.reads_by_month[current_year]
+
 
 class BlogPostViewsAggregatedStatsFrontendDict(TypedDict):
     """Frontend Dict type for BlogPostViewsAggregatedStats object."""
@@ -429,10 +428,14 @@ class BlogPostViewsAggregatedStats:
         self.views_by_month = views_by_month
         self.created_on = created_on
 
-
     def repack_stats(self) -> BlogPostViewsAggregatedStats:
         """Repacks stats to contain only required aggregated stats removing old
         stats.
+
+        Returns:
+            BlogPostViewsAggregatedStats. Repacked
+            BlogPostViewsAggregatedStats domain object which contains only
+            necessary data required for generating graphs.
         """
         return _repack_views_stats(self)
 
@@ -460,12 +463,11 @@ class BlogPostViewsAggregatedStats:
         }
         return stats_dict
 
-
     def validate(self) -> None:
         """Checks whether the blog post id is a valid one.
 
         Raises:
-            ValidationError. No blog_post_id specified
+            ValidationError. No blog_post_id specified.
             ValidationError. The blog_post_id is not a string.
             ValidationError. The blog_post_id is invalid.
         """
@@ -515,13 +517,16 @@ class BlogPostReadsAggregatedStats:
         self.reads_by_month = reads_by_month
         self.created_on = created_on
 
-
     def repack_stats(self) -> BlogPostReadsAggregatedStats:
         """Repacks stats to contain only required aggregated stats removing old
         stats.
+
+        Returns:
+            BlogPostReadsAggregatedStats. Repacked
+            BlogPostReadsAggregatedStats domain object which contains only
+            necessary data required for generating graphs.
         """
         return _repack_reads_stats(self)
-
 
     def to_frontend_dict(self) -> BlogPostReadsAggregatedStatsFrontendDict:
         """Returns a dict representation of the domain object for use in the
@@ -546,12 +551,11 @@ class BlogPostReadsAggregatedStats:
         }
         return stats_dict
 
-
     def validate(self) -> None:
         """Checks whether the blog post id is a valid one.
 
         Raises:
-            ValidationError. No blog_post_id specified
+            ValidationError. No blog_post_id specified.
             ValidationError. The blog_post_id is not a string.
             ValidationError. The blog_post_id is invalid.
         """
@@ -565,6 +569,7 @@ class BlogPostReadsAggregatedStats:
         if len(self.blog_post_id) != BLOG_POST_ID_LENGTH:
             raise utils.ValidationError(
                 'Blog ID %s is invalid' % self.blog_post_id)
+
 
 class BlogPostReadingTime:
     """Domain object representing blog post reading time model."""
@@ -647,12 +652,11 @@ class BlogPostReadingTime:
         }
         return stats_dict
 
-
     def validate(self) -> None:
         """Checks whether the blog post id is a valid one.
 
         Raises:
-            ValidationError. No blog_post_id specified
+            ValidationError. No blog_post_id specified.
             ValidationError. The blog_post_id is not a string.
             ValidationError. The blog_post_id is invalid.
         """
@@ -666,7 +670,6 @@ class BlogPostReadingTime:
         if len(self.blog_post_id) != BLOG_POST_ID_LENGTH:
             raise utils.ValidationError(
                 'Blog ID %s is invalid' % self.blog_post_id)
-
 
 
 class AuthorBlogPostViewsAggregatedStats:
@@ -709,6 +712,11 @@ class AuthorBlogPostViewsAggregatedStats:
     def repack_stats(self) -> AuthorBlogPostViewsAggregatedStats:
         """Repacks stats to contain only required aggregated stats removing old
         stats.
+
+        Returns:
+            AuthorBlogPostViewsAggregatedStats. Repacked
+            AuthorBlogPostViewsAggregatedStats domain object which contains only
+            necessary data required for generating graphs.
         """
         return _repack_views_stats(self)
 
@@ -734,12 +742,11 @@ class AuthorBlogPostViewsAggregatedStats:
         }
         return stats_dict
 
-
     def validate(self) -> None:
         """Checks whether the blog post id is a valid one.
 
         Raises:
-            ValidationError. No author_id specified
+            ValidationError. No author_id specified.
             ValidationError. The author_id is not a string.
             ValidationError. The author_id has invalid format.
         """
@@ -797,11 +804,11 @@ class AuthorBlogPostReadsAggregatedStats:
         stats.
 
         Returns:
-            AuthorBlogPostReadsAggregatedStats
+            AuthorBlogPostReadsAggregatedStats. Repacked
+            AuthorBlogPostReadsAggregatedStats domain object which contains only
+            necessary data required for generating graphs.
         """
         return _repack_reads_stats(self)
-
-
 
     def to_frontend_dict(self) -> AuthorBlogPostReadsAggregatedStatsDict:
         """Returns a dict representation of the domain object for use in the
@@ -825,12 +832,11 @@ class AuthorBlogPostReadsAggregatedStats:
         }
         return stats_dict
 
-
     def validate(self) -> None:
         """Checks whether the blog post id is a valid one.
 
         Raises:
-            ValidationError. No author_id specified
+            ValidationError. No author_id specified.
             ValidationError. The author_id is not a string.
             ValidationError. The author_id has invalid format.
         """
@@ -844,6 +850,7 @@ class AuthorBlogPostReadsAggregatedStats:
         if not utils.is_user_id_valid(self.author_id):
             raise utils.ValidationError(
                 'author_id=%r has the wrong format' % self.author_id)
+
 
 class AuthorBlogPostsReadingTime:
     """Domain object representing author blog post reading time model."""
@@ -866,7 +873,7 @@ class AuthorBlogPostsReadingTime:
         """Constructs an BlogPostReadingTime domain object.
 
         Args:
-            author_id: str. user ID of the author.
+            author_id: str. User ID of the author.
             zero_to_one_min: int. Number of user taking less than a minute to
                 read the blog posts written by the author.
             one_to_two_min: int. Number of users taking one to two minutes to
@@ -926,12 +933,11 @@ class AuthorBlogPostsReadingTime:
         }
         return stats_dict
 
-
     def validate(self) -> None:
         """Checks whether the author id is a valid one.
 
         Raises:
-            ValidationError. No author_id specified
+            ValidationError. No author_id specified.
             ValidationError. The author_id is not a string.
             ValidationError. The author_id has invalid format.
         """

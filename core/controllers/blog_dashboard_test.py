@@ -593,16 +593,9 @@ class BlogDashboardBlogPostStatisticsHandlerTests(test_utils.GenericTestBase):
         self.views_stats = stats_service.get_blog_post_views_stats_by_id(
                 self.blog_post_id
             )
-        stats_service.add_missing_stat_keys_with_default_values_in_views_stats(
-            self.views_stats
-        )
         self.reads_stats = stats_service.get_blog_post_reads_stats_by_id(
                 self.blog_post_id
             )
-        stats_service.add_missing_stat_keys_with_default_values_in_reads_stats(
-            self.reads_stats
-        )
-
 
     def test_get_blog_post_views_stats_data(self) -> None:
         # Checks blog editor can load blog post stats data.
@@ -625,7 +618,6 @@ class BlogDashboardBlogPostStatisticsHandlerTests(test_utils.GenericTestBase):
         )
         self.logout()
 
-
         # Checks non-editors can not access blog editor.
         self.login(self.user_email)
         self.get_json(
@@ -647,7 +639,6 @@ class BlogDashboardBlogPostStatisticsHandlerTests(test_utils.GenericTestBase):
             ),
             expected_status_int=401)
         self.logout()
-
 
     def test_get_blog_post_reads_stats_data(self) -> None:
         # Checks blog editor can load blog post stats data.
@@ -747,15 +738,9 @@ class BlogDashboardAuthorBlogPostStatisticsHandlerTests(
         self.views_stats = stats_service.get_author_blog_post_views_stats_by_id(
                 self.blog_admin_id
             )
-        stats_service.add_missing_stat_keys_with_default_values_in_views_stats(
-            self.views_stats
-        )
         self.reads_stats = stats_service.get_author_blog_post_reads_stats_by_id(
                 self.blog_editor_id
             )
-        stats_service.add_missing_stat_keys_with_default_values_in_reads_stats(
-            self.reads_stats
-        )
 
     def test_get_author_blog_post_views_stats_data(self) -> None:
         # Checks blog admin can load blog post stats data.
@@ -771,7 +756,6 @@ class BlogDashboardAuthorBlogPostStatisticsHandlerTests(
             self.views_stats.to_frontend_dict(), json_response['stats']
         )
         self.logout()
-
 
         # Checks non-editors can not access blog editor.
         self.login(self.user_email)
@@ -792,7 +776,6 @@ class BlogDashboardAuthorBlogPostStatisticsHandlerTests(
             ),
             expected_status_int=401)
         self.logout()
-
 
     def test_get_blog_post_reads_stats_data(self) -> None:
         # Checks blog editor can load blog post stats data.

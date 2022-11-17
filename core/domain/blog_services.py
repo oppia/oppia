@@ -488,7 +488,7 @@ def publish_blog_post(blog_post_id: str) -> None:
     blog_post.validate(strict=True)
     blog_post_summary = get_blog_post_summary_by_id(blog_post_id, strict=True)
     blog_post_summary.validate(strict=True)
-   
+
     if not blog_post_rights.blog_post_is_published:
         blog_post_rights.blog_post_is_published = True
         published_on = datetime.datetime.utcnow()
@@ -500,7 +500,6 @@ def publish_blog_post(blog_post_id: str) -> None:
                     blog_post_id
                 )
         )
-
 
     save_blog_post_rights(blog_post_rights)
     _save_blog_post_summary(blog_post_summary)
@@ -793,7 +792,7 @@ def create_blog_post_stats_models(blog_post_id: str) -> None:
     """Creates blog post stats models for a newly published blog post.
 
     Args:
-        blog_post_id: str. The blog post ID of the newly published blog post
+        blog_post_id: str. The blog post ID of the newly published blog post.
     """
     blog_stats_models.BlogPostReadsAggregatedStatsModel.create(blog_post_id)
     blog_stats_models.BlogPostViewsAggregatedStatsModel.create(blog_post_id)
