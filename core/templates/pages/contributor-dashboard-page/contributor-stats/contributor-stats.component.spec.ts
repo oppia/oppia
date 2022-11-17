@@ -269,6 +269,26 @@ describe('Contributor stats component', () => {
         }));
     });
 
+  describe('when user contribution rights can not be fetched',
+    () => {
+      it('should throw error to mention the error',
+        fakeAsync(() => {
+          spyOn(userService, 'getUserInfoAsync')
+            .and.returnValue(Promise.resolve({
+              isLoggedIn: () => true,
+              getUsername: () => 'user'
+            } as UserInfo));
+          spyOn(userService, 'getUserContributionRightsDataAsync')
+            .and.returnValue(Promise.resolve(undefined));
+
+          expect(() => {
+            component.ngOnInit();
+            tick();
+          }).toThrowError();
+          flush();
+        }));
+    });
+
   describe('when user interacts with dropdown',
     () => {
       let getDropdownOptionsContainer: () => HTMLElement;

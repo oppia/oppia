@@ -88,9 +88,9 @@ export class ContributorStatsComponent {
   username: string = '';
   ITEMS_PER_PAGE: number = 5;
 
-  userCanReviewTranslationSuggestions: boolean | undefined = false;
-  userCanReviewQuestionSuggestions: boolean | undefined = false;
-  userCanSuggestQuestions: boolean | undefined = false;
+  userCanReviewTranslationSuggestions: boolean = false;
+  userCanReviewQuestionSuggestions: boolean = false;
+  userCanSuggestQuestions: boolean = false;
 
   COLUMNS = {
     translationContribution: {
@@ -184,14 +184,18 @@ export class ContributorStatsComponent {
 
     const userContributionRights =
       await this.userService.getUserContributionRightsDataAsync();
+
+    if (userContributionRights === null) {
+      throw new Error('Cannot fetch user contribution rights.');
+    }
     const reviewableLanguageCodes = (
-      userContributionRights?.can_review_translation_for_language_codes);
+      userContributionRights.can_review_translation_for_language_codes);
     this.userCanReviewTranslationSuggestions = (
-      reviewableLanguageCodes?.length > 0);
+      reviewableLanguageCodes.length > 0);
     this.userCanReviewQuestionSuggestions = (
-      userContributionRights?.can_review_questions);
+      userContributionRights.can_review_questions);
     this.userCanSuggestQuestions = (
-      userContributionRights?.can_suggest_questions);
+      userContributionRights.can_suggest_questions);
 
     if (this.userCanReviewTranslationSuggestions) {
       this.options.push(this.translationReviewOption);
