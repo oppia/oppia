@@ -389,3 +389,21 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
 
         self.assertFalse(json_response['classroom_url_fragment_exists'])
         self.logout()
+
+    def test_get_classroom_id_from_url_fragment_works_correctly(
+        self
+    ) -> None:
+        url = '%s/%s' % (feconf.CLASSROOM_ID_HANDLER_URL, 'physics')
+
+        json_response = self.get_json(url)
+
+        self.assertEqual(
+            json_response['classroom_id'],
+            self.physics_classroom_id
+        )
+
+        non_existent_classroom_url = '%s/%s' % (
+            feconf.CLASSROOM_ID_HANDLER_URL, 'incorrect')
+
+        json_response = self.get_json(
+            non_existent_classroom_url, expected_status_int=404)

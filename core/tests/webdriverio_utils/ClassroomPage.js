@@ -18,9 +18,11 @@
  */
 
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var ClassroomPage = function() {
   var topicSummaryTile = $('.e2e-test-topic-summary-tile');
+  var takeDiagnosticTest = $('.e2e-test-take-diagnostic-test');
   var topicSummaryTilesSelector = function() {
     return $$('.e2e-test-topic-summary-tile');
   };
@@ -39,6 +41,10 @@ var ClassroomPage = function() {
     } else {
       expect(topicSummaryTiles.length).toEqual(0);
     }
+  };
+
+  this.takeDiagnosticTest = async function() {
+    await action.click('Take diagnostic test', takeDiagnosticTest);
   };
 };
 

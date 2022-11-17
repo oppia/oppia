@@ -87,14 +87,6 @@ export class DiagnosticTestCurrentTopicStatusModel {
     this.numberOfAttemptedQuestions += 1;
   }
 
-  getNextSkill(): string {
-    try {
-      return this._pendingSkillIdsToTest[0];
-    } catch {
-      return '';
-    }
-  }
-
   getNextQuestion(skillId: string): Question {
     if (this._lifelineIsConsumed) {
       return this._skillIdToQuestionsDict[skillId].getBackupQuestion();

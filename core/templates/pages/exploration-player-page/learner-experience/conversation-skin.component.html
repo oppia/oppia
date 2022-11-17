@@ -24,7 +24,8 @@
                         [milestoneMessageIsToBeDisplayed]="chapterIsCompletedForTheFirstTime"
                         [enableFeedback]="enableFeedback"
                         [allowOnlySingleAttemptForAnswering]="allowOnlySingleAttemptForAnswering"
-                        [showOnlyLastInputPairResponse]="showOnlyLastInputPairResponse">
+                        [showOnlyLastInputPairResponse]="showOnlyLastInputPairResponse"
+                        [enableCheckpointCelebrationModal]="enableCheckpointCelebrationModal">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"

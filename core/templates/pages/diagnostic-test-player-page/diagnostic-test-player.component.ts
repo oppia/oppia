@@ -114,7 +114,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
   getTopicUrlFromUrlFragment(urlFragment: string): string {
     return this.urlInterpolationService.interpolateUrl(
-      'learn/math/<topicUrlFragment>', {
+      '/learn/math/<topicUrlFragment>', {
         topicUrlFragment: urlFragment
       });
   }

@@ -2003,10 +2003,20 @@ describe('Conversation skin component', () => {
       successCallback(
         stateCard, true, 'feedback', null, '', 'skill_id', true, '', true,
         false, false, null, '');
+      spyOn(explorationPlayerStateService, 'isInDiagnosticTestPlayerMode')
+        .and.returnValue(true);
+      componentInstance.displayedCard = new StateCard(
+        null, null, null, new Interaction(
+          [], [], null, null, [], 'TextInput', null),
+        [], null, null, '', null);
+      successCallback(
+        stateCard, true, 'feedback', null, '', 'skill_id', true, '', true,
+        false, false, null, '');
       componentInstance.displayedCard = new StateCard(
         null, null, null, new Interaction(
           [], [], null, null, [], 'ImageClickInput', null),
         [], null, null, '', null);
+      componentInstance.isInPreviewMode = true;
       successCallback(
         stateCard, true, 'feedback', null, 'refresherId', 'skill_id', true,
         '', true, false, false, null, '');

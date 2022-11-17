@@ -86,7 +86,7 @@ export class DiagnosticTestPlayerEngineService {
       this._diagnosticTestCurrentTopicStatusModel = (
         new DiagnosticTestCurrentTopicStatusModel(response));
       this._currentSkillId = (
-        this._diagnosticTestCurrentTopicStatusModel.getNextSkill());
+        this._diagnosticTestCurrentTopicStatusModel.getPendingSkillIds()[0]);
       this._currentQuestion = (
         this._diagnosticTestCurrentTopicStatusModel.getNextQuestion(
           this._currentSkillId)
@@ -132,7 +132,9 @@ export class DiagnosticTestPlayerEngineService {
               skillIdToQuestionsModel)
           );
           this._currentSkillId = (
-            this._diagnosticTestCurrentTopicStatusModel.getNextSkill());
+            this._diagnosticTestCurrentTopicStatusModel
+              .getPendingSkillIds()[0]
+          );
 
           this._currentQuestion = (
             this._diagnosticTestCurrentTopicStatusModel.getNextQuestion(
@@ -146,7 +148,7 @@ export class DiagnosticTestPlayerEngineService {
     } else {
       if (!this._diagnosticTestCurrentTopicStatusModel.isLifelineConsumed()) {
         this._currentSkillId = (
-          this._diagnosticTestCurrentTopicStatusModel.getNextSkill());
+          this._diagnosticTestCurrentTopicStatusModel.getPendingSkillIds()[0]);
       }
 
       this._currentQuestion = (

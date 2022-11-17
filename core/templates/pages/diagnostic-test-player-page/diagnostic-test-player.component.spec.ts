@@ -28,6 +28,14 @@ import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-a
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { DiagnosticTestTopicTrackerModel } from './diagnostic-test-topic-tracker.model';
+import { TranslateService } from '@ngx-translate/core';
+import { EventEmitter } from '@angular/core';
+
+class MockTranslateService {
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
+  }
+}
 
 class MockWindowRef {
   _window = {
@@ -49,6 +57,14 @@ describe('Diagnostic test player component', () => {
   let preventPageUnloadEventService: PreventPageUnloadEventService;
   let diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService;
   let classroomBackendApiService: ClassroomBackendApiService;
+  let translateService: TranslateService;
+  let sessionCompleteEmitter = new EventEmitter<string[]>();
+  let progressEmitter = new EventEmitter<number>();
+
+  class MockDiagnosticTestPlayerStatusService {
+    onDiagnosticTestSessionCompleted = sessionCompleteEmitter;
+    onDiagnosticTestSessionProgressChange = progressEmitter;
+  }
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -63,7 +79,18 @@ describe('Diagnostic test player component', () => {
       ],
       providers: [
         PreventPageUnloadEventService,
-        { provide: WindowRef, useValue: windowRef },
+        {
+          provide: WindowRef,
+          useValue: windowRef
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        },
+        {
+          provide: DiagnosticTestPlayerStatusService,
+          useClass: MockDiagnosticTestPlayerStatusService
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -77,6 +104,7 @@ describe('Diagnostic test player component', () => {
     diagnosticTestPlayerStatusService = TestBed.inject(
       DiagnosticTestPlayerStatusService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    translateService = TestBed.inject(TranslateService);
   });
 
   it('should listen to page unload events after initialization', () => {
@@ -104,29 +132,36 @@ describe('Diagnostic test player component', () => {
       expect(component.OPPIA_AVATAR_IMAGE_URL).toEqual(avatarImageLocation);
     });
 
-  it('should be able to subscribe event emitters after initialization', () => {
-    spyOn(preventPageUnloadEventService, 'addListener');
-    spyOn(
-      diagnosticTestPlayerStatusService.onDiagnosticTestSessionCompleted,
-      'subscribe'
-    ).and.callThrough();
-    spyOn(
-      diagnosticTestPlayerStatusService.onDiagnosticTestSessionProgressChange,
-      'subscribe'
-    ).and.callThrough();
+  it(
+    'should be able to subscribe event emitters after initialization',
+    fakeAsync(() => {
+      spyOn(preventPageUnloadEventService, 'addListener');
+      spyOn(
+        diagnosticTestPlayerStatusService.onDiagnosticTestSessionCompleted,
+        'subscribe'
+      );
+      spyOn(
+        diagnosticTestPlayerStatusService.onDiagnosticTestSessionProgressChange,
+        'subscribe'
+      );
 
-    component.ngOnInit();
+      component.ngOnInit();
+      tick();
 
-    expect(
-      diagnosticTestPlayerStatusService
-        .onDiagnosticTestSessionCompleted.subscribe
-    ).toHaveBeenCalled();
+      sessionCompleteEmitter.emit(['recommendedTopicId']);
+      progressEmitter.emit(20);
+      tick();
 
-    expect(
-      diagnosticTestPlayerStatusService
-        .onDiagnosticTestSessionProgressChange.subscribe
-    ).toHaveBeenCalled();
-  });
+      expect(
+        diagnosticTestPlayerStatusService
+          .onDiagnosticTestSessionCompleted.subscribe
+      ).toHaveBeenCalled();
+
+      expect(
+        diagnosticTestPlayerStatusService
+          .onDiagnosticTestSessionProgressChange.subscribe
+      ).toHaveBeenCalled();
+    }));
 
   it(
     'should be able to get the math classroom ID after initialization',
@@ -146,9 +181,12 @@ describe('Diagnostic test player component', () => {
 
   it('should be able to get the topic button text', () => {
     let topicName = 'Fraction';
+    spyOn(translateService, 'instant').and.callThrough();
 
-    expect(component.getTopicButtonText(topicName)).toEqual(
-      'Start ' + topicName);
+    component.getTopicButtonText(topicName);
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_DIAGNOSTIC_TEST_RESULT_START_TOPIC', { topicName: 'Fraction' });
   });
 
   it('should be able to get the topic URL from the URL fragment', () => {

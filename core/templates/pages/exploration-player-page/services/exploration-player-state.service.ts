@@ -372,6 +372,16 @@ export class ExplorationPlayerStateService {
     ExplorationPlayerConstants.EXPLORATION_MODE.STORY_CHAPTER;
   }
 
+  isInExplorationMode(): boolean {
+    return this.explorationMode ===
+    ExplorationPlayerConstants.EXPLORATION_MODE.EXPLORATION;
+  }
+
+  isInOtherMode(): boolean {
+    return this.explorationMode ===
+    ExplorationPlayerConstants.EXPLORATION_MODE.OTHER;
+  }
+
   moveToExploration(
       callback: (stateCard: StateCard, label: string) => void): void {
     if (

@@ -117,6 +117,7 @@ export class TutorCardComponent {
   @Input() enableFeedback: boolean;
   @Input() allowOnlySingleAttemptForAnswering: boolean;
   @Input() showOnlyLastInputPairResponse: boolean;
+  @Input() enableCheckpointCelebrationModal: boolean;
   directiveSubscriptions = new Subscription();
   private _editorPreviewMode: boolean;
   arePreviousResponsesShown: boolean = false;
@@ -137,7 +138,6 @@ export class TutorCardComponent {
   checkMarkSkipped: boolean = false;
   confettiAnimationTimeout: NodeJS.Timeout | null = null;
   skipClickListener: Function | null = null;
-  celebrationComponentIsShown!: boolean;
 
   constructor(
     private audioBarStatusService: AudioBarStatusService,
@@ -201,12 +201,6 @@ export class TutorCardComponent {
         }
       )
     );
-
-    if (this.showOnlyLastInputPairResponse) {
-      this.celebrationComponentIsShown = false;
-    } else {
-      this.celebrationComponentIsShown = true;
-    }
   }
 
   ngOnDestroy(): void {

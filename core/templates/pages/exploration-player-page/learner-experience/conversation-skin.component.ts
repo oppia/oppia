@@ -174,6 +174,7 @@ export class ConversationSkinComponent {
   allowOnlySingleAttemptForAnswering!: boolean;
   showOnlyLastInputPairResponse!: boolean;
   enableNavigationThroughCardHistory!: boolean;
+  enableCheckpointCelebrationModal!: boolean;
 
   constructor(
     private windowRef: WindowRef,
@@ -473,11 +474,13 @@ export class ConversationSkinComponent {
         this.allowOnlySingleAttemptForAnswering = true;
         this.showOnlyLastInputPairResponse = true;
         this.enableNavigationThroughCardHistory = false;
+        this.enableCheckpointCelebrationModal = false;
       } else {
         this.enableFeedback = true;
         this.allowOnlySingleAttemptForAnswering = false;
         this.showOnlyLastInputPairResponse = false;
         this.enableNavigationThroughCardHistory = true;
+        this.enableCheckpointCelebrationModal = true;
       }
     });
   }
@@ -1211,10 +1214,11 @@ export class ConversationSkinComponent {
       }
     }
 
-    if (
-      !this.explorationPlayerStateService.isInQuestionMode() &&
-        !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode() &&
-        !this.isInPreviewMode &&
+    if (!this.isInPreviewMode && (
+      this.explorationPlayerStateService.isInExplorationMode() ||
+        this.explorationPlayerStateService.isInStoryChapterMode() ||
+        this.isInPreviewMode ||
+        this.explorationPlayerStateService.isInOtherMode()) &&
         AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE
     ) {
       this.initLearnerAnswerInfoService(
@@ -1257,9 +1261,11 @@ export class ConversationSkinComponent {
           isFirstHit, isFinalQuestion, nextCardIfReallyStuck, focusLabel,) => {
         this.nextCard = nextCard;
         this.nextCardIfStuck = nextCardIfReallyStuck;
-        if (!this._editorPreviewMode &&
-            !this.explorationPlayerStateService.isInQuestionMode() &&
-            !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
+        if (!this._editorPreviewMode && (
+          this.explorationPlayerStateService.isInExplorationMode() ||
+            this.explorationPlayerStateService.isInStoryChapterMode() ||
+            this.isInPreviewMode ||
+            this.explorationPlayerStateService.isInOtherMode())
         ) {
           let oldStateName =
             this.playerPositionService.getCurrentStateName();
@@ -1281,14 +1287,13 @@ export class ConversationSkinComponent {
             this.explorationActuallyStarted = true;
           }
         }
-        if (
-          !this.explorationPlayerStateService.isInQuestionMode() &&
-            !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
-        ) {
+        if (this.explorationPlayerStateService.isInExplorationMode() ||
+            this.explorationPlayerStateService.isInStoryChapterMode() ||
+            this.isInPreviewMode) {
           this.explorationPlayerStateService.onPlayerStateChange.emit(
             nextCard.getStateName());
         } else if (
-          !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
+          this.explorationPlayerStateService.isInQuestionPlayerMode()
         ) {
           this.questionPlayerStateService.answerSubmitted(
             this.questionPlayerEngineService.getCurrentQuestion(),
