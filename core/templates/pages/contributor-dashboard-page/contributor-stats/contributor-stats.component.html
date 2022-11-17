@@ -319,14 +319,14 @@
     height: 300px;
   }
   .oppia-contributions-required-message {
+    align-items: center;
     color: #4a4a4a;
+    display: flex;
+    height: 100%;
     font-size: 28px;
+    justify-content: center;
     text-align: center;
     vertical-align: middle;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
   .oppia-pagination-container {
     display: flex;
@@ -357,8 +357,8 @@
     color: #009688;
   }
   .stats-contribution-type-mobile-container {
+    background-color: #fff;
     display: none;
-    background-color: #ffffff;
     font-size: 20px;
     margin-bottom: 3%;
     padding: 0 20px;
@@ -370,8 +370,8 @@
   .mobile-stats-data-container {
     display: none;
     font-size: 2.5vw;
-    padding-top: 10px;
     padding-bottom: 10px;
+    padding-top: 10px;
     width: 100%;
   }
   .mobile-stats-row {
@@ -396,7 +396,7 @@
     margin-top: 30px;
   }
   .stats-welcome-text-container {
-    color: #00645C;
+    color: #00645c;
     display: inline-block;
     font-family: "Roboto", Arial, sans-serif;
     font-size: 24px;
@@ -419,14 +419,14 @@
   }
   .list-view-item {
     background: #fff;
-    box-shadow: none;
     border: 1px solid #000;
+    box-shadow: none;
     margin-top: 10px;
   }
   .dashboard-table {
     font-size: 1.2vw;
-    width: 100%;
     margin-top: 40px;
+    width: 100%;
   }
   .dashboard-table .dashboard-table-headings {
     border-bottom: 2px solid black;
@@ -466,8 +466,8 @@
   .oppia-stats-type-selector-inner-container {
     display: flex;
     flex: 1;
-    justify-content: space-between;
     font-size: 16px;
+    justify-content: space-between;
   }
 
   .oppia-stats-type-selector-inner-container-arrow {
@@ -531,8 +531,8 @@
       display: none;
     }
     .dropdown-label {
-      font-size: 18px;
       color: #4a4a4a;
+      font-size: 18px;
       margin-right: 10px;
       width: 175px;
     }
@@ -541,19 +541,16 @@
       display: flex;
       justify-content: space-between;
       margin-bottom: 10px;
+      margin-left: calc(-50vw + 50% + 0px);
       padding-bottom: 30px;
       padding-top: 5px;
       width: 100vw;
-      margin-left: calc(-50vw + 50% + 0px);
     }
     .dashboard-table {
       display: none;
     }
     .mobile-stats-data-container {
       display: table;
-    }
-    .stats-container {
-      margin-left: 0px;
     }
     .oppia-contribution-stats-type-selector-mobile-container {
       background-color: #fff;
