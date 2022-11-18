@@ -21,14 +21,21 @@ var users = require('../webdriverio_utils/users.js');
 
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var ClassroomPage = require('../webdriverio_utils/ClassroomPage.js');
+var ExplorationPlayerPage = require(
+  '../webdriverio_utils/ExplorationPlayerPage.js');
+var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage');
 
 describe('Diagnostic test page functionality', function() {
   var classroomPage = null;
   var adminPage = null;
+  var explorationPlayerPage = null;
+  var diagnosticTestPage = null;
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    diagnosticTestPage = new DiagnosticTestPage.DiagnosticTestPage();
 
     await users.createAndLoginCurriculumAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
@@ -43,7 +50,23 @@ describe('Diagnostic test page functionality', function() {
   it('should be able to start diagnostic test', async function() {
     await classroomPage.get('math');
     await classroomPage.takeDiagnosticTest();
+    await diagnosticTestPage.startDiagnosticTest();
+    await explorationPlayerPage.submitAnswer('TextInput', 'correct');
+    await explorationPlayerPage.submitAnswer('TextInput', 'correct');
+    await explorationPlayerPage.submitAnswer('TextInput', 'correct');
   });
+
+  it(
+    'should be able to skip questions and get topic recommendation',
+    async function() {
+      await classroomPage.get('math');
+      await classroomPage.takeDiagnosticTest();
+      await diagnosticTestPage.startDiagnosticTest();
+      await explorationPlayerPage.skipQuestion();
+      await explorationPlayerPage.skipQuestion();
+      await explorationPlayerPage.skipQuestion();
+      await explorationPlayerPage.skipQuestion();
+    });
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
