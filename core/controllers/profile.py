@@ -462,6 +462,8 @@ class SignupHandlerNormalizedPayloadDict(TypedDict):
     can_receive_email_updates: Optional[bool]
 
 
+# TODO(#16566): Restrict the type of `can_receive_email_updates` field to
+# only one type, currently it is accepting two types of values None and bool.
 class SignupHandler(
     base.BaseHandler[
         SignupHandlerNormalizedPayloadDict, Dict[str, str]
