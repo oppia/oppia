@@ -60,8 +60,6 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         """
         super().__init__(label=label)
         self.client = client
-        self.gcs = gcsio.GcsIO(self.client)
-        self.bucket = app_identity_services.get_gcs_resource_bucket_name()
         if mode_is_binary:
             self.mode = 'rb'
         else:
@@ -91,8 +89,10 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         Returns:
             data: Union[bytes, str]. The file data.
         """
-        gcs_url = f'gs://{self.bucket}/{file_path}'
-        file = self.gcs.open(gcs_url, mode=self.mode)
+        gcs = gcsio.GcsIO(self.client)
+        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        gcs_url = f'gs://{bucket}/{file_path}'
+        file = gcs.open(gcs_url, mode=self.mode)
         data = file.read()
         file.close()
         return (file_path, data)
@@ -135,8 +135,6 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
         super().__init__(label=label)
         self.client = client
         self.mime_type = mime_type
-        self.gcs = gcsio.GcsIO(self.client)
-        self.bucket = app_identity_services.get_gcs_resource_bucket_name()
         if mode_is_binary:
             self.mode = 'wb'
         else:
@@ -169,9 +167,11 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
             write_file: int. Returns the number of bytes that has
             been written to GCS.
         """
+        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        gcs = gcsio.GcsIO(self.client)
         filepath = file_obj['filepath']
-        gcs_url = 'gs://%s/%s' % (self.bucket, filepath)
-        file = self.gcs.open(
+        gcs_url = 'gs://%s/%s' % (bucket, filepath)
+        file = gcs.open(
             filename=gcs_url,
             mode=self.mode,
             mime_type=self.mime_type)
@@ -206,8 +206,6 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
         """
         super().__init__(label=label)
         self.client = client
-        self.gcs = gcsio.GcsIO(self.client)
-        self.bucket = app_identity_services.get_gcs_resource_bucket_name()
 
     def expand(self, file_paths: beam.PCollection) -> beam.pvalue.PDone:
         """Deletes the files in given PCollection.
@@ -233,8 +231,10 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
         Returns:
             delete_result: None. Returns None or error.
         """
-        gcs_url = f'gs://{self.bucket}/{file_path}'
-        delete_result = self.gcs.delete(gcs_url)
+        gcs = gcsio.GcsIO(self.client)
+        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        gcs_url = f'gs://{bucket}/{file_path}'
+        delete_result = gcs.delete(gcs_url)
         # TODO(#15613): Here we use MyPy ignore because of the incomplete
         # typing of apache_beam library and absences of stubs in Typeshed,
         # forces MyPy to assume that the return is of type Any.
@@ -264,8 +264,6 @@ class GetFiles(beam.PTransform): # type: ignore[misc]
         """
         super().__init__(label=label)
         self.client = client
-        self.gcs = gcsio.GcsIO(self.client)
-        self.bucket = app_identity_services.get_gcs_resource_bucket_name()
 
     def expand(self, prefixes: beam.PCollection) -> beam.PCollection:
         """Returns PCollection with file names.
@@ -291,8 +289,10 @@ class GetFiles(beam.PTransform): # type: ignore[misc]
         Returns:
             Dict[str, int]. The file name as key and size of file as value.
         """
-        gcs_url = f'gs://{self.bucket}/{prefix}'
+        gcs = gcsio.GcsIO(self.client)
+        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        gcs_url = f'gs://{bucket}/{prefix}'
         # TODO(#15613): Here we use MyPy ignore because of the incomplete
         # typing of apache_beam library and absences of stubs in Typeshed,
         # forces MyPy to assume that the return is of type Any.
-        return self.gcs.list_prefix(gcs_url) # type: ignore[no-any-return]
+        return gcs.list_prefix(gcs_url) # type: ignore[no-any-return]
