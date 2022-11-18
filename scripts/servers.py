@@ -429,6 +429,7 @@ def managed_ng_build(
             # Capture compiler's output to detect when builds have completed.
             stdout=subprocess.PIPE
         ))
+        print(proc.stdout.read())
         read_line_func: Callable[[], Optional[bytes]] = (
             lambda: proc.stdout.readline() or None
         )

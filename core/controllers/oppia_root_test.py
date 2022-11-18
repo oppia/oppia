@@ -1,3 +1,4 @@
+
 # Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,9 +17,15 @@
 
 from __future__ import annotations
 
-from core.constants import constants
-from core.tests import test_utils
+import types
+from http import cookiejar
 
+from core.constants import constants
+from core.controllers import oppia_root
+from core.tests import test_utils
+import main
+
+import webtest
 
 class OppiaRootPageTests(test_utils.GenericTestBase):
 
@@ -33,3 +40,43 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
                         '<lightweight-oppia-root></lightweight-oppia-root>')
                 else:
                     response.mustcontain('<oppia-root></oppia-root>')
+
+
+class OppiaLightweightRootPageTests(test_utils.GenericTestBase):
+
+    def test_oppia_lightweight_root_page(self) -> None:
+        response = self.get_html_response('/', expected_status_int=200)
+        response.mustcontain(
+            '<lightweight-oppia-root></lightweight-oppia-root>',
+            '<title>OppiaAngular</title>'
+        )
+
+    def test_oppia_lightweight_root_page_with_rtl_lang_param(self) -> None:
+        response = self.get_html_response('/?lang=ar', expected_status_int=200)
+        response.mustcontain(
+            '<lightweight-oppia-root></lightweight-oppia-root>',
+            no='<title>OppiaAngular</title>'
+        )
+
+    def test_oppia_lightweight_root_page_with_ltr_lang_param(self) -> None:
+        response = self.get_html_response('/?lang=en', expected_status_int=200)
+        response.mustcontain(
+            '<lightweight-oppia-root></lightweight-oppia-root>',
+            '<title>OppiaAngular</title>'
+        )
+
+    def test_oppia_lightweight_root_page_with_rtl_dir_cookie(self) -> None:
+        self.testapp.set_cookie('dir', 'rtl')
+        response = self.get_html_response('/', expected_status_int=200)
+        response.mustcontain(
+            '<lightweight-oppia-root></lightweight-oppia-root>',
+            no='<title>OppiaAngular</title>'
+        )
+
+    def test_oppia_lightweight_root_page_with_ltr_dir_cookie(self) -> None:
+        self.testapp.set_cookie('dir', 'ltr')
+        response = self.get_html_response('/', expected_status_int=200)
+        response.mustcontain(
+            '<lightweight-oppia-root></lightweight-oppia-root>',
+            '<title>OppiaAngular</title>'
+        )
