@@ -163,7 +163,7 @@ describe('State version history component', () => {
   it('should open the state version history modal on clicking the explore ' +
   'version history button', () => {
     class MockComponentInstance {
-      compoenentInstance = {
+      componentInstance = {
         newState: null,
         newStateName: 'A',
         oldState: null,

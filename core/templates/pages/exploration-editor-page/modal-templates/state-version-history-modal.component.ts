@@ -80,6 +80,15 @@ export class StateVersionHistoryModalComponent
     return this.versionHistoryService.canShowForwardStateDiffData();
   }
 
+  // The return value of the below function can never be null because it is
+  // called only when canExploreBackwardVersionHistory() returns true.
+  // If the previously edited version number is null,
+  // canExploreBackwardVersionHistory() would have returned false. Here,
+  // the return value is written as (number | null) in order to fix the
+  // typescript errors. Also, the return value null represents the end of
+  // version history for that particular state i.e. we have reached the end
+  // of the version history and the state was not edited in any
+  // earlier versions.
   getLastEditedVersionNumber(): number | null {
     return (
       this.versionHistoryService.getBackwardStateDiffData().oldVersionNumber);
