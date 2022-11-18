@@ -250,6 +250,11 @@ export class ContributorStatsComponent {
       response.translation_review_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
+        if (
+          this.statsData.translationReview === null ||
+          this.statsData.translationReview === undefined) {
+          throw new Error('Invalid');
+        }
         if (!this.statsData.translationReview[language]) {
           this.statsData.translationReview[language] = new PageableStats(
             [this.createTranslationReviewStat(stat)]);
