@@ -240,7 +240,7 @@ export class ContributorStatsComponent {
         if (
           this.statsData.translationContribution === null ||
           this.statsData.translationContribution === undefined) {
-          throw new Error('Translation contributions are undefined');
+          throw new Error('Translation contributions are undefined.');
         }
         if (!this.statsData.translationContribution[language]) {
           this.statsData.translationContribution[language] = new PageableStats(
@@ -259,7 +259,7 @@ export class ContributorStatsComponent {
         if (
           this.statsData.translationReview === null ||
           this.statsData.translationReview === undefined) {
-          throw new Error('Translation reviews are undefined');
+          throw new Error('Translation reviews are undefined.');
         }
         if (!this.statsData.translationReview[language]) {
           this.statsData.translationReview[language] = new PageableStats(
@@ -337,7 +337,7 @@ export class ContributorStatsComponent {
 
   goToNextPage(page: PageableStats): void {
     if (typeof page.data === 'undefined') {
-      throw new Error('Data does not exist');
+      throw new Error('Data does not exist.');
     }
     if (
       page.currentPageStartIndex + this.ITEMS_PER_PAGE >=
