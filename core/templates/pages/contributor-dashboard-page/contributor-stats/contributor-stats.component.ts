@@ -247,11 +247,11 @@ export class ContributorStatsComponent {
             [this.createTranslationContributionStat(stat)]);
         } else {
           if (
-            typeof this.statsData?.translationReview[
+            typeof this.statsData?.translationContribution[
               language]?.data === 'undefined') {
             throw new Error('Data does not exist');
           }
-          this.statsData?.translationContribution[language].data?.push(
+          this.statsData?.translationContribution[language]?.data?.push(
             this.createTranslationContributionStat(stat));
         }
       });
@@ -275,7 +275,7 @@ export class ContributorStatsComponent {
               language]?.data === 'undefined') {
             throw new Error('Data does not exist');
           }
-          this.statsData?.translationReview[language].data?.push(
+          this.statsData?.translationReview[language]?.data?.push(
             this.createTranslationReviewStat(stat));
         }
       });
