@@ -156,8 +156,8 @@ export class ContributorStatsComponent {
   ];
 
   statsData: {
-    translationContribution?: {[key: string]: PageableStats};
-    translationReview?: {[key: string]: PageableStats};
+    translationContribution?: {[key: string]: PageableStats} | undefined;
+    translationReview?: {[key: string]: PageableStats} | undefined;
     questionContribution?: PageableStats;
     questionReview?: PageableStats;
   } = {};
@@ -236,9 +236,6 @@ export class ContributorStatsComponent {
       response.translation_contribution_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        if (language === null || language === undefined) {
-          throw new Error('Invalid language code');
-        }
         if (!this.statsData.translationContribution[language]) {
           this.statsData.translationContribution[language] = new PageableStats(
             [this.createTranslationContributionStat(stat)]);
@@ -253,14 +250,11 @@ export class ContributorStatsComponent {
       response.translation_review_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        if (language === null || language === undefined) {
-          throw new Error('Invalid language code');
-        }
         if (!this.statsData.translationReview[language]) {
           this.statsData.translationReview[language] = new PageableStats(
             [this.createTranslationReviewStat(stat)]);
         } else {
-          this.statsData?.translationReview[language].data.push(
+          this.statsData.translationReview[language].data.push(
             this.createTranslationReviewStat(stat));
         }
       });
