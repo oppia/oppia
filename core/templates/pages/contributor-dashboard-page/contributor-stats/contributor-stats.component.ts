@@ -242,11 +242,15 @@ export class ContributorStatsComponent {
           this.statsData.translationContribution === undefined) {
           throw new Error('Invalid');
         }
-        if (this.statsData.translationContribution[language] === undefined ||
-          this.statsData.translationContribution[language] === null) {
+        if (!this.statsData.translationContribution[language]) {
           this.statsData.translationContribution[language] = new PageableStats(
             [this.createTranslationContributionStat(stat)]);
         } else {
+          if (
+            this.statsData.translationContribution[language] === null ||
+            this.statsData.translationContribution[language] === undefined) {
+            throw new Error('Invalid');
+          }
           this.statsData.translationContribution[language].data.push(
             this.createTranslationContributionStat(stat));
         }
