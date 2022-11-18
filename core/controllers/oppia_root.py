@@ -54,19 +54,13 @@ class OppiaLightweightRootPage(
     @acl_decorators.open_access
     def get(self, **kwargs: Dict[str, str]) -> None:
         """Handles GET requests."""
-        print(self.request.cookies.get('dir'))
         if self.request.cookies.get('dir') == 'rtl':
             self.render_template('lightweight-oppia-root.mainpage.html')
             return
         if self.request.cookies.get('dir') == 'ltr':
             self.render_template('index.html', template_is_aot_compiled=True)
             return
-        lang_code_to_direction = {
-            lang['id']: lang['direction']
-            for lang in constants.SUPPORTED_SITE_LANGUAGES
-        }
-        url_lang = self.request.params.get('lang')
-        if lang_code_to_direction.get(url_lang) == 'rtl':
+        if self.request.get('dir') == 'rtl':
             self.render_template('lightweight-oppia-root.mainpage.html')
             return
         self.render_template('index.html', template_is_aot_compiled=True)

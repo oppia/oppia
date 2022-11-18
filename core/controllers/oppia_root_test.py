@@ -52,14 +52,14 @@ class OppiaLightweightRootPageTests(test_utils.GenericTestBase):
         )
 
     def test_oppia_lightweight_root_page_with_rtl_lang_param(self) -> None:
-        response = self.get_html_response('/?lang=ar', expected_status_int=200)
+        response = self.get_html_response('/?dir=rtl', expected_status_int=200)
         response.mustcontain(
             '<lightweight-oppia-root></lightweight-oppia-root>',
             no='<title>OppiaAngular</title>'
         )
 
     def test_oppia_lightweight_root_page_with_ltr_lang_param(self) -> None:
-        response = self.get_html_response('/?lang=en', expected_status_int=200)
+        response = self.get_html_response('/?dir=ltr', expected_status_int=200)
         response.mustcontain(
             '<lightweight-oppia-root></lightweight-oppia-root>',
             '<title>OppiaAngular</title>'
