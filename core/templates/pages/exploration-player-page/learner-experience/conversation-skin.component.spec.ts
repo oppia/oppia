@@ -1945,6 +1945,9 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = displayedCard;
     spyOn(componentInstance, 'isCurrentCardAtEndOfTranscript').and.returnValue(
       true);
+    let explorationModeSpy = spyOn(
+      explorationPlayerStateService, 'isPresentingIsolatedQuestions');
+    explorationModeSpy.and.returnValue(false);
     componentInstance.isInPreviewMode = false;
     spyOn(fatigueDetectionService, 'recordSubmissionTimestamp');
     spyOn(fatigueDetectionService, 'isSubmittingTooFast').and.returnValues(
@@ -2034,8 +2037,7 @@ describe('Conversation skin component', () => {
       successCallback(
         stateCard, true, 'feedback', null, '', 'skill_id', true, '', true,
         false, false, null, '');
-      spyOn(explorationPlayerStateService, 'isInDiagnosticTestPlayerMode')
-        .and.returnValue(true);
+      explorationModeSpy.and.returnValue(true);
       componentInstance.displayedCard = new StateCard(
         null, null, null, new Interaction(
           [], [], null, null, [], 'TextInput', null),
@@ -2047,7 +2049,7 @@ describe('Conversation skin component', () => {
         null, null, null, new Interaction(
           [], [], null, null, [], 'ImageClickInput', null),
         [], null, null, '', null);
-      componentInstance.isInPreviewMode = true;
+      explorationModeSpy.and.returnValue(false);
       successCallback(
         stateCard, true, 'feedback', null, 'refresherId', 'skill_id', true,
         '', true, false, false, null, '');

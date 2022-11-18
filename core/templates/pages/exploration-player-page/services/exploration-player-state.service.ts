@@ -361,6 +361,28 @@ export class ExplorationPlayerStateService {
       .EXPLORATION_MODE.QUESTION_PLAYER;
   }
 
+  isPresentingIsolatedQuestions(): boolean {
+    if (
+      this.explorationMode ===
+      ExplorationPlayerConstants.EXPLORATION_MODE.QUESTION_PLAYER ||
+      this.explorationMode ===
+      ExplorationPlayerConstants.EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER ||
+      this.explorationMode ===
+      ExplorationPlayerConstants.EXPLORATION_MODE.PRETEST
+    ) {
+      return true;
+    } else if (
+      this.explorationMode ===
+      ExplorationPlayerConstants.EXPLORATION_MODE.EXPLORATION ||
+      this.explorationMode ===
+      ExplorationPlayerConstants.EXPLORATION_MODE.STORY_CHAPTER
+    ) {
+      return false;
+    } else {
+      throw new Error('Invalid mode received.');
+    }
+  }
+
   isInDiagnosticTestPlayerMode(): boolean {
     return (
       this.explorationMode ===

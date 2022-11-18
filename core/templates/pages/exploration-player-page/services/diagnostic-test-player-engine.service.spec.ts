@@ -411,6 +411,10 @@ describe('Diagnostic test engine service', () => {
         outcomeObjectFactory
           .createNew('default', '', '', []), 1, 0, 'default_outcome'
       );
+
+      // Setting it as correct answer so this will mark the skill as passed and
+      // move to the next pending skill ID. And as per the spy, the next
+      // fetching of skill ID will trigger a rejection handler.
       answerClassificationResult.outcome.labelledAsCorrect = true;
 
       spyOn(answerClassificationService, 'getMatchingClassificationResult')

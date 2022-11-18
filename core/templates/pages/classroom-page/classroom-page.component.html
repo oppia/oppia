@@ -23,7 +23,7 @@
     <p>{{ 'I18N_MATH_TOPICS_COVERED' | translate }}</p>
   </div>
   <div class="oppia-classroom-page-guidance-tile-container"
-       *ngIf="classroomData.getTopicSummaries().length > 0">
+       *ngIf="classroomData && classroomData.getTopicSummaries().length > 0">
     <div class="oppia-classroom-page-guidance-tile">
       <p>
         <strong>

@@ -1215,11 +1215,8 @@ export class ConversationSkinComponent {
       }
     }
 
-    if (!this.isInPreviewMode && (
-      this.explorationPlayerStateService.isInExplorationMode() ||
-        this.explorationPlayerStateService.isInStoryChapterMode() ||
-        this.isInPreviewMode ||
-        this.explorationPlayerStateService.isInOtherMode()) &&
+    if (!this.isInPreviewMode &&
+        !this.explorationPlayerStateService.isPresentingIsolatedQuestions() &&
         AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE
     ) {
       this.initLearnerAnswerInfoService(
@@ -1262,11 +1259,8 @@ export class ConversationSkinComponent {
           isFirstHit, isFinalQuestion, nextCardIfReallyStuck, focusLabel,) => {
         this.nextCard = nextCard;
         this.nextCardIfStuck = nextCardIfReallyStuck;
-        if (!this._editorPreviewMode && (
-          this.explorationPlayerStateService.isInExplorationMode() ||
-            this.explorationPlayerStateService.isInStoryChapterMode() ||
-            this.isInPreviewMode ||
-            this.explorationPlayerStateService.isInOtherMode())
+        if (!this._editorPreviewMode &&
+            this.explorationPlayerStateService.isPresentingIsolatedQuestions()
         ) {
           let oldStateName =
             this.playerPositionService.getCurrentStateName();
@@ -1288,9 +1282,9 @@ export class ConversationSkinComponent {
             this.explorationActuallyStarted = true;
           }
         }
-        if (this.explorationPlayerStateService.isInExplorationMode() ||
-            this.explorationPlayerStateService.isInStoryChapterMode() ||
-            this.isInPreviewMode) {
+        if (
+          this.explorationPlayerStateService.isPresentingIsolatedQuestions()
+        ) {
           this.explorationPlayerStateService.onPlayerStateChange.emit(
             nextCard.getStateName());
         } else if (
