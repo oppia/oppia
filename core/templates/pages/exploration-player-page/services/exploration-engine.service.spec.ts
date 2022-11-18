@@ -64,7 +64,6 @@ describe('Exploration engine service ', () => {
   let paramChangeObjectFactory: ParamChangeObjectFactory;
   let textInputService: InteractionRulesService;
   let outcomeObjectFactory: OutcomeObjectFactory;
-
   let explorationDict: ExplorationBackendDict;
   let paramChangeDict: ParamChangeBackendDict;
   let explorationBackendResponse: FetchExplorationBackendResponse;
@@ -108,6 +107,9 @@ describe('Exploration engine service ', () => {
                   unicode_str: '',
                   content_id: 'ca_placeholder_0'
                 }
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             answer_groups: [
@@ -233,6 +235,9 @@ describe('Exploration engine service ', () => {
                   unicode_str: '',
                   content_id: 'ca_placeholder_0'
                 }
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             answer_groups: [
@@ -372,7 +377,9 @@ describe('Exploration engine service ', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [
+        HttpClientTestingModule,
+      ]
     });
 
     alertsService = TestBed.inject(AlertsService);
