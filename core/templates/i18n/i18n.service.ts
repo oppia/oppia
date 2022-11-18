@@ -23,6 +23,7 @@ import { TranslateCacheService } from 'ngx-translate-cache';
 import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService, LanguageInfo } from 'services/i18n-language-code.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 import { CookieService } from 'ngx-cookie';
 import { UserService } from 'services/user.service';
@@ -69,7 +70,8 @@ export class I18nService {
     private userService: UserService,
     private translateCacheService: TranslateCacheService,
     private translateService: TranslateService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   setLocalStorageKeys(langCode: string): void {
@@ -172,6 +174,7 @@ export class I18nService {
 
 
   updateUserPreferredLanguage(newLangCode: string): void {
+    this.siteAnalyticsService.registerSiteLanguageChangeEvent(newLangCode);
     this.setLocalStorageKeys(newLangCode);
 
 

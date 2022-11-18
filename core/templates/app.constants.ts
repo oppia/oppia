@@ -109,6 +109,10 @@ export const AppConstants = {
   // to if they get stuck.
   DEST_IF_REALLY_STUCK_FEAT_ENABLED: false,
 
+  INTERACTION_NAMES: {
+    TEXT_INPUT: 'TextInput'
+  },
+
   // The maximum number of nodes to show in a row of the state graph.
   MAX_NODES_PER_ROW: 4,
   // The following variable must be at least 3. It represents the maximum
