@@ -180,10 +180,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW, 'test_author',
             'reviewer_1', self.change_cmd, self.score_category,
             'exploration.exp1.thread_6', 'hi')
+        to_date = datetime.datetime.now()
+        from_date = to_date - datetime.timedelta(days=1)
 
         suggestions = (
-            suggestion_models.GeneralSuggestionModel.get_translation_suggestions_submitted_before_given_date(
-                datetime.datetime.now(), 'test_author', 'hi'))
+            suggestion_models.GeneralSuggestionModel.get_translation_suggestions_submitted_within_given_dates(
+                to_date, from_date, 'test_author', 'hi'))
 
         self.assertEqual(len(suggestions), 1)
 
@@ -196,11 +198,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW, 'test_author',
             'reviewer_1', self.change_cmd, self.score_category,
             'exploration.exp1.thread_6', 'hi')
+        to_date = datetime.datetime.now()
+        from_date = to_date - datetime.timedelta(days=1)
 
         suggestions = (
             suggestion_models.GeneralSuggestionModel
-                .get_question_suggestions_submitted_before_given_date(
-                    datetime.datetime.now(), 'test_author'))
+                .get_question_suggestions_submitted_before_given_dates(
+                    to_date, from_date, 'test_author'))
 
         self.assertEqual(len(suggestions), 1)
 

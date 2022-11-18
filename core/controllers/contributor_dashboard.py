@@ -965,12 +965,12 @@ class ContributorCertificateHandler(base.BaseHandler):
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
     def get(self, username, suggestion_type, language, from_date, to_date):
         """Handles GET requests."""
-        from_date_object = datetime.datetime.strptime(from_date, '%Y-%m-%d')
-        to_date_object = datetime.datetime.strptime(to_date, '%Y-%m-%d')
+        from_datetime = datetime.datetime.strptime(from_date, '%Y-%m-%d')
+        to_datetime = datetime.datetime.strptime(to_date, '%Y-%m-%d')
 
         file = suggestion_services.generate_contributor_certificate(
-            username, suggestion_type, language, from_date_object,
-            to_date_object)
+            username, suggestion_type, language, from_datetime,
+            to_datetime)
 
         with open(file, "rb") as fh:
             buf = io.BytesIO(fh.read())

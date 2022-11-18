@@ -34,11 +34,11 @@ export class CertificateDownloadModalComponent {
   toDate: string;
   errorMessage: string;
   errorsFound = false;
-  certificateDownloadiing = false;
+  certificateDownloading = false;
   constructor(
     private alertsService: AlertsService,
     private readonly activeModal: NgbActiveModal,
-    private api: ContributionAndReviewService) {
+    private contributionAndReviewService: ContributionAndReviewService) {
   }
 
   ngOnInit(): void {
@@ -60,35 +60,33 @@ export class CertificateDownloadModalComponent {
       this.errorMessage = 'Invalid date range.';
       return;
     }
-    this.certificateDownloadiing = true;
-    if (!this.errorsFound) {
-      this.alertsService.addInfoMessage(
-        'Generating certificate...', 5000);
-      this.api.downloadContributorCertificateAsync(
-        this.username,
-        this.suggestionType,
-        this.languageCode,
-        this.fromDate,
-        this.toDate).then((response: Blob) => {
-        let dataType = response.type;
-        let binaryData = [];
-        binaryData.push(response);
+    this.certificateDownloading = true;
+    this.alertsService.addInfoMessage(
+      'Generating certificate...', 5000);
+    this.contributionAndReviewService.downloadContributorCertificateAsync(
+      this.username,
+      this.suggestionType,
+      this.languageCode,
+      this.fromDate,
+      this.toDate).then((response: Blob) => {
+      const dataType = response.type;
+      const binaryData = [];
+      binaryData.push(response);
 
-        let downloadLink = document.createElement('a');
-        downloadLink.href = window.URL.createObjectURL(
-          new Blob(binaryData, {type: dataType}));
-        downloadLink.setAttribute('download', 'certificate');
+      const downloadLink = document.createElement('a');
+      downloadLink.href = window.URL.createObjectURL(
+        new Blob(binaryData, {type: dataType}));
+      downloadLink.setAttribute('download', 'certificate');
 
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        this.certificateDownloadiing = false;
-      }).catch(() => {
-        this.errorsFound = true;
-        this.certificateDownloadiing = false;
-        this.errorMessage = (
-          'Accepted contributions not found for the given inputs.');
-      });
-    }
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      this.certificateDownloading = false;
+    }).catch(() => {
+      this.errorsFound = true;
+      this.certificateDownloading = false;
+      this.errorMessage = (
+        'Accepted contributions not found for the given inputs.');
+    });
   }
 }
 

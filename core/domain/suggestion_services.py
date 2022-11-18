@@ -48,7 +48,6 @@ from typing import (
 )
 from typing_extensions import Final, Literal
 from html2image import Html2Image
-hti = Html2Image()
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -2862,7 +2861,8 @@ def enqueue_contributor_ranking_notification_email_task(
     contribution_sub_type: str, language_code: str, rank_name: str,
 ) -> None:
     """Adds a 'send feedback email' (instant) task into the task queue.
-    Attributes:
+
+    Args:
         contributor_user_id: str. The ID of the contributor.
         contribution_type: str. The type of the contribution i.e.
             translation or question.
@@ -2910,25 +2910,48 @@ def enqueue_contributor_ranking_notification_email_task(
         payload, 0)
 
 
-def _generate_image_from_html(template: str) -> str:
-    """Generates an image from the html string.
-    Attributes:
-        template: str. The html template to create the image.
+def generate_contributor_certificate(
+    username: str,
+    suggestion_type: str,
+    language_code: Optional[str],
+    from_date: datetime.datetime,
+    to_date: datetime.datetime
+) -> str:
+    """Generates a certificate for contributors' contributions.
+
+    Args:
+        username: str. The username of the contributor.
+        language_code: str|None. The language which the contributions should be
+            considered.
+        suggestion_type: str. The type of the suggestions that the
+            certificate needs to be generated.
+        from_date: datetime.datetime. The first date that the contributions
+            should be considered for the certificate.
+        to_date: datetime.datetime. The last date that the contributions
+            should be considered for the certificate.
+
+    Returns:
+        str. The path of the generated image of the certificate.
 
     Raises:
-        Exception. Image generation is failed.
+        Exception: The suggestion type is invalid.
     """
-    image_width = 1493
-    image_height = 1313
-    filename = str(uuid.uuid4()) + '.png'
+    user_id = user_services.get_user_id_from_username(username)
+    date = datetime.datetime.now().strftime('%Y-%m-%d')
+    template = ''
 
-    path = hti.screenshot(
-        html_str=template, save_as=filename, size=(image_width, image_height))
+    if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        template = _generate_translation_contributor_certificate(
+            language_code, from_date, to_date, username, user_id, date)
 
-    if len(path) == 0:
-        raise Exception('Image generation failed.')
+    elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+        template = _generate_question_contributor_certificate(
+            from_date, to_date, username, user_id, date)
 
-    return path[0]
+    else:
+        raise Exception('The suggestion type is invalid.')
+        
+    return _generate_contributor_certificate_image(template)
 
 
 def _generate_translation_contributor_certificate(
@@ -2940,11 +2963,12 @@ def _generate_translation_contributor_certificate(
     date: str
 ) -> str:
     """Generates a certificate for contributors' translation contributions.
-    Attributes:
-        language_code: str|None. The language which the contributions should be
-            considered.
-        suggestion_type: str. The type of the suggestions that the
-            certificate needs to be generated.
+
+    Args:
+        language_code: str|None. The language for which the contributions should
+            be considered.
+        suggestion_type: str. The type of suggestion that the certificate
+            needs to generate.
         from_date: datetime.datetime. The first date that the contributions
             should be considered for the certificate.
         to_date: datetime.datetime. The last date that the contributions
@@ -2958,9 +2982,7 @@ def _generate_translation_contributor_certificate(
         str. The HTML template to generate the certificate.
 
     Raises:
-        Exception. The language that is provided is invalid.
-        Exception: The suggestion type given to generate the certificate is
-            invalid.
+        Exception. The language is invalid.
     """
     minutes_per_sentence = 5
     signature = feconf.TRANSLATION_TEAM_LEAD
@@ -2970,38 +2992,33 @@ def _generate_translation_contributor_certificate(
         lambda lang: lang['id'] == language_code,
         constants.SUPPORTED_AUDIO_LANGUAGES))
     if len(languages) == 0:
-        raise Exception('The language that is provided is invalid.')
+        raise Exception('The provided language is invalid.')
     language_description = languages[0]['description']
 
-    all_sugestions = (
+    all_suggestions = (
         suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_submitted_before_given_date(
-                to_date, user_id, language_code))
-    older_suggestions = (
-        suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_submitted_before_given_date(
-                from_date, user_id, language_code))
+            .get_translation_suggestions_submitted_within_given_dates(
+                to_date, from_date, user_id, language_code))
 
     sentences_count = 0
-    for model in all_sugestions:
-        if model not in older_suggestions:
-            suggestion = get_suggestion_from_model(model)
+    for model in all_suggestions:
+        suggestion = get_suggestion_from_model(model)
 
-            # Retrieve the html content that is emphasized on the 
-            # Contributor Dashboard pages. This content is what stands
-            # out for each suggestion when a user views a list of
-            # suggestions.
-            get_html_representing_suggestion = (
-                SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
-                    suggestion.suggestion_type]
-            )
-            plain_text = _get_plain_text_from_html_content_string(
-                get_html_representing_suggestion(suggestion))
+        # Retrieve the html content that is emphasized on the 
+        # Contributor Dashboard pages. This content is what stands
+        # out for each suggestion when a user views a list of
+        # suggestions.
+        get_html_representing_suggestion = (
+            SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
+                suggestion.suggestion_type]
+        )
+        plain_text = _get_plain_text_from_html_content_string(
+            get_html_representing_suggestion(suggestion))
 
-            sentences = plain_text.split('.')
-            sentences_without_empty_strings = [
-                sentence for sentence in sentences if sentence != '']
-            sentences_count += len(sentences_without_empty_strings)
+        sentences = plain_text.split('.')
+        sentences_without_empty_strings = [
+            sentence for sentence in sentences if sentence != '']
+        sentences_count += len(sentences_without_empty_strings)
     hours_contributed = round(
         ((sentences_count * minutes_per_sentence) / 60), 2)
 
@@ -3088,7 +3105,8 @@ def _generate_question_contributor_certificate(
     date: str
 ) -> str:
     """Generates a certificate for contributors' question contributions.
-    Attributes:
+
+    Args:
         suggestion_type: str. The type of the suggestions that the
             certificate needs to be generated.
         from_date: datetime.datetime. The first date that the contributions
@@ -3111,25 +3129,20 @@ def _generate_question_contributor_certificate(
 
     all_sugestions = (
         suggestion_models.GeneralSuggestionModel
-            .get_question_suggestions_submitted_before_given_date(
-                to_date, user_id))
-    older_suggestions = (
-        suggestion_models.GeneralSuggestionModel
-            .get_question_suggestions_submitted_before_given_date(
-                from_date, user_id))
+            .get_question_suggestions_submitted_before_given_dates(
+                to_date, from_date, user_id))
 
     minutes_contributed = 0
     for model in all_sugestions:
-        if model not in older_suggestions:
-            suggestion = get_suggestion_from_model(model)
+        suggestion = get_suggestion_from_model(model)
 
-            content = suggestion.change.question_dict[
-                'question_state_data']['content']['html']
+        content = suggestion.change.question_dict[
+            'question_state_data']['content']['html']
 
-            if 'oppia-noninteractive-image' in content:
-                minutes_contributed += 20
-            else:
-                minutes_contributed += 12
+        if 'oppia-noninteractive-image' in content:
+            minutes_contributed += 20
+        else:
+            minutes_contributed += 12
     hours_contributed = round((minutes_contributed / 60), 2)
 
     if minutes_contributed == 0:
@@ -3205,47 +3218,24 @@ def _generate_question_contributor_certificate(
     return question_submitter_certificate_template
 
 
-def generate_contributor_certificate(
-    username: str,
-    suggestion_type: str,
-    language_code: Optional[str],
-    from_date: datetime.datetime,
-    to_date: datetime.datetime
-) -> str:
-    """Generates a certificate for contributors' contributions.
-    Attributes:
-        username: str. The username of the contributor.
-        language_code: str|None. The language which the contributions should be
-            considered.
-        suggestion_type: str. The type of the suggestions that the
-            certificate needs to be generated.
-        from_date: datetime.datetime. The first date that the contributions
-            should be considered for the certificate.
-        to_date: datetime.datetime. The last date that the contributions
-            should be considered for the certificate.
+def _generate_contributor_certificate_image(template: str) -> str:
+    """Generates an image from the html string.
 
-    Returns:
-        str. The path of the generated image of the certificate.
+    Args:
+        template: str. The html template to create the image.
 
     Raises:
-        Exception. There are no contributions for the given suggestion type
-            for the given time range.
-        Exception: The suggestion type given to generate the certificate is
-            invalid.
+        Exception. Image generation failed.
     """
-    user_id = user_services.get_user_id_from_username(username)
-    date = datetime.datetime.now().strftime('%Y-%m-%d')
-    template = ''
+    hti = Html2Image()
+    image_width = 1493
+    image_height = 1313
+    filename = str(uuid.uuid4()) + '.png'
 
-    if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        template = _generate_translation_contributor_certificate(
-            language_code, from_date, to_date, username, user_id, date)
+    image_paths = hti.screenshot(
+        html_str=template, save_as=filename, size=(image_width, image_height))
 
-    elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
-        template = _generate_question_contributor_certificate(
-            from_date, to_date, username, user_id, date)
+    if len(image_paths) == 0:
+        raise Exception('Image generation failed.')
 
-    else:
-        raise Exception('Invalid contribution type to generate the certificate.')
-        
-    return _generate_image_from_html(template)
+    return image_paths[0]

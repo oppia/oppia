@@ -180,7 +180,7 @@
         </button>
       </div>
       <div class="certificate-download-button-container" *ngIf="type == 'translationContribution'">
-        <button class="btn btn-success certificate-download-button" (click)="openCertificateDownloadModal('translate_content', block.key)">
+        <button class="btn btn-success certificate-download-button" (click)="openCertificateDownloadModal('translate_content', translationStatByLanguageAndTopic.key)">
           <span>
             Download Certificate
           </span>

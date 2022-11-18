@@ -239,18 +239,18 @@ export class ContributorStatsComponent {
 
     if (response.translation_contribution_stats.length > 0) {
       response.translation_contribution_stats.map((stat) => {
-        const language = this.languageUtilService.getAudioLanguageDescription(
-          stat.language_code);
         if (
           this.statsData.translationContribution === null ||
           this.statsData.translationContribution === undefined) {
           throw new Error('Translation contributions are undefined.');
         }
-        if (!this.statsData.translationContribution[language]) {
-          this.statsData.translationContribution[language] = new PageableStats(
+        if (!this.statsData.translationContribution[stat.language_code]) {
+          this.statsData.translationContribution[
+            stat.language_code] = new PageableStats(
             [this.createTranslationContributionStat(stat)]);
         } else {
-          this.statsData?.translationContribution[language]?.data?.push(
+          this.statsData?.translationContribution[
+            stat.language_code]?.data?.push(
             this.createTranslationContributionStat(stat));
         }
       });
@@ -258,18 +258,17 @@ export class ContributorStatsComponent {
 
     if (response.translation_review_stats.length > 0) {
       response.translation_review_stats.map((stat) => {
-        const language = this.languageUtilService.getAudioLanguageDescription(
-          stat.language_code);
         if (
           this.statsData.translationReview === null ||
           this.statsData.translationReview === undefined) {
           throw new Error('Translation reviews are undefined.');
         }
-        if (!this.statsData.translationReview[language]) {
-          this.statsData.translationReview[language] = new PageableStats(
+        if (!this.statsData.translationReview[stat.language_code]) {
+          this.statsData.translationReview[
+            stat.language_code] = new PageableStats(
             [this.createTranslationReviewStat(stat)]);
         } else {
-          this.statsData?.translationReview[language]?.data?.push(
+          this.statsData?.translationReview[stat.language_code]?.data?.push(
             this.createTranslationReviewStat(stat));
         }
       });

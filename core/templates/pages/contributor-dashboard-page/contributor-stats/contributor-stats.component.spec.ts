@@ -209,7 +209,9 @@ describe('Contributor stats component', () => {
         'Question Reviews');
     }));
 
-    it('should open translation modal when clicking button', fakeAsync(() => {
+    it('should open date range selecting model to generate certificate for' +
+      ' contributors',
+    fakeAsync(() => {
       component.openCertificateDownloadModal('add_question');
       tick();
       expect(modalService.open).toHaveBeenCalled();

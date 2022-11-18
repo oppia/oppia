@@ -106,7 +106,7 @@ describe('Contributor Certificate Download Modal Component', () => {
       .toHaveBeenCalledWith('Generating certificate...', 5000);
   });
 
-  it('should show errors when invalid', fakeAsync(() => {
+  it('should show error when contributions not found', fakeAsync(() => {
     component.fromDate = '2022/01/01';
     component.toDate = '2022/12/31';
     spyOn(
@@ -125,7 +125,7 @@ describe('Contributor Certificate Download Modal Component', () => {
       'Contributions not found for the given inputs.');
   }));
 
-  it('should show invalid time ranges', () => {
+  it('should show error for invalid time ranges', () => {
     component.fromDate = '2023/01/01';
     component.toDate = '2022/12/31';
 
