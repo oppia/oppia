@@ -31,7 +31,7 @@ interface Option {
 
 class PageableStats {
   currentPageStartIndex: number;
-  data: (
+  data?: (
     TranslationContributionStats | TranslationReviewStats |
     QuestionContributionStats | QuestionReviewStats)[];
 
@@ -246,12 +246,7 @@ export class ContributorStatsComponent {
           this.statsData.translationContribution[language] = new PageableStats(
             [this.createTranslationContributionStat(stat)]);
         } else {
-          if (
-            this.statsData.translationContribution[language] === null ||
-            this.statsData.translationContribution[language] === undefined) {
-            throw new Error('Invalid');
-          }
-          this.statsData.translationContribution[language].data.push(
+          this.statsData.translationContribution[language].data?.push(
             this.createTranslationContributionStat(stat));
         }
       });
@@ -270,7 +265,7 @@ export class ContributorStatsComponent {
           this.statsData.translationReview[language] = new PageableStats(
             [this.createTranslationReviewStat(stat)]);
         } else {
-          this.statsData.translationReview[language].data.push(
+          this.statsData.translationReview[language].data?.push(
             this.createTranslationReviewStat(stat));
         }
       });
