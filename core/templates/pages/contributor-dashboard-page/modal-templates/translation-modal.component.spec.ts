@@ -296,13 +296,13 @@ describe('Translation Modal Component', () => {
           .toBe('ltr');
       });
 
-      it('should throw error if CodeMirrorComponent is undefined', fakeAsync(
+      it('should throw error if contribution rights is null', fakeAsync(
         () => {
           getUserContributionRightsDataAsyncSpy.and.returnValue(null);
           expect(() => {
             component.ngOnInit();
             tick();
-          }).toThrowError('CodeMirrorComponent not Found');
+          }).toThrowError();
         }));
     });
 
