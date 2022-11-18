@@ -329,8 +329,16 @@ var ContributorDashboardPage = function() {
   this.navigateToQuestionReviewStats = async function() {
     await action.click(
       'Stats tab button', navigateToStatsTab);
+    await waitFor.elementToBeClickable(
+      contributionTypeSelectorContainer,
+      'Contribution type selector taking too long to become clickable.'
+    );
     await action.click(
       'Contribution type selector', contributionTypeSelectorContainer);
+    await waitFor.elementToBeClickable(
+      navigateToQuestionReviewStatsOption,
+      'Question review stats taking too long to become clickable.'
+    );
     await action.click(
       'Question review stats', navigateToQuestionReviewStatsOption);
     await this.waitForStatsToLoad();

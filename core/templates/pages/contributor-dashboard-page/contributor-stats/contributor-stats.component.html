@@ -2,7 +2,7 @@
   <div class="stats-contribution-type-mobile-container">
     <div class="dropdown-label">Type</div>
     <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container">
-      <div class="oppia-stats-type-selector-inner-containerr e2e-test-contribution-type-selector" (click)="toggleMobileDropdown()">
+      <div class="oppia-stats-type-selector-inner-container e2e-test-contribution-type-selector" (click)="toggleMobileDropdown()">
         {{selectedContributionType}}
         <span class="material-icons oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': mobileDropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
           arrow_drop_down
@@ -26,8 +26,8 @@
     Explore the impact of your contributions!
   </div>
   <div class="stats-contribution-type-container">
-    <div #dropdown class="oppia-stats-type-selector-containe">
-      <div class="oppia-stats-type-selector-inner-containerr e2e-test-contribution-type-selector" (click)="toggleDropdown()">
+    <div #dropdown class="oppia-stats-type-selector-container">
+      <div class="oppia-stats-type-selector-inner-container e2e-test-contribution-type-selector" (click)="toggleDropdown()">
         {{selectedContributionType}}
         <span class="fas fa-caret-down oppia-stats-type-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
         </span>
