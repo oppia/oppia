@@ -31,8 +31,9 @@ interface Option {
 
 class PageableStats {
   currentPageStartIndex: number;
-  // eslint-disable-next-line max-len
-  data: (TranslationContributionStats | TranslationReviewStats | QuestionContributionStats | QuestionReviewStats)[];
+  data: (
+    TranslationContributionStats | TranslationReviewStats |
+    QuestionContributionStats | QuestionReviewStats)[];
 
   constructor(
       data: (
@@ -235,31 +236,13 @@ export class ContributorStatsComponent {
       response.translation_contribution_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        // This throws "Object is possibly 'undefined'.".
-        // We are checking whether there exists translation contribution stats
-        // data for a given language. If there are no stats data or it is
-        // undefined, we are setting it here. Hence we can ignore the ts check
-        // here. We need to suppress this error because of strict type checking.
-        // @ts-ignore
+        if (language === null || language === undefined) {
+          throw new Error('Invalid language code');
+        }
         if (!this.statsData.translationContribution[language]) {
-          // This throws "Object is possibly 'undefined'.".
-          // We are checking whether there exists translation contribution stats
-          // data for a given language. If there are no stats data or it is
-          // undefined, we are setting it here. Hence we can ignore the ts check
-          // here. We need to suppress this error because of strict type
-          // checking.
-          // @ts-ignore
-          this.statsData.translationContribution[language] = this
-            .createTranslationContributionPageableStats(stat);
+          this.statsData.translationContribution[language] = new PageableStats(
+            [this.createTranslationContributionStat(stat)]);
         } else {
-          // This throws "Object is possibly 'undefined'.".
-          // In the previous if block, we are checking whether
-          // statsData.translationContribution[language] is undefined. Hence we
-          // can confirm that statsData.translationContribution[language] is not
-          // undefined in this block. Hence we can ignore the ts check
-          // here. We need to suppress this error because of strict type
-          // checking.
-          // @ts-ignore
           this.statsData.translationContribution[language].data.push(
             this.createTranslationContributionStat(stat));
         }
@@ -270,31 +253,13 @@ export class ContributorStatsComponent {
       response.translation_review_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        // This throws "Object is possibly 'undefined'.".
-        // We are checking whether there exists translation review stats
-        // data for a given language. If there are no stats data or it is
-        // undefined, we are setting it here. Hence we can ignore the ts check
-        // here. We need to suppress this error because of strict type checking.
-        // @ts-ignore
+        if (language === null || language === undefined) {
+          throw new Error('Invalid language code');
+        }
         if (!this.statsData.translationReview[language]) {
-          // This throws "Object is possibly 'undefined'.".
-          // We are checking whether there exists translation review stats
-          // data for a given language. If there are no stats data or it is
-          // undefined, we are setting it here. Hence we can ignore the ts check
-          // here. We need to suppress this error because of strict type
-          // checking.
-          // @ts-ignore
-          this.statsData.translationReview[language] = this
-            .createTranslationReviewPageableStats(stat);
+          this.statsData.translationReview[language] = new PageableStats(
+            [this.createTranslationReviewStat(stat)]);
         } else {
-          // This throws "Object is possibly 'undefined'.".
-          // In the previous if block, we are checking whether
-          // statsData.translationReview[language] is undefined. Hence we can
-          // confirm that statsData.translationReview[language] is not undefined
-          // in this block. Hence we can ignore the ts check
-          // here. We need to suppress this error because of strict type
-          // checking.
-          // @ts-ignore
           this.statsData?.translationReview[language].data.push(
             this.createTranslationReviewStat(stat));
         }
@@ -302,43 +267,20 @@ export class ContributorStatsComponent {
     }
 
     if (response.question_contribution_stats.length > 0) {
-      this.statsData.questionContribution = this
-        .createQuestionContributionPageableStats(
-          response.question_contribution_stats);
+      this.statsData.questionContribution = new PageableStats(
+        response.question_contribution_stats.map((stat) => {
+          return this.createQuestionContributionStat(stat);
+        })
+      );
     }
 
     if (response.question_review_stats.length > 0) {
-      this.statsData.questionReview = this.createQuestionReviewPageableStats(
-        response.question_review_stats);
+      this.statsData.questionReview = new PageableStats(
+        response.question_review_stats.map((stat) => {
+          return this.createQuestionReviewStat(stat);
+        })
+      );
     }
-  }
-
-  createTranslationContributionPageableStats(
-      stat: TranslationContributionBackendDict): PageableStats {
-    const data = [this.createTranslationContributionStat(stat)];
-    return new PageableStats(data);
-  }
-
-  createTranslationReviewPageableStats(
-      stat: TranslationReviewBackendDict): PageableStats {
-    const data = [this.createTranslationReviewStat(stat)];
-    return new PageableStats(data);
-  }
-
-  createQuestionContributionPageableStats(
-      stat: QuestionContributionBackendDict[]): PageableStats {
-    const data = stat.map((stat) => {
-      return this.createQuestionContributionStat(stat);
-    });
-    return new PageableStats(data);
-  }
-
-  createQuestionReviewPageableStats(
-      stat: QuestionReviewBackendDict[]): PageableStats {
-    const data = stat.map((stat) => {
-      return this.createQuestionReviewStat(stat);
-    });
-    return new PageableStats(data);
   }
 
   createTranslationContributionStat(
