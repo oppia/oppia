@@ -318,6 +318,7 @@
 	"I18N_DEST_IF_STUCK_INFO_TOOLTIP": "You can now specify a new card in which you can walk the learners through the concepts used in the question, if they get really stuck!",
 	"I18N_DIAGNOSTIC_TEST_INTRO_TEXT_1": "Text displayed on the diagnostic test player page telling user that in the diagnostic test they will get a topic recommendation for getting started with Math lessons.",
 	"I18N_DIAGNOSTIC_TEST_INTRO_TEXT_2": "Text displayed on the diagnostic test player page telling user that they will not be able to change their answer after moving to the next question.",
+	"I18N_DIAGNOSTIC_TEST_RESULT_HEADER_TEXT": "The text is presented on the result page header of the diagnostic test. The text congratulates the learner for their completion of the diagnostic test.",
 	"I18N_DIAGNOSTIC_TEST_RESULT_START_TOPIC": "The button text is present on the diagnostic test result page. The button guides the learner to start a topic. After clicking the button the learners are navigated to the topic viewer page.",
 	"I18N_DIAGNOSTIC_TEST_RESULT_TEXT_1_FOR_NO_TOPIC": "The text is presented on the result page of the diagnostic test. The text congratulates the learner for their basic understanding of the topics that are currently present in the Math Classroom.",
 	"I18N_DIAGNOSTIC_TEST_RESULT_TEXT_2_FOR_NO_TOPIC": "The text is presented on the result page of the diagnostic test. The text informs the learner to review any of the topics or improve what they know. The text also informs them to visit Oppia regularly as the Classroom is constantly updating.",
