@@ -314,10 +314,15 @@ var ContributorDashboardPage = function() {
       contributionTypeSelectorContainer,
       'Contribution type selector taking too long to become clickable.'
     );
+    await action.click(
+      'Contribution type selector', contributionTypeSelectorContainer);
     await waitFor.elementToBeClickable(
       navigateToQuestionContributionStatsOption,
       'Question contribution stats taking too long to become clickable.'
     );
+    await action.click(
+      'Question contributino option',
+      navigateToQuestionContributionStatsOption);
     await this.waitForStatsToLoad();
   };
 
