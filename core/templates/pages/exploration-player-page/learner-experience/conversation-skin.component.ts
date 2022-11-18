@@ -60,7 +60,7 @@ import { LocalStorageService } from 'services/local-storage.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { State } from 'domain/state/StateObjectFactory';
-import { InteractionRulesService } from '../services/answer-classification.service';
+import { AnswerClassificationService, InteractionRulesService } from '../services/answer-classification.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
@@ -78,6 +78,10 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 import './conversation-skin.component.css';
+import { ConceptCardManagerService } from '../services/concept-card-manager.service';
+import { TranslateService } from '@ngx-translate/core';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';
 
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
@@ -121,11 +125,14 @@ export class ConversationSkinComponent {
   recommendedExplorationSummaries = [];
   answerIsCorrect = false;
   nextCard;
+  nextCardIfStuck: StateCard | null;
   alertMessage = {};
   pendingCardWasSeenBefore: boolean = false;
   OPPIA_AVATAR_IMAGE_URL: string;
   displayedCard: StateCard;
   upcomingInlineInteractionHtml;
+  timeout: NodeJS.Timeout | null = null;
+  responseTimeout: NodeJS.Timeout | null = null;
   DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
 
@@ -148,6 +155,7 @@ export class ConversationSkinComponent {
   completedStateNames: string[] = [];
   prevSessionStatesProgress: string[] = [];
   mostRecentlyReachedCheckpoint: string;
+  numberOfIncorrectSubmissions: number = 0;
   showProgressClearanceMessage: boolean = false;
   alertMessageTimeout = 6000;
   // 'completedChaptersCount' is fetched via a HTTP request.
@@ -157,6 +165,8 @@ export class ConversationSkinComponent {
   CHECKPOINTS_FEATURE_IS_ENABLED: boolean = false;
   pidInUrl: string;
   submitButtonIsDisabled = true;
+  solutionForState: Solution | null = null;
+  isLearnerReallyStuck: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
@@ -183,6 +193,7 @@ export class ConversationSkinComponent {
     private focusManagerService: FocusManagerService,
     private guestCollectionProgressService: GuestCollectionProgressService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
+    private conceptCardManagerService: ConceptCardManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private imagePreloaderService: ImagePreloaderService,
     private learnerAnswerInfoService: LearnerAnswerInfoService,
@@ -213,6 +224,8 @@ export class ConversationSkinComponent {
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,
     private platformFeatureService: PlatformFeatureService,
+    private translateService: TranslateService,
+    private answerClassificationService: AnswerClassificationService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
   ) {}
 
@@ -272,6 +285,41 @@ export class ConversationSkinComponent {
           })
       );
     }
+
+    this.directiveSubscriptions.add(
+      this.playerPositionService.onNewCardOpened.subscribe(
+        (newCard: StateCard) => {
+          this.solutionForState = newCard.getSolution();
+          this.numberOfIncorrectSubmissions = 0;
+          this.nextCardIfStuck = null;
+          this.triggerIfLearnerStuckAction();
+        }
+      )
+    );
+
+    this.directiveSubscriptions.add(
+      this.hintsAndSolutionManagerService.onLearnerReallyStuck.subscribe(
+        () => {
+          this.triggerIfLearnerStuckActionDirectly();
+        }
+      )
+    );
+
+    this.directiveSubscriptions.add(
+      this.hintsAndSolutionManagerService.onHintsExhausted.subscribe(
+        () => {
+          this.triggerIfLearnerStuckAction();
+        }
+      )
+    );
+
+    this.directiveSubscriptions.add(
+      this.conceptCardManagerService.onLearnerGetsReallyStuck
+        .subscribe(() => {
+          this.isLearnerReallyStuck = true;
+          this.triggerIfLearnerStuckActionDirectly();
+        })
+    );
 
     this.directiveSubscriptions.add(
       this.explorationPlayerStateService.onPlayerStateChange.subscribe(
@@ -982,6 +1030,68 @@ export class ConversationSkinComponent {
     }
   }
 
+  triggerIfLearnerStuckAction(): void {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = null;
+    }
+    if (this.responseTimeout) {
+      clearTimeout(this.responseTimeout);
+      this.responseTimeout = null;
+    }
+    this.responseTimeout = setTimeout(() => {
+      if (this.nextCardIfStuck) {
+        // Let the learner know about the redirection to a state
+        // for clearing concepts.
+        this.playerTranscriptService.addNewResponse(
+          this.translateService.instant(
+            'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE')
+        );
+      } else if (this.solutionForState !== null &&
+        this.numberOfIncorrectSubmissions >=
+        ExplorationPlayerConstants.
+          MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION) {
+        // Release solution if no separate state for addressing
+        // the stuck learner exists and the solution exists.
+        this.hintsAndSolutionManagerService.releaseSolution();
+      }
+    }, ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
+    this.timeout = setTimeout(() => {
+      if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
+        // Redirect the learner.
+        this.nextCard = this.nextCardIfStuck;
+        this.showPendingCard();
+      }
+    }, ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
+  }
+
+  triggerIfLearnerStuckActionDirectly(): void {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = null;
+    }
+    if (this.responseTimeout) {
+      clearTimeout(this.responseTimeout);
+      this.responseTimeout = null;
+    }
+    // Directly trigger action for the really stuck learner.
+    if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
+      this.playerTranscriptService.addNewResponse(
+        this.translateService.instant(
+          'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE'));
+      setTimeout(() => {
+        this.nextCard = this.nextCardIfStuck;
+        this.showPendingCard();
+      }, 10000);
+    } else if (this.solutionForState !== null &&
+      this.numberOfIncorrectSubmissions >=
+      ExplorationPlayerConstants.
+        MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION) {
+      // Release solution if it exists.
+      this.hintsAndSolutionManagerService.releaseSolution();
+    }
+  }
+
   showQuestionAreNotAvailable(): void {
     this.loaderService.hideLoadingScreen();
   }
@@ -1106,8 +1216,9 @@ export class ConversationSkinComponent {
           feedbackAudioTranslations, refresherExplorationId,
           missingPrerequisiteSkillId, remainOnCurrentCard,
           taggedSkillMisconceptionId, wasOldStateInitial,
-          isFirstHit, isFinalQuestion, focusLabel) => {
+          isFirstHit, isFinalQuestion, nextCardIfReallyStuck, focusLabel,) => {
         this.nextCard = nextCard;
+        this.nextCardIfStuck = nextCardIfReallyStuck;
         if (!this._editorPreviewMode &&
             !this.explorationPlayerStateService.isInQuestionMode()) {
           let oldStateName =
@@ -1158,7 +1269,24 @@ export class ConversationSkinComponent {
 
           if (remainOnCurrentCard) {
             // Stay on the same card.
+            let oldStateCard: StateCard = this.playerTranscriptService.
+              getLastCard();
+            let oldInteractionId = oldStateCard.getInteractionId();
+            let oldInteractionArgs = oldStateCard.
+              getInteractionCustomizationArgs() as TextInputCustomizationArgs;
+            if (oldInteractionId === AppConstants.
+              INTERACTION_NAMES.TEXT_INPUT &&
+              oldInteractionArgs.catchMisspellings) {
+              let answerIsOnlyMisspelled = this.answerClassificationService.
+                isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
+              if (answerIsOnlyMisspelled) {
+                // Change the feedbackHtml.
+                feedbackHtml = this.getFeedbackHtmlWhenAnswerMisspelled();
+              }
+            }
+            this.numberOfIncorrectSubmissions++;
             this.hintsAndSolutionManagerService.recordWrongAnswer();
+            this.conceptCardManagerService.recordWrongAnswer();
             this.playerTranscriptService.addNewResponse(feedbackHtml);
             let helpCardAvailable = false;
             if (feedbackHtml &&
@@ -1287,6 +1415,16 @@ export class ConversationSkinComponent {
           this.answerIsBeingProcessed = false;
         }, millisecsLeftToWait);
       }
+    );
+  }
+
+  getFeedbackHtmlWhenAnswerMisspelled(): string {
+    let availableKeyCount = ExplorationPlayerConstants.
+      I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS.length;
+    const randomKeyIndex = Math.floor(Math.random() * availableKeyCount);
+    return this.translateService.instant(
+      ExplorationPlayerConstants.
+        I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS[randomKeyIndex]
     );
   }
 

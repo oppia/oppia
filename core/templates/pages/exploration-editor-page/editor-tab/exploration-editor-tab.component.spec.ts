@@ -330,7 +330,10 @@ describe('Exploration editor tab component', () => {
               content_id: 'ca_placeholder',
               unicode_str: ''
             }},
-            rows: {value: 1}
+            rows: {value: 1},
+            catchMisspellings: {
+              value: false
+            }
           },
           answer_groups: [{
             rule_specs: [],
@@ -422,7 +425,10 @@ describe('Exploration editor tab component', () => {
               content_id: 'ca_placeholder',
               unicode_str: ''
             }},
-            rows: {value: 1}
+            rows: {value: 1},
+            catchMisspellings: {
+              value: false
+            }
           },
           answer_groups: [{
             rule_specs: [],
@@ -705,7 +711,10 @@ describe('Exploration editor tab component', () => {
 
     expect(stateEditorService.interaction.customizationArgs).toEqual({
       rows: { value: 1 },
-      placeholder: { value: new SubtitledUnicode('', 'ca_placeholder') }
+      placeholder: { value: new SubtitledUnicode('', 'ca_placeholder') },
+      catchMisspellings: {
+        value: false
+      }
     });
 
     let displayedValue = {
@@ -714,6 +723,9 @@ describe('Exploration editor tab component', () => {
       },
       rows: {
         value: 2
+      },
+      catchMisspellings: {
+        value: false
       }
     };
     component.saveInteractionCustomizationArgs(displayedValue);

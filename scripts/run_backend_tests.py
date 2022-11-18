@@ -61,8 +61,10 @@ import subprocess
 import sys
 import threading
 import time
+from typing import Dict, Final, List, Optional, Tuple, cast
 
 from . import install_third_party_libs
+
 # This installs third party libraries before importing other files or importing
 # libraries that use the builtins python module (e.g. build, utils).
 install_third_party_libs.main()
@@ -72,21 +74,28 @@ from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-COVERAGE_EXCLUSION_LIST_PATH = os.path.join(
-    os.getcwd(), 'scripts', 'backend_tests_incomplete_coverage.txt')
+COVERAGE_EXCLUSION_LIST_PATH: Final = os.path.join(
+    os.getcwd(), 'scripts', 'backend_tests_incomplete_coverage.txt'
+)
 
-TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
+TEST_RUNNER_PATH: Final = os.path.join(
+    os.getcwd(), 'core', 'tests', 'gae_suite.py'
+)
 # This should be the same as core.test_utils.LOG_LINE_PREFIX.
-LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
+LOG_LINE_PREFIX: Final = 'LOG_INFO_TEST: '
 # This path points to a JSON file that defines which modules belong to
 # each shard.
-SHARDS_SPEC_PATH = os.path.join(
-    os.getcwd(), 'scripts', 'backend_test_shards.json')
-SHARDS_WIKI_LINK = (
-    'https://github.com/oppia/oppia/wiki/Writing-backend-tests#common-errors')
-_LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
+SHARDS_SPEC_PATH: Final = os.path.join(
+    os.getcwd(), 'scripts', 'backend_test_shards.json'
+)
+SHARDS_WIKI_LINK: Final = (
+    'https://github.com/oppia/oppia/wiki/Writing-backend-tests#common-errors'
+)
+_LOAD_TESTS_DIR: Final = os.path.join(
+    os.getcwd(), 'core', 'tests', 'load_tests'
+)
 
-_PARSER = argparse.ArgumentParser(
+_PARSER: Final = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder:
     python -m scripts.run_backend_tests
@@ -94,7 +103,7 @@ IMPORTANT: Only one of --test_path,  --test_target, and --test_shard
 should be specified.
 """)
 
-_EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
+_EXCLUSIVE_GROUP: Final = _PARSER.add_mutually_exclusive_group()
 _EXCLUSIVE_GROUP.add_argument(
     '--test_target',
     help='optional dotted module name of the test(s) to run',
@@ -127,18 +136,22 @@ _PARSER.add_argument(
 
 
 def run_shell_cmd(
-        exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=None):
+    exe: List[str],
+    stdout: int = subprocess.PIPE,
+    stderr: int = subprocess.PIPE,
+    env: Optional[Dict[str, str]] = None
+) -> str:
     """Runs a shell command and captures the stdout and stderr output.
 
     If the cmd fails, raises Exception. Otherwise, returns a string containing
     the concatenation of the stdout and stderr logs.
     """
     p = subprocess.Popen(exe, stdout=stdout, stderr=stderr, env=env)
-    last_stdout_str, last_stderr_str = p.communicate()
+    last_stdout_bytes, last_stderr_bytes = p.communicate()
     # Standard and error output is in bytes, we need to decode them to be
     # compatible with rest of the code.
-    last_stdout_str = last_stdout_str.decode('utf-8')
-    last_stderr_str = last_stderr_str.decode('utf-8')
+    last_stdout_str = last_stdout_bytes.decode('utf-8')
+    last_stderr_str = last_stderr_bytes.decode('utf-8')
     last_stdout = last_stdout_str.split('\n')
 
     if LOG_LINE_PREFIX in last_stdout_str:
@@ -160,11 +173,15 @@ def run_shell_cmd(
 class TestingTaskSpec:
     """Executes a set of tests given a test class name."""
 
-    def __init__(self, test_target, generate_coverage_report):
+    def __init__(
+        self,
+        test_target: str,
+        generate_coverage_report: bool
+    ) -> None:
         self.test_target = test_target
         self.generate_coverage_report = generate_coverage_report
 
-    def run(self):
+    def run(self) -> List[concurrent_task_utils.TaskResult]:
         """Runs all tests corresponding to the given test target."""
         env = os.environ.copy()
         test_target_flag = '--test_target=%s' % self.test_target
@@ -210,15 +227,17 @@ class TestingTaskSpec:
                 # fully covering their (nonexistent) associated code
                 # file.
                 report = ''
-                coverage = 100
+                coverage = 100.0
             messages.append(report)
-            messages.append(coverage)
+            messages.append(str(coverage))
 
-        return [concurrent_task_utils.TaskResult(
-            None, None, None, messages)]
+        return [concurrent_task_utils.TaskResult('', False, [], messages)]
 
 
-def get_all_test_targets_from_path(test_path=None, include_load_tests=True):
+def get_all_test_targets_from_path(
+    test_path: Optional[str] = None,
+    include_load_tests: bool = True
+) -> List[str]:
     """Returns a list of test targets for all classes under test_path
     containing tests.
     """
@@ -246,7 +265,7 @@ def get_all_test_targets_from_path(test_path=None, include_load_tests=True):
     return result
 
 
-def get_all_test_targets_from_shard(shard_name):
+def get_all_test_targets_from_shard(shard_name: str) -> List[str]:
     """Find all test modules in a shard.
 
     Args:
@@ -256,11 +275,17 @@ def get_all_test_targets_from_shard(shard_name):
         list(str). The dotted module names that belong to the shard.
     """
     with utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
-        shards_spec = json.load(shards_file)
+        # Here we use cast because we are narrowing down the type
+        # since we know the type of shards_spec as it is the content
+        # of the file backend_test_shards.json.
+        shards_spec = cast(
+            Dict[str, List[str]],
+            json.load(shards_file)
+        )
     return shards_spec[shard_name]
 
 
-def check_shards_match_tests(include_load_tests=True):
+def check_shards_match_tests(include_load_tests: bool = True) -> str:
     """Check whether the test shards match the tests that exist.
 
     Args:
@@ -314,7 +339,7 @@ def check_shards_match_tests(include_load_tests=True):
     ).format(test_extra, SHARDS_WIKI_LINK)
 
 
-def load_coverage_exclusion_list(path):
+def load_coverage_exclusion_list(path: str) -> List[str]:
     """Load modules excluded from per-file coverage checks.
 
     Args:
@@ -334,7 +359,11 @@ def load_coverage_exclusion_list(path):
     return exclusion_list
 
 
-def check_test_results(tasks, task_to_taskspec, generate_coverage_report):
+def check_test_results(
+    tasks: List[concurrent_task_utils.TaskThread],
+    task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec],
+    generate_coverage_report: bool
+) -> Tuple[int, int, int, int]:
     """Run tests and parse coverage reports."""
     coverage_exclusions = load_coverage_exclusion_list(
         COVERAGE_EXCLUSION_LIST_PATH)
@@ -367,6 +396,11 @@ def check_test_results(tasks, task_to_taskspec, generate_coverage_report):
             )
 
             try:
+                if not tests_failed_regex_match:
+                    raise Exception(
+                        'The error message did not match '
+                        'tests_failed_regex_match'
+                    )
                 test_count = int(tests_failed_regex_match.group(1))
                 errors = int(tests_failed_regex_match.group(2))
                 failures = int(tests_failed_regex_match.group(3))
@@ -374,7 +408,7 @@ def check_test_results(tasks, task_to_taskspec, generate_coverage_report):
                 total_failures += failures
                 print('FAILED    %s: %s errors, %s failures' % (
                     spec.test_target, errors, failures))
-            except AttributeError as e:
+            except Exception as e:
                 # There was an internal error, and the tests did not run (The
                 # error message did not match `tests_failed_regex_match`).
                 total_errors += 1
@@ -390,6 +424,10 @@ def check_test_results(tasks, task_to_taskspec, generate_coverage_report):
                 tests_run_regex_match = re.search(
                     r'Ran ([0-9]+) tests? in ([0-9\.]+)s',
                     task.task_results[0].get_report()[0])
+                if not tests_run_regex_match:
+                    raise Exception(
+                        'The error message did not match tests_run_regex_match'
+                    )
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
                 print(
@@ -403,7 +441,7 @@ def check_test_results(tasks, task_to_taskspec, generate_coverage_report):
                 coverage = task.task_results[0].get_report()[-2]
                 if (
                         spec.test_target not in coverage_exclusions
-                        and coverage != 100):
+                        and float(coverage) != 100.0):
                     print('INCOMPLETE COVERAGE (%s%%): %s' % (
                         coverage, spec.test_target))
                     incomplete_coverage += 1
@@ -414,7 +452,7 @@ def check_test_results(tasks, task_to_taskspec, generate_coverage_report):
     return total_count, total_errors, total_failures, incomplete_coverage
 
 
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> None:
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
@@ -549,7 +587,10 @@ def main(args=None):
 
 
 def check_coverage(
-        combine, data_file=None, include=tuple()):
+    combine: bool,
+    data_file: Optional[str] = None,
+    include: Optional[Tuple[str, ...]] = tuple()
+) -> Tuple[str, float]:
     """Check code coverage of backend tests.
 
     Args:
@@ -594,7 +635,7 @@ def check_coverage(
     if process.stdout.strip() == 'No data to report.':
         # File under test is exempt from coverage according to the
         # --omit flag or .coveragerc.
-        coverage = 100
+        coverage = 100.0
     elif process.returncode:
         raise RuntimeError(
             'Failed to calculate coverage because subprocess failed. %s'
@@ -604,7 +645,9 @@ def check_coverage(
         coverage_result = re.search(
             r'TOTAL\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
             process.stdout)
-        coverage = float(coverage_result.group('total'))
+        coverage = (
+            float(coverage_result.group('total')) if coverage_result else 0.0
+        )
 
     return process.stdout, coverage
 
