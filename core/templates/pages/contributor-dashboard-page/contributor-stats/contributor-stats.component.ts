@@ -38,7 +38,7 @@ class PageableStats {
   constructor(
       data: (
       TranslationContributionStats | TranslationReviewStats |
-      QuestionContributionStats | QuestionReviewStats)[]) {
+      QuestionContributionStats | QuestionReviewStats)[] | undefined) {
     this.data = data;
     this.currentPageStartIndex = 0;
   }
