@@ -23,7 +23,7 @@ import { QuestionPlayerStateService } from 'components/question-directives/quest
 import { Collection } from 'domain/collection/collection.model';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
@@ -54,7 +54,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
-import { InteractionRulesService } from '../services/answer-classification.service';
+import { AnswerClassificationService, InteractionRulesService } from '../services/answer-classification.service';
 import { ContentTranslationLanguageService } from '../services/content-translation-language.service';
 import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 import { CurrentInteractionService } from '../services/current-interaction.service';
@@ -77,9 +77,10 @@ import { ConversationSkinComponent } from './conversation-skin.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
-import { ConceptCardManagerService } from '../services/concept-card-manager.service';
 import { TranslateService } from '@ngx-translate/core';
 import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
+import { ConceptCardManagerService } from '../services/concept-card-manager.service';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 
 class MockWindowRef {
@@ -138,12 +139,15 @@ describe('Conversation skin component', () => {
   let localStorageService: LocalStorageService;
   let messengerService: MessengerService;
   let numberAttemptsService: NumberAttemptsService;
+  let interactionObjectFactory: InteractionObjectFactory;
+  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let playerCorrectnessFeedbackEnabledService:
     PlayerCorrectnessFeedbackEnabledService;
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let questionPlayerStateService: QuestionPlayerStateService;
+  let answerClassificationService: AnswerClassificationService;
   let readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService;
   let refresherExplorationConfirmationModalService:
     RefresherExplorationConfirmationModalService;
@@ -159,10 +163,10 @@ describe('Conversation skin component', () => {
     ReadOnlyExplorationBackendApiService;
   let stateObjectFactory: StateObjectFactory;
   let platformFeatureService: PlatformFeatureService;
+  let translateService: TranslateService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   let conceptCardManagerService: ConceptCardManagerService;
   let solutionObjectFactory: SolutionObjectFactory;
-  let translateService: TranslateService;
 
 
   let displayedCard = new StateCard(
@@ -549,7 +553,10 @@ describe('Conversation skin component', () => {
     explorationSummaryBackendApiService = TestBed.inject(
       ExplorationSummaryBackendApiService);
     fatigueDetectionService = TestBed.inject(FatigueDetectionService);
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
+    audioTranslationLanguageService = (
+      TestBed.inject(AudioTranslationLanguageService));
     guestCollectionProgressService = TestBed.inject(
       GuestCollectionProgressService);
     hintsAndSolutionManagerService = TestBed.inject(
@@ -584,6 +591,7 @@ describe('Conversation skin component', () => {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
+    answerClassificationService = TestBed.inject(AnswerClassificationService);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     conceptCardManagerService = TestBed.inject(ConceptCardManagerService);
     translateService = TestBed.inject(TranslateService);
@@ -1872,7 +1880,6 @@ describe('Conversation skin component', () => {
     spyOn(componentInstance, 'isSupplementalCardNonempty')
       .and.returnValues(false, true);
     spyOn(playerTranscriptService, 'getCard');
-    spyOn(playerTranscriptService, 'getLastCard');
     spyOn(componentInstance, 'canWindowShowTwoCards').and.returnValue(true);
     spyOn(playerPositionService, 'setDisplayedCardIndex');
     spyOn(componentInstance, 'animateToTwoCards').and.callFake((callb) => {
@@ -1916,6 +1923,26 @@ describe('Conversation skin component', () => {
     spyOn(fatigueDetectionService, 'isSubmittingTooFast').and.returnValues(
       true, false);
     spyOn(fatigueDetectionService, 'displayTakeBreakMessage');
+    let lastCardInteraction = interactionObjectFactory.createFromBackendDict({
+      id: 'TextInput',
+      answer_groups: [],
+      default_outcome: null,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        rows: {
+          value: true,
+        },
+        placeholder: {
+          value: 1,
+        }
+      },
+      hints: [],
+      solution: null
+    });
+    let lastCard = StateCard.createNewCard(
+      'Card 1', 'Content html', 'Interaction text', lastCardInteraction,
+      null, null, 'content_id', audioTranslationLanguageService);
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
     spyOn(explorationPlayerStateService.onOppiaFeedbackAvailable, 'emit');
     spyOn(componentInstance, 'showPendingCard');
     componentInstance.submitAnswer('', null);
@@ -1989,6 +2016,8 @@ describe('Conversation skin component', () => {
         '', true, false, false, null, '');
       return false;
     };
+    spyOn(answerClassificationService, 'isAnswerOnlyMisspelled').
+      and.returnValue(true);
     spyOn(explorationEngineService, 'submitAnswer').and.callFake(callback);
     spyOn(playerPositionService, 'getCurrentStateName')
       .and.returnValue('oldState');
@@ -2091,6 +2120,14 @@ describe('Conversation skin component', () => {
     hackyStoryTitleTranslationIsDisplayed =
       componentInstance.isHackyExpTitleTranslationDisplayed(expId);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
+  });
+
+  it('should get feedback when answer is misspelled', () => {
+    spyOn(Math, 'random').and.returnValue(0.45);
+    spyOn(translateService, 'instant').and.callThrough();
+    expect(
+      componentInstance.getFeedbackHtmlWhenAnswerMisspelled())
+      .toEqual('I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_1');
   });
 
   it('should check if current card was completed in a previous session',
