@@ -237,6 +237,11 @@ export class ContributorStatsComponent {
       response.translation_contribution_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
+        if (
+          this.statsData.translationContribution === null ||
+          this.statsData.translationContribution === undefined) {
+          throw new Error('Invalid');
+        }
         if (!this.statsData.translationContribution[language]) {
           this.statsData.translationContribution[language] = new PageableStats(
             [this.createTranslationContributionStat(stat)]);
