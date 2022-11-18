@@ -18,9 +18,11 @@
 
 from __future__ import annotations
 
-import webptools
+import io
+from PIL import Image
 
 from core import utils
+from core.domain import user_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.io import gcs_io
@@ -65,6 +67,9 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
         file_dict = {}
         username = user_model.username
         filename = f'user/{username}/profile_picture.png'
+        if user_model.profile_picture_data_url is None:
+            user_model.profile_picture_data_url = (
+                user_services.fetch_gravatar(user_model.email))
         profile_picture_binary = utils.convert_png_or_webp_data_url_to_binary(
             user_model.profile_picture_data_url)
         file_dict = {
@@ -86,12 +91,15 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
         file_dict = {}
         username = user_model.username
         filename = f'user/{username}/profile_picture.webp'
-        profile_picture = user_model.profile_picture_data_url
-        webp_base64 = webptools.base64str2webp_base64str(
-            base64str=profile_picture, image_type="png",
-            option="-q 80",logging="-v")
-        webp_binary = utils.convert_png_or_webp_data_url_to_binary(
-            webp_base64, True)
+        if user_model.profile_picture_data_url is None:
+            user_model.profile_picture_data_url = (
+                user_services.fetch_gravatar(user_model.email))
+        profile_picture_binary = utils.convert_png_or_webp_data_url_to_binary(
+            user_model.profile_picture_data_url)
+        output = io.BytesIO()
+        image = Image.open(io.BytesIO(profile_picture_binary)).convert("RGB")
+        image.save(output, 'webp')
+        webp_binary = output.getvalue()
         file_dict = {
             'filepath': filename,
             'data': webp_binary
@@ -173,29 +181,61 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
                 lambda username: f'user/{username}/profile_picture.png')
             | 'Read png files from GCS' >> gcs_io.ReadFile(
                 client=self.client, mode_is_binary=True)
-            | 'Convert them to data url' >> utils.convert_png_binary_to_data_url
+            | 'Make tuple of username and data url' >> beam.Map(
+                lambda data: (data[0].split('/')[1],
+                utils.convert_png_binary_to_data_url(data[1]))
+            )
         )
 
-        png_values = (
-            audit_png_profile_pictures
-            | 'Report the png data' >> beam.Map(lambda data: (
+        username_with_profile_data = (
+            users_with_valid_username
+            | 'map username and data url' >> beam.Map(
+                lambda model: (model.username, model.profile_picture_data_url))
+        )
+
+        mismatched_images_on_gcs_and_model = (
+            {
+                'gcs_picture': audit_png_profile_pictures,
+                'model_picture': username_with_profile_data
+            }
+            | 'Merge models' >> beam.CoGroupByKey()
+            | 'Filter invalid images' >> beam.Filter(
+                lambda object: (
+                    object[1]['gcs_picture'] != object[1]['model_picture']))
+        )
+
+        report_mismatched_images_on_gcs_and_model = (
+            mismatched_images_on_gcs_and_model
+            | 'Report the data' >> beam.Map(lambda data: (
                 job_run_result.JobRunResult.as_stdout(
-                    f'The png image value is {data}'
+                    'The user having username %s, have mismatched data on '
+                    'GCS and in the model. The data on GCS is %s and the '
+                    'data in model is %s' % (
+                        data[0], data[1]['gcs_picture'],
+                        data[1]['model_picture'])
                 )
             ))
         )
 
-        total_png_images = (
-            audit_png_profile_pictures
-            | 'Total number of png images' >> (
+        total_mismatched_images = (
+            mismatched_images_on_gcs_and_model
+            | 'Total number of mismatched images' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'TOTAL PNG IMAGES'))
+                    'TOTAL MISMATCHED IMAGES'))
+        )
+
+        images_iterated_on_gcs = (
+            audit_png_profile_pictures
+            | 'Total number of images iterated' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL IMAGES ITERATED ON GCS'))
         )
 
         return (
             (
-                png_values,
-                total_png_images
+                report_mismatched_images_on_gcs_and_model,
+                total_mismatched_images,
+                images_iterated_on_gcs
             )
             | 'Combine results' >> beam.Flatten()
         )
