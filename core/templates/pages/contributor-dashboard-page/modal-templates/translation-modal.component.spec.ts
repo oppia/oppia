@@ -298,7 +298,8 @@ describe('Translation Modal Component', () => {
 
       it('should throw error if contribution rights is null', fakeAsync(
         () => {
-          getUserContributionRightsDataAsyncSpy.and.returnValue(null);
+          getUserContributionRightsDataAsyncSpy.and.returnValue(Promise.resolve(
+            null));
           expect(() => {
             component.ngOnInit();
             tick();
