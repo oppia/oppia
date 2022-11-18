@@ -146,11 +146,9 @@ describe('Diagnostic test player component', () => {
       );
 
       component.ngOnInit();
-      tick();
-
       sessionCompleteEmitter.emit(['recommendedTopicId']);
       progressEmitter.emit(20);
-      tick();
+      tick(200);
 
       expect(
         diagnosticTestPlayerStatusService
