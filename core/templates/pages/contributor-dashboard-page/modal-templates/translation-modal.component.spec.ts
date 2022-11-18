@@ -54,6 +54,7 @@ describe('Translation Modal Component', () => {
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let siteAnalyticsService: SiteAnalyticsService;
   let imageLocalStorageService: ImageLocalStorageService;
+  let getUserContributionRightsDataAsyncSpy: jasmine.Spy;
   let userService: UserService;
   let activeModal: NgbActiveModal;
   let httpTestingController: HttpTestingController;
@@ -125,17 +126,16 @@ describe('Translation Modal Component', () => {
       // the need to test validations.
       // @ts-ignore
       null, null, new ElementRef({offsetHeight: 200}), null);
-    spyOn(
-      userService,
-      'getUserContributionRightsDataAsync')
-      .and.returnValue(Promise.resolve(
-        {
-          can_suggest_questions: false,
-          can_review_translation_for_language_codes: ['ar'],
-          can_review_voiceover_for_language_codes: [],
-          can_review_questions: false
-        }
-      ));
+    getUserContributionRightsDataAsyncSpy = spyOn(
+      userService, 'getUserContributionRightsDataAsync');
+    getUserContributionRightsDataAsyncSpy.and.returnValue(Promise.resolve(
+      {
+        can_suggest_questions: false,
+        can_review_translation_for_language_codes: ['ar'],
+        can_review_voiceover_for_language_codes: [],
+        can_review_questions: false
+      }
+    ));
   });
 
   it('should invoke change detection when html is updated', () => {
@@ -295,6 +295,15 @@ describe('Translation Modal Component', () => {
         expect(component.getHtmlSchema().ui_config.languageDirection)
           .toBe('ltr');
       });
+
+      it('should throw error if CodeMirrorComponent is undefined', fakeAsync(
+        () => {
+          getUserContributionRightsDataAsyncSpy.and.returnValue(null);
+          expect(() => {
+            component.ngOnInit();
+            tick();
+          }).toThrowError('CodeMirrorComponent not Found');
+        }));
     });
 
     it('should set context correctly', fakeAsync(() => {

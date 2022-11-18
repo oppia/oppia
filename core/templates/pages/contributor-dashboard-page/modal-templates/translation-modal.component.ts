@@ -207,12 +207,13 @@ export class TranslationModalComponent {
       });
     this.userService.getUserContributionRightsDataAsync().then(
       userContributionRights => {
-        if (userContributionRights) {
-          const reviewableLanguageCodes = (
-            userContributionRights.can_review_translation_for_language_codes);
-          if (reviewableLanguageCodes.includes(this.activeLanguageCode)) {
-            this.isActiveLanguageReviewer = true;
-          }
+        if (!userContributionRights) {
+          throw new Error('User contribution rights not found.');
+        }
+        const reviewableLanguageCodes = (
+          userContributionRights.can_review_translation_for_language_codes);
+        if (reviewableLanguageCodes.includes(this.activeLanguageCode)) {
+          this.isActiveLanguageReviewer = true;
         }
       });
     this.HTML_SCHEMA = {
