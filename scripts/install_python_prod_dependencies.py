@@ -315,9 +315,7 @@ def _rectify_third_party_directory(mismatches: MismatchType) -> None:
         # The library listed in 'requirements.txt' is not in the
         # 'third_party/python_libs' directory.
         if not directory_version or requirements_version != directory_version:
-            _install_direct_url(
-                normalized_library_name, requirements_version
-            )
+            _install_direct_url(normalized_library_name, requirements_version)
 
     for normalized_library_name, versions in pip_mismatches:
         requirements_version = (
