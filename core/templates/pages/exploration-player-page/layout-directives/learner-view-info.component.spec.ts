@@ -146,6 +146,34 @@ describe('Learner view info component', () => {
       .toHaveBeenCalled();
   }));
 
+  it('should register community lesson start event', fakeAsync(() => {
+    let explorationId = 'expId';
+    let explorationTitle = 'Exploration Title';
+
+    spyOn(urlService, 'getPathname').and.returnValue('/explore/');
+    spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
+      .and.returnValue(Promise.resolve({
+        exploration: {
+          title: explorationTitle
+        }
+      } as FetchExplorationBackendResponse));
+    spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
+    spyOn(componentInstance, 'getTopicUrl').and.returnValue('');
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+      .and.returnValue('');
+    spyOn(statsReportingService, 'setTopicName');
+    spyOn(siteAnalyticsService, 'registerCommunityLessonStarted');
+
+    componentInstance.ngOnInit();
+    tick();
+    tick();
+
+    expect(siteAnalyticsService.registerCommunityLessonStarted)
+      .toHaveBeenCalled();
+  }));
+
   it('should get topic url from fragment correctly', () => {
     let topicUrl = 'topic_url';
 

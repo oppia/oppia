@@ -126,7 +126,8 @@
         <div *ngIf="storySummary.isNodeCompleted(title)" class="fas fa-check completed-icon">
         </div>
         <div [ngClass]="{'border-bottom': idx < chaptersDisplayed, 'pending-chapter': !storySummary.isNodeCompleted(title) && isPreviousChapterCompleted(idx), 'incomplete-chapter': !storySummary.isNodeCompleted(title), 'complete-chapter': storySummary.isNodeCompleted(title)}"
-             *ngIf="idx < chaptersDisplayed">
+             *ngIf="idx < chaptersDisplayed"
+             (click)="onChapterClick(idx)">
           <a [href]="getChapterUrl(title)" rel="noopener">
             <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
             </span>&nbsp;<span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;<span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">{{ title }}</span>

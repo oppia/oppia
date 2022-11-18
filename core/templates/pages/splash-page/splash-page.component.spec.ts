@@ -140,6 +140,17 @@ describe('Splash Page', () => {
       '/assets/images/path/to/image');
   });
 
+  it('should record analytics when start learning is clicked', function() {
+    spyOn(
+      siteAnalyticsService, 'registerClickHomePageStartLearningButtonEvent')
+      .and.callThrough();
+
+    component.onClickStartLearningButton();
+
+    expect(siteAnalyticsService.registerClickHomePageStartLearningButtonEvent)
+      .toHaveBeenCalled();
+  });
+
   it('should record analytics when Browse Lessons is clicked', function() {
     spyOn(
       siteAnalyticsService, 'registerClickBrowseLessonsButtonEvent')

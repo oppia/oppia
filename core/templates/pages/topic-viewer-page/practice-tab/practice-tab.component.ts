@@ -36,6 +36,7 @@ import { PracticeSessionConfirmationModal } from 'pages/topic-viewer-page/modals
 import { LoaderService } from 'services/loader.service';
 
 import './practice-tab.component.css';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 
 @Component({
@@ -75,7 +76,8 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
     private windowRef: WindowRef,
     private ngbModal: NgbModal,
     private translateService: TranslateService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -200,6 +202,11 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
         classroom_url_fragment: this.classroomUrlFragment,
         stringified_subtopic_ids: JSON.stringify(selectedSubtopicIds)
       });
+    this.siteAnalyticsService.registerPracticeSessionStartEvent(
+      this.classroomUrlFragment,
+      this.topicName,
+      selectedSubtopicIds.toString()
+    );
     this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
     this.loaderService.showLoadingScreen('Loading');
   }

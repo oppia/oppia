@@ -52,7 +52,8 @@ describe('I18n service', () => {
       },
       history: {
         pushState: () => {}
-      }
+      },
+      gtag: () => {}
     };
   }
 
