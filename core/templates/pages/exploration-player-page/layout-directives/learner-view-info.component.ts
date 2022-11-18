@@ -120,6 +120,9 @@ export class LearnerViewInfoComponent {
           );
         }
       );
+    } else {
+      this.siteAnalyticsService.registerCommunityLessonStarted(
+        this.explorationId);
     }
   }
 

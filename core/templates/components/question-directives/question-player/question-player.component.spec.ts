@@ -31,6 +31,7 @@ import { QuestionPlayerStateService } from './services/question-player-state.ser
 import { Location } from '@angular/common';
 import { UserInfo } from 'domain/user/user-info.model';
 import { State } from 'domain/state/StateObjectFactory';
+import { UrlService } from 'services/contextual/url.service';
 
 class MockNgbModal {
   open() {
@@ -53,6 +54,7 @@ describe('Question Player Component', () => {
   let playerPositionServiceEmitter = new EventEmitter();
   let explorationPlayerStateServiceEmitter = new EventEmitter();
   let questionPlayerStateServiceEmitter = new EventEmitter();
+  let urlService: UrlService;
   let userInfo = new UserInfo(
     null, true, false, false, false,
     true, 'en', 'username1', 'tester@example.org', true);
@@ -63,7 +65,8 @@ describe('Question Player Component', () => {
         href: '',
         hash: null
       },
-      addEventListener: () => {}
+      addEventListener: () => {},
+      gtag: () => {}
     };
   }
 
@@ -119,6 +122,7 @@ describe('Question Player Component', () => {
         },
         PreventPageUnloadEventService,
         UserService,
+        UrlService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -137,6 +141,7 @@ describe('Question Player Component', () => {
     questionPlayerStateService = TestBed.inject(QuestionPlayerStateService);
     userService = TestBed.inject(UserService);
     windowRef = TestBed.inject(WindowRef);
+    urlService = TestBed.inject(UrlService);
 
     fixture.detectChanges();
 
@@ -352,6 +357,10 @@ describe('Question Player Component', () => {
   });
 
   it('should calculate score based on question state data', () => {
+    spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
+      'classroom_url_fragment');
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic_url_fragment');
     let questionStateData = {
       ques1: {
         answers: ['1'],
