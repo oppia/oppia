@@ -406,7 +406,7 @@ describe('Question Player Component', () => {
     component.calculateScores(
       questionStateData as {[key: string]: QuestionData});
 
-    expect(component.totalScore).toBe(50);
+    expect(component.totalScore).toBe(55);
     expect(questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit)
       .toHaveBeenCalledWith(true);
   });
