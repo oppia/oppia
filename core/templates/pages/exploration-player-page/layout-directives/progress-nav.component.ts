@@ -165,7 +165,7 @@ export class ProgressNavComponent {
     this.conceptCardIsBeingShown = (
       this.displayedCard.getStateName() === null &&
         !this.explorationPlayerStateService.isPresentingIsolatedQuestions()
-      );
+    );
 
     if (!this.conceptCardIsBeingShown) {
       this.interactionIsInline = this.displayedCard.isInteractionInline();
