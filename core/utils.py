@@ -43,9 +43,7 @@ import yaml
 
 from typing import ( # isort:skip
     Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Mapping,
-    Optional, TextIO, Tuple, TypeVar, Union, cast, overload)
-from typing_extensions import Literal # isort:skip
-
+    Literal, Optional, TextIO, Tuple, TypeVar, Union, cast, overload)
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
@@ -385,6 +383,18 @@ def get_random_choice(alist: List[T]) -> T:
     )
     index = get_random_int(len(alist))
     return alist[index]
+
+
+def get_url_scheme(url: str) -> str:
+    """Gets the url scheme used by a link.
+
+    Args:
+        url: str. The URL.
+
+    Returns:
+        str. Returns the URL scheme.
+    """
+    return urllib.parse.urlparse(url).scheme
 
 
 def convert_png_data_url_to_binary(image_data_url: str) -> bytes:

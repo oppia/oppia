@@ -35,9 +35,9 @@ describe('Contributor stats component', () => {
     can_review_questions: true,
     can_suggest_questions: true,
   };
-  const translationContributionStat = {
+  const translationContributionStatTopic1 = {
     language_code: 'es',
-    topic_name: 'published_topic_name',
+    topic_name: 'topic_1',
     submitted_translations_count: 2,
     submitted_translation_word_count: 100,
     accepted_translations_count: 1,
@@ -48,9 +48,33 @@ describe('Contributor stats component', () => {
     first_contribution_date: 'Mar 2021',
     last_contribution_date: 'Mar 2021'
   };
-  const translationReviewStat = {
+  const translationContributionStatTopic2 = {
     language_code: 'es',
-    topic_name: 'published_topic_name',
+    topic_name: 'topic_2',
+    submitted_translations_count: 2,
+    submitted_translation_word_count: 100,
+    accepted_translations_count: 1,
+    accepted_translations_without_reviewer_edits_count: 0,
+    accepted_translation_word_count: 50,
+    rejected_translations_count: 0,
+    rejected_translation_word_count: 0,
+    first_contribution_date: 'Mar 2021',
+    last_contribution_date: 'Mar 2021'
+  };
+  const translationReviewStatTopic1 = {
+    language_code: 'es',
+    topic_name: 'topic_2',
+    reviewed_translations_count: 1,
+    reviewed_translation_word_count: 1,
+    accepted_translations_count: 1,
+    accepted_translations_with_reviewer_edits_count: 0,
+    accepted_translation_word_count: 1,
+    first_contribution_date: 'Mar 2021',
+    last_contribution_date: 'Mar 2021'
+  };
+  const translationReviewStatTopic2 = {
+    language_code: 'es',
+    topic_name: 'topic_2',
     reviewed_translations_count: 1,
     reviewed_translation_word_count: 1,
     accepted_translations_count: 1,
@@ -77,8 +101,10 @@ describe('Contributor stats component', () => {
   };
 
   const fetchAllStatsResponse = {
-    translation_contribution_stats: [translationContributionStat],
-    translation_review_stats: [translationReviewStat],
+    translation_contribution_stats: [
+      translationContributionStatTopic1, translationContributionStatTopic2],
+    translation_review_stats: [
+      translationReviewStatTopic1, translationReviewStatTopic2],
     question_contribution_stats: [questionContributionStat],
     question_review_stats: [questionReviewStat]
   };
@@ -189,32 +215,116 @@ describe('Contributor stats component', () => {
       expect(modalService.open).toHaveBeenCalled();
     }));
 
-    it('should page stats', fakeAsync(() => {
+    it('should be able to page stats', fakeAsync(() => {
       const pagedStats = {
-        language: 'hi',
-        currentPage: 2,
-        totalPages: 3,
-        pagedStats: [
+        currentPageStartIndex: 0,
+        data: [
           {
-            pageNumber: 1,
-            stats: [
-              {
-                firstContributionDate: 'Mar 2020',
-                lastContributionDate: 'Mar 2022',
-                topicName: 'Dummy Topic',
-                acceptedCards: 1,
-                acceptedWordCount: 1
-              }
-            ]
+            firstContributionDate: 'Mar 2020',
+            lastContributionDate: 'Mar 2022',
+            topicName: 'Dummy Topic',
+            acceptedCards: 1,
+            acceptedWordCount: 1
+          },
+          {
+            firstContributionDate: 'Mar 2020',
+            lastContributionDate: 'Mar 2022',
+            topicName: 'Dummy Topic',
+            acceptedCards: 1,
+            acceptedWordCount: 1
+          },
+          {
+            firstContributionDate: 'Mar 2020',
+            lastContributionDate: 'Mar 2022',
+            topicName: 'Dummy Topic',
+            acceptedCards: 1,
+            acceptedWordCount: 1
+          },
+          {
+            firstContributionDate: 'Mar 2020',
+            lastContributionDate: 'Mar 2022',
+            topicName: 'Dummy Topic',
+            acceptedCards: 1,
+            acceptedWordCount: 1
+          },
+          {
+            firstContributionDate: 'Mar 2020',
+            lastContributionDate: 'Mar 2022',
+            topicName: 'Dummy Topic',
+            acceptedCards: 1,
+            acceptedWordCount: 1
+          },
+          {
+            firstContributionDate: 'Mar 2020',
+            lastContributionDate: 'Mar 2022',
+            topicName: 'Dummy Topic',
+            acceptedCards: 1,
+            acceptedWordCount: 1
+          },
+        ]
+      };
+
+      component.goToNextPage(pagedStats);
+      expect(pagedStats.currentPageStartIndex).toBe(5);
+
+      component.goToPreviousPage(pagedStats);
+      expect(pagedStats.currentPageStartIndex).toBe(0);
+    }));
+
+    it('should throw errors when there are no more pages', fakeAsync(() => {
+      const pagedStats = {
+        currentPageStartIndex: 0,
+        data: [
+          {
+            firstContributionDate: 'Mar 2020',
+            lastContributionDate: 'Mar 2022',
+            topicName: 'Dummy Topic',
+            acceptedCards: 1,
+            acceptedWordCount: 1
           }
         ]
       };
 
-      component.nextPage(pagedStats);
-      expect(pagedStats.currentPage).toBe(3);
+      expect(() => {
+        component.goToNextPage(pagedStats);
+      }).toThrowError('There are no more pages after this one.');
+      expect(() => {
+        component.goToPreviousPage(pagedStats);
+      }).toThrowError('There are no more pages before this one.');
+    }));
 
-      component.previousPage(pagedStats);
-      expect(pagedStats.currentPage).toBe(2);
+    it('should throw errors when translation contributions are undefined',
+      fakeAsync(() => {
+        component.statsData.translationContribution = undefined;
+
+        expect(() => {
+          component.fetchStats();
+        }).toThrowError('Translation contributions are undefined.');
+      }));
+
+    it('should throw errors when translation reviews are undefined',
+      fakeAsync(() => {
+        component.statsData.translationReview = undefined;
+
+        expect(() => {
+          component.fetchStats();
+        }).toThrowError('Translation reviews are undefined.');
+      }));
+
+    it('should throw errors when data are undefined when paging',
+      fakeAsync(() => {
+        const pagedStats = {
+          currentPageStartIndex: 0,
+          data: undefined
+        };
+
+        expect(() => {
+          component.goToNextPage(pagedStats);
+        }).toThrowError('Data does not exist.');
+      }));
+
+    it('should provide 0 to get original order of keyvaluea', fakeAsync(() => {
+      expect(component.provideOriginalOrder()).toEqual(0);
     }));
   });
 
@@ -236,6 +346,26 @@ describe('Contributor stats component', () => {
         }));
     });
 
+  describe('when user contribution rights can not be fetched',
+    () => {
+      it('should throw error to mention the error',
+        fakeAsync(() => {
+          spyOn(userService, 'getUserInfoAsync')
+            .and.returnValue(Promise.resolve({
+              isLoggedIn: () => true,
+              getUsername: () => 'user'
+            } as UserInfo));
+          spyOn(userService, 'getUserContributionRightsDataAsync')
+            .and.returnValue(Promise.resolve(null));
+
+          expect(() => {
+            component.ngOnInit();
+            tick();
+          }).toThrowError();
+          flush();
+        }));
+    });
+
   describe('when user interacts with dropdown',
     () => {
       let getDropdownOptionsContainer: () => HTMLElement;
@@ -246,6 +376,7 @@ describe('Contributor stats component', () => {
             '.oppia-stats-type-selector-dropdown-container');
         };
       });
+
       it('should correctly show and hide when clicked away',
         fakeAsync(() => {
           let fakeClickAwayEvent = new MouseEvent('click');

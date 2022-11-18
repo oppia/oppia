@@ -56,9 +56,9 @@ describe('Blog Card Preview Modal Component', () => {
   let blogPostData: BlogPostData;
   let sampleBlogPostBackendDict: BlogPostBackendDict = {
     id: 'sampleBlogId',
-    author_name: 'test_user',
+    displayed_author_name: 'test_user',
     title: 'sample_title',
-    content: '<p>hello</p>',
+    content: '<p>hello</p><strong>HEllo</strong>',
     thumbnail_filename: 'image.png',
     tags: ['learners', 'news'],
     url_fragment: 'sample#url',
@@ -103,9 +103,10 @@ describe('Blog Card Preview Modal Component', () => {
       sampleBlogPostBackendDict);
     let expectedBlogPostSummary = new BlogPostSummary (
       blogPostData.id,
-      blogPostData.authorUsername,
+      '',
+      blogPostData.displayedAuthorName,
       blogPostData.title,
-      '<p>hello</p>',
+      '<p>hello</p> ',
       blogPostData.tags,
       blogPostData.thumbnailFilename,
       blogPostData.urlFragment,
@@ -127,9 +128,10 @@ describe('Blog Card Preview Modal Component', () => {
       sampleBlogPostBackendDict);
     let expectedBlogPostSummary = new BlogPostSummary (
       blogPostData.id,
-      blogPostData.authorUsername,
+      '',
+      blogPostData.displayedAuthorName,
       blogPostData.title,
-      '<p>hello</p>',
+      '<p>hello</p> ',
       blogPostData.tags,
       blogPostData.thumbnailFilename,
       blogPostData.urlFragment,

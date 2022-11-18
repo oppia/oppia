@@ -43,8 +43,7 @@ from core.domain import user_domain
 from core.platform import models
 
 
-from typing import Dict, List, Optional, Tuple
-from typing_extensions import TypedDict
+from typing import Dict, List, Optional, Tuple, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover

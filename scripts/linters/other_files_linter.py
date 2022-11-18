@@ -25,33 +25,57 @@ import re
 
 from core import utils
 
+from typing import Any, Dict, Final, List, Tuple, TypedDict
 import yaml
 
+from . import linter_utils
 from .. import concurrent_task_utils
 
-STRICT_TS_CONFIG_FILE_NAME = 'tsconfig-strict.json'
-STRICT_TS_CONFIG_FILEPATH = os.path.join(
+MYPY = False
+if MYPY:  # pragma: no cover
+    from scripts.linters import pre_commit_linter
+
+
+class ThirdPartyLibDict(TypedDict):
+    """Type for the dictionary representation of elements of THIRD_PARTY_LIB."""
+
+    name: str
+    dependency_key: str
+    dependency_source: str
+    type_defs_filename_prefix: str
+
+
+STRICT_TS_CONFIG_FILE_NAME: Final = 'tsconfig-strict.json'
+STRICT_TS_CONFIG_FILEPATH: Final = os.path.join(
     os.getcwd(), STRICT_TS_CONFIG_FILE_NAME)
 
-WEBPACK_CONFIG_FILE_NAME = 'webpack.common.config.ts'
-WEBPACK_CONFIG_FILEPATH = os.path.join(os.getcwd(), WEBPACK_CONFIG_FILE_NAME)
+WEBPACK_CONFIG_FILE_NAME: Final = 'webpack.common.config.ts'
+WEBPACK_CONFIG_FILEPATH: Final = os.path.join(
+    os.getcwd(), WEBPACK_CONFIG_FILE_NAME
+)
 
-APP_YAML_FILEPATH = os.path.join(os.getcwd(), 'app_dev.yaml')
+APP_YAML_FILEPATH: Final = os.path.join(os.getcwd(), 'app_dev.yaml')
 
-DEPENDENCIES_JSON_FILE_PATH = os.path.join(os.getcwd(), 'dependencies.json')
-PACKAGE_JSON_FILE_PATH = os.path.join(os.getcwd(), 'package.json')
-_TYPE_DEFS_FILE_EXTENSION_LENGTH = len('.d.ts')
-_DEPENDENCY_SOURCE_DEPENDENCIES_JSON = 'dependencies.json'
-_DEPENDENCY_SOURCE_PACKAGE = 'package.json'
+DEPENDENCIES_JSON_FILE_PATH: Final = os.path.join(
+    os.getcwd(), 'dependencies.json'
+)
+PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
+_TYPE_DEFS_FILE_EXTENSION_LENGTH: Final = len('.d.ts')
+_DEPENDENCY_SOURCE_DEPENDENCIES_JSON: Final = 'dependencies.json'
+_DEPENDENCY_SOURCE_PACKAGE: Final = 'package.json'
 
-WORKFLOWS_DIR = os.path.join(os.getcwd(), '.github', 'workflows')
-WORKFLOW_FILENAME_REGEX = r'\.(yaml)|(yml)$'
-MERGE_STEP = {'uses': './.github/actions/merge'}
-WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT = (
-    'backend_tests.yml', 'pending-review-notification.yml',
-    'revert-web-wiki-updates.yml', 'frontend_tests.yml')
+WORKFLOWS_DIR: Final = os.path.join(os.getcwd(), '.github', 'workflows')
+WORKFLOW_FILENAME_REGEX: Final = r'\.(yaml)|(yml)$'
+MERGE_STEP: Final = {'uses': './.github/actions/merge'}
+WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT: Final = (
+    'backend_tests.yml',
+    'develop_commit_notification.yml',
+    'pending-review-notification.yml',
+    'revert-web-wiki-updates.yml',
+    'frontend_tests.yml'
+)
 
-THIRD_PARTY_LIBS = [
+THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
     {
         'name': 'Guppy',
         'dependency_key': 'guppy',
@@ -79,10 +103,10 @@ THIRD_PARTY_LIBS = [
 ]
 
 
-class CustomLintChecksManager:
+class CustomLintChecksManager(linter_utils.BaseLinter):
     """Manages other files lint checks."""
 
-    def __init__(self, file_cache):
+    def __init__(self, file_cache: pre_commit_linter.FileCache) -> None:
         """Constructs a CustomLintChecksManager object.
 
         Args:
@@ -91,7 +115,9 @@ class CustomLintChecksManager:
         """
         self.file_cache = file_cache
 
-    def check_skip_files_in_app_dev_yaml(self):
+    def check_skip_files_in_app_dev_yaml(
+        self
+    ) -> concurrent_task_utils.TaskResult:
         """Check to ensure that all lines in skip_files in app_dev.yaml
         reference valid files in the repository.
         """
@@ -127,7 +153,9 @@ class CustomLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def check_third_party_libs_type_defs(self):
+    def check_third_party_libs_type_defs(
+        self
+    ) -> concurrent_task_utils.TaskResult:
         """Checks the type definitions for third party libs
         are up to date.
 
@@ -203,7 +231,7 @@ class CustomLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def check_webpack_config_file(self):
+    def check_webpack_config_file(self) -> concurrent_task_utils.TaskResult:
         """Check to ensure that the instances of HtmlWebpackPlugin in
         webpack.common.config.ts contains all needed keys.
 
@@ -250,7 +278,9 @@ class CustomLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def check_github_workflows_use_merge_action(self):
+    def check_github_workflows_use_merge_action(
+        self
+    ) -> concurrent_task_utils.TaskResult:
         """Checks that all github actions workflows use the merge action.
 
         Returns:
@@ -273,9 +303,13 @@ class CustomLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, bool(errors), errors, errors)
 
+    # Here we use type Any because the argument 'workflow_dict' accept
+    # dictionaries that represents the content of workflow YAML file and
+    # that dictionaries can contain various types of values.
     @staticmethod
     def _check_that_workflow_steps_use_merge_action(
-            workflow_dict, workflow_path):
+        workflow_dict: Dict[str, Any], workflow_path: str
+    ) -> List[str]:
         """Check that a workflow uses the merge action.
 
         Args:
@@ -291,14 +325,13 @@ class CustomLintChecksManager:
         for job, job_dict in workflow_dict['jobs'].items():
             if MERGE_STEP not in job_dict['steps']:
                 jobs_without_merge.append(job)
-        error_messages = [
+        return [
             '%s --> Job %s does not use the .github/actions/merge action.' % (
                 workflow_path, job)
             for job in jobs_without_merge
         ]
-        return error_messages
 
-    def perform_all_lint_checks(self):
+    def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
@@ -316,7 +349,9 @@ class CustomLintChecksManager:
         return linter_stdout
 
 
-def get_linters(file_cache):
+def get_linters(
+    file_cache: pre_commit_linter.FileCache
+) -> Tuple[CustomLintChecksManager, None]:
     """Creates CustomLintChecksManager and returns it.
 
     Args:
