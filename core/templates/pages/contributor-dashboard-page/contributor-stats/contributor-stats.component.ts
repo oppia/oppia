@@ -246,6 +246,12 @@ export class ContributorStatsComponent {
           this.statsData.translationContribution[language] = new PageableStats(
             [this.createTranslationContributionStat(stat)]);
         } else {
+          if (
+            this.statsData.translationContribution[language].data === null ||
+            this.statsData.translationContribution[language].data === undefined
+          ) {
+            throw new Error('Invalid');
+          }
           this.statsData.translationContribution[language].data?.push(
             this.createTranslationContributionStat(stat));
         }
@@ -265,6 +271,11 @@ export class ContributorStatsComponent {
           this.statsData.translationReview[language] = new PageableStats(
             [this.createTranslationReviewStat(stat)]);
         } else {
+          if (
+            this.statsData.translationReview[language].data === null ||
+            this.statsData.translationReview[language].data === undefined) {
+            throw new Error('Invalid');
+          }
           this.statsData.translationReview[language].data?.push(
             this.createTranslationReviewStat(stat));
         }
