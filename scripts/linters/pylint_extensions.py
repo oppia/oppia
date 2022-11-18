@@ -2434,7 +2434,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
         message accordingly.
 
         Args:
-            tokens: TokenInfo. Object to access all tokens of a module.
+            tokens: List[TokenInfo]. Object to access all tokens of a module.
             node: astroid.scoped_nodes.Module. Node to access module content.
         """
         self.check_comment_is_present_with_any_type(tokens, node)
