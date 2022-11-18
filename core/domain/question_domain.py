@@ -199,6 +199,9 @@ class MigrateStateSchemaToLatestVersion(QuestionChange):
 class QuestionSuggestionChangeDict(TypedDict):
     """Dictionary representing the QuestionSuggestionChange domain object."""
 
+    # Note: Here we are defining question's id as None, because while submitting
+    # question suggestion from the frontend we are never providing question id
+    # in its payload.
     id: None
     question_state_data: state_domain.StateDict
     question_state_data_schema_version: int
