@@ -362,6 +362,12 @@ export class ExplorationPlayerStateService {
   }
 
   isPresentingIsolatedQuestions(): boolean {
+    // The method returns a boolean value by checking whether the current mode
+    // is only presenting the questions or not.
+    // The diagnostic player mode, question player mode, and pretest mode are
+    // the ones in which only questions are presented to the learner, while in
+    // the exploration mode and story chapter mode the learning contents along
+    // with questions are presented.
     if (
       this.explorationMode ===
       ExplorationPlayerConstants.EXPLORATION_MODE.QUESTION_PLAYER ||
