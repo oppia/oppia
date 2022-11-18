@@ -211,8 +211,8 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
                     'The user having username %s, have mismatched data on '
                     'GCS and in the model. The data on GCS is %s and the '
                     'data in model is %s' % (
-                        data[0], data[1]['gcs_picture'],
-                        data[1]['model_picture'])
+                        data[0], data[1]['gcs_picture'][0],
+                        data[1]['model_picture'][0])
                 )
             ))
         )

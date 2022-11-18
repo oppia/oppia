@@ -94,7 +94,7 @@ class AuditProfilePictureFromGCSJobTests(job_test_utils.JobTestBase):
         )
 
     def _push_file_to_gcs(self) -> None:
-        """"""
+        """Push file to the fake gcs client."""
         _, bucket = gcs_io_test.get_client_and_bucket()
         gcs_url = f'gs://{bucket}/user/test_1/profile_picture.png'
         data = utils.convert_png_or_webp_data_url_to_binary(
@@ -111,8 +111,8 @@ class AuditProfilePictureFromGCSJobTests(job_test_utils.JobTestBase):
         ])
 
     def test_images_on_gcs_and_model_are_not_same(self) -> None:
-        self.put_multi([self.user_1])
         self.user_1.profile_picture_data_url = VALID_IMAGE
+        self.put_multi([self.user_1])
         self._push_file_to_gcs()
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -120,5 +120,13 @@ class AuditProfilePictureFromGCSJobTests(job_test_utils.JobTestBase):
             ),
             job_run_result.JobRunResult(
                 stdout='TOTAL MISMATCHED IMAGES SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult(
+                stdout=(
+                    'The user having username test_1, have mismatched data '
+                    'on GCS and in the model. The data on GCS is %s and '
+                    'the data in model is %s' % (
+                        user_services.DEFAULT_IDENTICON_DATA_URL, VALID_IMAGE)
+                )
             )
         ])
