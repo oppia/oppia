@@ -71,7 +71,7 @@ class AuditInvalidProfilePictureJobTests(job_test_utils.JobTestBase):
                 stdout='TOTAL INVALID IMAGES SUCCESS: 1'
             ),
             job_run_result.JobRunResult(
-                stdout=(
+                stderr=(
                     'The username is test_1 and the invalid image details '
                     'are [\'wrong dimensions - height = 76 and width = 76\'].'
                 )
@@ -88,7 +88,7 @@ class AuditInvalidProfilePictureJobTests(job_test_utils.JobTestBase):
                 stdout='TOTAL INVALID IMAGES SUCCESS: 1'
             ),
             job_run_result.JobRunResult(
-                stdout=(
+                stderr=(
                     'The username is test_2 and the invalid image details '
                     'are [\'Image is not base64 having value - None\'].'
                 )
@@ -183,6 +183,9 @@ class FixInvalidProfilePictureJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout='USER MODELS ITERATED SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult(
+                stdout='DEFAULT PROFILE PICTURE SUCCESS: 1'
             )
         ])
 

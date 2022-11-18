@@ -111,7 +111,7 @@ class AuditInvalidProfilePictureJob(base_jobs.JobBase):
         report_invalid_images = (
             invalid_user_profile_picture
             | 'Report the data' >> beam.Map(lambda data: (
-                job_run_result.JobRunResult.as_stdout(
+                job_run_result.JobRunResult.as_stderr(
                     f'The username is {data[0]} and the invalid image '
                     f'details are {data[1]}.'
                 )
@@ -169,7 +169,8 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
         # of all the default images.
         if (
             user_model.profile_picture_data_url ==
-            user_services.DEFAULT_IDENTICON_DATA_URL
+            user_services.DEFAULT_IDENTICON_DATA_URL or (
+                width == 76 and height == 76)
         ):
             return (user_model, False)
 
