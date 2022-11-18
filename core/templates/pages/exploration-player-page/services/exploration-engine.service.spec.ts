@@ -64,7 +64,6 @@ describe('Exploration engine service ', () => {
   let paramChangeObjectFactory: ParamChangeObjectFactory;
   let textInputService: InteractionRulesService;
   let outcomeObjectFactory: OutcomeObjectFactory;
-
   let explorationDict: ExplorationBackendDict;
   let paramChangeDict: ParamChangeBackendDict;
   let explorationBackendResponse: FetchExplorationBackendResponse;
@@ -378,7 +377,9 @@ describe('Exploration engine service ', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [
+        HttpClientTestingModule,
+      ]
     });
 
     alertsService = TestBed.inject(AlertsService);
