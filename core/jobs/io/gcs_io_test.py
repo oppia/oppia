@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from core import utils
+from core.domain import user_services
 from core.jobs import job_test_utils
 from core.jobs.io import gcs_io
 from core.platform import models
@@ -25,7 +27,7 @@ from core.platform import models
 import apache_beam as beam
 from apache_beam.io.gcp import gcsio
 from apache_beam.io.gcp import gcsio_test
-from typing import Dict
+from typing import Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -57,12 +59,18 @@ def insert_random_file(
     return file
 
 
+def get_client_and_bucket() -> Tuple[gcsio_test.FakeGcsClient, str]:
+    """Return client and bucket."""
+    client = gcsio_test.FakeGcsClient()
+    bucket = app_identity_services.get_gcs_resource_bucket_name()
+    return (client, bucket)
+
+
 class ReadFileTest(job_test_utils.PipelinedTestBase):
     """Tests to check gcs_io.ReadFile."""
 
     def test_read_from_gcs(self) -> None:
-        client = gcsio_test.FakeGcsClient()
-        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        client, bucket = get_client_and_bucket()
         gcs_url = f'gs://{bucket}/dummy_file'
         string = b'testing'
         insert_random_file(client, gcs_url, string)
@@ -73,6 +81,22 @@ class ReadFileTest(job_test_utils.PipelinedTestBase):
             | 'Read file from GCS' >> gcs_io.ReadFile(client)
         )
         self.assert_pcoll_equal(filepath_p_collec, [('dummy_file', string)])
+
+    def test_read_binary_from_gcs(self) -> None:
+        client, bucket = get_client_and_bucket()
+        gcs_url = f'gs://{bucket}/dummy_file'
+        binary_data = utils.convert_png_data_url_to_binary(
+            user_services.DEFAULT_IDENTICON_DATA_URL)
+        insert_random_file(client, gcs_url, binary_data)
+        filepaths = ['dummy_file']
+        filepath_p_collec = (
+            self.pipeline
+            | 'Create pcoll of filepaths' >> beam.Create(filepaths)
+            | 'Read file from GCS' >> gcs_io.ReadFile(
+                client, mode_is_binary=True)
+        )
+        self.assert_pcoll_equal(
+            filepath_p_collec, [('dummy_file', binary_data)])
 
 
 class WriteFileTest(job_test_utils.PipelinedTestBase):
@@ -98,13 +122,29 @@ class WriteFileTest(job_test_utils.PipelinedTestBase):
         )
         self.assert_pcoll_equal(filepath_p_collec, [7, 7])
 
+    def test_write_binary_files_to_gcs(self) -> None:
+        client = gcsio_test.FakeGcsClient()
+        binary_data = utils.convert_png_data_url_to_binary(
+            user_services.DEFAULT_IDENTICON_DATA_URL)
+        filepaths = [
+            {
+                'filepath': 'dummy_folder/dummy_subfolder/dummy_file_1',
+                'data': binary_data
+            }
+        ]
+        filepath_p_collec = (
+            self.pipeline
+            | 'Create pcoll of filepaths' >> beam.Create(filepaths)
+            | 'Write to GCS' >> gcs_io.WriteFile(client, mode_is_binary=True)
+        )
+        self.assert_pcoll_equal(filepath_p_collec, [3681])
+
 
 class DeleteFileTest(job_test_utils.PipelinedTestBase):
     """Tests to check gcs_io.DeleteFile."""
 
     def test_delete_files_in_gcs(self) -> None:
-        client = gcsio_test.FakeGcsClient()
-        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        client, bucket = get_client_and_bucket()
         gcs_url = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file'
         string = b'testing'
         insert_random_file(client, gcs_url, string)
@@ -117,14 +157,16 @@ class DeleteFileTest(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(filepath_p_collec, [None])
 
     def test_check_correct_files_are_passing(self) -> None:
-        client = gcsio_test.FakeGcsClient()
-        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        client, bucket = get_client_and_bucket()
         gcs_url = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file'
         string = b'testing'
         insert_random_file(client, gcs_url, string)
         file_paths = ['dummy_folder/dummy_subfolder/dummy_file']
 
-        def _mock_delete(_, filepath: str) -> str:
+        # Here we use MyPy ignore because it raises an error for not having
+        # typing for "_". The underscore is representing the "self" which
+        # is getting passed by the gcs_io.
+        def _mock_delete(_, filepath: str) -> str: # type: ignore[no-untyped-def]
             return filepath
 
         with self.swap(gcsio.GcsIO, 'delete', _mock_delete):
@@ -140,8 +182,7 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
     """Tests to check gcs_io.GetFiles."""
 
     def test_get_files_with_specefic_prefix(self) -> None:
-        client = gcsio_test.FakeGcsClient()
-        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        client, bucket = get_client_and_bucket()
         gcs_url_1 = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file_1'
         gcs_url_2 = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file_2'
         string = b'testing'
@@ -164,14 +205,16 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
             ])
 
     def test_check_correct_filepath_is_passing(self) -> None:
-        client = gcsio_test.FakeGcsClient()
-        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        client, bucket = get_client_and_bucket()
         gcs_url_1 = f'gs://{bucket}/dummy_folder/dummy_subfolder/dummy_file_1'
         string = b'testing'
         insert_random_file(client, gcs_url_1, string)
         file_paths = ['dummy_folder/dummy_subfolder']
 
-        def _mock_list_prefix(_, filepath: str) -> Dict[str, int]:
+        # Here we use MyPy ignore because it raises an error for not having
+        # typing for "_". The underscore is representing the "self" which
+        # is getting passed by the gcs_io.
+        def _mock_list_prefix(_, filepath: str) -> str: # type: ignore[no-untyped-def]
             return filepath
 
         with self.swap(gcsio.GcsIO, 'list_prefix', _mock_list_prefix):

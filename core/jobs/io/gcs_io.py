@@ -177,7 +177,10 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
             mime_type=self.mime_type)
         write_file = file.write(file_obj['data'])
         file.close()
-        return write_file
+        # TODO(#15613): Here we use MyPy ignore because of the incomplete
+        # typing of apache_beam library and absences of stubs in Typeshed,
+        # forces MyPy to assume that the return is of type Any.
+        return write_file # type: ignore[no-any-return]
 
 
 # TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
@@ -232,7 +235,10 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
         """
         gcs_url = f'gs://{self.bucket}/{file_path}'
         delete_result = self.gcs.delete(gcs_url)
-        return delete_result
+        # TODO(#15613): Here we use MyPy ignore because of the incomplete
+        # typing of apache_beam library and absences of stubs in Typeshed,
+        # forces MyPy to assume that the return is of type Any.
+        return delete_result # type: ignore[no-any-return]
 
 
 # TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
@@ -286,4 +292,7 @@ class GetFiles(beam.PTransform): # type: ignore[misc]
             Dict[str, int]. The file name as key and size of file as value.
         """
         gcs_url = f'gs://{self.bucket}/{prefix}'
-        return self.gcs.list_prefix(gcs_url)
+        # TODO(#15613): Here we use MyPy ignore because of the incomplete
+        # typing of apache_beam library and absences of stubs in Typeshed,
+        # forces MyPy to assume that the return is of type Any.
+        return self.gcs.list_prefix(gcs_url) # type: ignore[no-any-return]
