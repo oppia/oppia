@@ -246,7 +246,7 @@ export class ContributorStatsComponent {
           this.statsData.translationContribution[language] = new PageableStats(
             [this.createTranslationContributionStat(stat)]);
         } else {
-          this.statsData.translationContribution[language].data.push(
+          this.statsData.translationContribution[language].data?.push(
             this.createTranslationContributionStat(stat));
         }
       });
@@ -265,7 +265,7 @@ export class ContributorStatsComponent {
           this.statsData.translationReview[language] = new PageableStats(
             [this.createTranslationReviewStat(stat)]);
         } else {
-          this.statsData.translationReview[language].data.push(
+          this.statsData.translationReview[language].data?.push(
             this.createTranslationReviewStat(stat));
         }
       });
@@ -338,7 +338,7 @@ export class ContributorStatsComponent {
   goToNextPage(page: PageableStats): void {
     if (
       page.currentPageStartIndex + this.ITEMS_PER_PAGE >=
-      page.data.length) {
+      page.data?.length) {
       throw new Error('There are no more pages after this one.');
     }
     page.currentPageStartIndex += this.ITEMS_PER_PAGE;
