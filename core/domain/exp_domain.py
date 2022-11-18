@@ -5011,10 +5011,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v53_dict_to_v54_dict(
+    def _convert_states_v54_dict_to_v55_dict(
         cls, states_dict: Dict[str, state_domain.StateDict]
     ) -> Tuple[Dict[str, state_domain.StateDict], int]:
-        """Converts from v53 to v54. Version 54 removes next_content_id_index
+        """Converts from v54 to v55. Version 55 removes next_content_id_index
         and WrittenTranslation from State. This version also updates the
         content-ids for each translatable field in the state with its new
         content-id.
