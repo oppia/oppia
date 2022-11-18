@@ -374,10 +374,18 @@ describe('Question Player Component', () => {
       'topic_url_fragment');
     let questionStateData = {
       ques1: {
-        answers: [],
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        answers: null,
         usedHints: [],
         viewedSolution: false,
-        linkedSkillIds: []
+        // This throws "Argument of type 'null' is not assignable to
+        // parameter of type 'AnswerGroup[]'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        linkedSkillIds: null
       },
       ques2: {
         answers: [{
@@ -406,7 +414,7 @@ describe('Question Player Component', () => {
     component.calculateScores(
       questionStateData as {[key: string]: QuestionData});
 
-    expect(component.totalScore).toBe(55);
+    expect(component.totalScore).toBe(50);
     expect(questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit)
       .toHaveBeenCalledWith(true);
   });
