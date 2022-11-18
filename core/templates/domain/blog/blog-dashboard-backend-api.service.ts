@@ -61,14 +61,15 @@ interface AllStats {
   [yearKey: string]: YearlyStats;
 }
 
-interface BlogPostReadsStatsBackendDict {
+export interface BlogPostReadsStatsBackendDict {
   'blog_post_id': string;
-  'hourly_reads': HourlyStats;
-  'weekly_reads': WeeklyStats;
-  'monthly_reads': MonthlyStats;
-  'yearly_reads': YearlyStats;
-  'all_reads': AllStats;
+  'stats': ReadsStatsBackendDict;
 }
+
+export interface AuthorBlogPostReadsStatsBackendDict {
+  'stats': ReadsStatsBackendDict;
+}
+
 
 interface ReadsStatsBackendDict {
   'hourly_reads': HourlyStats;
@@ -80,11 +81,11 @@ interface ReadsStatsBackendDict {
 
 export interface BlogPostViewsStatsBackendDict {
   'blog_post_id': string;
-  'hourly_views': HourlyStats;
-  'weekly_views': WeeklyStats;
-  'monthly_views': MonthlyStats;
-  'yearly_views': YearlyStats;
-  'all_views': AllStats;
+  'stats': ViewsStatsBackendDict;
+}
+
+export interface AuthorBlogPostViewsStatsBackendDict {
+  'stats': ViewsStatsBackendDict;
 }
 
 interface ViewsStatsBackendDict {
@@ -95,22 +96,15 @@ interface ViewsStatsBackendDict {
   'all_views': AllStats;
 }
 
-interface BlogPostReadingTimeStatsBackendDict {
+export interface BlogPostReadingTimeStatsBackendDict {
   'blog_post_id': string;
-  'zero_to_one_min': number;
-  'one_to_two_min': number;
-  'two_to_three_min': number;
-  'three_to_four_min': number;
-  'four_to_five_min': number;
-  'five_to_six_min': number;
-  'six_to_seven_min': number;
-  'seven_to_eight_min': number;
-  'eight_to_nine_min': number;
-  'nine_to_ten_min': number;
-  'more_than_ten_min': number;
+  'stats': ReadingTimeStatsBackendDict;
 }
 
-interface ReadingTimeStatsBackendDict {
+export interface AuthorBlogPostReadingTimeStatsBackendDict {
+  'stats': ReadingTimeStatsBackendDict;
+}
+export interface ReadingTimeStatsBackendDict {
   'zero_to_one_min': number;
   'one_to_two_min': number;
   'two_to_three_min': number;
@@ -257,11 +251,11 @@ export class BlogDashboardBackendApiService {
         statsHandlerUrl).toPromise().then(response => {
         resolve({
           blogPostId: response.blog_post_id,
-          hourlyViews: response.hourly_views,
-          weeklyViews: response.weekly_views,
-          monthlyViews: response.monthly_views,
-          yearlyViews: response.yearly_views,
-          allViews: response.all_views,
+          hourlyViews: response.stats.hourly_views,
+          weeklyViews: response.stats.weekly_views,
+          monthlyViews: response.stats.monthly_views,
+          yearlyViews: response.stats.yearly_views,
+          allViews: response.stats.all_views,
         });
       }, errorResponse => {
         reject(errorResponse.error.error);
@@ -278,14 +272,14 @@ export class BlogDashboardBackendApiService {
       )
     );
     return new Promise((resolve, reject) => {
-      this.http.get<ViewsStatsBackendDict>(
+      this.http.get<AuthorBlogPostViewsStatsBackendDict>(
         statsHandlerUrl).toPromise().then(response => {
         resolve({
-          hourlyStats: response.hourly_views,
-          weeklyStats: response.weekly_views,
-          monthlyStats: response.monthly_views,
-          yearlyStats: response.yearly_views,
-          allStats: response.all_views,
+          hourlyStats: response.stats.hourly_views,
+          weeklyStats: response.stats.weekly_views,
+          monthlyStats: response.stats.monthly_views,
+          yearlyStats: response.stats.yearly_views,
+          allStats: response.stats.all_views,
         });
       }, errorResponse => {
         reject(errorResponse.error.error);
@@ -310,11 +304,11 @@ export class BlogDashboardBackendApiService {
         statsHandlerUrl).toPromise().then(response => {
         resolve({
           blogPostId: response.blog_post_id,
-          hourlyReads: response.hourly_reads,
-          weeklyReads: response.weekly_reads,
-          monthlyReads: response.monthly_reads,
-          yearlyReads: response.yearly_reads,
-          allReads: response.all_reads,
+          hourlyReads: response.stats.hourly_reads,
+          weeklyReads: response.stats.weekly_reads,
+          monthlyReads: response.stats.monthly_reads,
+          yearlyReads: response.stats.yearly_reads,
+          allReads: response.stats.all_reads,
         });
       }, errorResponse => {
         reject(errorResponse.error.error);
@@ -332,14 +326,14 @@ export class BlogDashboardBackendApiService {
       )
     );
     return new Promise((resolve, reject) => {
-      this.http.get<ReadsStatsBackendDict>(
+      this.http.get<AuthorBlogPostReadsStatsBackendDict>(
         statsHandlerUrl).toPromise().then(response => {
         resolve({
-          hourlyStats: response.hourly_reads,
-          weeklyStats: response.weekly_reads,
-          monthlyStats: response.monthly_reads,
-          yearlyStats: response.yearly_reads,
-          allStats: response.all_reads,
+          hourlyStats: response.stats.hourly_reads,
+          weeklyStats: response.stats.weekly_reads,
+          monthlyStats: response.stats.monthly_reads,
+          yearlyStats: response.stats.yearly_reads,
+          allStats: response.stats.all_reads,
         });
       }, errorResponse => {
         reject(errorResponse.error.error);
@@ -363,17 +357,17 @@ export class BlogDashboardBackendApiService {
         statsHandlerUrl).toPromise().then(response => {
         resolve({
           blogPostId: response.blog_post_id,
-          zeroToOneMin: response.zero_to_one_min,
-          oneToTwoMin: response.one_to_two_min,
-          twoToThreeMin: response.two_to_three_min,
-          threeToFourMin: response.three_to_four_min,
-          fourToFiveMin: response.four_to_five_min,
-          fiveToSixMin: response.five_to_six_min,
-          sixToSevenMin: response.six_to_seven_min,
-          sevenToEightMin: response.seven_to_eight_min,
-          eightToNineMin: response.eight_to_nine_min,
-          nineToTenMin: response.nine_to_ten_min,
-          moreThanTenMin: response.more_than_ten_min,
+          zeroToOneMin: response.stats.zero_to_one_min,
+          oneToTwoMin: response.stats.one_to_two_min,
+          twoToThreeMin: response.stats.two_to_three_min,
+          threeToFourMin: response.stats.three_to_four_min,
+          fourToFiveMin: response.stats.four_to_five_min,
+          fiveToSixMin: response.stats.five_to_six_min,
+          sixToSevenMin: response.stats.six_to_seven_min,
+          sevenToEightMin: response.stats.seven_to_eight_min,
+          eightToNineMin: response.stats.eight_to_nine_min,
+          nineToTenMin: response.stats.nine_to_ten_min,
+          moreThanTenMin: response.stats.more_than_ten_min,
         });
       }, errorResponse => {
         reject(errorResponse.error.error);
@@ -391,20 +385,20 @@ export class BlogDashboardBackendApiService {
       )
     );
     return new Promise((resolve, reject) => {
-      this.http.get<ReadingTimeStatsBackendDict>(
+      this.http.get<AuthorBlogPostReadingTimeStatsBackendDict>(
         statsHandlerUrl).toPromise().then(response => {
         resolve({
-          zeroToOneMin: response.zero_to_one_min,
-          oneToTwoMin: response.one_to_two_min,
-          twoToThreeMin: response.two_to_three_min,
-          threeToFourMin: response.three_to_four_min,
-          fourToFiveMin: response.four_to_five_min,
-          fiveToSixMin: response.five_to_six_min,
-          sixToSevenMin: response.six_to_seven_min,
-          sevenToEightMin: response.seven_to_eight_min,
-          eightToNineMin: response.eight_to_nine_min,
-          nineToTenMin: response.nine_to_ten_min,
-          moreThanTenMin: response.more_than_ten_min,
+          zeroToOneMin: response.stats.zero_to_one_min,
+          oneToTwoMin: response.stats.one_to_two_min,
+          twoToThreeMin: response.stats.two_to_three_min,
+          threeToFourMin: response.stats.three_to_four_min,
+          fourToFiveMin: response.stats.four_to_five_min,
+          fiveToSixMin: response.stats.five_to_six_min,
+          sixToSevenMin: response.stats.six_to_seven_min,
+          sevenToEightMin: response.stats.seven_to_eight_min,
+          eightToNineMin: response.stats.eight_to_nine_min,
+          nineToTenMin: response.stats.nine_to_ten_min,
+          moreThanTenMin: response.stats.more_than_ten_min,
         });
       }, errorResponse => {
         reject(errorResponse.error.error);

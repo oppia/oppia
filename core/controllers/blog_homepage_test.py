@@ -562,7 +562,7 @@ class BlogPostStatsEventHandlers(test_utils.GenericTestBase):
 
     MOCK_DATE: Final = datetime.datetime(2020, 6, 15)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         with self.mock_datetime_utcnow(self.MOCK_DATE):
             self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)

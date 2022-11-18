@@ -91,18 +91,17 @@ def _repack_reads_stats(
     stats.reads_by_hour = {
         k: stats.reads_by_hour[k] for k in list(stats.reads_by_hour)[:3]
     }
-    return stats
 
 
 @overload
 def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
     stats: BlogPostViewsAggregatedStats,
-) -> None: ...
+) -> Dict[str, int]: ...
 
 @overload
 def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
     stats: AuthorBlogPostViewsAggregatedStats,
-) -> None: ...
+) -> Dict[str, int]: ...
 
 def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
     stats: Union[
@@ -144,12 +143,12 @@ def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
 @overload
 def _generate_past_week_views_stats_from_views_by_date(
     stats: BlogPostViewsAggregatedStats,
-) -> None: ...
+) -> Dict[str, int]: ...
 
 @overload
 def _generate_past_week_views_stats_from_views_by_date(
     stats: AuthorBlogPostViewsAggregatedStats,
-) -> None: ...
+) -> Dict[str, int]: ...
 
 def _generate_past_week_views_stats_from_views_by_date(
     stats: Union[
@@ -195,12 +194,12 @@ def _generate_past_week_views_stats_from_views_by_date(
 @overload
 def _generate_monthly_views_from_views_by_date(
     stats: BlogPostViewsAggregatedStats,
-) -> None: ...
+) -> Dict[str, int]: ...
 
 @overload
 def _generate_monthly_views_from_views_by_date(
     stats: AuthorBlogPostViewsAggregatedStats,
-) -> None: ...
+) -> Dict[str, int]: ...
 
 def _generate_monthly_views_from_views_by_date(
     stats: Union[
@@ -225,12 +224,12 @@ def _generate_monthly_views_from_views_by_date(
 @overload
 def _generate_yearly_views_from_views_by_month(
     stats: BlogPostViewsAggregatedStats,
-) -> None: ...
+) -> Dict[str, int]: ...
 
 @overload
 def _generate_yearly_views_from_views_by_month(
     stats: AuthorBlogPostViewsAggregatedStats,
-) -> None: ...
+) -> Dict[str, int]: ...
 
 def _generate_yearly_views_from_views_by_month(
     stats: Union[
@@ -790,7 +789,7 @@ class AuthorBlogPostViewsAggregatedStats:
         self.views_by_month = views_by_month
         self.created_on = created_on
 
-    def repack_stats(self):
+    def repack_stats(self) -> None:
         """Repacks stats to contain only required aggregated stats removing old
         stats.
         """
@@ -875,7 +874,7 @@ class AuthorBlogPostReadsAggregatedStats:
         self.reads_by_month = reads_by_month
         self.created_on = created_on
 
-    def repack_stats(self):
+    def repack_stats(self) -> None:
         """Repacks stats to contain only required aggregated stats removing old
         stats.
         """

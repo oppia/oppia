@@ -30,7 +30,7 @@ from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import user_services
 
-from typing import Dict, List, Union, Optional, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 
 class BlogCardSummaryDict(TypedDict):
@@ -379,7 +379,7 @@ class BlogDashboardBlogPostStatisticsHandler(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] =  {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
 
@@ -429,7 +429,7 @@ class BlogDashboardAuthorBlogPostsStatisticsHandler(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] =  {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
 
@@ -457,7 +457,7 @@ class BlogDashboardAuthorBlogPostsStatisticsHandler(
             )
 
         stats_dict = stats.to_frontend_dict()
-
+        print(stats_dict)
         self.values.update({
             'chart_type': chart_type,
             'stats': stats_dict

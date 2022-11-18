@@ -170,29 +170,28 @@ export class BlogDashboardPageService {
     }
   }
 
-  renameKeysInDict(
-      keysMap: {[keyToReplace: string]: string},
-      stats: Object
-  ): void {
-    Object.keys(stats).reduce(
-      (acc, key) => ({
-        ...acc,
-        ...{ [keysMap[key] || key]: stats[key] },
-      }),
-      {}
-    );
-  }
-
-  getPastMonthString(monthOffset: number): string {
+  getMonthString(monthOffset: number): string {
     let now = new Date();
     let day = (
       new Date(
         now.getFullYear(),
-        now.getMonth() - monthOffset,
+        1 + monthOffset,
         now.getDate()
       )
     );
-    return dayjs(day).format('D-MMM');
+    return dayjs(day).format('MMM-YY');
+  }
+
+  getcurrentMonthDayString(dayOffset: number): string {
+    let now = new Date();
+    let day = (
+      new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        1 + dayOffset
+      )
+    );
+    return dayjs(day).format('D');
   }
 
   getPastDayString(dayOffset: number): string {
@@ -207,6 +206,17 @@ export class BlogDashboardPageService {
     return dayjs(day).format('D-MMM');
   }
 
+  getPastMonthString(dayOffset: number): string {
+    let now = new Date();
+    let day = (
+      new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() - dayOffset
+      )
+    );
+    return dayjs(day).format('MMM');
+  }
 
   getPastHourString(hourOffset: number): string {
     let now = new Date();
@@ -218,7 +228,7 @@ export class BlogDashboardPageService {
         now.getHours() - hourOffset
       ).getHours()
     );
-    return hour.toString() + ':00h';
+    return hour.toString() + 'h';
   }
 }
 

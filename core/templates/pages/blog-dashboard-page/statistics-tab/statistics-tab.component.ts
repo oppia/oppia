@@ -17,6 +17,7 @@
  */
 
 import * as d3 from 'd3';
+import dayjs from 'dayjs';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
@@ -58,11 +59,8 @@ export class BlogStatisticsTabComponent implements OnInit {
   private _width: number;
   private _height: number;
   private _dataForActiveChart: Stats | ReadingTimeStats;
-  private data = {
-    '00': 1000, '01': 2000, '02': 3000, '09': 5000
-  };
 
-  margin = { top: 20, right: 20, bottom: 30, left: 40 };
+  margin = { top: 20, right: 20, bottom: 50, left: 60 };
   authorAggregatedStatsShown!: boolean;
   selectedChartType!: string;
   viewsChartShown: boolean = true;
@@ -73,6 +71,7 @@ export class BlogStatisticsTabComponent implements OnInit {
   activeStatsBlogPostId: string;
   activeTimePeriod: string;
   loadingChartSpinnerShown: boolean;
+  xAxisLabels: string[] = [];
   directiveSubscriptions = new Subscription();
   constructor(
     private blogDashboardBackendApiService: BlogDashboardBackendApiService,
@@ -153,11 +152,7 @@ export class BlogStatisticsTabComponent implements OnInit {
 
   showAuthorStats(): void {
     this.authorAggregatedStatsShown = true;
-    // SetTimeout(() => {
-    //   this._createSvg();
-    //   this._drawBars(this.data);
-    // })
-    // this.showViewsChartStats();
+    this.showViewsChartStats();
   }
 
   showAuthorAggregatedReadingTimeStats(): void {
@@ -238,7 +233,8 @@ export class BlogStatisticsTabComponent implements OnInit {
       };
       this._dataForActiveChart = readsStats;
       this.showHourlyStats();
-      this.addStatsToLoadedBlogPostStats(stats.blogPostId, readsStats, 'reads');
+      this.addStatsToLoadedBlogPostStats(
+        stats.blogPostId, readsStats, 'reads');
     }, () => {});
   }
 
@@ -270,18 +266,16 @@ export class BlogStatisticsTabComponent implements OnInit {
 
   showHourlyStats(): void {
     this.loadingChartSpinnerShown = true;
-    let utcKeyedToLocaleHourDict = {};
     let data = (this._dataForActiveChart as Stats).hourlyStats;
     let statsKeys = Object.keys(data);
-    let hourOffset = statsKeys.length;
-    statsKeys.map(key => {
-      utcKeyedToLocaleHourDict[key] = (
+    let hourOffset = statsKeys.length - 1;
+    this.xAxisLabels = [];
+    statsKeys.map(() => {
+      this.xAxisLabels.push(
         this.blogDashboardPageService.getPastHourString(hourOffset)
       );
       hourOffset -= 1;
     });
-    this.blogDashboardPageService.renameKeysInDict(
-      utcKeyedToLocaleHourDict, data);
     this.plotStatsGraph(data);
   }
 
@@ -289,16 +283,14 @@ export class BlogStatisticsTabComponent implements OnInit {
     this.loadingChartSpinnerShown = true;
     let data = (this._dataForActiveChart as Stats).monthlyStats;
     let statsKeys = Object.keys(data);
-    let dayOffset = statsKeys.length;
-    let utcKeyedToLocaleDayDict = {};
-    statsKeys.map(key => {
-      utcKeyedToLocaleDayDict[key] = (
-        this.blogDashboardPageService.getPastDayString(dayOffset)
+    let dayOffset = 0;
+    this.xAxisLabels = [];
+    statsKeys.map(() => {
+      this.xAxisLabels.push(
+        this.blogDashboardPageService.getcurrentMonthDayString(dayOffset)
       );
-      dayOffset -= 1;
+      dayOffset += 1;
     });
-    this.blogDashboardPageService.renameKeysInDict(
-      utcKeyedToLocaleDayDict, data);
     this.plotStatsGraph(data);
   }
 
@@ -307,15 +299,13 @@ export class BlogStatisticsTabComponent implements OnInit {
     let data = (this._dataForActiveChart as Stats).weeklyStats;
     let statsKeys = Object.keys(data);
     let dayOffset = statsKeys.length;
-    let utcKeyedToLocaleDayDict = {};
-    statsKeys.map(key => {
-      utcKeyedToLocaleDayDict[key] = (
+    this.xAxisLabels = [];
+    statsKeys.map(() => {
+      this.xAxisLabels.push(
         this.blogDashboardPageService.getPastDayString(dayOffset)
       );
       dayOffset -= 1;
     });
-    this.blogDashboardPageService.renameKeysInDict(
-      utcKeyedToLocaleDayDict, data);
     this.plotStatsGraph(data);
   }
 
@@ -323,15 +313,14 @@ export class BlogStatisticsTabComponent implements OnInit {
     this.loadingChartSpinnerShown = true;
     let data = (this._dataForActiveChart as Stats).yearlyStats;
     let statsKeys = Object.keys(data);
-    let monthOffset = statsKeys.length;
-    let utcKeyedToLocaleMonthDict = {};
-    statsKeys.map(key => {
-      utcKeyedToLocaleMonthDict[key] = (
-        this.blogDashboardPageService.getPastMonthString(monthOffset));
-      monthOffset -= 1;
+    let monthOffset = 0;
+    this.xAxisLabels = [];
+    statsKeys.map(() => {
+      this.xAxisLabels.push(
+        this.blogDashboardPageService.getMonthString(monthOffset)
+      );
+      monthOffset += 1;
     });
-    this.blogDashboardPageService.renameKeysInDict(
-      utcKeyedToLocaleMonthDict, data);
     this.plotStatsGraph(data);
   }
 
@@ -341,14 +330,9 @@ export class BlogStatisticsTabComponent implements OnInit {
 
   plotReadingTimeStatsChart(): void {
     let data = this._dataForActiveChart as ReadingTimeStats;
-    this.blogDashboardPageService.renameKeysInDict(
-      BlogDashboardPageConstants.READING_TIME_BUCKET_KEYS_TO_DISPLAY,
-      data
-    );
-    setTimeout(() => {
-      this._createSvg();
-      this._drawBars(this._dataForActiveChart);
-    });
+    this.xAxisLabels = Object(
+      BlogDashboardPageConstants.READING_TIME_BUCKET_KEYS_TO_DISPLAY).values;
+    this.plotStatsGraph(data);
   }
 
   addStatsToLoadedBlogPostStats(
@@ -378,9 +362,15 @@ export class BlogStatisticsTabComponent implements OnInit {
     this.showViewsChartStats();
   }
 
-  plotStatsGraph(data: {[statsKey: string]: number}): void {
-    this._createSvg();
-    this._drawBars(data);
+  plotStatsGraph(data: {[statsKey: string]: number} | ReadingTimeStats): void {
+    const element = this.chartContainer.nativeElement;
+    d3.select(element).select('svg').selectAll('*').remove();
+    d3.select(element).select('svg').remove();
+    setTimeout(() => {
+      this.loadingChartSpinnerShown = false;
+      this._createSvg();
+      this._drawBars(data);
+    });
   }
 
   getYAxisBandScale(data: {[key: string]: number}): number {
@@ -394,7 +384,6 @@ export class BlogStatisticsTabComponent implements OnInit {
   }
 
   private _createSvg(): void {
-    d3.select('svg').remove();
     const element = this.chartContainer.nativeElement;
     this._svg = d3.select(element).append('svg')
       .attr('width', element.offsetWidth)
@@ -410,31 +399,64 @@ export class BlogStatisticsTabComponent implements OnInit {
 
   private _drawBars(data): void {
     let plotData = d3.entries(data);
-    // Let label = (
-    //   BlogDashboardPageConstants.STATS_CHART_LABLES[this.selectedChartType]
-    // );
     // Create the X-axis band scale.
     const x = d3.scaleBand()
       .range([0, this._width])
       .domain(plotData.map(d => d.key))
       .padding(0.1);
 
+    let xAxisGenerator = d3.axisBottom(x);
+    if (this.viewsChartShown || this.readsChartShown) {
+      xAxisGenerator.tickSize(0);
+    } else {
+      xAxisGenerator.ticks(11).tickSize(-this._height);
+    }
+    xAxisGenerator.tickFormat((d, i) => this.xAxisLabels[i]);
     // Draw the X-axis on the DOM.
-    this._svg.append('g')
-      .attr('transform', 'translate(0,' + this._height + ')')
-      .call(d3.axisBottom(x).tickSize(0))
-      .selectAll('text')
-      .style('text-anchor', 'end');
+    let xAxis = this._svg.append('g')
+      .call(xAxisGenerator.tickSizeOuter(-this._height));
+    xAxis.attr('transform', 'translate(0,' + this._height + ')');
+    xAxis.selectAll('text')
+      .style('text-anchor', 'middle');
+    xAxis.select('.domain')
+      .attr('stroke', '#000');
+    xAxis.selectAll('.tick:not(:first-of-type) line')
+      .attr('stroke', '#4682B4')
+      .attr('stroke-width', 2.5)
+      .attr('opacity', 0.5);
 
     // Create the Y-axis band scale.
+    let yAxisMaxValue = d3.max(plotData, d => Number(d.value));
+    if (Number(yAxisMaxValue) < 10) {
+      yAxisMaxValue += 100;
+    } else {
+      yAxisMaxValue += 50;
+    }
     const y = d3.scaleLinear()
-      .domain([0, d3.max(plotData, d => d.value)])
+      .domain([0, Number(yAxisMaxValue)])
       .range([this._height, 0]);
 
     // Draw the Y-axis on the DOM.
-    this._svg.append('g')
-      .attr('stroke-width', 0.1)
+    let yAxis = this._svg.append('g')
       .call(d3.axisLeft(y).ticks(10).tickSize(-this._width));
+
+    yAxis.select('.domain')
+      .attr('stroke-width', 1)
+      .attr('stroke', '#000');
+    yAxis.selectAll('.tick:not(:first-of-type) line')
+      .attr('stroke', '#4682B4')
+      .attr('stroke-width', 2.5)
+      .attr('opacity', 0.5);
+
+
+    d3.scaleBand().paddingOuter(0.35);
+    // Y axis label.
+    this._svg.append('text')
+      .attr('text-anchor', 'middle')
+      .attr('transform', 'rotate(-90)')
+      .attr('y', 0 - this.margin.left + 20)
+      .attr('x', 0 - this._height / 2)
+      .text(this.getYaxisLabel());
 
     // Create and fill the bars.
     this._svg.selectAll('bars')
@@ -447,8 +469,19 @@ export class BlogStatisticsTabComponent implements OnInit {
       .attr('width', x.bandwidth())
       .attr('height', d => this._height - y(d.value))
       .attr('fill', '#1F78B4');
+  }
 
-    this.loadingChartSpinnerShown = false;
+  getYaxisLabel(): string {
+    if (this.viewsChartShown) {
+      return 'VIEWS';
+    } else {
+      return 'READS';
+    }
+  }
+
+  getPublishedOnDateString(naiveDate: string): string {
+    return dayjs(
+      naiveDate.split(',')[0], 'MM-DD-YYYY').format('MM/DD/YYYY');
   }
 }
 

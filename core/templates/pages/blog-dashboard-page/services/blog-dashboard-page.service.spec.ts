@@ -207,4 +207,10 @@ describe('Blog Post Page service', () => {
 
     expect(blogDashboardPageService.blogPostData).toEqual(summaryObject);
   });
+
+  it('should get corrent month string according to the ongoing month and' +
+  ' month offset in MMM-YY', () => {
+    var baseTime = new Date();
+    jasmine.clock().mockDate(baseTime);
+  });
 });

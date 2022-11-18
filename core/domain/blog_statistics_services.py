@@ -52,15 +52,16 @@ def get_blog_post_views_stats_by_id(
     """
     stats_model = blog_stats_models.BlogPostViewsAggregatedStatsModel.get(
         blog_post_id, strict=True)
-    add_missing_stat_keys_with_default_values_in_views_stats(
-        stats_model)
-    return blog_statistics_domain.BlogPostViewsAggregatedStats(
+    stats_domain_obj = blog_statistics_domain.BlogPostViewsAggregatedStats(
         blog_post_id,
         stats_model.views_by_hour,
         stats_model.views_by_date,
         stats_model.views_by_month,
         stats_model.created_on
     )
+    add_missing_stat_keys_with_default_values_in_views_stats(
+        stats_domain_obj)
+    return stats_domain_obj
 
 
 def get_blog_post_reads_stats_by_id(
@@ -76,15 +77,16 @@ def get_blog_post_reads_stats_by_id(
     """
     stats_model = blog_stats_models.BlogPostReadsAggregatedStatsModel.get(
         blog_post_id, strict=True)
-    add_missing_stat_keys_with_default_values_in_reads_stats(
-        stats_model)
-    return blog_statistics_domain.BlogPostReadsAggregatedStats(
+    stats_domain_obj = blog_statistics_domain.BlogPostReadsAggregatedStats(
         blog_post_id,
         stats_model.reads_by_hour,
         stats_model.reads_by_date,
         stats_model.reads_by_month,
         stats_model.created_on
     )
+    add_missing_stat_keys_with_default_values_in_reads_stats(
+        stats_domain_obj)
+    return stats_domain_obj
 
 
 def get_blog_post_reading_time_stats_by_id(
@@ -130,15 +132,16 @@ def get_author_blog_post_views_stats_by_id(
     """
     stats_model = blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
         author_id, strict=True)
-    add_missing_stat_keys_with_default_values_in_views_stats(
-        stats_model)
-    return blog_statistics_domain.AuthorBlogPostViewsAggregatedStats(
+    stats_domain_obj = blog_statistics_domain.AuthorBlogPostViewsAggregatedStats(
         author_id,
         stats_model.views_by_hour,
         stats_model.views_by_date,
         stats_model.views_by_month,
         stats_model.created_on
     )
+    add_missing_stat_keys_with_default_values_in_views_stats(
+        stats_domain_obj)
+    return stats_domain_obj
 
 
 def get_author_blog_post_reads_stats_by_id(
@@ -155,16 +158,18 @@ def get_author_blog_post_reads_stats_by_id(
     """
     stats_model = blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
         author_id, strict=True)
-    add_missing_stat_keys_with_default_values_in_reads_stats(
-        stats_model)
-    return blog_statistics_domain.AuthorBlogPostReadsAggregatedStats(
-        author_id,
-        stats_model.reads_by_hour,
-        stats_model.reads_by_date,
-        stats_model.reads_by_month,
-        stats_model.created_on
+    stats_domain_obj = (
+        blog_statistics_domain.AuthorBlogPostReadsAggregatedStats(
+            author_id,
+            stats_model.reads_by_hour,
+            stats_model.reads_by_date,
+            stats_model.reads_by_month,
+            stats_model.created_on
+        )
     )
-
+    add_missing_stat_keys_with_default_values_in_reads_stats(
+        stats_domain_obj)
+    return stats_domain_obj
 
 def get_author_blog_posts_reading_time_stats_by_id(
     author_id: str
