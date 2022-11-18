@@ -251,7 +251,7 @@ describe('Customize Interaction Modal Component', () => {
       document, 'getElementsByClassName'
     ).withArgs(className).and.returnValue(undefined);
 
-    expect(component.isSaveInteractionButtonEnabled()).toBe(true);
+    expect(component.buttonEnabledOnEndExploration()).toBe(true);
   });
 
   it('should enable Save Interaction button when exploration IDs' +
@@ -260,26 +260,29 @@ describe('Customize Interaction Modal Component', () => {
       .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
 
     let inputField = document.createElement('input');
-    let inputValue = angular.element(inputField);
     let className = 'oppia-exploration-id-input';
+    inputField.classList.add(className);
+    inputField.setAttribute('ng-reflect-model', 'explorationID');
 
-    spyOn(
-      document, 'getElementsByClassName'
-    ).withArgs(className).and.returnValue(inputValue as any);
-
-    expect(component.isSaveInteractionButtonEnabled()).toBe(true);
+    expect(component.buttonEnabledOnEndExploration()).toBe(true);
   });
 
   it('should disable Save Interaction button when recommendation ID' +
   ' is null', () => {
-    spyOn(component, 'getTitle').and
-      .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
-
+    let inputField = document.createElement('input');
     let className = 'oppia-exploration-id-input';
+    inputField.classList.add(className);
+    inputField.setAttribute('ng-reflect-model', null);
 
-    spyOn(
-      document, 'getElementsByClassName'
-    ).withArgs(className).and.returnValue(null);
+    expect(component.isSaveInteractionButtonEnabled()).toBe(false);
+  });
+
+  it('should disable Save Interaction button when recommendation ID' +
+  ' is undefined', () => {
+    let inputField = document.createElement('input');
+    let className = 'oppia-exploration-id-input';
+    inputField.classList.add(className);
+    inputField.setAttribute('ng-reflect-model', undefined);
 
     expect(component.isSaveInteractionButtonEnabled()).toBe(false);
   });
@@ -289,8 +292,7 @@ describe('Customize Interaction Modal Component', () => {
     let inputField = document.createElement('input');
     let className = 'oppia-exploration-id-input';
     inputField.classList.add(className);
-    let inputValue = angular.element(inputField).attr('ng-reflect-model');
-    inputValue = '';
+    inputField.setAttribute('ng-reflect-model', '');
 
     expect(component.isSaveInteractionButtonEnabled()).toBe(false);
   });
