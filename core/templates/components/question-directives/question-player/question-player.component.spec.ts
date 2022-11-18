@@ -374,18 +374,10 @@ describe('Question Player Component', () => {
       'topic_url_fragment');
     let questionStateData = {
       ques1: {
-        // This throws "Argument of type 'null' is not assignable to
-        // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
-        // @ts-ignore
-        answers: null,
+        answers: [],
         usedHints: [],
         viewedSolution: false,
-        // This throws "Argument of type 'null' is not assignable to
-        // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
-        // @ts-ignore
-        linkedSkillIds: null
+        linkedSkillIds: []
       },
       ques2: {
         answers: [{
@@ -420,6 +412,10 @@ describe('Question Player Component', () => {
   });
 
   it('should calculate score based on question state data', () => {
+    spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
+      'classroom_url_fragment');
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic_url_fragment');
     let questionStateData = {
       ques1: {
         answers: [],
