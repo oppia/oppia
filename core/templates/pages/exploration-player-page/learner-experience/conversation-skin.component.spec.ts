@@ -2247,7 +2247,7 @@ describe('Conversation skin component', () => {
       componentInstance.displayedCard = displayedCard;
 
       componentInstance.ngOnInit();
-      tick();
+      tick(200);
 
       expect(componentInstance.enableFeedback).toBeTrue();
       expect(componentInstance.allowOnlySingleAttemptForAnswering).toBeFalse();
@@ -2264,7 +2264,7 @@ describe('Conversation skin component', () => {
         new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds));
 
       componentInstance.ngOnInit();
-      tick();
+      tick(200);
 
       expect(componentInstance.enableFeedback).toBeFalse();
       expect(componentInstance.allowOnlySingleAttemptForAnswering).toBeTrue();
