@@ -156,8 +156,9 @@ export class ContributorStatsComponent {
   ];
 
   statsData: {
-    translationContribution?: {[key: string]: PageableStats} | undefined;
-    translationReview?: {[key: string]: PageableStats} | undefined;
+    translationContribution?: {[key: string]: PageableStats | undefined} |
+      undefined;
+    translationReview?: {[key: string]: PageableStats | undefined} | undefined;
     questionContribution?: PageableStats;
     questionReview?: PageableStats;
   } = {};
