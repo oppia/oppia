@@ -27,21 +27,23 @@ from core.domain import story_fetchers
 from core.domain import subtopic_page_services
 from core.domain import user_services
 
-from typing import Dict
+from typing import Dict, List, TypedDict, Union
 
 
 LEARNER_GROUP_SCHEMA = {
     'group_title': {
         'schema': {
-            'type': 'basestring'
-        },
-        'default_value': None
+            'type': 'basestring',
+            'validators': [{
+                'id': 'has_length_at_most',
+                'max_value': constants.MAX_CHARS_IN_LEARNER_GROUP_TITLE
+            }]
+        }
     },
     'group_description': {
         'schema': {
             'type': 'basestring',
-        },
-        'default_value': None
+        }
     },
     'learner_usernames': {
         'schema': {
@@ -90,7 +92,24 @@ LEARNER_GROUP_SCHEMA = {
 }
 
 
-class CreateLearnerGroupHandler(base.BaseHandler):
+class CreateLearnerGroupHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of CreateLearnerGroupHandler's normalized_payload
+    dictionary.
+    """
+
+    group_title: str
+    group_description: str
+    learner_usernames: List[str]
+    invited_learner_usernames: List[str]
+    subtopic_page_ids: List[str]
+    story_ids: List[str]
+
+
+class CreateLearnerGroupHandler(
+    base.BaseHandler[
+        CreateLearnerGroupHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handles creation of a new learner group."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -101,16 +120,17 @@ class CreateLearnerGroupHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def post(self) -> None:
         """Creates a new learner group."""
-
-        title = self.normalized_payload.get('group_title')
-        description = self.normalized_payload.get('group_description')
-        invited_learner_usernames = self.normalized_payload.get(
-            'invited_learner_usernames')
-        subtopic_page_ids = self.normalized_payload.get('subtopic_page_ids')
-        story_ids = self.normalized_payload.get('story_ids')
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        title = self.normalized_payload['group_title']
+        description = self.normalized_payload['group_description']
+        invited_learner_usernames = self.normalized_payload[
+            'invited_learner_usernames']
+        subtopic_page_ids = self.normalized_payload['subtopic_page_ids']
+        story_ids = self.normalized_payload['story_ids']
 
         invited_learner_ids = user_services.get_multi_user_ids_from_usernames(
-            invited_learner_usernames)
+            invited_learner_usernames, strict=True)
 
         new_learner_grp_id = learner_group_fetchers.get_new_learner_group_id()
 
@@ -134,7 +154,24 @@ class CreateLearnerGroupHandler(base.BaseHandler):
         })
 
 
-class LearnerGroupHandler(base.BaseHandler):
+class LearnerGroupHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of LearnerGroupHandler's normalized_payload
+    dictionary.
+    """
+
+    group_title: str
+    group_description: str
+    learner_usernames: List[str]
+    invited_learner_usernames: List[str]
+    subtopic_page_ids: List[str]
+    story_ids: List[str]
+
+
+class LearnerGroupHandler(
+    base.BaseHandler[
+        LearnerGroupHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handles operations related to the learner groups."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -158,13 +195,15 @@ class LearnerGroupHandler(base.BaseHandler):
     def put(self, learner_group_id: str) -> None:
         """Updates an existing learner group."""
 
-        title = self.normalized_payload.get('group_title')
-        description = self.normalized_payload.get('group_description')
-        learner_usernames = self.normalized_payload.get('learner_usernames')
-        invited_learner_usernames = self.normalized_payload.get(
-            'invited_learner_usernames')
-        subtopic_page_ids = self.normalized_payload.get('subtopic_page_ids')
-        story_ids = self.normalized_payload.get('story_ids')
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        title = self.normalized_payload['group_title']
+        description = self.normalized_payload['group_description']
+        learner_usernames = self.normalized_payload['learner_usernames']
+        invited_learner_usernames = self.normalized_payload[
+            'invited_learner_usernames']
+        subtopic_page_ids = self.normalized_payload['subtopic_page_ids']
+        story_ids = self.normalized_payload['story_ids']
 
         # Check if user is the facilitator of the learner group, as only
         # facilitators have the right to update a learner group.
@@ -176,10 +215,10 @@ class LearnerGroupHandler(base.BaseHandler):
                 'You are not a facilitator of this learner group.')
 
         learner_ids = user_services.get_multi_user_ids_from_usernames(
-            learner_usernames
+            learner_usernames, strict=True
         )
         invited_learner_ids = user_services.get_multi_user_ids_from_usernames(
-            invited_learner_usernames
+            invited_learner_usernames, strict=True
         )
 
         learner_group = learner_group_services.update_learner_group(
@@ -204,7 +243,7 @@ class LearnerGroupHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def delete(self, learner_group_id: str) -> None:
         """Deletes a learner group."""
-
+        assert self.user_id is not None
         is_valid_request = learner_group_services.is_user_facilitator(
             self.user_id, learner_group_id
         )
@@ -220,7 +259,20 @@ class LearnerGroupHandler(base.BaseHandler):
         })
 
 
-class LearnerGroupLearnerProgressHandler(base.BaseHandler):
+class LearnerGroupLearnerProgressHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of LearnerGroupHandler's normalized_request
+    dictionary.
+    """
+
+    learner_usernames: List[str]
+
+
+class LearnerGroupLearnerProgressHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        LearnerGroupLearnerProgressHandlerNormalizedRequestDict
+    ]
+):
     """Handles operations related to the learner group learner's progress."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -248,15 +300,20 @@ class LearnerGroupLearnerProgressHandler(base.BaseHandler):
         }
     }
 
+    # TODO(#16539): Change the type of value that is rendered to JSON,
+    # because currently `render_json` can only accept Dict or TypedDict
+    # types of values but in this handler we are rendering List
+    # value. Also, once the value type is changed, please remove
+    # List[Mapping[str, Any]] from render_json's argument type.
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id: str) -> None:
         """Handles GET requests for users progress through learner
         group syllabus.
         """
-
-        learner_usernames = self.normalized_request.get('learner_usernames')
+        assert self.normalized_request is not None
+        learner_usernames = self.normalized_request['learner_usernames']
         learner_user_ids = user_services.get_multi_user_ids_from_usernames(
-            learner_usernames)
+            learner_usernames, strict=True)
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
             learner_group_id)
@@ -286,7 +343,8 @@ class LearnerGroupLearnerProgressHandler(base.BaseHandler):
             )
         )
 
-        all_users_settings = user_services.get_users_settings(learner_user_ids)
+        all_users_settings = user_services.get_users_settings(
+            learner_user_ids, strict=True)
         all_learners_progress = []
         for i, user_id in enumerate(learner_user_ids):
             learner_progress = {
@@ -314,7 +372,9 @@ class LearnerGroupLearnerProgressHandler(base.BaseHandler):
         self.render_json(all_learners_progress)
 
 
-class LearnerGroupLearnerSpecificProgressHandler(base.BaseHandler):
+class LearnerGroupLearnerSpecificProgressHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles operations related to fetching learner specific progress."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -330,17 +390,14 @@ class LearnerGroupLearnerSpecificProgressHandler(base.BaseHandler):
             }
         }
     }
-
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id: str) -> None:
         """Handles GET requests for user progress through learner
         group syllabus.
         """
-
+        assert self.user_id is not None
         learner_user_id = self.user_id
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
@@ -381,7 +438,9 @@ class LearnerGroupLearnerSpecificProgressHandler(base.BaseHandler):
         self.render_json(learner_progress)
 
 
-class LearnerGroupSyllabusHandler(base.BaseHandler):
+class LearnerGroupSyllabusHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles fetching of the learner group syllabus."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -398,9 +457,7 @@ class LearnerGroupSyllabusHandler(base.BaseHandler):
         }
     }
 
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id: str) -> None:
@@ -426,7 +483,24 @@ class LearnerGroupSyllabusHandler(base.BaseHandler):
         })
 
 
-class LearnerGroupSearchSyllabusHandler(base.BaseHandler):
+class LearnerGroupSearchSyllabusHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of LearnerGroupSearchSyllabusHandler's
+    normalized_request dictionary.
+    """
+
+    learner_group_id: str
+    search_keyword: str
+    search_type: str
+    search_category: str
+    search_language_code: str
+
+
+class LearnerGroupSearchSyllabusHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        LearnerGroupSearchSyllabusHandlerNormalizedRequestDict
+    ]
+):
     """Handles operations related to the learner group syllabus."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -471,13 +545,13 @@ class LearnerGroupSearchSyllabusHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def get(self) -> None:
         """Handles GET requests for learner group syllabus views."""
-
-        search_keyword = self.normalized_request.get('search_keyword')
-        search_type = self.normalized_request.get('search_type')
-        search_category = self.normalized_request.get('search_category')
-        search_language_code = self.normalized_request.get(
-            'search_language_code')
-        learner_group_id = self.normalized_request.get('learner_group_id')
+        assert self.normalized_request is not None
+        search_keyword = self.normalized_request['search_keyword']
+        search_type = self.normalized_request['search_type']
+        search_category = self.normalized_request['search_category']
+        search_language_code = self.normalized_request[
+            'search_language_code']
+        learner_group_id = self.normalized_request['learner_group_id']
 
         matching_syllabus = (
             learner_group_services.get_matching_learner_group_syllabus_to_add(
@@ -494,20 +568,20 @@ class LearnerGroupSearchSyllabusHandler(base.BaseHandler):
         })
 
 
-class FacilitatorDashboardHandler(base.BaseHandler):
+class FacilitatorDashboardHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles operations related to the facilitator dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests for the facilitator dashboard."""
-
+        assert self.user_id is not None
         learner_groups = (
             learner_group_fetchers.get_learner_groups_of_facilitator(
                 self.user_id)
@@ -520,7 +594,7 @@ class FacilitatorDashboardHandler(base.BaseHandler):
                 'title': learner_group.title,
                 'description': learner_group.description,
                 'facilitator_usernames': user_services.get_usernames(
-                    self.user_id),
+                    [self.user_id]),
                 'learners_count': len(learner_group.learner_user_ids)
             })
 
@@ -529,7 +603,9 @@ class FacilitatorDashboardHandler(base.BaseHandler):
         })
 
 
-class ViewLearnerGroupInfoHandler(base.BaseHandler):
+class ViewLearnerGroupInfoHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles operations related to viewing learner group info."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -545,14 +621,12 @@ class ViewLearnerGroupInfoHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id: str) -> None:
         """Handles GET requests for viewing learner group info."""
-
+        assert self.user_id is not None
         is_valid_facilitator = learner_group_services.is_user_facilitator(
             self.user_id, learner_group_id)
         is_valid_learner = learner_group_services.is_user_learner(
@@ -562,7 +636,7 @@ class ViewLearnerGroupInfoHandler(base.BaseHandler):
                 'You are not a member of this learner group.')
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
-            learner_group_id)
+            learner_group_id, strict=True)
 
         self.render_json({
             'id': learner_group.group_id,
@@ -579,13 +653,13 @@ class ViewLearnerGroupInfoHandler(base.BaseHandler):
         })
 
 
-class FacilitatorDashboardPage(base.BaseHandler):
+class FacilitatorDashboardPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Page showing the teacher dashboard."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
     def get(self) -> None:
@@ -596,13 +670,13 @@ class FacilitatorDashboardPage(base.BaseHandler):
         self.render_template('facilitator-dashboard-page.mainpage.html')
 
 
-class CreateLearnerGroupPage(base.BaseHandler):
+class CreateLearnerGroupPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Page for creating a new learner group."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
     def get(self) -> None:
@@ -613,13 +687,25 @@ class CreateLearnerGroupPage(base.BaseHandler):
         self.render_template('create-learner-group-page.mainpage.html')
 
 
-class LearnerGroupSearchLearnerHandler(base.BaseHandler):
+class LearnerGroupSearchLearnerHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of LearnerGroupSearchLearnerHandler's
+    normalized_request dictionary.
+    """
+
+    learner_group_id: str
+    username: str
+
+
+class LearnerGroupSearchLearnerHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        LearnerGroupSearchLearnerHandlerNormalizedRequestDict
+    ]
+):
     """Handles searching of learners to invite in learner group."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'learner_group_id': {
@@ -640,9 +726,10 @@ class LearnerGroupSearchLearnerHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def get(self) -> None:
         """Handles GET requests."""
-
-        username: str = self.normalized_request.get('username')
-        learner_group_id: str = self.normalized_request.get('learner_group_id')
+        assert self.username is not None
+        assert self.normalized_request is not None
+        username = self.normalized_request['username']
+        learner_group_id = self.normalized_request['learner_group_id']
 
         user_settings = user_services.get_user_settings_from_username(username)
 
@@ -661,6 +748,7 @@ class LearnerGroupSearchLearnerHandler(base.BaseHandler):
                 'error': 'You cannot invite yourself to the group'
             })
             return
+        assert user_settings.username is not None
 
         (valid_invitation, error) = learner_group_services.can_user_be_invited(
             user_settings.user_id, user_settings.username, learner_group_id
@@ -681,7 +769,9 @@ class LearnerGroupSearchLearnerHandler(base.BaseHandler):
         })
 
 
-class EditLearnerGroupPage(base.BaseHandler):
+class EditLearnerGroupPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Page for editing a learner group."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -702,6 +792,7 @@ class EditLearnerGroupPage(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def get(self, group_id: str) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
         if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
             raise self.PageNotFoundException
 
@@ -714,7 +805,9 @@ class EditLearnerGroupPage(base.BaseHandler):
         self.render_template('edit-learner-group-page.mainpage.html')
 
 
-class LearnerGroupLearnersInfoHandler(base.BaseHandler):
+class LearnerGroupLearnersInfoHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles getting info of learners of a learner group."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -738,7 +831,7 @@ class LearnerGroupLearnersInfoHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id: str) -> None:
         """Handles GET requests."""
-
+        assert self.user_id is not None
         is_valid_request = learner_group_services.is_user_facilitator(
             self.user_id, learner_group_id)
 
@@ -747,7 +840,7 @@ class LearnerGroupLearnersInfoHandler(base.BaseHandler):
                 'You are not a facilitator of this learner group.')
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
-            learner_group_id)
+            learner_group_id, strict=True)
 
         learners_user_settings = user_services.get_users_settings(
             learner_group.learner_user_ids, strict=True)
@@ -774,7 +867,25 @@ class LearnerGroupLearnersInfoHandler(base.BaseHandler):
         })
 
 
-class LearnerGroupLearnerInvitationHandler(base.BaseHandler):
+# TODO(#16566): Restrict the type of 'progress_sharing_permission' and
+# 'is_invitation_accepted' field to only one type, currently they are
+# accepting two types of values str and bool.
+class LearnerGroupLearnerInvitationHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of LearnerGroupLearnerInvitationHandler's
+    normalized_payload dictionary.
+    """
+
+    learner_username: str
+    is_invitation_accepted: Union[str, bool]
+    progress_sharing_permission: Union[str, bool]
+
+
+class LearnerGroupLearnerInvitationHandler(
+    base.BaseHandler[
+        LearnerGroupLearnerInvitationHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Handles a learner accepting or declining a learner group invitation."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -820,16 +931,20 @@ class LearnerGroupLearnerInvitationHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def put(self, learner_group_id: str) -> None:
         """Handles PUT requests."""
-
-        learner_username = self.normalized_payload.get('learner_username')
+        assert self.normalized_payload is not None
+        learner_username = self.normalized_payload['learner_username']
         is_invitation_accepted = (
-            self.normalized_payload.get('is_invitation_accepted') == 'true')
+            self.normalized_payload['is_invitation_accepted'] == 'true')
         progress_sharing_permission = (
-            self.normalized_payload.get(
-                'progress_sharing_permission') == 'true')
+            self.normalized_payload['progress_sharing_permission'] == 'true')
 
         learner_user_id = user_services.get_user_id_from_username(
             learner_username)
+        if learner_user_id is None:
+            raise Exception(
+                'No learner user_id found for the given learner username: %s' %
+                learner_username
+            )
         if is_invitation_accepted:
             learner_group_services.add_learner_to_learner_group(
                 learner_group_id, learner_user_id, progress_sharing_permission)
@@ -838,7 +953,7 @@ class LearnerGroupLearnerInvitationHandler(base.BaseHandler):
                 learner_group_id, [learner_user_id], True)
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
-            learner_group_id)
+            learner_group_id, strict=True)
 
         self.render_json({
             'id': learner_group.group_id,
@@ -855,7 +970,19 @@ class LearnerGroupLearnerInvitationHandler(base.BaseHandler):
         })
 
 
-class ExitLearnerGroupHandler(base.BaseHandler):
+class ExitLearnerGroupHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ExitLearnerGroupHandler's
+    normalized_payload dictionary.
+    """
+
+    learner_username: str
+
+
+class ExitLearnerGroupHandler(
+    base.BaseHandler[
+        ExitLearnerGroupHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handles a learner exiting from a learner group."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -889,16 +1016,21 @@ class ExitLearnerGroupHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def put(self, learner_group_id: str) -> None:
         """Handles PUT requests."""
-
-        learner_username = self.normalized_payload.get('learner_username')
+        assert self.normalized_payload is not None
+        learner_username = self.normalized_payload['learner_username']
 
         learner_user_id = user_services.get_user_id_from_username(
             learner_username)
+        if learner_user_id is None:
+            raise Exception(
+                'No learner user_id found for the given learner username: %s' %
+                learner_username
+            )
         learner_group_services.remove_learners_from_learner_group(
             learner_group_id, [learner_user_id], True)
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
-            learner_group_id)
+            learner_group_id, strict=True)
 
         self.render_json({
             'id': learner_group.group_id,
@@ -915,7 +1047,20 @@ class ExitLearnerGroupHandler(base.BaseHandler):
         })
 
 
-class LearnerStoriesChaptersProgressHandler(base.BaseHandler):
+class LearnerStoriesChaptersProgressHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of LearnerStoriesChaptersProgressHandler's
+    normalized_request dictionary.
+    """
+
+    story_ids: List[str]
+
+
+class LearnerStoriesChaptersProgressHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        LearnerStoriesChaptersProgressHandlerNormalizedRequestDict
+    ]
+):
     """Handles fetching progress of a user in all chapters of given stories"""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -940,12 +1085,22 @@ class LearnerStoriesChaptersProgressHandler(base.BaseHandler):
         }
     }
 
+    # TODO(#16539): Change the type of value that is rendered to JSON,
+    # because currently `render_json` can only accept Dict or TypedDict
+    # types of values but in this handler we are rendering List
+    # value. Also, once the value type is changed, please remove
+    # List[Mapping[str, Any]] from render_json's argument type.
     @acl_decorators.can_access_learner_groups
     def get(self, username: str) -> None:
         """Handles GET requests."""
-
-        story_ids = self.normalized_request.get('story_ids')
+        assert self.normalized_request is not None
+        story_ids = self.normalized_request['story_ids']
         user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
+            raise Exception(
+                'No learner user_id found for the given learner username: %s' %
+                username
+            )
 
         stories_chapters_progress = (
             story_fetchers.get_user_progress_in_story_chapters(
@@ -954,22 +1109,22 @@ class LearnerStoriesChaptersProgressHandler(base.BaseHandler):
         self.render_json(stories_chapters_progress)
 
 
-class LearnerDashboardLearnerGroupsHandler(base.BaseHandler):
+class LearnerDashboardLearnerGroupsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles fetching of learners groups on learner dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
     def get(self) -> None:
         """Handles GET requests for the fetching learner groups on learner
         dashboard.
         """
-
+        assert self.user_id is not None
         invited_to_learner_groups = (
             learner_group_fetchers.get_invited_learner_groups_of_learner(
                 self.user_id)
@@ -1006,7 +1161,24 @@ class LearnerDashboardLearnerGroupsHandler(base.BaseHandler):
         })
 
 
-class LearnerGroupProgressSharingPermissionHandler(base.BaseHandler):
+# TODO(#16566): Restrict the type of `progress_sharing_permission` field to
+# only one type, currently it is accepting two types of values str and bool.
+class LearnerGroupProgressSharingPermissionHandlerNormalizedPayloadDict(
+    TypedDict
+):
+    """Dict representation of LearnerGroupProgressSharingPermissionHandler's
+    normalized_payload dictionary.
+    """
+
+    progress_sharing_permission: Union[str, bool]
+
+
+class LearnerGroupProgressSharingPermissionHandler(
+    base.BaseHandler[
+        LearnerGroupProgressSharingPermissionHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """The handler for fetching and updating progress sharing permissions of
     a learner for a given learner group.
     """
@@ -1039,7 +1211,7 @@ class LearnerGroupProgressSharingPermissionHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id: str) -> None:
         """Handles GET requests."""
-
+        assert self.user_id is not None
         progress_sharing_permission = (
             learner_group_fetchers.can_multi_learners_share_progress(
                 [self.user_id], learner_group_id)[0]
@@ -1051,10 +1223,11 @@ class LearnerGroupProgressSharingPermissionHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def put(self, learner_group_id: str) -> None:
         """Handles PUT requests."""
-
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
         progress_sharing_permission = (
-            self.normalized_payload.get(
-                'progress_sharing_permission') == 'true')
+            self.normalized_payload[
+                'progress_sharing_permission'] == 'true')
 
         learner_group_services.update_progress_sharing_permission(
             self.user_id, learner_group_id, progress_sharing_permission)
@@ -1064,7 +1237,9 @@ class LearnerGroupProgressSharingPermissionHandler(base.BaseHandler):
         })
 
 
-class LearnerGroupsFeatureStatusHandler(base.BaseHandler):
+class LearnerGroupsFeatureStatusHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The handler for checking whether the learner groups feature is
     enabled.
     """
@@ -1072,9 +1247,7 @@ class LearnerGroupsFeatureStatusHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self) -> None:

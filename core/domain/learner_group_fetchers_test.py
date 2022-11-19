@@ -60,6 +60,15 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
         self.assertIsNotNone(learner_group)
         self.assertEqual(learner_group.group_id, self.LEARNER_GROUP_ID)
 
+        with self.assertRaisesRegex(
+            Exception,
+            'No LearnerGroupModel found for the given group_id: '
+            'fake_learner_group_id'
+        ):
+            learner_group_fetchers.get_learner_group_by_id(
+                fake_learner_group_id, strict=True
+            )
+
     def test_raises_error_if_learner_group_model_is_fetched_with_strict_and_invalid_id(  # pylint: disable=line-too-long
         self
     ) -> None:

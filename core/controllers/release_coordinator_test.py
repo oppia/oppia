@@ -23,7 +23,7 @@ from core.tests import test_utils
 class ReleaseCoordinatorPageTest(test_utils.GenericTestBase):
     """Test for release coordinator pages."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Complete the signup process for self.RELEASE_COORDINATOR_EMAIL."""
         super().setUp()
         self.signup(
@@ -38,7 +38,7 @@ class ReleaseCoordinatorPageTest(test_utils.GenericTestBase):
 class MemoryCacheHandlerTest(test_utils.GenericTestBase):
     """Tests MemoryCacheHandler."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(
@@ -48,7 +48,7 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 
-    def test_get_memory_cache_data(self):
+    def test_get_memory_cache_data(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
 
         response = self.get_json('/memorycachehandler')
@@ -58,7 +58,7 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
             response['peak_allocation'], 0)
         self.assertEqual(response['total_keys_stored'], 1)
 
-    def test_flush_memory_cache(self):
+    def test_flush_memory_cache(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
 
         response = self.get_json('/memorycachehandler')

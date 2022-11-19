@@ -16,20 +16,27 @@
 
 from __future__ import annotations
 
+from core import android_validation_constants
 from core import feconf
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import topic_fetchers
+from core.domain import user_domain
 from core.domain import user_services
 
+from typing import Dict, List, Optional, TypedDict
 
-def _require_valid_version(version_from_payload, skill_version):
+
+def _require_valid_version(
+    version_from_payload: int, skill_version: int
+) -> None:
     """Check that the payload version matches the given skill
     version.
 
@@ -50,7 +57,9 @@ def _require_valid_version(version_from_payload, skill_version):
             % (skill_version, version_from_payload))
 
 
-class SkillEditorPage(base.BaseHandler):
+class SkillEditorPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The editor page for a single skill."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -64,13 +73,10 @@ class SkillEditorPage(base.BaseHandler):
             }
         }
     }
-
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_skill
-    def get(self, skill_id):
+    def get(self, skill_id: str) -> None:
         """Handles GET requests."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
@@ -83,7 +89,7 @@ class SkillEditorPage(base.BaseHandler):
         self.render_template('skill-editor-page.mainpage.html')
 
 
-def check_can_edit_skill_description(user):
+def check_can_edit_skill_description(user: user_domain.UserActionsInfo) -> bool:
     """Checks whether the user can edit skill descriptions.
 
     Args:
@@ -100,9 +106,10 @@ def check_can_edit_skill_description(user):
         return True
 
 
-class SkillRightsHandler(base.BaseHandler):
+class SkillRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """A handler for returning skill rights."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'skill_id': {
             'schema': {
@@ -114,15 +121,10 @@ class SkillRightsHandler(base.BaseHandler):
             }
         }
     }
-
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
-    }
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_skill
-    def get(self, skill_id):
+    def get(self, skill_id: str) -> None:
         """Returns whether the user can edit the description of a skill."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
@@ -138,11 +140,24 @@ class SkillRightsHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class EditableSkillDataHandler(base.BaseHandler):
+class EditableSkillDataHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of EditableSkillDataHandler's
+    normalized_payload dictionary.
+    """
+
+    version: int
+    commit_message: Optional[str]
+    change_dicts: List[skill_domain.SkillChange]
+
+
+class EditableSkillDataHandler(
+    base.BaseHandler[
+        EditableSkillDataHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """A data handler for skills which supports writing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     URL_PATH_ARGS_SCHEMAS = {
         'skill_id': {
             'schema': {
@@ -154,7 +169,6 @@ class EditableSkillDataHandler(base.BaseHandler):
             }
         }
     }
-
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
@@ -187,7 +201,7 @@ class EditableSkillDataHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def get(self, skill_id):
+    def get(self, skill_id: str) -> None:
         """Populates the data on the individual skill page."""
 
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
@@ -231,14 +245,16 @@ class EditableSkillDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_edit_skill
-    def put(self, skill_id):
+    def put(self, skill_id: str) -> None:
         """Updates properties of the given skill."""
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
         if skill is None:
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
 
-        version = self.normalized_payload.get('version')
+        version = self.normalized_payload['version']
         _require_valid_version(version, skill.version)
 
         commit_message = self.normalized_payload.get('commit_message')
@@ -248,7 +264,7 @@ class EditableSkillDataHandler(base.BaseHandler):
                 'Commit messages must be at most %s characters long.'
                 % constants.MAX_COMMIT_MESSAGE_LENGTH)
 
-        change_list = self.normalized_payload.get('change_dicts')
+        change_list = self.normalized_payload['change_dicts']
         try:
             skill_services.update_skill(
                 self.user_id, skill_id, change_list, commit_message)
@@ -264,9 +280,9 @@ class EditableSkillDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_delete_skill
-    def delete(self, skill_id):
+    def delete(self, skill_id: str) -> None:
         """Handles Delete requests."""
-
+        assert self.user_id is not None
         skill_services.remove_skill_from_all_topics(self.user_id, skill_id)
 
         if skill_services.skill_has_associated_questions(skill_id):
@@ -279,23 +295,28 @@ class EditableSkillDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class SkillDataHandler(base.BaseHandler):
+class SkillDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """A handler for accessing skills data."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    # TODO(#16538): Change the type of `comma_separated_skill_ids` url_path
+    # argument to `JsonEncodedInString`.
+    URL_PATH_ARGS_SCHEMAS = {
+        'comma_separated_skill_ids': {
+            'schema': {
+                'type': 'object_dict',
+                'validation_method': domain_objects_validator.validate_skill_ids
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, comma_separated_skill_ids):
+    def get(self, comma_separated_skill_ids: str) -> None:
         """Populates the data on skill pages of the skill ids."""
 
         skill_ids = comma_separated_skill_ids.split(',')
 
-        try:
-            for skill_id in skill_ids:
-                skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError as e:
-            raise self.PageNotFoundException(
-                'Invalid skill id.') from e
         try:
             skills = skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
@@ -309,23 +330,20 @@ class SkillDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class FetchSkillsHandler(base.BaseHandler):
+class FetchSkillsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """A handler for accessing all skills data."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
-    }
-
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Returns all skill IDs linked to some topic."""
 
         skill_ids = topic_fetchers.get_all_skill_ids_assigned_to_some_topic()
 
-        skills = skill_fetchers.get_multi_skills(skill_ids, strict=False)
+        skills = skill_fetchers.get_multi_skills(list(skill_ids), strict=False)
 
         skill_dicts = [skill.to_dict() for skill in skills]
         self.values.update({
@@ -335,13 +353,25 @@ class FetchSkillsHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class SkillDescriptionHandler(base.BaseHandler):
+class SkillDescriptionHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """A data handler for checking if a skill with given description exists."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_description': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': android_validation_constants.MAX_CHARS_IN_SKILL_DESCRIPTION  # pylint: disable=line-too-long
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_create_skill
-    def get(self, skill_description):
+    def get(self, skill_description: str) -> None:
         """Handler that receives a skill description and checks whether
         a skill with the same description exists.
         """
@@ -353,7 +383,9 @@ class SkillDescriptionHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class DiagnosticTestSkillAssignmentHandler(base.BaseHandler):
+class DiagnosticTestSkillAssignmentHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """A handler that returns a list of topic names for which the given skill
     is assigned to that topic's diagnostic test.
     """
@@ -370,7 +402,7 @@ class DiagnosticTestSkillAssignmentHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_skill
     def get(self, skill_id: str) -> None:

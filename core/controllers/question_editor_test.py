@@ -30,12 +30,16 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import question_models
+
 (question_models,) = models.Registry.import_models([models.Names.QUESTION])
 
 
 class BaseQuestionEditorControllerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
@@ -86,7 +90,9 @@ class BaseQuestionEditorControllerTests(test_utils.GenericTestBase):
 class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
     """Tests returning of new question ids and creating questions."""
 
-    def test_post_with_non_admin_or_topic_manager_email_disallows_access(self):
+    def test_post_with_non_admin_or_topic_manager_email_disallows_access(
+        self
+    ) -> None:
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -95,11 +101,17 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=401)
         self.logout()
 
-    def test_post_with_editor_email_does_not_allow_question_creation(self):
+    def test_post_with_editor_email_does_not_allow_question_creation(
+        self
+    ) -> None:
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
-        question_dict['id'] = None
+        # Here we use MyPy ignore because the 'id' of a question can only
+        # be of string type but here we are assigning it with None because
+        # we want to test the scenario where the question is just created
+        # and the id is still needed to be assigned.
+        question_dict['id'] = None  # type: ignore[arg-type]
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -107,7 +119,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=401)
         self.logout()
 
-    def test_post_with_incorrect_skill_id_returns_404(self):
+    def test_post_with_incorrect_skill_id_returns_404(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         incorrect_skill_id = 'abc123456789'
@@ -117,7 +129,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=404)
         self.logout()
 
-    def test_post_with_no_skill_ids_returns_400(self):
+    def test_post_with_no_skill_ids_returns_400(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -125,7 +137,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_post_with_incorrect_list_of_skill_ids_returns_400(self):
+    def test_post_with_incorrect_list_of_skill_ids_returns_400(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         incorrect_skill_ids = [1, 2]
@@ -135,7 +147,9 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_post_with_incorrect_type_of_skill_ids_returns_400(self):
+    def test_post_with_incorrect_type_of_skill_ids_returns_400(
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         incorrect_skill_id = 1
@@ -145,7 +159,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_post_with_incorrect_question_id_returns_400(self):
+    def test_post_with_incorrect_question_id_returns_400(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
@@ -158,11 +172,13 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_post_with_incorrect_question_schema_returns_400(self):
+    def test_post_with_incorrect_question_schema_returns_400(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
-        del question_dict['question_state_data']['content']
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion
+        # from TypedDict.
+        del question_dict['question_state_data']['content'] # type: ignore[misc]
         question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -171,11 +187,15 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_post_with_no_skill_difficulty_returns_400(self):
+    def test_post_with_no_skill_difficulty_returns_400(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
-        question_dict['id'] = None
+        # Here we use MyPy ignore because the 'id' of a question can only
+        # be of string type but here we are assigning it with None because
+        # we want to test the scenario where the question is just created
+        # and the id is still needed to be assigned.
+        question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -184,7 +204,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_post_with_incorrect_version_returns_400(self):
+    def test_post_with_incorrect_version_returns_400(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
@@ -196,11 +216,15 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_post_with_wrong_skill_difficulty_length_returns_400(self):
+    def test_post_with_wrong_skill_difficulty_length_returns_400(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
-        question_dict['id'] = None
+        # Here we use MyPy ignore because the 'id' of a question can only
+        # be of string type but here we are assigning it with None because
+        # we want to test the scenario where the question is just created
+        # and the id is still needed to be assigned.
+        question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -210,11 +234,17 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_post_with_invalid_skill_difficulty_type_returns_400(self):
+    def test_post_with_invalid_skill_difficulty_type_returns_400(
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
-        question_dict['id'] = None
+        # Here we use MyPy ignore because the 'id' of a question can only
+        # be of string type but here we are assigning it with None because
+        # we want to test the scenario where the question is just created
+        # and the id is still needed to be assigned.
+        question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -224,11 +254,17 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_post_with_invalid_skill_difficulty_value_returns_400(self):
+    def test_post_with_invalid_skill_difficulty_value_returns_400(
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
-        question_dict['id'] = None
+        # Here we use MyPy ignore because the 'id' of a question can only
+        # be of string type but here we are assigning it with None because
+        # we want to test the scenario where the question is just created
+        # and the id is still needed to be assigned.
+        question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -238,11 +274,15 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_post_with_admin_email_allows_question_creation(self):
+    def test_post_with_admin_email_allows_question_creation(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
-        question_dict['id'] = None
+        # Here we use MyPy ignore because the 'id' of a question can only
+        # be of string type but here we are assigning it with None because
+        # we want to test the scenario where the question is just created
+        # and the id is still needed to be assigned.
+        question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -258,11 +298,17 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.assertEqual(len(questions), 2)
         self.logout()
 
-    def test_post_with_topic_manager_email_allows_question_creation(self):
+    def test_post_with_topic_manager_email_allows_question_creation(
+        self
+    ) -> None:
         self.login(self.TOPIC_MANAGER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
-        question_dict['id'] = None
+        # Here we use MyPy ignore because the 'id' of a question can only
+        # be of string type but here we are assigning it with None because
+        # we want to test the scenario where the question is just created
+        # and the id is still needed to be assigned.
+        question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -278,12 +324,19 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.assertEqual(len(questions), 2)
         self.logout()
 
-    def test_post_with_invalid_question_returns_400_status(self):
+    def test_post_with_invalid_question_returns_400_status(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
-        question_dict['id'] = None
-        question_dict['question_state_data'] = 'invalid_question_state_data'
+        # Here we use MyPy ignore because the 'id' of a question can only
+        # be of string type but here we are assigning it with None because
+        # we want to test the scenario where the question is just created
+        # and the id is still needed to be assigned.
+        question_dict['id'] = None  # type: ignore[arg-type]
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        question_dict['question_state_data'] = 'invalid_question_state_data'  # type: ignore[arg-type]
         question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -292,7 +345,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_post_with_too_many_skills_returns_400(self):
+    def test_post_with_too_many_skills_returns_400(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         skill_ids = [1, 2, 3, 4]
@@ -302,13 +355,17 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_post_with_valid_images(self):
+    def test_post_with_valid_images(self) -> None:
         """Test question creation with valid images."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         filename = 'img.png'
         question_dict = self.question.to_dict()
-        question_dict['id'] = None
+        # Here we use MyPy ignore because the 'id' of a question can only
+        # be of string type but here we are assigning it with None because
+        # we want to test the scenario where the question is just created
+        # and the id is still needed to be assigned.
+        question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         content_html = (
             '<oppia-noninteractive-image filepath-with-value='
@@ -330,8 +387,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.post_json(
             feconf.NEW_QUESTION_URL, post_data,
             csrf_token=csrf_token,
-            upload_files=(
-                (filename, filename, raw_image), )
+            upload_files=[(filename, filename, raw_image)]
         )
         all_models = question_models.QuestionModel.get_all()
         questions = [
@@ -341,12 +397,16 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.assertEqual(len(questions), 2)
         self.logout()
 
-    def test_post_with_invalid_images(self):
+    def test_post_with_invalid_images(self) -> None:
         """Test question creation with invalid images."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
-        question_dict['id'] = None
+        # Here we use MyPy ignore because the 'id' of a question can only
+        # be of string type but here we are assigning it with None because
+        # we want to test the scenario where the question is just created
+        # and the id is still needed to be assigned.
+        question_dict['id'] = None  # type: ignore[arg-type]
         question_dict['version'] = 0
         content_html = (
             '<oppia-noninteractive-image filepath-with-value='
@@ -368,14 +428,14 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             'No image data provided for file with name img.svg.',
             response_dict['error'])
 
-        large_image = '<svg><path d="%s" /></svg>' % (
-            'M150 0 L75 200 L225 200 Z ' * 4000)
+        large_image = b'<svg><path d="%s" /></svg>' % (
+            b'M150 0 L75 200 L225 200 Z ' * 4000)
         response_dict = self.post_json(
             feconf.NEW_QUESTION_URL, post_data,
             csrf_token=csrf_token,
-            upload_files=(
-                ('img.svg', 'img.svg', large_image),
-            ), expected_status_int=400)
+            upload_files=[
+                ('img.svg', 'img.svg', large_image)
+            ], expected_status_int=400)
         self.assertIn(
             'Image exceeds file size limit of 100 KB.',
             response_dict['error'])
@@ -385,7 +445,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
 class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
     """Tests link and unlink question from skills."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the setup for QuestionSkillLinkHandlerTest."""
         super().setUp()
         self.skill_id = skill_services.get_new_skill_id()
@@ -399,7 +459,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             self.question_id_2, self.editor_id,
             self._create_valid_question_data('ABC'), [self.skill_id])
 
-    def test_put_with_non_admin_or_topic_manager_disallows_access(self):
+    def test_put_with_non_admin_or_topic_manager_disallows_access(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
@@ -416,7 +476,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             expected_status_int=401)
         self.logout()
 
-    def test_put_with_admin_email_allows_updation(self):
+    def test_put_with_admin_email_allows_updation(self) -> None:
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, self.skill_id, 0.5)
         (
@@ -465,7 +525,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             ), {
                 'skill_ids_task_list': [{
                     'id': 'skill_2',
-                    'task': 'remove'
+                    'task': 'remove',
+                    'difficulty': 0
                 }]
             }, csrf_token=csrf_token)
         question_summaries, _, = (
@@ -474,7 +535,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.assertEqual(len(question_summaries), 0)
         self.logout()
 
-    def test_put_with_invalid_input_throws_error(self):
+    def test_put_with_invalid_input_throws_error(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
@@ -517,7 +578,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_put_with_topic_manager_email_allows_updation(self):
+    def test_put_with_topic_manager_email_allows_updation(self) -> None:
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, self.skill_id, 0.3)
 
@@ -547,15 +608,15 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
 class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
     """Tests get, put and delete methods of editable questions data handler."""
 
-    def test_get_can_not_access_handler_with_invalid_question_id(self):
+    def test_get_can_not_access_handler_with_invalid_question_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_json(
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, 'invalid_question_id'),
-            expected_status_int=404)
+            expected_status_int=400)
         self.logout()
 
-    def test_delete_with_guest_does_not_allow_question_deletion(self):
+    def test_delete_with_guest_does_not_allow_question_deletion(self) -> None:
         response = self.delete_json(
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
@@ -564,7 +625,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             response['error'],
             'You must be logged in to access this resource.')
 
-    def test_delete_with_new_user_does_not_allow_question_deletion(self):
+    def test_delete_with_new_user_does_not_allow_question_deletion(
+        self
+    ) -> None:
         self.login(self.NEW_USER_EMAIL)
         response = self.delete_json(
             '%s/%s' % (
@@ -575,7 +638,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             response['error'])
         self.logout()
 
-    def test_get_with_non_admin_or_topic_manager_email_disallows_access(self):
+    def test_get_with_non_admin_or_topic_manager_email_disallows_access(
+        self
+    ) -> None:
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
             '%s/%s' % (
@@ -583,7 +648,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             expected_status_int=401)
         self.logout()
 
-    def test_get_with_admin_email_allows_question_fetching(self):
+    def test_get_with_admin_email_allows_question_fetching(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         response_dict = self.get_json('%s/%s' % (
             feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id))
@@ -601,7 +666,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             self.skill_id)
         self.logout()
 
-    def test_get_with_topic_manager_email_allows_question_fetching(self):
+    def test_get_with_topic_manager_email_allows_question_fetching(
+        self
+    ) -> None:
         self.login(self.TOPIC_MANAGER_EMAIL)
         response_dict = self.get_json('%s/%s' % (
             feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id))
@@ -619,8 +686,10 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             self.skill_id)
         self.logout()
 
-    def test_get_with_invalid_question_id_returns_404_status(self):
-        def _mock_get_question_by_id(unused_question_id, **unused_kwargs):
+    def test_get_with_invalid_question_id_returns_404_status(self) -> None:
+        def _mock_get_question_by_id(
+            unused_question_id: str, **unused_kwargs: str
+        ) -> None:
             """Mocks '_get_question_by_id'. Returns None."""
             return None
 
@@ -636,7 +705,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
 
             self.logout()
 
-    def test_delete_with_incorrect_question_id_returns_404_status(self):
+    def test_delete_with_incorrect_question_id_returns_404_status(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.delete_json(
             '%s/%s' % (
@@ -644,7 +713,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             expected_status_int=404)
         self.logout()
 
-    def test_delete_with_admin_email_allows_question_deletion(self):
+    def test_delete_with_admin_email_allows_question_deletion(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.delete_json(
             '%s/%s' % (
@@ -652,8 +721,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             expected_status_int=200)
         self.logout()
 
-    def test_put_with_long_commit_message_fails(self):
-        payload = {}
+    def test_put_with_long_commit_message_fails(self) -> None:
         new_question_data = self._create_valid_question_data('DEF')
         change_list = [{
             'cmd': 'update_question_property',
@@ -661,9 +729,10 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             'new_value': new_question_data.to_dict(),
             'old_value': self.question.question_state_data.to_dict()
         }]
-        payload['change_list'] = change_list
-        payload['commit_message'] = (
-            'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
+        payload = {
+            'change_list': change_list,
+            'commit_message': ('a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
+        }
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -672,12 +741,15 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
             payload,
             csrf_token=csrf_token, expected_status_int=400)
+        max_len_object = 'a' * 376
         self.assertEqual(
             response_json['error'],
-            'Commit messages must be at most 375 characters long.')
+            'Schema validation for \'commit_message\' failed: Validation '
+            'failed: has_length_at_most ({\'max_value\': 375}) for object %s'
+            % max_len_object
+        )
 
-    def test_put_with_admin_email_allows_question_editing(self):
-        payload = {}
+    def test_put_with_admin_email_allows_question_editing(self) -> None:
         new_question_data = self._create_valid_question_data('DEF')
         change_list = [{
             'cmd': 'update_question_property',
@@ -685,8 +757,10 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             'new_value': new_question_data.to_dict(),
             'old_value': self.question.question_state_data.to_dict()
         }]
-        payload['change_list'] = change_list
-        payload['commit_message'] = 'update question data'
+        payload = {
+            'change_list': change_list,
+            'commit_message': 'update question data'
+        }
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -707,22 +781,21 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
                 self.question_id), payload,
-            csrf_token=csrf_token, expected_status_int=404)
+            csrf_token=csrf_token, expected_status_int=400)
         del payload['commit_message']
         payload['change_list'] = change_list
         self.put_json(
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
                 self.question_id), payload,
-            csrf_token=csrf_token, expected_status_int=404)
+            csrf_token=csrf_token, expected_status_int=400)
         payload['commit_message'] = 'update question data'
         self.put_json(
             feconf.QUESTION_EDITOR_DATA_URL_PREFIX, payload,
             csrf_token=csrf_token, expected_status_int=404)
         self.logout()
 
-    def test_put_with_topic_manager_email_allows_question_editing(self):
-        payload = {}
+    def test_put_with_topic_manager_email_allows_question_editing(self) -> None:
         new_question_data = self._create_valid_question_data('DEF')
         change_list = [{
             'cmd': 'update_question_property',
@@ -730,12 +803,13 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             'new_value': new_question_data.to_dict(),
             'old_value': self.question.question_state_data.to_dict()
         }]
-        payload['change_list'] = change_list
-        payload['commit_message'] = 'update question data'
+        payload = {
+            'change_list': change_list,
+            'commit_message': 'update question data'
+        }
 
         self.login(self.TOPIC_MANAGER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        payload = {}
         new_question_data = self._create_valid_question_data('GHI')
         change_list = [{
             'cmd': 'update_question_property',
@@ -759,16 +833,19 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             response_json['question_dict']['id'], self.question_id)
         self.logout()
 
-    def test_put_with_creating_new_fully_specified_question_returns_400(self):
-        payload = {}
+    def test_put_with_creating_new_fully_specified_question_returns_400(
+        self
+    ) -> None:
         self._create_valid_question_data('XXX')
         change_list = [{
             'cmd': 'create_new_fully_specified_question',
             'question_dict': {},
             'skill_id': 'abc123'
         }]
-        payload['change_list'] = change_list
-        payload['commit_message'] = 'update question data'
+        payload = {
+            'change_list': change_list,
+            'commit_message': 'update question data'
+        }
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(

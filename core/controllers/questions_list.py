@@ -17,35 +17,42 @@
 from __future__ import annotations
 
 from core import feconf
-from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import question_services
-from core.domain import skill_domain
 from core.domain import skill_fetchers
 
+from typing import Dict, TypedDict
 
-def _require_valid_skill_ids(skill_ids):
-    """Checks whether the given skill ids are valid.
 
-    Args:
-        skill_ids: list(str). The skill ids to validate.
+class QuestionsListHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of QuestionsListHandler's
+    normalized_payload dictionary.
     """
-    for skill_id in skill_ids:
-        skill_domain.Skill.require_valid_skill_id(skill_id)
+
+    offset: int
 
 
-class QuestionsListHandler(base.BaseHandler):
+class QuestionsListHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        QuestionsListHandlerNormalizedRequestDict
+    ]
+):
     """Manages receiving of all question summaries for display in topic editor
     and skill editor page.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    # TODO(#16538): Change the type of `comma_separated_skill_ids` url_path
+    # argument to `JsonEncodedInString`.
     URL_PATH_ARGS_SCHEMAS = {
         'comma_separated_skill_ids': {
             'schema': {
-                'type': 'basestring'
+                'type': 'object_dict',
+                'validation_method': domain_objects_validator.validate_skill_ids
             }
         }
     }
@@ -54,26 +61,18 @@ class QuestionsListHandler(base.BaseHandler):
             'offset': {
                 'schema': {
                     'type': 'int'
-                },
-                'default_none': None
+                }
             }
         }
     }
 
     @acl_decorators.open_access
-    def get(self, comma_separated_skill_ids):
+    def get(self, comma_separated_skill_ids: str) -> None:
         """Handles GET requests."""
+        assert self.normalized_request is not None
+        offset = self.normalized_request['offset']
 
-        offset = self.normalized_request.get('offset')
-
-        skill_ids = comma_separated_skill_ids.split(',')
-        skill_ids = list(set(skill_ids))
-
-        try:
-            _require_valid_skill_ids(skill_ids)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(
-                'Invalid skill id') from e
+        skill_ids = list(set(comma_separated_skill_ids.split(',')))
 
         try:
             skill_fetchers.get_multi_skills(skill_ids)
@@ -127,24 +126,30 @@ class QuestionsListHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class QuestionCountDataHandler(base.BaseHandler):
+class QuestionCountDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Provides data regarding the number of questions assigned to the given
     skill ids.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    # TODO(#16538): Change the type of `comma_separated_skill_ids` url_path
+    # argument to `JsonEncodedInString`.
+    URL_PATH_ARGS_SCHEMAS = {
+        'comma_separated_skill_ids': {
+            'schema': {
+                'type': 'object_dict',
+                'validation_method': domain_objects_validator.validate_skill_ids
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, comma_separated_skill_ids):
+    def get(self, comma_separated_skill_ids: str) -> None:
         """Handles GET requests."""
-        skill_ids = comma_separated_skill_ids.split(',')
-        skill_ids = list(set(skill_ids))
-
-        try:
-            _require_valid_skill_ids(skill_ids)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(
-                'Invalid skill id') from e
+        skill_ids = list(set(comma_separated_skill_ids.split(',')))
 
         total_question_count = (
             question_services.get_total_question_count_for_skill_ids(skill_ids))

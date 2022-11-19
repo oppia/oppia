@@ -22,13 +22,17 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import exp_models
+
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
     """Test the RecentCommitsHandler class."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -57,7 +61,7 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
         commit3.update_timestamps()
         commit3.put()
 
-    def test_get_recent_commits(self):
+    def test_get_recent_commits(self) -> None:
         """Test that this method should return all nonprivate commits."""
         self.login(self.MODERATOR_EMAIL)
         response_dict = self.get_json(
@@ -78,7 +82,7 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
             response_dict['results'][0])
         self.logout()
 
-    def test_get_recent_commits_explorations(self):
+    def test_get_recent_commits_explorations(self) -> None:
         """Test that the response dict contains the correct exploration."""
         self.login(self.MODERATOR_EMAIL)
         self.save_new_default_exploration(
@@ -92,7 +96,7 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
             'MyExploration')
         self.logout()
 
-    def test_get_recent_commits_three_pages_with_cursor(self):
+    def test_get_recent_commits_three_pages_with_cursor(self) -> None:
         self.login(self.MODERATOR_EMAIL)
         response_dict = self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
@@ -139,10 +143,17 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_recent_commits_with_invalid_query_type_returns_404_status(
-            self):
+        self
+    ) -> None:
         self.login(self.MODERATOR_EMAIL)
-        self.get_json(
+        response = self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
             params={'query_type': 'invalid_query_type'},
-            expected_status_int=404)
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Schema validation for \'query_type\' failed: Received '
+            'invalid_query_type which is not in the allowed range of '
+            'choices: [\'all_non_private_commits\']'
+        )
         self.logout()

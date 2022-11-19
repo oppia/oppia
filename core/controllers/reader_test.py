@@ -45,12 +45,23 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(classifier_models, exp_models, stats_models) = models.Registry.import_models([
-    models.Names.CLASSIFIER, models.Names.EXPLORATION, models.Names.STATISTICS
+from typing import Dict, Final, List, Optional, Union
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import exp_models
+    from mypy_imports import stats_models
+
+(exp_models, stats_models) = models.Registry.import_models([
+    models.Names.EXPLORATION, models.Names.STATISTICS
 ])
 
 
-def _get_change_list(state_name, property_name, new_value):
+def _get_change_list(
+    state_name: str,
+    property_name: str,
+    new_value: Union[bool, str]
+) -> List[exp_domain.ExplorationChange]:
     """Generates a change list for a single state change."""
     return [exp_domain.ExplorationChange({
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -63,9 +74,9 @@ def _get_change_list(state_name, property_name, new_value):
 class ReaderPermissionsTest(test_utils.GenericTestBase):
     """Test permissions for readers to view explorations."""
 
-    EXP_ID = 'eid'
+    EXP_ID: Final = 'eid'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Before each individual test, create a dummy exploration."""
         super().setUp()
 
@@ -77,12 +88,16 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             self.EXP_ID, self.editor_id, title=self.UNICODE_TEST_STRING,
             category=self.UNICODE_TEST_STRING)
 
-    def test_unpublished_explorations_are_invisible_to_logged_out_users(self):
+    def test_unpublished_explorations_are_invisible_to_logged_out_users(
+        self
+    ) -> None:
         self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expected_status_int=404)
 
-    def test_unpublished_explorations_are_invisible_to_unconnected_users(self):
+    def test_unpublished_explorations_are_invisible_to_unconnected_users(
+        self
+    ) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.get_html_response(
@@ -90,7 +105,9 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             expected_status_int=404)
         self.logout()
 
-    def test_unpublished_explorations_are_invisible_to_other_editors(self):
+    def test_unpublished_explorations_are_invisible_to_other_editors(
+        self
+    ) -> None:
         other_editor_email = 'another@example.com'
         self.signup(other_editor_email, 'othereditorusername')
 
@@ -105,13 +122,15 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             expected_status_int=404)
         self.logout()
 
-    def test_unpublished_explorations_are_visible_to_their_editors(self):
+    def test_unpublished_explorations_are_visible_to_their_editors(
+        self
+    ) -> None:
         self.login(self.EDITOR_EMAIL)
         self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.logout()
 
-    def test_unpublished_explorations_are_visible_to_moderator(self):
+    def test_unpublished_explorations_are_visible_to_moderator(self) -> None:
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.login(self.MODERATOR_EMAIL)
@@ -119,13 +138,17 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.logout()
 
-    def test_published_explorations_are_visible_to_logged_out_users(self):
+    def test_published_explorations_are_visible_to_logged_out_users(
+        self
+    ) -> None:
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
         self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
 
-    def test_published_explorations_are_visible_to_logged_in_users(self):
+    def test_published_explorations_are_visible_to_logged_in_users(
+        self
+    ) -> None:
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -133,7 +156,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
 
-    def test_exploration_page_with_iframed_redirects(self):
+    def test_exploration_page_with_iframed_redirects(self) -> None:
         self.login(self.EDITOR_EMAIL)
 
         exp_version = self.exploration.version
@@ -151,7 +174,8 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_exploration_page_raises_error_with_invalid_exploration_version(
-            self):
+        self
+    ) -> None:
         self.login(self.EDITOR_EMAIL)
 
         self.get_html_response(
@@ -167,7 +191,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
     """Test the handler for giving feedback."""
 
-    def test_give_feedback_handler(self):
+    def test_give_feedback_handler(self) -> None:
         """Test giving feedback handler."""
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
@@ -199,7 +223,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
     state_classifier_mapping.
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Before each individual test, initialize data."""
         super().setUp()
 
@@ -209,7 +233,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         self.save_new_skill(
             self.skill_id, 'user', description='Description')
 
-    def test_get_exploration_pretests(self):
+    def test_get_exploration_pretests(self) -> None:
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -235,11 +259,12 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         exp_services.load_demo('15')
         exp_services.delete_demo('1')
         exp_services.load_demo('1')
+        old_value_list: List[str] = []
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
-            'old_value': [],
+            'old_value': old_value_list,
             'new_value': [self.skill_id],
             'node_id': 'node_1'
         }), story_domain.StoryChange({
@@ -283,14 +308,87 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
                 feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2),
             expected_status_int=400)
 
+    def test_cannot_perform_exploration_pretests_without_prerequisite_skill_ids(
+        self
+    ) -> None:
+        story_id = story_services.get_new_story_id()
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, 'user', name='Topic',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
+        self.save_new_story(story_id, 'user', topic_id)
+        topic_services.add_canonical_story('user', topic_id, story_id)
+
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_1',
+                'title': 'Title 1'
+            })
+        ]
+        story_services.update_story('user', story_id, changelist, 'Added node.')
+
+        exp_id = '15'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('15')
+        old_value_list: List[str] = []
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
+            'old_value': old_value_list,
+            'new_value': [self.skill_id],
+            'node_id': 'node_1'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'old_value': None,
+            'new_value': exp_id,
+            'node_id': 'node_1'
+        })]
+        story_services.update_story(
+            'user', story_id, change_list, 'Updated Node 1.')
+        question_id = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id, 'user',
+            self._create_valid_question_data('ABC'), [self.skill_id])
+        question_id_2 = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id_2, 'user',
+            self._create_valid_question_data('ABC'), [self.skill_id])
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id, self.skill_id, 0.3)
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_2, self.skill_id, 0.5)
+        # Call the handler.
+        with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
+            with self.swap_to_always_return(
+                story_domain.Story,
+                'get_prerequisite_skill_ids_for_exp_id',
+                None
+            ):
+                json_response = self.get_json(
+                    '%s/%s?story_url_fragment=title' % (
+                        feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id),
+                    expected_status_int=500
+                )
+        self.assertEqual(
+            json_response['error'],
+            'No prerequisite skill_ids found for the exploration '
+            'with exploration_id: 15'
+        )
+
 
 class QuestionsUnitTest(test_utils.GenericTestBase):
     """Test the handler for fetching questions."""
 
-    USER_EMAIL = 'user@example.com'
-    USER_USERNAME = 'user'
+    USER_EMAIL: Final = 'user@example.com'
+    USER_USERNAME: Final = 'user'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Before each individual test, initialize data."""
         super().setUp()
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
@@ -316,21 +414,23 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id_2, self.skill_id, 0.5)
 
-    def test_questions_are_returned_successfully(self):
+    def test_questions_are_returned_successfully(self) -> None:
         # Call the handler.
         url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id, 'false')
         json_response_1 = self.get_json(url)
         self.assertEqual(len(json_response_1['question_dicts']), 1)
 
-    def test_question_count_more_than_available_returns_all_questions(self):
+    def test_question_count_more_than_available_returns_all_questions(
+        self
+    ) -> None:
         # Call the handler.
         url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '5', self.skill_id, 'true')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 2)
 
-    def test_multiple_skill_id_returns_questions(self):
+    def test_multiple_skill_id_returns_questions(self) -> None:
         skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id_2, 'user', description='Description')
 
@@ -348,7 +448,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [self.question_id, self.question_id_2, question_id_3], question_ids)
 
-    def test_filter_multiple_skill_id_return_questions(self):
+    def test_filter_multiple_skill_id_return_questions(self) -> None:
         self.login(self.USER_EMAIL)
         skill_ids_for_url = ''
 
@@ -387,20 +487,25 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
             len(json_response['question_dicts']),
             feconf.QUESTION_BATCH_SIZE)
 
-    def test_invalid_skill_id_returns_no_questions(self):
+    def test_invalid_skill_id_returns_no_questions(self) -> None:
         # Call the handler.
         url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '1', 'invalid_skill_id', 'true')
-        json_response = self.get_json(url)
-        self.assertEqual(len(json_response['question_dicts']), 0)
+        json_response = self.get_json(url, expected_status_int=400)
+        self.assertEqual(
+            json_response['error'],
+            'Schema validation for \'skill_ids\' failed: Invalid skill id'
+        )
 
-    def test_question_count_zero_raises_invalid_input_exception(self):
+    def test_question_count_zero_raises_invalid_input_exception(self) -> None:
         # Call the handler.
         url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '0', self.skill_id, 'true')
         self.get_json(url, expected_status_int=400)
 
-    def test_invalid_fetch_by_difficulty_raises_invalid_input_exception(self):
+    def test_invalid_fetch_by_difficulty_raises_invalid_input_exception(
+        self
+    ) -> None:
         # Call the handler.
         url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id, [])
@@ -410,7 +515,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):
     """Test methods relating to exploration parameters."""
 
-    def test_get_init_params(self):
+    def test_get_init_params(self) -> None:
         """Test the get_init_params() method."""
         independent_pc = param_domain.ParamChange(
             'a', 'Copier', {'value': 'firstValue', 'parse_with_jinja': False})
@@ -425,13 +530,13 @@ class ExplorationParametersUnitTests(test_utils.GenericTestBase):
 class RatingsIntegrationTests(test_utils.GenericTestBase):
     """Integration tests of ratings recording and display."""
 
-    EXP_ID = '0'
+    EXP_ID: Final = '0'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         exp_services.load_demo(self.EXP_ID)
 
-    def test_assign_and_read_ratings(self):
+    def test_assign_and_read_ratings(self) -> None:
         """Test the PUT and GET methods for ratings."""
 
         self.signup('user@example.com', 'user')
@@ -472,7 +577,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_non_logged_in_users_cannot_rate(self):
+    def test_non_logged_in_users_cannot_rate(self) -> None:
         """Check non logged-in users can view but not submit ratings."""
 
         self.signup('user@example.com', 'user')
@@ -492,7 +597,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
             expected_status_int=401
         )
 
-    def test_ratings_by_different_users(self):
+    def test_ratings_by_different_users(self) -> None:
         """Check that ratings by different users do not interfere."""
 
         self.signup('a@example.com', 'a')
@@ -530,20 +635,20 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
     """
 
     # Demo explorations.
-    EXP_ID_0 = '0'
-    EXP_ID_1 = '1'
-    EXP_ID_7 = '7'
-    EXP_ID_9 = '9'
+    EXP_ID_0: Final = '0'
+    EXP_ID_1: Final = '1'
+    EXP_ID_7: Final = '7'
+    EXP_ID_9: Final = '9'
 
     # Explorations contained within the demo collection.
-    EXP_ID_19 = '19'
-    EXP_ID_20 = '20'
-    EXP_ID_21 = '21'
+    EXP_ID_19: Final = '19'
+    EXP_ID_20: Final = '20'
+    EXP_ID_21: Final = '21'
 
     # Demo collection.
-    COL_ID = '0'
+    COL_ID: Final = '0'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         # Register users.
@@ -561,14 +666,19 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         collection_services.load_demo(self.COL_ID)
         self.logout()
 
-    def _get_exploration_ids_from_summaries(self, summaries):
+    def _get_exploration_ids_from_summaries(
+        self, summaries: List[Dict[str, str]]
+    ) -> List[str]:
         """Returns the sorted list of all the exploration ids from summaries."""
         return sorted([summary['id'] for summary in summaries])
 
     def _get_recommendation_ids(
-            self, exploration_id, collection_id=None,
-            include_system_recommendations=None,
-            author_recommended_ids_str='[]'):
+        self,
+        exploration_id: str,
+        collection_id: Optional[str] = None,
+        include_system_recommendations: Optional[bool] = None,
+        author_recommended_ids_str: str = '[]'
+    ) -> List[str]:
         """Gets the recommended exploration ids from the summaries."""
         collection_id_param = (
             '&collection_id=%s' % collection_id
@@ -593,14 +703,16 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
     # are also played within the context of collections, and whether that's
     # desirable.
 
-    def _set_recommendations(self, exp_id, recommended_ids):
+    def _set_recommendations(
+        self, exp_id: str, recommended_ids: List[str]
+    ) -> None:
         """Sets the recommendations in the exploration corresponding to the
         given exploration id.
         """
         recommendations_services.set_exploration_recommendations(
             exp_id, recommended_ids)
 
-    def _complete_exploration_in_collection(self, exp_id):
+    def _complete_exploration_in_collection(self, exp_id: str) -> None:
         """Completes the exploration within the collection. Records that the
         exploration has been played by the user in the context of the
         collection.
@@ -608,7 +720,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         collection_services.record_played_exploration_in_collection_context(
             self.new_user_id, self.COL_ID, exp_id)
 
-    def _complete_entire_collection_in_order(self):
+    def _complete_entire_collection_in_order(self) -> None:
         """Completes the entire collection in order."""
         self._complete_exploration_in_collection(self.EXP_ID_19)
         self._complete_exploration_in_collection(self.EXP_ID_20)
@@ -616,7 +728,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         self._complete_exploration_in_collection(self.EXP_ID_0)
 
     # Logged in standard viewer tests.
-    def test_logged_in_with_no_sysexps_no_authexps_no_col_has_no_exps(self):
+    def test_logged_in_with_no_sysexps_no_authexps_no_col_has_no_exps(
+        self
+    ) -> None:
         """Check there are no recommended explorations when a user is logged in,
         finishes an exploration in-viewer, but there are no recommended
         explorations and no author exploration IDs.
@@ -626,7 +740,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             self.EXP_ID_0, include_system_recommendations=True)
         self.assertEqual(recommendation_ids, [])
 
-    def test_logged_in_with_some_sysexps_no_authexps_no_col_has_some_exps(self):
+    def test_logged_in_with_some_sysexps_no_authexps_no_col_has_some_exps(
+        self
+    ) -> None:
         """Check there are recommended explorations when a user is logged in,
         finishes an exploration in-viewer, and there are system recommendations.
         """
@@ -636,7 +752,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             self.EXP_ID_0, include_system_recommendations=True)
         self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_9])
 
-    def test_logged_in_with_no_sysexps_some_authexps_no_col_has_some_exps(self):
+    def test_logged_in_with_no_sysexps_some_authexps_no_col_has_some_exps(
+        self
+    ) -> None:
         """Check there are some recommended explorations when a user is logged
         in, finishes an exploration in-viewer, and there are author-specified
         exploration IDs.
@@ -647,7 +765,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             author_recommended_ids_str='["7","9"]')
         self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
 
-    def test_logged_in_with_sysexps_and_authexps_no_col_has_some_exps(self):
+    def test_logged_in_with_sysexps_and_authexps_no_col_has_some_exps(
+        self
+    ) -> None:
         """Check there are recommended explorations when a user is logged in,
         finishes an exploration in-viewer, and there are both author-specified
         exploration IDs and recommendations from the system.
@@ -661,7 +781,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_9])
 
     # Logged in in-editor tests.
-    def test_logged_in_preview_no_authexps_no_col_has_no_exps(self):
+    def test_logged_in_preview_no_authexps_no_col_has_no_exps(self) -> None:
         """Check there are no recommended explorations when a user is logged in,
         finishes an exploration in-editor (no system recommendations since it's
         a preview of the exploration), and there are no author exploration IDs.
@@ -670,7 +790,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         recommendation_ids = self._get_recommendation_ids(self.EXP_ID_0)
         self.assertEqual(recommendation_ids, [])
 
-    def test_logged_in_preview_with_authexps_no_col_has_some_exps(self):
+    def test_logged_in_preview_with_authexps_no_col_has_some_exps(self) -> None:
         """Check there are some recommended explorations when a user is logged
         in, finishes an exploration in-editor (no system recommendations), and
         there are some author exploration IDs.
@@ -681,7 +801,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
 
     # Logged in collection tests.
-    def test_logged_in_no_sysexps_no_authexps_first_exp_in_col_has_exp(self):
+    def test_logged_in_no_sysexps_no_authexps_first_exp_in_col_has_exp(
+        self
+    ) -> None:
         """Check there is a recommended exploration when a user is logged in
         and completes the first exploration of a collection.
         """
@@ -692,7 +814,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         # The next exploration in the collection should be recommended.
         self.assertEqual(recommendation_ids, [self.EXP_ID_20])
 
-    def test_logged_in_no_sysexps_no_authexps_mid_exp_in_col_has_exps(self):
+    def test_logged_in_no_sysexps_no_authexps_mid_exp_in_col_has_exps(
+        self
+    ) -> None:
         """Check there are recommended explorations when a user is logged in
         and completes a middle exploration of the collection (since more
         explorations are needed to complete the collection).
@@ -706,7 +830,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         # the user would visit every node in the collection.
         self.assertEqual(recommendation_ids, [self.EXP_ID_19])
 
-    def test_logged_in_no_sysexps_no_authexps_all_exps_in_col_has_no_exps(self):
+    def test_logged_in_no_sysexps_no_authexps_all_exps_in_col_has_no_exps(
+        self
+    ) -> None:
         """Check there are not recommended explorations when a user is logged in
         and completes all explorations of the collection.
         """
@@ -717,7 +843,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         # No explorations are recommended since the collection was completed.
         self.assertEqual(recommendation_ids, [])
 
-    def test_logged_in_with_sysexps_no_authexps_first_exp_in_col_has_exp(self):
+    def test_logged_in_with_sysexps_no_authexps_first_exp_in_col_has_exp(
+        self
+    ) -> None:
         """Check there is a recommended exploration when a user is logged in
         and completes the first exploration of a collection. Note that even
         though the completed exploration has system recommendations, they are
@@ -733,7 +861,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         # The next exploration in the collection should be recommended.
         self.assertEqual(recommendation_ids, [self.EXP_ID_20])
 
-    def test_logged_in_with_sysexps_no_authexps_mid_exp_in_col_has_exps(self):
+    def test_logged_in_with_sysexps_no_authexps_mid_exp_in_col_has_exps(
+        self
+    ) -> None:
         """Check there are recommended explorations when a user is logged in
         and completes a middle exploration of the collection (since more
         explorations are needed to complete the collection). Note that even
@@ -752,7 +882,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         # the user would visit every node in the collection.
         self.assertEqual(recommendation_ids, [self.EXP_ID_19])
 
-    def test_logged_in_sysexps_no_authexps_all_exps_in_col_has_no_exps(self):
+    def test_logged_in_sysexps_no_authexps_all_exps_in_col_has_no_exps(
+        self
+    ) -> None:
         """Check there are not recommended explorations when a user is logged in
         and completes all explorations of the collection. This is true even if
         there are system recommendations for the last exploration.
@@ -767,7 +899,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         # No explorations are recommended since the collection was completed.
         self.assertEqual(recommendation_ids, [])
 
-    def test_logged_in_no_sysexps_with_authexps_first_exp_in_col_has_exps(self):
+    def test_logged_in_no_sysexps_with_authexps_first_exp_in_col_has_exps(
+        self
+    ) -> None:
         """Check there is are recommended explorations when a user is logged in
         and completes the first exploration of a collection where that
         exploration also has author-specified explorations.
@@ -782,7 +916,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         self.assertEqual(
             recommendation_ids, [self.EXP_ID_20, self.EXP_ID_7, self.EXP_ID_9])
 
-    def test_logged_in_no_sysexps_with_authexps_mid_exp_in_col_has_exps(self):
+    def test_logged_in_no_sysexps_with_authexps_mid_exp_in_col_has_exps(
+        self
+    ) -> None:
         """Check there are recommended explorations when a user is logged in
         and completes a middle exploration of the collection, and that these
         recommendations include author-specified explorations.
@@ -797,7 +933,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         self.assertEqual(
             recommendation_ids, [self.EXP_ID_19, self.EXP_ID_21, self.EXP_ID_7])
 
-    def test_logged_in_no_sysexps_authexps_all_exps_in_col_has_exps(self):
+    def test_logged_in_no_sysexps_authexps_all_exps_in_col_has_exps(
+        self
+    ) -> None:
         """Check there are still recommended explorations when a user is logged
         in and completes all explorations of the collection if the last
         exploration has author-specified explorations.
@@ -812,7 +950,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
 
     # Logged out standard viewer tests.
-    def test_logged_out_with_no_sysexps_no_authexps_no_col_has_no_exps(self):
+    def test_logged_out_with_no_sysexps_no_authexps_no_col_has_no_exps(
+        self
+    ) -> None:
         """Check there are no recommended explorations when a user is logged
         out, finishes an exploration in-viewer, but there are no recommended
         explorations and no author exploration IDs.
@@ -821,7 +961,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             self.EXP_ID_0, include_system_recommendations=True)
         self.assertEqual(recommendation_ids, [])
 
-    def test_logged_out_with_sysexps_no_authexps_no_col_has_some_exps(self):
+    def test_logged_out_with_sysexps_no_authexps_no_col_has_some_exps(
+        self
+    ) -> None:
         """Check there are recommended explorations when a user is logged out,
         finishes an exploration in-viewer, and there are system recommendations.
         """
@@ -830,7 +972,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             self.EXP_ID_0, include_system_recommendations=True)
         self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_9])
 
-    def test_logged_out_no_sysexps_some_authexps_no_col_has_some_exps(self):
+    def test_logged_out_no_sysexps_some_authexps_no_col_has_some_exps(
+        self
+    ) -> None:
         """Check there are some recommended explorations when a user is logged
         out, finishes an exploration in-viewer, and there are author-specified
         exploration IDs.
@@ -840,7 +984,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             author_recommended_ids_str='["7","9"]')
         self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
 
-    def test_logged_out_with_sysexps_and_authexps_no_col_has_some_exps(self):
+    def test_logged_out_with_sysexps_and_authexps_no_col_has_some_exps(
+        self
+    ) -> None:
         """Check there are recommended explorations when a user is logged in,
         finishes an exploration in-viewer, and there are both author-specified
         exploration IDs and recommendations from the system.
@@ -853,7 +999,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_9])
 
     # Logged out collection tests.
-    def test_logged_out_no_sysexps_no_authexps_first_exp_in_col_has_exp(self):
+    def test_logged_out_no_sysexps_no_authexps_first_exp_in_col_has_exp(
+        self
+    ) -> None:
         """Check there is a recommended exploration when a user is logged out
         and completes the first exploration of a collection.
         """
@@ -862,7 +1010,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         # The next exploration in the collection should be recommended.
         self.assertEqual(recommendation_ids, [self.EXP_ID_20])
 
-    def test_logged_out_no_sysexps_no_authexps_mid_exp_in_col_has_exp(self):
+    def test_logged_out_no_sysexps_no_authexps_mid_exp_in_col_has_exp(
+        self
+    ) -> None:
         """Check there is a recommended exploration when a user is logged out
         and completes a middle exploration of the collection.
         """
@@ -872,7 +1022,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         # follow a linear path through the collection.
         self.assertEqual(recommendation_ids, [self.EXP_ID_21])
 
-    def test_logged_out_no_sysexps_no_authexps_last_exp_col_has_no_exps(self):
+    def test_logged_out_no_sysexps_no_authexps_last_exp_col_has_no_exps(
+        self
+    ) -> None:
         """Check there are not recommended explorations when a user is logged
         out and completes the last exploration in the collection.
         """
@@ -880,7 +1032,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             self.EXP_ID_0, collection_id=self.COL_ID)
         self.assertEqual(recommendation_ids, [])
 
-    def test_logged_out_with_sysexps_no_authexps_first_exp_in_col_has_exp(self):
+    def test_logged_out_with_sysexps_no_authexps_first_exp_in_col_has_exp(
+        self
+    ) -> None:
         """Check there is a recommended exploration when a user is logged out
         and completes the first exploration of a collection. Note that even
         though the completed exploration has system recommendations, they are
@@ -894,7 +1048,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         # The next exploration in the collection should be recommended.
         self.assertEqual(recommendation_ids, [self.EXP_ID_20])
 
-    def test_logged_out_with_sysexps_no_authexps_mid_exp_in_col_has_exp(self):
+    def test_logged_out_with_sysexps_no_authexps_mid_exp_in_col_has_exp(
+        self
+    ) -> None:
         """Check there is a recommended explorations when a user is logged out
         and completes a middle exploration of the collection. Note that even
         though the completed exploration has system recommendations, they are
@@ -909,7 +1065,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         # follow a linear path through the collection.
         self.assertEqual(recommendation_ids, [self.EXP_ID_21])
 
-    def test_logged_out_sysexps_no_authexps_last_exp_in_col_has_no_exps(self):
+    def test_logged_out_sysexps_no_authexps_last_exp_in_col_has_no_exps(
+        self
+    ) -> None:
         """Check there are not recommended explorations when a user is logged
         out and completes the last exploration of the collection. This is true
         even if there are system recommendations for the last exploration.
@@ -923,7 +1081,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         # recommended.
         self.assertEqual(recommendation_ids, [])
 
-    def test_logged_out_no_sysexps_but_authexps_first_exp_in_col_has_exps(self):
+    def test_logged_out_no_sysexps_but_authexps_first_exp_in_col_has_exps(
+        self
+    ) -> None:
         """Check there is are recommended explorations when a user is logged out
         and completes the first exploration of a collection where that
         exploration also has author-specified explorations.
@@ -936,7 +1096,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         self.assertEqual(
             recommendation_ids, [self.EXP_ID_20, self.EXP_ID_7, self.EXP_ID_9])
 
-    def test_logged_out_no_sysexps_with_authexps_mid_exp_in_col_has_exps(self):
+    def test_logged_out_no_sysexps_with_authexps_mid_exp_in_col_has_exps(
+        self
+    ) -> None:
         """Check there are recommended explorations when a user is logged out
         and completes a middle exploration of the collection where that
         exploration also has author-specified explorations.
@@ -948,7 +1110,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         # be recommended.
         self.assertEqual(recommendation_ids, [self.EXP_ID_21, self.EXP_ID_7])
 
-    def test_logged_out_no_sysexps_with_dup_authexps_mid_col_exp_has_exps(self):
+    def test_logged_out_no_sysexps_with_dup_authexps_mid_col_exp_has_exps(
+        self
+    ) -> None:
         """test_logged_out_no_sysexps_with_authexps_mid_exp_in_col_has_exps but
         also checks that exploration IDs are de-duped if the next exploration
         overlaps with the author-specified explorations.
@@ -960,7 +1124,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         # be recommended.
         self.assertEqual(recommendation_ids, [self.EXP_ID_21, self.EXP_ID_7])
 
-    def test_logged_out_no_sysexps_authexps_last_exp_in_col_has_exps(self):
+    def test_logged_out_no_sysexps_authexps_last_exp_in_col_has_exps(
+        self
+    ) -> None:
         """Check there are still recommended explorations when a user is logged
         out and completes all explorations of the collection if the last
         exploration has author-specified explorations.
@@ -972,7 +1138,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         # others in the collection have been completed.
         self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
 
-    def test_get_recommendation_ids_with_invalid_author_recommended_ids(self):
+    def test_get_recommendation_ids_with_invalid_author_recommended_ids(
+        self
+    ) -> None:
         self.get_json(
             '/explorehandler/recommendations/%s' % self.EXP_ID_1, params={
                 'collection_id': self.COL_ID,
@@ -985,10 +1153,10 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
 class FlagExplorationHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for flagging an exploration."""
 
-    EXP_ID = '0'
-    REPORT_TEXT = 'AD'
+    EXP_ID: Final = '0'
+    REPORT_TEXT: Final = 'AD'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         # Register users.
@@ -1016,7 +1184,7 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         self.logout()
 
-    def test_that_emails_are_sent(self):
+    def test_that_emails_are_sent(self) -> None:
         """Check that emails are sent to moderaters when a logged-in
         user reports.
         """
@@ -1071,7 +1239,7 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             self.assertEqual(messages[0].html, expected_email_html_body)
             self.assertEqual(messages[0].body, expected_email_text_body)
 
-    def test_non_logged_in_users_cannot_report(self):
+    def test_non_logged_in_users_cannot_report(self) -> None:
         """Check that non-logged in users cannot report."""
 
         self.login(self.NEW_USER_EMAIL)
@@ -1089,19 +1257,19 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
 class LearnerProgressTest(test_utils.GenericTestBase):
     """Tests for tracking learner progress."""
 
-    EXP_ID_0 = 'exp_0'
-    EXP_ID_1 = 'exp_1'
+    EXP_ID_0: Final = 'exp_0'
+    EXP_ID_1: Final = 'exp_1'
     # The first number corresponds to the collection to which the exploration
     # belongs. The second number corresponds to the exploration id.
-    EXP_ID_1_0 = 'exp_2'
-    EXP_ID_1_1 = 'exp_3'
-    EXP_ID_2_0 = 'exp_4'
-    COL_ID_0 = 'col_0'
-    COL_ID_1 = 'col_1'
-    USER_EMAIL = 'user@example.com'
-    USER_USERNAME = 'user'
+    EXP_ID_1_0: Final = 'exp_2'
+    EXP_ID_1_1: Final = 'exp_3'
+    EXP_ID_2_0: Final = 'exp_4'
+    COL_ID_0: Final = 'col_0'
+    COL_ID_1: Final = 'col_1'
+    USER_EMAIL: Final = 'user@example.com'
+    USER_USERNAME: Final = 'user'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
@@ -1205,7 +1373,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         rights_manager.publish_collection(self.owner, self.COL_ID_0)
         rights_manager.publish_collection(self.owner, self.COL_ID_1)
 
-    def test_independent_exp_complete_event_handler(self):
+    def test_independent_exp_complete_event_handler(self) -> None:
         """Test handler for completion of explorations not in the context of
         collections.
         """
@@ -1242,7 +1410,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [])
 
-    def test_exp_complete_event_in_collection(self):
+    def test_exp_complete_event_in_collection(self) -> None:
         """Test handler for completion of explorations in the context of
         collections.
         """
@@ -1288,7 +1456,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             learner_progress_services.get_all_completed_exp_ids(
                 self.user_id), [self.EXP_ID_1_0, self.EXP_ID_1_1])
 
-    def test_cannot_complete_exploration_with_no_version(self):
+    def test_cannot_complete_exploration_with_no_version(self) -> None:
         self.login(self.USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -1307,7 +1475,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'], 'Missing key in handler args: version.')
 
-    def test_exp_incomplete_event_handler(self):
+    def test_exp_incomplete_event_handler(self) -> None:
         """Test handler for leaving an exploration incomplete."""
 
         self.login(self.USER_EMAIL)
@@ -1374,7 +1542,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         # If the exploration is played in context of an invalid story, raise
         # an error.
-        def _mock_none_function(_):
+        def _mock_none_function(_: str) -> None:
             """Mocks None."""
             return None
 
@@ -1392,7 +1560,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                     ['Could not find a story corresponding to '
                      '%s id.' % self.STORY_ID])
 
-    def test_exp_incomplete_event_handler_with_no_version_raises_error(self):
+    def test_exp_incomplete_event_handler_with_no_version_raises_error(
+        self
+    ) -> None:
         self.login(self.USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -1409,7 +1579,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         error_msg = 'Missing key in handler args: version.'
         self.assertEqual(response['error'], error_msg)
 
-    def test_remove_exp_from_incomplete_list_handler(self):
+    def test_remove_exp_from_incomplete_list_handler(self) -> None:
         """Test handler for removing explorations from the partially completed
         list.
         """
@@ -1449,7 +1619,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [])
 
-    def test_remove_collection_from_incomplete_list_handler(self):
+    def test_remove_collection_from_incomplete_list_handler(self) -> None:
         """Test handler for removing collections from incomplete list."""
 
         self.login(self.USER_EMAIL)
@@ -1511,7 +1681,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
     """Tests for the handler that records playthroughs."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.exp_id = '15'
 
@@ -1549,7 +1719,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 }
             ])
 
-        self.playthrough_data = {
+        self.playthrough_data: stats_domain.PlaythroughDict = {
             'exp_id': self.exp_id,
             'exp_version': self.exploration.version,
             'issue_type': 'EarlyQuit',
@@ -1570,7 +1740,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
 
         self.csrf_token = self.get_new_csrf_token()
 
-    def test_new_playthrough_gets_stored(self):
+    def test_new_playthrough_gets_stored(self) -> None:
         """Test that a new playthrough gets created and is added to an existing
         issue's list of playthrough IDs.
         """
@@ -1581,10 +1751,11 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
+        assert model is not None
         self.assertEqual(len(model.unresolved_issues), 1)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
 
-    def test_new_exp_issue_gets_created(self):
+    def test_new_exp_issue_gets_created(self) -> None:
         """Test that a new playthrough gets created and a new issue is created
         for it.
         """
@@ -1598,11 +1769,12 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
+        assert model is not None
         self.assertEqual(len(model.unresolved_issues), 2)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
         self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 1)
 
-    def test_playthrough_gets_added_to_cyclic_issues(self):
+    def test_playthrough_gets_added_to_cyclic_issues(self) -> None:
         """Test that a new cyclic playthrough gets added to the correct
         cyclic issue when it exists.
         """
@@ -1626,6 +1798,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             ])
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
+        assert model is not None
         model.unresolved_issues.append({
             'issue_type': 'CyclicStateTransitions',
             'issue_customization_args': {
@@ -1667,11 +1840,12 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
+        assert model is not None
         self.assertEqual(len(model.unresolved_issues), 2)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
         self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 2)
 
-    def test_cyclic_issues_of_different_order_creates_new_issue(self):
+    def test_cyclic_issues_of_different_order_creates_new_issue(self) -> None:
         """Test that a cyclic issue with the same list of states, but in
         a different order creates a new issue.
         """
@@ -1695,6 +1869,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             ])
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
+        assert model is not None
         model.unresolved_issues.append({
             'issue_type': 'CyclicStateTransitions',
             'issue_customization_args': {
@@ -1736,16 +1911,18 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
+        assert model is not None
         self.assertEqual(len(model.unresolved_issues), 3)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
         self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 1)
         self.assertEqual(len(model.unresolved_issues[2]['playthrough_ids']), 1)
 
-    def test_playthrough_not_stored_at_limiting_value(self):
+    def test_playthrough_not_stored_at_limiting_value(self) -> None:
         """Test that a playthrough is not stored when the maximum number of
         playthroughs per issue already exists.
         """
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
+        assert model is not None
         model.unresolved_issues[0]['playthrough_ids'] = [
             'id1', 'id2', 'id3', 'id4', 'id5'
         ]
@@ -1759,10 +1936,11 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
+        assert model is not None
         self.assertEqual(len(model.unresolved_issues), 1)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 5)
 
-    def test_error_without_schema_version_in_payload_dict(self):
+    def test_error_without_schema_version_in_payload_dict(self) -> None:
         """Test that passing a payload without schema version raises an
         exception.
         """
@@ -1770,7 +1948,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'playthrough_data': self.playthrough_data,
         }, csrf_token=self.csrf_token, expected_status_int=400)
 
-    def test_error_on_invalid_playthrough_dict(self):
+    def test_error_on_invalid_playthrough_dict(self) -> None:
         """Test that passing an invalid playthrough dict raises an exception."""
         self.playthrough_data['issue_type'] = 'FakeIssueType'
         self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
@@ -1782,7 +1960,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
 class StatsEventHandlerTest(test_utils.GenericTestBase):
     """Tests for all the statistics event models recording handlers."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.exp_id = '15'
 
@@ -1802,7 +1980,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             state_stats_mapping)
         stats_services.create_stats_model(exploration_stats)
 
-        self.aggregated_stats = {
+        self.aggregated_stats: stats_domain.AggregatedStatsDict = {
             'num_starts': 1,
             'num_actual_starts': 1,
             'num_completions': 1,
@@ -1818,7 +1996,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             }
         }
 
-    def test_none_version_raises_exception(self):
+    def test_none_version_raises_exception(self) -> None:
         """Test that error is raised on None exp_version."""
         self.post_json(
             '/explorehandler/stats_events/%s' % (
@@ -1827,7 +2005,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
                     'exp_version': None},
             expected_status_int=400)
 
-    def test_stats_events_handler(self):
+    def test_stats_events_handler(self) -> None:
         """Test the handler for handling batched events."""
         self.post_json('/explorehandler/stats_events/%s' % (
             self.exp_id), {
@@ -1841,6 +2019,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         # Check that the models are updated.
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
+        assert exploration_stats is not None
         self.assertEqual(exploration_stats.num_starts_v2, 1)
         self.assertEqual(exploration_stats.num_actual_starts_v2, 1)
         self.assertEqual(exploration_stats.num_completions_v2, 1)
@@ -1864,8 +2043,11 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
                 self.state_name].num_times_solution_viewed_v2, 1)
 
     def test_stats_events_handler_raises_error_with_missing_exp_stats_property(
-            self):
-        self.aggregated_stats.pop('num_starts')
+        self
+    ) -> None:
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion
+        # from TypedDict.
+        self.aggregated_stats.pop('num_starts')  # type: ignore[misc]
 
         response = self.post_json('/explorehandler/stats_events/%s' % (
             self.exp_id), {
@@ -1883,8 +2065,11 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
 
     def test_stats_events_handler_raises_error_with_invalid_exp_stats_property(
         self
-    ):
-        self.aggregated_stats['num_starts'] = 'invalid'
+    ) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.aggregated_stats['num_starts'] = 'invalid'  # type: ignore[arg-type]
 
         response = self.post_json('/explorehandler/stats_events/%s' % (
             self.exp_id), {
@@ -1901,7 +2086,8 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_stats_events_handler_raise_error_with_missing_state_stats_property(
-            self):
+        self
+    ) -> None:
         self.aggregated_stats['state_stats_mapping']['Home'].pop(
             'total_hit_count')
 
@@ -1920,10 +2106,14 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_stats_events_handler_raise_error_with_invalid_state_stats_property(
-            self):
+        self
+    ) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         self.aggregated_stats['state_stats_mapping']['Home'][
             'total_hit_count'
-        ] = 'invalid'
+        ] = 'invalid'  # type: ignore[assignment]
 
         response = self.post_json(
             '/explorehandler/stats_events/%s' % self.exp_id,
@@ -1945,7 +2135,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
 class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
     """Tests for the answer submitted event handler."""
 
-    def test_submit_answer_for_exploration(self):
+    def test_submit_answer_for_exploration(self) -> None:
         # Load demo exploration.
         exp_id = '6'
         exp_services.delete_demo(exp_id)
@@ -1975,6 +2165,7 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         )
         submitted_answer = stats_services.get_state_answers(
             exp_id, version, state_name_1)
+        assert submitted_answer is not None
         self.assertEqual(
             len(submitted_answer.get_submitted_answer_dict_list()), 1)
         self.assertEqual(
@@ -1983,7 +2174,9 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
-    def test_submit_answer_for_exploration_raises_error_with_no_version(self):
+    def test_submit_answer_for_exploration_raises_error_with_no_version(
+        self
+    ) -> None:
         exp_id = '6'
         exp_services.delete_demo(exp_id)
         exp_services.load_demo(exp_id)
@@ -2015,7 +2208,7 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
 
     def test_submit_answer_for_exp_raises_error_with_no_answer_matching_type(
         self
-    ):
+    ) -> None:
         # Load demo exploration.
         exp_id = '6'
         exp_services.delete_demo(exp_id)
@@ -2052,11 +2245,11 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
 
 class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
-    def test_hitting_new_state(self):
+    def test_hitting_new_state(self) -> None:
         self.login(self.VIEWER_EMAIL)
         # Load demo exploration.
         exp_id = '6'
@@ -2083,7 +2276,9 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
             stats_models.StateHitEventLogEntryModel.get_all())
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
+        state_hit_event_log_entry_model = all_models.get()
+        assert state_hit_event_log_entry_model is not None
+        model = state_hit_event_log_entry_model
 
         self.assertEqual(model.exploration_id, exp_id)
         self.assertEqual(model.state_name, 'new_state')
@@ -2094,7 +2289,7 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_cannot_hit_new_state_with_no_exploration_version(self):
+    def test_cannot_hit_new_state_with_no_exploration_version(self) -> None:
         self.login(self.VIEWER_EMAIL)
         # Load demo exploration.
         exp_id = '6'
@@ -2115,18 +2310,15 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
                 'old_params': {}
             }, expected_status_int=400
         )
-        self.assertEqual(response['error'], 'NONE EXP VERSION: State hit')
+        self.assertEqual(
+            response['error'],
+            'Missing key in handler args: exploration_version.'
+        )
 
         self.logout()
 
-    def test_cannot_hit_new_state_with_no_new_state_name(self):
+    def test_cannot_hit_new_state_with_no_new_state_name(self) -> None:
         self.login(self.VIEWER_EMAIL)
-
-        observed_log_messages = []
-
-        def _mock_logging_function(msg):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg)
 
         # Load demo exploration.
         exp_id = '6'
@@ -2138,32 +2330,33 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
             stats_models.StateHitEventLogEntryModel.get_all())
         self.assertEqual(all_models.count(), 0)
 
-        with self.swap(logging, 'exception', _mock_logging_function):
-            self.post_json(
-                '/explorehandler/state_hit_event/%s' % exp_id,
-                {
-                    'new_state_name': None,
-                    'exploration_version': exploration_version,
-                    'client_time_spent_in_secs': 0,
-                    'session_id': 'session_id',
-                    'old_params': {}
-                }
-            )
+        response = self.post_json(
+            '/explorehandler/state_hit_event/%s' % exp_id,
+            {
+                'new_state_name': None,
+                'exploration_version': exploration_version,
+                'client_time_spent_in_secs': 0,
+                'session_id': 'session_id',
+                'old_params': {}
+            },
+            expected_status_int=400
+        )
 
         self.assertEqual(
-            observed_log_messages,
-            ['Unexpected StateHit event for the END state.'])
+            response['error'],
+            'Missing key in handler args: new_state_name.'
+        )
 
         self.logout()
 
 
 class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
-    def test_completing_a_state(self):
+    def test_completing_a_state(self) -> None:
         self.login(self.VIEWER_EMAIL)
         # Load demo exploration.
         exp_id = '6'
@@ -2189,7 +2382,9 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
             stats_models.StateCompleteEventLogEntryModel.get_all())
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
+        state_complete_event_log_entry_model = all_models.get()
+        assert state_complete_event_log_entry_model is not None
+        model = state_complete_event_log_entry_model
 
         self.assertEqual(model.exp_id, exp_id)
         self.assertEqual(model.state_name, 'state_name')
@@ -2199,7 +2394,7 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_cannot_complete_state_with_no_exploration_version(self):
+    def test_cannot_complete_state_with_no_exploration_version(self) -> None:
         self.login(self.VIEWER_EMAIL)
         # Load demo exploration.
         exp_id = '6'
@@ -2227,11 +2422,11 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 
 class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
-    def test_leaving_an_exploration(self):
+    def test_leaving_an_exploration(self) -> None:
         self.login(self.VIEWER_EMAIL)
         # Load demo exploration.
         exp_id = '6'
@@ -2260,7 +2455,9 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
             .get_all())
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
+        exp_event_log_model = all_models.get()
+        assert exp_event_log_model is not None
+        model = exp_event_log_model
 
         self.assertEqual(model.exp_id, exp_id)
         self.assertEqual(model.refresher_exp_id, 'refresher_exp_id')
@@ -2274,12 +2471,12 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
 
 class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
-    def test_cannot_fetch_exploration_with_invalid_version(self):
+    def test_cannot_fetch_exploration_with_invalid_version(self) -> None:
         # Load demo exploration.
         exp_id = '0'
         exp_services.delete_demo('0')
@@ -2296,7 +2493,7 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 
     def test_user_checkpoint_progress_is_none_on_fetching_older_exploration(
         self
-    ):
+    ) -> None:
         exp_id = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
@@ -2370,7 +2567,7 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_starting_a_state(self):
+    def test_starting_a_state(self) -> None:
         self.login(self.VIEWER_EMAIL)
         # Load demo exploration.
         exp_id = '6'
@@ -2398,7 +2595,9 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
             stats_models.StartExplorationEventLogEntryModel.get_all())
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
+        event_log_entry_model = all_models.get()
+        assert event_log_entry_model is not None
+        model = event_log_entry_model
 
         self.assertEqual(model.exploration_id, exp_id)
         self.assertEqual(model.state_name, 'state_name')
@@ -2411,7 +2610,7 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_cannot_start_a_state_with_no_exploration_version(self):
+    def test_cannot_start_a_state_with_no_exploration_version(self) -> None:
         self.login(self.VIEWER_EMAIL)
         # Load demo exploration.
         exp_id = '6'
@@ -2439,11 +2638,11 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 
 class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
-    def test_actually_starting_a_state(self):
+    def test_actually_starting_a_state(self) -> None:
         self.login(self.VIEWER_EMAIL)
         # Load demo exploration.
         exp_id = '6'
@@ -2468,7 +2667,9 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
             stats_models.ExplorationActualStartEventLogEntryModel.get_all())
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
+        event_log_entry_model = all_models.get()
+        assert event_log_entry_model is not None
+        model = event_log_entry_model
 
         self.assertEqual(model.exp_id, exp_id)
         self.assertEqual(model.state_name, 'state_name')
@@ -2477,7 +2678,9 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_cannot_actually_start_a_state_with_no_exploration_version(self):
+    def test_cannot_actually_start_a_state_with_no_exploration_version(
+        self
+    ) -> None:
         self.login(self.VIEWER_EMAIL)
         # Load demo exploration.
         exp_id = '6'
@@ -2504,11 +2707,11 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 
 class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
-    def test_viewing_solution(self):
+    def test_viewing_solution(self) -> None:
         self.login(self.VIEWER_EMAIL)
         # Load demo exploration.
         exp_id = '6'
@@ -2534,7 +2737,9 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
             stats_models.SolutionHitEventLogEntryModel.get_all())
         self.assertEqual(all_models.count(), 1)
 
-        model = all_models.get()
+        event_log_entry_model = all_models.get()
+        assert event_log_entry_model is not None
+        model = event_log_entry_model
 
         self.assertEqual(model.exp_id, exp_id)
         self.assertEqual(model.state_name, 'state_name')
@@ -2544,7 +2749,7 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_cannot_view_solution_with_no_exploration_version(self):
+    def test_cannot_view_solution_with_no_exploration_version(self) -> None:
         self.login(self.VIEWER_EMAIL)
         # Load demo exploration.
         exp_id = '6'
@@ -2571,15 +2776,15 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
 
 class ExplorationEmbedPageTests(test_utils.GenericTestBase):
 
-    COL_ID = 'col_id'
-    EXP_ID = 'exp_id'
+    COL_ID: Final = 'col_id'
+    EXP_ID: Final = 'exp_id'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-    def test_exploration_embed_page(self):
+    def test_exploration_embed_page(self) -> None:
         self.login(self.OWNER_EMAIL)
 
         self.save_new_valid_collection(self.COL_ID, self.owner_id)
@@ -2597,7 +2802,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_handler_raises_error_with_invalid_exploration_id(self):
+    def test_handler_raises_error_with_invalid_exploration_id(self) -> None:
         self.login(self.OWNER_EMAIL)
         self.save_new_valid_collection(self.COL_ID, self.owner_id)
 
@@ -2610,7 +2815,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_handler_raises_error_with_invalid_collection_id(self):
+    def test_handler_raises_error_with_invalid_collection_id(self) -> None:
         self.login(self.OWNER_EMAIL)
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id)
@@ -2625,7 +2830,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_handler_raises_error_with_no_collection(self):
+    def test_handler_raises_error_with_no_collection(self) -> None:
         self.login(self.OWNER_EMAIL)
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id)
@@ -2640,7 +2845,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_handler_raises_error_with_invalid_version(self):
+    def test_handler_raises_error_with_invalid_version(self) -> None:
         self.login(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         self.save_new_valid_collection(self.COL_ID, self.owner_id)
@@ -2659,7 +2864,9 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
 class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
     """Tests for learner answer info handler tests."""
 
-    def test_submit_learner_answer_details_for_exploration_states(self):
+    def test_submit_learner_answer_details_for_exploration_states(
+        self
+    ) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         exp_id = '6'
@@ -2706,6 +2913,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
 
             learner_answer_details = stats_services.get_learner_answer_details(
                 entity_type, state_reference)
+            assert learner_answer_details is not None
             self.assertEqual(
                 learner_answer_details.state_reference, state_reference)
             self.assertEqual(
@@ -2730,7 +2938,47 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                     'answer_details': 'This is an answer details.',
                 }, csrf_token=csrf_token, expected_status_int=500)
 
-    def test_submit_learner_answer_details_for_question(self):
+    def test_cannot_submit_answer_details_for_exploration_without_state_name(
+        self
+    ) -> None:
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        entity_type = feconf.ENTITY_TYPE_EXPLORATION
+
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
+            exploration_dict = self.get_json(
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+            state_name = exploration_dict['exploration']['init_state_name']
+            interaction_id = exploration_dict['exploration'][
+                'states'][state_name]['interaction']['id']
+
+            self.assertEqual(state_name, 'Sentence')
+            self.assertEqual(interaction_id, 'TextInput')
+            response = self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    entity_type, exp_id),
+                {
+                    'interaction_id': interaction_id,
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                },
+                csrf_token=csrf_token,
+                expected_status_int=500
+            )
+
+        self.assertEqual(
+            response['error'],
+            'The \'state_name\' must be provided when the entity_type '
+            'is exploration.'
+        )
+
+    def test_submit_learner_answer_details_for_question(self) -> None:
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -2756,6 +3004,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
             learner_answer_details = stats_services.get_learner_answer_details(
                 feconf.ENTITY_TYPE_QUESTION, state_reference)
+            assert learner_answer_details is not None
             self.assertEqual(
                 learner_answer_details.state_reference, state_reference)
             self.put_json(
@@ -2781,7 +3030,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
 class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
     """Tests for checkpoint reached event handler."""
 
-    def test_user_checkpoint_progress_is_updated_correctly(self):
+    def test_user_checkpoint_progress_is_updated_correctly(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
@@ -2819,6 +3068,7 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
 
         exp_user_data = exp_fetchers.get_exploration_user_data(
             viewer_id, exp_id)
+        assert exp_user_data is not None
         self.assertEqual(
             exp_user_data.furthest_reached_checkpoint_exp_version, 1)
         self.assertEqual(
@@ -2866,17 +3116,20 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
             },
             csrf_token=csrf_token
         )
-        exp_user_data = exp_fetchers.get_exploration_user_data(
+        updated_exp_user_data = exp_fetchers.get_exploration_user_data(
             viewer_id, exp_id)
+        assert updated_exp_user_data is not None
         self.assertEqual(
-            exp_user_data.furthest_reached_checkpoint_exp_version, 2)
+            updated_exp_user_data.furthest_reached_checkpoint_exp_version, 2)
         self.assertEqual(
-            exp_user_data.furthest_reached_checkpoint_state_name,
+            updated_exp_user_data.furthest_reached_checkpoint_state_name,
             'What language')
         self.assertEqual(
-            exp_user_data.most_recently_reached_checkpoint_exp_version, 2)
+            updated_exp_user_data.most_recently_reached_checkpoint_exp_version,
+            2
+        )
         self.assertEqual(
-            exp_user_data.most_recently_reached_checkpoint_state_name,
+            updated_exp_user_data.most_recently_reached_checkpoint_state_name,
             'What language')
 
         self.logout()
@@ -2885,7 +3138,9 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
 class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
     """Tests for exploration restart event handler."""
 
-    def test_user_checkpoint_progress_is_updated_correctly_on_restart(self):
+    def test_user_checkpoint_progress_is_updated_correctly_on_restart(
+        self
+    ) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
@@ -2921,6 +3176,7 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
         )
         exp_user_data = exp_fetchers.get_exploration_user_data(
             viewer_id, exp_id)
+        assert exp_user_data is not None
         self.assertEqual(
             exp_user_data.furthest_reached_checkpoint_exp_version, 1)
         self.assertEqual(
@@ -2957,7 +3213,9 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
 class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
     """Tests for save transient checkpoint progress handler."""
 
-    def test_logged_out_user_checkpoint_progress_is_saved_correctly(self):
+    def test_logged_out_user_checkpoint_progress_is_saved_correctly(
+        self
+    ) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -2995,6 +3253,7 @@ class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
         exp_user_data = exp_fetchers.get_logged_out_user_progress(
             unique_progress_url_id
         )
+        assert exp_user_data is not None
         self.assertEqual(
             exp_user_data.furthest_reached_checkpoint_exp_version, 1)
         self.assertEqual(
@@ -3030,25 +3289,28 @@ class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
             },
             csrf_token=csrf_token
         )
-        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+        updated_exp_user_data = exp_fetchers.get_logged_out_user_progress(
             unique_progress_url_id
         )
+        assert updated_exp_user_data is not None
         self.assertEqual(
-            exp_user_data.furthest_reached_checkpoint_exp_version, 2)
+            updated_exp_user_data.furthest_reached_checkpoint_exp_version, 2)
         self.assertEqual(
-            exp_user_data.furthest_reached_checkpoint_state_name,
+            updated_exp_user_data.furthest_reached_checkpoint_state_name,
             'What language')
         self.assertEqual(
-            exp_user_data.most_recently_reached_checkpoint_exp_version, 2)
+            updated_exp_user_data.most_recently_reached_checkpoint_exp_version,
+            2
+        )
         self.assertEqual(
-            exp_user_data.most_recently_reached_checkpoint_state_name,
+            updated_exp_user_data.most_recently_reached_checkpoint_state_name,
             'What language')
 
 
 class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
     """Tests for transient checkpoint url handler."""
 
-    def test_exploration_page_raises_error_with_invalid_pid(self):
+    def test_exploration_page_raises_error_with_invalid_pid(self) -> None:
         unique_progress_url_id = 'pid123'
 
         self.get_html_response(
@@ -3056,7 +3318,9 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
             expected_status_int=404
         )
 
-    def test_logged_out_progress_is_displayed_correctly_when_exp_version_is_same(self): # pylint: disable=line-too-long
+    def test_logged_out_progress_is_displayed_correctly_when_exp_version_is_same( # pylint: disable=line-too-long
+        self
+    ) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
         # Load demo exploration.
@@ -3089,7 +3353,7 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
 
         unique_progress_url_id = response['unique_progress_url_id']
 
-        response = self.get_html_response(
+        url_response = self.get_html_response(
             '/progress/%s' % (unique_progress_url_id),
             expected_status_int=302
         )
@@ -3097,9 +3361,9 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
         exp_user_data = exp_fetchers.get_logged_out_user_progress(
             unique_progress_url_id
         )
-
+        assert exp_user_data is not None
         self.assertTrue(
-            response.headers['Location'].endswith(
+            url_response.headers['Location'].endswith(
                 '%s/%s?pid=%s' % (
             feconf.EXPLORATION_URL_PREFIX,
             exp_user_data.exploration_id,
@@ -3122,7 +3386,9 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
             exploration_dict['most_recently_reached_checkpoint_state_name'],
             'Welcome!')
 
-    def test_logged_out_progress_is_displayed_correctly_when_exp_version_different(self): # pylint: disable=line-too-long
+    def test_logged_out_progress_is_displayed_correctly_when_exp_version_different( # pylint: disable=line-too-long
+        self
+    ) -> None:
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -3171,7 +3437,7 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
 
         unique_progress_url_id = response['unique_progress_url_id']
 
-        response = self.get_html_response(
+        url_response = self.get_html_response(
             '/progress/%s' % (unique_progress_url_id),
             expected_status_int=302
         )
@@ -3179,9 +3445,10 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
         exp_user_data = exp_fetchers.get_logged_out_user_progress(
             unique_progress_url_id
         )
+        assert exp_user_data is not None
 
         self.assertTrue(
-            response.headers['Location'].endswith(
+            url_response.headers['Location'].endswith(
                 '%s/%s?pid=%s' % (
             feconf.EXPLORATION_URL_PREFIX,
             exp_user_data.exploration_id,
@@ -3208,7 +3475,7 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
 class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
     """Tests for sync logged out learner progress handler."""
 
-    def test_logged_in_checkpoint_progress_is_synced_correctly(self):
+    def test_logged_in_checkpoint_progress_is_synced_correctly(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
@@ -3245,6 +3512,7 @@ class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
 
         exp_user_data = exp_fetchers.get_exploration_user_data(
             viewer_id, exp_id)
+        assert exp_user_data is not None
         self.assertEqual(
             exp_user_data.furthest_reached_checkpoint_exp_version, 1)
         self.assertEqual(
@@ -3263,9 +3531,9 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
     exploration.
     """
 
-    EXP_ID = '0'
+    EXP_ID: Final = '0'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -3288,7 +3556,7 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
             'A commit message.'
         )
 
-    def test_raises_error_when_version_history_does_not_exist(self):
+    def test_raises_error_when_version_history_does_not_exist(self) -> None:
         self.login(self.OWNER_EMAIL)
         # Deleting the version history model produced by exp_services.
         vh_model = exp_models.ExplorationVersionHistoryModel.get(
@@ -3307,7 +3575,7 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_version_history_for_a_state_is_fetched_correctly(self):
+    def test_version_history_for_a_state_is_fetched_correctly(self) -> None:
         self.login(self.OWNER_EMAIL)
         exploration_v1 = exp_fetchers.get_exploration_by_id(
             self.EXP_ID, version=1
@@ -3352,9 +3620,9 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
 class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
     """Tests for fetching the version history of the exploration metadata."""
 
-    EXP_ID = '0'
+    EXP_ID: Final = '0'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -3374,7 +3642,7 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
             'A commit message.'
         )
 
-    def test_raises_error_when_version_history_does_not_exist(self):
+    def test_raises_error_when_version_history_does_not_exist(self) -> None:
         self.login(self.OWNER_EMAIL)
         # Deleting the version history model produced by exp_services.
         vh_model = exp_models.ExplorationVersionHistoryModel.get(
@@ -3393,7 +3661,7 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
 
     def test_version_history_for_exploration_metadata_is_fetched_correctly(
         self
-    ):
+    ) -> None:
         self.login(self.OWNER_EMAIL)
         exploration_v1 = exp_fetchers.get_exploration_by_id(
             self.EXP_ID, version=1
@@ -3420,7 +3688,7 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
 class CheckpointsFeatureStatusHandlerTests(test_utils.GenericTestBase):
     """Unit test for CheckpointsFeatureStatusHandler."""
 
-    def test_get_request_returns_correct_status(self):
+    def test_get_request_returns_correct_status(self) -> None:
         self.set_config_property(
             config_domain.CHECKPOINTS_FEATURE_IS_ENABLED, False)
 

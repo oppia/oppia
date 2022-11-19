@@ -111,7 +111,7 @@ class EditRulesPlatformParameterCmd(PlatformParameterChange):
 class ClientSideContextDict(TypedDict):
     """Dictionary representing the client's side Context object."""
 
-    platform_type: str
+    platform_type: Optional[str]
     browser_type: Optional[str]
     app_version: Optional[str]
 
@@ -127,7 +127,7 @@ class EvaluationContext:
 
     def __init__(
         self,
-        platform_type: str,
+        platform_type: Optional[str],
         browser_type: Optional[str],
         app_version: Optional[str],
         server_mode: ServerMode
@@ -138,11 +138,11 @@ class EvaluationContext:
         self._server_mode = server_mode
 
     @property
-    def platform_type(self) -> str:
+    def platform_type(self) -> Optional[str]:
         """Returns platform type.
 
         Returns:
-            str. The platform type, e.g. 'Web', 'Android', 'Backend'.
+            str|None. The platform type, e.g. 'Web', 'Android', 'Backend'.
         """
         return self._platform_type
 

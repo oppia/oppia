@@ -2632,11 +2632,8 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
             self.learner_answer_info,
             'The answer submitted by the learner cannot be empty')
 
-    # TODO(#13528): Here we use MyPy ignore because we remove this test after
-    # the backend is fully type-annotated. Here ignore[assignment] is used to
-    # test that answer is not an empty dict.
     def test_answer_must_not_be_empty_dict(self) -> None:
-        self.learner_answer_info.answer = {} # type: ignore[assignment]
+        self.learner_answer_info.answer = {}
         self._assert_validation_error(
             self.learner_answer_info,
             'The answer submitted cannot be an empty dict')

@@ -28,11 +28,7 @@ from core.tests import test_utils
 
 class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
 
-    OWNER_EMAIL = 'owner@example.com'
-    VIEWER_EMAIL = 'viewer@example.com'
-    VIEWER_USERNAME = 'viewer'
-
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -60,7 +56,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
             self.exp_id, self.owner_id, correctness_feedback_enabled=True)
         self.publish_exploration(self.owner_id, self.exp_id)
 
-        self.node_1 = {
+        self.node_1: story_domain.StoryNodeDict = {
             'id': self.node_id,
             'title': 'Title 1',
             'description': 'Description 1',
@@ -112,18 +108,20 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
 
 class ReviewTestsPageTests(BaseReviewTestsControllerTests):
 
-    def test_any_user_can_access_review_tests_page(self):
+    def test_any_user_can_access_review_tests_page(self) -> None:
         self.get_html_response(
             '/learn/staging/topic/review-test/%s'
             % self.story_url_fragment_1)
 
-    def test_no_user_can_access_unpublished_story_review_sessions_page(self):
+    def test_no_user_can_access_unpublished_story_review_sessions_page(
+        self
+    ) -> None:
         self.get_html_response(
             '/learn/staging/topic/review-test/%s'
             % self.story_url_fragment_2,
             expected_status_int=404)
 
-    def test_get_fails_when_story_doesnt_exist(self):
+    def test_get_fails_when_story_doesnt_exist(self) -> None:
         self.get_html_response(
             '/learn/staging/topic/review-test/%s'
             % 'non-existent-story',
@@ -132,7 +130,7 @@ class ReviewTestsPageTests(BaseReviewTestsControllerTests):
 
 class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
 
-    def test_any_user_can_access_review_tests_data(self):
+    def test_any_user_can_access_review_tests_data(self) -> None:
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.story_id_1, self.node_id)
         json_response = self.get_json(
@@ -147,16 +145,18 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             json_response['skill_descriptions']['skill_id_2'],
             'Skill 2')
 
-    def test_no_user_can_access_unpublished_story_review_sessions_data(self):
+    def test_no_user_can_access_unpublished_story_review_sessions_data(
+        self
+    ) -> None:
         self.get_json(
             '%s/staging/topic/%s' % (
                 feconf.REVIEW_TEST_DATA_URL_PREFIX,
                 self.story_url_fragment_2),
             expected_status_int=404)
 
-    def test_get_fails_when_acquired_skills_dont_exist(self):
+    def test_get_fails_when_acquired_skills_dont_exist(self) -> None:
         node_id = 'node_1'
-        node = {
+        node: story_domain.StoryNodeDict = {
             'id': node_id,
             'title': 'Title 1',
             'description': 'Description 1',
@@ -192,14 +192,14 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
                 'public-story-title-two'),
             expected_status_int=404)
 
-    def test_get_fails_when_story_doesnt_exist(self):
+    def test_get_fails_when_story_doesnt_exist(self) -> None:
         self.get_json(
             '%s/staging/topic/%s' % (
                 feconf.REVIEW_TEST_DATA_URL_PREFIX,
                 'non-existent-story-url-fragment'),
             expected_status_int=400)
 
-    def test_get_fails_when_no_completed_story_node(self):
+    def test_get_fails_when_no_completed_story_node(self) -> None:
         self.get_json(
             '%s/staging/topic/%s' % (
                 feconf.REVIEW_TEST_DATA_URL_PREFIX,
