@@ -156,12 +156,14 @@ export class ContributorStatsComponent {
   ];
 
   statsData: {
-    translationContribution?: {[key: string]: PageableStats | undefined} |
-      undefined;
-    translationReview?: {[key: string]: PageableStats | undefined} | undefined;
+    translationContribution?: Map<string, PageableStats>;
+    translationReview?: Map<string, PageableStats>;
     questionContribution?: PageableStats;
     questionReview?: PageableStats;
-  } = {};
+  } = {
+      translationContribution: new Map<string, PageableStats>(),
+      translationReview: new Map<string, PageableStats>()
+    };
 
   constructor(
     private readonly languageUtilService: LanguageUtilService,
@@ -171,8 +173,6 @@ export class ContributorStatsComponent {
   }
 
   async ngOnInit(): Promise<void> {
-    this.statsData.translationContribution = {};
-    this.statsData.translationReview = {};
     const userInfo = await this.userService.getUserInfoAsync();
     const username = userInfo.getUsername();
 
@@ -237,17 +237,18 @@ export class ContributorStatsComponent {
       response.translation_contribution_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        if (
-          this.statsData.translationContribution === null ||
-          this.statsData.translationContribution === undefined) {
-          throw new Error('Translation contributions are undefined.');
-        }
-        if (!this.statsData.translationContribution[language]) {
-          this.statsData.translationContribution[language] = new PageableStats(
-            [this.createTranslationContributionStat(stat)]);
+        if (!this.statsData.translationContribution.has(language)) {
+          this.statsData.translationContribution.set(
+            language,
+            new PageableStats([this.createTranslationContributionStat(stat)]));
         } else {
-          this.statsData?.translationContribution[language]?.data?.push(
-            this.createTranslationContributionStat(stat));
+          const statsData = this.statsData.translationContribution.get(
+            language);
+          statsData.data.push(this.createTranslationContributionStat(stat));
+          this.statsData.translationContribution.set(
+            language,
+            statsData
+          );
         }
       });
     }
@@ -256,17 +257,18 @@ export class ContributorStatsComponent {
       response.translation_review_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        if (
-          this.statsData.translationReview === null ||
-          this.statsData.translationReview === undefined) {
-          throw new Error('Translation reviews are undefined.');
-        }
-        if (!this.statsData.translationReview[language]) {
-          this.statsData.translationReview[language] = new PageableStats(
-            [this.createTranslationReviewStat(stat)]);
+        if (!this.statsData.translationReview.has(language)) {
+          this.statsData.translationContribution.set(
+            language,
+            new PageableStats([this.createTranslationReviewStat(stat)]));
         } else {
-          this.statsData?.translationReview[language]?.data?.push(
-            this.createTranslationReviewStat(stat));
+          const statsData = this.statsData.translationReview.get(
+            language);
+          statsData.data.push(this.createTranslationReviewStat(stat));
+          this.statsData.translationReview.set(
+            language,
+            statsData
+          );
         }
       });
     }
