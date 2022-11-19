@@ -1577,6 +1577,7 @@ class FixCommitCommandsHandler(
     """Handles the request to fix the commit commands of a particular
     exploration.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
@@ -1586,5 +1587,6 @@ class FixCommitCommandsHandler(
     @acl_decorators.can_access_admin_page
     def post(self):
         """Handles POST request to fix the commit commands."""
+
         exp_services.fix_commit_commands()
         self.render_json({})
