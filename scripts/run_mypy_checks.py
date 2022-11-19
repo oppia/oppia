@@ -70,10 +70,6 @@ NOT_FULLY_COVERED_FILES: Final = [
     'core/controllers/review_tests_test.py',
     'core/controllers/skill_editor.py',
     'core/controllers/skill_editor_test.py',
-    'scripts/docstrings_checker.py',
-    'scripts/docstrings_checker_test.py',
-    'scripts/linters/pylint_extensions.py',
-    'scripts/linters/pylint_extensions_test.py',
 ]
 
 
