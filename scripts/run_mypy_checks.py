@@ -42,10 +42,6 @@ EXCLUDED_DIRECTORIES: Final = [
     'core/tests/data/'
 ]
 
-# List of files who should be type-annotated but are not.
-NOT_FULLY_COVERED_FILES: List[str] = []
-
-
 CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')
 MYPY_REQUIREMENTS_FILE_PATH: Final = os.path.join('.', 'mypy_requirements.txt')
 MYPY_TOOLS_DIR: Final = os.path.join(os.getcwd(), 'third_party', 'python3_libs')
@@ -112,7 +108,8 @@ def get_mypy_cmd(
         cmd = [mypy_cmd, '--config-file', CONFIG_FILE_PATH] + files
     else:
         excluded_files_regex = (
-            '|'.join(NOT_FULLY_COVERED_FILES + EXCLUDED_DIRECTORIES))
+            '|'.join(EXCLUDED_DIRECTORIES)
+        )
         cmd = [
             mypy_cmd, '--exclude', excluded_files_regex,
             '--config-file', CONFIG_FILE_PATH, '.'
