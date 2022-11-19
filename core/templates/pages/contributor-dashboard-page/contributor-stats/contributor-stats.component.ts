@@ -156,8 +156,8 @@ export class ContributorStatsComponent {
   ];
 
   statsData: {
-    translationContribution?: Map<string, PageableStats>;
-    translationReview?: Map<string, PageableStats>;
+    translationContribution: Map<string, PageableStats>;
+    translationReview: Map<string, PageableStats>;
     questionContribution?: PageableStats;
     questionReview?: PageableStats;
   } = {

@@ -952,8 +952,498 @@ class ContributorAllStatsSummariesHandler(
         response = {}
 
         if stats.translation_contribution_stats is not None:
-            response['translation_contribution_stats'] = _get_client_side_stats(
-                stats.translation_contribution_stats)
+            response['translation_contribution_stats'] = [
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'es',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    },
+                    {
+                        'language_code': 'ak',
+                        'topic_name': 'published_topic_name',
+                        'submitted_translations_count': 2,
+                        'submitted_translation_word_count': 100,
+                        'accepted_translations_count': 1,
+                        'accepted_translations_without_reviewer_edits_count': (
+                            0),
+                        'accepted_translation_word_count': 50,
+                        'rejected_translations_count': 0,
+                        'rejected_translation_word_count': 0,
+                        'first_contribution_date': 'Mar 2021',
+                        'last_contribution_date': 'Mar 2021'
+                    }
+                ]
 
         if stats.translation_review_stats is not None:
             response['translation_review_stats'] = _get_client_side_stats(
