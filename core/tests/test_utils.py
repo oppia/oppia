@@ -2449,14 +2449,20 @@ title: Title
             self.assertEqual(response.status_int, 200)
             self.assertNotIn('<oppia-maintenance-page>', response)
 
-            response = self.testapp.post(feconf.SIGNUP_DATA_URL, params={
-                'csrf_token': self.get_new_csrf_token(),
-                'payload': json.dumps({
-                    'username': username,
-                    'agreed_to_terms': True,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                    }),
-                })
+            response = self.testapp.post(
+                feconf.SIGNUP_DATA_URL,
+                params={
+                    'csrf_token': self.get_new_csrf_token(),
+                    'payload': json.dumps(
+                        {
+                            'username': username,
+                            'agreed_to_terms': True,
+                            'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                            'can_receive_email_updates': True
+                        }
+                    )
+                }
+            )
             self.assertEqual(response.status_int, 200)
 
     def signup_superadmin_user(self) -> None:

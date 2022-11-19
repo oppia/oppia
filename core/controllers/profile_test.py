@@ -111,8 +111,10 @@ class ProfilePageTests(test_utils.GenericTestBase):
                     'username': self.EDITOR_USERNAME,
                     'agreed_to_terms': True,
                     'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
+                    'can_receive_email_updates': True
                 },
-                csrf_token=csrf_token)
+                csrf_token=csrf_token
+            )
             self.assertEqual(response, {})
             self.logout()
 
@@ -485,46 +487,24 @@ class ProfileLinkTests(test_utils.GenericTestBase):
 
 class EmailPreferencesTests(test_utils.GenericTestBase):
 
-    def test_user_not_setting_email_prefs_on_signup(self) -> None:
+    def test_missing_can_receive_email_updates_key_raises_error(self) -> None:
         self.login(self.EDITOR_EMAIL)
         self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
-        self.post_json(
+        response = self.post_json(
             feconf.SIGNUP_DATA_URL,
             {
                 'username': self.EDITOR_USERNAME,
                 'agreed_to_terms': True,
                 'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
             },
-            csrf_token=csrf_token)
-
-        # The email update preference should be whatever the setting in feconf
-        # is.
-        editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
-            email_preferences = user_services.get_email_preferences(editor_id)
-            self.assertEqual(email_preferences.can_receive_email_updates, True)
-            self.assertEqual(
-                email_preferences.can_receive_editor_role_email,
-                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
-            self.assertEqual(
-                email_preferences.can_receive_feedback_message_email,
-                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
-            self.assertEqual(
-                email_preferences.can_receive_subscription_email,
-                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
-        with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
-            email_preferences = user_services.get_email_preferences(editor_id)
-            self.assertEqual(email_preferences.can_receive_email_updates, False)
-            self.assertEqual(
-                email_preferences.can_receive_editor_role_email,
-                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
-            self.assertEqual(
-                email_preferences.can_receive_feedback_message_email,
-                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
-            self.assertEqual(
-                email_preferences.can_receive_subscription_email,
-                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'Missing key in handler args: can_receive_email_updates.'
+        )
 
     def test_user_allowing_emails_on_signup(self) -> None:
         self.login(self.EDITOR_EMAIL)
@@ -582,7 +562,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                     {
                         'username': self.EDITOR_USERNAME,
                         'agreed_to_terms': True,
-                        'default_dashboard': constants.DASHBOARD_TYPE_CREATOR
+                        'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
+                        'can_receive_email_updates': True
                     },
                     csrf_token=csrf_token
                 )
@@ -755,9 +736,11 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'username': self.EDITOR_USERNAME,
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'can_receive_email_updates': True
             },
-            csrf_token=csrf_token)
+            csrf_token=csrf_token
+        )
 
         def strip_domain_from_location_header(url: str) -> str:
             """To strip the domain form the location url."""
@@ -803,9 +786,12 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'username': self.EDITOR_USERNAME,
                 'agreed_to_terms': False,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'can_receive_email_updates': True
             },
-            csrf_token=csrf_token, expected_status_int=400)
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
         error_msg = (
             'In order to edit explorations on this site, you will need to'
             ' accept the license terms.'
@@ -819,9 +805,12 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'username': self.EDITOR_USERNAME,
                 'agreed_to_terms': False,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'can_receive_email_updates': True
             },
-            csrf_token=csrf_token, expected_status_int=400)
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
         self.assertIn(error_msg, response_dict['error'])
 
         self.post_json(
@@ -829,9 +818,11 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'agreed_to_terms': True,
                 'username': self.EDITOR_USERNAME,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'can_receive_email_updates': True
             },
-            csrf_token=csrf_token)
+            csrf_token=csrf_token
+        )
 
         self.logout()
 
@@ -883,9 +874,12 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'username': self.UNICODE_TEST_STRING,
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'can_receive_email_updates': True
             },
-            csrf_token=csrf_token, expected_status_int=400)
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
         self.assertIn(
             'Schema validation for \'username\' failed: %s for object %s'
             % (error_msg, self.UNICODE_TEST_STRING),
@@ -896,9 +890,11 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'username': 'abcde',
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'can_receive_email_updates': True
             },
-            csrf_token=csrf_token)
+            csrf_token=csrf_token
+        )
 
         self.logout()
 
@@ -913,9 +909,10 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'agreed_to_terms': True, 'username': self.EDITOR_USERNAME,
                 'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
-                'can_receive_email_updates': None
+                'can_receive_email_updates': False
             },
-            csrf_token=csrf_token)
+            csrf_token=csrf_token
+        )
 
         editor_user_id = user_services.get_user_id_from_username(
             self.EDITOR_USERNAME
@@ -937,10 +934,14 @@ class SignupTests(test_utils.GenericTestBase):
         # This user should have the learner dashboard as default.
         self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'agreed_to_terms': True, 'username': self.VIEWER_USERNAME,
-             'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
-             'can_receive_email_updates': None},
-            csrf_token=csrf_token)
+            {
+                'agreed_to_terms': True,
+                'username': self.VIEWER_USERNAME,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'can_receive_email_updates': False
+            },
+            csrf_token=csrf_token
+        )
 
         viewer_user_id = user_services.get_user_id_from_username(
             self.VIEWER_USERNAME
