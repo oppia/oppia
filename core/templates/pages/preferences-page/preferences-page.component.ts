@@ -17,7 +17,6 @@
  */
 
 import { Component } from '@angular/core';
-import { SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClient } from '@angular/common/http';
@@ -63,7 +62,7 @@ export class PreferencesPageComponent {
   preferredLanguageCodes!: string[];
   preferredSiteLanguageCode!: string;
   preferredAudioLanguageCode!: string;
-  profilePictureDataUrl!: SafeResourceUrl | string;
+  profilePictureDataUrl!: string;
   AUDIO_LANGUAGE_CHOICES!: AudioLangaugeChoice[];
   userBio!: string;
   defaultDashboard!: string;
@@ -197,13 +196,13 @@ export class PreferencesPageComponent {
       this.contextService.getImageSaveDestination() ===
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     ) {
-      this.saveProfileImageToLocalStorage(image);
+      this._saveProfileImageToLocalStorage(image);
     } else {
-      this.postProfileImageToServer(image);
+      this._postProfileImageToServer(image);
     }
   }
 
-  private saveProfileImageToLocalStorage(image: Blob): void {
+  private _saveProfileImageToLocalStorage(image: Blob): void {
     const reader = new FileReader();
     reader.onload = () => {
       const imageData = reader.result as string;
@@ -213,7 +212,7 @@ export class PreferencesPageComponent {
     reader.readAsDataURL(image);
   }
 
-  private postProfileImageToServer(image: Blob): void {
+  private _postProfileImageToServer(image: Blob): void {
     let form = new FormData();
     form.append('image', image);
     this.http.post<ImageUploadBackendResponse>(
@@ -266,14 +265,10 @@ export class PreferencesPageComponent {
     this.hasPageLoaded = false;
 
     let preferencesPromise = this.userBackendApiService.getPreferencesAsync();
-
     preferencesPromise.then((data) => {
       this.userBio = data.user_bio;
       this.subjectInterests = data.subject_interests;
       this.preferredLanguageCodes = data.preferred_language_codes;
-      this.userService.getProfileImageDataUrlAsync().then(data => {
-        this.profilePictureDataUrl = data;
-      });
       this.defaultDashboard = data.default_dashboard;
       this.canReceiveEmailUpdates = data.can_receive_email_updates;
       this.canReceiveEditorRoleEmail =
@@ -294,7 +289,14 @@ export class PreferencesPageComponent {
       this.hasPageLoaded = true;
     });
 
-    Promise.all([userInfoPromise, preferencesPromise]).then(() => {
+    let profileImagePromise = this.userService.getProfileImageDataUrlAsync();
+    profileImagePromise.then(data => {
+      this.profilePictureDataUrl = data as string;
+    });
+
+    Promise.all([
+      userInfoPromise, preferencesPromise, profileImagePromise
+    ]).then(() => {
       this.loaderService.hideLoadingScreen();
     });
 

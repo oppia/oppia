@@ -200,10 +200,10 @@ export class UserBackendApiService {
     if (this.profileImageCache.has(filename) && data !== undefined) {
       return new ImageFile(filename, data);
     }
-    return this.fetchProfileImage(username);
+    return this._fetchProfileImage(username);
   }
 
-  private async fetchProfileImage(username: string): Promise<ImageFile> {
+  private async _fetchProfileImage(username: string): Promise<ImageFile> {
     let onResolve!: (_: Blob) => void;
     let onReject!: () => void;
     const blobPromise = new Promise<Blob>((resolve, reject) => {
@@ -213,9 +213,9 @@ export class UserBackendApiService {
 
     const subscription = this.http.get(
       this.urlInterpolationService.interpolateUrl(
-        this.assetsBackendApiService.profileImageUrlTemplate, {username: username}), {
-        responseType: 'blob'
-      }).subscribe(onResolve, onReject);
+        this.assetsBackendApiService.profileImageUrlTemplate,
+        {username: username}), {responseType: 'blob'}
+    ).subscribe(onResolve, onReject);
 
     const filename = `${username}/profile_image.png`;
     try {

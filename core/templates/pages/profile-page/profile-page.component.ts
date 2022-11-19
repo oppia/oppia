@@ -101,10 +101,10 @@ export class ProfilePageComponent {
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
       .getStaticImageUrl('/general/no_profile_picture.png');
     this.loaderService.showLoadingScreen('Loading');
-    Promise.all([
-      this.profilePageBackendApiService.fetchProfileDataAsync(),
-      this.profilePageBackendApiService.fetchProfileImageDataUrlAsync()
-    ]).then(([data, profileImageData]) => {
+
+    let profileDataPromise = (
+      this.profilePageBackendApiService.fetchProfileDataAsync());
+    profileDataPromise.then((data) => {
       this.data = data;
       this.username = {
         title: 'Username',
@@ -173,8 +173,16 @@ export class ProfilePageComponent {
       this.numUserPortfolioExplorations = data.editedExpSummaries.length;
       this.subjectInterests = data.subjectInterests;
       this.firstContributionMsec = data.firstContributionMsec;
+    });
+
+    let profileImagePromise = (
+      this.profilePageBackendApiService.fetchProfileImageDataUrlAsync());
+    profileImagePromise.then((data) => {
       this.profilePictureDataUrl = decodeURIComponent((
-        profileImageData || this.DEFAULT_PROFILE_PICTURE_URL));
+        data || this.DEFAULT_PROFILE_PICTURE_URL));
+    });
+
+    Promise.all([profileDataPromise, profileImagePromise]).then(() => {
       this.loaderService.hideLoadingScreen();
     });
   }
