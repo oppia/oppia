@@ -19,6 +19,8 @@ from __future__ import annotations
 from core.controllers import payload_validator
 from core.tests import test_utils
 
+from typing import Any, Dict, List, Tuple
+
 
 class PayloadValidationUnitTests(test_utils.GenericTestBase):
 
@@ -27,7 +29,19 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
         # the second element is a schema dict and the third element
         # is a list of errors.
 
-        list_of_invalid_args_with_schema_and_errors = [
+        list_of_invalid_args_with_schema_and_errors: List[
+            Tuple[
+                # Here we use type Any because the first element of tuple
+                # represents the argument dict and those argument dicts
+                # can have various types of values.
+                Dict[str, Any],
+                # Here we use type Any because the second element of tuple
+                # represents the schema dict and those schema dicts
+                # can have different types of values.
+                Dict[str, Any],
+                List[str]
+            ]
+        ] = [
             ({
                 'exploration_id': 2
             }, {
@@ -81,7 +95,22 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
         # List of 3-tuples, where the first element is a valid argument dict,
         # the second element is a schema dict and the third element is the
         # normalized value of the corresponding argument.
-        list_of_valid_args_with_schmea = [
+        list_of_valid_args_with_schema: List[
+            Tuple[
+                # Here we use type Any because the first element of tuple
+                # represents the argument dict and those argument dicts
+                # can have various types of values.
+                Dict[str, Any],
+                # Here we use type Any because the second element of tuple
+                # represents the schema dict and those schema dicts
+                # can have different types of values.
+                Dict[str, Any],
+                # Here we use type Any because the third element of tuple
+                # represents the normalized value of the corresponding
+                # argument.
+                Dict[str, Any]
+            ]
+        ] = [
             ({}, {
                 'exploration_id': {
                     'schema': {
@@ -125,7 +154,8 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
             })
         ]
         for handler_args, handler_args_schema, normalized_value_for_args in (
-                list_of_valid_args_with_schmea):
+            list_of_valid_args_with_schema
+        ):
             normalized_value, errors = (
                 payload_validator.validate_arguments_against_schema(
                     handler_args,

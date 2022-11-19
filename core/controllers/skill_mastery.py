@@ -25,14 +25,37 @@ from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import topic_fetchers
 
+from typing import Dict, List, TypedDict
 
-class SkillMasteryDataHandler(base.BaseHandler):
+
+class SkillMasteryDataHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of SkillMasteryDataHandler's
+    normalized_request dictionary.
+    """
+
+    selected_skill_ids: List[str]
+
+
+class SkillMasteryDataHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of SkillMasteryDataHandler's
+    normalized_payload dictionary.
+    """
+
+    mastery_change_per_skill: Dict[str, float]
+
+
+class SkillMasteryDataHandler(
+    base.BaseHandler[
+        SkillMasteryDataHandlerNormalizedPayloadDict,
+        SkillMasteryDataHandlerNormalizedRequestDict
+    ]
+):
     """A handler that handles fetching and updating the degrees of user
     skill mastery.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'selected_skill_ids': {
@@ -62,10 +85,11 @@ class SkillMasteryDataHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
-        skill_ids = (
-            self.normalized_request.get('selected_skill_ids'))
+        assert self.user_id is not None
+        assert self.normalized_request is not None
+        skill_ids = self.normalized_request['selected_skill_ids']
 
         try:
             for skill_id in skill_ids:
@@ -88,14 +112,16 @@ class SkillMasteryDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_access_learner_dashboard
-    def put(self):
+    def put(self) -> None:
         """Handles PUT requests."""
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
         mastery_change_per_skill = (
-            self.normalized_payload.get('mastery_change_per_skill'))
+            self.normalized_payload['mastery_change_per_skill'])
 
         skill_ids = list(mastery_change_per_skill.keys())
 
-        current_degrees_of_mastery = (
+        current_degrees_of_mastery_dict = (
             skill_services.get_multi_user_skill_mastery(self.user_id, skill_ids)
         )
         new_degrees_of_mastery = {}
@@ -107,10 +133,13 @@ class SkillMasteryDataHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'Invalid skill ID %s' % skill_id) from e
 
-            if current_degrees_of_mastery[skill_id] is None:
-                current_degrees_of_mastery[skill_id] = 0.0
+            current_degrees_of_mastery = (
+                current_degrees_of_mastery_dict[skill_id]
+            )
+            if current_degrees_of_mastery is None:
+                current_degrees_of_mastery = 0.0
             new_degrees_of_mastery[skill_id] = (
-                current_degrees_of_mastery[skill_id] +
+                current_degrees_of_mastery +
                 mastery_change_per_skill[skill_id])
 
             if new_degrees_of_mastery[skill_id] < 0.0:
@@ -129,11 +158,24 @@ class SkillMasteryDataHandler(base.BaseHandler):
         self.render_json({})
 
 
-class SubtopicMasteryDataHandler(base.BaseHandler):
+class SubtopicMasteryDataHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of SubtopicMasteryDataHandler's
+    normalized_request dictionary.
+    """
+
+    selected_topic_ids: List[str]
+
+
+class SubtopicMasteryDataHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        SubtopicMasteryDataHandlerNormalizedRequestDict
+    ]
+):
     """A handler that handles fetching user subtopic mastery for a topic."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'selected_topic_ids': {
@@ -146,18 +188,22 @@ class SubtopicMasteryDataHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
-        topic_ids = self.normalized_request.get('selected_topic_ids')
-        topics = topic_fetchers.get_topics_by_ids(topic_ids)
+        assert self.user_id is not None
+        assert self.normalized_request is not None
+        topic_ids = self.normalized_request['selected_topic_ids']
+        topics_by_ids = topic_fetchers.get_topics_by_ids(topic_ids)
         all_skill_ids = []
-        subtopic_mastery_dict = {}
+        subtopic_mastery_dict: Dict[str, Dict[int, float]] = {}
 
-        for ind, topic in enumerate(topics):
+        topics = []
+        for ind, topic in enumerate(topics_by_ids):
             if not topic:
                 raise self.InvalidInputException(
                     'Invalid topic ID %s' % topic_ids[ind])
             all_skill_ids.extend(topic.get_all_skill_ids())
+            topics.append(topic)
 
         all_skill_ids = list(set(all_skill_ids))
         all_skills_mastery_dict = skill_services.get_multi_user_skill_mastery(

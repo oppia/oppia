@@ -60,7 +60,7 @@ import { LocalStorageService } from 'services/local-storage.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { State } from 'domain/state/StateObjectFactory';
-import { InteractionRulesService } from '../services/answer-classification.service';
+import { AnswerClassificationService, InteractionRulesService } from '../services/answer-classification.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
@@ -81,6 +81,7 @@ import './conversation-skin.component.css';
 import { ConceptCardManagerService } from '../services/concept-card-manager.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';
 
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
@@ -224,6 +225,7 @@ export class ConversationSkinComponent {
       ReadOnlyExplorationBackendApiService,
     private platformFeatureService: PlatformFeatureService,
     private translateService: TranslateService,
+    private answerClassificationService: AnswerClassificationService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
   ) {}
 
@@ -333,8 +335,18 @@ export class ConversationSkinComponent {
           // the end of the exploration.
           if (
             !this._editorPreviewMode && this.nextCard.isTerminal()) {
+            const currentEngineService = (
+              this.explorationPlayerStateService.getCurrentEngineService()
+            );
             this.statsReportingService.recordExplorationCompleted(
-              newStateName, this.learnerParamsService.getAllParams());
+              newStateName,
+              this.learnerParamsService.getAllParams(),
+              String(
+                this.completedChaptersCount && this.completedChaptersCount + 1
+              ),
+              String(this.playerTranscriptService.getNumCards()),
+              currentEngineService.getLanguageCode()
+            );
 
             // If the user is a guest, has completed this exploration
             // within the context of a collection, and the collection is
@@ -1224,7 +1236,13 @@ export class ConversationSkinComponent {
           if (!remainOnCurrentCard) {
             this.statsReportingService.recordStateTransition(
               oldStateName, nextCard.getStateName(), answer,
-              this.learnerParamsService.getAllParams(), isFirstHit);
+              this.learnerParamsService.getAllParams(), isFirstHit,
+              String(
+                this.completedChaptersCount && this.completedChaptersCount + 1
+              ),
+              String(this.playerTranscriptService.getNumCards()),
+              currentEngineService.getLanguageCode()
+            );
 
             this.statsReportingService.recordStateCompleted(
               oldStateName);
@@ -1267,6 +1285,21 @@ export class ConversationSkinComponent {
 
           if (remainOnCurrentCard) {
             // Stay on the same card.
+            let oldStateCard: StateCard = this.playerTranscriptService.
+              getLastCard();
+            let oldInteractionId = oldStateCard.getInteractionId();
+            let oldInteractionArgs = oldStateCard.
+              getInteractionCustomizationArgs() as TextInputCustomizationArgs;
+            if (oldInteractionId === AppConstants.
+              INTERACTION_NAMES.TEXT_INPUT &&
+              oldInteractionArgs.catchMisspellings) {
+              let answerIsOnlyMisspelled = this.answerClassificationService.
+                isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
+              if (answerIsOnlyMisspelled) {
+                // Change the feedbackHtml.
+                feedbackHtml = this.getFeedbackHtmlWhenAnswerMisspelled();
+              }
+            }
             this.numberOfIncorrectSubmissions++;
             this.hintsAndSolutionManagerService.recordWrongAnswer();
             this.conceptCardManagerService.recordWrongAnswer();
@@ -1398,6 +1431,16 @@ export class ConversationSkinComponent {
           this.answerIsBeingProcessed = false;
         }, millisecsLeftToWait);
       }
+    );
+  }
+
+  getFeedbackHtmlWhenAnswerMisspelled(): string {
+    let availableKeyCount = ExplorationPlayerConstants.
+      I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS.length;
+    const randomKeyIndex = Math.floor(Math.random() * availableKeyCount);
+    return this.translateService.instant(
+      ExplorationPlayerConstants.
+        I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS[randomKeyIndex]
     );
   }
 

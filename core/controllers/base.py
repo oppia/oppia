@@ -41,7 +41,8 @@ from core.domain import config_services
 from core.domain import user_services
 
 from typing import (
-    Any, Dict, Final, Generic, Mapping, Optional, TypedDict, TypeVar, Union
+    Any, Dict, Final, Generic, Mapping, Optional, Sequence, TypedDict, TypeVar,
+    Union
 )
 
 import webapp2
@@ -594,9 +595,14 @@ class BaseHandler(
         """
         return self.get(*args, **kwargs)
 
+    # TODO(#16539): Once all the places are fixed with the type of value
+    # that is rendered to JSON, then please remove Sequence[Mapping[str, Any]]
+    # from render_json's argument type.
     # Here we use type Any because the argument 'values' can accept various
     # kinds of dictionaries that needs to be sent as a JSON response.
-    def render_json(self, values: Union[str, Mapping[str, Any]]) -> None:
+    def render_json(
+        self, values: Union[str, Sequence[Mapping[str, Any]], Mapping[str, Any]]
+    ) -> None:
         """Prepares JSON response to be sent to the client.
 
         Args:
@@ -972,6 +978,8 @@ class CsrfTokenHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     REDIRECT_UNFINISHED_SIGNUPS = False
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     # Here we use MyPy ignore because the signature of 'get' method is not
     # compatible with super class's (BaseHandler) 'get' method.
@@ -988,6 +996,16 @@ class OppiaMLVMHandler(
 ):
     """Base class for the handlers that communicate with Oppia-ML VM instances.
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    # Here we use type Any because the sub-classes of OppiaMLVMHandler can
+    # contain different schemas with different types of values, like str,
+    # complex Dicts and etc.
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
+    # Here we use type Any because the sub-classes of OppiaMLVMHandler can
+    # contain different schemas with different types of values, like str,
+    # complex Dicts and etc.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {}
 
     @abc.abstractmethod
     def extract_request_message_vm_id_and_signature(

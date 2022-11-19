@@ -111,36 +111,88 @@ def get_email_from_user_id(user_id: str) -> str:
     return user_settings.email
 
 
-def get_user_id_from_username(username: str) -> Optional[str]:
+@overload
+def get_user_id_from_username(
+    username: str, *, strict: Literal[True]
+) -> str: ...
+
+
+@overload
+def get_user_id_from_username(
+    username: str
+) -> Optional[str]: ...
+
+
+@overload
+def get_user_id_from_username(
+    username: str, *, strict: Literal[False]
+) -> Optional[str]: ...
+
+
+def get_user_id_from_username(
+    username: str, strict: bool = False
+) -> Optional[str]:
     """Gets the user_id for a given username.
 
     Args:
         username: str. Identifiable username to display in the UI.
+        strict: bool. Whether to fail noisily if no UserSettingsModel with a
+            given username found in the datastore.
 
     Returns:
         str or None. If the user with given username does not exist, return
         None. Otherwise return the user_id corresponding to given username.
+
+    Raises:
+        Exception. No user_id found for the given username.
     """
     user_model = user_models.UserSettingsModel.get_by_normalized_username(
         user_domain.UserSettings.normalize_username(username))
     if user_model is None:
+        if strict:
+            raise Exception(
+                'No user_id found for the given username: %s' % username
+            )
         return None
     else:
         return user_model.id
 
 
+@overload
+def get_multi_user_ids_from_usernames(
+    usernames: List[str], *, strict: Literal[True]
+) -> List[str]: ...
+
+
+@overload
 def get_multi_user_ids_from_usernames(
     usernames: List[str]
-) -> List[Optional[str]]:
+) -> List[Optional[str]]: ...
+
+
+@overload
+def get_multi_user_ids_from_usernames(
+    usernames: List[str], *, strict: Literal[False]
+) -> List[Optional[str]]: ...
+
+
+def get_multi_user_ids_from_usernames(
+    usernames: List[str], strict: bool = False
+) -> Sequence[Optional[str]]:
     """Gets the user_ids for a given list of usernames.
 
     Args:
         usernames: list(str). Identifiable usernames to display in the UI.
+        strict: bool. Whether to fail noisily if no user_id with the given
+            useranme found.
 
     Returns:
         list(str|None). Return the list of user ids corresponding to given
         usernames.
-        """
+
+    Raises:
+        Exception. No user_id found for the username.
+    """
     if len(usernames) == 0:
         return []
 
@@ -160,11 +212,16 @@ def get_multi_user_ids_from_usernames(
     username_to_user_id_map = {
         model.normalized_username: model.id for model in found_models
     }
+    user_ids = []
+    for username in normalized_usernames:
+        user_id = username_to_user_id_map.get(username)
+        if strict and user_id is None:
+            raise Exception(
+                'No user_id found for the username: %s' % username
+            )
+        user_ids.append(user_id)
 
-    return [
-        username_to_user_id_map.get(username)
-        for username in normalized_usernames
-    ]
+    return user_ids
 
 
 def get_user_settings_from_username(
@@ -2793,8 +2850,26 @@ def clear_learner_checkpoint_progress(
         exp_user_model.put()
 
 
+@overload
 def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
     user_id: str, exploration_id: str
+) -> Optional[user_domain.ExplorationUserData]: ...
+
+
+@overload
+def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
+    user_id: str, exploration_id: str, *, strict: Literal[True]
+) -> user_domain.ExplorationUserData: ...
+
+
+@overload
+def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
+    user_id: str, exploration_id: str, *, strict: Literal[False]
+) -> Optional[user_domain.ExplorationUserData]: ...
+
+
+def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
+    user_id: str, exploration_id: str, strict: bool = False
 ) -> Optional[user_domain.ExplorationUserData]:
     """Synchronizes the most recently reached checkpoint and the furthest
     reached checkpoint with the latest exploration.
@@ -2802,15 +2877,26 @@ def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
     Args:
         user_id: str. The Id of the user.
         exploration_id: str. The Id of the exploration.
+        strict: bool. Whether to fail noisily if no ExplorationUserDataModel
+            with the given user_id exists in the datastore.
 
     Returns:
         ExplorationUserData. The domain object corresponding to the given user
         and exploration.
+
+    Raises:
+        Exception. No ExplorationUserDataModel found for the given user and
+            exploration ids.
     """
     exp_user_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
 
     if exp_user_model is None:
+        if strict:
+            raise Exception(
+                'No ExplorationUserDataModel found for the given user and '
+                'exploration ids: %s, %s' % (user_id, exploration_id)
+            )
         return None
 
     latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)

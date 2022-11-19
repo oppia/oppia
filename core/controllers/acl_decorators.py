@@ -259,6 +259,60 @@ def can_play_exploration(
     return test_can_play
 
 
+def can_play_exploration_as_logged_in_user(
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator to check whether user can play given exploration if the user
+    is logged in.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now can check if users can
+        play a given exploration if the user is logged in.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_play(
+        self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks if the user can play the exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException. The page is not found.
+            NotLoggedInException. The user is not logged in.
+        """
+        if self.user_id is None:
+            raise self.NotLoggedInException
+
+        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+            raise self.PageNotFoundException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+
+        if exploration_rights is None:
+            raise self.PageNotFoundException
+
+        if rights_manager.check_can_access_activity(
+                self.user, exploration_rights):
+            return handler(self, exploration_id, **kwargs)
+        else:
+            raise self.PageNotFoundException
+
+    return test_can_play
+
+
 def can_view_skills(
     handler: Callable[..., _GenericHandlerFunctionReturnType]
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
@@ -3772,6 +3826,119 @@ def can_access_story_viewer_page(
     return test_can_access
 
 
+def can_access_story_viewer_page_as_logged_in_user(
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., Optional[_GenericHandlerFunctionReturnType]]:
+    """Decorator to check whether the user can access story viewer page
+    if the user is logged in.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+        if the user can access the given story viewer page if the
+        user is logged in.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_access(
+        self: _SelfBaseHandlerType,
+        classroom_url_fragment: str,
+        topic_url_fragment: str,
+        story_url_fragment: str,
+        *args: Any,
+        **kwargs: Any
+    ) -> Optional[_GenericHandlerFunctionReturnType]:
+        """Checks if the user can access story viewer page.
+
+        Args:
+            classroom_url_fragment: str. The classroom url fragment.
+            topic_url_fragment: str. The url fragment of the topic
+                associated with the story.
+            story_url_fragment: str. The story url fragment.
+            *args: list(*). A list of arguments from the calling function.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            PageNotFoundException. The given page cannot be found.
+        """
+        if self.user_id is None:
+            raise self.NotLoggedInException
+
+        if story_url_fragment != story_url_fragment.lower():
+            _redirect_based_on_return_type(
+                self, '/learn/%s/%s/story/%s' % (
+                    classroom_url_fragment,
+                    topic_url_fragment,
+                    story_url_fragment.lower()),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return None
+
+        story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
+
+        if story is None:
+            _redirect_based_on_return_type(
+                self,
+                '/learn/%s/%s/story' %
+                (classroom_url_fragment, topic_url_fragment),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return None
+
+        story_is_published = False
+        topic_is_published = False
+        topic_id = story.corresponding_topic_id
+        story_id = story.id
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
+        if topic_id:
+            topic = topic_fetchers.get_topic_by_id(topic_id)
+            if topic.url_fragment != topic_url_fragment:
+                _redirect_based_on_return_type(
+                    self,
+                    '/learn/%s/%s/story/%s' % (
+                        classroom_url_fragment,
+                        topic.url_fragment,
+                        story_url_fragment),
+                    self.GET_HANDLER_ERROR_RETURN_TYPE)
+                return None
+
+            verified_classroom_url_fragment = (
+                classroom_services.get_classroom_url_fragment_for_topic_id(
+                    topic.id))
+            if classroom_url_fragment != verified_classroom_url_fragment:
+                url_substring = '%s/story/%s' % (
+                    topic_url_fragment, story_url_fragment)
+                _redirect_based_on_return_type(
+                    self, '/learn/%s/%s' % (
+                        verified_classroom_url_fragment,
+                        url_substring),
+                    self.GET_HANDLER_ERROR_RETURN_TYPE)
+                return None
+            topic_rights = topic_fetchers.get_topic_rights(topic_id)
+            topic_is_published = topic_rights.topic_is_published
+            all_story_references = topic.get_all_story_references()
+            for reference in all_story_references:
+                if reference.story_id == story_id:
+                    story_is_published = reference.story_is_published
+
+        if (
+            (story_is_published and topic_is_published) or
+            role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in
+            user_actions_info.actions
+        ):
+            return handler(self, story_id, *args, **kwargs)
+        else:
+            raise self.PageNotFoundException
+
+    return test_can_access
+
+
 def can_access_subtopic_viewer_page(
     handler: Callable[..., _GenericHandlerFunctionReturnType]
 ) -> Callable[..., Optional[_GenericHandlerFunctionReturnType]]:
@@ -3881,8 +4048,8 @@ def can_access_subtopic_viewer_page(
 
 
 def get_decorator_for_accepting_suggestion(
-    decorator: Callable[..., Callable[..., _GenericHandlerFunctionReturnType]]
-) -> Callable[..., Callable[..., _GenericHandlerFunctionReturnType]]:
+    decorator: Callable[[Callable[..., None]], Callable[..., None]]
+) -> Callable[[Callable[..., None]], Callable[..., None]]:
     """Function that takes a decorator as an argument and then applies some
     common checks and then checks the permissions specified by the passed in
     decorator.
@@ -3901,8 +4068,8 @@ def get_decorator_for_accepting_suggestion(
             accept/reject suggestions for that entity.
     """
     def generate_decorator_for_handler(
-        handler: Callable[..., _GenericHandlerFunctionReturnType]
-    ) -> Callable[..., _GenericHandlerFunctionReturnType]:
+        handler: Callable[..., None]
+    ) -> Callable[..., None]:
         """Function that generates a decorator for a given handler.
 
         Args:
@@ -3924,7 +4091,7 @@ def get_decorator_for_accepting_suggestion(
             target_id: str,
             suggestion_id: str,
             **kwargs: Any
-        ) -> _GenericHandlerFunctionReturnType:
+        ) -> None:
             """Returns a (possibly-decorated) handler to test whether a
             suggestion can be accepted based on the user actions and roles.
 
