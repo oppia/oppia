@@ -17,7 +17,6 @@
 """Job for computation of exploration version history data."""
 
 from __future__ import annotations
-import logging
 
 from core import feconf
 from core.domain import exp_domain
