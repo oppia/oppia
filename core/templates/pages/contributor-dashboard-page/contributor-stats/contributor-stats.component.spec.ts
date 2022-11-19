@@ -276,6 +276,15 @@ describe('Contributor stats component', () => {
       }).toThrowError('There are no more pages before this one.');
     }));
 
+    it('should throw errors when translation reviews are undefined',
+      fakeAsync(() => {
+        component.statsData = undefined;
+
+        expect(() => {
+          component.fetchStats();
+        }).toThrowError('Stats data are empty.');
+      }));
+
     it('should provide 0 to get original order of keyvaluea', fakeAsync(() => {
       expect(component.provideOriginalOrder()).toEqual(0);
     }));
