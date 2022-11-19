@@ -245,8 +245,8 @@ export class ContributorStatsComponent {
             language,
             new PageableStats([this.createTranslationContributionStat(stat)]));
         } else {
-          const statsData = this.statsData?.translationContribution.get(
-            language);
+          const statsData: PageableStats = this
+            .statsData?.translationContribution.get(language);
           statsData?.data.push(this.createTranslationContributionStat(stat));
           this.statsData?.translationContribution.set(
             language,
@@ -265,8 +265,8 @@ export class ContributorStatsComponent {
             language,
             new PageableStats([this.createTranslationReviewStat(stat)]));
         } else {
-          const statsData = this.statsData?.translationReview.get(
-            language);
+          const statsData: PageableStats = this
+            .statsData?.translationReview.get(language);
           statsData?.data.push(this.createTranslationReviewStat(stat));
           this.statsData?.translationReview.set(
             language,
