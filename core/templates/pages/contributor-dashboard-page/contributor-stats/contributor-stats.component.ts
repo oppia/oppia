@@ -29,10 +29,19 @@ interface Option {
   displayName: string;
 }
 
-interface PageableStats {
+class PageableStats {
   currentPageStartIndex: number;
-  // eslint-disable-next-line max-len
-  data: (TranslationContributionStats | TranslationReviewStats | QuestionContributionStats | QuestionReviewStats)[];
+  data: (
+    TranslationContributionStats | TranslationReviewStats |
+    QuestionContributionStats | QuestionReviewStats)[] | undefined;
+
+  constructor(
+      data: (
+      TranslationContributionStats | TranslationReviewStats |
+      QuestionContributionStats | QuestionReviewStats)[] | undefined) {
+    this.data = data;
+    this.currentPageStartIndex = 0;
+  }
 }
 
 interface Stat {
@@ -76,8 +85,8 @@ export class ContributorStatsComponent {
 
   dropdownShown: boolean = false;
   mobileDropdownShown: boolean = false;
-  selectedContributionType: string;
-  username: string;
+  selectedContributionType: string | undefined = '';
+  username: string = '';
   ITEMS_PER_PAGE: number = 5;
 
   userCanReviewTranslationSuggestions: boolean = false;
@@ -147,8 +156,9 @@ export class ContributorStatsComponent {
   ];
 
   statsData: {
-    translationContribution?: {[key: string]: PageableStats};
-    translationReview?: {[key: string]: PageableStats};
+    translationContribution?: {[key: string]: PageableStats | undefined} |
+      undefined;
+    translationReview?: {[key: string]: PageableStats | undefined} | undefined;
     questionContribution?: PageableStats;
     questionReview?: PageableStats;
   } = {};
@@ -172,13 +182,18 @@ export class ContributorStatsComponent {
     this.username = username;
     const currentOption = this.options.find(
       (option) => option.contributionType === this.type);
-    this.selectedContributionType = currentOption.displayName;
+    this.selectedContributionType = currentOption?.displayName;
 
     const userContributionRights =
       await this.userService.getUserContributionRightsDataAsync();
+
+    if (userContributionRights === null) {
+      throw new Error('Cannot fetch user contribution rights.');
+    }
+    const reviewableLanguageCodes = (
+      userContributionRights.can_review_translation_for_language_codes);
     this.userCanReviewTranslationSuggestions = (
-      userContributionRights
-        .can_review_translation_for_language_codes.length > 0);
+      reviewableLanguageCodes.length > 0);
     this.userCanReviewQuestionSuggestions = (
       userContributionRights.can_review_questions);
     this.userCanSuggestQuestions = (
@@ -209,7 +224,7 @@ export class ContributorStatsComponent {
     this.type = contributionType;
     const currentOption = this.options.find(
       (option) => option.contributionType === contributionType);
-    this.selectedContributionType = currentOption.displayName;
+    this.selectedContributionType = currentOption?.displayName;
     this.dropdownShown = false;
     this.mobileDropdownShown = false;
   }
@@ -222,11 +237,16 @@ export class ContributorStatsComponent {
       response.translation_contribution_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        if (!this.statsData?.translationContribution[language]) {
-          this.statsData.translationContribution[language] = this
-            .createTranslationContributionPageableStats(stat);
+        if (
+          this.statsData.translationContribution === null ||
+          this.statsData.translationContribution === undefined) {
+          throw new Error('Translation contributions are undefined.');
+        }
+        if (!this.statsData.translationContribution[language]) {
+          this.statsData.translationContribution[language] = new PageableStats(
+            [this.createTranslationContributionStat(stat)]);
         } else {
-          this.statsData.translationContribution[language].data.push(
+          this.statsData?.translationContribution[language]?.data?.push(
             this.createTranslationContributionStat(stat));
         }
       });
@@ -236,62 +256,36 @@ export class ContributorStatsComponent {
       response.translation_review_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
+        if (
+          this.statsData.translationReview === null ||
+          this.statsData.translationReview === undefined) {
+          throw new Error('Translation reviews are undefined.');
+        }
         if (!this.statsData.translationReview[language]) {
-          this.statsData.translationReview[language] = this
-            .createTranslationReviewPageableStats(stat);
+          this.statsData.translationReview[language] = new PageableStats(
+            [this.createTranslationReviewStat(stat)]);
         } else {
-          this.statsData.translationReview[language].data.push(
+          this.statsData?.translationReview[language]?.data?.push(
             this.createTranslationReviewStat(stat));
         }
       });
     }
 
     if (response.question_contribution_stats.length > 0) {
-      this.statsData.questionContribution = this
-        .createQuestionContributionPageableStats(
-          response.question_contribution_stats);
+      this.statsData.questionContribution = new PageableStats(
+        response.question_contribution_stats.map((stat) => {
+          return this.createQuestionContributionStat(stat);
+        })
+      );
     }
 
     if (response.question_review_stats.length > 0) {
-      this.statsData.questionReview = this.createQuestionReviewPageableStats(
-        response.question_review_stats);
+      this.statsData.questionReview = new PageableStats(
+        response.question_review_stats.map((stat) => {
+          return this.createQuestionReviewStat(stat);
+        })
+      );
     }
-  }
-
-  createTranslationContributionPageableStats(
-      stat: TranslationContributionBackendDict): PageableStats {
-    return {
-      data: [this.createTranslationContributionStat(stat)],
-      currentPageStartIndex: 0
-    };
-  }
-
-  createTranslationReviewPageableStats(
-      stat: TranslationReviewBackendDict): PageableStats {
-    return {
-      data: [this.createTranslationReviewStat(stat)],
-      currentPageStartIndex: 0
-    };
-  }
-
-  createQuestionContributionPageableStats(
-      stats: QuestionContributionBackendDict[]): PageableStats {
-    return {
-      data: stats.map((stat) => {
-        return this.createQuestionContributionStat(stat);
-      }),
-      currentPageStartIndex: 0
-    };
-  }
-
-  createQuestionReviewPageableStats(
-      stat: QuestionReviewBackendDict[]): PageableStats {
-    return {
-      data: stat.map((stat) => {
-        return this.createQuestionReviewStat(stat);
-      }),
-      currentPageStartIndex: 0
-    };
   }
 
   createTranslationContributionStat(
@@ -342,9 +336,12 @@ export class ContributorStatsComponent {
   }
 
   goToNextPage(page: PageableStats): void {
+    if (typeof page.data === 'undefined') {
+      throw new Error('Data does not exist.');
+    }
     if (
       page.currentPageStartIndex + this.ITEMS_PER_PAGE >=
-      page.data.length) {
+      page.data?.length) {
       throw new Error('There are no more pages after this one.');
     }
     page.currentPageStartIndex += this.ITEMS_PER_PAGE;
@@ -363,8 +360,9 @@ export class ContributorStatsComponent {
   // returning from this function, but it gives console errors.
   // Reference: https://stackoverflow.com/a/52794221
   // We need to return a non-negative constant number in order to preserve
-  // original column property order. There is no specific reason to return 0
-  // any other positive value should also give the preferred order.
+  // original column property order. There is no specific reason to return 0,
+  // since any other any other positive value should also give the preferred
+  // order.
   provideOriginalOrder(): number {
     return 0;
   }
