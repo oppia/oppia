@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 

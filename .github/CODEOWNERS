@@ -79,8 +79,7 @@
 
 # TS typing
 /typings/ @oppia/data-and-stability-reviewers
-/tsconfig.json @oppia/data-and-stability-reviewers
-/tsconfig-strict.json @oppia/data-and-stability-reviewers
+/tsconfig*.json @oppia/data-and-stability-reviewers
 /scripts/typescript_checks*.py @oppia/data-and-stability-reviewers
 
 

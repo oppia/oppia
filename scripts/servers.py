@@ -398,8 +398,7 @@ def create_managed_web_browser(
 
 @contextlib.contextmanager
 def managed_ng_build(
-    use_prod_env: bool = False,
-    watch_mode: bool = False
+    use_prod_env: bool = False, watch_mode: bool = False
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the ng compiler gracefully.
 
@@ -429,7 +428,7 @@ def managed_ng_build(
             # Capture compiler's output to detect when builds have completed.
             stdout=subprocess.PIPE
         ))
-        print(proc.stdout.read())
+
         read_line_func: Callable[[], Optional[bytes]] = (
             lambda: proc.stdout.readline() or None
         )
@@ -438,7 +437,7 @@ def managed_ng_build(
                 common.write_stdout_safe(line)
                 # Message printed when a compilation has succeeded. We break
                 # after the first one to ensure the site is ready to be visited.
-                if b'Build at:' in line:
+                if b'Build at: ' in line:
                     break
             else:
                 # If none of the lines contained the string 'Built at',
@@ -454,6 +453,7 @@ def managed_ng_build(
         printer_thread = threading.Thread(target=print_proc_output)
         printer_thread.start()
         exit_stack.callback(printer_thread.join)
+
         yield proc
 
 
