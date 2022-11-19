@@ -89,15 +89,14 @@ export class UserBackendApiService {
   ) {}
 
   private USER_INFO_URL = '/userinfohandler';
-  private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
   private PREFERENCES_DATA_URL = '/preferenceshandler/data';
   private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
     '/usercontributionrightsdatahandler');
 
   private SITE_LANGUAGE_URL = '/save_site_language';
 
-  // Map from username to profile image.
-  private profileImageCache: Map<string, Blob> = new Map();
+  // Cache of current user's profile image.
+  private profileImageCache: Blob;
 
   async getUserInfoAsync(): Promise<UserInfo> {
     return this.http.get<UserInfoBackendDict>(
@@ -195,10 +194,8 @@ export class UserBackendApiService {
     username = username || await this.getUserInfoAsync().then(
       userInfo => userInfo.getUsername());
     
-    const filename = `${username}/profile_image.png`;
-    let data = this.profileImageCache.get(filename);
-    if (this.profileImageCache.has(filename) && data !== undefined) {
-      return new ImageFile(filename, data);
+    if (this.profileImageCache !== undefined) {
+      return new ImageFile('profile_image.png', this.profileImageCache);
     }
     return this._fetchProfileImage(username);
   }
@@ -217,13 +214,12 @@ export class UserBackendApiService {
         {username: username}), {responseType: 'blob'}
     ).subscribe(onResolve, onReject);
 
-    const filename = `${username}/profile_image.png`;
     try {
       const blob = await blobPromise;
-      this.profileImageCache.set(filename, blob);
-      return new ImageFile(filename, blob);
+      this.profileImageCache = blob;
+      return new ImageFile('profile_image.png', blob);
     } catch {
-      return Promise.reject(filename);
+      return Promise.reject('profile_image.png');
     }  
   }
 }
