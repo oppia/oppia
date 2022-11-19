@@ -1283,7 +1283,7 @@ export class ConversationSkinComponent {
           }
         }
         if (
-          this.explorationPlayerStateService.isPresentingIsolatedQuestions()
+          !this.explorationPlayerStateService.isPresentingIsolatedQuestions()
         ) {
           this.explorationPlayerStateService.onPlayerStateChange.emit(
             nextCard.getStateName());
