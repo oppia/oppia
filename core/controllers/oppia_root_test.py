@@ -17,15 +17,9 @@
 
 from __future__ import annotations
 
-import types
-from http import cookiejar
-
 from core.constants import constants
-from core.controllers import oppia_root
 from core.tests import test_utils
-import main
 
-import webtest
 
 class OppiaRootPageTests(test_utils.GenericTestBase):
 
