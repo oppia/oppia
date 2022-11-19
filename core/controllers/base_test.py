@@ -1388,7 +1388,9 @@ class SignUpTests(test_utils.GenericTestBase):
                 'username': 'abc',
                 'agreed_to_terms': True,
                 'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
-                'can_receive_email_updates': True
+                'can_receive_email_updates': (
+                    feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                )
             }, csrf_token=csrf_token,
         )
 
