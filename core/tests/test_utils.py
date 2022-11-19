@@ -2457,7 +2457,9 @@ title: Title
                         {
                             'username': username,
                             'agreed_to_terms': True,
-                            'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                            'default_dashboard': (
+                                constants.DASHBOARD_TYPE_LEARNER
+                            ),
                             'can_receive_email_updates': True
                         }
                     )

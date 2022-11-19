@@ -459,11 +459,9 @@ class SignupHandlerNormalizedPayloadDict(TypedDict):
     username: str
     agreed_to_terms: bool
     default_dashboard: str
-    can_receive_email_updates: Optional[bool]
+    can_receive_email_updates: bool
 
 
-# TODO(#16566): Restrict the type of `can_receive_email_updates` field to
-# only one type, currently it is accepting two types of values None and bool.
 class SignupHandler(
     base.BaseHandler[
         SignupHandlerNormalizedPayloadDict, Dict[str, str]
@@ -532,8 +530,8 @@ class SignupHandler(
         username = self.normalized_payload['username']
         agreed_to_terms = self.normalized_payload['agreed_to_terms']
         default_dashboard = self.normalized_payload['default_dashboard']
-        can_receive_email_updates = self.normalized_payload.get(
-            'can_receive_email_updates')
+        can_receive_email_updates = self.normalized_payload[
+            'can_receive_email_updates']
         bulk_email_signup_message_should_be_shown = False
 
         bulk_email_signup_message_should_be_shown = (
