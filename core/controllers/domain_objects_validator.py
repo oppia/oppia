@@ -20,6 +20,7 @@ handler arguments.
 
 from __future__ import annotations
 
+from core import utils
 from core.constants import constants
 from core.controllers import base
 from core.domain import blog_domain
@@ -30,6 +31,7 @@ from core.domain import exp_domain
 from core.domain import image_validation_services
 from core.domain import improvements_domain
 from core.domain import question_domain
+from core.domain import skill_domain
 from core.domain import state_domain
 from core.domain import stats_domain
 
@@ -262,3 +264,24 @@ def validate_suggestion_images(files: Dict[str, bytes]) -> Dict[str, bytes]:
     # The files argument do not represent any domain class, hence dict form
     # of the data is returned from here.
     return files
+
+
+def validate_skill_ids(comma_separated_skill_ids: str) -> str:
+    """Checks whether the given skill ids are valid.
+
+    Args:
+        comma_separated_skill_ids: str. Comma separated skill IDs.
+
+    Returns:
+        str. The comma separated skill ids after validation.
+    """
+    skill_ids = comma_separated_skill_ids.split(',')
+    skill_ids = list(set(skill_ids))
+    try:
+        for skill_id in skill_ids:
+            skill_domain.Skill.require_valid_skill_id(skill_id)
+    except utils.ValidationError as e:
+        raise base.BaseHandler.InvalidInputException(
+            'Invalid skill id') from e
+
+    return comma_separated_skill_ids

@@ -43,34 +43,7 @@ EXCLUDED_DIRECTORIES: Final = [
 ]
 
 # List of files who should be type-annotated but are not.
-NOT_FULLY_COVERED_FILES: Final = [
-    'core/controllers/learner_group.py',
-    'core/controllers/learner_group_test.py',
-    'core/controllers/payload_validator.py',
-    'core/controllers/payload_validator_test.py',
-    'core/controllers/platform_feature.py',
-    'core/controllers/platform_feature_test.py',
-    'core/controllers/practice_sessions.py',
-    'core/controllers/practice_sessions_test.py',
-    'core/controllers/profile.py',
-    'core/controllers/profile_test.py',
-    'core/controllers/question_editor.py',
-    'core/controllers/question_editor_test.py',
-    'core/controllers/questions_list.py',
-    'core/controllers/questions_list_test.py',
-    'core/controllers/reader.py',
-    'core/controllers/reader_test.py',
-    'core/controllers/recent_commits.py',
-    'core/controllers/recent_commits_test.py',
-    'core/controllers/release_coordinator.py',
-    'core/controllers/release_coordinator_test.py',
-    'core/controllers/resources.py',
-    'core/controllers/resources_test.py',
-    'core/controllers/review_tests.py',
-    'core/controllers/review_tests_test.py',
-    'core/controllers/skill_editor.py',
-    'core/controllers/skill_editor_test.py',
-]
+NOT_FULLY_COVERED_FILES: Final = []
 
 
 CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')
