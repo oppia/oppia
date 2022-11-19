@@ -2961,32 +2961,6 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         temp_file.close()
 
-    def test_raises_no_error_if_module_is_excluded(self) -> None:
-        node_with_ignore_having_todo = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test'
-        )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                def foo(exp_id: str) -> str:  # type: ignore[arg-type]
-                    return 'hi' #@
-                """
-            )
-        node_with_ignore_having_todo.file = filename
-
-        self.checker_test_object.checker.EXCLUDED_DIRS_HAVING_IGNORE_TYPE_COMMENTS = (   # pylint: disable=line-too-long
-            [filename]
-        )
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(
-                node_with_ignore_having_todo
-            )
-        temp_file.close()
-
 
 class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
 
@@ -3523,32 +3497,6 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_object_and_todo_comment.file = filename
 
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(
-                node_with_object_and_todo_comment
-            )
-        temp_file.close()
-
-    def test_no_error_raised_if_module_is_excluded(self) -> None:
-        node_with_object_and_todo_comment = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test'
-        )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                def foo(exp_id: object) -> object:
-                    return 'hi' #@
-                """
-            )
-        node_with_object_and_todo_comment.file = filename
-
-        self.checker_test_object.checker.EXCLUDED_DIRS_HAVING_EXCEPTIONAL_TYPE_COMMENTS = (   # pylint: disable=line-too-long
-            [filename]
-        )
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_module(
                 node_with_object_and_todo_comment

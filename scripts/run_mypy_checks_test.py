@@ -99,10 +99,6 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             lambda _: (1, 'exec')
         )
 
-        self.files_swap = self.swap(
-            run_mypy_checks, 'NOT_FULLY_COVERED_FILES',
-            ['file1.py', 'file2.py'])
-
         self.directories_swap = self.swap(
             run_mypy_checks, 'EXCLUDED_DIRECTORIES',
             ['dir1/', 'dir2/'])
@@ -132,13 +128,6 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             run_mypy_checks, 'install_mypy_prerequisites',
             mock_install_mypy_prerequisites)
 
-    def test_all_files_and_folders_in_not_fully_covered_files_exist(
-        self
-    ) -> None:
-        for path in run_mypy_checks.NOT_FULLY_COVERED_FILES:
-            self.assertTrue(
-                os.path.exists(path), msg='"%s" does not exist' % path)
-
     def test_install_third_party_libraries_with_skip_install_as_true(
         self
     ) -> None:
@@ -152,32 +141,29 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def test_get_mypy_cmd_without_files(self) -> None:
         expected_cmd = [
-            self.mypy_cmd_path, '--exclude', 'file1.py|file2.py|dir1/|dir2/',
+            self.mypy_cmd_path, '--exclude', 'dir1/|dir2/',
             '--config-file', './mypy.ini', '.'
         ]
-        with self.files_swap:
-            with self.directories_swap:
-                cmd = run_mypy_checks.get_mypy_cmd(
-                    None, self.mypy_cmd_path, False)
-                self.assertEqual(cmd, expected_cmd)
+        with self.directories_swap:
+            cmd = run_mypy_checks.get_mypy_cmd(
+                None, self.mypy_cmd_path, False)
+            self.assertEqual(cmd, expected_cmd)
 
     def test_get_mypy_cmd_for_ci(self) -> None:
-        with self.files_swap:
-            with self.directories_swap:
-                cmd = run_mypy_checks.get_mypy_cmd(
-                    None, self.mypy_cmd_path, True)
-                self.assertEqual(cmd[0], 'mypy')
+        with self.directories_swap:
+            cmd = run_mypy_checks.get_mypy_cmd(
+                None, self.mypy_cmd_path, True)
+            self.assertEqual(cmd[0], 'mypy')
 
     def test_get_mypy_cmd_with_files(self) -> None:
         expected_cmd = [
             self.mypy_cmd_path, '--config-file', './mypy.ini',
             'file1.py', 'file2.py'
         ]
-        with self.files_swap:
-            with self.directories_swap:
-                cmd = run_mypy_checks.get_mypy_cmd(
-                    ['file1.py', 'file2.py'], self.mypy_cmd_path, False)
-                self.assertEqual(cmd, expected_cmd)
+        with self.directories_swap:
+            cmd = run_mypy_checks.get_mypy_cmd(
+                ['file1.py', 'file2.py'], self.mypy_cmd_path, False)
+            self.assertEqual(cmd, expected_cmd)
 
     def test_install_mypy_prerequisites(self) -> None:
         with self.popen_swap_success:

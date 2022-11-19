@@ -34,7 +34,6 @@ from typing import (
 )
 
 from .. import docstrings_checker
-from .. import run_mypy_checks
 
 # List of punctuation symbols that can be used at the end of
 # comments and docstrings.
@@ -52,15 +51,6 @@ ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS: Final = [
 ]
 
 ALLOWED_LINES_OF_GAP_IN_COMMENT: Final = 15
-
-# TODO(#16024): Currently, the following directories are not annotated with
-# MyPy type annotations completely, and still, we are using exceptional types
-# in these dirs which causes linters to throw an error. So, once these dirs
-# are annotated completely, we can remove these dirs from this list and fix
-# the lint errors accordingly.
-EXCLUDED_TYPE_COMMENT_DIRECTORIES: Final = (
-    run_mypy_checks.NOT_FULLY_COVERED_FILES
-)
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
@@ -2127,10 +2117,6 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
 
     __implements__ = interfaces.IAstroidChecker
 
-    EXCLUDED_DIRS_HAVING_IGNORE_TYPE_COMMENTS = (
-        EXCLUDED_TYPE_COMMENT_DIRECTORIES
-    )
-
     name = 'type-ignore-comment'
     priority = -1
     msgs = {
@@ -2188,9 +2174,6 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
         Args:
             node: astroid.scoped_nodes.Module. Node to access module content.
         """
-        for directory in self.EXCLUDED_DIRS_HAVING_IGNORE_TYPE_COMMENTS:
-            if directory in node.root().file:
-                return
         tokens = pylint_utils.tokenize_module(node)
         self._process_module_tokens(tokens, node)
 
@@ -2375,10 +2358,6 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
         'func_def_start_line': 0,
     }
 
-    EXCLUDED_DIRS_HAVING_EXCEPTIONAL_TYPE_COMMENTS = (
-        EXCLUDED_TYPE_COMMENT_DIRECTORIES
-    )
-
     __implements__ = interfaces.IAstroidChecker
 
     name = 'comment-for-exceptional-types'
@@ -2420,9 +2399,6 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
         Args:
             node: astroid.scoped_nodes.Module. Node to access module content.
         """
-        for directory in self.EXCLUDED_DIRS_HAVING_EXCEPTIONAL_TYPE_COMMENTS:
-            if directory in node.root().file:
-                return
         tokens = pylint_utils.tokenize_module(node)
         self._process_module_tokens(tokens, node)
 

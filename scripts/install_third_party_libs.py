@@ -22,9 +22,9 @@ import pathlib
 import shutil
 import subprocess
 import zipfile
-
-
 from scripts import install_python_dev_dependencies
+from typing import Final, List
+
 install_python_dev_dependencies.main(['--assert_compiled'])
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -36,41 +36,47 @@ from . import setup_gae  # isort:skip  pylint: disable=wrong-import-position, wr
 
 from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
-_PARSER = argparse.ArgumentParser(
+_PARSER: Final = argparse.ArgumentParser(
     description="""
 Installation script for Oppia third-party libraries.
 """)
 
 # Download locations for buf binary.
-BUF_BASE_URL = (
+BUF_BASE_URL: Final = (
     'https://github.com/bufbuild/buf/releases/download/v0.29.0/')
 
-BUF_LINUX_FILES = [
+BUF_LINUX_FILES: Final = [
     'buf-Linux-x86_64', 'protoc-gen-buf-check-lint-Linux-x86_64',
     'protoc-gen-buf-check-breaking-Linux-x86_64']
-BUF_DARWIN_FILES = [
+BUF_DARWIN_FILES: Final = [
     'buf-Darwin-x86_64', 'protoc-gen-buf-check-lint-Darwin-x86_64',
     'protoc-gen-buf-check-breaking-Darwin-x86_64']
 
 # Download URL of protoc compiler.
-PROTOC_URL = (
+PROTOC_URL: Final = (
     'https://github.com/protocolbuffers/protobuf/releases/download/v%s' %
     common.PROTOC_VERSION)
-PROTOC_LINUX_FILE = 'protoc-%s-linux-x86_64.zip' % (common.PROTOC_VERSION)
-PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % (common.PROTOC_VERSION)
+PROTOC_LINUX_FILE: Final = 'protoc-%s-linux-x86_64.zip' % (
+    common.PROTOC_VERSION
+)
+PROTOC_DARWIN_FILE: Final = 'protoc-%s-osx-x86_64.zip' % (
+    common.PROTOC_VERSION
+)
 
 # Path of the buf executable.
-BUF_DIR = os.path.join(
+BUF_DIR: Final = os.path.join(
     common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
-PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
+PROTOC_DIR: Final = os.path.join(BUF_DIR, 'protoc')
 # Path of files which needs to be compiled by protobuf.
-PROTO_FILES_PATHS = [
+PROTO_FILES_PATHS: Final = [
     os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')]
 # Path to typescript plugin required to compile ts compatible files from proto.
-PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
+PROTOC_GEN_TS_PATH: Final = os.path.join(
+    common.NODE_MODULES_PATH, 'protoc-gen-ts'
+)
 
 
-def tweak_yarn_executable():
+def tweak_yarn_executable() -> None:
     """When yarn is run on Windows, the file yarn will be executed by default.
     However, this file is a bash script, and can't be executed directly on
     Windows. So, to prevent Windows automatically executing it by default
@@ -83,14 +89,14 @@ def tweak_yarn_executable():
         os.rename(origin_file_path, renamed_file_path)
 
 
-def get_yarn_command():
+def get_yarn_command() -> str:
     """Get the executable file for yarn."""
     if common.is_windows_os():
         return 'yarn.cmd'
     return 'yarn'
 
 
-def install_buf_and_protoc():
+def install_buf_and_protoc() -> None:
     """Installs buf and protoc for Linux or Darwin, depending upon the
     platform.
     """
@@ -119,7 +125,7 @@ def install_buf_and_protoc():
     common.recursive_chmod(protoc_path, 0o744)
 
 
-def compile_protobuf_files(proto_files_paths):
+def compile_protobuf_files(proto_files_paths: List[str]) -> None:
     """Compiles protobuf files using buf.
 
     Raises:
@@ -152,7 +158,7 @@ def compile_protobuf_files(proto_files_paths):
     for p in compiled_protobuf_dir.iterdir():
         if p.suffix == '.py':
             common.inplace_replace_file(
-                p.absolute(),
+                p.absolute().as_posix(),
                 r'^import (\w*_pb2 as)', r'from proto_files import \1')
 
 

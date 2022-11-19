@@ -490,7 +490,7 @@ def check_for_backend_python_library_inconsistencies() -> None:
     If any inconsistencies are found, the script displays the inconsistencies
     and exits.
     """
-    mismatches = install_python_prod_dependencies.get_mismatches()  # type: ignore[no-untyped-call]
+    mismatches = install_python_prod_dependencies.get_mismatches()
 
     if mismatches:
         print(
