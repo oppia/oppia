@@ -190,7 +190,7 @@ export class BlogHomePageBackendApiService {
     });
   }
 
-  async recordBlogPostViewedEvent(blogPostUrl: string): Promise<Object> {
+  async recordBlogPostViewedEventAsync(blogPostUrl: string): Promise<Object> {
     const postViewedEventHandlerUrl = (
       this.urlInterpolationService.interpolateUrl(
         BlogPostPageConstants.BLOG_POST_VIEWED_EVENT_HANDLER_URL, {
@@ -201,7 +201,7 @@ export class BlogHomePageBackendApiService {
     return this.http.post(postViewedEventHandlerUrl, {}).toPromise();
   }
 
-  async recordBlogPostReadEvent(blogPostUrl: string): Promise<Object> {
+  async recordBlogPostReadEventAsync(blogPostUrl: string): Promise<Object> {
     const postReadEventHandlerUrl = (
       this.urlInterpolationService.interpolateUrl(
         BlogPostPageConstants.BLOG_POST_READ_EVENT_HANDLER_URL, {
@@ -212,7 +212,7 @@ export class BlogHomePageBackendApiService {
     return this.http.post(postReadEventHandlerUrl, {}).toPromise();
   }
 
-  async recordBlogPostExitedEvent(
+  async recordBlogPostExitedEventAsync(
       blogPostUrl: string, timeSpent: number
   ): Promise<Object> {
     const postExitedEventHandlerUrl = (

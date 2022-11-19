@@ -209,8 +209,87 @@ describe('Blog Post Page service', () => {
   });
 
   it('should get corrent month string according to the ongoing month and' +
-  ' month offset in MMM-YY', () => {
+  ' month offset in MM-YYYY format', () => {
     var baseTime = new Date();
+    baseTime.setFullYear(2022);
     jasmine.clock().mockDate(baseTime);
+
+    let monthOffset = 0;
+    expect(
+      blogDashboardPageService.getMonthString(monthOffset)
+    ).toEqual('Feb-22');
+
+    monthOffset = 3;
+    expect(
+      blogDashboardPageService.getMonthString(monthOffset)
+    ).toEqual('May-22');
+  });
+
+  it('should get current month day string according to the ongoing month and' +
+  ' day offset', () => {
+    var baseTime = new Date();
+    baseTime.setFullYear(2022);
+    jasmine.clock().mockDate(baseTime);
+
+    let dayOffset = 0;
+    expect(
+      blogDashboardPageService.getCurrentMonthDayString(dayOffset)
+    ).toEqual('1');
+
+    dayOffset = 3;
+    expect(
+      blogDashboardPageService.getCurrentMonthDayString(dayOffset)
+    ).toEqual('4');
+
+    dayOffset = 13;
+    expect(
+      blogDashboardPageService.getCurrentMonthDayString(dayOffset)
+    ).toEqual('14');
+  });
+
+  it('should get past day strings according to day offset in D-MMM format',
+    () => {
+      var baseTime = new Date();
+      baseTime.setFullYear(2022);
+      baseTime.setDate(8);
+      baseTime.setMonth(3);
+      jasmine.clock().mockDate(baseTime);
+
+      let dayOffset = 0;
+      expect(
+        blogDashboardPageService.getPastDayString(dayOffset)
+      ).toEqual('8-Apr');
+
+      dayOffset = 3;
+      expect(
+        blogDashboardPageService.getPastDayString(dayOffset)
+      ).toEqual('5-Apr');
+
+      dayOffset = 9;
+      expect(
+        blogDashboardPageService.getPastDayString(dayOffset)
+      ).toEqual('30-Mar');
+    });
+
+
+  it('should get past hour strings according to hour offset', () => {
+    var baseTime = new Date();
+    baseTime.setHours(20);
+    jasmine.clock().mockDate(baseTime);
+
+    let hourOffset = 0;
+    expect(
+      blogDashboardPageService.getPastHourString(hourOffset)
+    ).toEqual('20h');
+
+    hourOffset = 3;
+    expect(
+      blogDashboardPageService.getPastHourString(hourOffset)
+    ).toEqual('17h');
+
+    hourOffset = 21;
+    expect(
+      blogDashboardPageService.getPastHourString(hourOffset)
+    ).toEqual('23h');
   });
 });

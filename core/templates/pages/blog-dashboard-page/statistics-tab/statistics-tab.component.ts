@@ -31,6 +31,7 @@ import { BlogPostViewsStats,
 import { BlogDashboardPageConstants } from '../blog-dashboard-page.constants';
 import { BlogDashboardPageService } from '../services/blog-dashboard-page.service';
 import { Subscription } from 'rxjs';
+import { AlertsService } from 'services/alerts.service';
 
 interface BlogPostStatsDict {
   [blogPostId: string]: {
@@ -68,18 +69,19 @@ export class BlogStatisticsTabComponent implements OnInit {
   readingTimeChartShown: boolean = false;
   loadedBlogPostStats: BlogPostStatsDict = {};
   authorAggregatedStats: AuthorStatsDict = {};
-  activeStatsBlogPostId: string;
-  activeTimePeriod: string;
-  loadingChartSpinnerShown: boolean;
+  activeStatsBlogPostId!: string;
+  loadingChartSpinnerShown: boolean = false;
   xAxisLabels: string[] = [];
   directiveSubscriptions = new Subscription();
   constructor(
     private blogDashboardBackendApiService: BlogDashboardBackendApiService,
     private blogDashboardPageService: BlogDashboardPageService,
+    private alertsService: AlertsService,
   ) {}
 
   ngOnInit(): void {
-    this.showAuthorStats();
+    this.authorAggregatedStatsShown = true;
+    this.showViewsChartStats();
   }
 
   showViewsChartStats(): void {
@@ -128,6 +130,8 @@ export class BlogStatisticsTabComponent implements OnInit {
           this._dataForActiveChart = viewsStats;
           this.authorAggregatedStats.views = viewsStats;
           this.showHourlyStats();
+        }, (error) => {
+          this.alertsService.addWarning(error);
         }
       );
     }
@@ -145,14 +149,11 @@ export class BlogStatisticsTabComponent implements OnInit {
           this._dataForActiveChart = readsStats;
           this.authorAggregatedStats.reads = readsStats;
           this.showHourlyStats();
+        }, (error) => {
+          this.alertsService.addWarning(error);
         }
       );
     }
-  }
-
-  showAuthorStats(): void {
-    this.authorAggregatedStatsShown = true;
-    this.showViewsChartStats();
   }
 
   showAuthorAggregatedReadingTimeStats(): void {
@@ -168,6 +169,8 @@ export class BlogStatisticsTabComponent implements OnInit {
             this._dataForActiveChart = readingTimeStats;
             this.authorAggregatedStats.readingTime = readingTimeStats;
             this.plotReadingTimeStatsChart();
+          }, (error) => {
+            this.alertsService.addWarning(error);
           }
         );
     }
@@ -202,7 +205,9 @@ export class BlogStatisticsTabComponent implements OnInit {
       this._dataForActiveChart = viewStats;
       this.showHourlyStats();
       this.addStatsToLoadedBlogPostStats(stats.blogPostId, viewStats, 'views');
-    }, () => {});
+    }, (error) => {
+      this.alertsService.addWarning(error);
+    });
   }
 
   showblogPostReadsChart(): void {
@@ -235,7 +240,9 @@ export class BlogStatisticsTabComponent implements OnInit {
       this.showHourlyStats();
       this.addStatsToLoadedBlogPostStats(
         stats.blogPostId, readsStats, 'reads');
-    }, () => {});
+    }, (error) => {
+      this.alertsService.addWarning(error);
+    });
   }
 
   showblogPostReadingTimeChart(): void {
@@ -257,11 +264,26 @@ export class BlogStatisticsTabComponent implements OnInit {
       this.activeStatsBlogPostId
     ).then((stats: BlogPostReadingTimeStats) => {
       this._dataForActiveChart = stats;
+      let readingTimeStats: ReadingTimeStats = {
+        zeroToOneMin: stats.zeroToOneMin,
+        oneToTwoMin: stats.oneToTwoMin,
+        twoToThreeMin: stats.twoToThreeMin,
+        threeToFourMin: stats.threeToFourMin,
+        fourToFiveMin: stats.fourToFiveMin,
+        fiveToSixMin: stats.fiveToSixMin,
+        sixToSevenMin: stats.sixToSevenMin,
+        sevenToEightMin: stats.sevenToEightMin,
+        eightToNineMin: stats.eightToNineMin,
+        nineToTenMin: stats.nineToTenMin,
+        moreThanTenMin: stats.moreThanTenMin,
+      };
       this.addStatsToLoadedBlogPostStats(
-        stats.blogPostId, stats, 'readingTime'
+        stats.blogPostId, readingTimeStats, 'readingTime'
       );
       this.plotReadingTimeStatsChart();
-    }, () => {});
+    }, (error) => {
+      this.alertsService.addWarning(error);
+    });
   }
 
   showHourlyStats(): void {
@@ -287,7 +309,7 @@ export class BlogStatisticsTabComponent implements OnInit {
     this.xAxisLabels = [];
     statsKeys.map(() => {
       this.xAxisLabels.push(
-        this.blogDashboardPageService.getcurrentMonthDayString(dayOffset)
+        this.blogDashboardPageService.getCurrentMonthDayString(dayOffset)
       );
       dayOffset += 1;
     });
@@ -371,16 +393,6 @@ export class BlogStatisticsTabComponent implements OnInit {
       this._createSvg();
       this._drawBars(data);
     });
-  }
-
-  getYAxisBandScale(data: {[key: string]: number}): number {
-    let maxStat;
-    let highestPlaceValue;
-    let statValues = Object.values(data);
-    maxStat = Math.max(...statValues);
-    highestPlaceValue = 10 ** maxStat.toString().length;
-    return (
-      ((maxStat / highestPlaceValue) * highestPlaceValue) + highestPlaceValue);
   }
 
   private _createSvg(): void {

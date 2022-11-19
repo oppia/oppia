@@ -132,12 +132,14 @@ def get_author_blog_post_views_stats_by_id(
     """
     stats_model = blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
         author_id, strict=True)
-    stats_domain_obj = blog_statistics_domain.AuthorBlogPostViewsAggregatedStats(
-        author_id,
-        stats_model.views_by_hour,
-        stats_model.views_by_date,
-        stats_model.views_by_month,
-        stats_model.created_on
+    stats_domain_obj = (
+        blog_statistics_domain.AuthorBlogPostViewsAggregatedStats(
+            author_id,
+            stats_model.views_by_hour,
+            stats_model.views_by_date,
+            stats_model.views_by_month,
+            stats_model.created_on
+        )
     )
     add_missing_stat_keys_with_default_values_in_views_stats(
         stats_domain_obj)
@@ -170,6 +172,7 @@ def get_author_blog_post_reads_stats_by_id(
     add_missing_stat_keys_with_default_values_in_reads_stats(
         stats_domain_obj)
     return stats_domain_obj
+
 
 def get_author_blog_posts_reading_time_stats_by_id(
     author_id: str
@@ -675,17 +678,20 @@ def _update_reading_time_stats_transactional(
         author_blog_post_reading_time_stats
     )
 
+
 @overload
 def _increment_reading_time_bucket_count(
     stats: blog_statistics_domain.BlogPostReadingTime,
     time_taken: int
 ) -> None: ...
 
+
 @overload
 def _increment_reading_time_bucket_count(
     stats: blog_statistics_domain.AuthorBlogPostsReadingTime,
     time_taken: int
 ) -> None: ...
+
 
 def _increment_reading_time_bucket_count(
     stats: Union[
@@ -774,10 +780,12 @@ def parse_datetime_into_date_dict(
         'hour': date_time_obj.hour
     }
 
+
 @overload
 def add_missing_stat_keys_with_default_values_in_views_stats(
     stats: blog_statistics_domain.BlogPostViewsAggregatedStats
 ) -> blog_statistics_domain.BlogPostViewsAggregatedStats: ...
+
 
 @overload
 def add_missing_stat_keys_with_default_values_in_views_stats(
@@ -876,15 +884,18 @@ def add_missing_stat_keys_with_default_values_in_views_stats(stats: Union[
 
     return stats
 
+
 @overload
 def add_missing_stat_keys_with_default_values_in_reads_stats(
     stats: blog_statistics_domain.BlogPostReadsAggregatedStats
 ) -> blog_statistics_domain.BlogPostReadsAggregatedStats: ...
 
+
 @overload
 def add_missing_stat_keys_with_default_values_in_reads_stats(
     stats: blog_statistics_domain.AuthorBlogPostReadsAggregatedStats
 ) -> blog_statistics_domain.AuthorBlogPostReadsAggregatedStats: ...
+
 
 def add_missing_stat_keys_with_default_values_in_reads_stats(stats: Union[
     blog_statistics_domain.BlogPostReadsAggregatedStats,

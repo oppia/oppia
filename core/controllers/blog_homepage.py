@@ -549,7 +549,7 @@ class BlogPostReadEventHandler(
     }
 
     @acl_decorators.open_access
-    def post(self, blog_post_url:str) -> None:
+    def post(self, blog_post_url: str) -> None:
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
         if not blog_post:
             raise self.PageNotFoundException(
@@ -599,6 +599,7 @@ class BlogPostExitedEventHandler(
 
     @acl_decorators.open_access
     def post(self, blog_post_url: str) -> None:
+        assert self.normalized_payload is not None
         time_taken_to_read_blog_post = self.normalized_payload.get(
             'time_taken_to_read_blog_post')
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)

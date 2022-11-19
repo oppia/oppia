@@ -52,8 +52,8 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
   DEFAULT_PROFILE_PICTURE_URL!: string;
   postsToRecommend: BlogPostSummary[] = [];
   blogPostLinkCopied: boolean = false;
-  blogPostPageIsHidden!: string;
-  visibilityChange!: string;
+  hiddenPropertyString!: string;
+  visibilityChangeEvent!: string;
   timeUserStartedViewingPost!: number;
   activeTimeUserStayedOnPostInMinutes: number = 0;
   blogPostExitedEventFired: boolean = false;
@@ -84,23 +84,27 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
       this.publishedDateString = this.getDateStringInWords(
         this.blogPost.publishedOn);
     }
-    this.blogHomePageBackendApiService.recordBlogPostViewedEvent(
+    this.blogHomePageBackendApiService.recordBlogPostViewedEventAsync(
       this.blogPostUrlFragment
     );
     if (typeof document.hidden !== 'undefined') {
-      this.blogPostPageIsHidden = 'hidden';
-      this.visibilityChange = 'visibilitychange';
+      this.hiddenPropertyString = 'hidden';
+      this.visibilityChangeEvent = 'visibilitychange';
     }
     document.addEventListener(
-      this.visibilityChange, this.handleVisibilityChange, false
+      this.visibilityChangeEvent, this.handleVisibilityChange, false
     );
     this.timeUserStartedViewingPost = new Date().getTime();
     // If user stays on the blog post for more than 45 minutes or
     // 5 time estimated reading time, which ever is greater, we fire the blog
     // post exited event.
+    let MILLISECS_IN_MIN = 60000;
     setTimeout(() => {
       this.recordBlogPostExitedEvent();
-    }, Math.max(45, this.calculateEstimatedReadingTimeInMinutes() * 5));
+    }, Math.max(
+      45 * MILLISECS_IN_MIN,
+      this.calculateEstimatedReadingTimeInMinutes() * 5 * MILLISECS_IN_MIN
+    ));
   }
 
   ngOnDestroy(): void {
@@ -116,14 +120,14 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
   }
 
   recordBlogPostExitedEvent(): void {
-    this.blogHomePageBackendApiService.recordBlogPostExitedEvent(
+    this.blogHomePageBackendApiService.recordBlogPostExitedEventAsync(
       this.blogPostUrlFragment, this.activeTimeUserStayedOnPostInMinutes
     );
     this.blogPostExitedEventFired = true;
   }
 
   recordBlogPostReadEvent(): void {
-    this.blogHomePageBackendApiService.recordBlogPostReadEvent(
+    this.blogHomePageBackendApiService.recordBlogPostReadEventAsync(
       this.blogPostUrlFragment
     );
   }
@@ -163,7 +167,7 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
   }
 
   handleVisibilityChange(): void {
-    if (document[this.blogPostPageIsHidden]) {
+    if (document[this.hiddenPropertyString]) {
       let timeUserMovedAwayFromPost: number = new Date().getTime();
       this.activeTimeUserStayedOnPostInMinutes += (
         (timeUserMovedAwayFromPost - this.timeUserStartedViewingPost) / 60000);

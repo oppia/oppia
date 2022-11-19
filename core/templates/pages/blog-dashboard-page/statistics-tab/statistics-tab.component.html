@@ -2,7 +2,7 @@
   <div class="blog-post-list col-3 px-0">
     <mat-selection-list #blogPostSelectionList [multiple]="false" class="pt-0">
       <mat-list-option class="blog-post-list-option blog-post-title"
-                       (click)="showAuthorStats()"
+                       (click)="authorAggregatedStatsShown = true; showViewsChartStats()"
                        selected="authorAggregatedStatsShown">
       {{ 'I18N_BLOG_DASHBOARD_STATISTICS_ALL_BLOG_POSTS_STATS_BUTTON' | translate }}
       </mat-list-option>
@@ -105,13 +105,13 @@
 
 
   .mat-list-item .blog-post-title {
-    display: block;
     color: #fff;
+    display: block;
     overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
     font-size: 22px;
     font-weight: 400;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .mat-list-item .blog-post-published-on-date {
@@ -129,14 +129,14 @@
     color: #333;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 16px;
-    letter-spacing: 0px;
+    letter-spacing: 0;
     text-align: center;
   }
 
   .time-period-button:focus {
-    background-color: #00645C33;
+    background-color: #00645c33;
     border-radius: 2px;
-    color: #00645C;
+    color: #00645c;
     opacity: 1;
   }
 

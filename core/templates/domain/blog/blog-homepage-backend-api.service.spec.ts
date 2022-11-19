@@ -360,4 +360,47 @@ describe('Blog home page backend api service', () => {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
   }));
+
+  it('should record the blog post viewing event', fakeAsync(() => {
+    bhpbas.recordBlogPostViewedEventAsync('sample_url').then(
+      successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/blogdatahandler/data/blog_post_viewed_event/sample_url');
+    expect(req.request.method).toEqual('POST');
+
+    req.flush({});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should record the blog post read event', fakeAsync(() => {
+    bhpbas.recordBlogPostReadEventAsync('sample_url').then(
+      successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/blogdatahandler/data/blog_post_read_event/sample_url');
+    expect(req.request.method).toEqual('POST');
+
+    req.flush({});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+
+  it('should record the blog post exited event', fakeAsync(() => {
+    bhpbas.recordBlogPostExitedEventAsync('sample_url', 0.3).then(
+      successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/blogdatahandler/data/blog_post_exited_event/sample_url');
+    expect(req.request.method).toEqual('POST');
+
+    req.flush({});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

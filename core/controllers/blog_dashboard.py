@@ -24,13 +24,14 @@ from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import blog_domain
 from core.domain import blog_services
+from core.domain import blog_statistics_domain
 from core.domain import blog_statistics_services
 from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import user_services
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, Optional, TypedDict, Union
 
 
 class BlogCardSummaryDict(TypedDict):
@@ -387,6 +388,12 @@ class BlogDashboardBlogPostStatisticsHandler(
     def get(self, blog_post_id: str, chart_type: str) -> None:
         """Populates the data for generating statistics plot."""
 
+        stats: Union[
+            blog_statistics_domain.BlogPostViewsAggregatedStats,
+            blog_statistics_domain.BlogPostReadsAggregatedStats,
+            blog_statistics_domain.BlogPostReadingTimeDict
+            ]
+
         if chart_type == 'views':
             stats = blog_statistics_services.get_blog_post_views_stats_by_id(
                 blog_post_id
@@ -437,6 +444,11 @@ class BlogDashboardAuthorBlogPostsStatisticsHandler(
     def get(self, chart_type: str) -> None:
         """Populates the data for generating author statistics plot."""
         author_id = self.user_id
+        stats: Union[
+            blog_statistics_domain.AuthorBlogPostViewsAggregatedStats,
+            blog_statistics_domain.AuthorBlogPostReadsAggregatedStats,
+            blog_statistics_domain.AuthorBlogPostReadingTimeDict
+            ]
         if chart_type == 'views':
             stats = (
                 blog_statistics_services.get_author_blog_post_views_stats_by_id(
@@ -457,7 +469,6 @@ class BlogDashboardAuthorBlogPostsStatisticsHandler(
             )
 
         stats_dict = stats.to_frontend_dict()
-        print(stats_dict)
         self.values.update({
             'chart_type': chart_type,
             'stats': stats_dict

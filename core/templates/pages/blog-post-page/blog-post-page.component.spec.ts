@@ -17,7 +17,7 @@
  */
 
 import { Pipe } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MaterialModule } from 'modules/material.module';
@@ -38,10 +38,18 @@ import { RichTextComponentsModule } from 'rich_text_components/rich-text-compone
 import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post.model';
 import { SharingLinksComponent } from 'components/common-layout-directives/common-elements/sharing-links.component';
 import { BlogPostPageService } from './services/blog-post-page.service';
+import { BlogHomePageBackendApiService } from 'domain/blog/blog-homepage-backend-api.service';
 
 @Pipe({name: 'truncate'})
 class MockTruncatePipe {
   transform(value: string, params: Object | undefined): string {
+    return value;
+  }
+}
+
+@Pipe({ name: 'convertToPlainText' })
+class MockConvertToPlainTextPipe {
+  transform(value: string): string {
     return value;
   }
 }
@@ -55,6 +63,9 @@ class MockWindowRef {
         return 'http://localhost/test_path';
       },
       reload: () => { }
+    },
+    addEventListener: function(eventname: string, callback: () => {}) {
+      document.addEventListener('mock' + eventname, callback);
     }
   };
 }
@@ -74,6 +85,21 @@ describe('Blog home page component', () => {
   let component: BlogPostPageComponent;
   let mockWindowRef: MockWindowRef;
   let fixture: ComponentFixture<BlogPostPageComponent>;
+  let blogHomePageBackendApiService: BlogHomePageBackendApiService;
+  let sampleBlogPostBackendDict: BlogPostBackendDict = {
+    id: 'sampleBlogId',
+    displayed_author_name: 'test_user',
+    title: 'sample_title',
+    content: '<p>hello</p>',
+    thumbnail_filename: 'image.png',
+    tags: ['learners', 'news'],
+    url_fragment: 'sample-post-url',
+    last_updated: '11/21/2014, 09:45:00',
+    published_on: '11/21/2014, 09:45:00',
+  };
+  let blogPostData: BlogPostData;
+  let visibilityChangeEvent = document.createEvent('Event');
+  visibilityChangeEvent.initEvent('mockvisibilitychange');
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -90,6 +116,7 @@ describe('Blog home page component', () => {
         BlogCardComponent,
         MockTranslatePipe,
         MockTruncatePipe,
+        MockConvertToPlainTextPipe,
         SharingLinksComponent
       ],
       providers: [
@@ -102,7 +129,8 @@ describe('Blog home page component', () => {
           useClass: MockWindowDimensionsService
         },
         LoaderService,
-        BlogPostPageService
+        BlogPostPageService,
+        BlogHomePageBackendApiService
       ],
     }).compileComponents();
   }));
@@ -113,11 +141,26 @@ describe('Blog home page component', () => {
     urlService = TestBed.inject(UrlService);
     loaderService = TestBed.inject(LoaderService);
     blogPostPageService = TestBed.inject(BlogPostPageService);
+    blogHomePageBackendApiService = TestBed.inject(
+      BlogHomePageBackendApiService);
     mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(urlService, 'getBlogPostUrlFromUrl').
+      and.returnValue('sample-post-url');
+
+    blogPostData = BlogPostData.createFromBackendDict(
+      sampleBlogPostBackendDict);
+    component.blogPostPageData = {
+      authorUsername: 'test_username',
+      blogPostDict: blogPostData,
+      profilePictureDataUrl: 'sample-url',
+      summaryDicts: [],
+    };
+    component.blogPostUrlFragment = 'sample-post-url';
+    component.activeTimeUserStayedOnPostInMinutes = 0;
   });
 
   it('should get the blog post page url', () => {
@@ -167,29 +210,19 @@ describe('Blog home page component', () => {
   });
 
   it('should initialize correctly', () => {
-    let sampleBlogPostBackendDict: BlogPostBackendDict = {
-      id: 'sampleBlogId',
-      displayed_author_name: 'test_user',
-      title: 'sample_title',
-      content: '<p>hello</p>',
-      thumbnail_filename: 'image.png',
-      tags: ['learners', 'news'],
-      url_fragment: 'sample-post-url',
-      last_updated: '11/21/2014, 09:45:00',
-      published_on: '11/21/2014, 09:45:00',
-    };
-    let blogPostData = BlogPostData.createFromBackendDict(
-      sampleBlogPostBackendDict);
     component.blogPostPageData = {
       authorUsername: 'test_username',
       blogPostDict: blogPostData,
       profilePictureDataUrl: 'sample-url',
       summaryDicts: [],
     };
+    let baseTime = new Date();
+    jasmine.clock().mockDate(baseTime);
     spyOn(urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue('sample-url');
-    spyOn(urlService, 'getBlogPostUrlFromUrl').
-      and.returnValue('sample-post-url');
+    spyOn(blogHomePageBackendApiService, 'recordBlogPostViewedEventAsync');
+    spyOn(component, 'handleVisibilityChange');
+    spyOnProperty(document, 'hidden').and.returnValue(false);
 
     component.ngOnInit();
 
@@ -201,6 +234,117 @@ describe('Blog home page component', () => {
     expect(component.postsToRecommend.length).toBe(0);
     expect(component.publishedDateString).toBe('November 21, 2014');
     expect(blogPostPageService.blogPostId).toBe(sampleBlogPostBackendDict.id);
+    expect(component.timeUserStartedViewingPost).toBe(baseTime.getTime());
+    expect(
+      blogHomePageBackendApiService.recordBlogPostViewedEventAsync
+    ).toHaveBeenCalledWith('sample-post-url');
+    expect(component.hiddenPropertyString).toEqual('hidden');
+    expect(component.visibilityChangeEvent).toEqual('visibilitychange');
+  });
+
+  it('should fire blog post exited event after 45 minutes', fakeAsync(() => {
+    spyOn(component, 'calculateEstimatedReadingTimeInMinutes')
+      .and.returnValue(5);
+    spyOn(blogHomePageBackendApiService, 'recordBlogPostExitedEventAsync');
+    let millisecsInMin = 60000;
+
+    component.ngOnInit();
+    tick((45 * millisecsInMin) + 1);
+
+    expect(
+      blogHomePageBackendApiService.recordBlogPostExitedEventAsync
+    ).toHaveBeenCalled();
+  }));
+
+  it('should fire blog post exited event after user has stayed on post for' +
+  ' more than 5 times the estimated reading time', fakeAsync(() => {
+    spyOn(component, 'calculateEstimatedReadingTimeInMinutes')
+      .and.returnValue(10);
+    spyOn(blogHomePageBackendApiService, 'recordBlogPostExitedEventAsync');
+    let millisecsInMin = 60000;
+
+    component.ngOnInit();
+    tick(5 * 10 * millisecsInMin + 1);
+
+    expect(
+      blogHomePageBackendApiService.recordBlogPostExitedEventAsync
+    ).toHaveBeenCalled();
+  }));
+
+  it('should handle changing of browser tabs by user while recording active' +
+  ' time user stayed on blog post.', () => {
+    component.hiddenPropertyString = 'hidden';
+    let baseTime = new Date();
+    baseTime.setMinutes(0);
+    component.timeUserStartedViewingPost = baseTime.getTime();
+
+    baseTime.setMinutes(30);
+    jasmine.clock().mockDate(baseTime);
+    spyOnProperty(document, 'hidden').and.returnValues(true, false, true, true);
+    spyOn(component, 'isBlogPostRead').and.returnValues(
+      false, false, true, true);
+    spyOn(blogHomePageBackendApiService, 'recordBlogPostReadEventAsync');
+
+    // When blog post is not read by the user and user switches tab.
+    component.blogPostReadEventFired = false;
+
+    component.handleVisibilityChange();
+    expect(component.activeTimeUserStayedOnPostInMinutes).toBe(30);
+    expect(blogHomePageBackendApiService.recordBlogPostReadEventAsync)
+      .not.toHaveBeenCalled();
+
+    // When user comes back to the blog post page tab.
+    component.handleVisibilityChange();
+    component.activeTimeUserStayedOnPostInMinutes = 0;
+
+    expect(component.timeUserStartedViewingPost).toEqual(baseTime.getTime());
+
+    // When blog post is read by the user but the event is already fired.
+    baseTime.setMinutes(0);
+    component.timeUserStartedViewingPost = baseTime.getTime();
+    component.blogPostReadEventFired = true;
+    component.activeTimeUserStayedOnPostInMinutes = 0;
+
+    component.handleVisibilityChange();
+    expect(component.activeTimeUserStayedOnPostInMinutes).toBe(30);
+    expect(blogHomePageBackendApiService.recordBlogPostReadEventAsync)
+      .not.toHaveBeenCalled();
+
+    // When blog post is read by the user and user switches tab.
+    baseTime.setMinutes(0);
+    component.timeUserStartedViewingPost = baseTime.getTime();
+    component.blogPostReadEventFired = false;
+    component.activeTimeUserStayedOnPostInMinutes = 0;
+
+    component.handleVisibilityChange();
+    expect(component.activeTimeUserStayedOnPostInMinutes).toBe(30);
+    expect(blogHomePageBackendApiService.recordBlogPostReadEventAsync)
+      .toHaveBeenCalled();
+  });
+
+  it('should calculate estimated reading time of the blog post', () => {
+    component.blogPost = blogPostData;
+    component.blogPost.content = ('word ').repeat(400);
+    component.NUM_WORDS_READ_PER_MIN = 200;
+
+    expect(component.calculateEstimatedReadingTimeInMinutes()).toBe(2);
+
+    component.blogPost.content = ('word ').repeat(100);
+    expect(component.calculateEstimatedReadingTimeInMinutes()).toBe(0.5);
+  });
+
+  it('should return true if blog post is read', () => {
+    component.activeTimeUserStayedOnPostInMinutes = 5;
+    spyOn(component, 'calculateEstimatedReadingTimeInMinutes').and.returnValues(
+      8, 20
+    );
+
+    // When the blog post is read by the user (50% of 8 minutes < 5 minutes).
+    expect(component.isBlogPostRead()).toBeTrue();
+
+    // When the blog post is not read by the user (
+    // 50% of 20 minutes > 5 minutes).
+    expect(component.isBlogPostRead()).toBeFalse();
   });
 
   it('should navigate to author profile page', () => {
@@ -212,5 +356,47 @@ describe('Blog home page component', () => {
 
     expect(mockWindowRef.nativeWindow.location.href).toEqual(
       '/blog/author/test-username');
+  });
+
+  it('should fire blog post exited event when blog post is exited.', () => {
+    component.blogPostExitedEventFired = false;
+    let baseTime = new Date();
+    baseTime.setMinutes(0);
+    component.timeUserStartedViewingPost = baseTime.getTime();
+    baseTime.setMinutes(35);
+    jasmine.clock().mockDate(baseTime);
+    spyOn(component, 'recordBlogPostExitedEvent');
+    spyOn(component, 'isBlogPostRead').and.returnValues(false);
+
+    component.ngOnDestroy();
+
+    expect(component.recordBlogPostExitedEvent).toHaveBeenCalled();
+    expect(component.activeTimeUserStayedOnPostInMinutes).toBe(35);
+  });
+
+  it('should not fire blog post exited event when blog post is exited but' +
+  ' event has already fired.', () => {
+    component.blogPostExitedEventFired = true;
+    let baseTime = new Date();
+    baseTime.setMinutes(0);
+    component.timeUserStartedViewingPost = baseTime.getTime();
+    baseTime.setMinutes(35);
+    jasmine.clock().mockDate(baseTime);
+    spyOn(component, 'recordBlogPostExitedEvent');
+    spyOn(component, 'recordBlogPostReadEvent');
+    spyOn(component, 'isBlogPostRead').and.returnValues(false, true);
+
+    component.ngOnDestroy();
+
+    expect(component.recordBlogPostExitedEvent).not.toHaveBeenCalled();
+    expect(component.activeTimeUserStayedOnPostInMinutes).toBe(35);
+    expect(component.recordBlogPostReadEvent).not.toHaveBeenCalled();
+
+    component.activeTimeUserStayedOnPostInMinutes = 0;
+    component.ngOnDestroy();
+
+    expect(component.recordBlogPostExitedEvent).not.toHaveBeenCalled();
+    expect(component.activeTimeUserStayedOnPostInMinutes).toBe(35);
+    expect(component.recordBlogPostReadEvent).toHaveBeenCalled();
   });
 });

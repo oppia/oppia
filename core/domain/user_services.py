@@ -1552,6 +1552,7 @@ def create_aggregated_author_blog_post_stats_models(
         blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
             author_id)
 
+
 def remove_user_role(user_id: str, role: str) -> None:
     """Updates the roles of the user with given user_id.
 
