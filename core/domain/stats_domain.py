@@ -186,7 +186,7 @@ class LearnerAnswerInfoDict(TypedDict):
     """Dictionary representing LearnerAnswerInfo object."""
 
     id: str
-    answer: Optional[str]
+    answer: Optional[Union[str, int, Dict[str, str], List[str]]]
     answer_details: str
     created_on: str
 
@@ -2112,7 +2112,7 @@ class LearnerAnswerInfo:
     def __init__(
         self,
         learner_answer_info_id: str,
-        answer: Optional[str],
+        answer: Optional[Union[str, int, Dict[str, str], List[str]]],
         answer_details: str,
         created_on: datetime.datetime
     ) -> None:
