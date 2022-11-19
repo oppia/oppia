@@ -16,7 +16,7 @@
  * @fileoverview Component for state changes modal.
  */
 
-import { OnInit } from '@angular/core';
+import { Input, OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -44,12 +44,12 @@ interface mergeviewOptions {
 })
 export class StateVersionHistoryModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  committerUsername: string | null = null;
-  oldVersion: number | null = null;
-  newState: State | null = null;
-  oldState: State | null = null;
-  newStateName: string = '';
-  oldStateName: string = '';
+  @Input() committerUsername!: string;
+  @Input() oldVersion: number | null = null;
+  @Input() newState!: State;
+  @Input() oldState!: State;
+  @Input() newStateName!: string;
+  @Input() oldStateName!: string;
   yamlStrs: headersAndYamlStrs = {
     leftPane: '',
     rightPane: '',
@@ -85,10 +85,11 @@ export class StateVersionHistoryModalComponent
   // If the previously edited version number is null,
   // canExploreBackwardVersionHistory() would have returned false. Here,
   // the return value is written as (number | null) in order to fix the
-  // typescript errors. Also, the return value null represents the end of
-  // version history for that particular state i.e. we have reached the end
-  // of the version history and the state was not edited in any
-  // earlier versions.
+  // typescript errors since the list called fetchedStateVersionNumbers in
+  // VersionHistoryService has type (number | null) []. Also, the return
+  // value null represents the end of version history for that particular
+  // state i.e. we have reached the end of the version history and the state
+  // was not edited in any earlier versions.
   getLastEditedVersionNumber(): number | null {
     return (
       this.versionHistoryService.getBackwardStateDiffData().oldVersionNumber);
@@ -100,6 +101,8 @@ export class StateVersionHistoryModalComponent
   }
 
   // Returns the next version number at which the state was modified.
+  // The explanation for return type being (number | null) is same as explained
+  // above the function getLastEditedVersionNumber().
   getNextEditedVersionNumber(): number | null {
     return (
       this.versionHistoryService.getForwardStateDiffData().oldVersionNumber);
@@ -116,12 +119,13 @@ export class StateVersionHistoryModalComponent
 
     const diffData = this.versionHistoryService.getForwardStateDiffData();
 
-    this.newState = diffData.newState;
-    this.oldState = diffData.oldState;
+    // The explanation for these if-conditions is added in the below function.
     if (diffData.newState && diffData.newState.name !== null) {
+      this.newState = diffData.newState;
       this.newStateName = diffData.newState.name;
     }
     if (diffData.oldState && diffData.oldState.name !== null) {
+      this.oldState = diffData.oldState;
       this.oldStateName = diffData.oldState.name;
     }
     this.committerUsername = diffData.committerUsername;
@@ -141,12 +145,23 @@ export class StateVersionHistoryModalComponent
 
     const diffData = this.versionHistoryService.getBackwardStateDiffData();
 
-    this.newState = diffData.newState;
-    this.oldState = diffData.oldState;
+    // Explanation for why diffData.newState can be null:
+    // It is explained in VersionHistoryService as to why the values of
+    // newState or oldState can be null. This is because they are elements of
+    // the list fetchedStateData whose last element can be null which marks
+    // the end of the version history of that particular state.
+    // Explanation for adding diffData.newState.name !== null:
+    // In the State object from StateObjectFactory, we can see that the name
+    // property has type (string | null) and the properties newStateName and
+    // oldStateName have string type. Hence, in order to fix the typescript
+    // errors, this condition was added. It does not have any conceptual
+    // meaning.
     if (diffData.newState && diffData.newState.name !== null) {
+      this.newState = diffData.newState;
       this.newStateName = diffData.newState.name;
     }
     if (diffData.oldState && diffData.oldState.name !== null) {
+      this.oldState = diffData.oldState;
       this.oldStateName = diffData.oldState.name;
     }
     this.committerUsername = diffData.committerUsername;

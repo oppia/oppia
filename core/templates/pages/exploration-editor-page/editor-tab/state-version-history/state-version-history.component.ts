@@ -66,12 +66,12 @@ export class StateVersionHistoryComponent {
 
     const stateDiffData: StateDiffData = (
       this.versionHistoryService.getBackwardStateDiffData());
-    modalRef.componentInstance.newState = stateDiffData.newState;
-    modalRef.componentInstance.oldState = stateDiffData.oldState;
     if (stateDiffData.newState && stateDiffData.newState.name) {
+      modalRef.componentInstance.newState = stateDiffData.newState;
       modalRef.componentInstance.newStateName = stateDiffData.newState.name;
     }
     if (stateDiffData.oldState && stateDiffData.oldState.name) {
+      modalRef.componentInstance.oldState = stateDiffData.oldState;
       modalRef.componentInstance.oldStateName = stateDiffData.oldState.name;
     }
     modalRef.componentInstance.committerUsername = (

@@ -41,14 +41,26 @@ export interface MetadataDiffData {
   providedIn: 'root'
 })
 export class VersionHistoryService {
+  // The following value is null when the service is not initialized i.e.
+  // the user hasn't opened any exploration editor page yet.
   latestVersionOfExploration: number | null = null;
-  fetchedStateData: (State | null) [] = [];
-  fetchedMetadata: (ExplorationMetadata | null) [] = [];
-  fetchedCommitterUsernames: string[] = [];
+
+  // The following four arrays namely fetchedStateVersionNumbers,
+  // fetchedMetadataVersionNumbers, fetchedStateData, fetchedMetadata can
+  // contain only their last element as null and no other element of these
+  // arrays will be none. The element null marks the end of the version
+  // history of a particular state or exploration metadata. When we keep
+  // fetching the 'previously edited versions' of a state or exploration
+  // metadata, the backend returns the version number as 'None' when we
+  // reach the end of the version history.
   fetchedStateVersionNumbers: (number | null) [] = [];
   fetchedMetadataVersionNumbers: (number | null) [] = [];
-  currentPositionInStateVersionHistoryList: number| null = null;
-  currentPositionInMetadataVersionHistoryList: number | null = null;
+  fetchedStateData: (State | null) [] = [];
+  fetchedMetadata: (ExplorationMetadata | null) [] = [];
+
+  fetchedCommitterUsernames: string[] = [];
+  currentPositionInStateVersionHistoryList: number = 0;
+  currentPositionInMetadataVersionHistoryList: number = 0;
 
   constructor() {}
 
@@ -60,19 +72,18 @@ export class VersionHistoryService {
     this.fetchedStateData = [];
     this.fetchedStateVersionNumbers = [];
     this.fetchedCommitterUsernames = [];
-    this.currentPositionInStateVersionHistoryList = null;
+    this.currentPositionInStateVersionHistoryList = 0;
   }
 
   resetMetadataVersionHistory(): void {
     this.fetchedMetadata = [];
     this.fetchedMetadataVersionNumbers = [];
     this.fetchedCommitterUsernames = [];
-    this.currentPositionInMetadataVersionHistoryList = null;
+    this.currentPositionInMetadataVersionHistoryList = 0;
   }
 
   shouldFetchNewStateVersionHistory(): boolean {
     if (
-      this.currentPositionInStateVersionHistoryList !== null &&
       this.currentPositionInStateVersionHistoryList <
         this.fetchedStateVersionNumbers.length - 2
     ) {
@@ -83,7 +94,6 @@ export class VersionHistoryService {
 
   shouldFetchNewMetadataVersionHistory(): boolean {
     if (
-      this.currentPositionInMetadataVersionHistoryList !== null &&
       this.currentPositionInMetadataVersionHistoryList <
         this.fetchedMetadataVersionNumbers.length - 2
     ) {
@@ -104,9 +114,6 @@ export class VersionHistoryService {
     this.fetchedMetadataVersionNumbers.push(versionNumber);
     this.fetchedMetadata.push(metadata);
     this.fetchedCommitterUsernames.push(committerUsername);
-    if (this.currentPositionInMetadataVersionHistoryList === null) {
-      this.currentPositionInMetadataVersionHistoryList = 0;
-    }
   }
 
   insertStateVersionHistoryData(
@@ -121,15 +128,9 @@ export class VersionHistoryService {
     this.fetchedStateVersionNumbers.push(versionNumber);
     this.fetchedStateData.push(stateData);
     this.fetchedCommitterUsernames.push(committerUsername);
-    if (this.currentPositionInStateVersionHistoryList === null) {
-      this.currentPositionInStateVersionHistoryList = 0;
-    }
   }
 
   canShowBackwardStateDiffData(): boolean {
-    if (this.currentPositionInStateVersionHistoryList === null) {
-      return false;
-    }
     return (
       this.currentPositionInStateVersionHistoryList >= 0 &&
       this.currentPositionInStateVersionHistoryList <
@@ -142,9 +143,6 @@ export class VersionHistoryService {
   }
 
   canShowForwardStateDiffData(): boolean {
-    if (this.currentPositionInStateVersionHistoryList === null) {
-      return false;
-    }
     return (
       this.currentPositionInStateVersionHistoryList >= 2 &&
       this.currentPositionInStateVersionHistoryList <
@@ -161,53 +159,42 @@ export class VersionHistoryService {
   }
 
   getBackwardStateDiffData(): StateDiffData {
-    // The following (this.currentPositionInStateVersionHistoryList || 0) is
-    // done to fix the typescript errors. Otherwise, when this function will
-    // be called, currentPositionInStateVersionHistoryList will always
-    // be defined.
     return {
       oldState: this.fetchedStateData[
-        (this.currentPositionInStateVersionHistoryList || 0) + 1],
+        this.currentPositionInStateVersionHistoryList + 1],
       newState: this.fetchedStateData[
-        (this.currentPositionInStateVersionHistoryList || 0)],
+        this.currentPositionInStateVersionHistoryList],
       oldVersionNumber: (
         this.fetchedStateVersionNumbers[
-          (this.currentPositionInStateVersionHistoryList || 0) + 1]),
+          this.currentPositionInStateVersionHistoryList + 1]),
       newVersionNumber: (
         this.fetchedStateVersionNumbers[
-          (this.currentPositionInStateVersionHistoryList || 0)]),
+          this.currentPositionInStateVersionHistoryList]),
       committerUsername: (
         this.fetchedCommitterUsernames[
-          (this.currentPositionInStateVersionHistoryList || 0) + 1])
+          this.currentPositionInStateVersionHistoryList + 1])
     };
   }
 
   getForwardStateDiffData(): StateDiffData {
-    // The following (this.currentPositionInStateVersionHistoryList || 0) is
-    // done to fix the typescript errors. Otherwise, when this function will
-    // be called, currentPositionInStateVersionHistoryList will always
-    // be defined.
     return {
       oldState: this.fetchedStateData[
-        (this.currentPositionInStateVersionHistoryList || 0) - 1],
+        this.currentPositionInStateVersionHistoryList - 1],
       newState: this.fetchedStateData[
-        (this.currentPositionInStateVersionHistoryList || 0) - 2],
+        this.currentPositionInStateVersionHistoryList - 2],
       oldVersionNumber: (
         this.fetchedStateVersionNumbers[
-          (this.currentPositionInStateVersionHistoryList || 0) - 1]),
+          this.currentPositionInStateVersionHistoryList - 1]),
       newVersionNumber: (
         this.fetchedStateVersionNumbers[
-          (this.currentPositionInStateVersionHistoryList || 0) - 2]),
+          this.currentPositionInStateVersionHistoryList - 2]),
       committerUsername: (
         this.fetchedCommitterUsernames[
-          (this.currentPositionInStateVersionHistoryList || 0) - 1])
+          this.currentPositionInStateVersionHistoryList - 1])
     };
   }
 
   canShowBackwardMetadataDiffData(): boolean {
-    if (this.currentPositionInMetadataVersionHistoryList === null) {
-      return false;
-    }
     return (
       this.currentPositionInMetadataVersionHistoryList >= 0 &&
       this.currentPositionInMetadataVersionHistoryList <
@@ -220,9 +207,6 @@ export class VersionHistoryService {
   }
 
   canShowForwardMetadataDiffData(): boolean {
-    if (this.currentPositionInMetadataVersionHistoryList === null) {
-      return false;
-    }
     return (
       this.currentPositionInMetadataVersionHistoryList >= 2 &&
       this.currentPositionInMetadataVersionHistoryList <
@@ -239,46 +223,38 @@ export class VersionHistoryService {
   }
 
   getBackwardMetadataDiffData(): MetadataDiffData {
-    // The following (this.currentPositionInMetadataVersionHistoryList || 0) is
-    // done to fix the typescript errors. Otherwise, when this function will
-    // be called, currentPositionInMetadataVersionHistoryList will always
-    // be defined.
     return {
       oldMetadata: this.fetchedMetadata[
-        (this.currentPositionInMetadataVersionHistoryList || 0) + 1],
+        this.currentPositionInMetadataVersionHistoryList + 1],
       newMetadata: this.fetchedMetadata[
-        (this.currentPositionInMetadataVersionHistoryList || 0)],
+        this.currentPositionInMetadataVersionHistoryList],
       oldVersionNumber: (
         this.fetchedMetadataVersionNumbers[
-          (this.currentPositionInMetadataVersionHistoryList || 0) + 1]),
+          this.currentPositionInMetadataVersionHistoryList + 1]),
       newVersionNumber: (
         this.fetchedMetadataVersionNumbers[
-          (this.currentPositionInMetadataVersionHistoryList || 0)]),
+          this.currentPositionInMetadataVersionHistoryList]),
       committerUsername: (
         this.fetchedCommitterUsernames[
-          (this.currentPositionInMetadataVersionHistoryList || 0) + 1])
+          this.currentPositionInMetadataVersionHistoryList + 1])
     };
   }
 
   getForwardMetadataDiffData(): MetadataDiffData {
-    // The following (this.currentPositionInMetadataVersionHistoryList || 0) is
-    // done to fix the typescript errors. Otherwise, when this function will
-    // be called, currentPositionInMetadataVersionHistoryList will always
-    // be defined.
     return {
       oldMetadata: this.fetchedMetadata[
-        (this.currentPositionInMetadataVersionHistoryList || 0) - 1],
+        this.currentPositionInMetadataVersionHistoryList - 1],
       newMetadata: this.fetchedMetadata[
-        (this.currentPositionInMetadataVersionHistoryList || 0) - 2],
+        this.currentPositionInMetadataVersionHistoryList - 2],
       oldVersionNumber: (
         this.fetchedMetadataVersionNumbers[
-          (this.currentPositionInMetadataVersionHistoryList || 0) - 1]),
+          this.currentPositionInMetadataVersionHistoryList - 1]),
       newVersionNumber: (
         this.fetchedMetadataVersionNumbers[
-          (this.currentPositionInMetadataVersionHistoryList || 0) - 2]),
+          this.currentPositionInMetadataVersionHistoryList - 2]),
       committerUsername: (
         this.fetchedCommitterUsernames[
-          (this.currentPositionInMetadataVersionHistoryList || 0) - 1])
+          this.currentPositionInMetadataVersionHistoryList - 1])
     };
   }
 
@@ -302,17 +278,13 @@ export class VersionHistoryService {
   }
 
   decrementCurrentPositionInStateVersionHistoryList(): void {
-    if (this.currentPositionInStateVersionHistoryList !== null) {
-      this.currentPositionInStateVersionHistoryList = (
-        this.currentPositionInStateVersionHistoryList - 1);
-    }
+    this.currentPositionInStateVersionHistoryList = (
+      this.currentPositionInStateVersionHistoryList - 1);
   }
 
   incrementCurrentPositionInStateVersionHistoryList(): void {
-    if (this.currentPositionInStateVersionHistoryList !== null) {
-      this.currentPositionInStateVersionHistoryList = (
-        this.currentPositionInStateVersionHistoryList + 1);
-    }
+    this.currentPositionInStateVersionHistoryList = (
+      this.currentPositionInStateVersionHistoryList + 1);
   }
 
   getCurrentPositionInMetadataVersionHistoryList(): number | null {
@@ -327,17 +299,13 @@ export class VersionHistoryService {
   }
 
   decrementCurrentPositionInMetadataVersionHistoryList(): void {
-    if (this.currentPositionInMetadataVersionHistoryList !== null) {
-      this.currentPositionInMetadataVersionHistoryList = (
-        this.currentPositionInMetadataVersionHistoryList - 1);
-    }
+    this.currentPositionInMetadataVersionHistoryList = (
+      this.currentPositionInMetadataVersionHistoryList - 1);
   }
 
   incrementCurrentPositionInMetadataVersionHistoryList(): void {
-    if (this.currentPositionInMetadataVersionHistoryList !== null) {
-      this.currentPositionInMetadataVersionHistoryList = (
-        this.currentPositionInMetadataVersionHistoryList + 1);
-    }
+    this.currentPositionInMetadataVersionHistoryList = (
+      this.currentPositionInMetadataVersionHistoryList + 1);
   }
 }
 

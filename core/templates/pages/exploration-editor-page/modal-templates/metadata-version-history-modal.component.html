@@ -17,8 +17,7 @@
   </div>
   <ng-template #elseBlock>
     <div class="interstitial-loading">
-      Loading diff data
-      <loading-dots></loading-dots>
+      <div class="spinner-border" style="height: 4rem; width: 4rem;"></div>
     </div>
   </ng-template>
 </div>
@@ -53,9 +52,10 @@
     max-width: 1200px;
     width: 90%;
   }
-  .state-diff-modal .modal-body {
-    height: 60vh;
+  .modal-body {
+    height: 405px;
     margin-top: -30px;
+    overflow: auto;
   }
   .state-diff-modal .colgroup-1 {
     width: 47%;

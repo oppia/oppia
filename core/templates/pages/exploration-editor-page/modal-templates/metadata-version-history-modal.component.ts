@@ -16,7 +16,7 @@
  * @fileoverview Component for state changes modal.
  */
 
-import { OnInit } from '@angular/core';
+import { Input, OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -44,10 +44,10 @@ interface mergeviewOptions {
 })
 export class MetadataVersionHistoryModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  committerUsername: string | null = null;
-  oldVersion: number | null = null;
-  newMetadata: ExplorationMetadata | null = null;
-  oldMetadata: ExplorationMetadata | null = null;
+  @Input() committerUsername!: string;
+  @Input() oldVersion: number | null = null;
+  @Input() newMetadata!: ExplorationMetadata;
+  @Input() oldMetadata!: ExplorationMetadata;
   yamlStrs: headersAndYamlStrs = {
     leftPane: '',
     rightPane: '',
@@ -83,10 +83,11 @@ export class MetadataVersionHistoryModalComponent
   // If the previously edited version number is null,
   // canExploreBackwardVersionHistory() would have returned false. Here,
   // the return value is written as (number | null) in order to fix the
-  // typescript errors. Also, the return value null represents the end of
-  // version history for that particular state i.e. we have reached the end
-  // of the version history and the state was not edited in any
-  // earlier versions.
+  // typescript errors since the list called fetchedMetadataVersionNumbers in
+  // VersionHistoryService has type (number | null) []. Also, the return
+  // value null represents the end of version history for the exploration
+  // metadata i.e. we have reached the end of the version history and the
+  // exploration metadata was not edited in any earlier versions.
   getLastEditedVersionNumber(): number | null {
     return (
       this
@@ -105,7 +106,9 @@ export class MetadataVersionHistoryModalComponent
     );
   }
 
-  // Returns the next version number at which the state was modified.
+  // Returns the next version number at which the metadata was modified.
+  // The explanation for return type being (number | null) is same as explained
+  // above the function getLastEditedVersionNumber().
   getNextEditedVersionNumber(): number | null {
     return (
       this
@@ -130,8 +133,13 @@ export class MetadataVersionHistoryModalComponent
 
     const diffData = this.versionHistoryService.getForwardMetadataDiffData();
 
-    this.newMetadata = diffData.newMetadata;
-    this.oldMetadata = diffData.oldMetadata;
+    // The explanation for these if-conditions is added in the below function.
+    if (diffData.newMetadata !== null) {
+      this.newMetadata = diffData.newMetadata;
+    }
+    if (diffData.oldMetadata !== null) {
+      this.oldMetadata = diffData.oldMetadata;
+    }
     this.committerUsername = diffData.committerUsername;
     this.oldVersion = diffData.oldVersionNumber;
 
@@ -148,8 +156,17 @@ export class MetadataVersionHistoryModalComponent
 
     const diffData = this.versionHistoryService.getBackwardMetadataDiffData();
 
-    this.oldMetadata = diffData.oldMetadata;
-    this.newMetadata = diffData.newMetadata;
+    // Explanation for why diffData.newMetadata can be null:
+    // It is explained in VersionHistoryService as to why the values of
+    // newMetadata or oldMetadata can be null. This is because they are elements
+    // of the list fetchedMetadata whose last element can be null which marks
+    // the end of the version history of the exploration metadata.
+    if (diffData.newMetadata !== null) {
+      this.newMetadata = diffData.newMetadata;
+    }
+    if (diffData.oldMetadata !== null) {
+      this.oldMetadata = diffData.oldMetadata;
+    }
     this.committerUsername = diffData.committerUsername;
     this.oldVersion = diffData.oldVersionNumber;
 
