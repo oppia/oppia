@@ -2712,6 +2712,90 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(response['next_offset'], 1)
 
+    def test_exploration_handler_does_not_return_obsolete_suggestions(
+        self
+    ) -> None:
+        # Create a new exploration and linked story.
+        self.login(self.EDITOR_EMAIL)
+        continue_state_name = 'continue state'
+        exp_100 = self.save_new_linear_exp_with_state_names_and_interactions(
+            '100',
+            self.owner_id,
+            ['Introduction', continue_state_name, 'End state'],
+            ['TextInput', 'Continue'],
+            category='Algebra',
+            correctness_feedback_enabled=True
+        )
+        self.publish_exploration(self.owner_id, exp_100.id)
+        self.create_story_for_translation_opportunity(
+            self.owner_id, self.admin_id, 'story_id_100', self.TOPIC_ID,
+            exp_100.id)
+        self.logout()
+
+        # Create a translation suggestion for the Continue button text.
+        self.login(self.AUTHOR_EMAIL)
+        continue_state = exp_100.states['continue state']
+        content_id_of_continue_button_text = (
+            continue_state.interaction.customization_args[
+                'buttonText'].value.content_id)
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': content_id_of_continue_button_text,
+            'language_code': 'hi',
+            'content_html': 'Continue',
+            'state_name': continue_state_name,
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_100.id, 1, self.owner_id, change_dict, 'description')
+        self.logout()
+
+        self.login(self.REVIEWER_EMAIL)
+        # Handler should return the new suggestion.
+        response = self.get_json(
+            '/getreviewablesuggestions/exploration/translate_content', params={
+                'exploration_id': exp_100.id,
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(response['next_offset'], 1)
+        self.logout()
+
+        # Replace the Continue button text content ID.
+        self.login(self.EDITOR_EMAIL)
+        exp_services.update_exploration(
+            self.owner_id, exp_100.id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': continue_state_name,
+                    'new_value': {
+                        'buttonText': {
+                            'value': {
+                                'content_id': 'new_content_id',
+                                'unicode_str': 'Continua'
+                            }
+                        }
+                    }
+                })], 'Change continue button content ID')
+        self.logout()
+
+        self.login(self.REVIEWER_EMAIL)
+        # After the new suggestion's content was deleted, handler should not
+        # return the obsolete suggestion.
+        response = self.get_json(
+            '/getreviewablesuggestions/exploration/translate_content', params={
+                'exploration_id': exp_100.id,
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0
+            })
+        self.assertEqual(len(response['suggestions']), 0)
+        self.assertEqual(response['next_offset'], 1)
+
     def test_topic_translate_handler_returns_no_data(self) -> None:
         response = self.get_json(
             '/getreviewablesuggestions/topic/translate_content', {
