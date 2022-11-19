@@ -1387,7 +1387,8 @@ class SignUpTests(test_utils.GenericTestBase):
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'can_receive_email_updates': True
             }, csrf_token=csrf_token,
         )
 
