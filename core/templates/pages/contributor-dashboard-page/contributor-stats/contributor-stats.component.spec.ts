@@ -276,7 +276,7 @@ describe('Contributor stats component', () => {
       }).toThrowError('There are no more pages before this one.');
     }));
 
-    it('should throw errors when translation reviews are undefined',
+    it('should throw errors when stats data is undefined',
       fakeAsync(() => {
         component.statsData = undefined;
 

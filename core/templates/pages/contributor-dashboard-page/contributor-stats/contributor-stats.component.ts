@@ -240,17 +240,18 @@ export class ContributorStatsComponent {
       response.translation_contribution_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        const statsData = this
+        const translationContributionStatsData = this
           .statsData?.translationContribution.get(language);
-        if (typeof statsData === 'undefined') {
+        if (typeof translationContributionStatsData === 'undefined') {
           this.statsData?.translationContribution.set(
             language,
             new PageableStats([this.createTranslationContributionStat(stat)]));
         } else {
-          statsData.data?.push(this.createTranslationContributionStat(stat));
+          translationContributionStatsData.data?.push(
+            this.createTranslationContributionStat(stat));
           this.statsData?.translationContribution.set(
             language,
-            statsData
+            translationContributionStatsData
           );
         }
       });
@@ -260,17 +261,18 @@ export class ContributorStatsComponent {
       response.translation_review_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        const statsData = this
+        const translationReviewStatsData = this
           .statsData?.translationReview.get(language);
-        if (typeof statsData === 'undefined') {
-          this.statsData.translationContribution.set(
+        if (typeof translationReviewStatsData === 'undefined') {
+          this.statsData.translationReview.set(
             language,
             new PageableStats([this.createTranslationReviewStat(stat)]));
         } else {
-          statsData.data?.push(this.createTranslationReviewStat(stat));
+          translationReviewStatsData.data?.push(
+            this.createTranslationReviewStat(stat));
           this.statsData?.translationReview.set(
             language,
-            statsData
+            translationReviewStatsData
           );
         }
       });
