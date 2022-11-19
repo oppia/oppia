@@ -187,7 +187,13 @@ class EditorTests(BaseEditorControllerTests):
             version: Optional[int] = None
         ) -> Dict[str, Union[str, List[Dict[str, str]], int]]:
             """Gets the payload in the dict format."""
-            result: Dict[str, Union[str, List[Dict[str, str]], int]] = {
+            result: Dict[
+                str, Union[
+                    str,
+                    List[Dict[str, Union[str, int]]],
+                    int
+                ]
+            ] = {
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': new_state_name,

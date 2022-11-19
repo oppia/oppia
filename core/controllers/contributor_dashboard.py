@@ -26,7 +26,7 @@ from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
-from core.domain import state_domain
+from core.domain import translation_domain
 from core.domain import story_fetchers
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
@@ -479,9 +479,9 @@ class TranslatableTextHandler(
     def _get_state_names_to_not_set_content_id_mapping(
         self,
         state_names_to_content_id_mapping: Dict[
-            str, Dict[str, state_domain.TranslatableItem]
+            str, Dict[str, translation_domain.TranslatableContent]
         ]
-    ) -> Dict[str, Dict[str, state_domain.TranslatableItem]]:
+    ) -> Dict[str, Dict[str, translation_domain.TranslatableContent]]:
         """Returns a copy of the supplied state_names_to_content_id_mapping
         minus any contents of which the data is set of strings.
 
@@ -514,10 +514,10 @@ class TranslatableTextHandler(
     def _get_state_names_to_not_in_review_content_id_mapping(
         self,
         state_names_to_content_id_mapping: Dict[
-            str, Dict[str, state_domain.TranslatableItem]
+            str, Dict[str, translation_domain.TranslatableContent]
         ],
         suggestions: List[suggestion_registry.BaseSuggestion]
-    ) -> Dict[str, Dict[str, state_domain.TranslatableItemDict]]:
+    ) -> Dict[str, Dict[str, translation_domain.TranslatableContentDict]]:
         """Returns a copy of the supplied state_names_to_content_id_mapping
         minus any contents found in suggestions.
 

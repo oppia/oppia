@@ -5429,7 +5429,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration_dict['schema_version'] = 60
 
         exploration_dict['states'], next_content_id_index = (
-            cls._convert_states_v53_dict_to_v54_dict(
+            cls._convert_states_v54_dict_to_v55_dict(
                 exploration_dict['states'])
         )
         exploration_dict['states_schema_version'] = 54
