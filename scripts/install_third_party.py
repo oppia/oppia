@@ -28,33 +28,46 @@ import urllib
 import zipfile
 
 from core import utils
+from typing import Dict, Final, List, Literal, Optional, TypedDict, cast
 
 from . import common
 from . import install_python_prod_dependencies
 
-TOOLS_DIR = os.path.join('..', 'oppia_tools')
-THIRD_PARTY_DIR = os.path.join('.', 'third_party')
-THIRD_PARTY_STATIC_DIR = os.path.join(THIRD_PARTY_DIR, 'static')
-DEPENDENCIES_FILE_PATH = os.path.join(os.getcwd(), 'dependencies.json')
+TOOLS_DIR: Final = os.path.join('..', 'oppia_tools')
+THIRD_PARTY_DIR: Final = os.path.join('.', 'third_party')
+THIRD_PARTY_STATIC_DIR: Final = os.path.join(THIRD_PARTY_DIR, 'static')
+DEPENDENCIES_FILE_PATH: Final = os.path.join(os.getcwd(), 'dependencies.json')
 
 # Place to download zip files for temporary storage.
-TMP_UNZIP_PATH = os.path.join('.', 'tmp_unzip.zip')
+TMP_UNZIP_PATH: Final = os.path.join('.', 'tmp_unzip.zip')
 
 
 # Check that the current directory is correct.
 common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
-TARGET_DOWNLOAD_DIRS = {
+TARGET_DOWNLOAD_DIRS: Final = {
     'proto': THIRD_PARTY_DIR,
     'frontend': THIRD_PARTY_STATIC_DIR,
     'oppiaTools': TOOLS_DIR
 }
 
-_DOWNLOAD_FORMAT_ZIP = 'zip'
-_DOWNLOAD_FORMAT_TAR = 'tar'
-_DOWNLOAD_FORMAT_FILES = 'files'
+_DOWNLOAD_FORMAT_ZIP: Final = 'zip'
+_DOWNLOAD_FORMAT_TAR: Final = 'tar'
+_DOWNLOAD_FORMAT_FILES: Final = 'files'
 
-DOWNLOAD_FORMATS_TO_DEPENDENCIES_KEYS = {
+DownloadFormatType = Literal['zip', 'files', 'tar']
+
+
+class DownloadFormatToDependenciesKeysDict(TypedDict):
+    """TypeDict for download format to dependencies keys dict."""
+
+    mandatory_keys: List[str]
+    optional_key_pairs: List[List[str]]
+
+
+DOWNLOAD_FORMATS_TO_DEPENDENCIES_KEYS: Dict[
+    DownloadFormatType, DownloadFormatToDependenciesKeysDict
+] = {
     'zip': {
         'mandatory_keys': ['version', 'url', 'downloadFormat'],
         'optional_key_pairs': [
@@ -80,7 +93,37 @@ Installation script for Oppia third-party libraries.
 """)
 
 
-def download_files(source_url_root, target_dir, source_filenames):
+# Here we use total=False since some fields in this dict
+# is optional/not required. There are possibilities that some fields
+# can be present or not. In some cases, either one of the 2 fields
+# should be present. However, we do have validation for this in code over
+# here in test_dependencies_syntax() function.
+class DependencyDict(TypedDict, total=False):
+    """Dict representation of dependency."""
+
+    version: str
+    downloadFormat: DownloadFormatType
+    url: str
+    rootDirPrefix: str
+    rootDir: str
+    targetDirPrefix: str
+    targetDir: str
+    tarRootDirPrefix: str
+    files: List[str]
+    bundle: Dict[str, List[str]]
+
+
+class DependenciesDict(TypedDict):
+    """Dict representation of dependencies."""
+
+    dependencies: Dict[str, Dict[str, DependencyDict]]
+
+
+def download_files(
+    source_url_root: str,
+    target_dir: str,
+    source_filenames: List[str]
+) -> None:
     """Downloads a group of files and saves them to a given directory.
 
     Each file is downloaded only if it does not already exist.
@@ -107,7 +150,11 @@ def download_files(source_url_root, target_dir, source_filenames):
 
 
 def download_and_unzip_files(
-        source_url, target_parent_dir, zip_root_name, target_root_name):
+    source_url: str,
+    target_parent_dir: str,
+    zip_root_name: str,
+    target_root_name: str
+) -> None:
     """Downloads a zip file, unzips it, and saves the result in a given dir.
 
     The download occurs only if the target directory that the zip file unzips
@@ -145,7 +192,7 @@ def download_and_unzip_files(
             req.add_header('User-agent', 'python')
             # This is needed to get a seekable filestream that can be used
             # by zipfile.ZipFile.
-            file_stream = io.StringIO(utils.url_open(req).read())
+            file_stream = io.BytesIO(utils.url_open(req).read())
             with zipfile.ZipFile(file_stream, 'r') as zfile:
                 zfile.extractall(path=target_parent_dir)
 
@@ -158,7 +205,11 @@ def download_and_unzip_files(
 
 
 def download_and_untar_files(
-        source_url, target_parent_dir, tar_root_name, target_root_name):
+    source_url: str,
+    target_parent_dir: str,
+    tar_root_name: str,
+    target_root_name: str
+) -> None:
     """Downloads a tar file, untars it, and saves the result in a given dir.
 
     The download occurs only if the target directory that the tar file untars
@@ -195,13 +246,13 @@ def download_and_untar_files(
         print('Download of %s succeeded.' % tar_root_name)
 
 
-def get_file_contents(filepath, mode='r'):
+def get_file_contents(filepath: str, mode: utils.TextModeTypes = 'r') -> str:
     """Gets the contents of a file, given a relative filepath from oppia/."""
     with utils.open_file(filepath, mode) as f:
         return f.read()
 
 
-def return_json(filepath):
+def return_json(filepath: str) -> DependenciesDict:
     """Return json object when provided url
 
     Args:
@@ -213,15 +264,24 @@ def return_json(filepath):
             https://docs.python.org/3/library/json.html#encoders-and-decoders.
     """
     response = get_file_contents(filepath)
-    return json.loads(response)
+    # Here we use cast because we are narrowing down the type from to
+    # DependenciesDict since we know the type of dependencies
+    # as it is the content of the file dependencies.json.
+    return cast(
+        DependenciesDict,
+        json.loads(response)
+    )
 
 
-def test_dependencies_syntax(dependency_type, dependency_dict):
+def test_dependencies_syntax(
+    dependency_type: DownloadFormatType,
+    dependency_dict: DependencyDict
+) -> None:
     """This checks syntax of the dependencies.json dependencies.
     Display warning message when there is an error and terminate the program.
 
     Args:
-        dependency_type: str. Dependency download format.
+        dependency_type: DownloadFormatType. Dependency download format.
         dependency_dict: dict. A dependencies.json dependency dict.
     """
     keys = list(dependency_dict.keys())
@@ -272,7 +332,7 @@ def test_dependencies_syntax(dependency_type, dependency_dict):
         sys.exit(1)
 
 
-def validate_dependencies(filepath):
+def validate_dependencies(filepath: str) -> None:
     """This validates syntax of the dependencies.json
 
     Args:
@@ -293,7 +353,7 @@ def validate_dependencies(filepath):
             test_dependencies_syntax(download_format, dependency_contents)
 
 
-def download_all_dependencies(filepath):
+def download_all_dependencies(filepath: str) -> None:
     """This download all files to the required folders.
 
     Args:
@@ -343,7 +403,7 @@ def download_all_dependencies(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 
-def install_elasticsearch_dev_server():
+def install_elasticsearch_dev_server() -> None:
     """This installs a local ElasticSearch server to the oppia_tools
     directory to be used by development servers and backend tests.
     """
@@ -363,12 +423,12 @@ def install_elasticsearch_dev_server():
 
     if common.is_mac_os() or common.is_linux_os():
         file_ext = 'tar.gz'
-        def download_and_extract(*args):
+        def download_and_extract(*args: str) -> None:
             """This downloads and extracts the elasticsearch files."""
             download_and_untar_files(*args)
     elif common.is_windows_os():
         file_ext = 'zip'
-        def download_and_extract(*args):
+        def download_and_extract(*args: str) -> None:
             """This downloads and extracts the elasticsearch files."""
             download_and_unzip_files(*args)
     else:
@@ -388,7 +448,7 @@ def install_elasticsearch_dev_server():
     print('ElasticSearch installed successfully.')
 
 
-def install_redis_cli():
+def install_redis_cli() -> None:
     """This installs the redis-cli to the local oppia third_party directory so
     that development servers and backend tests can make use of a local redis
     cache. Redis-cli installed here (redis-cli-6.0.6) is different from the
@@ -450,7 +510,7 @@ def install_redis_cli():
         print('Redis-cli installed successfully.')
 
 
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> None:
     """Installs all the third party libraries."""
     if common.is_windows_os():
         # The redis cli is not compatible with Windows machines.
