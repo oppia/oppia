@@ -1260,7 +1260,7 @@ export class ConversationSkinComponent {
         this.nextCard = nextCard;
         this.nextCardIfStuck = nextCardIfReallyStuck;
         if (!this._editorPreviewMode &&
-            this.explorationPlayerStateService.isPresentingIsolatedQuestions()
+            !this.explorationPlayerStateService.isPresentingIsolatedQuestions()
         ) {
           let oldStateName =
             this.playerPositionService.getCurrentStateName();

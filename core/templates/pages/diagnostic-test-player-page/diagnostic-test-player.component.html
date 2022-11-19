@@ -9,7 +9,7 @@
       </a>
     </button>
     <div class="oppia-diagnostic-test-session">
-      Learner Diagnostic Test
+      {{ 'I18N_DIAGNOSTIC_TEST_HEADING' | translate }}
     </div>
   </div>
   <mat-card class="oppia-introductory-card" *ngIf="!diagnosticTestIsStarted">
@@ -37,7 +37,7 @@
         <div class="oppia-current-progress" [ngStyle]="{'width': progressPercentage + '%'}"></div>
       </div>
       <div class="oppia-progress-percentage-container">
-        <span><i>Current progress: {{progressPercentage}}%</i></span>
+        <span><i>{{ getProgressText() }}</i></span>
       </div>
     </div>
     <oppia-conversation-skin [diagnosticTestTopicTrackerModel]="diagnosticTestTopicTrackerModel">
@@ -94,7 +94,7 @@
         <div class="oppia-classroom-button-container">
           <button class="btn oppia-goto-classroom-button">
             <a class="oppia-anchor-tag-under-button" href="/learn/math">
-              Go to classroom
+              {{ 'I18N_DIAGNOSTIC_TEST_RESULT_GO_TO_CLASSROOM_BUTTON_TEXT' | translate }}
             </a>
           </button>
         </div>

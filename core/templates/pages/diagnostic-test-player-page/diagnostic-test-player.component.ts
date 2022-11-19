@@ -74,12 +74,22 @@ export class DiagnosticTestPlayerComponent implements OnInit {
         .onDiagnosticTestSessionProgressChange.subscribe(
           (progressPercentage: number) => {
             this.progressPercentage = progressPercentage;
+            this.getProgressText();
           }
         ));
+
+    this.getProgressText();
     this.classroomBackendApiService.getClassroomIdAsync(
       this.classroomUrlFragment).then(classroomId => {
       this.classroomId = classroomId;
     });
+  }
+
+  getProgressText(): string {
+    return this.translateService.instant(
+      'I18N_DIAGNOSTIC_TEST_CURRENT_PROGRESS', {
+        progressPercentage: this.progressPercentage
+      });
   }
 
   startDiagnosticTest(): void {
