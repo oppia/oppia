@@ -219,6 +219,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/tests/services_sources/CTest.service.ts',
     'core/tests/services_sources/DTest.service.ts',
     'core/tests/services_sources/ETestFactory.ts',
+    'core/tests/services_sources/F.directive.ts',
     'extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.spec.ts',
     'extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts',
     'extensions/interactions/DragAndDropSortInput/drag-and-drop-sort-input-interactions.module.ts',
