@@ -18,20 +18,19 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import subscription_services
-from core.platform import models
 from core.tests import test_utils
 
-(user_models,) = models.Registry.import_models([models.Names.USER])
+from typing import Final
 
 
 class SubscriptionTests(test_utils.GenericTestBase):
 
-    USER_EMAIL = 'user@example.com'
-    USER_USERNAME = 'user'
-    USER2_EMAIL = 'user2@example.com'
-    USER2_USERNAME = 'user2'
+    USER_EMAIL: Final = 'user@example.com'
+    USER_USERNAME: Final = 'user'
+    USER2_EMAIL: Final = 'user2@example.com'
+    USER2_USERNAME: Final = 'user2'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -42,7 +41,63 @@ class SubscriptionTests(test_utils.GenericTestBase):
         self.signup(self.USER2_EMAIL, self.USER2_USERNAME)
         self.user_id_2 = self.get_user_id_from_email(self.USER2_EMAIL)
 
-    def test_subscribe_handler(self):
+    def test_cannot_subscribe_without_login(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'creator_username': self.EDITOR_USERNAME
+        }
+        response = self.post_json(
+            feconf.SUBSCRIBE_URL_PREFIX,
+            payload,
+            csrf_token=csrf_token,
+            expected_status_int=401
+        )
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to manage subscriptions.'
+        )
+
+    def test_invalid_creator_username_raises_error_while_subscribing(
+        self
+    ) -> None:
+        self.login(self.USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'creator_username': 'invalid'
+        }
+        response = self.post_json(
+            feconf.SUBSCRIBE_URL_PREFIX,
+            payload,
+            csrf_token=csrf_token,
+            expected_status_int=500
+        )
+        self.assertEqual(
+            response['error'],
+            'No user_id found for the given username: invalid'
+        )
+
+    def test_invalid_creator_username_raises_error_while_unsubscribing(
+        self
+    ) -> None:
+        self.login(self.USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'creator_username': 'invalid'
+        }
+        response = self.post_json(
+            feconf.UNSUBSCRIBE_URL_PREFIX,
+            payload,
+            csrf_token=csrf_token,
+            expected_status_int=500
+        )
+        self.assertEqual(
+            response['error'],
+            'No creator user_id found for the given creator username: invalid'
+        )
+
+    def test_subscribe_handler(self) -> None:
         """Test handler for new subscriptions to creators."""
 
         self.login(self.USER_EMAIL)
@@ -90,7 +145,7 @@ class SubscriptionTests(test_utils.GenericTestBase):
                 self.user_id_2), [self.editor_id])
         self.logout()
 
-    def test_unsubscribe_handler(self):
+    def test_unsubscribe_handler(self) -> None:
         """Test handler for unsubscriptions."""
 
         payload = {

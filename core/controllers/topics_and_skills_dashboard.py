@@ -40,32 +40,51 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 
+from typing import Dict, List, Optional, TypedDict, Union
 
-class TopicsAndSkillsDashboardPage(base.BaseHandler):
+
+class FrontendTopicSummaryDict(topic_domain.TopicSummaryDict):
+    """Dictionary that represents TopicSummary domain object for frontend."""
+
+    is_published: bool
+    can_edit_topic: bool
+    classroom: Optional[str]
+
+
+class TopicsAndSkillsDashboardPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Page showing the topics and skills dashboard."""
 
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
     @acl_decorators.can_access_topics_and_skills_dashboard
-    def get(self):
+    def get(self) -> None:
         self.render_template(
             'topics-and-skills-dashboard-page.mainpage.html')
 
 
-class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
+class TopicsAndSkillsDashboardPageDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Provides data for the user's topics and skills dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_topics_and_skills_dashboard
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
 
         topic_summaries = topic_fetchers.get_all_topic_summaries()
-        topic_summary_dicts = [
-            summary.to_dict() for summary in topic_summaries]
+        # Here we use MyPy ignore because we are explicitly changing
+        # the type from the list of 'TopicSummaryDict' to the list of
+        # 'FrontendTopicSummaryDict', and this is done because below we
+        # are adding new keys that are not defined on the 'TopicSummaryDict'.
+        topic_summary_dicts: List[FrontendTopicSummaryDict] = [
+            summary.to_dict() for summary in topic_summaries]  # type: ignore[misc]
 
         skill_summaries = skill_services.get_all_skill_summaries()
         skill_summary_dicts = [
@@ -146,18 +165,18 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class CategorizedAndUntriagedSkillsDataHandler(base.BaseHandler):
+class CategorizedAndUntriagedSkillsDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Provides information about categorized skills and untriaged skill
     summaries for the exploration editor page's skill editor component."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         skill_summaries = skill_services.get_all_skill_summaries()
         skill_ids_assigned_to_some_topic = (
@@ -185,7 +204,9 @@ class CategorizedAndUntriagedSkillsDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class TopicAssignmentsHandler(base.BaseHandler):
+class TopicAssignmentsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Provides information about which topics contain the given skill."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -200,12 +221,10 @@ class TopicAssignmentsHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_topics_and_skills_dashboard
-    def get(self, skill_id):
+    def get(self, skill_id: str) -> None:
         """Handles GET requests."""
         topic_assignments = skill_services.get_all_topic_assignments_for_skill(
             skill_id)
@@ -218,11 +237,29 @@ class TopicAssignmentsHandler(base.BaseHandler):
         })
 
 
-class SkillsDashboardPageDataHandler(base.BaseHandler):
+class SkillsDashboardPageDataHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of SkillsDashboardPageDataHandler's
+    normalized_payload dictionary.
+    """
+
+    classroom_name: str
+    next_cursor: Optional[str]
+    keywords: List[str]
+    num_skills_to_fetch: int
+    sort: str
+    status: str
+
+
+class SkillsDashboardPageDataHandler(
+    base.BaseHandler[
+        SkillsDashboardPageDataHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Provides data for the user's skills dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'classroom_name': {
@@ -269,15 +306,15 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_topics_and_skills_dashboard
-    def post(self):
+    def post(self) -> None:
         """Handles POST requests."""
-
-        classroom_name = self.normalized_payload.get('classroom_name')
+        assert self.normalized_payload is not None
+        classroom_name = self.normalized_payload['classroom_name']
         urlsafe_start_cursor = self.normalized_payload.get('next_cursor')
-        keywords = self.normalized_payload.get('keywords')
-        num_skills_to_fetch = self.normalized_payload.get('num_skills_to_fetch')
-        sort_by = self.normalized_payload.get('sort')
-        status = self.normalized_payload.get('status')
+        keywords = self.normalized_payload['keywords']
+        num_skills_to_fetch = self.normalized_payload['num_skills_to_fetch']
+        sort_by = self.normalized_payload['sort']
+        status = self.normalized_payload['status']
 
         skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
@@ -293,25 +330,115 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
         })
 
 
-class NewTopicHandler(base.BaseHandler):
+class NewTopicHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of NewTopicHandler's
+    normalized_payload dictionary.
+    """
+
+    name: str
+    url_fragment: str
+    description: str
+    filename: str
+    thumbnailBgColor: str
+    page_title_fragment: str
+
+
+class NewTopicHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of NewTopicHandler's
+    normalized_request dictionary.
+    """
+
+    image: bytes
+
+
+class NewTopicHandler(
+    base.BaseHandler[
+        NewTopicHandlerNormalizedPayloadDict,
+        NewTopicHandlerNormalizedRequestDict
+    ]
+):
     """Creates a new topic."""
 
-    @acl_decorators.can_create_topic
-    def post(self):
-        """Handles POST requests."""
-        name = self.payload.get('name')
-        url_fragment = self.payload.get('url_fragment')
-        description = self.payload.get('description')
-        thumbnail_filename = self.payload.get('filename')
-        thumbnail_bg_color = self.payload.get('thumbnailBgColor')
-        raw_image = self.request.get('image')
-        page_title_frag = self.payload.get('page_title_fragment')
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': android_validation_constants
+                            .MAX_CHARS_IN_TOPIC_NAME
+                    }, {
+                        'id': 'is_nonempty',
+                    }]
+                }
+            },
+            'url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+            'description': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': android_validation_constants
+                            .MAX_CHARS_IN_TOPIC_DESCRIPTION
+                    }]
+                }
+            },
+            'filename': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': r'[-\w]+[.]\w+'
+                    }]
+                }
+            },
+            'thumbnailBgColor': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': constants.ALLOWED_THUMBNAIL_BG_COLORS['topic']
+                }
+            },
+            'image': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'page_title_fragment': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': (
+                            constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+                        )
+                    }, {
+                        'id': 'has_length_at_least',
+                        'min_value': (
+                            constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+                        )
+                    }]
+                }
+            }
+        }
+    }
 
-        try:
-            topic_domain.Topic.require_valid_name(name)
-        except Exception as e:
-            raise self.InvalidInputException(
-                'Invalid topic name, received %s.' % name) from e
+    @acl_decorators.can_create_topic
+    def post(self) -> None:
+        """Handles POST requests."""
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        assert self.normalized_request is not None
+        name = self.normalized_payload['name']
+        url_fragment = self.normalized_payload['url_fragment']
+        description = self.normalized_payload['description']
+        thumbnail_filename = self.normalized_payload['filename']
+        thumbnail_bg_color = self.normalized_payload['thumbnailBgColor']
+        raw_image = self.normalized_request['image']
+        page_title_frag = self.normalized_payload['page_title_fragment']
+
         new_topic_id = topic_fetchers.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
             new_topic_id, name, url_fragment, description, page_title_frag)
@@ -350,11 +477,28 @@ class NewTopicHandler(base.BaseHandler):
         })
 
 
-class NewSkillHandler(base.BaseHandler):
+class NewSkillHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of NewSkillHandler's
+    normalized_payload dictionary.
+    """
+
+    description: str
+    linked_topic_ids: List[str]
+    explanation_dict: state_domain.SubtitledHtml
+    rubrics: List[skill_domain.Rubric]
+    files: Dict[str, Union[str, bytes]]
+
+
+class NewSkillHandler(
+    base.BaseHandler[
+        NewSkillHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Creates a new skill."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'description': {
@@ -407,12 +551,14 @@ class NewSkillHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_create_skill
-    def post(self):
-        description = self.normalized_payload.get('description')
-        linked_topic_ids = self.normalized_payload.get('linked_topic_ids')
-        explanation_dict = self.normalized_payload.get('explanation_dict')
-        rubrics = self.normalized_payload.get('rubrics')
-        files = self.normalized_payload.get('files')
+    def post(self) -> None:
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        description = self.normalized_payload['description']
+        linked_topic_ids = self.normalized_payload['linked_topic_ids']
+        explanation_dict = self.normalized_payload['explanation_dict']
+        rubrics = self.normalized_payload['rubrics']
+        files = self.normalized_payload['files']
 
         new_skill_id = skill_services.get_new_skill_id()
         if linked_topic_ids is not None:
@@ -437,8 +583,11 @@ class NewSkillHandler(base.BaseHandler):
         skill_services.save_new_skill(self.user_id, skill)
 
         for filename in image_filenames:
-            base64_image = files.get(filename)
-            bytes_image = base64.decodebytes(base64_image.encode('utf-8'))
+            base64_image = files[filename]
+            bytes_image = (
+                base64_image if isinstance(base64_image, bytes)
+                else base64.decodebytes(base64_image.encode('utf-8'))
+            )
             file_format = (
                 image_validation_services.validate_image_and_filename(
                     bytes_image, filename))
@@ -453,24 +602,57 @@ class NewSkillHandler(base.BaseHandler):
         })
 
 
-class MergeSkillHandler(base.BaseHandler):
+class MergeSkillHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of MergeSkillHandler's
+    normalized_payload dictionary.
+    """
+
+    old_skill_id: str
+    new_skill_id: str
+
+
+class MergeSkillHandler(
+    base.BaseHandler[
+        MergeSkillHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """Handles merging of the skills."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'old_skill_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                }
+            },
+            'new_skill_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_access_topics_and_skills_dashboard
-    def post(self):
+    def post(self) -> None:
         """Handles the POST request."""
-        old_skill_id = self.payload.get('old_skill_id')
-        new_skill_id = self.payload.get('new_skill_id')
-        new_skill = skill_fetchers.get_skill_by_id(new_skill_id, strict=False)
-        if new_skill is None:
-            raise self.PageNotFoundException(
-                Exception('The new skill with the given id doesn\'t exist.'))
-        old_skill = skill_fetchers.get_skill_by_id(old_skill_id, strict=False)
-        if old_skill is None:
-            raise self.PageNotFoundException(
-                Exception('The old skill with the given id doesn\'t exist.'))
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        old_skill_id = self.normalized_payload['old_skill_id']
+        new_skill_id = self.normalized_payload['new_skill_id']
+        skill_fetchers.get_skill_by_id(new_skill_id, strict=True)
+        old_skill = skill_fetchers.get_skill_by_id(old_skill_id, strict=True)
 
         skill_services.replace_skill_id_in_all_topics(
             self.user_id, old_skill_id, new_skill_id)
@@ -494,7 +676,9 @@ class MergeSkillHandler(base.BaseHandler):
         })
 
 
-def normalize_comma_separated_topic_ids(comma_separated_topic_ids):
+def normalize_comma_separated_topic_ids(
+    comma_separated_topic_ids: str
+) -> List[str]:
     """Normalizes a string of comma-separated topic IDs into a list of
     topic IDs.
 
@@ -505,16 +689,28 @@ def normalize_comma_separated_topic_ids(comma_separated_topic_ids):
         list(str). A list of topic IDs.
     """
     if not comma_separated_topic_ids:
-        return list([])
+        return []
     return list(comma_separated_topic_ids.split(','))
 
 
-class TopicIdToDiagnosticTestSkillIdsHandler(base.BaseHandler):
+class TopicIdToDiagnosticTestSkillIdsHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of TopicIdToDiagnosticTestSkillIdsHandler's
+    normalized_request dictionary.
+    """
+
+    comma_separated_topic_ids: List[str]
+
+
+class TopicIdToDiagnosticTestSkillIdsHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        TopicIdToDiagnosticTestSkillIdsHandlerNormalizedRequestDict
+    ]
+):
     """Handler class to get topic ID to diagnostic test skill IDs dict."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'comma_separated_topic_ids': {
@@ -527,9 +723,10 @@ class TopicIdToDiagnosticTestSkillIdsHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def get(self):
-        topic_ids = self.normalized_request.get(
-            'comma_separated_topic_ids')
+    def get(self) -> None:
+        assert self.normalized_request is not None
+        topic_ids = self.normalized_request[
+            'comma_separated_topic_ids']
         self.values.update({
             'topic_id_to_diagnostic_test_skill_ids': (
                 topic_services.get_topic_id_to_diagnostic_test_skill_ids(

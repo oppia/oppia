@@ -134,6 +134,18 @@ def create_suggestion(
 ) -> suggestion_registry.SuggestionEditStateContent: ...
 
 
+@overload
+def create_suggestion(
+    suggestion_type: str,
+    target_type: str,
+    target_id: str,
+    target_version_at_submission: int,
+    author_id: str,
+    change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+    description: Optional[str]
+) -> suggestion_registry.BaseSuggestion: ...
+
+
 def create_suggestion(
     suggestion_type: str,
     target_type: str,
@@ -894,10 +906,7 @@ def resubmit_rejected_suggestion(
     suggestion_id: str,
     summary_message: str,
     author_id: str,
-    change: Union[
-        exp_domain.ExplorationChange,
-        question_domain.QuestionSuggestionChange
-    ]
+    change: change_domain.BaseChange
 ) -> None:
     """Resubmit a rejected suggestion with the given suggestion_id.
 
@@ -906,7 +915,7 @@ def resubmit_rejected_suggestion(
         summary_message: str. The message provided by the author to
             summarize new suggestion.
         author_id: str. The ID of the author creating the suggestion.
-        change: ExplorationChange. The new change to apply to the suggestion.
+        change: BaseChange. The new change to apply to the suggestion.
 
     Raises:
         Exception. The summary message is empty.
@@ -1187,8 +1196,8 @@ def get_translation_suggestions_in_review_by_exp_ids(
 
 
 def get_suggestions_with_translatable_explorations(
-    suggestions: List[suggestion_registry.SuggestionTranslateContent]
-) -> List[suggestion_registry.SuggestionTranslateContent]:
+    suggestions: Sequence[suggestion_registry.SuggestionTranslateContent]
+) -> Sequence[suggestion_registry.SuggestionTranslateContent]:
     """Filters the supplied suggestions for those suggestions that have
     translatable exploration content. That is, the following are true:
     - The suggestion's change content corresponds to an existing exploration
@@ -1489,9 +1498,37 @@ def get_submitted_suggestions(
     ])
 
 
+@overload
+def get_submitted_suggestions_by_offset(
+    user_id: str,
+    suggestion_type: Literal['add_question'],
+    limit: int,
+    offset: int
+) -> Tuple[
+    Sequence[suggestion_registry.SuggestionAddQuestion], int
+]: ...
+
+
+@overload
+def get_submitted_suggestions_by_offset(
+    user_id: str,
+    suggestion_type: Literal['translate_content'],
+    limit: int,
+    offset: int
+) -> Tuple[
+    Sequence[suggestion_registry.SuggestionTranslateContent], int
+]: ...
+
+
+@overload
 def get_submitted_suggestions_by_offset(
     user_id: str, suggestion_type: str, limit: int, offset: int
-) -> Tuple[List[suggestion_registry.BaseSuggestion], int]:
+) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]: ...
+
+
+def get_submitted_suggestions_by_offset(
+    user_id: str, suggestion_type: str, limit: int, offset: int
+) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]:
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
 

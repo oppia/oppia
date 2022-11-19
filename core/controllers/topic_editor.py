@@ -42,8 +42,35 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 
+from typing import Dict, List, TypedDict, Union
 
-class TopicEditorStoryHandler(base.BaseHandler):
+
+class TopicEditorStoryHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of TopicEditorStoryHandler's
+    normalized_payload dictionary.
+    """
+
+    title: str
+    description: str
+    filename: str
+    thumbnailBgColor: str
+    story_url_fragment: str
+
+
+class TopicEditorStoryHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of TopicEditorStoryHandler's
+    normalized_request dictionary.
+    """
+
+    image: bytes
+
+
+class TopicEditorStoryHandler(
+    base.BaseHandler[
+        TopicEditorStoryHandlerNormalizedPayloadDict,
+        TopicEditorStoryHandlerNormalizedRequestDict
+    ]
+):
     """Manages the creation of a story and receiving of all story summaries for
     display in topic editor page.
     """
@@ -98,7 +125,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_view_any_topic_editor
-    def get(self, topic_id):
+    def get(self, topic_id: str) -> None:
         """Handles GET requests."""
         topic = topic_fetchers.get_topic_by_id(topic_id)
         story_id_to_publication_status_map = {}
@@ -118,36 +145,77 @@ class TopicEditorStoryHandler(base.BaseHandler):
         additional_story_summary_dicts = [
             summary.to_dict() for summary in additional_story_summaries]
 
+        updated_canonical_story_summary_dicts = []
         for summary in canonical_story_summary_dicts:
-            summary['story_is_published'] = (
-                story_id_to_publication_status_map[summary['id']])
-            summary['completed_node_titles'] = []
-            summary['all_node_dicts'] = []
+            updated_canonical_story_summary_dict = {
+                'id': summary['id'],
+                'title': summary['title'],
+                'description': summary['description'],
+                'language_code': summary['language_code'],
+                'version': summary['version'],
+                'node_titles': summary['node_titles'],
+                'thumbnail_filename': summary['thumbnail_filename'],
+                'thumbnail_bg_color': summary['thumbnail_bg_color'],
+                'url_fragment': summary['url_fragment'],
+                'story_model_created_on': summary['story_model_created_on'],
+                'story_model_last_updated': summary['story_model_last_updated'],
+                'story_is_published': (
+                    story_id_to_publication_status_map[summary['id']]),
+                'completed_node_titles': [],
+                'all_node_dicts': []
+            }
+            updated_canonical_story_summary_dicts.append(
+                updated_canonical_story_summary_dict
+            )
 
+        updated_additional_story_summary_dicts = []
         for summary in additional_story_summary_dicts:
-            summary['story_is_published'] = (
-                story_id_to_publication_status_map[summary['id']])
-            summary['completed_node_titles'] = []
-            summary['all_node_dicts'] = []
+            updated_additional_story_summary_dict = {
+                'id': summary['id'],
+                'title': summary['title'],
+                'description': summary['description'],
+                'language_code': summary['language_code'],
+                'version': summary['version'],
+                'node_titles': summary['node_titles'],
+                'thumbnail_filename': summary['thumbnail_filename'],
+                'thumbnail_bg_color': summary['thumbnail_bg_color'],
+                'url_fragment': summary['url_fragment'],
+                'story_model_created_on': summary['story_model_created_on'],
+                'story_model_last_updated': summary['story_model_last_updated'],
+                'story_is_published': (
+                    story_id_to_publication_status_map[summary['id']]),
+                'completed_node_titles': [],
+                'all_node_dicts': []
+            }
+            updated_additional_story_summary_dicts.append(
+                updated_additional_story_summary_dict
+            )
 
         self.values.update({
-            'canonical_story_summary_dicts': canonical_story_summary_dicts,
-            'additional_story_summary_dicts': additional_story_summary_dicts
+            'canonical_story_summary_dicts': (
+                updated_canonical_story_summary_dicts
+            ),
+            'additional_story_summary_dicts': (
+                updated_additional_story_summary_dicts
+            )
         })
         self.render_json(self.values)
 
     @acl_decorators.can_add_new_story_to_topic
-    def post(self, topic_id):
+    def post(self, topic_id: str) -> None:
         """Handles POST requests.
         Currently, this only adds the story to the canonical story id list of
         the topic.
         """
-        title = self.normalized_payload.get('title')
-        description = self.normalized_payload.get('description')
-        thumbnail_filename = self.normalized_payload.get('filename')
-        thumbnail_bg_color = self.normalized_payload.get('thumbnailBgColor')
-        raw_image = self.normalized_request.get('image')
-        story_url_fragment = self.normalized_payload.get('story_url_fragment')
+        assert self.user_id is not None
+        assert self.normalized_request is not None
+        assert self.normalized_payload is not None
+        title = self.normalized_payload['title']
+        description = self.normalized_payload['description']
+        thumbnail_filename = self.normalized_payload['filename']
+        thumbnail_bg_color = self.normalized_payload['thumbnailBgColor']
+        raw_image = self.normalized_request['image']
+        story_url_fragment = self.normalized_payload['story_url_fragment']
 
         story_domain.Story.require_valid_title(title)
         if story_services.does_story_exist_with_url_fragment(
@@ -201,7 +269,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
         })
 
 
-class TopicEditorPage(base.BaseHandler):
+class TopicEditorPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """The editor page for a single topic."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -215,12 +283,10 @@ class TopicEditorPage(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_any_topic_editor
-    def get(self, topic_id):
+    def get(self, topic_id: str) -> None:
         """Handles GET requests."""
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
@@ -231,11 +297,12 @@ class TopicEditorPage(base.BaseHandler):
         self.render_template('topic-editor-page.mainpage.html')
 
 
-class EditableSubtopicPageDataHandler(base.BaseHandler):
+class EditableSubtopicPageDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The data handler for subtopic pages."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     URL_PATH_ARGS_SCHEMAS = {
         'topic_id': {
             'schema': {
@@ -256,12 +323,10 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_any_topic_editor
-    def get(self, topic_id, subtopic_id):
+    def get(self, topic_id: str, subtopic_id: int) -> None:
         """Handles GET requests."""
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             topic_id, subtopic_id, strict=False)
@@ -277,7 +342,22 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class EditableTopicDataHandler(base.BaseHandler):
+class EditableTopicDataHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of EditableTopicDataHandler's
+    normalized_payload dictionary.
+    """
+
+    version: int
+    commit_message: str
+    topic_and_subtopic_page_change_dicts: List[topic_domain.TopicChange]
+
+
+class EditableTopicDataHandler(
+    base.BaseHandler[
+        EditableTopicDataHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """A data handler for topics which supports writing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -323,7 +403,9 @@ class EditableTopicDataHandler(base.BaseHandler):
         'DELETE': {}
     }
 
-    def _require_valid_version(self, version_from_payload, topic_version):
+    def _require_valid_version(
+        self, version_from_payload: int, topic_version: int
+    ) -> None:
         """Check that the payload version matches the given topic
         version.
         """
@@ -335,7 +417,7 @@ class EditableTopicDataHandler(base.BaseHandler):
                 % (topic_version, version_from_payload))
 
     @acl_decorators.can_view_any_topic_editor
-    def get(self, topic_id):
+    def get(self, topic_id: str) -> None:
         """Populates the data on the individual topic page."""
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
@@ -400,7 +482,7 @@ class EditableTopicDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_edit_topic
-    def put(self, topic_id):
+    def put(self, topic_id: str) -> None:
         """Updates properties of the given topic.
         Also, each change_dict given for editing should have an additional
         property called is_topic_change, which would be a boolean. If True, it
@@ -408,16 +490,23 @@ class EditableTopicDataHandler(base.BaseHandler):
         subtopics), while False would mean it is for a Subtopic Page (this
         includes editing its html data as of now).
         """
-        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=True)
 
-        version = self.normalized_payload.get('version')
+        version = self.normalized_payload['version']
         self._require_valid_version(version, topic.version)
 
-        commit_message = self.normalized_payload.get('commit_message')
+        commit_message = self.normalized_payload['commit_message']
 
-        topic_and_subtopic_page_change_dicts = self.normalized_payload.get(
-            'topic_and_subtopic_page_change_dicts')
-        topic_and_subtopic_page_change_list = []
+        topic_and_subtopic_page_change_dicts = self.normalized_payload[
+            'topic_and_subtopic_page_change_dicts']
+        topic_and_subtopic_page_change_list: List[
+            Union[
+                subtopic_page_domain.SubtopicPageChange,
+                topic_domain.TopicChange
+            ]
+        ] = []
         for change in topic_and_subtopic_page_change_dicts:
             if change.cmd == (
                     subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
@@ -432,7 +521,7 @@ class EditableTopicDataHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=True)
 
         skill_id_to_description_dict, deleted_skill_ids = (
             skill_services.get_descriptions_of_skills(
@@ -463,8 +552,9 @@ class EditableTopicDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_delete_topic
-    def delete(self, topic_id):
+    def delete(self, topic_id: str) -> None:
         """Handles Delete requests."""
+        assert self.user_id is not None
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.PageNotFoundException(
@@ -474,11 +564,12 @@ class EditableTopicDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class TopicRightsHandler(base.BaseHandler):
+class TopicRightsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """A handler for returning topic rights."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     URL_PATH_ARGS_SCHEMAS = {
         'topic_id': {
             'schema': {
@@ -490,13 +581,12 @@ class TopicRightsHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_any_topic_editor
-    def get(self, topic_id):
+    def get(self, topic_id: str) -> None:
         """Returns the TopicRights object of a topic."""
+        assert self.user_id is not None
         topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
             raise self.InvalidInputException(
@@ -518,11 +608,23 @@ class TopicRightsHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class TopicPublishSendMailHandler(base.BaseHandler):
+class TopicPublishSendMailHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of TopicPublishSendMailHandler's
+    normalized_payload dictionary.
+    """
+
+    topic_name: str
+
+
+class TopicPublishSendMailHandler(
+    base.BaseHandler[
+        TopicPublishSendMailHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """A handler for sending mail to admins to review and publish topic."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     URL_PATH_ARGS_SCHEMAS = {
         'topic_id': {
             'schema': {
@@ -549,8 +651,9 @@ class TopicPublishSendMailHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_view_any_topic_editor
-    def put(self, topic_id):
+    def put(self, topic_id: str) -> None:
         """Returns the TopicRights object of a topic."""
+        assert self.normalized_payload is not None
         topic_url = feconf.TOPIC_EDITOR_URL_PREFIX + '/' + topic_id
         if feconf.CAN_SEND_EMAILS:
             email_manager.send_mail_to_admin(
@@ -559,7 +662,7 @@ class TopicPublishSendMailHandler(base.BaseHandler):
                 ' and publish if it looks good.'
                 % (
                     self.username,
-                    self.normalized_payload.get('topic_name'),
+                    self.normalized_payload['topic_name'],
                     topic_url
                 )
             )
@@ -567,7 +670,20 @@ class TopicPublishSendMailHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class TopicPublishHandler(base.BaseHandler):
+class TopicPublishHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of TopicPublishHandler's
+    normalized_payload dictionary.
+    """
+
+    publish_status: bool
+
+
+class TopicPublishHandler(
+    base.BaseHandler[
+        TopicPublishHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """A handler for publishing and unpublishing topics."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -587,18 +703,20 @@ class TopicPublishHandler(base.BaseHandler):
                 'schema': {
                     'type': 'bool'
                 }
-            },
+            }
         }
     }
 
     @acl_decorators.can_change_topic_publication_status
-    def put(self, topic_id):
+    def put(self, topic_id: str) -> None:
         """Publishes or unpublishes a topic."""
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.PageNotFoundException
 
-        publish_status = self.normalized_payload.get('publish_status')
+        publish_status = self.normalized_payload['publish_status']
 
         try:
             if publish_status:
@@ -611,7 +729,9 @@ class TopicPublishHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class TopicUrlFragmentHandler(base.BaseHandler):
+class TopicUrlFragmentHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """A data handler for checking if a topic with given url fragment exists."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -619,12 +739,10 @@ class TopicUrlFragmentHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_create_topic
-    def get(self, topic_url_fragment):
+    def get(self, topic_url_fragment: str) -> None:
         """Handler that receives a topic url fragment and checks whether
         a topic with the same url fragment exists.
         """
@@ -636,11 +754,12 @@ class TopicUrlFragmentHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class TopicNameHandler(base.BaseHandler):
+class TopicNameHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """A data handler for checking if a topic with given name exists."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     URL_PATH_ARGS_SCHEMAS = {
         'topic_name': {
             'schema': {
@@ -652,12 +771,10 @@ class TopicNameHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_create_topic
-    def get(self, topic_name):
+    def get(self, topic_name: str) -> None:
         """Handler that receives a topic name and checks whether
         a topic with the same name exists.
         """
@@ -668,7 +785,9 @@ class TopicNameHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-def normalize_comma_separated_topic_ids(comma_separated_topic_ids):
+def normalize_comma_separated_topic_ids(
+    comma_separated_topic_ids: str
+) -> List[str]:
     """Normalizes a string of comma-separated topic IDs into a list of
     topic IDs.
 
@@ -683,12 +802,24 @@ def normalize_comma_separated_topic_ids(comma_separated_topic_ids):
     return list(comma_separated_topic_ids.split(','))
 
 
-class TopicIdToTopicNameHandler(base.BaseHandler):
+class TopicIdToTopicNameHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of TopicIdToTopicNameHandler's
+    normalized_request dictionary.
+    """
+
+    comma_separated_topic_ids: List[str]
+
+
+class TopicIdToTopicNameHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        TopicIdToTopicNameHandlerNormalizedRequestDict
+    ]
+):
     """Handler class to get topic ID to topic name dict."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'comma_separated_topic_ids': {
@@ -701,9 +832,10 @@ class TopicIdToTopicNameHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self):
-        topic_ids = self.normalized_request.get(
-            'comma_separated_topic_ids')
+    def get(self) -> None:
+        assert self.normalized_request is not None
+        topic_ids = self.normalized_request[
+            'comma_separated_topic_ids']
         self.values.update({
             'topic_id_to_topic_name': (
                 topic_services.get_topic_id_to_topic_name_dict(topic_ids))

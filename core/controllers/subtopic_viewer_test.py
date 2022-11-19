@@ -28,7 +28,7 @@ from core.tests import test_utils
 
 class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -96,7 +96,7 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             additional_story_ids=[],
             uncategorized_skill_ids=[],
             subtopics=[subtopic], next_subtopic_id=2)
-        self.recorded_voiceovers_dict = {
+        self.recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 'content': {
                     'en': {
@@ -108,7 +108,7 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
                 }
             }
         }
-        self.written_translations_dict = {
+        self.written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {}
             }
@@ -153,12 +153,13 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
 
 class SubtopicViewerPageTests(BaseSubtopicViewerControllerTests):
 
-    def test_any_user_can_access_subtopic_viewer_page(self):
+    def test_any_user_can_access_subtopic_viewer_page(self) -> None:
         self.get_html_response(
             '/learn/staging/%s/revision/%s' % ('name', 'sub-url-frag-one'))
 
     def test_accessibility_of_subtopic_viewer_page_of_unpublished_topic(
-            self):
+        self
+    ) -> None:
         self.get_html_response(
             '/learn/staging/%s/revision/%s'
             % ('pvttopic', 'sub-url-frag-one'),
@@ -171,7 +172,7 @@ class SubtopicViewerPageTests(BaseSubtopicViewerControllerTests):
 
 
 class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
-    def test_get_for_first_subtopic_in_topic(self):
+    def test_get_for_first_subtopic_in_topic(self) -> None:
         json_response = self.get_json(
             '%s/staging/%s/%s' % (
                 feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'))
@@ -202,7 +203,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
-    def test_get_for_last_subtopic_in_topic(self):
+    def test_get_for_last_subtopic_in_topic(self) -> None:
         json_response = self.get_json(
             '%s/staging/%s/%s' % (
                 feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-two'))
@@ -233,30 +234,45 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
-    def test_cannot_get_with_unpublished_topic(self):
+    def test_cannot_get_with_unpublished_topic(self) -> None:
         topic_services.unpublish_topic(self.topic_id, self.admin_id)
-        self.get_json(
+        response = self.get_json(
             '%s/staging/%s/%s' % (
-                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'),
-            expected_status_int=404)
+                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'
+            ),
+            expected_status_int=404
+        )
+        self.assertIn('Could not find the page', response['error'])
 
-    def test_cannot_get_with_invalid_topic_name(self):
-        self.get_json(
+    def test_cannot_get_with_invalid_topic_name(self) -> None:
+        response = self.get_json(
             '%s/staging/%s/%s' % (
                 feconf.SUBTOPIC_DATA_HANDLER, 'Invalid Name',
-                'sub-url-frag-one'),
-            expected_status_int=404)
+                'sub-url-frag-one'
+            ),
+            expected_status_int=400
+        )
+        self.assertIn(
+            '\nSchema validation for \'topic_url_fragment\' failed',
+            response['error']
+        )
 
-    def test_cannot_get_with_invalid_subtopic_id(self):
-        self.get_json(
+    def test_cannot_get_with_invalid_subtopic_id(self) -> None:
+        response = self.get_json(
             '%s/staging/%s/%s' % (
-                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-zero'),
-            expected_status_int=404)
+                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-zero'
+            ),
+            expected_status_int=404
+        )
+        self.assertIn('Could not find the page', response['error'])
 
-    def test_cannot_get_with_deleted_subtopic_page(self):
+    def test_cannot_get_with_deleted_subtopic_page(self) -> None:
         subtopic_page_services.delete_subtopic_page(
             self.admin_id, self.topic_id, 1)
-        self.get_json(
+        response = self.get_json(
             '%s/staging/%s/%s' % (
-                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'),
-            expected_status_int=404)
+                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'
+            ),
+            expected_status_int=404
+        )
+        self.assertIn('Could not find the page', response['error'])

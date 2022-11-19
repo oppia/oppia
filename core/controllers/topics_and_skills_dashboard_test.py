@@ -24,6 +24,7 @@ from core import utils
 from core.constants import constants
 from core.domain import config_services
 from core.domain import question_services
+from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
@@ -32,10 +33,12 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
 
+from typing import Callable, Dict, List
+
 
 class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -73,7 +76,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
 class TopicsAndSkillsDashboardPageDataHandlerTests(
         BaseTopicsAndSkillsDashboardTests):
 
-    def test_get(self):
+    def test_get(self) -> None:
         # Check that non-admins or non-topic managers cannot access the
         # topics and skills dashboard data.
         skill_id = skill_services.get_new_skill_id()
@@ -164,7 +167,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
             json_response['can_create_skill'], False)
         self.logout()
 
-    def test_topics_and_skills_dashboard_page(self):
+    def test_topics_and_skills_dashboard_page(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         response = self.get_html_response(
@@ -178,7 +181,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
 class CategorizedAndUntriagedSkillsDataHandlerTests(
     BaseTopicsAndSkillsDashboardTests):
 
-    def test_get(self):
+    def test_get(self) -> None:
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
 
@@ -215,7 +218,7 @@ class CategorizedAndUntriagedSkillsDataHandlerTests(
 
 class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
-    def test_get(self):
+    def test_get(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
@@ -255,9 +258,11 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         json_response = self.get_json(
             '%s/%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
+        sort_func: Callable[[Dict[str, str]], str] = lambda i: i['topic_name']
         topic_assignment_dicts = sorted(
             json_response['topic_assignment_dicts'],
-            key=lambda i: i['topic_name'])
+            key=sort_func
+        )
 
         self.assertEqual(len(topic_assignment_dicts), 2)
         self.assertEqual(topic_assignment_dicts[0]['topic_name'], 'Topic1')
@@ -271,7 +276,7 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
 class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
-    def test_post(self):
+    def test_post(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -327,7 +332,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertFalse(json_response['more'])
         self.assertEqual(json_response['next_cursor'], None)
 
-    def test_fetch_filtered_skills_with_given_keywords(self):
+    def test_fetch_filtered_skills_with_given_keywords(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -368,7 +373,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertFalse(json_response['more'])
         self.assertEqual(json_response['next_cursor'], None)
 
-    def test_fetch_filtered_skills_with_given_status(self):
+    def test_fetch_filtered_skills_with_given_status(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -398,7 +403,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertFalse(json_response['more'])
         self.assertEqual(json_response['next_cursor'], None)
 
-    def test_fetch_filtered_skills_with_given_cursor(self):
+    def test_fetch_filtered_skills_with_given_cursor(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         skill_id = skill_services.get_new_skill_id()
@@ -445,7 +450,9 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(
             json_response['skill_summary_dicts'][0]['id'], self.linked_skill_id)
 
-    def test_fetch_filtered_skills_with_invalid_num_skills_to_fetch(self):
+    def test_fetch_filtered_skills_with_invalid_num_skills_to_fetch(
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -468,7 +475,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             json_response['error'],
             expected_error)
 
-    def test_fetch_filtered_skills_with_invalid_cursor_type(self):
+    def test_fetch_filtered_skills_with_invalid_cursor_type(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         skill_id = skill_services.get_new_skill_id()
@@ -494,7 +501,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(
             json_response['error'], expected_error)
 
-    def test_fetch_filtered_skills_with_invalid_cursor_value(self):
+    def test_fetch_filtered_skills_with_invalid_cursor_value(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         skill_id = skill_services.get_new_skill_id()
@@ -512,7 +519,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             }, csrf_token=csrf_token,
             expected_status_int=500)
 
-    def test_fetch_filtered_skills_with_invalid_classroom(self):
+    def test_fetch_filtered_skills_with_invalid_classroom(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -534,7 +541,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(
             json_response['error'], expected_error)
 
-    def test_fetch_filtered_skills_with_invalid_keywords(self):
+    def test_fetch_filtered_skills_with_invalid_keywords(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -574,7 +581,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(
             json_response['error'], expected_error)
 
-    def test_fetch_filtered_skills_with_invalid_status(self):
+    def test_fetch_filtered_skills_with_invalid_status(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -596,7 +603,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(
             json_response['error'], expected_error)
 
-    def test_fetch_filtered_skills_with_invalid_sort(self):
+    def test_fetch_filtered_skills_with_invalid_sort(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -621,16 +628,15 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
 class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.url = feconf.NEW_TOPIC_URL
 
-    def test_topic_creation(self):
+    def test_topic_creation(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
             'name': 'Topic name',
-            'abbreviatedName': 'name-one',
             'description': 'Topic description',
             'filename': 'test_svg.svg',
             'thumbnailBgColor': '#C6DCDA',
@@ -645,7 +651,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             raw_image = f.read()
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
-            upload_files=(('image', 'unused_filename', raw_image),)
+            upload_files=[('image', 'unused_filename', raw_image)]
         )
         topic_id = json_response['topicId']
         self.assertEqual(len(topic_id), 12)
@@ -653,7 +659,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             topic_fetchers.get_topic_by_id(topic_id, strict=False))
         self.logout()
 
-    def test_topic_creation_with_invalid_name(self):
+    def test_topic_creation_with_invalid_name(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
@@ -662,14 +668,21 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         }
         self.post_json(
             self.url, payload, csrf_token=csrf_token, expected_status_int=400)
+
+        payload = {
+            'name': '',
+            'abbreviatedName': 'name-two'
+        }
+        self.post_json(
+            self.url, payload, csrf_token=csrf_token, expected_status_int=400)
+
         self.logout()
 
-    def test_topic_creation_with_invalid_image(self):
+    def test_topic_creation_with_invalid_image(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
             'name': 'Topic name',
-            'abbreviatedName': 'name-three',
             'description': 'Topic description',
             'filename': 'cafe.flac',
             'thumbnailBgColor': '#C6DCDA',
@@ -685,7 +698,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
-            upload_files=(('image', 'unused_filename', raw_image),),
+            upload_files=[('image', 'unused_filename', raw_image)],
             expected_status_int=400
         )
 
@@ -695,7 +708,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
 class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.url = feconf.NEW_SKILL_URL
         with utils.open_file(
@@ -704,7 +717,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         ) as f:
             self.original_image_content = f.read()
 
-    def test_skill_creation(self):
+    def test_skill_creation(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         rubrics = [{
@@ -739,7 +752,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             skill_fetchers.get_skill_by_id(skill_id, strict=False))
         self.logout()
 
-    def test_skill_creation_in_invalid_topic(self):
+    def test_skill_creation_in_invalid_topic(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
@@ -756,7 +769,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
 
-    def test_skill_creation_with_invalid_images(self):
+    def test_skill_creation_with_invalid_images(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         explanation_html = (
@@ -816,7 +829,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             response_dict['error'])
         self.logout()
 
-    def test_skill_creation_with_valid_images(self):
+    def test_skill_creation_with_valid_images(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         explanation_html = (
@@ -867,7 +880,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             skill_fetchers.get_skill_by_id(skill_id, strict=False))
         self.logout()
 
-    def test_skill_creation_in_invalid_rubrics(self):
+    def test_skill_creation_in_invalid_rubrics(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
@@ -884,28 +897,30 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
 
-    def test_skill_creation_in_invalid_explanation(self):
+    def test_skill_creation_in_invalid_explanation(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        payload = {
+        corrupt_payload = {
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': [],
             'explanation_dict': 'explanation'
         }
         json_response = self.post_json(
-            self.url, payload, csrf_token=csrf_token,
+            self.url, corrupt_payload, csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(json_response['status_code'], 400)
 
+        rubrics: List[skill_domain.RubricDict] = []
+        files: Dict[str, bytes] = {}
         payload = {
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
-            'rubrics': [],
+            'rubrics': rubrics,
             'explanation_dict': {
                 'explanation': 'Explanation'
             },
-            'files': {}
+            'files': files
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -913,7 +928,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
 
-    def test_skill_creation_in_valid_topic(self):
+    def test_skill_creation_in_valid_topic(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         rubrics = [{
@@ -946,7 +961,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             [self.linked_skill_id, skill_id])
         self.logout()
 
-    def test_skill_creation_in_duplicate_description(self):
+    def test_skill_creation_in_duplicate_description(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         rubrics = [{
@@ -988,7 +1003,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
 class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.url = feconf.MERGE_SKILLS_URL
 
@@ -999,7 +1014,7 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         question_services.create_new_question_skill_link(
             self.admin_id, self.question_id, self.linked_skill_id, 0.5)
 
-    def test_merge_skill(self):
+    def test_merge_skill(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         old_skill_id = self.linked_skill_id
@@ -1035,7 +1050,7 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         self.logout()
 
-    def test_merge_skill_fails_when_new_skill_id_is_invalid(self):
+    def test_merge_skill_fails_when_new_skill_id_is_invalid(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         old_skill_id = self.linked_skill_id
         payload = {
@@ -1043,13 +1058,17 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'new_skill_id': 'invalid_new_skill_id'
             }
         csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            self.url, payload, csrf_token=csrf_token,
-            expected_status_int=404)
+        response = self.post_json(
+            self.url, payload, csrf_token=csrf_token, expected_status_int=400
+        )
+        self.assertIn(
+            'Schema validation for \'new_skill_id\' failed',
+            response['error']
+        )
 
         self.logout()
 
-    def test_merge_skill_fails_when_old_skill_id_is_invalid(self):
+    def test_merge_skill_fails_when_old_skill_id_is_invalid(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         new_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
@@ -1059,9 +1078,13 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'new_skill_id': new_skill_id
             }
         csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            self.url, payload, csrf_token=csrf_token,
-            expected_status_int=404)
+        response = self.post_json(
+            self.url, payload, csrf_token=csrf_token, expected_status_int=400
+        )
+        self.assertIn(
+            'Schema validation for \'old_skill_id\' failed',
+            response['error']
+        )
 
         self.logout()
 

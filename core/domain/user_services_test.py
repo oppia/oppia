@@ -385,6 +385,16 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
 
+        # Raises error for usernames which don't exist, if
+        # 'get_user_id_from_username' called with strict.
+        with self.assertRaisesRegex(
+            Exception,
+            'No user_id found for the given username: fakeUsername'
+        ):
+            user_services.get_user_id_from_username(
+                'fakeUsername', strict=True
+            )
+
     def test_get_multi_user_ids_from_usernames(self) -> None:
         auth_id1 = 'someUser1'
         username1 = 'username1'
