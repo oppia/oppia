@@ -21,6 +21,7 @@ from __future__ import annotations
 import io
 
 from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_services
@@ -30,9 +31,12 @@ from core.domain import user_services
 
 import mutagen
 from mutagen import mp3
+from typing import Dict, TypedDict
 
 
-class AudioUploadHandler(base.BaseHandler):
+class AudioUploadHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles audio file uploads (to Google Cloud Storage in production, and
     to the local datastore in dev).
     """
@@ -42,7 +46,7 @@ class AudioUploadHandler(base.BaseHandler):
     _FILENAME_PREFIX = 'audio'
 
     @acl_decorators.can_voiceover_exploration
-    def post(self, exploration_id):
+    def post(self, exploration_id: str) -> None:
         """Saves an audio file uploaded by a content creator."""
         raw_audio_file = self.request.get('raw_audio_file')
         filename = self.payload.get('filename')
@@ -121,29 +125,109 @@ class AudioUploadHandler(base.BaseHandler):
         self.render_json({'filename': filename, 'duration_secs': duration_secs})
 
 
-class StartedTranslationTutorialEventHandler(base.BaseHandler):
+class StartedTranslationTutorialEventHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Records that this user has started the state translation tutorial."""
 
-    @acl_decorators.can_play_exploration
-    def post(self, unused_exploration_id):
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
+
+    @acl_decorators.can_play_exploration_as_logged_in_user
+    def post(self, unused_exploration_id: str) -> None:
         """Handles POST requests."""
+        assert self.user_id is not None
         user_services.record_user_started_state_translation_tutorial(
             self.user_id)
         self.render_json({})
 
 
-class VoiceArtistManagementHandler(base.BaseHandler):
+class VoiceArtistManagementHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of VoiceArtistManagementHandler's
+    normalized_payload dictionary.
+    """
+
+    username: str
+
+
+class VoiceArtistManagementHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of VoiceArtistManagementHandler's
+    normalized_request dictionary.
+    """
+
+    voice_artist: str
+
+
+class VoiceArtistManagementHandler(
+    base.BaseHandler[
+        VoiceArtistManagementHandlerNormalizedPayloadDict,
+        VoiceArtistManagementHandlerNormalizedRequestDict
+    ]
+):
     """Handles assignment of voice artists."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'entity_type': {
+            'schema': {
+                'type': 'basestring',
+                'choices': [
+                    feconf.ENTITY_TYPE_EXPLORATION
+                ]
+            }
+        },
+        'entity_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_username_string'
+                    }]
+                }
+            }
+        },
+        'DELETE': {
+            'voice_artist': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_valid_username_string'
+                    }]
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_add_voice_artist
-    def post(self, unused_entity_type, entity_id):
+    def post(self, unused_entity_type: str, entity_id: str) -> None:
         """Handles Post requests."""
-        voice_artist = self.payload.get('username')
+        assert self.normalized_payload is not None
+        voice_artist = self.normalized_payload['username']
         voice_artist_id = user_services.get_user_id_from_username(
             voice_artist)
-        if voice_artist_id is None:
-            raise self.InvalidInputException(
-                'Sorry, we could not find the specified user.')
+        assert voice_artist_id is not None
         rights_manager.assign_role_for_exploration(
             self.user, entity_id, voice_artist_id,
             rights_domain.ROLE_VOICE_ARTIST)
@@ -151,15 +235,13 @@ class VoiceArtistManagementHandler(base.BaseHandler):
         self.render_json({})
 
     @acl_decorators.can_remove_voice_artist
-    def delete(self, unused_entity_type, entity_id):
+    def delete(self, unused_entity_type: str, entity_id: str) -> None:
         """Handles Delete requests."""
-        voice_artist = self.request.get('voice_artist')
+        assert self.normalized_request is not None
+        voice_artist = self.normalized_request['voice_artist']
         voice_artist_id = user_services.get_user_id_from_username(
             voice_artist)
-
-        if voice_artist_id is None:
-            raise self.InvalidInputException(
-                'Sorry, we could not find the specified user.')
+        assert voice_artist_id is not None
         rights_manager.deassign_role_for_exploration(
             self.user, entity_id, voice_artist_id)
 
