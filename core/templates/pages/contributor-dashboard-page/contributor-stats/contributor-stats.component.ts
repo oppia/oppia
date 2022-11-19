@@ -237,15 +237,15 @@ export class ContributorStatsComponent {
       response.translation_contribution_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        if (!this.statsData.translationContribution.has(language)) {
-          this.statsData.translationContribution.set(
+        if (!this.statsData?.translationContribution.has(language)) {
+          this.statsData?.translationContribution.set(
             language,
             new PageableStats([this.createTranslationContributionStat(stat)]));
         } else {
-          const statsData = this.statsData.translationContribution.get(
+          const statsData = this.statsData?.translationContribution.get(
             language);
-          statsData.data.push(this.createTranslationContributionStat(stat));
-          this.statsData.translationContribution.set(
+          statsData?.data.push(this.createTranslationContributionStat(stat));
+          this.statsData?.translationContribution.set(
             language,
             statsData
           );
@@ -257,15 +257,15 @@ export class ContributorStatsComponent {
       response.translation_review_stats.map((stat) => {
         const language = this.languageUtilService.getAudioLanguageDescription(
           stat.language_code);
-        if (!this.statsData.translationReview.has(language)) {
-          this.statsData.translationContribution.set(
+        if (!this.statsData?.translationReview.has(language)) {
+          this.statsData?.translationContribution.set(
             language,
             new PageableStats([this.createTranslationReviewStat(stat)]));
         } else {
-          const statsData = this.statsData.translationReview.get(
+          const statsData = this.statsData?.translationReview.get(
             language);
-          statsData.data.push(this.createTranslationReviewStat(stat));
-          this.statsData.translationReview.set(
+          statsData?.data.push(this.createTranslationReviewStat(stat));
+          this.statsData?.translationReview.set(
             language,
             statsData
           );
