@@ -196,6 +196,21 @@ class MigrateStateSchemaToLatestVersion(QuestionChange):
     to_version: str
 
 
+class QuestionSuggestionChangeDict(TypedDict):
+    """Dictionary representing the QuestionSuggestionChange domain object."""
+
+    # Note: Here we are defining question's id as None, because while submitting
+    # question suggestion from the frontend we are never providing question id
+    # in its payload.
+    id: None
+    question_state_data: state_domain.StateDict
+    question_state_data_schema_version: int
+    language_code: str
+    version: int
+    linked_skill_ids: List[str]
+    inapplicable_skill_misconception_ids: List[str]
+
+
 class QuestionSuggestionChange(change_domain.BaseChange):
     """Domain object for changes made to question suggestion object.
 
@@ -1632,6 +1647,32 @@ class Question(translation_domain.BaseTranslatableObject):
 
         # The version 53 only fixes the data for `Exploration` and make
         # no changes in the `Question` that is why we are simply returning.
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v53_dict_to_v54_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
+        """Converts from version 53 to 54. Version 54 adds
+        catchMisspellings customization arg to TextInput
+        interaction which allows creators to detect misspellings.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'TextInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'catchMisspellings': {
+                    'value': False
+                }
+            })
         return question_state_dict
 
     @classmethod
