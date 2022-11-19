@@ -562,7 +562,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             '%s/invalid_exp_id' % (self.AUDIO_UPLOAD_URL_PREFIX),
             {'filename': self.TEST_AUDIO_FILE_MP3},
             csrf_token=csrf_token,
-            upload_files=[('raw_audio_file', 'unused_filename', raw_audio),],
+            upload_files=[('raw_audio_file', 'unused_filename', raw_audio)],
             expected_status_int=400
         )
         self.logout()
@@ -663,7 +663,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             {'filename': self.TEST_AUDIO_FILE_FLAC},
             csrf_token=csrf_token,
             expected_status_int=400,
-            upload_files=[('raw_audio_file', 'unused_filename', raw_audio),]
+            upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
         )
         self.logout()
 
