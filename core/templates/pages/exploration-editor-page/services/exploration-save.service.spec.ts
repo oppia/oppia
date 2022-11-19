@@ -113,7 +113,8 @@ describe('Exploration save service ' +
             nativeWindow: {
               location: {
                 reload() {}
-              }
+              },
+              gtag: () => {}
             }
           }
         }
