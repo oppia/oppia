@@ -73,7 +73,7 @@ def validate_arguments_against_schema(
     and collects all the errors.
 
     Args:
-        handler_args: *. Object for normalization.
+        handler_args: Dict(str, *). Object for normalization.
         handler_args_schemas: dict. Schema for args.
         allowed_extra_args: bool. Whether extra args are allowed in handler.
         allow_string_to_bool_conversion: bool. Whether to allow string to

@@ -200,10 +200,8 @@ class PromoBarHandler(
     def put(self) -> None:
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        promo_bar_enabled_value = self.normalized_payload[
-            'promo_bar_enabled']
-        promo_bar_message_value = self.normalized_payload[
-            'promo_bar_message']
+        promo_bar_enabled_value = self.normalized_payload['promo_bar_enabled']
+        promo_bar_message_value = self.normalized_payload['promo_bar_message']
 
         logging.info(
             '[RELEASE COORDINATOR] %s saved promo-bar config property values: '

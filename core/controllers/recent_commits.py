@@ -72,7 +72,6 @@ class RecentCommitsHandler(
         assert self.user_id is not None
         assert self.normalized_request is not None
         urlsafe_start_cursor = self.normalized_request.get('cursor')
-        query_type = self.normalized_request['query_type']  # pylint: disable=unused-variable
 
         all_commits, new_urlsafe_start_cursor, more = (
             exp_services.get_next_page_of_all_non_private_commits(

@@ -2390,7 +2390,8 @@ class CheckpointReachedEventHandler(
                 self.user_id,
                 exploration_id,
                 most_recently_reached_checkpoint_state_name,
-                most_recently_reached_checkpoint_exp_version)
+                most_recently_reached_checkpoint_exp_version
+            )
 
         self.render_json(self.values)
 
