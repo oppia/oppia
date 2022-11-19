@@ -230,9 +230,6 @@ export class ContributorStatsComponent {
   }
 
   async fetchStats(): Promise<void> {
-    if (typeof this.statsData === 'undefined') {
-      throw new Error('Stats data are empty.');
-    }
     const response = await this.contributionAndReviewStatsService.fetchAllStats(
       this.username);
 
