@@ -100,6 +100,8 @@ var USER_PREFERENCES_URL = '/preferences';
 var LOGIN_URL_SUFFIX = '/login';
 var LOGOUT_URL_SUFFIX = '/logout';
 var MODERATOR_URL_SUFFIX = '/moderator';
+var BLOG_PAGE_URL_SUFFIX = '/blog';
+var BLOG_PAGE_SEARCH_URL_PREFIX = '/blog/search/find';
 // Note that this only works in dev, due to the use of cache slugs in prod.
 var SCRIPTS_URL_SLICE = '/assets/scripts/';
 var EXPLORATION_ID_LENGTH = 12;
@@ -253,6 +255,11 @@ var openProfileDropdown = async function() {
     profileDropdown);
 };
 
+var openAboutDropdown = async function() {
+  var aboutDropdown = $('.e2e-test-about-oppia-list-item');
+  await action.click('About dropdown', aboutDropdown);
+};
+
 var navigateToTopicsAndSkillsDashboardPage = async function() {
   await openProfileDropdown();
   var topicsAndSkillsDashboardLink = $(
@@ -312,6 +319,8 @@ exports.LOGOUT_URL_SUFFIX = LOGOUT_URL_SUFFIX;
 exports.MODERATOR_URL_SUFFIX = MODERATOR_URL_SUFFIX;
 exports.SCRIPTS_URL_SLICE = SCRIPTS_URL_SLICE;
 exports.FIRST_STATE_DEFAULT_NAME = FIRST_STATE_DEFAULT_NAME;
+exports.BLOG_PAGE_URL_SUFFIX = BLOG_PAGE_URL_SUFFIX;
+exports.BLOG_PAGE_SEARCH_URL_PREFIX = BLOG_PAGE_SEARCH_URL_PREFIX;
 
 exports.getExplorationIdFromEditor = getExplorationIdFromEditor;
 exports.getExplorationIdFromPlayer = getExplorationIdFromPlayer;
@@ -322,6 +331,7 @@ exports.moveToEditor = moveToEditor;
 exports.expectErrorPage = expectErrorPage;
 exports.closeCurrentTabAndSwitchTo = closeCurrentTabAndSwitchTo;
 exports.dragAndDrop = dragAndDrop;
+exports.openAboutDropdown = openAboutDropdown;
 
 exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;
 

@@ -2464,7 +2464,9 @@ title: Title
         self.signup(self.SUPER_ADMIN_EMAIL, self.SUPER_ADMIN_USERNAME)
 
     def set_config_property(
-        self, config_obj: config_domain.ConfigProperty, new_config_value: str
+        self,
+        config_obj: config_domain.ConfigProperty,
+        new_config_value: Union[str, List[str], bool, float]
     ) -> None:
         """Sets a given configuration object's value to the new value specified
         using a POST request.
@@ -4142,7 +4144,8 @@ title: Title
                     'unicode_str': 'Enter text here',
                 },
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {'value': False}
         })
         state.update_next_content_id_index(2)
         # Here, state is a State domain object and it is created using
@@ -4436,13 +4439,9 @@ class ClassifierTestBase(GenericEmailTestBase):
         )
         return result
 
-    # TODO(#15451): Here we use type Any because currently, the stubs of
-    # protobuf in typeshed are not fully type annotated yet and because of
-    # this MyPy is not able to fetch the return type of this method and
-    # assuming it as Any type.
     def _get_classifier_data_from_classifier_training_job(
         self, classifier_training_job: classifier_domain.ClassifierTrainingJob
-    ) -> Any:
+    ) -> text_classifier_pb2.TextClassifierFrozenModel:
         """Retrieves classifier training job from GCS using metadata stored in
         classifier_training_job.
 

@@ -111,19 +111,48 @@ def get_email_from_user_id(user_id: str) -> str:
     return user_settings.email
 
 
-def get_user_id_from_username(username: str) -> Optional[str]:
+@overload
+def get_user_id_from_username(
+    username: str, *, strict: Literal[True]
+) -> str: ...
+
+
+@overload
+def get_user_id_from_username(
+    username: str
+) -> Optional[str]: ...
+
+
+@overload
+def get_user_id_from_username(
+    username: str, *, strict: Literal[False]
+) -> Optional[str]: ...
+
+
+def get_user_id_from_username(
+    username: str, strict: bool = False
+) -> Optional[str]:
     """Gets the user_id for a given username.
 
     Args:
         username: str. Identifiable username to display in the UI.
+        strict: bool. Whether to fail noisily if no UserSettingsModel with a
+            given username found in the datastore.
 
     Returns:
         str or None. If the user with given username does not exist, return
         None. Otherwise return the user_id corresponding to given username.
+
+    Raises:
+        Exception. No user_id found for the given username.
     """
     user_model = user_models.UserSettingsModel.get_by_normalized_username(
         user_domain.UserSettings.normalize_username(username))
     if user_model is None:
+        if strict:
+            raise Exception(
+                'No user_id found for the given username: %s' % username
+            )
         return None
     else:
         return user_model.id
@@ -1739,7 +1768,7 @@ def update_email_preferences(
     if not bulk_email_db_already_updated and feconf.CAN_SEND_EMAILS:
         user_creation_successful = (
             bulk_email_services.add_or_update_user_status(
-                email, {}, 'Web',
+                email, {}, 'Account',
                 can_receive_email_updates=can_receive_email_updates))
         if not user_creation_successful:
             email_preferences_model.site_updates = False
@@ -2306,7 +2335,8 @@ def allow_user_to_review_translation_in_language(
     user_contribution_rights = get_user_contribution_rights(user_id)
     allowed_language_codes = set(
         user_contribution_rights.can_review_translation_for_language_codes)
-    allowed_language_codes.add(language_code)
+    if language_code is not None:
+        allowed_language_codes.add(language_code)
     user_contribution_rights.can_review_translation_for_language_codes = (
         sorted(list(allowed_language_codes)))
     _save_user_contribution_rights(user_contribution_rights)
