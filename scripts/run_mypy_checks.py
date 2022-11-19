@@ -43,7 +43,7 @@ EXCLUDED_DIRECTORIES: Final = [
 ]
 
 # List of files who should be type-annotated but are not.
-NOT_FULLY_COVERED_FILES: Final = []
+NOT_FULLY_COVERED_FILES: List[str] = []
 
 
 CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')
