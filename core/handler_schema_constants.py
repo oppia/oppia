@@ -31,33 +31,20 @@ from __future__ import annotations
 HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'AudioUploadHandler',
     'DeferredTasksHandler',
-    'EditableStoryDataHandler',
     'FeedbackThreadStatusChangeEmailHandler',
     'FlagExplorationEmailHandler',
     'InstantFeedbackMessageEmailHandler',
-    'MergeSkillHandler',
-    'NewTopicHandler',
     'PreferencesHandler',
     'QuestionCreationHandler',
-    'ResubmitSuggestionHandler',
-    'StartedTranslationTutorialEventHandler',
-    'SubtopicPageDataHandler',
-    'SuggestionListHandler',
-    'SuggestionToExplorationActionHandler',
-    'SuggestionToSkillActionHandler',
-    'SuggestionsProviderHandler',
-    'TopicPageDataHandler',
-    'TopicsAndSkillsDashboardPage',
     'UnsentFeedbackEmailHandler',
-    'UpdateQuestionSuggestionHandler',
-    'UpdateTranslationSuggestionHandler',
-    'ValidateExplorationsHandler',
-    'VoiceArtistManagementHandler',
-    'Error404Handler'
 ]
 
 # These handlers do not require any schema validation.
 HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS = [
+    # Handler 'Error404Handler' is not supposed to be schema validated because
+    # this handler is defined to catch all 404 errors that will occur in any
+    # other handlers.
+    'Error404Handler',
     'SessionBeginHandler',
     'SessionEndHandler',
     'SeedFirebaseHandler',

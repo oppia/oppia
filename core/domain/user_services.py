@@ -111,19 +111,48 @@ def get_email_from_user_id(user_id: str) -> str:
     return user_settings.email
 
 
-def get_user_id_from_username(username: str) -> Optional[str]:
+@overload
+def get_user_id_from_username(
+    username: str, *, strict: Literal[True]
+) -> str: ...
+
+
+@overload
+def get_user_id_from_username(
+    username: str
+) -> Optional[str]: ...
+
+
+@overload
+def get_user_id_from_username(
+    username: str, *, strict: Literal[False]
+) -> Optional[str]: ...
+
+
+def get_user_id_from_username(
+    username: str, strict: bool = False
+) -> Optional[str]:
     """Gets the user_id for a given username.
 
     Args:
         username: str. Identifiable username to display in the UI.
+        strict: bool. Whether to fail noisily if no UserSettingsModel with a
+            given username found in the datastore.
 
     Returns:
         str or None. If the user with given username does not exist, return
         None. Otherwise return the user_id corresponding to given username.
+
+    Raises:
+        Exception. No user_id found for the given username.
     """
     user_model = user_models.UserSettingsModel.get_by_normalized_username(
         user_domain.UserSettings.normalize_username(username))
     if user_model is None:
+        if strict:
+            raise Exception(
+                'No user_id found for the given username: %s' % username
+            )
         return None
     else:
         return user_model.id
