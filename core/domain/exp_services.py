@@ -3610,12 +3610,6 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
 ) -> Optional[exp_domain.TransientCheckpointUrl]: ...
 
 
-@overload
-def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
-    exploration_id: str, unique_progress_url_id: str, *, strict: bool
-) -> Optional[exp_domain.TransientCheckpointUrl]: ...
-
-
 def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
     exploration_id: str, unique_progress_url_id: str, strict: bool = False
 ) -> Optional[exp_domain.TransientCheckpointUrl]:
