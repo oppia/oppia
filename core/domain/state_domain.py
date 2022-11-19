@@ -5614,7 +5614,10 @@ class StateVersionHistory:
             state_version_history_dict['committer_id']
         )
 
-
+# Note: This union type depends on several classes like SubtitledHtml,
+# SubtitledHtmlDict, SubtitledUnicode and SubtitledUnicodeDict. So, it
+# has to be defined after those classes are defined, otherwise backend
+# tests will fail with 'module has no attribute' error.
 UnionOfCustomizationArgsDictValues = Union[
     str,
     int,
@@ -5630,6 +5633,9 @@ UnionOfCustomizationArgsDictValues = Union[
 ]
 
 
+# Note: This Dict type depends on UnionOfCustomizationArgsDictValues so it
+# has to be defined after UnionOfCustomizationArgsDictValues is defined,
+# otherwise backend tests will fail with 'module has no attribute' error.
 CustomizationArgsDictType = Dict[
     str, Dict[str, UnionOfCustomizationArgsDictValues]
 ]

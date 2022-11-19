@@ -50,46 +50,6 @@ if MYPY:  # pragma: no cover
     ]
 
 
-def get_full_customization_args(
-    customization_args: CustomizationArgsDictType,
-    ca_specs: List[domain.CustomizationArgSpec]
-) -> Dict[str, Dict[str, AcceptableCustomizationArgsTypes]]:
-    """Populates the given customization_args dict with default values
-    if any of the expected customization_args are missing.
-
-    Args:
-        customization_args: dict. The customization dict. The keys are names
-            of customization_args and the values are dicts with a
-            single key, 'value', whose corresponding value is the value of
-            the customization arg.
-        ca_specs: list(dict). List of spec dictionaries. Is used to check if
-            some keys are missing in customization_args. Dicts have the
-            following structure:
-                - name: str. The customization variable name.
-                - description: str. The customization variable description.
-                - default_value: *. The default value of the customization
-                    variable.
-
-    Returns:
-        dict. The customization_args dict where missing keys are populated
-        with the default values.
-    """
-    # For argument 'customization_args' we have used Mapping type because we
-    # want to allow 'get_full_customization_args' method to accept different
-    # subtypes of customization_arg dictionaries, but the problem with Mapping
-    # is that the Mapping does not allow to update(or set) values because
-    # Mapping is a read-only type. To overcome this issue, we narrowed down
-    # the type from Mapping to Dict by using assert so that while updating or
-    # setting a new value MyPy will not throw any error.
-    assert isinstance(customization_args, dict)
-    for ca_spec in ca_specs:
-        if ca_spec.name not in customization_args:
-            customization_args[ca_spec.name] = {
-                'value': ca_spec.default_value
-            }
-    return customization_args
-
-
 def validate_customization_args_and_values(
     item_name: str,
     item_type: str,
