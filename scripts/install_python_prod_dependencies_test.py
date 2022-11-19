@@ -727,9 +727,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         import pip
         try:
-            # Here we use MyPy ignore because we are assigning a None value
-            # sys module pip, and this is done to trigger an exception and
-            # test the case where pip is not present.
+            # Here we use MyPy ignore because to test the case where pip
+            # is not present, we need to set a value in sys.modules to None.
             sys.modules['pip'] = None  # type: ignore[assignment]
             with os_name_swap, self.print_swap, self.swap_check_call:
                 with self.assertRaisesRegex(
@@ -750,9 +749,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         import pip
         try:
-            # Here we use MyPy ignore because we are assigning a None value
-            # sys module pip, and this is done to trigger an exception and
-            # test the case where pip is not present.
+            # Here we use MyPy ignore because to test the case where pip
+            # is not present, we need to set a value in sys.modules to None.
             sys.modules['pip'] = None  # type: ignore[assignment]
             with os_name_swap, self.print_swap, self.swap_check_call:
                 with self.assertRaisesRegex(
@@ -772,9 +770,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
         import pip
         try:
-            # Here we use MyPy ignore because we are assigning a None value
-            # sys module pip, and this is done to trigger an exception and
-            # test the case where pip is not present.
+            # Here we use MyPy ignore because to test the case where pip
+            # is not present, we need to set a value in sys.modules to None.
             sys.modules['pip'] = None  # type: ignore[assignment]
             with os_name_swap, self.print_swap, self.swap_check_call:
                 with self.assertRaisesRegex(
