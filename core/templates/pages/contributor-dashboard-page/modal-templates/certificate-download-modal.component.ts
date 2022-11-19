@@ -85,7 +85,7 @@ export class CertificateDownloadModalComponent {
       this.errorsFound = true;
       this.certificateDownloading = false;
       this.errorMessage = (
-        'Accepted contributions not found for the given inputs.');
+        'Not able to download contributor certificate');
     });
   }
 }

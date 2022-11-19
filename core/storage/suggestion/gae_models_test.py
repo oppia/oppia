@@ -171,7 +171,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.assertTrue(
                 suggestion_models.SCORE_CATEGORY_DELIMITER not in score_type)
 
-    def test_get_translation_suggestions_submitted_before_given_date(
+    def test_get_translation_suggestions_submitted_for_given_date_range(
         self) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -184,12 +184,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         from_date = to_date - datetime.timedelta(days=1)
 
         suggestions = (
-            suggestion_models.GeneralSuggestionModel.get_translation_suggestions_submitted_within_given_dates(
-                to_date, from_date, 'test_author', 'hi'))
+            suggestion_models.GeneralSuggestionModel
+                .get_translation_suggestions_submitted_within_given_dates(
+                    from_date, to_date, 'test_author', 'hi'))
 
         self.assertEqual(len(suggestions), 1)
 
-    def test_get_question_suggestions_submitted_before_given_date(
+    def test_get_question_suggestions_submitted_for_given_date_range(
         self) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
@@ -203,8 +204,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         suggestions = (
             suggestion_models.GeneralSuggestionModel
-                .get_question_suggestions_submitted_before_given_dates(
-                    to_date, from_date, 'test_author'))
+                .get_question_suggestions_submitted_within_given_dates(
+                    from_date, to_date, 'test_author'))
 
         self.assertEqual(len(suggestions), 1)
 

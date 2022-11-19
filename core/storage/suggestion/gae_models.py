@@ -423,15 +423,15 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_translation_suggestions_submitted_within_given_dates(
-        cls, to_date: datetime.datetime, from_date: datetime.datetime,
+        cls, from_date: datetime.datetime, to_date: datetime.datetime,
         user_id: str, language_code: str
     ) -> Sequence[GeneralSuggestionModel]:
         """Gets all suggestions which are are submitted within the given
         date range.
 
         Args:
-            to_date: Date. The date that suggestions are submitted before.
             from_date: Date. The date that suggestions are submitted after.
+            to_date: Date. The date that suggestions are submitted before.
             user_id: str. The id of the user who made the submissions.
             language_code: str. The language that the contributions should be
                 fetched.
@@ -441,8 +441,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             within the given date range.
         """
         return cls.get_all().filter(datastore_services.all_of(
-            cls.created_on < to_date,
-            cls.created_on > from_date,
+            cls.created_on <= to_date,
+            cls.created_on >= from_date,
             cls.author_id == user_id,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             cls.language_code == language_code,
@@ -450,26 +450,25 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )).order(cls.created_on).fetch()
 
     @classmethod
-    def get_question_suggestions_submitted_before_given_dates(
-        cls, to_date: datetime.datetime, from_date: datetime.datetime,
+    def get_question_suggestions_submitted_within_given_dates(
+        cls, from_date: datetime.datetime, to_date: datetime.datetime,
         user_id: str
     ) -> Sequence[GeneralSuggestionModel]:
-        """Gets all suggestions which are are submitted before the given
+        """Gets all suggestions which are are submitted within the given
         date range.
 
         Args:
-            to_date: Date. The date that suggestions are submitted before.
             from_date: Date. The date that suggestions are submitted after.
+            to_date: Date. The date that suggestions are submitted before.
             user_id: str. The id of the user who made the submissions.
-            language_code: str. The language that the contributions should 
 
         Returns:
             list(SuggestionModel). A list of suggestions that are submitted
             before the given date range.
         """
         return cls.get_all().filter(datastore_services.all_of(
-            cls.created_on < to_date,
-            cls.created_on > from_date,
+            cls.created_on <= to_date,
+            cls.created_on >= from_date,
             cls.author_id == user_id,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
             cls.status == STATUS_ACCEPTED

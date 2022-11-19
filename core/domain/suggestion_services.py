@@ -2917,14 +2917,14 @@ def generate_contributor_certificate(
     from_date: datetime.datetime,
     to_date: datetime.datetime
 ) -> str:
-    """Generates a certificate for contributors' contributions.
+    """Generates a certificate for user contributions.
 
     Args:
         username: str. The username of the contributor.
-        language_code: str|None. The language which the contributions should be
-            considered.
-        suggestion_type: str. The type of the suggestions that the
-            certificate needs to be generated.
+        language_code: str|None. The language for which the contributions should
+            be considered.
+        suggestion_type: str. The type of suggestion that the certificate
+            needs to generate.
         from_date: datetime.datetime. The first date that the contributions
             should be considered for the certificate.
         to_date: datetime.datetime. The last date that the contributions
@@ -2962,17 +2962,17 @@ def _generate_translation_contributor_certificate(
     user_id: str,
     date: str
 ) -> str:
-    """Generates a certificate for contributors' translation contributions.
+    """Generates a certificate for a user's translation contributions.
 
     Args:
         language_code: str|None. The language for which the contributions should
             be considered.
         suggestion_type: str. The type of suggestion that the certificate
             needs to generate.
-        from_date: datetime.datetime. The first date that the contributions
-            should be considered for the certificate.
-        to_date: datetime.datetime. The last date that the contributions
-            should be considered for the certificate.
+        from_date: datetime.datetime. The start of the date range for which
+            the contributions were created.
+        to_date: datetime.datetime. The end of the date range for which
+            the contributions were created.
         username: str. The username of the contributor.
         user_id: str. The user ID of the contributor.
         date: datetime.datetime. The current date that should be included in the
@@ -2984,9 +2984,7 @@ def _generate_translation_contributor_certificate(
     Raises:
         Exception. The language is invalid.
     """
-    minutes_per_sentence = 5
     signature = feconf.TRANSLATION_TEAM_LEAD
-    print(from_date)
 
     languages = list(filter(
         lambda lang: lang['id'] == language_code,
@@ -2995,13 +2993,13 @@ def _generate_translation_contributor_certificate(
         raise Exception('The provided language is invalid.')
     language_description = languages[0]['description']
 
-    all_suggestions = (
+    suggestions = (
         suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_submitted_within_given_dates(
-                to_date, from_date, user_id, language_code))
+                from_date, to_date, user_id, language_code))
 
-    sentences_count = 0
-    for model in all_suggestions:
+    words_count = 0
+    for model in suggestions:
         suggestion = get_suggestion_from_model(model)
 
         # Retrieve the html content that is emphasized on the 
@@ -3015,14 +3013,13 @@ def _generate_translation_contributor_certificate(
         plain_text = _get_plain_text_from_html_content_string(
             get_html_representing_suggestion(suggestion))
 
-        sentences = plain_text.split('.')
-        sentences_without_empty_strings = [
-            sentence for sentence in sentences if sentence != '']
-        sentences_count += len(sentences_without_empty_strings)
-    hours_contributed = round(
-        ((sentences_count * minutes_per_sentence) / 60), 2)
+        words = plain_text.split(' ')
+        words_without_empty_strings = [
+            word for word in words if word != '']
+        words_count += len(words_without_empty_strings)
+    hours_contributed = round((words_count / 300), 2)
 
-    if sentences_count == 0:
+    if words_count == 0:
         raise Exception(
             'There are no contributions for the given time range.')
 
@@ -3104,15 +3101,15 @@ def _generate_question_contributor_certificate(
     user_id: str,
     date: str
 ) -> str:
-    """Generates a certificate for contributors' question contributions.
+    """Generates a certificate for a user's question contributions.
 
     Args:
-        suggestion_type: str. The type of the suggestions that the
-            certificate needs to be generated.
-        from_date: datetime.datetime. The first date that the contributions
-            should be considered for the certificate.
-        to_date: datetime.datetime. The last date that the contributions
-            should be considered for the certificate.
+        suggestion_type: str. The type of suggestion that the certificate
+            needs to generate.
+        from_date: datetime.datetime. The start of the date range for which
+            the contributions were created.
+        to_date: datetime.datetime. The end of the date range for which
+            the contributions were created.
         username: str. The username of the contributor.
         user_id: str. The user ID of the contributor.
         date: datetime.datetime. The current date that should be included in the
@@ -3127,13 +3124,13 @@ def _generate_question_contributor_certificate(
     """
     signature = feconf.QUESTION_TEAM_LEAD
 
-    all_sugestions = (
+    suggestions = (
         suggestion_models.GeneralSuggestionModel
-            .get_question_suggestions_submitted_before_given_dates(
-                to_date, from_date, user_id))
+            .get_question_suggestions_submitted_within_given_dates(
+                from_date, to_date, user_id))
 
     minutes_contributed = 0
-    for model in all_sugestions:
+    for model in suggestions:
         suggestion = get_suggestion_from_model(model)
 
         content = suggestion.change.question_dict[
