@@ -18,51 +18,39 @@
 
 from __future__ import annotations
 
-import contextlib
-import unittest
-
+from core.tests import test_utils
 from . import docstrings_checker  # isort:skip
 
 import astroid  # isort:skip
 from pylint.checkers import utils # isort:skip
 
 
-class DocstringsCheckerTest(unittest.TestCase):
+class DocstringsCheckerTest(test_utils.GenericTestBase):
     """Class for testing the docstrings_checker script."""
 
-    def test_space_indentation(self):
+    def test_space_indentation(self) -> None:
         sample_string = '     This is a sample string.'
-        self.assertEqual(docstrings_checker.space_indentation(sample_string), 5)
+        self.assertEqual(
+            docstrings_checker.space_indentation(sample_string), 5
+        )
 
-    def test_possible_exc_types_with_inference_error(self):
-
-        @contextlib.contextmanager
-        def swap(obj, attr, newvalue):
-            """Swap an object's attribute value within the context of a
-            'with' statement. The object can be anything that supports
-            getattr and setattr, such as class instances, modules, etc.
-            """
-            original = getattr(obj, attr)
-            setattr(obj, attr, newvalue)
-            try:
-                yield
-            finally:
-                setattr(obj, attr, original)
+    def test_possible_exc_types_with_inference_error(self) -> None:
 
         raise_node = astroid.extract_node(
             """
         def func():
             raise Exception('An exception.') #@
         """)
-        node_ignores_exception_swap = swap(
+        node_ignores_exception_swap = self.swap(
             utils, 'node_ignores_exception',
-            lambda _, __: (_ for _ in ()).throw(astroid.InferenceError()))
+            lambda _, __: (_ for _ in ()).throw(astroid.InferenceError())
+        )
 
         with node_ignores_exception_swap:
             exceptions = docstrings_checker.possible_exc_types(raise_node)
         self.assertEqual(exceptions, set([]))
 
-    def test_possible_exc_types_with_exception_message(self):
+    def test_possible_exc_types_with_exception_message(self) -> None:
         raise_node = astroid.extract_node(
             """
         def func():
@@ -73,7 +61,7 @@ class DocstringsCheckerTest(unittest.TestCase):
         exceptions = docstrings_checker.possible_exc_types(raise_node)
         self.assertEqual(exceptions, set(['Exception']))
 
-    def test_possible_exc_types_with_no_exception(self):
+    def test_possible_exc_types_with_no_exception(self) -> None:
         raise_node = astroid.extract_node(
             """
         def func():
@@ -84,7 +72,7 @@ class DocstringsCheckerTest(unittest.TestCase):
         exceptions = docstrings_checker.possible_exc_types(raise_node)
         self.assertEqual(exceptions, set([]))
 
-    def test_possible_exc_types_with_exception_inside_function(self):
+    def test_possible_exc_types_with_exception_inside_function(self) -> None:
         raise_node = astroid.extract_node(
             """
         def func():
