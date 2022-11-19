@@ -534,11 +534,7 @@ class ComputeExplorationVersionHistoryJobTests(
         snapshot_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stderr(
-                'Version history cannot be computed for exploration '
-                'with ID exp_1'
-            )
+            job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1')
         ])
 
 
