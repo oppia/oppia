@@ -341,9 +341,6 @@ export class ContributorStatsComponent {
   }
 
   goToNextPage(page: PageableStats): void {
-    if (typeof page.data === 'undefined') {
-      throw new Error('Data does not exist.');
-    }
     if (
       page.currentPageStartIndex + this.ITEMS_PER_PAGE >=
       page.data?.length) {
