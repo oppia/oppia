@@ -81,8 +81,14 @@ class AudioUploadHandler(
     @acl_decorators.can_voiceover_exploration
     def post(self, exploration_id: str) -> None:
         """Saves an audio file uploaded by a content creator."""
-        raw_audio_file = self.normalized_request.get('raw_audio_file')
-        filename = self.normalized_payload.get('filename')
+        assert self.normalized_payload is not None
+        assert self.normalized_request is not None
+
+        filename = self.normalized_payload['filename']
+        if isinstance(self.normalized_request['raw_audio_file'], str):
+            raw_audio_file = self.normalized_request['raw_audio_file'].encode()
+        else:
+            raw_audio_file = self.normalized_request['raw_audio_file']
 
         tempbuffer = io.BytesIO()
         tempbuffer.write(raw_audio_file)
