@@ -23,13 +23,31 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import platform_feature_services
+from core.domain import platform_parameter_domain
+
+from typing import Dict, Optional, TypedDict
 
 
-class PlatformFeaturesEvaluationHandler(base.BaseHandler):
+class PlatformFeaturesEvaluationHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of PlatformFeaturesEvaluationHandler's
+    normalized_request dictionary.
+    """
+
+    platform_type: Optional[str]
+    browser_type: Optional[str]
+    app_version: Optional[str]
+
+
+class PlatformFeaturesEvaluationHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        PlatformFeaturesEvaluationHandlerNormalizedRequestDict
+    ]
+):
     """The handler for retrieving feature flag values."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'platform_type': {
@@ -63,11 +81,12 @@ class PlatformFeaturesEvaluationHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests. Evaluates and returns all feature flags using
         the given client information.
         """
-        context_dict = {
+        assert self.normalized_request is not None
+        context_dict: platform_parameter_domain.ClientSideContextDict = {
             'platform_type': self.normalized_request.get('platform_type'),
             'browser_type': self.normalized_request.get('browser_type'),
             'app_version': self.normalized_request.get('app_version'),
@@ -87,17 +106,17 @@ class PlatformFeaturesEvaluationHandler(base.BaseHandler):
         self.render_json(result_dict)
 
 
-class PlatformFeatureDummyHandler(base.BaseHandler):
+class PlatformFeatureDummyHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Dummy handler for testing e2e feature gating flow."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         # This handler is gated by the dummy_feature flag, i.e. it's only
         # visible when the dummy_feature is enabled.
         if not platform_feature_services.is_feature_enabled(
