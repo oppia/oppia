@@ -2047,6 +2047,8 @@ describe('Conversation skin component', () => {
         null, null, null, new Interaction(
           [], [], null, null, [], 'TextInput', null),
         [], null, null, '', null);
+      spyOn(explorationPlayerStateService, 'isInDiagnosticTestPlayerMode')
+        .and.returnValue(true);
       successCallback(
         stateCard, true, 'feedback', null, '', 'skill_id', true, '', true,
         false, false, null, '');
@@ -2294,12 +2296,9 @@ describe('Conversation skin component', () => {
       componentInstance.hasInteractedAtLeastOnce = true;
       componentInstance.displayedCard = displayedCard;
 
-      componentInstance.ngOnInit();
-      tick(200);
-
       expect(componentInstance.feedbackIsEnabled).toBeTrue();
       expect(componentInstance.learnerCanOnlyAttemptQuestionOnce).toBeFalse();
-      expect(componentInstance.onlyLastInputResponsePairIsShown).toBeFalse();
+      expect(componentInstance.lastInputOutputPairIsOnlyShown).toBeFalse();
       expect(componentInstance.navigationThroughCardHistoryIsEnabled)
         .toBeTrue();
 
@@ -2317,7 +2316,7 @@ describe('Conversation skin component', () => {
 
       expect(componentInstance.feedbackIsEnabled).toBeFalse();
       expect(componentInstance.learnerCanOnlyAttemptQuestionOnce).toBeTrue();
-      expect(componentInstance.onlyLastInputResponsePairIsShown).toBeTrue();
+      expect(componentInstance.lastInputOutputPairIsOnlyShown).toBeTrue();
       expect(componentInstance.navigationThroughCardHistoryIsEnabled)
         .toBeFalse();
     }));

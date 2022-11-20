@@ -171,11 +171,11 @@ export class ConversationSkinComponent {
 
   // The fields are used to customize the component for the diagnostic player,
   // question player, and exploration player page.
-  feedbackIsEnabled!: boolean;
-  learnerCanOnlyAttemptQuestionOnce!: boolean;
-  onlyLastInputResponsePairIsShown!: boolean;
-  navigationThroughCardHistoryIsEnabled!: boolean;
-  checkpointCelebrationModalIsEnabled!: boolean;
+  feedbackIsEnabled: boolean = true;
+  learnerCanOnlyAttemptQuestionOnce: boolean = false;
+  lastInputOutputPairIsOnlyShown: boolean = false;
+  navigationThroughCardHistoryIsEnabled: boolean = true;
+  checkpointCelebrationModalIsEnabled: boolean = true;
 
   constructor(
     private windowRef: WindowRef,
@@ -483,15 +483,9 @@ export class ConversationSkinComponent {
       if (this.diagnosticTestTopicTrackerModel) {
         this.feedbackIsEnabled = false;
         this.learnerCanOnlyAttemptQuestionOnce = true;
-        this.onlyLastInputResponsePairIsShown = true;
+        this.lastInputOutputPairIsOnlyShown = true;
         this.navigationThroughCardHistoryIsEnabled = false;
         this.checkpointCelebrationModalIsEnabled = false;
-      } else {
-        this.feedbackIsEnabled = true;
-        this.learnerCanOnlyAttemptQuestionOnce = false;
-        this.onlyLastInputResponsePairIsShown = false;
-        this.navigationThroughCardHistoryIsEnabled = true;
-        this.checkpointCelebrationModalIsEnabled = true;
       }
     });
   }

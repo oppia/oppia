@@ -634,6 +634,24 @@ describe('Exploration Player State Service', () => {
       .toBeTrue();
   });
 
+  it(
+    'should tell if the mode can only present isolated questions or not',
+    fakeAsync(() => {
+      explorationPlayerStateService.setDiagnosticTestPlayerMode();
+      expect(explorationPlayerStateService.isPresentingIsolatedQuestions())
+        .toBeTrue();
+
+      explorationPlayerStateService.setExplorationMode();
+      expect(explorationPlayerStateService.isPresentingIsolatedQuestions())
+        .toBeFalse();
+
+      explorationPlayerStateService.explorationMode = 'invalidMode';
+      expect(() => {
+        explorationPlayerStateService.isPresentingIsolatedQuestions();
+        tick(10);
+      }).toThrowError('Invalid mode received: invalidMode.');
+    }));
+
   it('should tell if is in question player mode', () => {
     explorationPlayerStateService.setQuestionPlayerMode();
     expect(explorationPlayerStateService.isInQuestionPlayerMode()).toBeTrue();
