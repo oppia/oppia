@@ -2335,12 +2335,13 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.owner_id, self.admin_id, 'story_id_02', topic_id, '1')
 
         return {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '',
             'state_name': 'Introduction',
-            'translation_html': '<p>Translation for content.</p>'
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html'
         }
 
     def test_update_translation_contribution_stats_without_language_codes(
@@ -2464,7 +2465,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion_services.get_question_review_stats_models(
                 ['invalid_id'])
 
-    def test_update_translation_contribution_stats_when_submitting(
+    def test_update_translation_contribution_stats_when_submitting( 
         self) -> None:
         # Steps required in the setup phase before testing.
         # 1. Create and publish explorations.
@@ -2476,6 +2477,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.author_id, change_dict, 'description')
+        change_dict['translation_html'] = ['abc', 'def']
         latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -2508,7 +2510,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 translation_contribution_stats_model
                 .submitted_translation_word_count
             ),
-            6
+            5
         )
         self.assertEqual(
             translation_contribution_stats_model.accepted_translations_count,
@@ -2529,6 +2531,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.author_id, change_dict, 'description')
+        change_dict['translation_html'] = ['abc', 'def']
+        change_dict['data_format'] = 'set_of_normalized_string'
         latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -2582,7 +2586,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 translation_contribution_stats_model
                 .accepted_translation_word_count
             ),
-            6
+            5
         )
         self.assertEqual(
             translation_contribution_stats_model.accepted_translations_count,

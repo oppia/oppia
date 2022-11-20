@@ -2447,14 +2447,14 @@ def update_translation_contribution_stats_at_submission(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    if suggestion.change.data_format == (
-        state_domain.WrittenTranslation.DATA_FORMAT_SET_OF_UNICODE_STRING):
+    if type(suggestion.change.translation_html) == str:
         content_plain_text = html_cleaner.strip_html_tags(
             suggestion.change.translation_html)
         content_word_count = len(content_plain_text.split())
-    else:
+    elif type(suggestion.change.translation_html) == list:
         for content in suggestion.change.translation_html:
-            content_word_count += len(content.split())
+            content_plain_text = html_cleaner.strip_html_tags(content)
+            content_word_count += len(content_plain_text.split())
 
     translation_contribution_stat_model = (
         suggestion_models.TranslationContributionStatsModel.get(
@@ -2510,14 +2510,14 @@ def update_translation_contribution_stats_at_review(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    if suggestion.change.data_format == (
-        state_domain.WrittenTranslation.DATA_FORMAT_SET_OF_UNICODE_STRING):
+    if type(suggestion.change.translation_html) == str:
         content_plain_text = html_cleaner.strip_html_tags(
             suggestion.change.translation_html)
         content_word_count = len(content_plain_text.split())
-    else:
+    elif type(suggestion.change.translation_html) == list:
         for content in suggestion.change.translation_html:
-            content_word_count += len(content.split())
+            content_plain_text = html_cleaner.strip_html_tags(content)
+            content_word_count += len(content_plain_text.split())
 
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
@@ -2600,14 +2600,14 @@ def update_translation_review_stats(
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
 
-    if suggestion.change.data_format == (
-        state_domain.WrittenTranslation.DATA_FORMAT_SET_OF_UNICODE_STRING):
+    if type(suggestion.change.translation_html) == str:
         content_plain_text = html_cleaner.strip_html_tags(
             suggestion.change.translation_html)
         content_word_count = len(content_plain_text.split())
-    else:
+    elif type(suggestion.change.translation_html) == list:
         for content in suggestion.change.translation_html:
-            content_word_count += len(content.split())
+            content_plain_text = html_cleaner.strip_html_tags(content)
+            content_word_count += len(content_plain_text.split())
 
     translation_review_stat_model = (
         # This function is called when reviewing a translation and hence
