@@ -51,6 +51,7 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
 
     STORY_1_ID: Final = 'story_1_id'
     TOPIC_1_ID: Final = 'topic_1_id'
+    STORY_2_ID: Final = 'story_2_id'
 
     def setUp(self) -> None:
         super().setUp()
@@ -147,7 +148,7 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             migrated_story_model.story_contents, self.latest_contents)
 
     def test_broken_story_is_not_migrated(self) -> None:
-        story_model = self.create_model(
+        story_model_one = self.create_model(
             story_models.StoryModel,
             id=self.STORY_1_ID,
             story_contents_schema_version=4,
@@ -159,8 +160,25 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='urlfragment',
         )
-        story_model.update_timestamps()
-        story_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create story', [{
+        story_model_one.update_timestamps()
+        story_model_one.commit(feconf.SYSTEM_COMMITTER_ID, 'Create story', [{
+            'cmd': story_domain.CMD_CREATE_NEW
+        }])
+
+        story_model_two = self.create_model(
+            story_models.StoryModel,
+            id=self.STORY_2_ID,
+            story_contents_schema_version=4,
+            title='title',
+            language_code='cs',
+            notes='notes',
+            description='description',
+            story_contents=self.unmigrated_contents,
+            corresponding_topic_id=self.TOPIC_1_ID,
+            url_fragment='urlfragment',
+        )
+        story_model_two.update_timestamps()
+        story_model_two.commit(feconf.SYSTEM_COMMITTER_ID, 'Create story', [{
             'cmd': story_domain.CMD_CREATE_NEW
         }])
         self.assert_job_output_is([
@@ -170,10 +188,13 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
                     '\'Expected description to be a string, received 123\''
                     '))": 1'
                 )
-            )
+            ),
+            job_run_result.JobRunResult(stdout='STORY PROCESSED SUCCESS: 1')
         ])
 
         migrated_story_model = story_models.StoryModel.get(self.STORY_1_ID)
+        self.assertEqual(migrated_story_model.version, 1)
+        migrated_story_model = story_models.StoryModel.get(self.STORY_2_ID)
         self.assertEqual(migrated_story_model.version, 1)
 
     def test_migrated_story_is_not_migrated(self) -> None:
