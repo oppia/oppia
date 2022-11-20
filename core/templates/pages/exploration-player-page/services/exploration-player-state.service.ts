@@ -385,6 +385,8 @@ export class ExplorationPlayerStateService {
       this.explorationMode ===
       ExplorationPlayerConstants.EXPLORATION_MODE.OTHER
     ) {
+      // TODO(#16582): Remove "other" mode from exploration player
+      // state service.
       return false;
     } else {
       throw new Error('Invalid mode received: ' + this.explorationMode + '.');
@@ -408,6 +410,8 @@ export class ExplorationPlayerStateService {
   }
 
   isInOtherMode(): boolean {
+    // TODO(#16582): Remove "other" mode from exploration player
+    // state service.
     return this.explorationMode ===
     ExplorationPlayerConstants.EXPLORATION_MODE.OTHER;
   }
