@@ -2346,6 +2346,24 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'data_format': 'html'
         }
 
+    def _get_change_with_normalized_string(self) -> Mapping[
+        str, change_domain.AcceptableChangeDictTypes]:
+        """Provides change object with normalized translation html.
+
+        Returns:
+            Mapping[str, change_domain.AcceptableChangeDictTypes]. A dictionary
+            of the change object for the translations.
+        """
+        return {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': ['translated text1', 'translated text2'],
+            'data_format': 'set_of_normalized_string'
+        }
+
     def test_update_translation_contribution_stats_without_language_codes(
         self
     ) -> None:
@@ -2479,13 +2497,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.author_id, change_dict, 'description')
-        change_dict['translation_html'] = [
-            'translated text1', 'translated text2']
-        change_dict['data_format'] = 'set_of_normalized_string'
+        new_change_dict = self._get_change_with_normalized_string()
         latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
-            '1', 1, self.author_id, change_dict, 'description')
+            '1', 1, self.author_id, new_change_dict, 'description')
 
         suggestion_services.update_translation_contribution_stats_at_submission(
             initial_suggestion
@@ -2535,13 +2551,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.author_id, change_dict, 'description')
-        change_dict['translation_html'] = [
-            'translated text1', 'translated text2']
-        change_dict['data_format'] = 'set_of_normalized_string'
+        new_change_dict = self._get_change_with_normalized_string()
         latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
-            '1', 1, self.author_id, change_dict, 'description')
+            '1', 1, self.author_id, new_change_dict, 'description')
         suggestion_services.accept_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
