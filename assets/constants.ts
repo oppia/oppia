@@ -22,6 +22,9 @@ export default {
   // in the URL for topics that are not yet attached to a classroom.
   "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
 
+  // Acceptable URL schemes for links.
+  "ACCEPTABLE_SCHEMES": ["https", ""],
+
   // The default classroom URL fragment to use when the provided classroom URL
   // fragment in the controller is invalid.
   "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",
@@ -280,6 +283,7 @@ export default {
   },
 
   "ALLOWED_IMAGE_FORMATS": ["svg", "png", "jpeg", "jpg", "gif"],
+  "MAX_ALLOWED_IMAGE_SIZE_IN_KB_FOR_BLOG": 1024,
 
   "TASK_TYPE_HIGH_BOUNCE_RATE": "high_bounce_rate",
   "TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP": "ineffective_feedback_loop",
@@ -4947,6 +4951,8 @@ export default {
     "Welcome": "#992a2b"
   },
 
+  "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": ["tabs", "skillreview"],
+
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
   "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
 
@@ -5687,11 +5693,13 @@ export default {
       // eslint-disable-next-line max-len
       "Use respectful pronouns (like “आप” instead of “तुम/तू ”) and a corresponding respectful tone like “करिये, करेंगे”.",
       // eslint-disable-next-line max-len
-      "Use the same voice (active or passive) as in the original English text.",
+      "Feel free to change the voice and order of phrases to make the text readable.",
       // eslint-disable-next-line max-len
       "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Hindi as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes.",
       // eslint-disable-next-line max-len
-      "If the original card has “components” (such as pictures, links, and equations), these need to be added to the translated content. You can use the “Copy tool” for this -- click on the Copy tool and then click on the component you want to carry over. Also, double-click on the image and translate the alt text (and caption, if any)."
+      "If the original card has “components” (such as pictures, links, and equations), these need to be added to the translated content. You can use the “Copy tool” for this -- click on the Copy tool and then click on the component you want to carry over. Also, double-click on the image and translate the alt text (and caption, if any).",
+      // eslint-disable-next-line max-len
+      "Refer to Glossary - https://docs.google.com/spreadsheets/d/13NMEnYqLZuMbeX1Z6XXG-femHkKNAN8KwjhaC67EkxI/edit#gid=0"
     ],
     // Spanish.
     "es": [
@@ -5732,6 +5740,8 @@ export default {
     "CARD": "card",
     "LIST": "list"
   },
+
+  "EMAIL_REGEX": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+",
 
   "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
     "name": "Commonly Used",
@@ -5823,6 +5833,9 @@ export default {
     ]
   }],
 
+  "MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_CURATED_EXP": 4,
+  "MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_REGULAR_EXP": 2,
+
   "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION": "translation",
   "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER": "voiceover",
   "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION": "question",
@@ -5898,7 +5911,7 @@ export default {
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
-  "MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL": 2,
+  "MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL": 3,
 
   "BULK_EMAIL_SERVICE_SIGNUP_URL": "",
 
@@ -5937,9 +5950,10 @@ export default {
   "MAX_CHARS_IN_EXPLORATION_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
-  "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
+  "MAX_CHARS_IN_BLOG_POST_TITLE": 65,
   "MIN_CHARS_IN_BLOG_POST_TITLE": 5,
   "MAX_CHARS_IN_BLOG_POST_SUMMARY": 300,
+  "MAX_CHARS_IN_LEARNER_GROUP_TITLE": 36,
   "STORY_ID_LENGTH": 12,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
@@ -5959,6 +5973,11 @@ export default {
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,
   "MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 5,
   "MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 50,
+  // The maximum number of questions can exceed this by at most 3
+  // (i.e., 18 questions) in some special cases when the user has attempted 14
+  // questions and another topic is tested for more accurate results. For all
+  // other cases, 15 questions is the upper limit.
+  "MAX_ALLOWED_QUESTIONS_IN_THE_DIAGNOSTIC_TEST": 15,
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
@@ -6043,7 +6062,8 @@ export default {
   "LEARNER_GROUP_ID_REGEX": "^[a-zA-Z]{1,12}$",
 
   // A regular expression for allowed characters in Title field for Blog Post.
-  "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
+  // eslint-disable-next-line max-len
+  "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+([-:][ a-zA-Z0-9]+)*$",
 
   // A regular expression for allowed characters in URL fragment for Blog Post.
   "VALID_URL_BLOG_FRAGMENT_REGEX": "^[a-z0-9]+(-[a-z0-9]+)*$",
@@ -6055,6 +6075,9 @@ export default {
   // A regular expression for valid skill misconception id.
   "VALID_SKILL_MISCONCEPTION_ID_REGEX": "[A-Za-z0-9]{12}-[0-9]+",
 
+  // A regular expression for allowed characters in author name field for Author
+  // details Model.
+  "VALID_AUTHOR_NAME_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
   // Invalid names for parameters used in expressions.
   "INVALID_PARAMETER_NAMES": [
     "answer", "choices", "abs", "all", "and", "any", "else",
@@ -6174,7 +6197,6 @@ export default {
 
   "OPPORTUNITY_TYPE_SKILL": "skill",
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
-  "OPPORTUNITY_TYPE_VOICEOVER": "voiceover",
 
   // The bucket name is set to app_default_bucket which is used to store files
   // in GCS when local development server is running. This should be changed
@@ -6188,6 +6210,12 @@ export default {
 
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
+
+  // Maximum allowed length of a blog post author's name.
+  "MAX_AUTHOR_NAME_LENGTH": 35,
+
+  // Maximum allowed characters in a blog post author's bio.
+  "MAX_CHARS_IN_AUTHOR_BIO": 250,
 
   // Maximum allowed length of a state name.
   "MAX_STATE_NAME_LENGTH": 50,
@@ -6745,6 +6773,25 @@ export default {
         }
       ]
     },
+    "BLOG_AUTHOR_PROFILE_PAGE": {
+      "ROUTE": "blog/author/:author_username",
+      "TITLE": "I18N_BLOG_AUTHOR_PROFILE_PAGE_TITLE",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
+        }
+      ]
+    },
     "BLOG_POST_PAGE": {
       "ROUTE": "blog/:blog_post_url_fragment",
       "TITLE": "I18N_BLOG_POST_PAGE_TITLE",
@@ -6766,6 +6813,15 @@ export default {
           "CONTENT": "Read the latest on what's new and exciting with Oppia."
         }
       ]
+    },
+    "LEARNER_GROUP_VIEWER": {
+      "ROUTE": "learner-group/:learner_group_id",
+      "TITLE": "I18N_LEARNER_GROUP_PAGE_TITLE",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
     },
     "SPLASH": {
       "ROUTE": "",

@@ -117,6 +117,12 @@ export class UserService {
       );
     });
   }
+
+  async canUserEditBlogPosts(): Promise<boolean> {
+    return this.getUserInfoAsync().then((info) => {
+      return (info.isBlogAdmin() || info.isBlogPostEditor());
+    });
+  }
 }
 
 angular.module('oppia').factory(

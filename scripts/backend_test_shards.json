@@ -56,8 +56,10 @@
         "core.jobs.batch_jobs.story_migration_jobs_test",
         "core.jobs.batch_jobs.email_deletion_jobs_test",
         "core.jobs.batch_jobs.blog_post_search_indexing_jobs_test",
+        "core.jobs.batch_jobs.rejecting_suggestion_for_invalid_content_ids_jobs_test",
         "core.jobs.io.cache_io_test",
-        "scripts.contributor_dashboard_debug_test"
+        "scripts.contributor_dashboard_debug_test",
+        "core.platform.secrets.cloud_secrets_services_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
@@ -70,7 +72,6 @@
         "core.domain.email_subscription_services_test",
         "core.domain.value_generators_domain_test",
         "core.domain.summary_services_test",
-        "core.domain.voiceover_services_test",
         "core.domain.interaction_registry_test",
         "core.domain.skill_domain_test",
         "core.domain.auth_services_test",

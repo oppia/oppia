@@ -15,16 +15,16 @@
       </div>
       <div class="skill-analysis-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)">
         <div class="tab-description">
-          <span>{{learnerProgress.username}}'s Progress in Assigned Skills</span>
+          <span>{{ learnerProgress.username }}'s {{ 'I18N_LEARNER_GROUP_SKILLS_ANALYSIS_SECTION' | translate }}</span>
           <div *ngIf="learnerProgress" class="all-subtopics-progress">
             <div *ngFor="let topicName of topicNames" class="progress-dropdown">
               <mat-accordion>
-                <mat-expansion-panel hideToggle>
+                <mat-expansion-panel hideToggle expanded>
                   <mat-expansion-panel-header>
                     <mat-panel-title>
                       <div class="story-info-summary-container">
-                        <span class="subtopic-title">{{topicName}}
-                          <span *ngIf="getStrugglingWithSubtopicsCount(topicName) > 0" class="warning-pill">{{getStrugglingWithSubtopicsCount(topicName)}}</span>
+                        <span class="subtopic-title">{{ topicName }}
+                          <span *ngIf="getStrugglingWithSubtopicsCount(topicName) > 0" class="warning-pill">{{ getStrugglingWithSubtopicsCount(topicName) }}</span>
                         </span>
                         <div class="drop-icon">
                           <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
@@ -42,10 +42,10 @@
                           <span [innerHTML]="'I18N_STRUGGLING_WITH_SKILL' | translate: { username: learnerProgress.username }"></span>
                         </div>
                         <div class="subtopic-progress-info">
-                          <div class="subtopic-title">{{subtopicProgress.subtopicTitle}}</div>
-                          <div class="subtopic-progress">
+                          <div class="subtopic-title">{{ subtopicProgress.subtopicTitle }}</div>
+                          <div class="subtopic-progress" [ngClass]="{'no-progress': !subtopicProgress.subtopicMastery}">
                             <div *ngIf="!subtopicProgress.subtopicMastery">
-                              &#8212; {{'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET' | translate}} &#8212;
+                              &#8212; {{ 'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET' | translate }} &#8212;
                             </div>
                             <div *ngIf="subtopicProgress.subtopicMastery" class="subtopic-progress-bar">
                               <div class="subtopic-progress-bar-fill" [ngStyle]="{'width': (subtopicProgress.subtopicMastery*100) + '%'}"></div>
@@ -68,17 +68,18 @@
         </div>
       </div>
       <div class="stories-progress-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)">
-        <span class="tab-description">{{learnerProgress.username}}'s Progress in Assigned Stories</span>
+        <span class="tab-description">{{ learnerProgress.username }}'s {{ 'I18N_LEARNER_GROUP_USER_STORIES_PROGRESS' | translate }}</span>
         <div *ngIf="learnerProgress" class="all-stories-progress">
           <div *ngFor="let storyProgress of learnerProgress.storiesProgress; let storyIndex = index" class="progress-dropdown story-progress-dropdown">
             <mat-accordion>
-              <mat-expansion-panel hideToggle>
+              <mat-expansion-panel hideToggle expanded>
                 <mat-expansion-panel-header>
                   <mat-panel-title>
                     <div class="story-info-summary-container">
                       <div class="story-info-summary">
-                        <div class="story-title">{{storyProgress.getTitle()}}</div>
-                        <div class="chapters-count-pill">{{storyProgress.getNodeTitles().length}} lessons</div>
+                        <div class="story-title">
+                          {{ storyProgress.getTitle() }} | {{ storyProgress.getNodeTitles().length }} {{ 'I18N_LEARNER_GROUP_SYLLABUS_LESSONS' | translate }}
+                        </div>
                       </div>
                       <div class="drop-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
@@ -92,20 +93,23 @@
                 <div *ngFor="let chapterName of storyProgress.getNodeTitles(); let idx = index;">
                   <div class="story-chapter-progress">
                     <div class="chapter-title">
-                      <span>Lesson {{idx+1}}: {{chapterName}}</span>
+                      <span>{{ 'I18N_TOPIC_VIEWER_LESSON' | translate }} {{ idx+1 }}: {{ chapterName }}</span>
                     </div>
                     <div class="chapter-progress-container" *ngIf="storiesChaptersProgress">
-                      <div class="chapter-progress" *ngIf="getVisitedCheckpointsCount(storyIndex, idx) > 0">
-                        <div class="chapter-progress-bar"></div>
-                        <div class="completed-progress-bar" [style.width.%]="getCompletedProgressBarWidth(storyIndex, idx)"></div>
-                        <div *ngFor="let checkpoint of getAllCheckpointsProgressOfChapter(storyIndex, idx); let checkpointIdx = index;" class="checkpoints-progress-node-container">
-                          <div class="checkpoints-progress-node" *ngIf="checkpoint == 0" title="Checkpoint Not Started">{{checkpointIdx + 1}}</div>
-                          <div class="checkpoints-progress-node completed-checkpoint" *ngIf="checkpoint == 1" title="Checkpoint Completed"></div>
-                          <div class="checkpoints-progress-node in-progress-checkpoint" *ngIf="checkpoint == 2" title="Checkpoint In Progress">{{checkpointIdx + 1}}</div>
+                      <span *ngIf="getVisitedCheckpointsCount(storyIndex, idx) > 0"
+                            class="chapter-progress-percentage">
+                        {{ getCompletedProgressBarWidth(storyIndex, idx) }}%
+                        <span translate="I18N_LEARNER_GROUP_SYLLABUS_COMPLETION"></span>
+                        &nbsp;
+                      </span>
+                      <div *ngIf="getVisitedCheckpointsCount(storyIndex, idx) > 0"
+                           class="chapter-progress-bar">
+                        <div class="chapter-progress-bar-fill"
+                             [style.width.%]="getCompletedProgressBarWidth(storyIndex, idx)">
                         </div>
                       </div>
                       <div *ngIf="getVisitedCheckpointsCount(storyIndex, idx) === 0" class="chapter-not-started">
-                        &#8212; {{'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET' | translate}} &#8212;
+                        &#8212; {{ 'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET' | translate }} &#8212;
                       </div>
                     </div>
                   </div>

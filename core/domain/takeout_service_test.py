@@ -707,30 +707,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             display_alias=self.GENERIC_DISPLAY_ALIAS_2
         ).put()
 
-        suggestion_models.GeneralVoiceoverApplicationModel(
-            id='application_1_id',
-            target_type='exploration',
-            target_id='exp_id',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            author_id=self.USER_ID_1,
-            final_reviewer_id='reviewer_id',
-            language_code=self.SUGGESTION_LANGUAGE_CODE,
-            filename='application_audio.mp3',
-            content='<p>Some content</p>',
-            rejection_message=None).put()
-
-        suggestion_models.GeneralVoiceoverApplicationModel(
-            id='application_2_id',
-            target_type='exploration',
-            target_id='exp_id',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            author_id=self.USER_ID_1,
-            final_reviewer_id=None,
-            language_code=self.SUGGESTION_LANGUAGE_CODE,
-            filename='application_audio.mp3',
-            content='<p>Some content</p>',
-            rejection_message=None).put()
-
         suggestion_models.TranslationContributionStatsModel.create(
             language_code=self.SUGGESTION_LANGUAGE_CODE,
             contributor_user_id=self.USER_ID_1,
@@ -964,6 +940,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         blog_post_rights_for_post_2.update_timestamps()
         blog_post_rights_for_post_2.put()
 
+        blog_models.BlogAuthorDetailsModel.create(
+            author_id=self.USER_ID_1,
+            displayed_author_name='general name',
+            author_bio='general blog author'
+        )
+
         learner_group_model = learner_group_models.LearnerGroupModel(
             id=self.LEARNER_GROUP_ID,
             title='sample title',
@@ -1093,9 +1075,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'managed_topic_ids': []
         }
 
-        expected_voiceover_application_data: Dict[
-            str, Dict[str, Optional[str]]
-        ] = {}
         expected_contrib_proficiency_data: Dict[
             str, Dict[str, Union[int, bool]]
         ] = {}
@@ -1136,6 +1115,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_blog_post_rights: Dict[str, List[str]] = {
             'editable_blog_post_ids': []
         }
+        expected_blog_author_details: Dict[str, Dict[str, str]] = {}
         expected_learner_group_model_data: Dict[str, str] = {}
         expected_learner_grp_user_model_data: Dict[str, str] = {}
 
@@ -1147,6 +1127,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'app_feedback_report': app_feedback_report,
             'blog_post': expected_blog_post_data,
             'blog_post_rights': expected_blog_post_rights,
+            'blog_author_details': expected_blog_author_details,
             'user_stats': stats_data,
             'user_settings': user_settings_data,
             'user_subscriptions': subscriptions_data,
@@ -1171,8 +1152,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'collection_rights': collection_rights_data,
             'general_suggestion': general_suggestion_data,
             'exploration_rights': exploration_rights_data,
-            'general_voiceover_application':
-                expected_voiceover_application_data,
             'user_contribution_proficiency': expected_contrib_proficiency_data,
             'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
@@ -1649,27 +1628,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'managed_topic_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
         }
 
-        expected_voiceover_application_data = {
-            'application_1_id': {
-                'target_type': 'exploration',
-                'target_id': 'exp_id',
-                'status': 'review',
-                'language_code': 'en',
-                'filename': 'application_audio.mp3',
-                'content': '<p>Some content</p>',
-                'rejection_message': None
-            },
-            'application_2_id': {
-                'target_type': 'exploration',
-                'target_id': 'exp_id',
-                'status': 'review',
-                'language_code': 'en',
-                'filename': 'application_audio.mp3',
-                'content': '<p>Some content</p>',
-                'rejection_message': None
-            }
-        }
-
         expected_contribution_rights_data = {
             'can_review_translation_for_language_codes': ['hi', 'en'],
             'can_review_voiceover_for_language_codes': ['hi'],
@@ -1795,6 +1753,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 self.BLOG_POST_ID_1,
                 self.BLOG_POST_ID_2
             ],
+        }
+        expected_blog_author_details = {
+            'author_name': 'test name',
+            'author_bio': ''
         }
         expected_learner_group_data = {
             'title': 'sample title',
@@ -1923,8 +1885,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_collection_rights_data,
             'general_suggestion': expected_general_suggestion_data,
             'exploration_rights': expected_exploration_rights_data,
-            'general_voiceover_application':
-                expected_voiceover_application_data,
             'user_contribution_proficiency': expected_contrib_proficiency_data,
             'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
@@ -1959,7 +1919,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'user_auth_details': expected_user_auth_details,
             'app_feedback_report': expected_app_feedback_report,
             'blog_post': expected_blog_post_data,
-            'blog_post_rights': expected_blog_post_rights
+            'blog_post_rights': expected_blog_post_rights,
+            'blog_author_details': expected_blog_author_details
         }
 
         user_takeout_object = takeout_service.export_data_for_user(

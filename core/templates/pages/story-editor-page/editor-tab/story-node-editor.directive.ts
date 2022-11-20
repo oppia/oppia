@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
-import { ExplorationIdValidationService } from 'domain/exploration/exploration-id-validation.service';
+import { CuratedExplorationValidationService } from 'domain/exploration/curated-exploration-validation.service';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { StoryUpdateService } from 'domain/story/story-update.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
@@ -96,7 +96,8 @@ export class StoryNodeEditorComponent {
 
   constructor(
     private alertsService: AlertsService,
-    private explorationIdValidationService: ExplorationIdValidationService,
+    private curatedExplorationValidationService:
+    CuratedExplorationValidationService,
     private focusManagerService: FocusManagerService,
     private ngbModal: NgbModal,
     private pageTitleService: PageTitleService,
@@ -236,7 +237,8 @@ export class StoryNodeEditorComponent {
         return;
       }
 
-      this.explorationIdValidationService.isExpPublishedAsync(explorationId)
+      this.curatedExplorationValidationService.isExpPublishedAsync(
+        explorationId)
         .then((expIdIsValid) => {
           this.expIdIsValid = expIdIsValid;
 
