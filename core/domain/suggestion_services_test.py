@@ -2509,7 +2509,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 translation_contribution_stats_model
                 .submitted_translation_word_count
             ),
-            5
+            6
         )
         self.assertEqual(
             translation_contribution_stats_model.accepted_translations_count,
@@ -2583,7 +2583,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 translation_contribution_stats_model
                 .accepted_translation_word_count
             ),
-            5
+            6
         )
         self.assertEqual(
             translation_contribution_stats_model.accepted_translations_count,
