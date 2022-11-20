@@ -29,8 +29,8 @@
       '.e2e-test-exploration-id-input-field').val();
     $('div > iframe').each(function(index) {
       var src = $.find(this).attr('src');
-      src = src.replace(placeholderExplorationId, newExplorationId);
-      $.find(this).attr('src', src);
+      src = $.find(src).replace(placeholderExplorationId, newExplorationId);
+      $.find(this).attr('src', $.find(src));
     });
     placeholderExplorationId = newExplorationId;
 

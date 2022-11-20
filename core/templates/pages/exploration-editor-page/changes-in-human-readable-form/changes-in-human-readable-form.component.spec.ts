@@ -31,13 +31,15 @@ describe('Changes in Human Readable Form Component', () => {
 
   // This is a helper function to clean the compiled html
   // for each test, in order to make a cleaner assertion.
-  const removeComments = (HTML: { toString: () => string }) => {
+  const removeComments = (HTML) => {
+    HTML = HTML.toString();
+    // Removes Comments.
+    while (HTML.includes('<!--')) {
+      HTML = HTML.replace(/<!--[^>]*-*-*>*/gm, '');
+    }
     return HTML
-      .toString()
       // Removes Unecessary white spaces and new lines.
       .replace(/^\s+|\r\n|\n|\r|(>)\s+(<)|\s+$/gm, '$1$2')
-      // Removes Comments.
-      .replace(/<!--[^>]*-*-*>*/gm, '')
       // Removes marker.
       .replace(/::marker/, '');
   };
