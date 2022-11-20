@@ -317,6 +317,7 @@
 	"I18N_DELETE_LEARNER_GROUP_MODAL_BODY_TEXT": "Confirmation message displayed in the modal body when the facilitator clicks on the delete learner group button on edit learner group page.",
 	"I18N_DEST_IF_STUCK_INFO_TOOLTIP": "You can now specify a new card in which you can walk the learners through the concepts used in the question, if they get really stuck!",
 	"I18N_DIAGNOSTIC_TEST_CURRENT_PROGRESS": "The text is displayed on the bottom right of the progress bar of the diagnostic test page. This text displays the progress percentage of the user in the diagnostic test.",
+	"I18N_DIAGNOSTIC_TEST_EXIT_TEST": "The text is displayed on the top left corner of the diagnostic test page. This guides the learner to quit the test.",
 	"I18N_DIAGNOSTIC_TEST_HEADING": "The text is displayed on the top center of the diagnostic test page. This text is the heading of the page.",
 	"I18N_DIAGNOSTIC_TEST_INTRO_TEXT_1": "Text displayed on the diagnostic test player page telling user that in the diagnostic test they will get a topic recommendation for getting started with Math lessons.",
 	"I18N_DIAGNOSTIC_TEST_INTRO_TEXT_2": "Text displayed on the diagnostic test player page telling user that they will not be able to change their answer after moving to the next question.",

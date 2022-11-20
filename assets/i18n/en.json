@@ -317,6 +317,7 @@
     "I18N_DELETE_LEARNER_GROUP_MODAL_BODY_TEXT": "Are you sure you want to delete <b><[groupName]></b> learner group?",
     "I18N_DEST_IF_STUCK_INFO_TOOLTIP": "You can now specify a new card in which you can walk the learners through the concepts used in the question, if they get really stuck!",
     "I18N_DIAGNOSTIC_TEST_CURRENT_PROGRESS": "Current Progress: <[progressPercentage]> %",
+    "I18N_DIAGNOSTIC_TEST_EXIT_TEST": "Exit Test",
     "I18N_DIAGNOSTIC_TEST_HEADING": "Learner Diagnostic Test",
     "I18N_DIAGNOSTIC_TEST_INTRO_TEXT_1": "Answer a few questions to help us recommend a few topics for you to get started with Math lessons.",
     "I18N_DIAGNOSTIC_TEST_INTRO_TEXT_2": "Please note that you will not be able to change your answer after moving to the next question.",
