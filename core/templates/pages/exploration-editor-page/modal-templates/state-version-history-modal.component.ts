@@ -25,6 +25,7 @@ import { ContextService } from 'services/context.service';
 import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
 import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 import { VersionHistoryService } from '../services/version-history.service';
+import { AlertsService } from 'services/alerts.service';
 
 interface headersAndYamlStrs {
   previousVersionStateYaml: string;
@@ -64,6 +65,7 @@ export class StateVersionHistoryModalComponent
 
   constructor(
       private ngbActiveModal: NgbActiveModal,
+      private alertsService: AlertsService,
       private contextService: ContextService,
       private versionHistoryService: VersionHistoryService,
       private versionHistoryBackendApiService: VersionHistoryBackendApiService,
@@ -194,10 +196,17 @@ export class StateVersionHistoryModalComponent
       return;
     }
     const diffData = this.versionHistoryService.getBackwardStateDiffData();
-    if (
-      diffData.oldVersionNumber !== null &&
-      diffData.oldState && diffData.oldState.name !== null
-    ) {
+    if (!diffData.oldState) {
+      throw new Error(
+        'The state data for the previous version is not available.'
+      );
+    }
+    if (diffData.oldState.name === null) {
+      throw new Error(
+        'The name of the state in the previous version was not specified.'
+      );
+    }
+    if (diffData.oldVersionNumber !== null) {
       this.versionHistoryBackendApiService.fetchStateVersionHistoryAsync(
         this.contextService.getExplorationId(),
         diffData.oldState.name, diffData.oldVersionNumber
@@ -210,6 +219,10 @@ export class StateVersionHistoryModalComponent
           );
           this.versionHistoryService
             .incrementCurrentPositionInStateVersionHistoryList();
+        } else {
+          this.alertsService.addWarning(
+            'Could not fetch the version history data due to some reasons. ' +
+            'Please reload the page and try again.');
         }
       });
     }
