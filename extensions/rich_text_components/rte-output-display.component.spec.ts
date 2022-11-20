@@ -54,7 +54,8 @@ describe('RTE display component', () => {
     let rteComponentDe: DebugElement = fixture.debugElement;
 
     // eslint-disable-next-line oppia/no-inner-html
-    let html = fixture.nativeElement.innerHTML.replace(/(?=<!--)([\s\S]*?)-->/g, '');
+    let html = fixture.nativeElement.innerHTML
+      .replace(/(?=<!--)([\s\S]*?)-->/g, '');
     expect(html).toBe('');
 
     fixture.detectChanges();
