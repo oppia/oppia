@@ -398,39 +398,25 @@ def get_url_scheme(url: str) -> str:
     return urllib.parse.urlparse(url).scheme
 
 
-def convert_png_or_webp_data_url_to_binary(
-    image_data_url: str, is_data_url_webp: bool = False
-) -> bytes:
-    """Converts a PNG or WebP base64 data URL to a PNG binary data.
+def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
+    """Converts a PNG base64 data URL to a PNG binary data.
 
     Args:
         image_data_url: str. A string that is to be interpreted as a PNG
-            or WebP data URL.
-        is_data_url_webp: bool. True when the data url is of type WebP.
+            data URL.
 
     Returns:
-        bytes. Binary content of the PNG or WebP created from the data URL.
+        bytes. Binary content of the PNG created from the data URL.
 
     Raises:
         Exception. The given string does not represent a PNG data URL.
-        Exception. The given string does not represent a WebP data URL.
     """
-    if is_data_url_webp:
-        if image_data_url.startswith(WEBP_DATA_URL_PREFIX):
-            return base64.b64decode(
-                urllib.parse.unquote(
-                    image_data_url[len(WEBP_DATA_URL_PREFIX):]))
-        else:
-            raise Exception(
-                'The given string does not represent a WebP data URL.')
+    if image_data_url.startswith(PNG_DATA_URL_PREFIX):
+        return base64.b64decode(
+            urllib.parse.unquote(
+                image_data_url[len(PNG_DATA_URL_PREFIX):]))
     else:
-        if image_data_url.startswith(PNG_DATA_URL_PREFIX):
-            return base64.b64decode(
-                urllib.parse.unquote(
-                    image_data_url[len(PNG_DATA_URL_PREFIX):]))
-        else:
-            raise Exception(
-                'The given string does not represent a PNG data URL.')
+        raise Exception('The given string does not represent a PNG data URL.')
 
 
 def convert_png_binary_to_data_url(content: bytes) -> str:

@@ -19,17 +19,17 @@
 from __future__ import annotations
 
 import io
-from PIL import Image
 
 from core import utils
 from core.domain import user_services
 from core.jobs import base_jobs
-from core.jobs.io import ndb_io
 from core.jobs.io import gcs_io
+from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
+from PIL import Image
 import apache_beam as beam
 from typing import Optional
 
@@ -54,57 +54,72 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
         self.client = client
         self.pipeline = pipeline
 
-    def _filenames_png(
-        self, user_model: user_models.UserSettingsModel
+    @staticmethod
+    def _filepath_png(
+        user_model: user_models.UserSettingsModel
     ) -> gcs_io.FileObjectDict:
         """Returns file object for png images to write to the GCS.
 
         Args:
             user_model: UserSettingsModel. The user settings model.
 
-        Returns: file_dict. The FileObjectDict.
+        Returns:
+            file_dict: gcs_io.FileObjectDict. The FileObjectDict containing
+            filepath and data.
         """
-        file_dict = {}
         username = user_model.username
-        filename = f'user/{username}/profile_picture.png'
-        if user_model.profile_picture_data_url is None:
-            user_model.profile_picture_data_url = (
-                user_services.fetch_gravatar(user_model.email))
-        profile_picture_binary = utils.convert_png_or_webp_data_url_to_binary(
+        filepath = f'user/{username}/profile_picture.png'
+        profile_picture_binary = utils.convert_png_data_url_to_binary(
             user_model.profile_picture_data_url)
-        file_dict = {
-            'filepath': filename,
+        file_dict: gcs_io.FileObjectDict = {
+            'filepath': filepath,
             'data': profile_picture_binary
         }
         return file_dict
 
-    def _filenames_webp(
-        self, user_model: user_models.UserSettingsModel
+    @staticmethod
+    def _filepath_webp(
+        user_model: user_models.UserSettingsModel
     ) -> gcs_io.FileObjectDict:
         """Returns file object for webp images to write to the GCS.
 
         Args:
             user_model: UserSettingsModel. The user settings model.
 
-        Returns: file_dict. The FileObjectDict.
+        Returns:
+            file_dict: gcs_io.FileObjectDict. The FileObjectDict containing
+            filepath and data.
         """
-        file_dict = {}
         username = user_model.username
-        filename = f'user/{username}/profile_picture.webp'
-        if user_model.profile_picture_data_url is None:
-            user_model.profile_picture_data_url = (
-                user_services.fetch_gravatar(user_model.email))
-        profile_picture_binary = utils.convert_png_or_webp_data_url_to_binary(
+        filepath = f'user/{username}/profile_picture.webp'
+        profile_picture_binary = utils.convert_png_data_url_to_binary(
             user_model.profile_picture_data_url)
         output = io.BytesIO()
-        image = Image.open(io.BytesIO(profile_picture_binary)).convert("RGB")
+        image = Image.open(io.BytesIO(profile_picture_binary)).convert('RGB')
         image.save(output, 'webp')
         webp_binary = output.getvalue()
-        file_dict = {
-            'filepath': filename,
+        file_dict: gcs_io.FileObjectDict = {
+            'filepath': filepath,
             'data': webp_binary
         }
         return file_dict
+
+    def _make_profile_picture_valid(
+        self, user_model: user_models.UserSettingsModel
+    ) -> user_models.UserSettingsModel:
+        """Generate gravatar for users that have profile picture None.
+
+        Args:
+            user_model: user_models.UserSettingsModel. The user model.
+
+        Returns:
+            user_model: user_models.UserSettingsModel. The updated user model.
+        """
+        if user_model.profile_picture_data_url is None:
+            user_model.profile_picture_data_url = (
+                user_services.fetch_gravatar(user_model.email))
+
+        return user_model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         users_with_valid_username = (
@@ -113,11 +128,13 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
                 user_models.UserSettingsModel.get_all(include_deleted=False))
             | 'Filter valid users with not None username' >> beam.Filter(
                 lambda model: model.username is not None)
+            | 'Make the invalid profile picture valid' >> beam.Map(
+                self._make_profile_picture_valid)
         )
 
         write_png_files_to_gcs = (
             users_with_valid_username
-            | 'Map files for png' >> beam.Map(self._filenames_png)
+            | 'Map files for png' >> beam.Map(self._filepath_png)
             | 'Write png file to GCS' >> gcs_io.WriteFile(
                 client=self.client, mode_is_binary=True, mime_type='image/png')
         )
@@ -131,7 +148,7 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
 
         write_webp_files_to_gcs = (
             users_with_valid_username
-            | 'Map files for webp' >> beam.Map(self._filenames_webp)
+            | 'Map files for webp' >> beam.Map(self._filepath_webp)
             | 'Write webp file to GCS' >> gcs_io.WriteFile(
                 client=self.client, mode_is_binary=True, mime_type='image/webp')
         )
@@ -182,8 +199,9 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
             | 'Read png files from GCS' >> gcs_io.ReadFile(
                 client=self.client, mode_is_binary=True)
             | 'Make tuple of username and data url' >> beam.Map(
-                lambda data: (data[0].split('/')[1],
-                utils.convert_png_binary_to_data_url(data[1]))
+                lambda data: (
+                    data[0].split('/')[1],
+                    utils.convert_png_binary_to_data_url(data[1]))
             )
         )
 
@@ -200,8 +218,10 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
             }
             | 'Merge models' >> beam.CoGroupByKey()
             | 'Filter invalid images' >> beam.Filter(
-                lambda object: (
-                    object[1]['gcs_picture'] != object[1]['model_picture']))
+                lambda object_image: (
+                    object_image[1]['gcs_picture'] !=
+                    object_image[1]['model_picture'])
+            )
         )
 
         report_mismatched_images_on_gcs_and_model = (
