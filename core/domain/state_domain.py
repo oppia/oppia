@@ -4859,27 +4859,29 @@ class State(translation_domain.BaseTranslatableObject):
 
     def update_interaction_customization_args(
         self,
-        customization_args_dict: Mapping[
+        customization_args_mapping: Mapping[
             str, Mapping[str, UnionOfCustomizationArgsDictValues]
         ]
     ) -> None:
         """Update the customization_args of InteractionInstance domain object.
 
         Args:
-            customization_args_dict: dict. The new customization_args to set.
+            customization_args_mapping: dict. The new customization_args to set.
 
         Raises:
             Exception. The customization arguments are not unique.
         """
-        # For argument 'customization_args_dict' we have used Mapping type
-        # because we want to allow 'update_interaction_customization_args'
-        # method to accept different subtypes of customization_arg dictionaries,
-        # but the problem with Mapping is that the Mapping does not allow to
-        # update(or set) values because Mapping is a read-only type. To overcome
-        # this issue, we narrowed down the type from Mapping to Dict by using
-        # assert so that while updating or setting a new value MyPy will not
-        # throw any error.
-        assert isinstance(customization_args_dict, dict)
+        # Here we use cast because for argument 'customization_args_mapping'
+        # we have used Mapping type because we want to allow
+        # 'update_interaction_customization_args' method to accept different
+        # subtypes of customization_arg dictionaries, but the problem with
+        # Mapping is that the Mapping does not allow to update(or set) values
+        # because Mapping is a read-only type. To overcome this issue, we
+        # narrowed down the type from Mapping to Dict by using cast so that
+        # while updating or setting a new value MyPy will not throw any error.
+        customization_args_dict = cast(
+            CustomizationArgsDictType, customization_args_mapping
+        )
         customization_args = (
             InteractionInstance.
             convert_customization_args_dict_to_customization_args(
