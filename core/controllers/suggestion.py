@@ -729,18 +729,21 @@ class ReviewableSuggestionsHandler(
         suggestions: Sequence[suggestion_registry.BaseSuggestion] = []
         next_offset = 0
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-            suggestions, next_offset = (
-                suggestion_services.
-                get_reviewable_translation_suggestions_by_offset(
-                    self.user_id,
-                    exp_ids,
-                    limit, offset
-                )
-            )
+            reviewable_suggestions, next_offset = (
+                suggestion_services
+                .get_reviewable_translation_suggestions_by_offset(
+                    self.user_id, exp_ids, limit, offset))
+            # Filter out obsolete translation suggestions, i.e. suggestions with
+            # translations that no longer match the current exploration content
+            # text. See issue #16536 for more details.
+            suggestions = (
+                suggestion_services
+                .get_suggestions_with_translatable_explorations(
+                    reviewable_suggestions))
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             suggestions, next_offset = (
-                suggestion_services.
-                get_reviewable_question_suggestions_by_offset(
+                suggestion_services
+                .get_reviewable_question_suggestions_by_offset(
                     self.user_id, limit, offset))
         self._render_suggestions(target_type, suggestions, next_offset)
 
