@@ -62,7 +62,11 @@ datastore_services = models.Registry.import_datastore_services()
 class SuggestionUnitTests(test_utils.GenericTestBase):
 
     ASSET_HANDLER_URL_PREFIX: Final = '/assetsdevhandler'
+    TOPIC_ID = 'topic'
+    STORY_ID = 'story'
     EXP_ID: Final = 'exp1'
+    SKILL_ID = 'skill1234567'
+    SKILL_DESCRIPTION = 'skill to link question to'
     TRANSLATION_LANGUAGE_CODE: Final = 'en'
 
     AUTHOR_EMAIL: Final = 'author@example.com'
@@ -82,6 +86,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.signup(self.TRANSLATOR_EMAIL, 'translator')
 
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
@@ -102,7 +107,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
                 self.EXP_ID, self.editor_id, ['State 1', 'State 2', 'State 3'],
-                ['TextInput'], category='Algebra'))
+                ['TextInput'], category='Algebra',
+                correctness_feedback_enabled=True))
 
         self.old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
@@ -133,6 +139,44 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'content', '<p>resubmit change content html</p>').to_dict()
         self.update_change_content = state_domain.SubtitledHtml(
             'content', '<p>update change content html</p>').to_dict()
+
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_333'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_333']
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID, 'story-a')
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, self.STORY_ID)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
+
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': self.EXP_ID
+            })], 'Changes.')
+
+        self.save_new_skill(
+            self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION)
 
         self.logout()
 
@@ -759,7 +803,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
                 exp_id, self.editor_id, ['State 1'],
-                ['EndExploration'], category='Algebra'))
+                ['EndExploration'], category='Algebra',
+                correctness_feedback_enabled=True))
 
         state_content_dict = {
             'content_id': 'content',
@@ -792,6 +837,27 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'new_value': state_content_dict
             })], 'Changes content.')
         rights_manager.publish_exploration(self.editor, exp_id)
+
+        story = story_domain.Story.create_default_story(
+            'story_123', 'A story', 'Description', self.TOPIC_ID, 'story-a')
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, 'story_123')
+        topic_services.publish_story(
+            self.TOPIC_ID, 'story_123', self.admin_id)
+
+        story_services.update_story(
+            self.owner_id, 'story_123', [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': exp_id
+            })], 'Changes.')
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         text_to_translate = exploration.states['State 1'].content.html
