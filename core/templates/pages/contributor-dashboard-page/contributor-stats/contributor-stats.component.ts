@@ -239,7 +239,7 @@ export class ContributorStatsComponent {
           stat.language_code);
         const translationContributionStatsData = this
           .statsData?.translationContribution.get(language);
-        if (typeof translationContributionStatsData === 'undefined') {
+        if (translationContributionStatsData === undefined) {
           this.statsData?.translationContribution.set(
             language,
             new PageableStats([this.createTranslationContributionStat(stat)]));
@@ -260,7 +260,7 @@ export class ContributorStatsComponent {
           stat.language_code);
         const translationReviewStatsData = this
           .statsData?.translationReview.get(language);
-        if (typeof translationReviewStatsData === 'undefined') {
+        if (translationReviewStatsData === undefined) {
           this.statsData.translationReview.set(
             language,
             new PageableStats([this.createTranslationReviewStat(stat)]));
