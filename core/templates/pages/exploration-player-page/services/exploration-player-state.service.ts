@@ -387,7 +387,7 @@ export class ExplorationPlayerStateService {
     ) {
       return false;
     } else {
-      throw new Error('Invalid mode received.');
+      throw new Error('Invalid mode received: ' + this.explorationMode + '.');
     }
   }
 

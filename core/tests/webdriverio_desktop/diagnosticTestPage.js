@@ -117,6 +117,10 @@ describe('Diagnostic test page functionality', function() {
     await topicEditorPage.publishTopic();
     await classroomPage.get('math');
     await classroomPage.expectNumberOfTopicsToBe(1);
+
+    await browser.url('/classroom-admin/');
+    await waitFor.pageToFullyLoad();
+    await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
   });
 
   afterAll(async function() {

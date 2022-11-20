@@ -21,9 +21,32 @@ var action = require('./action.js');
 
 var DiagnosticTestPage = function() {
   var startDiagnosticTestButton = $('.e2e-test-start-diagnostic-test');
+  var addNewClassroomButton = $('.e2e-test-add-new-classroom-config');
+  var newClassrooomNameInput = $('.e2e-test-new-classroom-name');
+  var newClassroomUrlFragmentInput = $('.e2e-test-new-classroom-url-fragment');
+  var createNewClassroomButton = $('.e2e-test-create-new-classroom');
 
   this.startDiagnosticTest = async function() {
     await action.click('Start diagnostic test', startDiagnosticTestButton);
+  };
+
+  this.createNewClassroomConfig = async function(
+      classroomName, classroomUrlFragment
+  ) {
+    await action.click(
+      'Add new classroom config data', addNewClassroomButton);
+    await action.setValue(
+      'New classroom name input',
+      newClassrooomNameInput,
+      classroomName
+    );
+    await action.setValue(
+      'New classroom URL fragment input',
+      newClassroomUrlFragmentInput,
+      classroomUrlFragment
+    );
+    await action.click(
+      'Create new classroom config', createNewClassroomButton);
   };
 };
 
