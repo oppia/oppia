@@ -1,4 +1,5 @@
 import datetime
+import io
 from re import Pattern
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
@@ -37,6 +38,7 @@ class Response:
     cache_control: Any
     pragma: Any
     expires: Any
+    body_file: io.BytesIO
 
     def write(self, content: Union[bytes, str]) -> None: ...
     def set_cookie(

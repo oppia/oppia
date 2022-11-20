@@ -66,7 +66,9 @@ from core.platform import models
 
 import deepdiff
 from typing import (
-    Dict, Final, List, Optional, Sequence, Tuple, Type, TypedDict, Union, cast)
+    Dict, Final, List, Literal, Optional, Sequence, Tuple, Type, TypedDict,
+    Union, cast, overload
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -3590,8 +3592,26 @@ def update_logged_out_user_progress(
     checkpoint_url_model.put()
 
 
+@overload
 def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
-    exploration_id: str, unique_progress_url_id: str
+    exploration_id: str, unique_progress_url_id: str, *, strict: Literal[True]
+) -> exp_domain.TransientCheckpointUrl: ...
+
+
+@overload
+def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
+    exploration_id: str, unique_progress_url_id: str,
+) -> Optional[exp_domain.TransientCheckpointUrl]: ...
+
+
+@overload
+def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
+    exploration_id: str, unique_progress_url_id: str, *, strict: Literal[False]
+) -> Optional[exp_domain.TransientCheckpointUrl]: ...
+
+
+def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
+    exploration_id: str, unique_progress_url_id: str, strict: bool = False
 ) -> Optional[exp_domain.TransientCheckpointUrl]:
     """Synchronizes the most recently reached checkpoint and the furthest
     reached checkpoint with the latest exploration.
@@ -3600,6 +3620,8 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
         exploration_id: str. The Id of the exploration.
         unique_progress_url_id: str. Unique 6-digit url to track a
             logged-out user's progress.
+        strict: bool. Whether to fail noisily if no TransientCheckpointUrlModel
+            with the given unique_progress_url_id exists in the datastore.
 
     Returns:
         TransientCheckpointUrl. The domain object corresponding to the
@@ -3607,7 +3629,7 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
     """
     # Fetch the model associated with the unique_progress_url_id.
     checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get(
-        unique_progress_url_id, strict=False)
+        unique_progress_url_id, strict=strict)
 
     if checkpoint_url_model is None:
         return None
