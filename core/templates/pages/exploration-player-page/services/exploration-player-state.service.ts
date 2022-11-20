@@ -381,7 +381,9 @@ export class ExplorationPlayerStateService {
       this.explorationMode ===
       ExplorationPlayerConstants.EXPLORATION_MODE.EXPLORATION ||
       this.explorationMode ===
-      ExplorationPlayerConstants.EXPLORATION_MODE.STORY_CHAPTER
+      ExplorationPlayerConstants.EXPLORATION_MODE.STORY_CHAPTER ||
+      this.explorationMode ===
+      ExplorationPlayerConstants.EXPLORATION_MODE.OTHER
     ) {
       return false;
     } else {
