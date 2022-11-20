@@ -2342,8 +2342,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'language_code': 'hi',
             'content_html': '',
             'state_name': 'Introduction',
-            'translation_html': ['translated text1', 'translated text2'],
-            'data_format': 'set_of_normalized_string'
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html'
         }
 
     def test_update_translation_contribution_stats_without_language_codes(
@@ -2479,6 +2479,9 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.author_id, change_dict, 'description')
+        change_dict['translation_html'] = [
+            'translated text1', 'translated text2']
+        change_dict['data_format'] = 'set_of_normalized_string'
         latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -2511,7 +2514,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 translation_contribution_stats_model
                 .submitted_translation_word_count
             ),
-            6
+            7
         )
         self.assertEqual(
             translation_contribution_stats_model.accepted_translations_count,
@@ -2532,6 +2535,9 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.author_id, change_dict, 'description')
+        change_dict['translation_html'] = [
+            'translated text1', 'translated text2']
+        change_dict['data_format'] = 'set_of_normalized_string'
         latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -2577,7 +2583,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 translation_review_stats_model
                 .reviewed_translation_word_count
             ),
-            6
+            7
         )
         assert translation_contribution_stats_model is not None
         self.assertEqual(
@@ -2585,7 +2591,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 translation_contribution_stats_model
                 .accepted_translation_word_count
             ),
-            6
+            7
         )
         self.assertEqual(
             translation_contribution_stats_model.accepted_translations_count,
