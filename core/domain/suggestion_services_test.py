@@ -2348,7 +2348,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     def _get_change_with_normalized_string(self) -> Mapping[
         str, change_domain.AcceptableChangeDictTypes]:
-        """Provides change object with normalized translation html.
+        """Provides change dictionary with normalized translation html.
 
         Returns:
             Mapping[str, change_domain.AcceptableChangeDictTypes]. A dictionary
