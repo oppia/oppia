@@ -78,9 +78,9 @@ export class MetadataVersionHistoryModalComponent
     return this.versionHistoryService.canShowForwardMetadataDiffData();
   }
 
-  // The return value of the below function can never be null because it is
-  // called only when canExploreBackwardVersionHistory() returns true.
-  // If the previously edited version number is null,
+  // In practice, the return value of the below function can never be null
+  // because it is called only when canExploreBackwardVersionHistory()
+  // returns true. If the previously edited version number is null,
   // canExploreBackwardVersionHistory() would have returned false. Here,
   // the return value is written as (number | null) in order to fix the
   // typescript errors since the list called fetchedMetadataVersionNumbers in
@@ -88,13 +88,15 @@ export class MetadataVersionHistoryModalComponent
   // value null represents the end of version history for the exploration
   // metadata i.e. we have reached the end of the version history and the
   // exploration metadata was not edited in any earlier versions.
-  getLastEditedVersionNumber(): number | null {
-    return (
-      this
-        .versionHistoryService
-        .getBackwardMetadataDiffData()
-        .oldVersionNumber
-    );
+  getLastEditedVersionNumber(): number {
+    const lastEditedVersionNumber = this
+      .versionHistoryService
+      .getBackwardMetadataDiffData()
+      .oldVersionNumber;
+    if (lastEditedVersionNumber === null) {
+      throw new Error('Last edited version number cannot be null');
+    }
+    return lastEditedVersionNumber;
   }
 
   getLastEditedCommitterUsername(): string {
@@ -109,13 +111,15 @@ export class MetadataVersionHistoryModalComponent
   // Returns the next version number at which the metadata was modified.
   // The explanation for return type being (number | null) is same as explained
   // above the function getLastEditedVersionNumber().
-  getNextEditedVersionNumber(): number | null {
-    return (
-      this
-        .versionHistoryService
-        .getForwardMetadataDiffData()
-        .oldVersionNumber
-    );
+  getNextEditedVersionNumber(): number {
+    const nextEditedVersionNumber = this
+      .versionHistoryService
+      .getForwardMetadataDiffData()
+      .oldVersionNumber;
+    if (nextEditedVersionNumber === null) {
+      throw new Error('Next edited version number cannot be null');
+    }
+    return nextEditedVersionNumber;
   }
 
   getNextEditedCommitterUsername(): string {

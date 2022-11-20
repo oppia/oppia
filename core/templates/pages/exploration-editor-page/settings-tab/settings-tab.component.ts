@@ -268,12 +268,14 @@ export class SettingsTabComponent
   }
 
   getLastEditedVersionNumber(): number {
-    return (
-      this
-        .versionHistoryService
-        .getBackwardMetadataDiffData()
-        .oldVersionNumber
-    );
+    const lastEditedVersionNumber = this
+      .versionHistoryService
+      .getBackwardMetadataDiffData()
+      .oldVersionNumber;
+    if (lastEditedVersionNumber === null) {
+      throw new Error('Last edited version number cannot be null');
+    }
+    return lastEditedVersionNumber;
   }
 
   getLastEditedCommitterUsername(): string {

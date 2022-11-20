@@ -41,19 +41,22 @@ export class StateVersionHistoryComponent {
     );
   }
 
-  // The return value of the below function can never be null because it is
-  // called only when canShowExploreVersionHistoryButton() returns true.
-  // If the previously edited version number is null,
+  // In practice, the return value of the below function can never be null
+  // because it is called only when canShowExploreVersionHistoryButton()
+  // returns true. If the previously edited version number is null,
   // canShowExploreVersionHistoryButton() would have returned false. Here,
   // the return value is written as (number | null) in order to fix the
   // typescript errors. Also, the return value null represents the end of
   // version history for that particular state i.e. we have reached the end
   // of the version history and the state was not edited in any
   // earlier versions.
-  getLastEditedVersionNumber(): number | null {
-    return (
-      this.versionHistoryService.getBackwardStateDiffData().oldVersionNumber
-    );
+  getLastEditedVersionNumber(): number {
+    const lastEditedVersionNumber =
+      this.versionHistoryService.getBackwardStateDiffData().oldVersionNumber;
+    if (lastEditedVersionNumber === null) {
+      throw new Error('The value of last edited version number cannot be null');
+    }
+    return lastEditedVersionNumber;
   }
 
   onClickExploreVersionHistoryButton(): void {
@@ -66,12 +69,24 @@ export class StateVersionHistoryComponent {
 
     const stateDiffData: StateDiffData = (
       this.versionHistoryService.getBackwardStateDiffData());
-    if (stateDiffData.newState && stateDiffData.newState.name) {
+
+    // Explanation for why diffData.newState can be null:
+    // It is explained in VersionHistoryService as to why the values of
+    // newState or oldState can be null. This is because they are elements of
+    // the list fetchedStateData whose last element can be null which marks
+    // the end of the version history of that particular state.
+    if (stateDiffData.newState) {
       modalRef.componentInstance.newState = stateDiffData.newState;
+      if (stateDiffData.newState.name === null) {
+        throw new Error('State name cannot be null');
+      }
       modalRef.componentInstance.newStateName = stateDiffData.newState.name;
     }
-    if (stateDiffData.oldState && stateDiffData.oldState.name) {
+    if (stateDiffData.oldState) {
       modalRef.componentInstance.oldState = stateDiffData.oldState;
+      if (stateDiffData.oldState.name === null) {
+        throw new Error('State name cannot be null');
+      }
       modalRef.componentInstance.oldStateName = stateDiffData.oldState.name;
     }
     modalRef.componentInstance.committerUsername = (

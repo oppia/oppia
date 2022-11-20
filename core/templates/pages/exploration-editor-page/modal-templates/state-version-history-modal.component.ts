@@ -80,9 +80,9 @@ export class StateVersionHistoryModalComponent
     return this.versionHistoryService.canShowForwardStateDiffData();
   }
 
-  // The return value of the below function can never be null because it is
-  // called only when canExploreBackwardVersionHistory() returns true.
-  // If the previously edited version number is null,
+  // In practice, the return value of the below function can never be null
+  // because it is called only when canExploreBackwardVersionHistory() returns
+  // true. If the previously edited version number is null,
   // canExploreBackwardVersionHistory() would have returned false. Here,
   // the return value is written as (number | null) in order to fix the
   // typescript errors since the list called fetchedStateVersionNumbers in
@@ -90,9 +90,13 @@ export class StateVersionHistoryModalComponent
   // value null represents the end of version history for that particular
   // state i.e. we have reached the end of the version history and the state
   // was not edited in any earlier versions.
-  getLastEditedVersionNumber(): number | null {
-    return (
-      this.versionHistoryService.getBackwardStateDiffData().oldVersionNumber);
+  getLastEditedVersionNumber(): number {
+    const lastEditedVersionNumber =
+      this.versionHistoryService.getBackwardStateDiffData().oldVersionNumber;
+    if (lastEditedVersionNumber === null) {
+      throw new Error('Last edited version number cannot be null');
+    }
+    return lastEditedVersionNumber;
   }
 
   getLastEditedCommitterUsername(): string {
@@ -103,9 +107,13 @@ export class StateVersionHistoryModalComponent
   // Returns the next version number at which the state was modified.
   // The explanation for return type being (number | null) is same as explained
   // above the function getLastEditedVersionNumber().
-  getNextEditedVersionNumber(): number | null {
-    return (
-      this.versionHistoryService.getForwardStateDiffData().oldVersionNumber);
+  getNextEditedVersionNumber(): number {
+    const nextEditedVersionNumber =
+      this.versionHistoryService.getForwardStateDiffData().oldVersionNumber;
+    if (nextEditedVersionNumber === null) {
+      throw new Error('Next edited version number cannot be null');
+    }
+    return nextEditedVersionNumber;
   }
 
   getNextEditedCommitterUsername(): string {
@@ -120,12 +128,18 @@ export class StateVersionHistoryModalComponent
     const diffData = this.versionHistoryService.getForwardStateDiffData();
 
     // The explanation for these if-conditions is added in the below function.
-    if (diffData.newState && diffData.newState.name !== null) {
+    if (diffData.newState) {
       this.newState = diffData.newState;
+      if (diffData.newState.name === null) {
+        throw new Error('State name cannot be null');
+      }
       this.newStateName = diffData.newState.name;
     }
-    if (diffData.oldState && diffData.oldState.name !== null) {
+    if (diffData.oldState) {
       this.oldState = diffData.oldState;
+      if (diffData.oldState.name === null) {
+        throw new Error('State name cannot be null');
+      }
       this.oldStateName = diffData.oldState.name;
     }
     this.committerUsername = diffData.committerUsername;
@@ -150,18 +164,18 @@ export class StateVersionHistoryModalComponent
     // newState or oldState can be null. This is because they are elements of
     // the list fetchedStateData whose last element can be null which marks
     // the end of the version history of that particular state.
-    // Explanation for adding diffData.newState.name !== null:
-    // In the State object from StateObjectFactory, we can see that the name
-    // property has type (string | null) and the properties newStateName and
-    // oldStateName have string type. Hence, in order to fix the typescript
-    // errors, this condition was added. It does not have any conceptual
-    // meaning.
-    if (diffData.newState && diffData.newState.name !== null) {
+    if (diffData.newState) {
       this.newState = diffData.newState;
+      if (diffData.newState.name === null) {
+        throw new Error('State name cannot be null');
+      }
       this.newStateName = diffData.newState.name;
     }
-    if (diffData.oldState && diffData.oldState.name !== null) {
+    if (diffData.oldState) {
       this.oldState = diffData.oldState;
+      if (diffData.oldState.name === null) {
+        throw new Error('State name cannot be null');
+      }
       this.oldStateName = diffData.oldState.name;
     }
     this.committerUsername = diffData.committerUsername;
