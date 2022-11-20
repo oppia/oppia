@@ -42,70 +42,6 @@ EXCLUDED_DIRECTORIES: Final = [
     'core/tests/data/'
 ]
 
-# List of files who should be type-annotated but are not.
-NOT_FULLY_COVERED_FILES: Final = [
-    'core/controllers/base_test.py',
-    'core/controllers/learner_group.py',
-    'core/controllers/learner_group_test.py',
-    'core/controllers/payload_validator.py',
-    'core/controllers/payload_validator_test.py',
-    'core/controllers/platform_feature.py',
-    'core/controllers/platform_feature_test.py',
-    'core/controllers/practice_sessions.py',
-    'core/controllers/practice_sessions_test.py',
-    'core/controllers/profile.py',
-    'core/controllers/profile_test.py',
-    'core/controllers/question_editor.py',
-    'core/controllers/question_editor_test.py',
-    'core/controllers/questions_list.py',
-    'core/controllers/questions_list_test.py',
-    'core/controllers/reader.py',
-    'core/controllers/reader_test.py',
-    'core/controllers/recent_commits.py',
-    'core/controllers/recent_commits_test.py',
-    'core/controllers/release_coordinator.py',
-    'core/controllers/release_coordinator_test.py',
-    'core/controllers/resources.py',
-    'core/controllers/resources_test.py',
-    'core/controllers/review_tests.py',
-    'core/controllers/review_tests_test.py',
-    'core/controllers/skill_editor.py',
-    'core/controllers/skill_editor_test.py',
-    'core/controllers/skill_mastery.py',
-    'core/controllers/skill_mastery_test.py',
-    'core/controllers/story_editor.py',
-    'core/controllers/story_editor_test.py',
-    'core/controllers/story_viewer.py',
-    'core/controllers/story_viewer_test.py',
-    'core/controllers/subscriptions.py',
-    'core/controllers/subscriptions_test.py',
-    'core/controllers/subtopic_viewer.py',
-    'core/controllers/subtopic_viewer_test.py',
-    'core/controllers/suggestion.py',
-    'core/controllers/suggestion_test.py',
-    'core/controllers/tasks.py',
-    'core/controllers/tasks_test.py',
-    'core/controllers/topic_editor.py',
-    'core/controllers/topic_editor_test.py',
-    'core/controllers/topic_viewer.py',
-    'core/controllers/topic_viewer_test.py',
-    'core/controllers/topics_and_skills_dashboard.py',
-    'core/controllers/topics_and_skills_dashboard_test.py',
-    'core/controllers/voice_artist.py',
-    'core/controllers/voice_artist_test.py',
-    'scripts/docstrings_checker.py',
-    'scripts/docstrings_checker_test.py',
-    'scripts/install_python_prod_dependencies.py',
-    'scripts/install_python_prod_dependencies_test.py',
-    'scripts/install_third_party_libs.py',
-    'scripts/install_third_party_libs_test.py',
-    'scripts/install_third_party.py',
-    'scripts/install_third_party_test.py',
-    'scripts/linters/pylint_extensions.py',
-    'scripts/linters/pylint_extensions_test.py',
-]
-
-
 CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')
 MYPY_REQUIREMENTS_FILE_PATH: Final = os.path.join('.', 'mypy_requirements.txt')
 MYPY_TOOLS_DIR: Final = os.path.join(os.getcwd(), 'third_party', 'python3_libs')
@@ -172,7 +108,8 @@ def get_mypy_cmd(
         cmd = [mypy_cmd, '--config-file', CONFIG_FILE_PATH] + files
     else:
         excluded_files_regex = (
-            '|'.join(NOT_FULLY_COVERED_FILES + EXCLUDED_DIRECTORIES))
+            '|'.join(EXCLUDED_DIRECTORIES)
+        )
         cmd = [
             mypy_cmd, '--exclude', excluded_files_regex,
             '--config-file', CONFIG_FILE_PATH, '.'
