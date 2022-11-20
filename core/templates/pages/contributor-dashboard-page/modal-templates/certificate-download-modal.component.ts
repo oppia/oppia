@@ -35,6 +35,7 @@ export class CertificateDownloadModalComponent {
   errorMessage: string;
   errorsFound = false;
   certificateDownloading = false;
+
   constructor(
     private alertsService: AlertsService,
     private readonly activeModal: NgbActiveModal,
@@ -70,12 +71,10 @@ export class CertificateDownloadModalComponent {
       this.fromDate,
       this.toDate).then((response: Blob) => {
       const dataType = response.type;
-      const binaryData = [];
-      binaryData.push(response);
 
       const downloadLink = document.createElement('a');
       downloadLink.href = window.URL.createObjectURL(
-        new Blob(binaryData, {type: dataType}));
+        new Blob([response], {type: dataType}));
       downloadLink.setAttribute('download', 'certificate');
 
       document.body.appendChild(downloadLink);

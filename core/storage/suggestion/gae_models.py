@@ -430,8 +430,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
         date range.
 
         Args:
-            from_date: Date. The date that suggestions are submitted after.
-            to_date: Date. The date that suggestions are submitted before.
+            from_date: Date. The date that suggestions are submitted on or
+                after.
+            to_date: Date. The date that suggestions are submitted on or before.
             user_id: str. The id of the user who made the submissions.
             language_code: str. The language that the contributions should be
                 fetched.
@@ -458,8 +459,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
         date range.
 
         Args:
-            from_date: Date. The date that suggestions are submitted after.
-            to_date: Date. The date that suggestions are submitted before.
+            from_date: Date. The date that suggestions are submitted on or
+                after.
+            to_date: Date. The date that suggestions are submitted on or before.
             user_id: str. The id of the user who made the submissions.
 
         Returns:

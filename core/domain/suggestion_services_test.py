@@ -5974,7 +5974,7 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
 
 
 class ContributorCertificateTests(test_utils.GenericTestBase):
-    """Tests for tasks in emails taskqueue."""
+    """Tests for contributor certificate generation."""
 
     AUTHOR_EMAIL: Final = 'author@example.com'
 

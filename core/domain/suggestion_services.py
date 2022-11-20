@@ -2925,10 +2925,10 @@ def generate_contributor_certificate(
             be considered.
         suggestion_type: str. The type of suggestion that the certificate
             needs to generate.
-        from_date: datetime.datetime. The first date that the contributions
-            should be considered for the certificate.
-        to_date: datetime.datetime. The last date that the contributions
-            should be considered for the certificate.
+        from_date: datetime.datetime. The start of the date range for which the
+            contributions were created.
+        to_date: datetime.datetime. The end of the date range for which the
+            contributions were created.
 
     Returns:
         str. The path of the generated image of the certificate.
@@ -2986,12 +2986,12 @@ def _generate_translation_contributor_certificate(
     """
     signature = feconf.TRANSLATION_TEAM_LEAD
 
-    languages = list(filter(
+    language = next(filter(
         lambda lang: lang['id'] == language_code,
-        constants.SUPPORTED_AUDIO_LANGUAGES))
-    if len(languages) == 0:
+        constants.SUPPORTED_AUDIO_LANGUAGES), None)
+    if not language:
         raise Exception('The provided language is invalid.')
-    language_description = languages[0]['description']
+    language_description = language['description']
 
     suggestions = (
         suggestion_models.GeneralSuggestionModel
@@ -3017,6 +3017,7 @@ def _generate_translation_contributor_certificate(
         words_without_empty_strings = [
             word for word in words if word != '']
         words_count += len(words_without_empty_strings)
+    # Source: https://github.com/oppia/oppia/pull/16513/files#r1027109026
     hours_contributed = round((words_count / 300), 2)
 
     if words_count == 0:
@@ -3140,6 +3141,7 @@ def _generate_question_contributor_certificate(
             minutes_contributed += 20
         else:
             minutes_contributed += 12
+    # Source: https://github.com/oppia/oppia/pull/16513/files#r1027109026
     hours_contributed = round((minutes_contributed / 60), 2)
 
     if minutes_contributed == 0:
