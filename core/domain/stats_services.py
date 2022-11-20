@@ -31,7 +31,7 @@ from core.domain import question_services
 from core.domain import stats_domain
 from core.platform import models
 
-from typing import Dict, List, Literal, Optional, Sequence, overload
+from typing import Dict, List, Literal, Optional, Sequence, Union, overload
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1344,7 +1344,7 @@ def record_learner_answer_info(
     entity_type: str,
     state_reference: str,
     interaction_id: str,
-    answer: str,
+    answer: Union[str, int, Dict[str, str], List[str]],
     answer_details: str
 ) -> None:
     """Records the new learner answer info received from the learner in the
