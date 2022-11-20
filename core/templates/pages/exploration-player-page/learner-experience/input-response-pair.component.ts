@@ -52,7 +52,7 @@ export class InputResponsePairComponent {
   @Input() inputResponsePairId!: string;
   @Input() bottomSection!: boolean;
   @Input() isLastPair!: boolean;
-  @Input() enableFeedback!: boolean;
+  @Input() feedbackIsEnabled!: boolean;
   @Output() dataChange: EventEmitter<InputResponsePair> = new EventEmitter();
   decodedProfilePicture: string | undefined;
   @ViewChild('popover') popover!: NgbPopover;

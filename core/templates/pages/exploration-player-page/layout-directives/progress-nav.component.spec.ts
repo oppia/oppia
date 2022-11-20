@@ -270,7 +270,7 @@ describe('Progress nav component', () => {
       spyOnProperty(schemaFormSubmittedService, 'onSubmittedSchemaBasedForm')
         .and.returnValue(mockSchemaFormSubmittedEventEmitter);
 
-      componentInstance.enableNavigationThroughCardHistory = true;
+      componentInstance.navigationThroughCardHistoryIsEnabled = true;
 
       componentInstance.ngOnInit();
       mockOnHelpCardAvailableEventEmitter.emit({
@@ -281,7 +281,7 @@ describe('Progress nav component', () => {
 
       expect(componentInstance.skipButtonIsShown).toBeFalse();
 
-      componentInstance.enableNavigationThroughCardHistory = false;
+      componentInstance.navigationThroughCardHistoryIsEnabled = false;
 
       componentInstance.ngOnInit();
       tick();

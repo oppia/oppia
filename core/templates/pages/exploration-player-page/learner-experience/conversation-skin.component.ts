@@ -171,11 +171,11 @@ export class ConversationSkinComponent {
 
   // The fields are used to customize the component for the diagnostic player,
   // question player, and exploration player page.
-  enableFeedback!: boolean;
-  allowOnlySingleAttemptForAnswering!: boolean;
-  showOnlyLastInputPairResponse!: boolean;
-  enableNavigationThroughCardHistory!: boolean;
-  enableCheckpointCelebrationModal!: boolean;
+  feedbackIsEnabled!: boolean;
+  learnerCanOnlyAttemptQuestionOnce!: boolean;
+  onlyLastInputResponsePairIsShown!: boolean;
+  navigationThroughCardHistoryIsEnabled!: boolean;
+  checkpointCelebrationModalIsEnabled!: boolean;
 
   constructor(
     private windowRef: WindowRef,
@@ -481,17 +481,17 @@ export class ConversationSkinComponent {
       }
 
       if (this.diagnosticTestTopicTrackerModel) {
-        this.enableFeedback = false;
-        this.allowOnlySingleAttemptForAnswering = true;
-        this.showOnlyLastInputPairResponse = true;
-        this.enableNavigationThroughCardHistory = false;
-        this.enableCheckpointCelebrationModal = false;
+        this.feedbackIsEnabled = false;
+        this.learnerCanOnlyAttemptQuestionOnce = true;
+        this.onlyLastInputResponsePairIsShown = true;
+        this.navigationThroughCardHistoryIsEnabled = false;
+        this.checkpointCelebrationModalIsEnabled = false;
       } else {
-        this.enableFeedback = true;
-        this.allowOnlySingleAttemptForAnswering = false;
-        this.showOnlyLastInputPairResponse = false;
-        this.enableNavigationThroughCardHistory = true;
-        this.enableCheckpointCelebrationModal = true;
+        this.feedbackIsEnabled = true;
+        this.learnerCanOnlyAttemptQuestionOnce = false;
+        this.onlyLastInputResponsePairIsShown = false;
+        this.navigationThroughCardHistoryIsEnabled = true;
+        this.checkpointCelebrationModalIsEnabled = true;
       }
     });
   }

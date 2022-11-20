@@ -22,10 +22,10 @@
                         [nextLessonLink]="getExplorationLink()"
                         [completedChaptersCount]="completedChaptersCount"
                         [milestoneMessageIsToBeDisplayed]="chapterIsCompletedForTheFirstTime"
-                        [enableFeedback]="enableFeedback"
-                        [allowOnlySingleAttemptForAnswering]="allowOnlySingleAttemptForAnswering"
-                        [showOnlyLastInputPairResponse]="showOnlyLastInputPairResponse"
-                        [enableCheckpointCelebrationModal]="enableCheckpointCelebrationModal">
+                        [feedbackIsEnabled]="feedbackIsEnabled"
+                        [learnerCanOnlyAttemptQuestionOnce]="learnerCanOnlyAttemptQuestionOnce"
+                        [onlyLastInputResponsePairIsShown]="onlyLastInputResponsePairIsShown"
+                        [checkpointCelebrationModalIsEnabled]="checkpointCelebrationModalIsEnabled">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
@@ -42,7 +42,7 @@
                             [isLearnAgainButton]="isLearnAgainButton()"
                             [displayedCard]="displayedCard"
                             [submitButtonIsShown]="!answerIsBeingProcessed"
-                            [enableNavigationThroughCardHistory]="enableNavigationThroughCardHistory"
+                            [navigationThroughCardHistoryIsEnabled]="navigationThroughCardHistoryIsEnabled"
                             (clickContinueButton)="showUpcomingCard()"
                             (changeCard)="changeCard($event)"
                             (skipQuestion)="skipCurrentQuestion()">

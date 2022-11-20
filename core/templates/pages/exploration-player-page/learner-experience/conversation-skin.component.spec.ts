@@ -2297,10 +2297,11 @@ describe('Conversation skin component', () => {
       componentInstance.ngOnInit();
       tick(200);
 
-      expect(componentInstance.enableFeedback).toBeTrue();
-      expect(componentInstance.allowOnlySingleAttemptForAnswering).toBeFalse();
-      expect(componentInstance.showOnlyLastInputPairResponse).toBeFalse();
-      expect(componentInstance.enableNavigationThroughCardHistory).toBeTrue();
+      expect(componentInstance.feedbackIsEnabled).toBeTrue();
+      expect(componentInstance.learnerCanOnlyAttemptQuestionOnce).toBeFalse();
+      expect(componentInstance.onlyLastInputResponsePairIsShown).toBeFalse();
+      expect(componentInstance.navigationThroughCardHistoryIsEnabled)
+        .toBeTrue();
 
       const topicIdToPrerequisiteTopicIds = {
         topicId1: [],
@@ -2314,10 +2315,11 @@ describe('Conversation skin component', () => {
       componentInstance.ngOnInit();
       tick(200);
 
-      expect(componentInstance.enableFeedback).toBeFalse();
-      expect(componentInstance.allowOnlySingleAttemptForAnswering).toBeTrue();
-      expect(componentInstance.showOnlyLastInputPairResponse).toBeTrue();
-      expect(componentInstance.enableNavigationThroughCardHistory).toBeFalse();
+      expect(componentInstance.feedbackIsEnabled).toBeFalse();
+      expect(componentInstance.learnerCanOnlyAttemptQuestionOnce).toBeTrue();
+      expect(componentInstance.onlyLastInputResponsePairIsShown).toBeTrue();
+      expect(componentInstance.navigationThroughCardHistoryIsEnabled)
+        .toBeFalse();
     }));
 
   it('should be able to skip the current question', fakeAsync(() => {

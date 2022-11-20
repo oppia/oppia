@@ -34,7 +34,7 @@
       </div>
     </div>
 
-    <div *ngIf="!showOnlyLastInputPairResponse && (displayedCard.getInputResponsePairs().length > 1 && isInteractionInline()) || (displayedCard.getInputResponsePairs().length > 0 && !isInteractionInline())">
+    <div *ngIf="!onlyLastInputResponsePairIsShown && (displayedCard.getInputResponsePairs().length > 1 && isInteractionInline()) || (displayedCard.getInputResponsePairs().length > 0 && !isInteractionInline())">
       <h4 class="conversation-skin-responses-dropdown-container"
           (click)="toggleShowPreviousResponses()">
         <span class="conversation-skin-responses-dropdown-text">
@@ -57,7 +57,7 @@
                                      [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
                                      [inputResponsePairId]="getInputResponsePairId($index)"
                                      [isLastPair]="false"
-                                     [enableFeedback]="enableFeedback">
+                                     [feedbackIsEnabled]="feedbackIsEnabled">
           </oppia-input-response-pair>
         </div>
       </div>
@@ -71,7 +71,7 @@
                                  [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
                                  [inputResponsePairId]="getInputResponsePairId(displayedCard.getInputResponsePairs().length - 1)"
                                  [isLastPair]="true"
-                                 [enableFeedback]="enableFeedback">
+                                 [feedbackIsEnabled]="feedbackIsEnabled">
       </oppia-input-response-pair>
     </div>
 
@@ -173,5 +173,5 @@
     </div>
   </div>
 </div>
-<oppia-checkpoint-celebration-modal class="checkpoint-celebration-modal-container" *ngIf="enableCheckpointCelebrationModal">
+<oppia-checkpoint-celebration-modal class="checkpoint-celebration-modal-container" *ngIf="checkpointCelebrationModalIsEnabled">
 </oppia-checkpoint-celebration-modal>

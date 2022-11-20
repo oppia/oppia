@@ -58,7 +58,7 @@ export class ProgressNavComponent {
   @Input() isLearnAgainButton: boolean;
   @Input() displayedCard: StateCard;
   @Input() submitButtonIsShown: boolean;
-  @Input() enableNavigationThroughCardHistory: boolean;
+  @Input() navigationThroughCardHistoryIsEnabled: boolean;
   @Output() submit: EventEmitter<void> = (
     new EventEmitter());
 
@@ -116,7 +116,7 @@ export class ProgressNavComponent {
   ngOnInit(): void {
     this.isIframed = this.urlService.isIframed();
 
-    if (!this.enableNavigationThroughCardHistory) {
+    if (!this.navigationThroughCardHistoryIsEnabled) {
       this.skipButtonIsShown = true;
     } else {
       this.skipButtonIsShown = false;
