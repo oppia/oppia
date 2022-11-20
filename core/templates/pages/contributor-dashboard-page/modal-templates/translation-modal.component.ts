@@ -115,8 +115,6 @@ export class TranslationModalComponent {
   loadingData: boolean = true;
   moreAvailable: boolean = false;
   textToTranslate: string | string[] = '';
-  // Language description is null when active language code is invalid.
-  languageDescription!: string | null;
   activeStatus!: Status;
   activeLanguageCode!: string;
   HTML_SCHEMA!: {
@@ -124,6 +122,8 @@ export class TranslationModalComponent {
     'ui_config': UiConfig;
   };
 
+  // Language description is null when active language code is invalid.
+  languageDescription: string | null = null;
   UNICODE_SCHEMA: UnicodeSchema = { type: 'unicode' };
   SET_OF_STRINGS_SCHEMA: ListSchema = {
     type: 'list',
@@ -300,7 +300,7 @@ export class TranslationModalComponent {
       interactionId
     } = translatableItem;
     this.activeContentType = this.getFormattedContentType(
-      contentType, interactionId as string
+      contentType, interactionId
     );
     this.activeRuleDescription = this.getRuleDescription(
       ruleType, interactionId
@@ -383,7 +383,7 @@ export class TranslationModalComponent {
   }
 
   getFormattedContentType(
-      contentType: string, interactionId: string | null): string {
+      contentType: string, interactionId: string | undefined): string {
     if (contentType === 'interaction') {
       return interactionId + ' interaction';
     } else if (contentType === 'rule') {
@@ -407,7 +407,7 @@ export class TranslationModalComponent {
   getElementAttributeTexts(
       elements: HTMLCollectionOf<Element>, type: string): string[] {
     const textWrapperLength = 6;
-    const attributes = Array.from(elements, function(element: Element) {
+    let attributes = Array.from(elements, function(element: Element) {
       // A sample element would be as <oppia-noninteractive-image alt-with-value
       // ="&amp;quot;Image description&amp;quot;" caption-with-value=
       // "&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;
@@ -421,7 +421,9 @@ export class TranslationModalComponent {
           textWrapperLength, attributeValue.length - textWrapperLength);
       }
     });
-    return attributes.filter(attributeValue => attributeValue) as string[];
+    // Typecasted to string[] because Array.from() returns
+    // (string | undefined)[] and we need to remove the undefined elements.
+    return attributes.filter(attributeValues => attributeValues) as string[];
   }
 
   getImageAttributeTexts(

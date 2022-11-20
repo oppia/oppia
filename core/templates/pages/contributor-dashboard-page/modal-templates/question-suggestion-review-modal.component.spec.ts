@@ -629,6 +629,14 @@ describe('Question Suggestion Review Modal component', () => {
     }).toThrowError();
   }));
 
+  it('should throw Error if skip contribution id is null', fakeAsync(() => {
+    component.isFirstItem = false;
+    component.skippedContributionIds = [];
+    expect(() => {
+      component.goToPreviousItem();
+    }).toThrowError();
+  }));
+
   it('should not navigate if the corresponding opportunity is deleted',
     function() {
       spyOn(component, 'cancel');

@@ -108,14 +108,10 @@ export class QuestionSuggestionReviewModalComponent
   @Input() misconceptionsBySkill!: MisconceptionSkillMap;
   reviewMessage!: string;
   questionStateData!: State;
-  // Question ID is null when it is not used in the backend.
-  questionId!: string | null;
   canEditQuestion!: boolean;
   skillDifficultyLabel!: string;
   skillRubricExplanations!: string | string[];
   suggestionIsRejected!: boolean;
-  // Below property is null if there is no error.
-  validationError!: string | null;
   allContributions!: Record<string, ActiveContributionDict>;
   suggestion!: ActiveSuggestionDict;
   question!: Question;
@@ -130,6 +126,10 @@ export class QuestionSuggestionReviewModalComponent
   contentHtml!: string;
   questionHeader!: string;
   authorName!: string;
+  // Below property is null if there is no error.
+  validationError: string | null = null;
+  // Question ID is null when it is not used in the backend.
+  questionId: string | null = null;
   isFirstItem: boolean = true;
   isLastItem: boolean = true;
 
@@ -249,9 +249,9 @@ export class QuestionSuggestionReviewModalComponent
     this.showQuestion = false;
     this.skippedContributionIds.push(this.currentSuggestionId);
 
-    let CurrentSuggestionId = this.remainingContributionIdStack.pop();
+    const CurrentSuggestionId = this.remainingContributionIdStack.pop();
     if (CurrentSuggestionId === undefined) {
-      throw new Error('CurrentSuggestionId should not be undefined.');
+      throw new Error('currentSuggestionId should not be undefined.');
     }
     this.currentSuggestionId = CurrentSuggestionId;
 
@@ -265,7 +265,12 @@ export class QuestionSuggestionReviewModalComponent
     this.showQuestion = false;
     this.remainingContributionIdStack.push(this.currentSuggestionId);
 
-    this.currentSuggestionId = this.skippedContributionIds.pop() as string;
+    const currentSuggestionId = this.skippedContributionIds.pop();
+
+    if (currentSuggestionId === undefined) {
+      throw new Error('currentSuggestionId should not be undefined.');
+    }
+    this.currentSuggestionId = currentSuggestionId;
 
     this.refreshActiveContributionState();
   }
