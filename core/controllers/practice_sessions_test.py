@@ -26,7 +26,7 @@ from core.tests import test_utils
 
 class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -75,18 +75,20 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
 
 class PracticeSessionsPageTests(BasePracticeSessionsControllerTests):
 
-    def test_any_user_can_access_practice_sessions_page(self):
+    def test_any_user_can_access_practice_sessions_page(self) -> None:
         self.get_html_response(
             '/learn/staging/public-topic-name/practice/session?'
             'selected_subtopic_ids=["1","2"]')
 
-    def test_no_user_can_access_unpublished_topic_practice_session_page(self):
+    def test_no_user_can_access_unpublished_topic_practice_session_page(
+        self
+    ) -> None:
         self.get_html_response(
             '/learn/staging/private-topic-name/practice/session?'
             'selected_subtopic_ids=["1","2"]',
             expected_status_int=404)
 
-    def test_get_fails_when_topic_doesnt_exist(self):
+    def test_get_fails_when_topic_doesnt_exist(self) -> None:
         self.get_html_response(
             '/learn/staging/invalid/practice/session?'
             'selected_subtopic_ids=["1","2"]',
@@ -95,7 +97,7 @@ class PracticeSessionsPageTests(BasePracticeSessionsControllerTests):
 
 class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
-    def test_get_fails_when_skill_ids_dont_exist(self):
+    def test_get_fails_when_skill_ids_dont_exist(self) -> None:
         topic = topic_domain.Topic.create_default_topic(
             'topic_id_3', 'topic_without_skills', 'noskills', 'description',
             'fragm')
@@ -116,7 +118,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                 'noskills'),
             expected_status_int=404)
 
-    def test_any_user_can_access_practice_sessions_data(self):
+    def test_any_user_can_access_practice_sessions_data(self) -> None:
         # Adding invalid subtopic IDs as well, which should get ignored.
         json_response = self.get_json(
             '%s/staging/%s?selected_subtopic_ids=[1,2,3,4]' % (
@@ -132,21 +134,23 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             json_response['skill_ids_to_descriptions_map']['skill_id_2'],
             'Skill 2')
 
-    def test_no_user_can_access_unpublished_topic_practice_session_data(self):
+    def test_no_user_can_access_unpublished_topic_practice_session_data(
+        self
+    ) -> None:
         self.get_json(
             '%s/staging/%s?selected_subtopic_ids=["1","2"]' % (
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                 'private-topic-name'),
             expected_status_int=404)
 
-    def test_get_fails_when_topic_doesnt_exist(self):
+    def test_get_fails_when_topic_doesnt_exist(self) -> None:
         self.get_json(
             '%s/staging/%s?selected_subtopic_ids=[1,2]' % (
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                 'invalid'),
             expected_status_int=404)
 
-    def test_get_fails_when_json_loads_fails(self):
+    def test_get_fails_when_json_loads_fails(self) -> None:
         response = self.get_json(
             '%s/staging/%s?selected_subtopic_ids=1,2' % (
                 feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
