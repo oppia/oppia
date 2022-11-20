@@ -633,6 +633,99 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class PlayExplorationAsLoggedInUserTests(test_utils.GenericTestBase):
+    """Tests for can_play_exploration_as_logged_in_user decorator."""
+
+    user_email = 'user@example.com'
+    username = 'user'
+    published_exp_id = 'exp_id_1'
+    private_exp_id = 'exp_id_2'
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_play_exploration_as_logged_in_user
+        def get(self, exploration_id: str) -> None:
+            self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration/<exploration_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+
+    def test_cannot_access_explorations_with_disabled_exploration_ids(
+        self
+    ) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                (
+                    '/mock_play_exploration/%s' %
+                    feconf.DISABLED_EXPLORATION_IDS[0]
+                ),
+                expected_status_int=404
+            )
+        self.logout()
+
+    def test_moderator_user_can_access_private_exploration(self) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_play_exploration/%s' % self.private_exp_id
+            )
+        self.assertEqual(response['exploration_id'], self.private_exp_id)
+        self.logout()
+
+    def test_exp_owner_can_access_private_exploration(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_play_exploration/%s' % self.private_exp_id
+            )
+        self.assertEqual(response['exploration_id'], self.private_exp_id)
+        self.logout()
+
+    def test_logged_in_user_cannot_access_not_owned_exploration(self) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_play_exploration/%s' % self.private_exp_id,
+                expected_status_int=404
+            )
+        self.logout()
+
+    def test_invalid_exploration_id_raises_error(self) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_play_exploration/%s' % 'invalid_exp_id',
+                expected_status_int=404
+            )
+        self.logout()
+
+
 class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
     """Tests for play collection decorator."""
 
@@ -3530,10 +3623,8 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         }
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        # Here we use MyPy ignore because the signature of 'get' method does not
-        # match with the signature of super class's (BaseHandler) 'get' method.
         @acl_decorators.get_decorator_for_accepting_suggestion(
-            acl_decorators.open_access)  # type: ignore[override]
+            acl_decorators.open_access)
         def get(self, target_id: str, suggestion_id: str) -> None:
             self.render_json({
                 'target_id': target_id,
@@ -4832,6 +4923,206 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')
+
+
+class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
+    """Tests for decorator can_access_story_viewer_page_as_logged_in_user."""
+
+    user_email = 'user@example.com'
+    username = 'user'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+
+    class MockDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'story_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'classroom_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_access_story_viewer_page_as_logged_in_user
+        def get(self, story_url_fragment: str) -> None:
+            self.render_json({'story_url_fragment': story_url_fragment})
+
+    class MockPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'story_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'classroom_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_access_story_viewer_page_as_logged_in_user
+        def get(self, _: str) -> None:
+            self.render_template('oppia-root.mainpage.html')
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.signup(self.banned_user_email, self.banned_user)
+        self.mark_user_banned(self.banned_user)
+        story_data_url = (
+            '/mock_story_data/<classroom_url_fragment>/'
+            '<topic_url_fragment>/<story_url_fragment>')
+        story_page_url = (
+            '/mock_story_page/<classroom_url_fragment>/'
+            '<topic_url_fragment>/story/<story_url_fragment>')
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [
+                webapp2.Route(story_data_url, self.MockDataHandler),
+                webapp2.Route(story_page_url, self.MockPageHandler)
+            ],
+            debug=feconf.DEBUG,
+        ))
+
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.story_id = story_services.get_new_story_id()
+        self.story_url_fragment = 'story-frag'
+        self.save_new_story(
+            self.story_id, self.admin_id, self.topic_id,
+            url_fragment=self.story_url_fragment)
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            description='Description', canonical_story_ids=[self.story_id],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_1], next_subtopic_id=2)
+        self.login(self.user_email)
+
+    def test_user_cannot_access_non_existent_story(self) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_story_data/staging/topic/non-existent-frag',
+                expected_status_int=404)
+
+    def test_user_cannot_access_story_when_topic_is_not_published(self) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_story_data/staging/topic/%s'
+                % self.story_url_fragment,
+                expected_status_int=404)
+
+    def test_user_cannot_access_story_when_story_is_not_published(self) -> None:
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_story_data/staging/topic/%s'
+                % self.story_url_fragment,
+                expected_status_int=404)
+
+    def test_user_can_access_story_when_story_and_topic_are_published(
+        self
+    ) -> None:
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        topic_services.publish_story(
+            self.topic_id, self.story_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_story_data/staging/topic/%s'
+                % self.story_url_fragment,
+                expected_status_int=200)
+
+    def test_user_can_access_story_when_all_url_fragments_are_valid(
+        self
+    ) -> None:
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        topic_services.publish_story(
+            self.topic_id, self.story_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_html_response(
+                '/mock_story_page/staging/topic/story/%s'
+                % self.story_url_fragment,
+                expected_status_int=200)
+
+    def test_user_redirect_to_story_page_if_story_url_fragment_is_invalid(
+        self
+    ) -> None:
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        topic_services.publish_story(
+            self.topic_id, self.story_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_html_response(
+                '/mock_story_page/staging/topic/story/000',
+                expected_status_int=302)
+            self.assertEqual(
+                'http://localhost/learn/staging/topic/story',
+                response.headers['location'])
+
+    def test_user_redirect_to_correct_url_if_abbreviated_topic_is_invalid(
+        self
+    ) -> None:
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        topic_services.publish_story(
+            self.topic_id, self.story_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_html_response(
+                '/mock_story_page/staging/invalid-topic/story/%s'
+                % self.story_url_fragment,
+                expected_status_int=302)
+            self.assertEqual(
+                'http://localhost/learn/staging/topic/story/%s'
+                % self.story_url_fragment,
+                response.headers['location'])
+
+    def test_user_redirect_with_correct_classroom_name_in_url(self) -> None:
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        topic_services.publish_story(
+            self.topic_id, self.story_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_html_response(
+                '/mock_story_page/math/topic/story/%s'
+                % self.story_url_fragment,
+                expected_status_int=302)
+            self.assertEqual(
+                'http://localhost/learn/staging/topic/story/%s'
+                % self.story_url_fragment,
+                response.headers['location'])
+
+    def test_user_redirect_to_lowercase_story_url_fragment(self) -> None:
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        topic_services.publish_story(
+            self.topic_id, self.story_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_html_response(
+                '/mock_story_page/staging/topic/story/Story-frag',
+                expected_status_int=302)
+            self.assertEqual(
+                'http://localhost/learn/staging/topic/story/story-frag',
+                response.headers['location'])
 
 
 class StoryViewerTests(test_utils.GenericTestBase):

@@ -35,10 +35,15 @@ from core.domain import takeout_service
 from core.domain import user_services
 from core.domain import wipeout_service
 
+from typing import Callable, Dict, Optional, TypedDict
 
-class ProfileHandler(base.BaseHandler):
+
+class ProfileHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Provides data for the profile page."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'username': {
             'schema': {
@@ -49,14 +54,10 @@ class ProfileHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, username):
+    def get(self, username: str) -> None:
         """Handles GET requests."""
 
         user_settings = user_services.get_user_settings_from_username(username)
@@ -101,27 +102,77 @@ class ProfileHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class BulkEmailWebhookEndpoint(base.BaseHandler):
+class BulkEmailWebhookEndpoint(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The endpoint for the webhook that is triggered when a user
     subscribes/unsubscribes to the bulk email service provider externally.
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'secret': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'data[list_id]': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'data[email]': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.EMAIL_REGEX
+                    }]
+                }
+            },
+            'type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        'subscribe', 'unsubscribe'
+                    ]
+                }
+            }
+        }
+    }
+
+    # Here, the 'secret' url_path_argument is not used in the function body
+    # because the actual usage of 'secret' lies within the 'is_source_mailchimp'
+    # decorator, and here we are getting 'secret' because the decorator always
+    # passes every url_path_args to HTTP methods.
     @acl_decorators.is_source_mailchimp
-    def get(self, _):
+    def get(self, unused_secret: str) -> None:
         """Handles GET requests. This is just an empty endpoint that is
         required since when the webhook is updated in the bulk email service
         provider, a GET request is sent initially to validate the endpoint.
         """
         pass
 
+    # Here, the 'secret' url_path_argument is not used in the function body
+    # because the actual usage of 'secret' lies within the 'is_source_mailchimp'
+    # decorator, and here we are getting 'secret' because the decorator always
+    # passes every url_path_args to HTTP methods.
     @acl_decorators.is_source_mailchimp
-    def post(self, _):
+    def post(self, unused_secret: str) -> None:
         """Handles POST requests."""
-        if self.request.get('data[list_id]') != feconf.MAILCHIMP_AUDIENCE_ID:
+        assert self.normalized_request is not None
+        if (
+            self.normalized_request['data[list_id]'] !=
+            feconf.MAILCHIMP_AUDIENCE_ID
+        ):
             self.render_json({})
             return
 
-        email = self.request.get('data[email]')
+        email = self.normalized_request['data[email]']
         user_settings = user_services.get_user_settings_from_email(email)
 
         # Ignore the request if the user does not exist in Oppia.
@@ -131,14 +182,14 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
 
         user_id = user_settings.user_id
         user_email_preferences = user_services.get_email_preferences(user_id)
-        if self.request.get('type') == 'subscribe':
+        if self.normalized_request['type'] == 'subscribe':
             user_services.update_email_preferences(
                 user_id, True,
                 user_email_preferences.can_receive_editor_role_email,
                 user_email_preferences.can_receive_feedback_message_email,
                 user_email_preferences.can_receive_subscription_email,
                 bulk_email_db_already_updated=True)
-        elif self.request.get('type') == 'unsubscribe':
+        elif self.normalized_request['type'] == 'unsubscribe':
             user_services.update_email_preferences(
                 user_id, False,
                 user_email_preferences.can_receive_editor_role_email,
@@ -148,10 +199,23 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
         self.render_json({})
 
 
-class AndroidListSubscriptionHandler(base.BaseHandler):
+class AndroidListSubscriptionHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of AndroidListSubscriptionHandler's
+    normalized_request dictionary.
+    """
+
+    email: str
+    name: str
+
+
+class AndroidListSubscriptionHandler(
+    base.BaseHandler[
+        AndroidListSubscriptionHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Adds user to Android mailing list."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'email': {
@@ -175,22 +239,24 @@ class AndroidListSubscriptionHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def put(self):
+    def put(self) -> None:
         """Handles PUT request."""
-        email = self.normalized_payload.get('email')
-        name = self.normalized_payload.get('name')
+        assert self.normalized_payload is not None
+        email = self.normalized_payload['email']
+        name = self.normalized_payload['name']
         status = user_services.add_user_to_android_list(email, name)
         self.render_json({'status': status})
 
 
-class PreferencesHandler(base.BaseHandler):
+class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides data for the preferences page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_manage_own_account
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
         user_email_preferences = user_services.get_email_preferences(
             self.user_id)
@@ -198,7 +264,8 @@ class PreferencesHandler(base.BaseHandler):
         creators_subscribed_to = subscription_services.get_all_creators_subscribed_to( # pylint: disable=line-too-long
             self.user_id)
         creators_settings = user_services.get_users_settings(
-            creators_subscribed_to)
+            creators_subscribed_to, strict=True
+        )
         subscription_list = []
 
         for index, creator_settings in enumerate(creators_settings):
@@ -238,8 +305,9 @@ class PreferencesHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_manage_own_account
-    def put(self):
+    def put(self) -> None:
         """Handles PUT requests."""
+        assert self.user_id is not None
         update_type = self.payload.get('update_type')
         data = self.payload.get('data')
         bulk_email_signup_message_should_be_shown = False
@@ -284,21 +352,21 @@ class PreferencesHandler(base.BaseHandler):
         })
 
 
-class ProfilePictureHandler(base.BaseHandler):
+class ProfilePictureHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Provides the dataURI of the user's profile picture, or none if no user
     picture is uploaded.
     """
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
-
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_manage_own_account
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
         self.values.update({
             'profile_picture_data_url': user_settings.profile_picture_data_url
@@ -306,13 +374,14 @@ class ProfilePictureHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
+class ProfilePictureHandlerByUsernameHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Provides the dataURI of the profile picture of the specified user,
     or None if no user picture is uploaded for the user with that ID.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     URL_PATH_ARGS_SCHEMAS = {
         'username': {
             'schema': {
@@ -323,12 +392,10 @@ class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, username):
+    def get(self, username: str) -> None:
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.PageNotFoundException
@@ -341,11 +408,21 @@ class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class SignupPage(base.BaseHandler):
+class SignupPageNormalizedRequestDict(TypedDict):
+    """Dict representation of SignupPage's
+    normalized_request dictionary.
+    """
+
+    return_url: Optional[str]
+
+
+class SignupPage(
+    base.BaseHandler[Dict[str, str], SignupPageNormalizedRequestDict]
+):
     """The page which prompts for username and acceptance of terms."""
 
     REDIRECT_UNFINISHED_SIGNUPS = False
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'return_url': {
@@ -358,12 +435,12 @@ class SignupPage(base.BaseHandler):
     }
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
-        return_url = self.normalized_request.get(
-            'return_url', self.request.uri)
-        # Ruling out the possibility of None for mypy type checking.
         assert self.user_id is not None
+        assert self.normalized_request is not None
+        fetched_url = self.normalized_request.get('return_url')
+        return_url = self.request.uri if fetched_url is None else fetched_url
         # Validating return_url for no external redirections.
         if re.match('^/[^//]', return_url) is None:
             return_url = '/'
@@ -374,10 +451,27 @@ class SignupPage(base.BaseHandler):
         self.render_template('oppia-root.mainpage.html')
 
 
-class SignupHandler(base.BaseHandler):
+class SignupHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of SignupHandler's
+    normalized_payload dictionary.
+    """
+
+    username: str
+    agreed_to_terms: bool
+    default_dashboard: str
+    can_receive_email_updates: bool
+
+
+class SignupHandler(
+    base.BaseHandler[
+        SignupHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Provides data for the editor prerequisites page."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    REDIRECT_UNFINISHED_SIGNUPS = False
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {
@@ -407,19 +501,15 @@ class SignupHandler(base.BaseHandler):
             'can_receive_email_updates': {
                 'schema': {
                     'type': 'bool'
-                },
-                'default_value': None
+                }
             }
         }
     }
 
-    REDIRECT_UNFINISHED_SIGNUPS = False
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     @acl_decorators.require_user_id_else_redirect_to_homepage
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
         self.render_json({
             'can_send_emails': feconf.CAN_SEND_EMAILS,
@@ -433,29 +523,32 @@ class SignupHandler(base.BaseHandler):
         })
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
-    def post(self):
+    def post(self) -> None:
         """Handles POST requests."""
-        username = self.normalized_payload.get('username')
-        agreed_to_terms = self.normalized_payload.get('agreed_to_terms')
-        default_dashboard = self.normalized_payload.get('default_dashboard')
-        can_receive_email_updates = self.normalized_payload.get(
-            'can_receive_email_updates')
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
+        agreed_to_terms = self.normalized_payload['agreed_to_terms']
+        default_dashboard = self.normalized_payload['default_dashboard']
+        can_receive_email_updates = self.normalized_payload[
+            'can_receive_email_updates']
         bulk_email_signup_message_should_be_shown = False
 
-        if can_receive_email_updates is not None:
-            bulk_email_signup_message_should_be_shown = (
-                user_services.update_email_preferences(
-                    self.user_id, can_receive_email_updates,
-                    feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-                    feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-                    feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+        bulk_email_signup_message_should_be_shown = (
+            user_services.update_email_preferences(
+                self.user_id, can_receive_email_updates,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
             )
-            if bulk_email_signup_message_should_be_shown:
-                self.render_json({
-                    'bulk_email_signup_message_should_be_shown': (
-                        bulk_email_signup_message_should_be_shown)
-                })
-                return
+        )
+        if bulk_email_signup_message_should_be_shown:
+            self.render_json({
+                'bulk_email_signup_message_should_be_shown': (
+                    bulk_email_signup_message_should_be_shown
+                )
+            })
+            return
         # Ruling out the possibility of None for mypy type checking.
         assert self.user_id is not None
         has_ever_registered = user_services.has_ever_registered(self.user_id)
@@ -494,37 +587,35 @@ class SignupHandler(base.BaseHandler):
         })
 
 
-class DeleteAccountHandler(base.BaseHandler):
+class DeleteAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides data for the delete account page."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'DELETE': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'DELETE': {}}
 
     @acl_decorators.can_manage_own_account
-    def delete(self):
+    def delete(self) -> None:
         """Handles DELETE requests."""
+        assert self.user_id is not None
         wipeout_service.pre_delete_user(self.user_id)
         self.render_json({'success': True})
 
 
-class ExportAccountHandler(base.BaseHandler):
+class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides user with relevant data for Takeout."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_manage_own_account
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
+        assert self.user_id is not None
         # Retrieve user data.
         user_takeout_object = takeout_service.export_data_for_user(
-            self.user_id)
+            self.user_id
+        )
         user_data = user_takeout_object.user_data
         user_images = user_takeout_object.user_images
 
@@ -556,12 +647,23 @@ class ExportAccountHandler(base.BaseHandler):
             temp_file, 'oppia_takeout_data.zip', 'text/plain')
 
 
-class UsernameCheckHandler(base.BaseHandler):
+class UsernameCheckHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of UsernameCheckHandler's
+    normalized_payload dictionary.
+    """
+
+    username: str
+
+
+class UsernameCheckHandler(
+    base.BaseHandler[
+        UsernameCheckHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Checks whether a username has already been taken."""
 
     REDIRECT_UNFINISHED_SIGNUPS = False
-
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'username': {
@@ -576,9 +678,10 @@ class UsernameCheckHandler(base.BaseHandler):
     }
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
-    def post(self):
+    def post(self) -> None:
         """Handles POST requests."""
-        username = self.normalized_payload.get('username')
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
 
         username_is_taken = user_services.is_username_taken(username)
         self.render_json({
@@ -586,17 +689,33 @@ class UsernameCheckHandler(base.BaseHandler):
         })
 
 
-class SiteLanguageHandler(base.BaseHandler):
+class SiteLanguageHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of SiteLanguageHandler's
+    normalized_payload dictionary.
+    """
+
+    site_language_code: str
+
+
+class SiteLanguageHandler(
+    base.BaseHandler[
+        SiteLanguageHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Changes the preferred system language in the user's preferences."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    LANGUAGE_ID_PROVIDER_FUNC: Callable[[Dict[str, str]], str] = (
+        lambda language_dict: language_dict['id']
+    )
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'site_language_code': {
                 'schema': {
                     'type': 'basestring',
                     'choices': list(map(
-                        lambda x: x['id'], constants.SUPPORTED_SITE_LANGUAGES
+                        LANGUAGE_ID_PROVIDER_FUNC,
+                        constants.SUPPORTED_SITE_LANGUAGES
                     ))
                 }
             }
@@ -604,19 +723,34 @@ class SiteLanguageHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_manage_own_account
-    def put(self):
+    def put(self) -> None:
         """Handles PUT requests."""
-        site_language_code = self.normalized_payload.get('site_language_code')
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        site_language_code = self.normalized_payload['site_language_code']
         user_services.update_preferred_site_language_code(
             self.user_id, site_language_code)
         self.render_json({})
 
 
-class UserInfoHandler(base.BaseHandler):
+class UserInfoHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of UserInfoHandler's
+    normalized_payload dictionary.
+    """
+
+    user_has_viewed_lesson_info_modal_once: bool
+
+
+class UserInfoHandler(
+    base.BaseHandler[
+        UserInfoHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Provides info about user. If user is not logged in,
     return dict containing false as logged in status."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
@@ -628,19 +762,18 @@ class UserInfoHandler(base.BaseHandler):
         }
     }
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
         """Handles GET requests."""
         # The following headers are added to prevent caching of this response.
         self.response.cache_control.no_store = True
         if self.username:
+            assert self.user_id is not None
             user_actions = user_services.get_user_actions_info(
                 self.user_id
             ).actions
             user_settings = user_services.get_user_settings(
-                self.user_id, strict=False)
+                self.user_id, strict=True)
             self.render_json({
                 'roles': self.roles,
                 'is_moderator': (
@@ -664,22 +797,40 @@ class UserInfoHandler(base.BaseHandler):
             })
 
     @acl_decorators.open_access
-    def put(self):
+    def put(self) -> None:
         """Handles PUT requests."""
-        user_has_viewed_lesson_info_modal_once = self.normalized_payload.get(
-            'user_has_viewed_lesson_info_modal_once')
+        # In frontend, we are calling this put method iff the user is
+        # logged-in, so here we sure that self.user_id is never going
+        # to be None, but to narrow down the type and handle the None
+        # case gracefully, we are returning if self.user_id is None.
+        if self.user_id is None:
+            return self.render_json({})
+        assert self.normalized_payload is not None
+        user_has_viewed_lesson_info_modal_once = self.normalized_payload[
+            'user_has_viewed_lesson_info_modal_once']
         if user_has_viewed_lesson_info_modal_once:
             user_services.set_user_has_viewed_lesson_info_modal_once(
                 self.user_id)
         self.render_json({'success': True})
 
 
-class UrlHandler(base.BaseHandler):
+class UrlHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of UrlHandler's
+    normalized_request dictionary.
+    """
+
+    current_url: str
+
+
+class UrlHandler(
+    base.BaseHandler[
+        Dict[str, str], UrlHandlerNormalizedRequestDict
+    ]
+):
     """The handler for generating login URL."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'current_url': {
@@ -691,10 +842,11 @@ class UrlHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def get(self):
+    def get(self) -> None:
+        assert self.normalized_request is not None
         if self.user_id:
             self.render_json({'login_url': None})
         else:
-            target_url = self.normalized_request.get('current_url')
+            target_url = self.normalized_request['current_url']
             login_url = user_services.create_login_url(target_url)
             self.render_json({'login_url': login_url})
