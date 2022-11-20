@@ -2340,8 +2340,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'language_code': 'hi',
             'content_html': '',
             'state_name': 'Introduction',
-            'translation_html': '<p>Translation for content.</p>',
-            'data_format': 'html'
+            'translation_html': ['translated text1', 'translated text2'],
+            'data_format': 'set_of_normalized_string'
         }
 
     def test_update_translation_contribution_stats_without_language_codes(
