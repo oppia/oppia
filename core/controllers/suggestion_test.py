@@ -73,6 +73,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     AUTHOR_EMAIL_2: Final = 'author2@example.com'
     REVIEWER_EMAIL: Final = 'reviewer@example.com'
     TRANSLATOR_EMAIL: Final = 'translator@example.com'
+    STRINGS_TRANSLATOR_EMAIL: Final = 'translator1@example.com'
     NORMAL_USER_EMAIL: Final = 'user@example.com'
 
     def setUp(self) -> None:
@@ -85,6 +86,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.signup(self.NORMAL_USER_EMAIL, 'normalUser')
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.signup(self.TRANSLATOR_EMAIL, 'translator')
+        self.signup(self.STRINGS_TRANSLATOR_EMAIL, 'stranslator')
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -93,6 +95,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.author_id_2 = self.get_user_id_from_email(self.AUTHOR_EMAIL_2)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
+        self.strings_translator_id = self.get_user_id_from_email(
+            self.STRINGS_TRANSLATOR_EMAIL)
         self.normal_useer_id = self.get_user_id_from_email(
             self.NORMAL_USER_EMAIL)
 
@@ -963,6 +967,63 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
             )['suggestions']
         self.assertEqual(len(suggestions), 2)
+
+    def test_set_of_strings_translation_suggestion_review(self) -> None:
+        self.login(self.STRINGS_TRANSLATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
+                'target_id': self.EXP_ID,
+                'target_version_at_submission': self.exploration.version,
+                'change': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'State 1',
+                    'content_id': 'content',
+                    'language_code': 'hi',
+                    'content_html': '<p>old content html</p>',
+                    'translation_html': ['test1', 'test2'],
+                    'data_format': (
+                        state_domain.WrittenTranslation
+                        .DATA_FORMAT_SET_OF_NORMALIZED_STRING
+                    ),
+                },
+                'description': 'description',
+            }, csrf_token=csrf_token)
+        self.logout()
+
+        suggestions = self.get_json(
+            '%s?author_id=%s&target_type=%s&target_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX, self.strings_translator_id,
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
+            )['suggestions']
+        self.assertEqual(len(suggestions), 1)
+
+        # Test reviewer can accept successfully.
+        self.login(self.REVIEWER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        suggestion_to_accept = suggestions[0]
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json('%s/exploration/%s/%s' % (
+            feconf.SUGGESTION_ACTION_URL_PREFIX,
+            suggestion_to_accept['target_id'],
+            suggestion_to_accept['suggestion_id']), {
+                'action': u'accept',
+                'commit_message': u'commit message',
+                'review_message': u'Accepted'
+            }, csrf_token=csrf_token)
+        suggestion_post_accept = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.strings_translator_id))['suggestions'][0]
+        self.assertEqual(
+            suggestion_post_accept['status'],
+            suggestion_models.STATUS_ACCEPTED)
+        self.logout()
 
     def test_update_suggestion_updates_translation_html(self) -> None:
         self.login(self.TRANSLATOR_EMAIL)

@@ -2477,19 +2477,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.author_id, change_dict, 'description')
-        new_change_dict = {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': '',
-            'state_name': 'Introduction',
-            'translation_html': ['abc', 'def'],
-            'data_format': 'set_of_normalized_string'
-        }
         latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
-            '1', 1, self.author_id, new_change_dict, 'description')
+            '1', 1, self.author_id, change_dict, 'description')
 
         suggestion_services.update_translation_contribution_stats_at_submission(
             initial_suggestion
@@ -2539,19 +2530,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.author_id, change_dict, 'description')
-        new_change_dict = {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': '',
-            'state_name': 'Introduction',
-            'translation_html': ['abc', 'def'],
-            'data_format': 'set_of_normalized_string'
-        }
         latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
-            '1', 1, self.author_id, new_change_dict, 'description')
+            '1', 1, self.author_id, change_dict, 'description')
         suggestion_services.accept_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
