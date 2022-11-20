@@ -3068,8 +3068,8 @@ def _generate_translation_contributor_certificate(
         <br><br> 
         This certificate confirms that """ + username + """ has contributed 
         """ + str(hours_contributed) + """ hours’ worth of translations
-        from """ + from_date.strftime('%d-%m-%Y') + """ to 
-        """ + to_date.strftime('%d-%m-%Y') + """ </p> </div> 
+        from """ + from_date.strftime('%d %b %Y') + """ to 
+        """ + to_date.strftime('%d %b %Y') + """ </p> </div> 
         <div style="display:block; position: absolute; top: 80%; 
         left: 50%; transform: translate(-50%, -50%); width: 100%;">
         <div class="signature" style="width: 50%; float:left; 
@@ -3190,8 +3190,8 @@ def _generate_question_contributor_certificate(
         <br><br> 
         We confirm that  """ + username + """ has contributed 
         """ + str(hours_contributed) + """ hours’ to Oppia
-        from """ + from_date.strftime('%d-%m-%Y') + """ to 
-        """ + to_date.strftime('%d-%m-%Y') + """ </p> </div> 
+        from """ + from_date.strftime('%d %b %Y') + """ to 
+        """ + to_date.strftime('%d %b %Y') + """ </p> </div> 
         <div style="display:block; position: absolute; top: 80%; 
         left: 50%; transform: translate(-50%, -50%); width: 100%;">
         <div class="signature" style="width: 50%; float:left; 
