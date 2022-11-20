@@ -21,6 +21,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StorySummaryTileComponent } from './story-summary-tile.component';
 
@@ -30,6 +31,7 @@ describe('StorySummaryTileComponent', () => {
   let fixture: ComponentFixture<StorySummaryTileComponent>;
   let wds: WindowDimensionsService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -46,6 +48,7 @@ describe('StorySummaryTileComponent', () => {
     component = fixture.componentInstance;
     wds = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
@@ -532,5 +535,89 @@ describe('StorySummaryTileComponent', () => {
     component.hideExtraChapters();
 
     expect(component.chaptersDisplayed).toBe(1);
+  });
+
+  it('should register topic start', () => {
+    spyOn(siteAnalyticsService, 'registerTopicStartEvent');
+    component.storySummary = StorySummary.createFromBackendDict({
+      id: 'storyId',
+      title: 'Story Title',
+      node_titles: ['node1'],
+      thumbnail_filename: 'math_thumbnail.jpg',
+      thumbnail_bg_color: '#FF9933',
+      description: 'This is the story description',
+      story_is_published: true,
+      completed_node_titles: ['node1'],
+      url_fragment: 'story1',
+      all_node_dicts: [
+        {
+          id: 'node_1',
+          title: 'node1',
+          description: 'This is node 1',
+          destination_node_ids: [],
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          outline: '',
+          outline_is_finalized: true,
+          exploration_id: null,
+          thumbnail_bg_color: null,
+          thumbnail_filename: null
+        }
+      ]
+    });
+    component.nodeTitles = ['node1'];
+    component.nodeCount = 1;
+
+    component.onChapterClick(0);
+
+    expect(siteAnalyticsService.registerTopicStartEvent).toHaveBeenCalled();
+  });
+
+  it('should register topic end', () => {
+    spyOn(siteAnalyticsService, 'registerTopicEndEvent');
+    component.storySummary = StorySummary.createFromBackendDict({
+      id: 'storyId',
+      title: 'Story Title',
+      node_titles: ['node1'],
+      thumbnail_filename: 'math_thumbnail.jpg',
+      thumbnail_bg_color: '#FF9933',
+      description: 'This is the story description',
+      story_is_published: true,
+      completed_node_titles: ['node1', 'node2'],
+      url_fragment: 'story1',
+      all_node_dicts: [
+        {
+          id: 'node_1',
+          title: 'node1',
+          description: 'This is node 1',
+          destination_node_ids: [],
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          outline: '',
+          outline_is_finalized: true,
+          exploration_id: null,
+          thumbnail_bg_color: null,
+          thumbnail_filename: null
+        }, {
+          id: 'node_2',
+          title: 'node1',
+          description: 'This is node 1',
+          destination_node_ids: [],
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          outline: '',
+          outline_is_finalized: true,
+          exploration_id: null,
+          thumbnail_bg_color: null,
+          thumbnail_filename: null
+        }
+      ]
+    });
+    component.nodeCount = 2;
+    component.nodeTitles = ['node1', 'node2'];
+
+    component.onChapterClick(1);
+
+    expect(siteAnalyticsService.registerTopicEndEvent).toHaveBeenCalled();
   });
 });
