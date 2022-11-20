@@ -21,11 +21,11 @@ from __future__ import annotations
 import datetime
 import hashlib
 import imghdr
+import io
 import itertools
 import logging
 import re
 import urllib
-import webptools
 
 from core import feconf
 from core import utils
@@ -38,6 +38,8 @@ from core.domain import role_services
 from core.domain import state_domain
 from core.domain import user_domain
 from core.platform import models
+
+from PIL import Image
 
 import requests
 
@@ -1387,17 +1389,18 @@ def update_profile_picture_data_url(
     username = user_settings.username
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
     filename_png = 'profile_picture.png'
-    png_binary = utils.convert_png_or_webp_data_url_to_binary(
+    png_binary = utils.convert_png_data_url_to_binary(
         profile_picture_data_url)
     fs.commit(filename_png, png_binary, mimetype='image/png')
 
-    profile_picture_webp = webptools.base64str2webp_base64str(
-        base64str=profile_picture_data_url, image_type="png",
-        option="-q 80",logging="-v")
-    webp_binary = utils.convert_png_or_webp_data_url_to_binary(
-        profile_picture_webp, is_data_url_webp=True)
+    profile_picture_binary = utils.convert_png_data_url_to_binary(
+        profile_picture_data_url)
+    output = io.BytesIO()
+    image = Image.open(io.BytesIO(profile_picture_binary)).convert("RGB")
+    image.save(output, 'webp')
+    webp_binary = output.getvalue()
     filename_webp = 'profile_picture.webp'
-    fs.commit(filename_webp, webp_binary, mimetype='image/webp')
+    fs.commit(filename_webp, webp_binary, mimetype='image/png')
 
 
 def update_user_bio(user_id: str, user_bio: str) -> None:

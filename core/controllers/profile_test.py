@@ -446,28 +446,6 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class ProfileLinkTests(test_utils.GenericTestBase):
-
-    USERNAME = 'abc123'
-    EMAIL = 'abc123@gmail.com'
-    PROFILE_PIC_URL = '/preferenceshandler/profile_picture_by_username/'
-
-    def test_get_profile_picture_invalid_username(self):
-        self.get_json(
-            '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME),
-            expected_status_int=404)
-
-    def test_get_profile_picture_valid_username(self):
-        self.signup(self.EMAIL, self.USERNAME)
-        response_dict = self.get_json(
-            '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME)
-        )
-        # Every user must have a profile picture.
-        self.assertEqual(
-            response_dict['profile_picture_data_url_for_username'],
-            user_services.DEFAULT_IDENTICON_DATA_URL)
-
-
 class EmailPreferencesTests(test_utils.GenericTestBase):
 
     def test_user_not_setting_email_prefs_on_signup(self):
@@ -1147,7 +1125,6 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             last_edited_an_exploration=user_settings.last_edited_an_exploration,
             last_created_an_exploration=(
                 user_settings.last_created_an_exploration),
-            profile_picture_data_url=user_settings.profile_picture_data_url,
             default_dashboard=user_settings.default_dashboard,
             creator_dashboard_display_pref=(
                 user_settings.creator_dashboard_display_pref),
@@ -1209,7 +1186,6 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             last_edited_an_exploration=user_settings.last_edited_an_exploration,
             last_created_an_exploration=(
                 user_settings.last_created_an_exploration),
-            profile_picture_data_url=user_settings.profile_picture_data_url,
             default_dashboard=user_settings.default_dashboard,
             creator_dashboard_display_pref=(
                 user_settings.creator_dashboard_display_pref),

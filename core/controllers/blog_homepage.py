@@ -91,7 +91,6 @@ def _get_blog_card_summary_dicts_for_homepage(
                 'title': summary_dict['title'],
                 'summary': summary_dict['summary'],
                 'author_username': user_settings.username,
-                'profile_pic_url': user_settings.profile_picture_data_url,
                 'tags': summary_dict['tags'],
                 'thumbnail_filename': summary_dict['thumbnail_filename'],
                 'url_fragment': summary_dict['url_fragment'],

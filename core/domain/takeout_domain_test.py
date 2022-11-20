@@ -45,15 +45,3 @@ class TakeoutImageTests(test_utils.GenericTestBase):
             takeout_image_data.b64_image_data, 'b64_fake_image_data')
         self.assertEqual(
             takeout_image_data.image_export_path, '/test/')
-
-
-class TakeoutImageReplacementInstructionTests(test_utils.GenericTestBase):
-
-    def test_that_domain_object_is_created_correctly(self) -> None:
-        image_replacement_data = (
-            takeout_domain.TakeoutImageReplacementInstruction(
-                ('exp1',), 'test', 'key1'))
-        self.assertEqual(
-            image_replacement_data.dictionary_path, ('exp1',))
-        self.assertEqual(image_replacement_data.export_filename, 'test')
-        self.assertEqual(image_replacement_data.new_key, 'key1')

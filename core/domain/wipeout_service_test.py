@@ -20,11 +20,13 @@ import datetime
 import logging
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import email_manager
 from core.domain import exp_services
+from core.domain import fs_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
@@ -846,6 +848,15 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.USER_1_USERNAME)
+        filename_png = 'profile_picture.png'
+        filename_webp = 'profile_picture.webp'
+        png_binary = utils.convert_png_data_url_to_binary(
+            user_services.DEFAULT_IDENTICON_DATA_URL)
+        fs.commit(filename_png, png_binary)
+        fs.commit(filename_webp, png_binary)
 
         app_feedback_report_models.AppFeedbackReportModel(
             id=self.REPORT_ID_1,

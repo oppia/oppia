@@ -40,7 +40,6 @@ typing-extensions==3.10.0.2
 urllib3==1.26.7
 webapp2==3.0.0b1
 webencodings==0.5.1
-webptools==0.0.9
 # TODO(#13506): Remove these after we refactor the Python library
 # handling process.
 # These libraries are already in oppia_tools folder, but are also needed here
