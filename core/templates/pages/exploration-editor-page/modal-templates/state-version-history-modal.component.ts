@@ -27,8 +27,8 @@ import { VersionHistoryBackendApiService } from '../services/version-history-bac
 import { VersionHistoryService } from '../services/version-history.service';
 
 interface headersAndYamlStrs {
-  leftPane: string;
-  rightPane: string;
+  previousVersionStateYaml: string;
+  currentVersionStateYaml: string;
 }
 
 interface mergeviewOptions {
@@ -51,8 +51,8 @@ export class StateVersionHistoryModalComponent
   @Input() newStateName!: string;
   @Input() oldStateName!: string;
   yamlStrs: headersAndYamlStrs = {
-    leftPane: '',
-    rightPane: '',
+    previousVersionStateYaml: '',
+    currentVersionStateYaml: '',
   };
 
   CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
@@ -122,8 +122,8 @@ export class StateVersionHistoryModalComponent
   }
 
   onClickExploreForwardVersionHistory(): void {
-    this.yamlStrs.leftPane = '';
-    this.yamlStrs.rightPane = '';
+    this.yamlStrs.previousVersionStateYaml = '';
+    this.yamlStrs.currentVersionStateYaml = '';
 
     const diffData = this.versionHistoryService.getForwardStateDiffData();
 
@@ -154,8 +154,8 @@ export class StateVersionHistoryModalComponent
   }
 
   onClickExploreBackwardVersionHistory(): void {
-    this.yamlStrs.leftPane = '';
-    this.yamlStrs.rightPane = '';
+    this.yamlStrs.previousVersionStateYaml = '';
+    this.yamlStrs.currentVersionStateYaml = '';
 
     const diffData = this.versionHistoryService.getBackwardStateDiffData();
 
@@ -219,7 +219,7 @@ export class StateVersionHistoryModalComponent
     this.historyTabYamlConversionService
       .getYamlStringFromStateOrMetadata(this.oldState)
       .then((result) => {
-        this.yamlStrs.leftPane = result;
+        this.yamlStrs.previousVersionStateYaml = result;
       });
   }
 
@@ -227,7 +227,7 @@ export class StateVersionHistoryModalComponent
     this.historyTabYamlConversionService
       .getYamlStringFromStateOrMetadata(this.newState)
       .then((result) => {
-        this.yamlStrs.rightPane = result;
+        this.yamlStrs.currentVersionStateYaml = result;
       });
   }
 

@@ -24,10 +24,10 @@
 </table>
 
 <div class="modal-body">
-  <div *ngIf="yamlStrs.leftPane && yamlStrs.rightPane; else elseBlock">
+  <div *ngIf="yamlStrs.previousVersionStateYaml && yamlStrs.currentVersionStateYaml; else elseBlock">
     <oppia-codemirror-mergeview [options]="CODEMIRROR_MERGEVIEW_OPTIONS"
-                                [leftValue]="yamlStrs.leftPane"
-                                [rightValue]="yamlStrs.rightPane">
+                                [leftValue]="yamlStrs.previousVersionStateYaml"
+                                [rightValue]="yamlStrs.currentVersionStateYaml">
     </oppia-codemirror-mergeview>
     <div align="center" class="oppia-click-arrows-text">
       <strong>Click arrows to desynchronize scrolling</strong>
@@ -41,7 +41,7 @@
 </div>
 
 <div class="modal-footer">
-  <ng-template [ngIf]="yamlStrs.leftPane && yamlStrs.rightPane">
+  <ng-template [ngIf]="yamlStrs.previousVersionStateYaml && yamlStrs.currentVersionStateYaml">
     <button class="btn btn-outline-primary previous-commit" *ngIf="canExploreBackwardVersionHistory()" (click)="onClickExploreBackwardVersionHistory()">
       View previous commit by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 }}</strong>
     </button>

@@ -27,8 +27,8 @@ import { VersionHistoryBackendApiService } from '../services/version-history-bac
 import { VersionHistoryService } from '../services/version-history.service';
 
 interface headersAndYamlStrs {
-  leftPane: string;
-  rightPane: string;
+  previousVersionMetadataYaml: string;
+  currentVersionMetadataYaml: string;
 }
 
 interface mergeviewOptions {
@@ -49,8 +49,8 @@ export class MetadataVersionHistoryModalComponent
   @Input() newMetadata!: ExplorationMetadata;
   @Input() oldMetadata!: ExplorationMetadata;
   yamlStrs: headersAndYamlStrs = {
-    leftPane: '',
-    rightPane: '',
+    previousVersionMetadataYaml: '',
+    currentVersionMetadataYaml: '',
   };
 
   CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
@@ -132,8 +132,8 @@ export class MetadataVersionHistoryModalComponent
   }
 
   onClickExploreForwardVersionHistory(): void {
-    this.yamlStrs.leftPane = '';
-    this.yamlStrs.rightPane = '';
+    this.yamlStrs.previousVersionMetadataYaml = '';
+    this.yamlStrs.currentVersionMetadataYaml = '';
 
     const diffData = this.versionHistoryService.getForwardMetadataDiffData();
 
@@ -155,8 +155,8 @@ export class MetadataVersionHistoryModalComponent
   }
 
   onClickExploreBackwardVersionHistory(): void {
-    this.yamlStrs.leftPane = '';
-    this.yamlStrs.rightPane = '';
+    this.yamlStrs.previousVersionMetadataYaml = '';
+    this.yamlStrs.currentVersionMetadataYaml = '';
 
     const diffData = this.versionHistoryService.getBackwardMetadataDiffData();
 
@@ -208,7 +208,7 @@ export class MetadataVersionHistoryModalComponent
     this.historyTabYamlConversionService
       .getYamlStringFromStateOrMetadata(this.oldMetadata)
       .then((result) => {
-        this.yamlStrs.leftPane = result;
+        this.yamlStrs.previousVersionMetadataYaml = result;
       });
   }
 
@@ -216,7 +216,7 @@ export class MetadataVersionHistoryModalComponent
     this.historyTabYamlConversionService
       .getYamlStringFromStateOrMetadata(this.newMetadata)
       .then((result) => {
-        this.yamlStrs.rightPane = result;
+        this.yamlStrs.currentVersionMetadataYaml = result;
       });
   }
 

@@ -209,14 +209,14 @@ describe('State version history modal', () => {
       historyTabYamlConversionService, 'getYamlStringFromStateOrMetadata'
     ).and.resolveTo('YAML STRING');
 
-    expect(component.yamlStrs.leftPane).toEqual('');
-    expect(component.yamlStrs.rightPane).toEqual('');
+    expect(component.yamlStrs.previousVersionStateYaml).toEqual('');
+    expect(component.yamlStrs.currentVersionStateYaml).toEqual('');
 
     component.onClickExploreForwardVersionHistory();
     tick();
 
-    expect(component.yamlStrs.leftPane).toEqual('YAML STRING');
-    expect(component.yamlStrs.rightPane).toEqual('YAML STRING');
+    expect(component.yamlStrs.previousVersionStateYaml).toEqual('YAML STRING');
+    expect(component.yamlStrs.currentVersionStateYaml).toEqual('YAML STRING');
   }));
 
   it('should update the left and the right side yaml strings on exploring' +
@@ -235,14 +235,14 @@ describe('State version history modal', () => {
     ).and.resolveTo('YAML STRING');
     spyOn(component, 'fetchPreviousVersionHistory').and.callFake(() => {});
 
-    expect(component.yamlStrs.leftPane).toEqual('');
-    expect(component.yamlStrs.rightPane).toEqual('');
+    expect(component.yamlStrs.previousVersionStateYaml).toEqual('');
+    expect(component.yamlStrs.currentVersionStateYaml).toEqual('');
 
     component.onClickExploreBackwardVersionHistory();
     tick();
 
-    expect(component.yamlStrs.leftPane).toEqual('YAML STRING');
-    expect(component.yamlStrs.rightPane).toEqual('YAML STRING');
+    expect(component.yamlStrs.previousVersionStateYaml).toEqual('YAML STRING');
+    expect(component.yamlStrs.currentVersionStateYaml).toEqual('YAML STRING');
   }));
 
   it('should be able to fetch the backward version history', fakeAsync(() => {
@@ -297,8 +297,10 @@ describe('State version history modal', () => {
       component.ngOnInit();
       tick();
 
-      expect(component.yamlStrs.leftPane).toEqual('YAML STRING');
-      expect(component.yamlStrs.rightPane).toEqual('YAML STRING');
+      expect(
+        component.yamlStrs.previousVersionStateYaml
+      ).toEqual('YAML STRING');
+      expect(component.yamlStrs.currentVersionStateYaml).toEqual('YAML STRING');
       expect(component.fetchPreviousVersionHistory).toHaveBeenCalled();
     }));
 });
