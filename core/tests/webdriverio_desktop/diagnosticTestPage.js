@@ -16,43 +16,118 @@
  * @fileoverview End-to-end tests for the diagnostic test page.
  */
 
+var action = require('../webdriverio_utils/action.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var ClassroomPage = require('../webdriverio_utils/ClassroomPage.js');
+var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage');
 var ExplorationPlayerPage = require(
   '../webdriverio_utils/ExplorationPlayerPage.js');
-var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage');
+var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
+var TopicsAndSkillsDashboardPage = require(
+  '../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
+var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
 
 describe('Diagnostic test page functionality', function() {
-  var classroomPage = null;
   var adminPage = null;
-  var explorationPlayerPage = null;
+  var classroomPage = null;
   var diagnosticTestPage = null;
+  var explorationPlayerPage = null;
+  var skillEditorPage = null;
+  var topicsAndSkillsDashboardPage = null;
+  var topicEditorPage = null;
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     diagnosticTestPage = new DiagnosticTestPage.DiagnosticTestPage();
+    skillEditorPage = new SkillEditorPage.SkillEditorPage();
+    topicsAndSkillsDashboardPage = (
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+    topicEditorPage = (
+      new TopicEditorPage.TopicEditorPage());
 
     await users.createAndLoginCurriculumAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
-    await adminPage.createDummyClassroom();
-    await users.logout();
+    var handle = await browser.getWindowHandle();
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
+      'Topic 1', 'topic-one', 'Description', false);
+    await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
+    await topicEditorPage.updateMetaTagContent('topic meta tag');
+    await topicEditorPage.updatePageTitleFragment('topic page title');
+    await topicEditorPage.saveTopic('Added thumbnail.');
+    var url = await browser.getUrl();
+    var topicId = url.split('/')[4].slice(0, -1);
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await adminPage.editConfigProperty(
+      'The details for each classroom page.',
+      'List',
+      async function(elem) {
+        elem = await elem.editItem(0, 'Dictionary');
+        elem = await elem.editEntry(4, 'List');
+        elem = await elem.addItem('Unicode');
+        await action.setValue(
+          'Topic ID', elem, topicId, false);
+      });
+    await classroomPage.get('math');
+    // Even if the topic is unpublished, an unclickable tile is shown
+    // currently.
+    await classroomPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.get();
+    (
+      await
+      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+        'Skill 1', 'Concept card explanation', false));
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Second explanation for easy difficulty.');
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+    // A minimum of three questions are required for skill to get assigned in
+    // a topic’s diagnostic test.
+    await workflow.createQuestion();
+    await workflow.createQuestion();
+    await workflow.createQuestion();
+
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      'Skill 1', 'Topic 1');
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+
+    await topicEditorPage.addDiagnosticTestSkill('Skill 1');
+
+    await topicEditorPage.addSubtopic(
+      'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
+      'Subtopic content');
+    await topicEditorPage.saveTopic('Added subtopic.');
+
+    await topicEditorPage.navigateToTopicEditorTab();
+    await topicEditorPage.navigateToReassignModal();
+
+    await topicEditorPage.dragSkillToSubtopic('Skill 1', 0);
+    await topicEditorPage.saveRearrangedSkills();
+    await topicEditorPage.saveTopic('Added skill to subtopic.');
+
+    await topicEditorPage.publishTopic();
+    await classroomPage.get('math');
+    await classroomPage.expectNumberOfTopicsToBe(1);
   });
 
-  beforeEach(async function() {
-    await users.login('creator@classroomPage.com');
+  afterAll(async function() {
+    await users.logout();
   });
 
   it('should be able to start diagnostic test', async function() {
     await classroomPage.get('math');
     await classroomPage.takeDiagnosticTest();
+    await waitFor.pageToFullyLoad();
     await diagnosticTestPage.startDiagnosticTest();
-    await explorationPlayerPage.submitAnswer('TextInput', 'correct');
-    await explorationPlayerPage.submitAnswer('TextInput', 'correct');
     await explorationPlayerPage.submitAnswer('TextInput', 'correct');
   });
 
@@ -61,9 +136,8 @@ describe('Diagnostic test page functionality', function() {
     async function() {
       await classroomPage.get('math');
       await classroomPage.takeDiagnosticTest();
+      await waitFor.pageToFullyLoad();
       await diagnosticTestPage.startDiagnosticTest();
-      await explorationPlayerPage.skipQuestion();
-      await explorationPlayerPage.skipQuestion();
       await explorationPlayerPage.skipQuestion();
       await explorationPlayerPage.skipQuestion();
     });
