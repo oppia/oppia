@@ -2447,11 +2447,11 @@ def update_translation_contribution_stats_at_submission(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    if type(suggestion.change.translation_html) == str:
+    if isinstance(suggestion.change.translation_html, str):
         content_plain_text = html_cleaner.strip_html_tags(
             suggestion.change.translation_html)
         content_word_count = len(content_plain_text.split())
-    elif type(suggestion.change.translation_html) == list:
+    elif isinstance(suggestion.change.translation_html, list):
         for content in suggestion.change.translation_html:
             content_plain_text = html_cleaner.strip_html_tags(content)
             content_word_count += len(content_plain_text.split())
@@ -2510,11 +2510,11 @@ def update_translation_contribution_stats_at_review(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    if type(suggestion.change.translation_html) == str:
+    if isinstance(suggestion.change.translation_html, str):
         content_plain_text = html_cleaner.strip_html_tags(
             suggestion.change.translation_html)
         content_word_count = len(content_plain_text.split())
-    elif type(suggestion.change.translation_html) == list:
+    elif isinstance(suggestion.change.translation_html, list):
         for content in suggestion.change.translation_html:
             content_plain_text = html_cleaner.strip_html_tags(content)
             content_word_count += len(content_plain_text.split())
@@ -2600,11 +2600,11 @@ def update_translation_review_stats(
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
 
-    if type(suggestion.change.translation_html) == str:
+    if isinstance(suggestion.change.translation_html, str):
         content_plain_text = html_cleaner.strip_html_tags(
             suggestion.change.translation_html)
         content_word_count = len(content_plain_text.split())
-    elif type(suggestion.change.translation_html) == list:
+    elif isinstance(suggestion.change.translation_html, list):
         for content in suggestion.change.translation_html:
             content_plain_text = html_cleaner.strip_html_tags(content)
             content_word_count += len(content_plain_text.split())
