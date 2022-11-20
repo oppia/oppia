@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import { StoryEditorStateService } from '../services/story-editor-state.service'
 
 @Component({
   selector: 'oppia-story-node-editor',
-  templateUrl: 'story-node-editor.directive.html'
+  templateUrl: 'story-node-editor.component.html'
 })
 export class StoryNodeEditorComponent {
   @Input() nodeId: string;

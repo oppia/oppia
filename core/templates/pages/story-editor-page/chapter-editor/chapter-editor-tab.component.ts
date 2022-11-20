@@ -21,7 +21,7 @@ require(
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('pages/story-editor-page/services/story-editor-navigation.service');
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
-require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
+require('pages/story-editor-page/editor-tab/story-node-editor.component.ts');
 
 import { Subscription } from 'rxjs';
 

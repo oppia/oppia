@@ -99,7 +99,7 @@ class StoryEditorPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
-import { StoryNodeEditorComponent } from './editor-tab/story-node-editor.directive';
+import { StoryNodeEditorComponent } from './editor-tab/story-node-editor.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
