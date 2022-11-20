@@ -44,10 +44,11 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Union
+from typing import Dict, Final, List, Mapping, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from core.domain import change_domain
     from mypy_imports import feedback_models
     from mypy_imports import suggestion_models
     from mypy_imports import user_models
@@ -2298,7 +2299,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             topic_services.add_uncategorized_skill(
                 self.admin_id, topic.id, skill_id)
 
-    def _set_up_topics_and_stories_for_translations(self) -> Dict[str, str]:
+    def _set_up_topics_and_stories_for_translations(self) -> Mapping[
+        str, change_domain.AcceptableChangeDictTypes]:
         """Sets up required topics and stories for translations. It does the
         following.
         1. Create 2 explorations and publish them.
@@ -2307,8 +2309,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         4. Create 2 stories for translation opportunities.
 
         Returns:
-            Dict[str, str]. A dictionary of the change object for the
-            translations.
+            Mapping[str, change_domain.AcceptableChangeDictTypes]. A dictionary
+            of the change object for the translations.
         """
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
