@@ -30,7 +30,6 @@ var AdminPage = function() {
   var adminRolesTab = $('.e2e-test-admin-roles-tab');
   var adminRolesTabContainer = $('.e2e-test-roles-tab-container');
   var configTab = $('.e2e-test-admin-config-tab');
-  var activitiesTab = $('.e2e-test-admin-activities-tab');
   var editUserRoleButton = $('.e2e-test-role-edit-button');
   var explorationElementsSelector = function() {
     return $$('.e2e-test-reload-exploration-row');
@@ -69,7 +68,6 @@ var AdminPage = function() {
   var usernameInputFieldForRolesEditing = $(
     '.e2e-test-username-for-role-editor');
   var viewRoleButton = $('.e2e-test-role-success');
-  var generateDummyClassroom = $('.e2e-test-generate-dummy-classroom-button');
 
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
@@ -323,11 +321,6 @@ var AdminPage = function() {
     if (!success) {
       throw new Error('Could not find config property: ' + propertyName);
     }
-  };
-
-  this.createDummyClassroom = async function() {
-    await action.click('Activities Tab', activitiesTab);
-    await action.click('Dummy Math Classroom', generateDummyClassroom);
   };
 
   this._editUserRole = async function(username) {
