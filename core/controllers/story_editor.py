@@ -29,45 +29,101 @@ from core.domain import story_services
 from core.domain import topic_fetchers
 from core.domain import topic_services
 
+from typing import Dict, List, TypedDict
 
-class StoryEditorPage(base.BaseHandler):
+SCHEMA_FOR_STORY_ID = {
+    'type': 'basestring',
+    'validators': [{
+        'id': 'has_length',
+        'value': constants.STORY_ID_LENGTH
+    }]
+}
+
+
+class StoryEditorPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """The editor page for a single story."""
 
     URL_PATH_ARGS_SCHEMAS = {
         'story_id': {
-            'schema': {
-                'type': 'basestring'
-            },
-            'validators': [{
-                'id': 'has_length',
-                'value': constants.STORY_ID_LENGTH
-            }]
+            'schema': SCHEMA_FOR_STORY_ID
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_story
-    def get(self, _):
+    def get(self, unused_story_id: str) -> None:
         """Handles GET requests."""
 
         self.render_template('story-editor-page.mainpage.html')
 
 
-class EditableStoryDataHandler(base.BaseHandler):
+class EditableStoryDataHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of EditableStoryDataHandler's
+    normalized_payload dictionary.
+    """
+
+    version: int
+    commit_message: str
+    change_dicts: List[story_domain.StoryChange]
+
+
+class EditableStoryDataHandler(
+    base.BaseHandler[
+        EditableStoryDataHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """A data handler for stories which support writing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'story_id': {
+            'schema': SCHEMA_FOR_STORY_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        # Version must be greater than zero.
+                        'min_value': 1
+                    }]
+                }
+            },
+            'commit_message': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH
+                    }]
+                }
+            },
+            'change_dicts': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': story_domain.StoryChange
+                    }
+                }
+            }
+        },
+        'DELETE': {}
+    }
 
-    def _require_valid_version(self, version_from_payload, story_version):
+    def _require_valid_version(
+        self,
+        version_from_payload: int,
+        story_version: int
+    ) -> None:
         """Check that the payload version matches the given story
         version.
         """
-        if version_from_payload is None:
-            raise base.BaseHandler.InvalidInputException(
-                'Invalid POST request: a version must be specified.')
-
         if version_from_payload != story_version:
             raise base.BaseHandler.InvalidInputException(
                 'Trying to update version %s of story from version %s, '
@@ -75,11 +131,11 @@ class EditableStoryDataHandler(base.BaseHandler):
                 % (story_version, version_from_payload))
 
     @acl_decorators.can_edit_story
-    def get(self, story_id):
+    def get(self, story_id: str) -> None:
         """Populates the data on the individual story page."""
-        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=True)
         topic_id = story.corresponding_topic_id
-        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=True)
         skill_ids = topic.get_all_skill_ids()
 
         skill_summaries = skill_services.get_multi_skill_summaries(skill_ids)
@@ -104,33 +160,20 @@ class EditableStoryDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_edit_story
-    def put(self, story_id):
+    def put(self, story_id: str) -> None:
         """Updates properties of the given story."""
-        story = story_fetchers.get_story_by_id(story_id, strict=False)
-
-        version = self.payload.get('version')
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        story = story_fetchers.get_story_by_id(story_id, strict=True)
+        version = self.normalized_payload['version']
+        commit_message = self.normalized_payload['commit_message']
+        change_dicts = self.normalized_payload['change_dicts']
         self._require_valid_version(version, story.version)
 
-        commit_message = self.payload.get('commit_message')
-
-        if commit_message is None:
-            raise self.InvalidInputException(
-                'Expected a commit message but received none.')
-
-        if len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH:
-            raise self.InvalidInputException(
-                'Commit messages must be at most %s characters long.'
-                % constants.MAX_COMMIT_MESSAGE_LENGTH)
-
-        change_dicts = self.payload.get('change_dicts')
-        change_list = [
-            story_domain.StoryChange(change_dict)
-            for change_dict in change_dicts
-        ]
         try:
             # Update the Story and its corresponding TopicSummary.
             topic_services.update_story_and_topic_summary(
-                self.user_id, story_id, change_list, commit_message,
+                self.user_id, story_id, change_dicts, commit_message,
                 story.corresponding_topic_id)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
@@ -144,25 +187,33 @@ class EditableStoryDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_delete_story
-    def delete(self, story_id):
+    def delete(self, story_id: str) -> None:
         """Handles Delete requests."""
+        assert self.user_id is not None
         story_services.delete_story(self.user_id, story_id)
         self.render_json(self.values)
 
 
-class StoryPublishHandler(base.BaseHandler):
+class StoryPublishHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of StoryPublishHandler's
+    normalized_payload dictionary.
+    """
+
+    new_story_status_is_public: bool
+
+
+class StoryPublishHandler(
+    base.BaseHandler[
+        StoryPublishHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
     """A data handler for publishing and unpublishing stories."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'story_id': {
-            'schema': {
-                'type': 'basestring'
-            },
-            'validators': [{
-                'id': 'has_length',
-                'value': constants.STORY_ID_LENGTH
-            }]
+            'schema': SCHEMA_FOR_STORY_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -176,13 +227,15 @@ class StoryPublishHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_edit_story
-    def put(self, story_id):
+    def put(self, story_id: str) -> None:
         """Published/unpublished given story."""
-        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        story = story_fetchers.get_story_by_id(story_id, strict=True)
         topic_id = story.corresponding_topic_id
 
-        new_story_status_is_public = self.normalized_payload.get(
-            'new_story_status_is_public')
+        new_story_status_is_public = self.normalized_payload[
+            'new_story_status_is_public']
 
         if new_story_status_is_public:
             topic_services.publish_story(topic_id, story_id, self.user_id)
@@ -192,21 +245,49 @@ class StoryPublishHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ValidateExplorationsHandler(base.BaseHandler):
+class ValidateExplorationsHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of ValidateExplorationsHandler's
+    normalized_request dictionary.
+    """
+
+    comma_separated_exp_ids: str
+
+
+# TODO(#16538): Change the type of `comma_separated_exp_ids` handler
+# argument to `JsonEncodedInString`.
+class ValidateExplorationsHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        ValidateExplorationsHandlerNormalizedRequestDict
+    ]
+):
     """A data handler for validating the explorations in a story."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'story_id': {
+            'schema': SCHEMA_FOR_STORY_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'comma_separated_exp_ids': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_edit_story
-    def get(self, _):
+    def get(self, unused_story_id: str) -> None:
         """Handler that receives a list of exploration IDs, checks whether the
         corresponding explorations are supported on mobile and returns the
         validation error messages (if any).
         """
-        comma_separated_exp_ids = self.request.get('comma_separated_exp_ids')
-        if not comma_separated_exp_ids:
-            raise self.InvalidInputException(
-                'Expected comma_separated_exp_ids parameter to be present.')
+        assert self.normalized_request is not None
+        comma_separated_exp_ids = self.normalized_request[
+            'comma_separated_exp_ids']
         exp_ids = comma_separated_exp_ids.split(',')
         validation_error_messages = (
             story_services.validate_explorations_for_story(exp_ids, False))
@@ -216,7 +297,9 @@ class ValidateExplorationsHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class StoryUrlFragmentHandler(base.BaseHandler):
+class StoryUrlFragmentHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """A data handler for checking if a story with given url fragment exists.
     """
 
@@ -224,12 +307,10 @@ class StoryUrlFragmentHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self, story_url_fragment):
+    def get(self, story_url_fragment: str) -> None:
         """Handler that receives a story url fragment and checks whether
         a story with the same url fragment exists or not.
         """

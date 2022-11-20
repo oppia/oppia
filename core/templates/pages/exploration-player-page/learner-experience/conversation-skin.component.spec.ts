@@ -652,6 +652,9 @@ describe('Conversation skin component', () => {
     spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
     spyOn(explorationEngineService, 'isInPreviewMode')
       .and.returnValue(isInPreviewMode);
+    spyOn(explorationPlayerStateService, 'getCurrentEngineService')
+      .and.returnValue(explorationEngineService);
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(urlInterpolationService, 'getStaticImageUrl')
@@ -1586,6 +1589,7 @@ describe('Conversation skin component', () => {
   });
 
   it('should submit answer from progress nav', () => {
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(currentInteractionService, 'submitAnswer');
 
     componentInstance.submitAnswerFromProgressNav();
@@ -1943,6 +1947,7 @@ describe('Conversation skin component', () => {
 
     componentInstance.answerIsBeingProcessed = false;
     componentInstance.displayedCard = displayedCard;
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(componentInstance, 'isCurrentCardAtEndOfTranscript').and.returnValue(
       true);
     let explorationModeSpy = spyOn(
