@@ -54,7 +54,10 @@ describe('RTE display component', () => {
     let rteComponentDe: DebugElement = fixture.debugElement;
 
     // eslint-disable-next-line oppia/no-inner-html
-    let html = fixture.nativeElement.innerHTML.replace(/<!--[^>]*-->/g, '');
+    let html = fixture.nativeElement.innerHTML
+    while (html.includes("<!--")) {
+      html.replace(/(?=<!--)([\s\S]*?)-->/g, '');
+    }
     expect(html).toBe('');
 
     fixture.detectChanges();
@@ -93,7 +96,10 @@ describe('RTE display component', () => {
 
     expect(() => {
       // eslint-disable-next-line oppia/no-inner-html
-      let html = fixture.nativeElement.innerHTML.replace(/<!--[^>]*-->/g, '');
+      let html = fixture.nativeElement.innerHTML
+      while (html.includes("<!--")) {
+        html.replace(/(?=<!--)([\s\S]*?)-->/g, '');
+      }
       expect(html).toBe('');
 
       fixture.detectChanges();
