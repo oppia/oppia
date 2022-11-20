@@ -825,18 +825,9 @@ class _Validators:
                 'Audio not recognized as a %s file' % extension
             ) from e
 
-        if audio is None:
-            raise Exception(
-                'Audio not recognized as a %s file' % extension)
         if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
             raise Exception(
                 'Audio files must be under %s seconds in length. The uploaded '
                 'file is %.2f seconds long.' % (
                     feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length))
-        if len(set(audio.mime).intersection(
-                set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
-            raise Exception(
-                'Although the filename extension indicates the file '
-                'is a %s file, it was not recognized as one. '
-                'Found mime types: %s' % (extension, audio.mime))
         return True
