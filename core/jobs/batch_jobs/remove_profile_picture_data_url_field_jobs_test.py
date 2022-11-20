@@ -31,6 +31,19 @@ if MYPY:  # pragma: no cover
 
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
+datastore_services = models.Registry.import_datastore_services()
+
+
+class MockUserSettingsModelWithProfilePicture(
+    user_models.UserSettingsModel
+):
+    """Mock UserSettingsModel so that it allows to set
+    profile_picture_data_url.
+    """
+
+    profile_picture_data_url = (
+        datastore_services.TextProperty(default=None, indexed=False))
+
 
 class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
     """Tests for remove_profile_picture_data_url_field_jobs."""
@@ -41,32 +54,28 @@ class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user_1 = self.create_model(
-            user_models.UserSettingsModel,
-            id='test_id_1',
-            email='test_1@example.com',
-            username='test_1',
-            roles=[feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
-            profile_picture_data_url=user_services.DEFAULT_IDENTICON_DATA_URL
-        )
-
-        self.user_2 = self.create_model(
-            user_models.UserSettingsModel,
-            id='test_id_2',
-            email='test_2@example.com',
-            username='test_2',
-            roles=[feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
-        )
-
     def test_removal_of_profile_field(self) -> None:
-        self.put_multi([self.user_1, self.user_2])
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='USER MODELS UPDATED SUCCESS: 2'
+        with self.swap(user_models, 'UserSettingsModel', MockUserSettingsModelWithProfilePicture):
+            self.user_1 = self.create_model(
+                user_models.UserSettingsModel,
+                id='test_id_1',
+                email='test_1@example.com',
+                username='test_1',
+                roles=[feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
+                profile_picture_data_url=user_services.DEFAULT_IDENTICON_DATA_URL
             )
-        ])
-        print("********************************")
-        print(self.user_1.id)
-        print(self.user_1.profile_picture_data_url)
-        print(abc)
+
+            self.user_2 = self.create_model(
+                user_models.UserSettingsModel,
+                id='test_id_2',
+                email='test_2@example.com',
+                username='test_2',
+                roles=[feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
+            )
+            self.put_multi([self.user_1, self.user_2])
+
+            self.assert_job_output_is([
+                job_run_result.JobRunResult(
+                    stdout='USER MODELS UPDATED SUCCESS: 2'
+                )
+            ])
