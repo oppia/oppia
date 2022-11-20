@@ -59,6 +59,7 @@ export class ProgressNavComponent {
   @Input() displayedCard: StateCard;
   @Input() submitButtonIsShown: boolean;
   @Input() navigationThroughCardHistoryIsEnabled: boolean;
+  @Input() skipButtonIsShown: boolean;
   @Output() submit: EventEmitter<void> = (
     new EventEmitter());
 
@@ -90,7 +91,6 @@ export class ProgressNavComponent {
   explorationId: string;
   newCardStateName: string;
   currentCardIndex: number;
-  skipButtonIsShown: boolean;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
@@ -115,12 +115,6 @@ export class ProgressNavComponent {
 
   ngOnInit(): void {
     this.isIframed = this.urlService.isIframed();
-
-    if (!this.navigationThroughCardHistoryIsEnabled) {
-      this.skipButtonIsShown = true;
-    } else {
-      this.skipButtonIsShown = false;
-    }
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onHelpCardAvailable.subscribe(

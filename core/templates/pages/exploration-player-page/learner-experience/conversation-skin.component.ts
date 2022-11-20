@@ -176,6 +176,7 @@ export class ConversationSkinComponent {
   lastInputOutputPairIsOnlyShown: boolean = false;
   navigationThroughCardHistoryIsEnabled: boolean = true;
   checkpointCelebrationModalIsEnabled: boolean = true;
+  skipButtonIsShown: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
@@ -486,6 +487,7 @@ export class ConversationSkinComponent {
         this.lastInputOutputPairIsOnlyShown = true;
         this.navigationThroughCardHistoryIsEnabled = false;
         this.checkpointCelebrationModalIsEnabled = false;
+        this.skipButtonIsShown = true;
       }
     });
   }

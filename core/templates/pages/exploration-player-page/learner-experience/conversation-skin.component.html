@@ -43,6 +43,7 @@
                             [displayedCard]="displayedCard"
                             [submitButtonIsShown]="!answerIsBeingProcessed"
                             [navigationThroughCardHistoryIsEnabled]="navigationThroughCardHistoryIsEnabled"
+                            [skipButtonIsShown]="skipButtonIsShown"
                             (clickContinueButton)="showUpcomingCard()"
                             (changeCard)="changeCard($event)"
                             (skipQuestion)="skipCurrentQuestion()">

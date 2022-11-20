@@ -2301,6 +2301,8 @@ describe('Conversation skin component', () => {
       expect(componentInstance.lastInputOutputPairIsOnlyShown).toBeFalse();
       expect(componentInstance.navigationThroughCardHistoryIsEnabled)
         .toBeTrue();
+      expect(componentInstance.checkpointCelebrationModalIsEnabled).toBeTrue();
+      expect(componentInstance.skipButtonIsShown).toBeFalse();
 
       const topicIdToPrerequisiteTopicIds = {
         topicId1: [],
@@ -2319,6 +2321,8 @@ describe('Conversation skin component', () => {
       expect(componentInstance.lastInputOutputPairIsOnlyShown).toBeTrue();
       expect(componentInstance.navigationThroughCardHistoryIsEnabled)
         .toBeFalse();
+      expect(componentInstance.checkpointCelebrationModalIsEnabled).toBeFalse();
+      expect(componentInstance.skipButtonIsShown).toBeTrue();
     }));
 
   it('should be able to skip the current question', fakeAsync(() => {
