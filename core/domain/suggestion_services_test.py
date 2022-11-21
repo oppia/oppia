@@ -44,10 +44,11 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Union
+from typing import Dict, Final, List, Mapping, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from core.domain import change_domain
     from mypy_imports import feedback_models
     from mypy_imports import suggestion_models
     from mypy_imports import user_models
@@ -2298,7 +2299,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             topic_services.add_uncategorized_skill(
                 self.admin_id, topic.id, skill_id)
 
-    def _set_up_topics_and_stories_for_translations(self) -> Dict[str, str]:
+    def _set_up_topics_and_stories_for_translations(self) -> Mapping[
+        str, change_domain.AcceptableChangeDictTypes]:
         """Sets up required topics and stories for translations. It does the
         following.
         1. Create 2 explorations and publish them.
@@ -2307,8 +2309,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         4. Create 2 stories for translation opportunities.
 
         Returns:
-            Dict[str, str]. A dictionary of the change object for the
-            translations.
+            Mapping[str, change_domain.AcceptableChangeDictTypes]. A dictionary
+            of the change object for the translations.
         """
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -2335,12 +2337,31 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.owner_id, self.admin_id, 'story_id_02', topic_id, '1')
 
         return {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '',
             'state_name': 'Introduction',
-            'translation_html': '<p>Translation for content.</p>'
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html'
+        }
+
+    def _get_change_with_normalized_string(self) -> Mapping[
+        str, change_domain.AcceptableChangeDictTypes]:
+        """Provides change dictionary with normalized translation html.
+
+        Returns:
+            Mapping[str, change_domain.AcceptableChangeDictTypes]. A dictionary
+            of the change object for the translations.
+        """
+        return {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': ['translated text1', 'translated text2'],
+            'data_format': 'set_of_normalized_string'
         }
 
     def test_update_translation_contribution_stats_without_language_codes(
@@ -2476,10 +2497,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.author_id, change_dict, 'description')
+        new_change_dict = self._get_change_with_normalized_string()
         latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
-            '1', 1, self.author_id, change_dict, 'description')
+            '1', 1, self.author_id, new_change_dict, 'description')
 
         suggestion_services.update_translation_contribution_stats_at_submission(
             initial_suggestion
@@ -2508,7 +2530,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 translation_contribution_stats_model
                 .submitted_translation_word_count
             ),
-            6
+            7
         )
         self.assertEqual(
             translation_contribution_stats_model.accepted_translations_count,
@@ -2529,10 +2551,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.author_id, change_dict, 'description')
+        new_change_dict = self._get_change_with_normalized_string()
         latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
-            '1', 1, self.author_id, change_dict, 'description')
+            '1', 1, self.author_id, new_change_dict, 'description')
         suggestion_services.accept_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
@@ -2574,7 +2597,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 translation_review_stats_model
                 .reviewed_translation_word_count
             ),
-            6
+            7
         )
         assert translation_contribution_stats_model is not None
         self.assertEqual(
@@ -2582,7 +2605,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 translation_contribution_stats_model
                 .accepted_translation_word_count
             ),
-            6
+            7
         )
         self.assertEqual(
             translation_contribution_stats_model.accepted_translations_count,
