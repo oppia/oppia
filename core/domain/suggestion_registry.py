@@ -306,11 +306,12 @@ class BaseSuggestion:
             'Subclasses of BaseSuggestion should implement '
             'populate_old_value_of_change.')
 
-    # TODO(#16047): Here we use type Any because BaseSuggestion class is not
-    # implemented according to the strict typing which forces us to use Any
-    # here so that MyPy does not throw errors for different types of values
-    # used in sub-classes. Once this BaseSuggestion is refactored, we can
-    # remove type Any from here.
+    # TODO(#16047): Here we use type Any because the method pre_update_validate
+    # is used inside sub-classes with different argument types, which according
+    # to MyPy violates the 'Liskov substitution principle' and throws an error
+    # in every sub-class where this pre_update_validate method is used, so to
+    # avoid the error in every sub-class, we have used Any type here but once
+    # this BaseSuggestion class is refactored, we can remove type Any from here.
     def pre_update_validate(self, change: Any) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
