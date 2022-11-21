@@ -55,6 +55,7 @@ INJECTABLES_TO_IGNORE: Final = [
     'CanAccessSplashPageGuard',
 ]
 
+FILES_CONTAIN_UNKNOWN_TYPE: Final = []
 
 def _parse_js_or_ts_file(
     filepath: str, file_content: str, comment: bool = False
@@ -457,12 +458,75 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
 
         linter_stdout.append(self._check_constants_declaration())
         linter_stdout.append(self._check_angular_services_index())
+        linter_stdout.append(self._check_unknown_type())
 
         # Clear temp compiled typescipt files.
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
 
         return linter_stdout
 
+    def _check_unknown_type(self):
+        """Prints a list of lint errors if an unknown type is used. This lint
+        check is not enabled by default. Add proper comment if unknown is needed.
+        Returns:
+        TaskResult. A TaskResult object representing the result of the
+        lint check.
+        """
+        name = 'Unknown type'
+        error_messages = []
+        failed = False
+        comment_before_unknown_type = False
+        ts_files_to_check = self.ts_filepaths
+        for file_path in ts_files_to_check:
+            # Not showing lint errors for files present in FILES_CONTAIN_UNKNOWN_TYPE
+            if file_path in FILES_CONTAIN_UNKNOWN_TYPE:
+                continue
+
+            file_content = self.file_cache.read(file_path)
+            for line_num, line in enumerate(file_content.split('\n')):
+                # Indexes where unknown type (: unknown) is present in a particular
+                # line.
+                unknown_type_object = re.finditer(pattern=': unknown', string=line)
+                unknown_type = [index.start() for index in unknown_type_object]
+                # Indexes where unknown type conversion (as unknown) is present in
+                # a particular line.
+                unknown_type_conversion_object = (
+                    re.finditer(pattern='as unknown', string=line))
+                unknown_type_conversion = (
+                    [index.start() for index in unknown_type_conversion_object])
+
+                # Checking previous line contain comment, if yes then skip throw
+                # errors.
+                if not comment_before_unknown_type:
+                    # Throw error if unknown type is present.
+                    if len(unknown_type):
+                        failed = True
+                        for x in range(len(unknown_type)):
+                            error_message = (
+                                '%s:%s:%s: unknown type used. Add proper comment if'
+                                ' Unknown is needed.' % (
+                                file_path, line_num + 1, unknown_type[x]))
+                            error_messages.append(error_message)
+
+                    # Throw error if unknown type conversion is present.
+                    if len(unknown_type_conversion):
+                        failed = True
+                        for x in range(len(unknown_type_conversion)):
+                            error_message = (
+                                '%s:%s:%s: unknown type conversion used. Add proper'
+                                'comment if unknown is needed.' % (
+                                file_path, line_num + 1, unknown_type_conversion[x]))
+                            error_messages.append(error_message)
+
+                # Checking line contains comments.
+                ts_unknown_error = re.findall(pattern=r'^ *//', string=line)
+                if len(ts_unknown_error):
+                    comment_before_unknown_type = True
+                else:
+                    comment_before_unknown_type = False
+
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
 class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
     """Manages all the third party Python linting functions."""
