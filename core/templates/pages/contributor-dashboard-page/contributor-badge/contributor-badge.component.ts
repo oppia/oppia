@@ -45,6 +45,7 @@ export class ContributorBadgeComponent {
   questionSubmissionBadges: Badge[];
   questionReviewBadges: Badge[];
   questionCorrectionBadges: Badge[];
+  selectedLanguage;
   totalQuestionStats: ContributionCounts = {
     submissions: 0,
     reviews: 0,
@@ -55,7 +56,6 @@ export class ContributorBadgeComponent {
   mobileDropdownShown = false;
   mobileBadgeTypeDropdownShown = false;
   mobileBadgeTypeSelected = MobileBadgeType.Translation;
-  selectedLanguage = '';
   dataLoading = false;
   userCanReviewTranslationSuggestion: boolean;
   userCanReviewQuestionSuggestions: boolean;
@@ -198,18 +198,18 @@ export class ContributorBadgeComponent {
         this.reviewableLanguages.includes(this.selectedLanguage));
     }
     this.dataLoading = false;
-    console.log(this.translationBadges);
-    console.log(this.questionSubmissionBadges);
   }
 
   getObtainedBadges(
       contributionCount: number,
-      contributionSubType: string, language?: string): Badge[] {
+      contributionSubType: string,
+      language?: string
+  ): Badge[] {
     const badges: Badge[] = [];
     let level = 0;
     let index = 0;
     while (contributionCount >= level) {
-      if (AppConstants.CONTRIBUTOR_BADGE_INITIAL_LEVELS.length > index) {
+      if (index < AppConstants.CONTRIBUTOR_BADGE_INITIAL_LEVELS.length) {
         level = AppConstants.CONTRIBUTOR_BADGE_INITIAL_LEVELS[index];
         index += 1;
       } else {
@@ -274,19 +274,19 @@ export class ContributorBadgeComponent {
     const targetElement = event.target as HTMLElement;
     if (
       targetElement &&
-       !this.dropdownRef.nativeElement.contains(targetElement)
+      !this.dropdownRef.nativeElement.contains(targetElement)
     ) {
       this.dropdownShown = false;
     }
     if (
       targetElement &&
-       !this.mobileDropdownRef.nativeElement.contains(targetElement)
+      !this.mobileDropdownRef.nativeElement.contains(targetElement)
     ) {
       this.mobileDropdownShown = false;
     }
     if (
       targetElement &&
-       !this.mobileBadgeTypeDropdownRef.nativeElement.contains(targetElement)
+      !this.mobileBadgeTypeDropdownRef.nativeElement.contains(targetElement)
     ) {
       this.mobileBadgeTypeDropdownShown = false;
     }
