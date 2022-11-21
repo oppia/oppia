@@ -305,7 +305,7 @@ describe('Contributor badge component', () => {
           component.ngOnInit();
         }));
 
-        fit('should not display any badge', fakeAsync(() => {
+        it('should not display any badge', fakeAsync(() => {
           expect(component.translationBadges).toEqual({});
           expect(component.questionSubmissionBadges).toEqual(undefined);
         }));
