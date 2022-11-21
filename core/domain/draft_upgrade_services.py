@@ -313,6 +313,25 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
+    def _convert_states_v53_dict_to_v54_dict(
+        cls, draft_change_list: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
+        """Converts draft change list from state version 53 to 54. State
+        version 54 adds catchMisspellings customization_arg to TextInput
+        interaction. As this is a new property and therefore
+        doesn't affect any pre-existing drafts, there should be
+        no changes to drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v52_dict_to_v53_dict(
         cls, draft_change_list: List[exp_domain.ExplorationChange]
     ) -> List[exp_domain.ExplorationChange]:

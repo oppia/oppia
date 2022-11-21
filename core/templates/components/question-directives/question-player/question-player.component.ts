@@ -33,6 +33,8 @@ import { UserService } from 'services/user.service';
 import { QuestionPlayerStateService } from './services/question-player-state.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ContextService } from 'services/context.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UrlService } from 'services/contextual/url.service';
 
 export interface QuestionData {
   linkedSkillIds: string[];
@@ -113,7 +115,9 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     private skillMasteryBackendApiService: SkillMasteryBackendApiService,
     private userService: UserService,
     private windowRef: WindowRef,
-    private _sanitizer: DomSanitizer
+    private _sanitizer: DomSanitizer,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private urlService: UrlService
   ) {}
 
   calculateScores(questionStateData: {[key: string]: QuestionData}): void {
@@ -168,6 +172,13 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     this.resultsLoaded = true;
     this.questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
       this.resultsLoaded);
+    this.siteAnalyticsService.registerPracticeSessionEndEvent(
+      this.urlService.getClassroomUrlFragmentFromUrl(),
+      this.urlService.getTopicUrlFragmentFromLearnerUrl(),
+      Object.keys(this.scorePerSkillMapping).toString(),
+      totalQuestions,
+      this.totalScore
+    );
   }
 
   getMasteryChangeForWrongAnswers(
