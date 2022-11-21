@@ -5953,6 +5953,7 @@ export default {
   "MAX_CHARS_IN_BLOG_POST_TITLE": 65,
   "MIN_CHARS_IN_BLOG_POST_TITLE": 5,
   "MAX_CHARS_IN_BLOG_POST_SUMMARY": 300,
+  "MAX_CHARS_IN_LEARNER_GROUP_TITLE": 36,
   "STORY_ID_LENGTH": 12,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
@@ -5972,6 +5973,11 @@ export default {
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,
   "MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 5,
   "MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 50,
+  // The maximum number of questions can exceed this by at most 3
+  // (i.e., 18 questions) in some special cases when the user has attempted 14
+  // questions and another topic is tested for more accurate results. For all
+  // other cases, 15 questions is the upper limit.
+  "MAX_ALLOWED_QUESTIONS_IN_THE_DIAGNOSTIC_TEST": 15,
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,

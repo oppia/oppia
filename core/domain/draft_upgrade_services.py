@@ -171,15 +171,27 @@ class DraftUpgradeUtil:
                 )
                 new_value = edit_interaction_cust_args_cmd.new_value
                 if 'choices' in new_value.keys():
+                    # Here we use cast because we are narrowing down the type
+                    # from various customization args value types to List[
+                    # SubtitledHtmlDict] type, and this is done because here
+                    # we are accessing 'choices' keys over customization_args
+                    # and every customization arg that has a 'choices' key will
+                    # contain values of type List[SubtitledHtmlDict].
+                    subtitled_html_new_value_dicts = cast(
+                        List[state_domain.SubtitledHtmlDict],
+                        new_value['choices']['value']
+                    )
                     for value_index, value in enumerate(
-                            new_value['choices']['value']):
+                        subtitled_html_new_value_dicts
+                    ):
                         if isinstance(value, dict) and 'html' in value:
-                            new_value['choices']['value'][value_index][
+                            subtitled_html_new_value_dicts[value_index][
                                 'html'
                             ] = conversion_fn(value['html'])
                         elif isinstance(value, str):
-                            new_value['choices']['value'][value_index] = (
-                                conversion_fn(value))
+                            subtitled_html_new_value_dicts[value_index] = (
+                                conversion_fn(value)
+                            )
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
                 # Here we use cast because this 'elif' condition forces change
@@ -310,6 +322,25 @@ class DraftUpgradeUtil:
                     'state_name': change.state_name,
                     'new_value': new_value
                 })
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v53_dict_to_v54_dict(
+        cls, draft_change_list: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
+        """Converts draft change list from state version 53 to 54. State
+        version 54 adds catchMisspellings customization_arg to TextInput
+        interaction. As this is a new property and therefore
+        doesn't affect any pre-existing drafts, there should be
+        no changes to drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
         return draft_change_list
 
     @classmethod
