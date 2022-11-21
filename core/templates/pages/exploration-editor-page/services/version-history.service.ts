@@ -62,7 +62,10 @@ export class VersionHistoryService {
 
   // The two below variables represent the current index of the version history
   // list which the user is navigating i.e. index value for the lists
-  // fetchedStateVersionNumbers, fetchedMetadataVersionNumbers etc.
+  // fetchedStateVersionNumbers, fetchedMetadataVersionNumbers etc. These
+  // variables are initialized as zero inside the resetStateVersionHistory and
+  // resetMetadataVersionHistory functions when a state editor or the
+  // exploration settings tab is opened by a user.
   currentPositionInStateVersionHistoryList: number = 0;
   currentPositionInMetadataVersionHistoryList: number = 0;
 
