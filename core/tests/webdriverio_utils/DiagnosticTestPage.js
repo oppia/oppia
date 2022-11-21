@@ -91,7 +91,6 @@ var DiagnosticTestPage = function() {
   };
 
   this.addTopicIdToClassroomConfig = async function(topicId, index) {
-    // var classroomTile = await classroomTileSelector();
     await waitFor.visibilityOf(
       classroomTileContainerSelector,
       'Classroom tile is not visible'
@@ -99,9 +98,6 @@ var DiagnosticTestPage = function() {
     await action.click(
       'Classroom config tile', classroomTileSelector);
 
-    await waitFor.elementToBeClickable(
-      editClassroomConfigButton,
-      'Edit classroom config button is not clickable');
     await action.click(
       'Edit classroom config button', editClassroomConfigButton);
 
