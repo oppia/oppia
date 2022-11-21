@@ -309,7 +309,7 @@ class BaseSuggestion:
     # TODO(#16047): Here we use type Any because the method pre_update_validate
     # is used inside sub-classes with different argument types, which according
     # to MyPy violates the 'Liskov substitution principle' and throws an error
-    # in every sub-class where this pre_update_validate method is used, so to
+    # in every sub-class where this pre_update_validate method is used. So, to
     # avoid the error in every sub-class, we have used Any type here but once
     # this BaseSuggestion class is refactored, we can remove type Any from here.
     def pre_update_validate(self, change: Any) -> None:
