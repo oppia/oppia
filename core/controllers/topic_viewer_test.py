@@ -31,7 +31,7 @@ from core.tests import test_utils
 
 class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
@@ -51,13 +51,11 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
             self.story_id_1, 'story_title', 'description', self.topic_id,
             'story-frag-one')
         self.story_1.description = 'story_description'
-        self.story_1.node_titles = []
 
         self.story_2 = story_domain.Story.create_default_story(
             self.story_id_2, 'story_title', 'description', self.topic_id,
             'story-frag-two')
         self.story_2.description = 'story_description'
-        self.story_2.node_titles = []
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'public_topic_name', 'public', 'description',
@@ -103,10 +101,10 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
 class TopicViewerPageTests(BaseTopicViewerControllerTests):
 
-    def test_any_user_can_access_topic_viewer_page(self):
+    def test_any_user_can_access_topic_viewer_page(self) -> None:
         self.get_html_response('/learn/staging/%s' % 'public')
 
-    def test_accessibility_of_unpublished_topic_viewer_page(self):
+    def test_accessibility_of_unpublished_topic_viewer_page(self) -> None:
         topic = topic_domain.Topic.create_default_topic(
             'topic_id_1', 'private_topic_name',
             'private_topic_name', 'description', 'fragm')
@@ -127,7 +125,7 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
 class TopicPageDataHandlerTests(
         BaseTopicViewerControllerTests, test_utils.EmailTestBase):
 
-    def test_get_with_no_user_logged_in(self):
+    def test_get_with_no_user_logged_in(self) -> None:
         json_response = self.get_json(
             '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
         expected_dict = {
@@ -137,7 +135,7 @@ class TopicPageDataHandlerTests(
                 'id': self.story_1.id,
                 'title': self.story_1.title,
                 'description': self.story_1.description,
-                'node_titles': self.story_1.node_titles,
+                'node_titles': [],
                 'thumbnail_filename': None,
                 'thumbnail_bg_color': None,
                 'story_is_published': True,
@@ -149,7 +147,7 @@ class TopicPageDataHandlerTests(
                 'id': self.story_2.id,
                 'title': self.story_2.title,
                 'description': self.story_2.description,
-                'node_titles': self.story_2.node_titles,
+                'node_titles': [],
                 'thumbnail_filename': None,
                 'thumbnail_bg_color': None,
                 'story_is_published': True,
@@ -178,7 +176,7 @@ class TopicPageDataHandlerTests(
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
-    def test_get_with_user_logged_in(self):
+    def test_get_with_user_logged_in(self) -> None:
         skill_services.delete_skill(self.admin_id, self.skill_id_1)
         self.login(self.NEW_USER_EMAIL)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
@@ -202,7 +200,7 @@ class TopicPageDataHandlerTests(
                     'id': self.story_1.id,
                     'title': self.story_1.title,
                     'description': self.story_1.description,
-                    'node_titles': self.story_1.node_titles,
+                    'node_titles': [],
                     'thumbnail_filename': None,
                     'thumbnail_bg_color': None,
                     'story_is_published': True,
@@ -214,7 +212,7 @@ class TopicPageDataHandlerTests(
                     'id': self.story_2.id,
                     'title': self.story_2.title,
                     'description': self.story_2.description,
-                    'node_titles': self.story_2.node_titles,
+                    'node_titles': [],
                     'thumbnail_filename': None,
                     'thumbnail_bg_color': None,
                     'story_is_published': True,
@@ -244,7 +242,7 @@ class TopicPageDataHandlerTests(
 
         self.logout()
 
-    def test_get_with_meta_tag_content(self):
+    def test_get_with_meta_tag_content(self) -> None:
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'topic_with_meta',
             'topic-with-meta', 'description', 'fragm')
@@ -257,7 +255,7 @@ class TopicPageDataHandlerTests(
         self.assertEqual(
             expected_meta_tag_content, json_response['meta_tag_content'])
 
-    def test_get_with_page_title_fragment_for_web(self):
+    def test_get_with_page_title_fragment_for_web(self) -> None:
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'topic_with_page_title_fragment_for_web',
             'topic-page-title', 'description', 'topic page title')
@@ -271,7 +269,7 @@ class TopicPageDataHandlerTests(
             expected_page_title_fragment_for_web,
             json_response['page_title_fragment_for_web'])
 
-    def test_get_with_no_skills_ids(self):
+    def test_get_with_no_skills_ids(self) -> None:
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'topic_with_no_skills',
             'topic-with-no-skills', 'description', 'fragm')
@@ -293,7 +291,7 @@ class TopicPageDataHandlerTests(
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
-    def test_get_with_five_or_more_questions(self):
+    def test_get_with_five_or_more_questions(self) -> None:
         number_of_questions = 6
         self.topic_id = 'new_topic'
         self.skill_id_1 = skill_services.get_new_skill_id()
@@ -320,9 +318,11 @@ class TopicPageDataHandlerTests(
         for index in range(number_of_questions):
             question_id = question_services.get_new_question_id()
             content_id_generator = translation_domain.ContentIdGenerator()
+            default_dest_state_name = '%s' % index
             self.save_new_question(
                 question_id, self.admin_id,
-                self._create_valid_question_data(index, content_id_generator),
+                self._create_valid_question_data(
+                    default_dest_state_name, content_id_generator),
                 [self.skill_id_1],
                 content_id_generator.next_content_id_index)
             question_services.create_new_question_skill_link(
@@ -348,7 +348,7 @@ class TopicPageDataHandlerTests(
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
 
-    def test_get_with_twenty_or_more_questions(self):
+    def test_get_with_twenty_or_more_questions(self) -> None:
         number_of_questions = 50
         self.topic_id = 'new_topic'
         self.skill_id_1 = skill_services.get_new_skill_id()
@@ -373,11 +373,13 @@ class TopicPageDataHandlerTests(
         self.save_new_skill(
             self.skill_id_1, self.admin_id, description='Skill Description 1')
         for index in range(number_of_questions):
+            default_dest_state_name = '%s' % index
             question_id = question_services.get_new_question_id()
             content_id_generator = translation_domain.ContentIdGenerator()
             self.save_new_question(
                 question_id, self.admin_id,
-                self._create_valid_question_data(index, content_id_generator),
+                self._create_valid_question_data(
+                    default_dest_state_name, content_id_generator),
                 [self.skill_id_1],
                 content_id_generator.next_content_id_index)
             question_services.create_new_question_skill_link(
@@ -403,7 +405,9 @@ class TopicPageDataHandlerTests(
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
 
-    def test_get_with_twenty_or_more_questions_with_multiple_skills(self):
+    def test_get_with_twenty_or_more_questions_with_multiple_skills(
+        self
+    ) -> None:
         number_of_skills = 3
         number_of_questions = [1, 2, 2]
         self.topic_id = 'new_topic'
@@ -435,9 +439,11 @@ class TopicPageDataHandlerTests(
             for j in range(number_of_questions[i]):
                 question_id = question_services.get_new_question_id()
                 content_id_generator = translation_domain.ContentIdGenerator()
+                default_dest_state_name = '%s' % j
                 self.save_new_question(
                     question_id, self.admin_id,
-                    self._create_valid_question_data(j, content_id_generator),
+                    self._create_valid_question_data(
+                        default_dest_state_name, content_id_generator),
                     [skill_ids[i]],
                     content_id_generator.next_content_id_index)
                 question_services.create_new_question_skill_link(
@@ -455,7 +461,9 @@ class TopicPageDataHandlerTests(
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
 
-    def test_get_with_lesser_questions_with_fifty_or_more_skills(self):
+    def test_get_with_lesser_questions_with_fifty_or_more_skills(
+        self
+    ) -> None:
         number_of_skills = 60
         number_of_questions = [0] * 60
         number_of_questions[46] = 2
@@ -486,11 +494,13 @@ class TopicPageDataHandlerTests(
                 description='Skill Description')
         for i in range(number_of_skills):
             for j in range(number_of_questions[i]):
+                default_dest_state_name = '%s' % j
                 question_id = question_services.get_new_question_id()
                 content_id_generator = translation_domain.ContentIdGenerator()
                 self.save_new_question(
                     question_id, self.admin_id,
-                    self._create_valid_question_data(j, content_id_generator),
+                    self._create_valid_question_data(
+                        default_dest_state_name, content_id_generator),
                     [skill_ids[i]],
                     content_id_generator.next_content_id_index)
                 question_services.create_new_question_skill_link(
@@ -508,7 +518,7 @@ class TopicPageDataHandlerTests(
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
 
-    def test_get_with_more_questions_with_fifty_or_more_skills(self):
+    def test_get_with_more_questions_with_fifty_or_more_skills(self) -> None:
         number_of_skills = 60
         number_of_questions = [0] * 60
         number_of_questions[46] = 2
@@ -541,11 +551,13 @@ class TopicPageDataHandlerTests(
                 description='Skill Description')
         for i in range(number_of_skills):
             for j in range(number_of_questions[i]):
+                default_dest_state_name = '%s' % j
                 question_id = question_services.get_new_question_id()
                 content_id_generator = translation_domain.ContentIdGenerator()
                 self.save_new_question(
                     question_id, self.admin_id,
-                    self._create_valid_question_data(j, content_id_generator),
+                    self._create_valid_question_data(
+                        default_dest_state_name, content_id_generator),
                     [skill_ids[i]],
                     content_id_generator.next_content_id_index)
                 question_services.create_new_question_skill_link(

@@ -51,6 +51,7 @@ class MockWindowRef {
       href: '',
       reload: (val: boolean) => val
     },
+    gtag: () => {}
   };
 
   get nativeWindow() {
