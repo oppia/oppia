@@ -243,7 +243,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
     def test_cannot_get_with_invalid_topic_name(self):
         self.get_json(
             '%s/staging/%s/%s' % (
-                feconf.SUBTOPIC_DATA_HANDLER, 'Invalid Name',
+                feconf.SUBTOPIC_DATA_HANDLER, 'invalidname',
                 'sub-url-frag-one'),
             expected_status_int=404)
 

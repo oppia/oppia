@@ -60,24 +60,20 @@ class SubtopicPageDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'topic_name': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': constants.MAX_CHARS_IN_TOPIC_NAME
-                }]
-            }
-        },
-        'subtopic_id': {
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'subtopic_url_fragment': {
             'schema': {
                 'type': 'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
+                    'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
                 }]
             }
-        }
+        },
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {}
