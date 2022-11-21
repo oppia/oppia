@@ -70,7 +70,7 @@
               <span *ngIf="!showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())">⚠️</span>
               <span (click)="removeQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId());$event.stopPropagation();"
                     class="link-off-icon">
-                <i class="fas fa-unlink"></i>
+                <i class="fas fa-trash"></i>
               </span>
             </div>
             <div class="question-interaction-id">

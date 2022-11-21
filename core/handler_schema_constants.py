@@ -29,13 +29,8 @@ import from this location.
 from __future__ import annotations
 
 HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
-    'AssetDevHandler',
     'AudioUploadHandler',
-    'BulkEmailWebhookEndpoint',
     'DeferredTasksHandler',
-    'DeleteAccountPage',
-    'EditableQuestionDataHandler',
-    'EditableStoryDataHandler',
     'FeedbackThreadStatusChangeEmailHandler',
     'FlagExplorationEmailHandler',
     'IncomingReplyEmailHandler',
@@ -51,38 +46,16 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'PendingAccountDeletionPage',
     'PreferenceHandler',
     'PreferencesHandler',
-    'ProfilePage',
-    'QuestionCountDataHandler',
     'QuestionCreationHandler',
-    'QuestionPlayerHandler',
-    'QuestionSkillLinkHandler',
-    'RecentCommitsHandler',
-    'ResubmitSuggestionHandler',
-    'SkillDataHandler',
-    'SkillDescriptionHandler',
-    'StartedTranslationTutorialEventHandler',
-    'StateHitEventHandler',
-    'SubtopicPageDataHandler',
-    'SuggestionListHandler',
-    'SuggestionToExplorationActionHandler',
-    'SuggestionToSkillActionHandler',
-    'SuggestionsProviderHandler',
-    'TopicPageDataHandler',
-    'TopicsAndSkillsDashboardPage',
     'UnsentFeedbackEmailHandler',
-    'UpdateQuestionSuggestionHandler',
-    'UpdateTranslationSuggestionHandler',
-    'ValidateExplorationsHandler',
-    'ValueGeneratorHandler',
-    'VoiceArtistManagementHandler',
-    'OppiaMLVMHandler',
-    'CsrfTokenHandler',
-    'Error404Handler',
-    'FrontendErrorHandler',
 ]
 
 # These handlers do not require any schema validation.
 HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS = [
+    # Handler 'Error404Handler' is not supposed to be schema validated because
+    # this handler is defined to catch all 404 errors that will occur in any
+    # other handlers.
+    'Error404Handler',
     'SessionBeginHandler',
     'SessionEndHandler',
     'SeedFirebaseHandler',
