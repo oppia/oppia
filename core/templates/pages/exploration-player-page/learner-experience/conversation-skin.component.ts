@@ -173,7 +173,7 @@ export class ConversationSkinComponent {
   // question player, and exploration player page.
   feedbackIsEnabled: boolean = true;
   learnerCanOnlyAttemptQuestionOnce: boolean = false;
-  lastInputOutputPairIsOnlyShown: boolean = false;
+  inputOutputHistoryIsShown: boolean = false;
   navigationThroughCardHistoryIsEnabled: boolean = true;
   checkpointCelebrationModalIsEnabled: boolean = true;
   skipButtonIsShown: boolean = false;
@@ -484,7 +484,7 @@ export class ConversationSkinComponent {
       if (this.diagnosticTestTopicTrackerModel) {
         this.feedbackIsEnabled = false;
         this.learnerCanOnlyAttemptQuestionOnce = true;
-        this.lastInputOutputPairIsOnlyShown = true;
+        this.inputOutputHistoryIsShown = true;
         this.navigationThroughCardHistoryIsEnabled = false;
         this.checkpointCelebrationModalIsEnabled = false;
         this.skipButtonIsShown = true;
@@ -1294,6 +1294,7 @@ export class ConversationSkinComponent {
             this.explorationActuallyStarted = true;
           }
         }
+
         if (
           !this.explorationPlayerStateService.isPresentingIsolatedQuestions()
         ) {

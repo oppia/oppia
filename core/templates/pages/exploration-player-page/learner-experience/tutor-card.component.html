@@ -34,7 +34,7 @@
       </div>
     </div>
 
-    <div *ngIf="!lastInputOutputPairIsOnlyShown && (displayedCard.getInputResponsePairs().length > 1 && isInteractionInline()) || (displayedCard.getInputResponsePairs().length > 0 && !isInteractionInline())">
+    <div *ngIf="!inputOutputHistoryIsShown && (displayedCard.getInputResponsePairs().length > 1 && isInteractionInline()) || (displayedCard.getInputResponsePairs().length > 0 && !isInteractionInline())">
       <h4 class="conversation-skin-responses-dropdown-container"
           (click)="toggleShowPreviousResponses()">
         <span class="conversation-skin-responses-dropdown-text">

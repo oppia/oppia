@@ -2298,7 +2298,7 @@ describe('Conversation skin component', () => {
 
       expect(componentInstance.feedbackIsEnabled).toBeTrue();
       expect(componentInstance.learnerCanOnlyAttemptQuestionOnce).toBeFalse();
-      expect(componentInstance.lastInputOutputPairIsOnlyShown).toBeFalse();
+      expect(componentInstance.inputOutputHistoryIsShown).toBeFalse();
       expect(componentInstance.navigationThroughCardHistoryIsEnabled)
         .toBeTrue();
       expect(componentInstance.checkpointCelebrationModalIsEnabled).toBeTrue();
@@ -2318,7 +2318,7 @@ describe('Conversation skin component', () => {
 
       expect(componentInstance.feedbackIsEnabled).toBeFalse();
       expect(componentInstance.learnerCanOnlyAttemptQuestionOnce).toBeTrue();
-      expect(componentInstance.lastInputOutputPairIsOnlyShown).toBeTrue();
+      expect(componentInstance.inputOutputHistoryIsShown).toBeTrue();
       expect(componentInstance.navigationThroughCardHistoryIsEnabled)
         .toBeFalse();
       expect(componentInstance.checkpointCelebrationModalIsEnabled).toBeFalse();

@@ -87,9 +87,9 @@ export class DiagnosticTestPlayerEngineService {
         new DiagnosticTestCurrentTopicStatusModel(response));
 
       // The diagnostic test current topic status model is initialized in the
-      // above step, so there always be at least one skill ID in the pending
-      // list. Hence accessing the first element from the pending list in the
-      // below line is safe.
+      // above step, so there will always be at least one skill ID in the
+      // pending list. Hence accessing the first element from the pending list
+      // in the below line is safe.
       this._currentSkillId = (
         this._diagnosticTestCurrentTopicStatusModel.getPendingSkillIds()[0]);
       this._currentQuestion = (
@@ -137,9 +137,9 @@ export class DiagnosticTestPlayerEngineService {
               skillIdToQuestionsModel)
           );
           // The diagnostic test current topic status model is initialized in
-          // the above step, so there always be at least one skill ID in the
-          // pending list. Hence accessing the first element from the pending
-          // list in the below line is safe.
+          // the above step, so there will always be at least one skill ID in
+          // the pending list. Hence accessing the first element from the
+          // pending list in the below line is safe.
           this._currentSkillId = (
             this._diagnosticTestCurrentTopicStatusModel
               .getPendingSkillIds()[0]
@@ -156,9 +156,9 @@ export class DiagnosticTestPlayerEngineService {
       );
     } else {
       if (!this._diagnosticTestCurrentTopicStatusModel.isLifelineConsumed()) {
-        // The topic completion is checked in the above step, so there always be
-        // at least one skill ID left for checking. Hence accessing the first
-        // element from the pending list in the below line is safe.
+        // The topic completion is checked in the above step, so there will
+        // always be at least one skill ID left for checking. Hence accessing
+        // the first element from the pending list in the below line is safe.
         this._currentSkillId = (
           this._diagnosticTestCurrentTopicStatusModel.getPendingSkillIds()[0]);
       }

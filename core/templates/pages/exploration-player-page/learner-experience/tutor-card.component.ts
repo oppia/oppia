@@ -116,7 +116,7 @@ export class TutorCardComponent {
   @Input() milestoneMessageIsToBeDisplayed!: boolean;
   @Input() feedbackIsEnabled: boolean;
   @Input() learnerCanOnlyAttemptQuestionOnce: boolean;
-  @Input() lastInputOutputPairIsOnlyShown: boolean;
+  @Input() inputOutputHistoryIsShown: boolean;
   @Input() checkpointCelebrationModalIsEnabled: boolean;
   directiveSubscriptions = new Subscription();
   private _editorPreviewMode: boolean;
