@@ -27,12 +27,12 @@ import { VersionHistoryBackendApiService } from '../services/version-history-bac
 import { VersionHistoryService } from '../services/version-history.service';
 import { AlertsService } from 'services/alerts.service';
 
-interface headersAndYamlStrs {
+interface HeadersAndYamlStrs {
   previousVersionStateYaml: string;
   currentVersionStateYaml: string;
 }
 
-interface mergeviewOptions {
+interface MergeviewOptions {
   lineNumbers: boolean;
   readOnly: boolean;
   mode: string;
@@ -51,12 +51,12 @@ export class StateVersionHistoryModalComponent
   @Input() oldState!: State;
   @Input() newStateName!: string;
   @Input() oldStateName!: string;
-  yamlStrs: headersAndYamlStrs = {
+  yamlStrs: HeadersAndYamlStrs = {
     previousVersionStateYaml: '',
     currentVersionStateYaml: '',
   };
 
-  CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
+  CODEMIRROR_MERGEVIEW_OPTIONS: MergeviewOptions = {
     lineNumbers: true,
     readOnly: true,
     mode: 'yaml',

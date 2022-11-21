@@ -230,7 +230,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       this.userService.getUserInfoAsync()
     ]).then(async(
         [explorationData, featuresData, _, userInfo]) => {
-      if ((explorationData as unknown as ExplorationData)
+      if ((explorationData as ExplorationData)
         .exploration_is_linked_to_story) {
         this.explorationIsLinkedToStory = true;
         this.contextService.setExplorationIsLinkedToStory();
@@ -244,15 +244,15 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
       this.explorationTitleService.init(explorationData.title);
       this.explorationCategoryService.init(
-        (explorationData as unknown as ExplorationData).category);
+        (explorationData as ExplorationData).category);
       this.explorationObjectiveService.init((
-         explorationData as unknown as ExplorationData).objective);
+         explorationData as ExplorationData).objective);
       this.explorationLanguageCodeService.init(
         explorationData.language_code);
       this.explorationInitStateNameService.init(
         explorationData.init_state_name);
       this.explorationTagsService.init(
-        (explorationData as unknown as ExplorationData).tags);
+        (explorationData as ExplorationData).tags);
       this.explorationParamSpecsService.init(
         this.paramSpecsObjectFactory.createFromBackendDict(
             explorationData.param_specs as ParamSpecsBackendDict
@@ -270,25 +270,25 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
       this.currentUserIsCurriculumAdmin = userInfo.isCurriculumAdmin();
       this.currentUserIsModerator = userInfo.isModerator();
-      this.currentUser = (explorationData as unknown as ExplorationData).user;
+      this.currentUser = (explorationData as ExplorationData).user;
       this.currentVersion = explorationData.version;
 
       this.explorationRightsService.init(
-        (explorationData as unknown as ExplorationData).rights.owner_names,
-        (explorationData as unknown as ExplorationData).rights.editor_names,
-        (explorationData as unknown as ExplorationData)
+        (explorationData as ExplorationData).rights.owner_names,
+        (explorationData as ExplorationData).rights.editor_names,
+        (explorationData as ExplorationData)
           .rights.voice_artist_names,
-        (explorationData as unknown as ExplorationData).rights.viewer_names,
-        (explorationData as unknown as ExplorationData).rights.status,
-        (explorationData as unknown as ExplorationData).rights.cloned_from,
-        (explorationData as unknown as ExplorationData).rights.community_owned,
-        (explorationData as unknown as ExplorationData)
+        (explorationData as ExplorationData).rights.viewer_names,
+        (explorationData as ExplorationData).rights.status,
+        (explorationData as ExplorationData).rights.cloned_from,
+        (explorationData as ExplorationData).rights.community_owned,
+        (explorationData as ExplorationData)
           .rights.viewable_if_private);
       this.userEmailPreferencesService.init(
         (
-           explorationData as unknown as ExplorationData
+           explorationData as ExplorationData
         ).email_preferences.mute_feedback_notifications,
-        (explorationData as unknown as ExplorationData).email_preferences
+        (explorationData as ExplorationData).email_preferences
           .mute_suggestion_notifications);
 
       this.userExplorationPermissionsService.getPermissionsAsync()
@@ -351,12 +351,12 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       }
 
       this.stateTutorialFirstTimeService.initEditor(
-        (explorationData as unknown as ExplorationData)
+        (explorationData as ExplorationData)
           .show_state_editor_tutorial_on_load,
         this.explorationId);
 
       if ((
-         explorationData as unknown as ExplorationData
+         explorationData as ExplorationData
       ).show_state_translation_tutorial_on_load) {
         this.stateTutorialFirstTimeService
           .markTranslationTutorialNotSeenBefore();

@@ -27,12 +27,12 @@ import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-co
 import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 import { VersionHistoryService } from '../services/version-history.service';
 
-interface headersAndYamlStrs {
+interface HeadersAndYamlStrs {
   previousVersionMetadataYaml: string;
   currentVersionMetadataYaml: string;
 }
 
-interface mergeviewOptions {
+interface MergeviewOptions {
   lineNumbers: boolean;
   readOnly: boolean;
   mode: string;
@@ -49,12 +49,12 @@ export class MetadataVersionHistoryModalComponent
   @Input() oldVersion: number | null = null;
   @Input() newMetadata!: ExplorationMetadata;
   @Input() oldMetadata!: ExplorationMetadata;
-  yamlStrs: headersAndYamlStrs = {
+  yamlStrs: HeadersAndYamlStrs = {
     previousVersionMetadataYaml: '',
     currentVersionMetadataYaml: '',
   };
 
-  CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
+  CODEMIRROR_MERGEVIEW_OPTIONS: MergeviewOptions = {
     lineNumbers: true,
     readOnly: true,
     mode: 'yaml',
