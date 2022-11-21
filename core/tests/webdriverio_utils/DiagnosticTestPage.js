@@ -18,6 +18,7 @@
  */
 
 var action = require('./action.js');
+var waitFor = require('./waitFor.js');
 
 var DiagnosticTestPage = function() {
   var startDiagnosticTestButton = $('.e2e-test-start-diagnostic-test');
@@ -32,6 +33,10 @@ var DiagnosticTestPage = function() {
   };
 
   this.startDiagnosticTest = async function() {
+    await waitFor.elementToBeClickable(
+      startDiagnosticTestButton,
+      'Start diagnostic test button taking too long to be clickable'
+    );
     await action.click(
       'Start diagnostic test button', startDiagnosticTestButton);
   };
@@ -39,17 +44,38 @@ var DiagnosticTestPage = function() {
   this.createNewClassroomConfig = async function(
       classroomName, classroomUrlFragment
   ) {
+    await waitFor.elementToBeClickable(
+      addNewClassroomButton,
+      'Add new classroom button taking too long to be clickable'
+    );
     await action.click(
       'Add new classroom config data', addNewClassroomButton);
+
+    await waitFor.modalPopupToAppear();
+
+    await waitFor.visibilityOf(
+      newClassrooomNameInput,
+      'New classroom name input is not visible'
+    );
     await action.setValue(
       'New classroom name input',
       newClassrooomNameInput,
       classroomName
     );
+
+    await waitFor.visibilityOf(
+      newClassrooomNameInput,
+      'New classroom URL fragment input is not visible'
+    );
     await action.setValue(
       'New classroom URL fragment input',
       newClassroomUrlFragmentInput,
       classroomUrlFragment
+    );
+
+    await waitFor.elementToBeClickable(
+      createNewClassroomButton,
+      'Create new classroom button taking too long to be clickable'
     );
     await action.click(
       'Create new classroom config', createNewClassroomButton);
