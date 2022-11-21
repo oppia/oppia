@@ -59,11 +59,11 @@ export class ContributorBadgeComponent {
 
   totalTranslationStats: {[key: string]: ContributionCounts} = {};
   translationBadges: {[key: string]: {[key: string]: Badge[]}} = {};
-  languages = [];
-  questionSubmissionBadges: Badge[];
-  questionReviewBadges: Badge[];
-  questionCorrectionBadges: Badge[];
-  selectedLanguage;
+  languages: string[] = [];
+  questionSubmissionBadges: Badge[] = [];
+  questionReviewBadges: Badge[] = [];
+  questionCorrectionBadges: Badge[] = [];
+  selectedLanguage: string;
   totalQuestionStats: ContributionCounts = {
     submissions: 0,
     reviews: 0,
@@ -75,11 +75,11 @@ export class ContributorBadgeComponent {
   mobileBadgeTypeDropdownShown = false;
   mobileBadgeTypeSelected = MobileBadgeType.Translation;
   dataLoading = false;
-  userCanReviewTranslationSuggestion: boolean;
-  userCanReviewQuestionSuggestions: boolean;
-  userCanSuggestQuestions: boolean;
-  userHasQuestionRights: boolean;
-  reviewableLanguages = [];
+  userCanReviewTranslationSuggestion: boolean = false;
+  userCanReviewQuestionSuggestions: boolean = false;
+  userCanSuggestQuestions: boolean = false;
+  userHasQuestionRights: boolean = false;
+  reviewableLanguages: string[] = [];
 
   constructor(
     private readonly languageUtilService: LanguageUtilService,
@@ -253,9 +253,10 @@ export class ContributorBadgeComponent {
             language
           }
         );
-        return badges;
+        break;
       }
     }
+    return badges;
   }
 
   toggleLanguageDropdown(): void {
