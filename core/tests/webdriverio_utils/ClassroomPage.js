@@ -22,7 +22,7 @@ var action = require('./action.js');
 
 var ClassroomPage = function() {
   var topicSummaryTile = $('.e2e-test-topic-summary-tile');
-  var takeDiagnosticTest = $('.e2e-test-take-diagnostic-test');
+  var launchDiagnosticTestPageButton = $('.e2e-test-take-diagnostic-test');
   var topicSummaryTilesSelector = function() {
     return $$('.e2e-test-topic-summary-tile');
   };
@@ -43,8 +43,9 @@ var ClassroomPage = function() {
     }
   };
 
-  this.takeDiagnosticTest = async function() {
-    await action.click('Take diagnostic test', takeDiagnosticTest);
+  this.launchDiagnosticTestPage = async function() {
+    await action.click(
+      'Launch diagnostic test page button', launchDiagnosticTestPageButton);
   };
 };
 

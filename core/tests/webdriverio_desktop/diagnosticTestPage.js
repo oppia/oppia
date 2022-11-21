@@ -53,11 +53,11 @@ describe('Diagnostic test page functionality', function() {
       new TopicEditorPage.TopicEditorPage());
 
     await users.createAndLoginCurriculumAdminUser(
-      'creator@classroomPage.com', 'creatorClassroomPage');
+      'creator@diagnosticTestPage.com', 'creatorDignosticTestPage');
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
-      'Topic 1', 'topic-one', 'Description', false);
+      'Addition', 'add', 'Addition of numbers', false);
     await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
     await topicEditorPage.updateMetaTagContent('topic meta tag');
     await topicEditorPage.updatePageTitleFragment('topic page title');
@@ -65,6 +65,7 @@ describe('Diagnostic test page functionality', function() {
     var url = await browser.getUrl();
     var topicId = url.split('/')[4].slice(0, -1);
     await general.closeCurrentTabAndSwitchTo(handle);
+
     await adminPage.editConfigProperty(
       'The details for each classroom page.',
       'List',
@@ -80,12 +81,13 @@ describe('Diagnostic test page functionality', function() {
     // currently.
     await classroomPage.expectNumberOfTopicsToBe(1);
     await topicsAndSkillsDashboardPage.get();
+
     (
       await
       topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill 1', 'Concept card explanation', false));
+        'Skill Addition', 'Concept card explanation', false));
     await skillEditorPage.addRubricExplanationForDifficulty(
-      'Easy', 'Second explanation for easy difficulty.');
+      'Easy', 'Explanation for easy difficulty.');
     await skillEditorPage.saveOrPublishSkill('Edited rubrics');
     // A minimum of three questions are required for skill to get assigned in
     // a topic’s diagnostic test.
@@ -96,21 +98,21 @@ describe('Diagnostic test page functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
-      'Skill 1', 'Topic 1');
+      'Skill Addition', 'Addition');
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
 
-    await topicEditorPage.addDiagnosticTestSkill('Skill 1');
+    await topicEditorPage.addDiagnosticTestSkill('Skill Addition');
 
     await topicEditorPage.addSubtopic(
-      'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
+      'Subtopic for Addition', 'subtopic-one', '../data/test2_svg.svg',
       'Subtopic content');
     await topicEditorPage.saveTopic('Added subtopic.');
 
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToReassignModal();
 
-    await topicEditorPage.dragSkillToSubtopic('Skill 1', 0);
+    await topicEditorPage.dragSkillToSubtopic('Skill Addition', 0);
     await topicEditorPage.saveRearrangedSkills();
     await topicEditorPage.saveTopic('Added skill to subtopic.');
 
@@ -121,32 +123,44 @@ describe('Diagnostic test page functionality', function() {
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
     await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
-  });
 
-  afterAll(async function() {
-    await users.logout();
-  });
-
-  it('should be able to start diagnostic test', async function() {
     await classroomPage.get('math');
-    await classroomPage.takeDiagnosticTest();
+    await classroomPage.launchDiagnosticTestPage();
     await waitFor.pageToFullyLoad();
-    await diagnosticTestPage.startDiagnosticTest();
-    await explorationPlayerPage.submitAnswer('TextInput', 'correct');
   });
+
+  it(
+    'should be able to submit correct answer and get no topic recommendation',
+    async function() {
+      await diagnosticTestPage.startDiagnosticTest();
+      await explorationPlayerPage.submitAnswer('TextInput', 'correct');
+      await diagnosticTestPage.expectNumberOfRecommendedTopicsToBe(0);
+    });
 
   it(
     'should be able to skip questions and get topic recommendation',
     async function() {
-      await classroomPage.get('math');
-      await classroomPage.takeDiagnosticTest();
-      await waitFor.pageToFullyLoad();
       await diagnosticTestPage.startDiagnosticTest();
       await explorationPlayerPage.skipQuestion();
       await explorationPlayerPage.skipQuestion();
+      await diagnosticTestPage.expectNumberOfRecommendedTopicsToBe(1);
+    });
+
+  it(
+    'should be able to submit correct answer after incorrect attempt',
+    async function() {
+      await diagnosticTestPage.startDiagnosticTest();
+      // Skipping question functionality is similar to incorrect attempt.
+      await explorationPlayerPage.skipQuestion();
+      await explorationPlayerPage.submitAnswer('TextInput', 'correct');
+      await diagnosticTestPage.expectNumberOfRecommendedTopicsToBe(0);
     });
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
+  });
+
+  afterAll(async function() {
+    await users.logout();
   });
 });

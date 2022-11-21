@@ -25,9 +25,15 @@ var DiagnosticTestPage = function() {
   var newClassrooomNameInput = $('.e2e-test-new-classroom-name');
   var newClassroomUrlFragmentInput = $('.e2e-test-new-classroom-url-fragment');
   var createNewClassroomButton = $('.e2e-test-create-new-classroom');
+  var recommendedTopicSummaryTile = $(
+    '.e2e-test-recommended-topic-summary-tile');
+  var recommendedTopicSummaryTilesSelector = function() {
+    return $$('.e2e-test-recommended-topic-summary-tile');
+  };
 
   this.startDiagnosticTest = async function() {
-    await action.click('Start diagnostic test', startDiagnosticTestButton);
+    await action.click(
+      'Start diagnostic test button', startDiagnosticTestButton);
   };
 
   this.createNewClassroomConfig = async function(
@@ -47,6 +53,20 @@ var DiagnosticTestPage = function() {
     );
     await action.click(
       'Create new classroom config', createNewClassroomButton);
+  };
+
+  this.expectNumberOfRecommendedTopicsToBe = async function(count) {
+    var recommendedTopicSummaryTiles = (
+      await recommendedTopicSummaryTilesSelector());
+    if (count > 0) {
+      await waitFor.visibilityOf(
+        recommendedTopicSummaryTile,
+        'Recommended topic summary tile is not visible'
+      );
+      expect(recommendedTopicSummaryTiles.length).toEqual(count);
+    } else {
+      expect(recommendedTopicSummaryTiles.length).toEqual(0);
+    }
   };
 };
 
