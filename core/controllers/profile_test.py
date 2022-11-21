@@ -1235,7 +1235,6 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             last_edited_an_exploration=user_settings.last_edited_an_exploration,
             last_created_an_exploration=(
                 user_settings.last_created_an_exploration),
-            profile_picture_data_url=user_settings.profile_picture_data_url,
             default_dashboard=user_settings.default_dashboard,
             creator_dashboard_display_pref=(
                 user_settings.creator_dashboard_display_pref),
@@ -1297,7 +1296,6 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             last_edited_an_exploration=user_settings.last_edited_an_exploration,
             last_created_an_exploration=(
                 user_settings.last_created_an_exploration),
-            profile_picture_data_url=user_settings.profile_picture_data_url,
             default_dashboard=user_settings.default_dashboard,
             creator_dashboard_display_pref=(
                 user_settings.creator_dashboard_display_pref),

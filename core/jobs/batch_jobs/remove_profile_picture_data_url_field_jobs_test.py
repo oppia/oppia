@@ -27,6 +27,7 @@ from core.platform import models
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from mypy_imports import datastore_services
     from mypy_imports import user_models
 
 (user_models,) = models.Registry.import_models([models.Names.USER])
@@ -51,28 +52,31 @@ class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
     JOB_CLASS = (
         remove_profile_picture_data_url_field_jobs.RemoveProfilePictureFieldJob)
 
-    def setUp(self) -> None:
-        super().setUp()
-
     def test_removal_of_profile_field(self) -> None:
-        with self.swap(user_models, 'UserSettingsModel', MockUserSettingsModelWithProfilePicture):
-            self.user_1 = self.create_model(
+        with self.swap(
+            user_models, 'UserSettingsModel',
+            MockUserSettingsModelWithProfilePicture
+        ):
+            user_1 = self.create_model(
                 user_models.UserSettingsModel,
                 id='test_id_1',
                 email='test_1@example.com',
                 username='test_1',
-                roles=[feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
-                profile_picture_data_url=user_services.DEFAULT_IDENTICON_DATA_URL
+                roles=[
+                    feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
+                profile_picture_data_url=(
+                    user_services.DEFAULT_IDENTICON_DATA_URL)
             )
 
-            self.user_2 = self.create_model(
+            user_2 = self.create_model(
                 user_models.UserSettingsModel,
                 id='test_id_2',
                 email='test_2@example.com',
                 username='test_2',
-                roles=[feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
+                roles=[
+                    feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
             )
-            self.put_multi([self.user_1, self.user_2])
+            self.put_multi([user_1, user_2])
 
             self.assert_job_output_is([
                 job_run_result.JobRunResult(
