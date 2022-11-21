@@ -1165,6 +1165,18 @@ describe('Settings Tab Component', () => {
     expect(component.getLastEditedVersionNumber()).toEqual(3);
   });
 
+  it('should throw error when last edited version number is null', () => {
+    spyOn(
+      versionHistoryService, 'getBackwardMetadataDiffData'
+    ).and.returnValue({
+      oldVersionNumber: null
+    } as MetadataDiffData);
+
+    expect(
+      () =>component.getLastEditedVersionNumber()
+    ).toThrowError('Last edited version number cannot be null');
+  });
+
   it('should get the last edited committer username for exploration metadata',
     () => {
       spyOn(

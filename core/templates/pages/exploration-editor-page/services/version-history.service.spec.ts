@@ -681,7 +681,7 @@ describe('Version history service', () => {
     () => {
       expect(
         versionHistoryService
-          .getCurrentPositionInStateVersionHistoryList()).toBeNull();
+          .getCurrentPositionInStateVersionHistoryList()).toEqual(0);
 
       versionHistoryService.setCurrentPositionInStateVersionHistoryList(2);
 
@@ -694,7 +694,7 @@ describe('Version history service', () => {
     () => {
       expect(
         versionHistoryService
-          .getCurrentPositionInMetadataVersionHistoryList()).toBeNull();
+          .getCurrentPositionInMetadataVersionHistoryList()).toEqual(0);
 
       versionHistoryService.setCurrentPositionInMetadataVersionHistoryList(2);
 
