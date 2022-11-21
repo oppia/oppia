@@ -82,20 +82,15 @@ export class StateVersionHistoryModalComponent
     return this.versionHistoryService.canShowForwardStateDiffData();
   }
 
-  // In practice, the return value of the below function can never be null
-  // because it is called only when canExploreBackwardVersionHistory() returns
-  // true. If the previously edited version number is null,
-  // canExploreBackwardVersionHistory() would have returned false. Here,
-  // the return value is written as (number | null) in order to fix the
-  // typescript errors since the list called fetchedStateVersionNumbers in
-  // VersionHistoryService has type (number | null) []. Also, the return
-  // value null represents the end of version history for that particular
-  // state i.e. we have reached the end of the version history and the state
-  // was not edited in any earlier versions.
   getLastEditedVersionNumber(): number {
     const lastEditedVersionNumber =
       this.versionHistoryService.getBackwardStateDiffData().oldVersionNumber;
     if (lastEditedVersionNumber === null) {
+      // A null value for lastEditedVersionNumber marks the end of the version
+      // history for a particular state. This is impossible here because this
+      // function 'getLastEditedVersionNumber' is called only when
+      // canExploreBackwardVersionHistory() returns true. This function will
+      // not return true when we reach the end of the version history list.
       throw new Error('Last edited version number cannot be null');
     }
     return lastEditedVersionNumber;
@@ -106,13 +101,15 @@ export class StateVersionHistoryModalComponent
       this.versionHistoryService.getBackwardStateDiffData().committerUsername);
   }
 
-  // Returns the next version number at which the state was modified.
-  // The explanation for return type being (number | null) is same as explained
-  // above the function getLastEditedVersionNumber().
   getNextEditedVersionNumber(): number {
     const nextEditedVersionNumber =
       this.versionHistoryService.getForwardStateDiffData().oldVersionNumber;
     if (nextEditedVersionNumber === null) {
+      // A null value for nextEditedVersionNumber marks the end of the version
+      // history for a particular state. This is impossible here because this
+      // function 'getNextEditedVersionNumber' is called only when
+      // canExploreForwardVersionHistory() returns true. This function will
+      // not return true when we reach the end of the version history list.
       throw new Error('Next edited version number cannot be null');
     }
     return nextEditedVersionNumber;
@@ -133,6 +130,10 @@ export class StateVersionHistoryModalComponent
     if (diffData.newState) {
       this.newState = diffData.newState;
       if (diffData.newState.name === null) {
+        // The state name is null before having a state
+        // (Please refer StateObjectFactory). This cannot happen here because
+        // all the states will be properly defined and will have a name during
+        // version history navigation.
         throw new Error('State name cannot be null');
       }
       this.newStateName = diffData.newState.name;
@@ -140,6 +141,10 @@ export class StateVersionHistoryModalComponent
     if (diffData.oldState) {
       this.oldState = diffData.oldState;
       if (diffData.oldState.name === null) {
+        // The state name is null before having a state
+        // (Please refer StateObjectFactory). This cannot happen here because
+        // all the states will be properly defined and will have a name during
+        // version history navigation.
         throw new Error('State name cannot be null');
       }
       this.oldStateName = diffData.oldState.name;
@@ -169,6 +174,10 @@ export class StateVersionHistoryModalComponent
     if (diffData.newState) {
       this.newState = diffData.newState;
       if (diffData.newState.name === null) {
+        // The state name is null before having a state
+        // (Please refer StateObjectFactory). This cannot happen here because
+        // all the states will be properly defined and will have a name during
+        // version history navigation.
         throw new Error('State name cannot be null');
       }
       this.newStateName = diffData.newState.name;
@@ -176,6 +185,10 @@ export class StateVersionHistoryModalComponent
     if (diffData.oldState) {
       this.oldState = diffData.oldState;
       if (diffData.oldState.name === null) {
+        // The state name is null before having a state
+        // (Please refer StateObjectFactory). This cannot happen here because
+        // all the states will be properly defined and will have a name during
+        // version history navigation.
         throw new Error('State name cannot be null');
       }
       this.oldStateName = diffData.oldState.name;
@@ -197,11 +210,20 @@ export class StateVersionHistoryModalComponent
     }
     const diffData = this.versionHistoryService.getBackwardStateDiffData();
     if (!diffData.oldState) {
+      // The state data for the previous version should be available for
+      // fetching the next element of the version history list. Here, it will
+      // always be available and hence this error will never be thrown because
+      // we check whether the diffData.oldVersionNumber is null or not.
+      // If it is null, we do not fetch anything.
       throw new Error(
         'The state data for the previous version is not available.'
       );
     }
     if (diffData.oldState.name === null) {
+      // The state name is null before having a state
+      // (Please refer StateObjectFactory). This cannot happen here because
+      // all the states will be properly defined and will have a name during
+      // version history navigation.
       throw new Error(
         'The name of the state in the previous version was not specified.'
       );
@@ -221,7 +243,7 @@ export class StateVersionHistoryModalComponent
             .incrementCurrentPositionInStateVersionHistoryList();
         } else {
           this.alertsService.addWarning(
-            'Could not fetch the version history data due to some reasons. ' +
+            'Could not fetch the version history data. ' +
             'Please reload the page and try again.');
         }
       });

@@ -41,19 +41,15 @@ export class StateVersionHistoryComponent {
     );
   }
 
-  // In practice, the return value of the below function can never be null
-  // because it is called only when canShowExploreVersionHistoryButton()
-  // returns true. If the previously edited version number is null,
-  // canShowExploreVersionHistoryButton() would have returned false. Here,
-  // the return value is written as (number | null) in order to fix the
-  // typescript errors. Also, the return value null represents the end of
-  // version history for that particular state i.e. we have reached the end
-  // of the version history and the state was not edited in any
-  // earlier versions.
   getLastEditedVersionNumber(): number {
     const lastEditedVersionNumber =
       this.versionHistoryService.getBackwardStateDiffData().oldVersionNumber;
     if (lastEditedVersionNumber === null) {
+      // A null value for lastEditedVersionNumber marks the end of the version
+      // history for a particular state. This is impossible here because this
+      // function 'getLastEditedVersionNumber' is called only when
+      // canShowExploreVersionHistoryButton() returns true. This function will
+      // not return true when we reach the end of the version history list.
       throw new Error('The value of last edited version number cannot be null');
     }
     return lastEditedVersionNumber;
@@ -78,6 +74,10 @@ export class StateVersionHistoryComponent {
     if (stateDiffData.newState) {
       modalRef.componentInstance.newState = stateDiffData.newState;
       if (stateDiffData.newState.name === null) {
+        // The state name is null before having a state
+        // (Please refer StateObjectFactory). This cannot happen here because
+        // all the states will be properly defined and will have a name during
+        // version history navigation.
         throw new Error('State name cannot be null');
       }
       modalRef.componentInstance.newStateName = stateDiffData.newState.name;
@@ -85,6 +85,10 @@ export class StateVersionHistoryComponent {
     if (stateDiffData.oldState) {
       modalRef.componentInstance.oldState = stateDiffData.oldState;
       if (stateDiffData.oldState.name === null) {
+        // The state name is null before having a state
+        // (Please refer StateObjectFactory). This cannot happen here because
+        // all the states will be properly defined and will have a name during
+        // version history navigation.
         throw new Error('State name cannot be null');
       }
       modalRef.componentInstance.oldStateName = stateDiffData.oldState.name;

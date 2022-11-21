@@ -273,6 +273,11 @@ export class SettingsTabComponent
       .getBackwardMetadataDiffData()
       .oldVersionNumber;
     if (lastEditedVersionNumber === null) {
+      // A null value for lastEditedVersionNumber marks the end of the version
+      // history for the exploration metadata. This is impossible here because
+      // this function 'getLastEditedVersionNumber' is called only when
+      // canShowExploreVersionHistoryButton() returns true. This function will
+      // not return true when we reach the end of the version history list.
       throw new Error('Last edited version number cannot be null');
     }
     return lastEditedVersionNumber;
