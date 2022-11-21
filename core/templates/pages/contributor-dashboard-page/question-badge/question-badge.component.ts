@@ -26,9 +26,9 @@ import { AppConstants } from 'app.constants';
 })
 export class QuestionBadgeComponent {
   @Input() type!: string;
-  @Input() contributionCount: number;
-  @Input() isUnlocked: boolean;
-  contributionTypeText: string;
+  @Input() contributionCount!: number;
+  @Input() isUnlocked!: boolean;
+  contributionTypeText!: string;
 
   constructor() {}
 

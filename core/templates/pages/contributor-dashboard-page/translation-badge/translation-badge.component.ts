@@ -26,10 +26,10 @@ import { AppConstants } from 'app.constants';
 })
 export class TranslationBadgeComponent {
   @Input() type!: string;
-  @Input() contributionCount: number;
+  @Input() contributionCount!: number;
   @Input() language!: string;
-  @Input() isUnlocked: boolean;
-  contributionTypeText: string;
+  @Input() isUnlocked!: boolean;
+  contributionTypeText!: string;
 
   fontSize: string = '13px';
   lineHeight: string = '20px';
