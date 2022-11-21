@@ -55,7 +55,43 @@ INJECTABLES_TO_IGNORE: Final = [
     'CanAccessSplashPageGuard',
 ]
 
-FILES_CONTAIN_UNKNOWN_TYPE: Final = []
+FILES_CONTAIN_UNKNOWN_TYPE: Final = [
+    'core/templates/pages/exploration-player-page/modals/display-solution-modal.component.spec.ts',
+    'extensions/objects/templates/music-phrase-editor.component.ts',
+    'core/templates/services/platform-feature.service.ts',
+    'core/templates/pages/exploration-editor-page/modal-templates/post-publish-modal.component.spec.ts',
+    'extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.spec.ts',
+    'core/templates/services/speech-synthesis-chunker.service.ts',
+    'core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts',
+    'core/templates/components/rubrics-editor/rubrics-editor.component.spec.ts',
+    'core/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.ts',
+    'extensions/interactions/MathEquationInput/directives/oppia-interactive-math-equation-input.component.ts',
+    'extensions/objects/templates/parameter-name-editor.component.spec.ts',
+    'extensions/objects/templates/subtitled-html-editor.component.ts',
+    'extensions/objects/templates/position-of-terms-editor.component.ts',
+    'core/templates/components/forms/schema-based-editors/schema-based-list-editor.component.ts',
+    'core/templates/pages/skill-editor-page/skill-preview-tab/skill-preview-tab.component.spec.ts',
+    'extensions/objects/templates/ratio-expression-editor.component.ts',
+    'core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-data.service.ts',
+    'core/templates/pages/moderator-page/moderator-page.component.spec.ts',
+    'core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts',
+    'extensions/interactions/NumericExpressionInput/directives/oppia-interactive-numeric-expression-input.component.ts',
+    'core/templates/pages/exploration-editor-page/services/exploration-diff.service.spec.ts',
+    'core/templates/services/request-interceptor.service.ts',
+    'core/templates/pages/topics-and-skills-dashboard-page/skills-list/skills-list.component.spec.ts',
+    'core/templates/pages/exploration-player-page/modals/display-hint-modal.component.spec.ts',
+    'core/templates/components/forms/validators/schema-validators.spec.ts',
+    'core/templates/pages/exploration-editor-page/services/exploration-property.service.ts',
+    'extensions/interactions/SetInput/directives/oppia-interactive-set-input.component.ts',
+    'extensions/interactions/NumberWithUnits/directives/number-with-units-validation.service.spec.ts',
+    'extensions/interactions/GraphInput/directives/graph-input-validation.service.spec.ts',
+    'core/templates/App.ts',
+    'core/templates/components/forms/schema-based-editors/schema-based-list-editor.component.spec.ts',
+    'extensions/objects/templates/image-editor.component.spec.ts',
+    'extensions/objects/templates/coord-two-dim-editor.component.spec.ts',
+    'extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.component.ts',
+    'core/templates/domain/exploration/stats-reporting-backend-api.service.ts',
+]
 
 def _parse_js_or_ts_file(
     filepath: str, file_content: str, comment: bool = False
@@ -526,7 +562,7 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                     comment_before_unknown_type = False
 
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, sorted(error_messages), sorted(error_messages))
 
 class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
     """Manages all the third party Python linting functions."""
