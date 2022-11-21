@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import datetime
-import json
 import re
 
 from core import feconf
@@ -382,14 +381,14 @@ class FeedbackMessageReference:
             domain object.
         """
         feedback_properties = [
-            'entity_type', 'entity_id', 
+            'entity_type', 'entity_id',
             'thread_id', 'message_id']
         for feedback_property in feedback_properties:
             if feedback_property not in reference_dict:
                 raise utils.ValidationError(
                     '%s not in reference dict.' % (
                         feedback_property))
-                        
+
         return cls(
             reference_dict['entity_type'],
             reference_dict['entity_id'],

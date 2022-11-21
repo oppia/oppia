@@ -74,6 +74,7 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
 
 class ContributorDashboardAchievementEmailHandler(base.BaseHandler):
     """Handler task of sending email of contributor dashboard achievements."""
+
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
@@ -152,8 +153,8 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
-        user_id = self.normalized_payload.get("user_id")
-        reference_dict = self.normalized_payload.get("reference_dict")
+        user_id = self.normalized_payload.get('user_id')
+        reference_dict = self.normalized_payload.get('reference_dict')
 
         message = feedback_services.get_message(
             reference_dict['thread_id'], reference_dict['message_id'])
