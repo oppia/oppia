@@ -65,7 +65,9 @@ export class VersionHistoryService {
   // fetchedStateVersionNumbers, fetchedMetadataVersionNumbers etc. These
   // variables are initialized as zero inside the resetStateVersionHistory and
   // resetMetadataVersionHistory functions when a state editor or the
-  // exploration settings tab is opened by a user.
+  // exploration settings tab is opened by a user. This is because the item
+  // that is shown to a user by default is the first item in each of these
+  // lists.
   currentPositionInStateVersionHistoryList: number = 0;
   currentPositionInMetadataVersionHistoryList: number = 0;
 
