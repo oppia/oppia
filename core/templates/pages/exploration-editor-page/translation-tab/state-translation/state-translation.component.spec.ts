@@ -130,6 +130,9 @@ describe('State translation component', () => {
           },
           rows: {
             value: 1
+          },
+          catchMisspellings: {
+            value: false
           }
         },
         answer_groups: [{
@@ -1487,6 +1490,9 @@ describe('State translation component', () => {
           },
           rows: {
             value: 1
+          },
+          catchMisspellings: {
+            value: false
           }
         },
         answer_groups: [{

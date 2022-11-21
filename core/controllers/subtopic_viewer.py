@@ -23,8 +23,12 @@ from core.controllers import base
 from core.domain import subtopic_page_services
 from core.domain import topic_fetchers
 
+from typing import Dict
 
-class SubtopicViewerPage(base.BaseHandler):
+
+class SubtopicViewerPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Renders the subtopic viewer page."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -43,17 +47,18 @@ class SubtopicViewerPage(base.BaseHandler):
             }
         }
     }
-
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_subtopic_viewer_page
-    def get(self, *args):
+    def get(self, *args: str) -> None:
         """Handles GET requests."""
 
         self.render_template('subtopic-viewer-page.mainpage.html')
 
 
-class SubtopicPageDataHandler(base.BaseHandler):
+class SubtopicPageDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Manages the data that needs to be displayed to a learner on the
     subtopic page.
     """
@@ -75,12 +80,10 @@ class SubtopicPageDataHandler(base.BaseHandler):
             }
         },
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_subtopic_viewer_page
-    def get(self, topic_name, subtopic_id):
+    def get(self, topic_name: str, subtopic_id: int) -> None:
         """Handles GET requests.
 
         Args:
