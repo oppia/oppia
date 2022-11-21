@@ -436,7 +436,7 @@ describe('Question Suggestion Review Modal component', () => {
             }) as NgbModalRef;
       });
 
-      component.suggestion.change.skill_id = null;
+      component.suggestion.change.skill_id = undefined;
       expect(() => {
         component.edit();
         tick();
