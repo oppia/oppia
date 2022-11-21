@@ -25,12 +25,12 @@
   // To keep track of next exploration id to be replaced.
   var placeholderExplorationId = 'idToBeReplaced';
   var onChangeExpId = function() {
-    var newExplorationId = $.find(
+    var newExplorationId = $(
       '.e2e-test-exploration-id-input-field').val();
     $('div > iframe').each(function(index) {
-      var src = $.find(this).attr('src');
-      src = $.find(src).replace(placeholderExplorationId, newExplorationId);
-      $.find(this).attr('src', $.find(src));
+      var src = $(this).attr('src');
+      src = src.replace(placeholderExplorationId, newExplorationId);
+      $(this).attr('src', $.find(src));
     });
     placeholderExplorationId = newExplorationId;
 
