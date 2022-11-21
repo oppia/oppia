@@ -63,7 +63,7 @@ export class ContributorBadgeComponent {
   questionSubmissionBadges: Badge[] = [];
   questionReviewBadges: Badge[] = [];
   questionCorrectionBadges: Badge[] = [];
-  selectedLanguage: string = '';
+  selectedLanguage!: string;
   totalQuestionStats: ContributionCounts = {
     submissions: 0,
     reviews: 0,
