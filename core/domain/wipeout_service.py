@@ -383,11 +383,16 @@ def _delete_profile_picture(username: str) -> None:
     Args:
         username: str. The username of the user.
     """
+    if username is None:
+        return
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
     filename_png = 'profile_picture.png'
     filename_webp = 'profile_picture.webp'
-    fs.delete(filename_png)
-    fs.delete(filename_webp)
+    if fs.isfile(filename_png):
+        fs.delete(filename_png)
+
+    if fs.isfile(filename_webp):
+        fs.delete(filename_webp)
 
 
 def delete_user(
@@ -406,7 +411,7 @@ def delete_user(
     auth_services.delete_external_auth_associations(user_id)
 
     # Remove profile picture.
-    user_settings_model = user_services.get_user_settings(user_id)
+    user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
     username = user_settings_model.username
     _delete_profile_picture(username)
 
@@ -491,6 +496,8 @@ def _verify_profile_picture_is_deleted(username: str) -> None:
     Args:
         username: str. The username of the user.
     """
+    if username is None:
+        return
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
     filename_png = 'profile_picture.png'
     filename_webp = 'profile_picture.webp'
@@ -519,7 +526,7 @@ def verify_user_deleted(
         return False
 
     # Verify if user is deleted.
-    user_settings_model = user_services.get_user_settings(user_id)
+    user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
     username = user_settings_model.username
     _verify_profile_picture_is_deleted(username)
 

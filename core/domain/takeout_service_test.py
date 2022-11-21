@@ -19,6 +19,7 @@ from __future__ import annotations
 import datetime
 import json
 import logging
+import os
 
 from core import feconf
 from core import utils
@@ -26,6 +27,7 @@ from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import fs_services
 from core.domain import rights_domain
 from core.domain import stats_domain
 from core.domain import takeout_domain
@@ -436,6 +438,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ]
     FIRST_CONTRIBUTION_DATE: Final = datetime.datetime(2021, 5, 20)
     LAST_CONTRIBUTION_DATE: Final = datetime.datetime(2022, 5, 20)
+    PROFILE_PICTURE_DATA: Final = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAIAAACAbBMhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAySURBVBhXY/iPDYBEV6xY0draCuFDAEgUKMTAANUEUYFuAkQFihIIGwigosiG/P//HwD5HmjphyAmJQAAAABJRU5ErkJggg%3D%3D' # pylint: disable=line-too-long
 
     def set_up_non_trivial(self) -> None:
         """Set up all models for use in testing.
@@ -1038,7 +1041,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'last_logged_in_msec': None,
             'last_edited_an_exploration_msec': None,
             'last_created_an_exploration_msec': None,
-            'profile_picture_filename': None,
+            'profile_picture_data_url': None,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
             'user_bio': None,
@@ -1596,7 +1599,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'last_logged_in_msec': self.GENERIC_EPOCH,
             'last_edited_an_exploration_msec': self.GENERIC_EPOCH,
             'last_created_an_exploration_msec': self.GENERIC_EPOCH,
-            'profile_picture_filename': 'user_settings_profile_picture.png',
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
             'user_bio': self.GENERIC_USER_BIO,
@@ -1919,6 +1921,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'blog_author_details': expected_blog_author_details
         }
 
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.GENERIC_USERNAME)
+        fs.commit('profile_picture.png', raw_image, mimetype='image/png')
+
         user_takeout_object = takeout_service.export_data_for_user(
             self.USER_ID_1)
         observed_data = user_takeout_object.user_data
@@ -1930,7 +1940,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             json.loads(observed_json), json.loads(expected_json))
         expected_images = [
             takeout_domain.TakeoutImage(
-                self.GENERIC_IMAGE_URL, 'user_settings_profile_picture.png')
+                self.PROFILE_PICTURE_DATA, 'user_settings_profile_picture.png')
         ]
         self.assertEqual(len(expected_images), len(observed_images))
         for i, _ in enumerate(expected_images):
@@ -2003,6 +2013,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'collection_progress': collection_progress_data,
             'story_progress': story_progress_data,
         }
+
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.GENERIC_USERNAME)
+        fs.commit('profile_picture.png', raw_image, mimetype='image/png')
 
         user_takeout_object = takeout_service.export_data_for_user(
             self.USER_ID_1)

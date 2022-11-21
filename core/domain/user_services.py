@@ -1428,7 +1428,7 @@ def update_profile_picture_data_url(
     image.save(output, 'webp')
     webp_binary = output.getvalue()
     filename_webp = 'profile_picture.webp'
-    fs.commit(filename_webp, webp_binary, mimetype='image/png')
+    fs.commit(filename_webp, webp_binary, mimetype='image/webp')
 
 
 def update_user_bio(user_id: str, user_bio: str) -> None:

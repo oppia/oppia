@@ -19,6 +19,7 @@ from __future__ import annotations
 import datetime
 import io
 import logging
+import os
 import re
 import zipfile
 
@@ -27,6 +28,7 @@ from core import utils
 from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import fs_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -382,19 +384,22 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         user_settings = user_services.get_user_settings(self.owner_id)
-        assert user_settings.profile_picture_data_url is not None
-        self.assertTrue(test_utils.check_image_png_or_webp(
-            user_settings.profile_picture_data_url))
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, user_settings.username)
+        fs.commit('profile_picture.png', raw_image, mimetype='image/png')
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
             {
                 'update_type': 'profile_picture_data_url',
-                'data': 'new_profile_picture_data_url'},
+                'data': user_services.DEFAULT_IDENTICON_DATA_URL},
             csrf_token=csrf_token)
-        user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            user_settings.profile_picture_data_url,
-            'new_profile_picture_data_url')
+        profile_data = utils.convert_png_binary_to_data_url(
+            fs.get('profile_picture.png'))
+        self.assertEqual(profile_data, user_services.DEFAULT_IDENTICON_DATA_URL)
         self.logout()
 
     def test_can_update_default_dashboard(self) -> None:
@@ -1266,6 +1271,14 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 user_settings.preferred_translation_language_code),
             deleted=user_settings.deleted
         ).put()
+
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, user_settings.username)
+        fs.commit('profile_picture.png', raw_image, mimetype='image/png')
 
         time_swap = self.swap(
             user_services, 'record_user_logged_in', lambda *args: None)

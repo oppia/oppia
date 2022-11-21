@@ -74,6 +74,8 @@ class EmulatorBlob:
         # this set. Only then can this exception be removed.
         elif content_type == 'audio/mp3':
             self._content_type = content_type
+        elif content_type == 'image/webp':
+            self._content_type = content_type
         else:
             if mimetypes.guess_extension(content_type) is None:
                 raise Exception('Content type contains unknown MIME type.')
