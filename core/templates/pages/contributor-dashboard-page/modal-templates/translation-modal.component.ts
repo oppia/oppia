@@ -407,7 +407,7 @@ export class TranslationModalComponent {
   getElementAttributeTexts(
       elements: HTMLCollectionOf<Element>, type: string): string[] {
     const textWrapperLength = 6;
-    let attributes = Array.from(elements, function(element: Element) {
+    const attributes = Array.from(elements, function(element: Element) {
       // A sample element would be as <oppia-noninteractive-image alt-with-value
       // ="&amp;quot;Image description&amp;quot;" caption-with-value=
       // "&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;

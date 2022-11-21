@@ -417,6 +417,32 @@ describe('Question Suggestion Review Modal component', () => {
       expect(ngbModal.open).toHaveBeenCalled();
     }));
 
+    it('should throw error edit if skill id is null', fakeAsync(() => {
+      class MockNgbModalRef {
+        componentInstance = {
+          suggestionId: suggestionId,
+          question: question,
+          questionId: '',
+          questionStateData: question.getStateData(),
+          skill: null,
+          skillDifficulty: 0.3
+        };
+      }
+
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return (
+            { componentInstance: MockNgbModalRef,
+              result: Promise.resolve()
+            }) as NgbModalRef;
+      });
+
+      component.suggestion.change.skill_id = null;
+      expect(() => {
+        component.edit();
+        tick();
+      }).toThrowError();
+    }));
+
     it('should open edit question modal when clicking on' +
       ' edit button', fakeAsync(() => {
       spyOn(contextService, 'resetImageSaveDestination').and.stub();

@@ -46,7 +46,7 @@ interface SkillRubrics {
   explanations: string[] | string;
 }
 
-export interface ActiveContributionDetailsDict {
+interface ActiveContributionDetailsDict {
   skill_description: string;
   skill_rubrics: SkillRubrics[];
   'chapter_title': string;
@@ -154,42 +154,43 @@ export class QuestionSuggestionReviewModalComponent
   edit(): void {
     this.ngbActiveModal.dismiss();
     const skillId = this.suggestion.change.skill_id;
-    if (skillId) {
-      this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
-        const modalRef = this.ngbModal.open(
-          QuestionSuggestionEditorModalComponent, {
-            size: 'lg',
-            backdrop: 'static',
-            keyboard: false,
-          });
+    if (!skillId) {
+      throw new Error('Skill ID is null.');
+    }
+    this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
+      const modalRef = this.ngbModal.open(
+        QuestionSuggestionEditorModalComponent, {
+          size: 'lg',
+          backdrop: 'static',
+          keyboard: false,
+        });
 
-        modalRef.componentInstance.suggestionId = this.suggestionId;
-        modalRef.componentInstance.question = this.question;
-        modalRef.componentInstance.questionId = '';
-        modalRef.componentInstance.questionStateData = (
-          this.question.getStateData());
-        modalRef.componentInstance.skill = skillDict.skill;
-        modalRef.componentInstance.skillDifficulty = this.skillDifficulty;
+      modalRef.componentInstance.suggestionId = this.suggestionId;
+      modalRef.componentInstance.question = this.question;
+      modalRef.componentInstance.questionId = '';
+      modalRef.componentInstance.questionStateData = (
+        this.question.getStateData());
+      modalRef.componentInstance.skill = skillDict.skill;
+      modalRef.componentInstance.skillDifficulty = this.skillDifficulty;
 
-        modalRef.result.then(() => {
-          this.editSuggestionEmitter.emit(
-            {
-              suggestionId: this.suggestionId,
-              suggestion: this.suggestion,
-              reviewable: this.reviewable,
-              question: this.question
-            });
-        }, () => {
-          this.contextService.resetImageSaveDestination();
-          this.editSuggestionEmitter.emit({
+      modalRef.result.then(() => {
+        this.editSuggestionEmitter.emit(
+          {
             suggestionId: this.suggestionId,
             suggestion: this.suggestion,
             reviewable: this.reviewable,
-            question: undefined
+            question: this.question
           });
+      }, () => {
+        this.contextService.resetImageSaveDestination();
+        this.editSuggestionEmitter.emit({
+          suggestionId: this.suggestionId,
+          suggestion: this.suggestion,
+          reviewable: this.reviewable,
+          question: undefined
         });
       });
-    }
+    });
   }
 
   reject(): void {
@@ -249,11 +250,11 @@ export class QuestionSuggestionReviewModalComponent
     this.showQuestion = false;
     this.skippedContributionIds.push(this.currentSuggestionId);
 
-    const CurrentSuggestionId = this.remainingContributionIdStack.pop();
-    if (CurrentSuggestionId === undefined) {
+    const currentSuggestionId = this.remainingContributionIdStack.pop();
+    if (currentSuggestionId === undefined) {
       throw new Error('currentSuggestionId should not be undefined.');
     }
-    this.currentSuggestionId = CurrentSuggestionId;
+    this.currentSuggestionId = currentSuggestionId;
 
     this.refreshActiveContributionState();
   }
