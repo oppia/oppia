@@ -123,6 +123,7 @@ describe('Diagnostic test page functionality', function() {
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
     await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
+    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
 
     await classroomPage.get('math');
     await classroomPage.launchDiagnosticTestPage();

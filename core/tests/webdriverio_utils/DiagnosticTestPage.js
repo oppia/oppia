@@ -31,6 +31,16 @@ var DiagnosticTestPage = function() {
   var recommendedTopicSummaryTilesSelector = function() {
     return $$('.e2e-test-recommended-topic-summary-tile');
   };
+  var classroomTileSelector = function() {
+    return $$('.e2e-test-classroom-tile');
+  };
+  var editClassroomConfigButton = $('.e2e-test-edit-classroom-config-button');
+  var addTopicToClassroomButton = $('.e2e-test-add-topic-to-classroom-button');
+  var addTopicToClassroomInput = $('.e2e-test-add-topic-to-classroom-input');
+  var submitTopicIdToClassroomButton = $(
+    '.e2e-test-submit-topic-id-to-classroom-button');
+  var saveClassroomConfigButton = $('.e2e-test-save-classroom-config-button');
+  var classroomTileContainerSelector = $('.e2e-test-classroom-tile-container');
 
   this.startDiagnosticTest = async function() {
     await waitFor.pageToFullyLoad();
@@ -80,6 +90,54 @@ var DiagnosticTestPage = function() {
     );
     await action.click(
       'Create new classroom config', createNewClassroomButton);
+  };
+
+  this.addTopicIdToClassroomConfig = async function(topicId, index) {
+    var classroomTiles = await classroomTileSelector();
+
+    await waitFor.visibilityOf(
+      classroomTileContainerSelector,
+      'Classroom tile is not visible'
+    );
+    await action.click(
+      'Classroom config tile', classroomTiles[index]);
+
+    await waitFor.elementToBeClickable(
+      editClassroomConfigButton,
+      'Edit classroom config button is not clickable');
+    await action.click(
+      'Edit classroom config button', editClassroomConfigButton);
+
+    await waitFor.elementToBeClickable(
+      addTopicToClassroomButton,
+      'Add topic to classroom button is not clickable');
+    await action.click(
+      'Add topic to classroom button', addTopicToClassroomButton);
+
+    await waitFor.visibilityOf(
+      addTopicToClassroomInput,
+      'Add topic to classroom input field is not visible');
+    await action.setValue(
+      'Add topic ID to classroom input field',
+      addTopicToClassroomInput,
+      topicId
+    );
+
+    await waitFor.elementToBeClickable(
+      submitTopicIdToClassroomButton,
+      'Submit topic ID to classroom button is not clickable'
+    );
+    await action.click(
+      'Add topic ID to classroom submit button',
+      submitTopicIdToClassroomButton
+    );
+
+    await waitFor.elementToBeClickable(
+      saveClassroomConfigButton,
+      'Save classroom config button is not clickable'
+    );
+    await action.click(
+      'Save classroom config button', saveClassroomConfigButton);
   };
 
   this.expectNumberOfRecommendedTopicsToBe = async function(count) {
