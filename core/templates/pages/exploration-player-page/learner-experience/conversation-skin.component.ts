@@ -173,7 +173,7 @@ export class ConversationSkinComponent {
   // question player, and exploration player page.
   feedbackIsEnabled: boolean = true;
   learnerCanOnlyAttemptQuestionOnce: boolean = false;
-  inputOutputHistoryIsShown: boolean = false;
+  inputOutputHistoryIsShown: boolean = true;
   navigationThroughCardHistoryIsEnabled: boolean = true;
   checkpointCelebrationModalIsEnabled: boolean = true;
   skipButtonIsShown: boolean = false;
@@ -484,7 +484,7 @@ export class ConversationSkinComponent {
       if (this.diagnosticTestTopicTrackerModel) {
         this.feedbackIsEnabled = false;
         this.learnerCanOnlyAttemptQuestionOnce = true;
-        this.inputOutputHistoryIsShown = true;
+        this.inputOutputHistoryIsShown = false;
         this.navigationThroughCardHistoryIsEnabled = false;
         this.checkpointCelebrationModalIsEnabled = false;
         this.skipButtonIsShown = true;
