@@ -411,6 +411,7 @@ describe('Question Suggestion Review Modal component', () => {
             }) as NgbModalRef;
       });
 
+      component.suggestion.change.skill_id = 'skill_1';
       component.edit();
       tick();
 
@@ -464,6 +465,7 @@ describe('Question Suggestion Review Modal component', () => {
             }) as NgbModalRef;
       });
 
+      component.suggestion.change.skill_id = 'skill_1';
       component.edit();
       tick();
 
@@ -491,6 +493,7 @@ describe('Question Suggestion Review Modal component', () => {
             }) as NgbModalRef;
       });
 
+      component.suggestion.change.skill_id = 'skill_1';
       component.edit();
       tick();
 
