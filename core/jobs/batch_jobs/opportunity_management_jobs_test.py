@@ -26,7 +26,7 @@ from core.jobs.batch_jobs import opportunity_management_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Final, Type
+from typing import Dict, Final, List, Type, Union
 
 MYPY = False
 if MYPY: # pragma: no cover

@@ -71,25 +71,26 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'content_0',
             'html': '<p>state content html</p>'
         }
-        state_customization_args_dict: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], bool]]
-        ] = {
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>state customization arg html 1</p>'
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>state customization arg html 2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>state customization arg html 3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>state customization arg html 4</p>'
+            }
+        ]
+        state_customization_args_dict: (
+            state_domain.CustomizationArgsDictType
+        ) = {
             'choices': {
-                'value': [
-                    {
-                        'content_id': 'ca_choices_0',
-                        'html': '<p>state customization arg html 1</p>'
-                    }, {
-                        'content_id': 'ca_choices_1',
-                        'html': '<p>state customization arg html 2</p>'
-                    }, {
-                        'content_id': 'ca_choices_2',
-                        'html': '<p>state customization arg html 3</p>'
-                    }, {
-                        'content_id': 'ca_choices_3',
-                        'html': '<p>state customization arg html 4</p>'
-                    }
-                ]
+                'value': choices_subtitled_dicts
             },
             'allowMultipleItemsInSamePosition': {
                 'value': True
@@ -296,9 +297,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>'
             }
         }
-        state_interaction_cust_args: Dict[
-            str, Dict[str, Union[Dict[str, str], int]]
-        ] = {
+        state_interaction_cust_args: state_domain.CustomizationArgsDictType = {
             'placeholder': {
                 'value': {
                     'content_id': 'ca_placeholder_0',
@@ -359,8 +358,23 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>init_state customization arg html 1</p>'
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>init_state customization arg html 2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>init_state customization arg html 3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>init_state customization arg html 4</p>'
+            },
+        ]
         state_customization_args_dict: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], int]]
+            str, Dict[str, Union[int, List[state_domain.SubtitledHtmlDict]]]
         ] = {
             'maxAllowableSelectionCount': {
                 'value': 1
@@ -369,21 +383,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'value': 1
             },
             'choices': {
-                'value': [
-                    {
-                        'content_id': 'ca_choices_0',
-                        'html': '<p>init_state customization arg html 1</p>'
-                    }, {
-                        'content_id': 'ca_choices_1',
-                        'html': '<p>init_state customization arg html 2</p>'
-                    }, {
-                        'content_id': 'ca_choices_2',
-                        'html': '<p>init_state customization arg html 3</p>'
-                    }, {
-                        'content_id': 'ca_choices_3',
-                        'html': '<p>init_state customization arg html 4</p>'
-                    },
-                ]
+                'value': choices_subtitled_dicts
             }
         }
         state_answer_group = state_domain.AnswerGroup(
@@ -602,13 +602,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         state.update_interaction_id('ItemSelectionInput')
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected content id to be a string, received None'
         ):
             state.update_interaction_customization_args(
-                state_customization_args_dict)
+                state_customization_args_dict) # type: ignore[arg-type]
 
     def test_rule_spec_with_html_having_invalid_input_variable(self) -> None:
         """Test the method for extracting all the HTML from a state
@@ -634,8 +637,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [],
             None
         )
+
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>init_state customization arg html 1</p>'
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>init_state customization arg html 2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>init_state customization arg html 3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>init_state customization arg html 4</p>'
+            }
+        ]
+
         state_customization_args_dict: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], int]]
+            str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], int]]
         ] = {
             'maxAllowableSelectionCount': {
                 'value': 1
@@ -644,21 +664,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'value': 1
             },
             'choices': {
-                'value': [
-                    {
-                        'content_id': 'ca_choices_0',
-                        'html': '<p>init_state customization arg html 1</p>'
-                    }, {
-                        'content_id': 'ca_choices_1',
-                        'html': '<p>init_state customization arg html 2</p>'
-                    }, {
-                        'content_id': 'ca_choices_2',
-                        'html': '<p>init_state customization arg html 3</p>'
-                    }, {
-                        'content_id': 'ca_choices_3',
-                        'html': '<p>init_state customization arg html 4</p>'
-                    }
-                ]
+                'value': choices_subtitled_dicts
             }
         }
 
@@ -705,25 +711,26 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>state customization arg html 1</p>'
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>state customization arg html 2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>state customization arg html 3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>state customization arg html 4</p>'
+            }
+        ]
         state_customization_args_dict: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], bool]]
+            str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], bool]]
         ] = {
             'choices': {
-                'value': [
-                    {
-                        'content_id': 'ca_choices_0',
-                        'html': '<p>state customization arg html 1</p>'
-                    }, {
-                        'content_id': 'ca_choices_1',
-                        'html': '<p>state customization arg html 2</p>'
-                    }, {
-                        'content_id': 'ca_choices_2',
-                        'html': '<p>state customization arg html 3</p>'
-                    }, {
-                        'content_id': 'ca_choices_3',
-                        'html': '<p>state customization arg html 4</p>'
-                    }
-                ]
+                'value': choices_subtitled_dicts
             },
             'allowMultipleItemsInSamePosition': {
                 'value': False
@@ -1399,6 +1406,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': html_with_old_math_schema
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>4</p>'
+            }
+        ]
         state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content_0', 'html': 'Hello!'
@@ -1430,19 +1452,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'customization_args': {
                     'choices': {
-                        'value': [{
-                            'content_id': 'ca_choices_0',
-                            'html': html_with_old_math_schema
-                        }, {
-                            'content_id': 'ca_choices_1',
-                            'html': '<p>2</p>'
-                        }, {
-                            'content_id': 'ca_choices_2',
-                            'html': '<p>3</p>'
-                        }, {
-                            'content_id': 'ca_choices_3',
-                            'html': '<p>4</p>'
-                        }]
+                        'value': choices_subtitled_dicts
                     },
                     'allowMultipleItemsInSamePosition': {'value': True}
                 },
@@ -1663,6 +1673,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>init_state customization arg html 1</p>'
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': html_with_old_math_schema
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>init_state customization arg html 3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>init_state customization arg html 4</p>'
+            }
+        ]
         state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content_0', 'html': 'Hello!'
@@ -1713,19 +1738,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'value': 1
                     },
                     'choices': {
-                        'value': [{
-                            'content_id': 'ca_choices_0',
-                            'html': '<p>init_state customization arg html 1</p>'
-                        }, {
-                            'content_id': 'ca_choices_1',
-                            'html': html_with_old_math_schema
-                        }, {
-                            'content_id': 'ca_choices_2',
-                            'html': '<p>init_state customization arg html 3</p>'
-                        }, {
-                            'content_id': 'ca_choices_3',
-                            'html': '<p>init_state customization arg html 4</p>'
-                        }]
+                        'value': choices_subtitled_dicts
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -2076,7 +2089,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
-
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': html_with_old_math_schema
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>4</p>'
+            }
+        ]
         state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content_0', 'html': html_with_old_math_schema
@@ -2100,7 +2127,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
                 },
-                'customization_args': {},
+                'customization_args': {
+                    'choices': {
+                        'value': choices_subtitled_dicts
+                    },
+                    'allowMultipleItemsInSamePosition': {'value': True}
+                },
                 'confirmed_unclassified_answers': [],
                 'id': 'MathExpressionInput',
                 'hints': [
@@ -2134,8 +2166,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'voiceovers_mapping': {}
             }
         }
-
-        state_dict_with_new_math_schema = {
+        choices_subtitled_dicts = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': html_with_new_math_schema
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>4</p>'
+            }
+        ]
+        state_dict_with_new_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content_0', 'html': html_with_new_math_schema
             },
@@ -2158,7 +2204,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
                 },
-                'customization_args': {},
+                'customization_args': {
+                    'choices': {
+                        'value': choices_subtitled_dicts
+                    },
+                    'allowMultipleItemsInSamePosition': {'value': True}
+                },
                 'confirmed_unclassified_answers': [],
                 'id': 'MathExpressionInput',
                 'hints': [
@@ -2849,19 +2900,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.set_interaction_for_state(
             init_state, 'MultipleChoiceInput', content_id_generator)
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'non-unique-content-id',
+                'html': '1'
+            }, {
+                'content_id': 'non-unique-content-id',
+                'html': '2'
+            }
+        ]
         with self.assertRaisesRegex(
             Exception,
             'All customization argument content_ids should be unique.'
         ):
             init_state.update_interaction_customization_args({
                 'choices': {
-                    'value': [{
-                        'content_id': 'non-unique-content-id',
-                        'html': '1'
-                    }, {
-                        'content_id': 'non-unique-content-id',
-                        'html': '2'
-                    }]
+                    'value': choices_subtitled_dicts
                 },
                 'showChoicesInShuffledOrder': {'value': True}
             })

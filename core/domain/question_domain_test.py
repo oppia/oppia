@@ -1754,15 +1754,18 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             },
             'answer_is_exclusive': False
         }
+
+        ca_choices_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {'html': 'correct_value', 'content_id': 'content_id_1'},
+            {'html': 'value_2', 'content_id': 'content_id_2'},
+            {'html': 'value_3', 'content_id': 'content_id_3'}
+        ]
+
         self.question_state_dict['interaction']['id'] = 'ItemSelectionInput'
         self.question_state_dict['interaction']['solution'] = test_solution_dict
         self.question_state_dict['interaction']['customization_args'] = {
             'choices': {
-                'value': [
-                    {'html': 'correct_value', 'content_id': 'content_id_1'},
-                    {'html': 'value_2', 'content_id': 'content_id_2'},
-                    {'html': 'value_3', 'content_id': 'content_id_3'}
-                ]
+                'value': ca_choices_dicts
             }
         }
         self.question_state_dict['interaction']['answer_groups'] = [{
@@ -1807,14 +1810,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_solution_dict
         )
 
+        ca_choices_dicts = [
+            {'html': 'correct_value', 'content_id': 'content_id_1'},
+        ]
+
         # Testing with invalid 'x' input.
         test_value['state']['interaction']['id'] = 'ItemSelectionInput'
         test_value['state']['interaction']['solution'] = test_solution_dict
         test_value['state']['interaction']['customization_args'] = {
             'choices': {
-                'value': [
-                    {'html': 'correct_value', 'content_id': 'content_id_1'},
-                ]
+                'value': ca_choices_dicts
             }
         }
         test_value['state']['interaction']['answer_groups'] = [{
@@ -1865,13 +1870,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_value['state']['interaction']['solution'] = (
             drag_and_drop_test_solution_dict
         )
+        ca_choices_dicts = [
+            {'html': 'correct_value', 'content_id': 'content_id_1'},
+            {'html': 'value_2', 'content_id': 'content_id_2'},
+            {'html': 'value_3', 'content_id': 'content_id_3'}
+        ]
         test_value['state']['interaction']['customization_args'] = {
             'choices': {
-                'value': [
-                    {'html': 'correct_value', 'content_id': 'content_id_1'},
-                    {'html': 'value_2', 'content_id': 'content_id_2'},
-                    {'html': 'value_3', 'content_id': 'content_id_3'}
-                ]
+                'value': ca_choices_dicts
             }
         }
         test_value['state']['interaction']['answer_groups'] = [{
