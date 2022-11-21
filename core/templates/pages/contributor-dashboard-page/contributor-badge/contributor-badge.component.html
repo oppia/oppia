@@ -54,34 +54,34 @@
   <div class="desktop-badge-container">
     <div [hidden]="dataLoading || (languages.length === 0)"
          class="badges-header-container">
-        <div class="badge-type-text">
-          <div class="badge-type-text-field">Translations</div>
+      <div class="badge-type-text">
+        <div class="badge-type-text-field">Translations</div>
+      </div>
+      <div class="stats-contribution-type-container">
+        <div class="stats-contribution-type-label">
+          Language
         </div>
-        <div class="stats-contribution-type-container">
-          <div class="stats-contribution-type-label">
-            Language
+        <div #dropdown
+              class="oppia-stats-type-selector-container e2e-test-topic-selector">
+          <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected"
+                (click)="toggleLanguageDropdown()">
+            {{selectedLanguage}}
+            <span class="fas fa-caret-down oppia-stats-type-selector-inner-container-arrow"
+                  [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }"
+            >
+            </span>
           </div>
-          <div #dropdown
-               class="oppia-stats-type-selector-container e2e-test-topic-selector">
-            <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected"
-                 (click)="toggleLanguageDropdown()">
-              {{selectedLanguage}}
-              <span class="fas fa-caret-down oppia-stats-type-selector-inner-container-arrow"
-                    [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }"
-              >
-              </span>
-            </div>
 
-            <div *ngIf="dropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
-              <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
+          <div *ngIf="dropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
+            <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
                   *ngFor="let language of languages"
                   (click)="selectLanguageOption(language)"
                   [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : language === selectedLanguage}">
-                  {{language}}
-              </div>
+                {{language}}
             </div>
           </div>
         </div>
+      </div>
     </div>
     <div *ngIf="!dataLoading && (languages.length > 0)">
       <mat-card layout="row"
@@ -126,7 +126,7 @@
       </mat-card>
     </div>
     <div [hidden]="dataLoading || (!userCanSuggestQuestions && !userCanReviewQuestionSuggestions)"
-        class="badge-type-text">
+         class="badge-type-text">
       Questions
     </div>
     <div *ngIf="!dataLoading && userHasQuestionRights">
@@ -134,15 +134,15 @@
                 class="list-view-item oppia-contributions-required-message-container">
         <div *ngIf="userCanSuggestQuestions"
              class="badge-box">
-            <div>Submissions</div>
-            <div class="badge-container">
-                <question-badge class="badge-item"
-                                *ngFor="let badge of questionSubmissionBadges"
-                                [isUnlocked]="badge.isUnlocked"
-                                type="{{badge.text}}"
-                                contributionCount="{{badge.contributionCount}}">
-                </question-badge>
-            </div>
+          <div>Submissions</div>
+          <div class="badge-container">
+            <question-badge class="badge-item"
+                            *ngFor="let badge of questionSubmissionBadges"
+                            [isUnlocked]="badge.isUnlocked"
+                            type="{{badge.text}}"
+                            contributionCount="{{badge.contributionCount}}">
+            </question-badge>
+          </div>
         </div>
         <div *ngIf="userCanReviewQuestionSuggestions"
              class="badge-box">
@@ -320,34 +320,34 @@
     margin-bottom: 10px;
   }
   .badge-type-text {
-    font-family: Capriola;
     color: #00645c;
     display: inline-block;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
     position: relative;
     width: 60%;
   }
   .badge-container {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
     align-items: center;
-    justify-content: center;
+    display: grid;
     gap: 8px;
-    margin-top: 25px;
+    grid-template-columns: repeat(5, 1fr);
+    justify-content: center;
     margin-bottom: 30px;
+    margin-top: 25px;
   }
   .oppia-contributions-required-message-container {
     height: 100%;
   }
   .oppia-contributions-required-message {
+    align-items: center;
     color: #4a4a4a;
+    display: flex;
     font-size: 28px;
+    height: 100%;
+    justify-content: center;
     text-align: center;
     vertical-align: middle;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
   .oppia-pagination-container {
     display: flex;
@@ -378,8 +378,8 @@
     color: #009688;
   }
   .badges-type-mobile-container {
+    background-color: #fff;
     display: none;
-    background-color: #ffffff;
     font-size: 20px;
     margin-bottom: 3%;
     padding: 0 20px;
@@ -391,8 +391,8 @@
   .mobile-stats-data-container {
     display: none;
     font-size: 2.5vw;
-    padding-top: 10px;
     padding-bottom: 10px;
+    padding-top: 10px;
     width: 100%;
   }
   .mobile-stats-row {
@@ -414,7 +414,7 @@
     text-align: center;
   }
   .stats-welcome-text-container {
-    color: #00645C;
+    color: #00645c;
     display: inline-block;
     font-family: "Roboto", Arial, sans-serif;
     font-size: 18px;
@@ -423,8 +423,8 @@
   }
   .stats-contribution-type-container {
     display: inline-block;
-    width: 40%;
     vertical-align: top;
+    width: 40%;
   }
   .stats-contribution-type-label {
     font-size: 18px;
@@ -434,15 +434,15 @@
   }
   .list-view-item {
     background: #fff;
-    box-shadow: none;
     border: 1px solid #000;
-    margin-top: 10px;
+    box-shadow: none;
     margin-bottom: 25px;
+    margin-top: 10px;
   }
   .dashboard-table {
     font-size: 1.2vw;
-    width: 100%;
     margin-top: 40px;
+    width: 100%;
   }
   .dashboard-table .dashboard-table-headings {
     border-bottom: 2px solid black;
@@ -481,9 +481,9 @@
   }
   .oppia-stats-type-selector-inner-container {
     display: flex;
+    font-size: 16px;
     flex: 1;
     justify-content: space-between;
-    font-size: 16px;
   }
 
   .oppia-stats-type-selector-inner-container-arrow {
@@ -569,20 +569,16 @@
       align-items: center;
       display: flex;
       justify-content: space-between;
-      margin-bottom: 0px;
+      margin-left: calc(-50vw + 50% + 0px);
       padding-bottom: 30px;
       padding-top: 5px;
       width: 100vw;
-      margin-left: calc(-50vw + 50% + 0px);
     }
     .dashboard-table {
       display: none;
     }
     .mobile-stats-data-container {
       display: table;
-    }
-    .stats-container {
-      margin-left: 0px;
     }
     .oppia-contribution-stats-type-selector-mobile-container {
       background-color: #fff;
@@ -603,6 +599,11 @@
     }
     .oppia-stats-type-selector-inner-container {
       font-size: 20px;
+    }
+  }
+  @media (min-width: 700px) {
+    .stats-container {
+      margin-left: 50px;
     }
   }
   @media (max-width: 600px) {
