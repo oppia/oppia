@@ -218,7 +218,8 @@ describe('Contributor badge component', () => {
       }));
 
       it('should create question badges', fakeAsync(() => {
-        expect(component.questionBadges).not.toBeNull();
+        expect(component.questionSubmissionBadges.length).toBeGreaterThan(0);
+        expect(component.questionReviewBadges.length).toBeGreaterThan(0);
       }));
 
       it('should toggle language dropdown when user clicks on it', fakeAsync(
@@ -282,7 +283,12 @@ describe('Contributor badge component', () => {
             contributionAndReviewStatsService,
             'fetchAllStats');
           fetchAllContributionAndReviewStatsAsync.and.returnValue(
-            Promise.resolve({}));
+            Promise.resolve({
+              translation_contribution_stats: [],
+              translation_review_stats: [],
+              question_contribution_stats: [],
+              question_review_stats: []
+            }));
           spyOn(
             languageUtilService, 'getAudioLanguageDescription')
             .and.returnValues('Spanish', 'português', 'Hindi', 'Akan');
@@ -299,9 +305,9 @@ describe('Contributor badge component', () => {
           component.ngOnInit();
         }));
 
-        it('should display translation badges', fakeAsync(() => {
-          expect(component.translationBadges).toBeNull();
-          expect(component.questionBadges).toBeNull();
+        fit('should not display any badge', fakeAsync(() => {
+          expect(component.translationBadges).toEqual({});
+          expect(component.questionSubmissionBadges).toEqual(undefined);
         }));
       });
   });

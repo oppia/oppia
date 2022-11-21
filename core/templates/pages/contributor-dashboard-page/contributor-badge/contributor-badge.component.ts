@@ -42,7 +42,6 @@ export class ContributorBadgeComponent {
   totalTranslationStats: {[key: string]: ContributionCounts} = {};
   translationBadges: {[key: string]: {[key: string]: Badge[]}} = {};
   languages = [];
-  questionBadges: Badge[];
   questionSubmissionBadges: Badge[];
   questionReviewBadges: Badge[];
   questionCorrectionBadges: Badge[];
@@ -177,15 +176,19 @@ export class ContributorBadgeComponent {
             this.totalTranslationStats[language].language);
     }
 
-    this.questionSubmissionBadges = this.getObtainedBadges(
-      this.totalQuestionStats.submissions,
-      AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION);
-    this.questionReviewBadges = this.getObtainedBadges(
-      this.totalQuestionStats.reviews,
-      AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW);
-    this.questionCorrectionBadges = this.getObtainedBadges(
-      this.totalQuestionStats.corrections,
-      AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION);
+    if (this.userCanSuggestQuestions) {
+      this.questionSubmissionBadges = this.getObtainedBadges(
+        this.totalQuestionStats.submissions,
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION);
+    }
+    if (this.userCanReviewQuestionSuggestions) {
+      this.questionReviewBadges = this.getObtainedBadges(
+        this.totalQuestionStats.reviews,
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW);
+      this.questionCorrectionBadges = this.getObtainedBadges(
+        this.totalQuestionStats.corrections,
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION);
+    }
 
     this.languages = Object.keys(this.totalTranslationStats);
 
@@ -195,6 +198,8 @@ export class ContributorBadgeComponent {
         this.reviewableLanguages.includes(this.selectedLanguage));
     }
     this.dataLoading = false;
+    console.log(this.translationBadges);
+    console.log(this.questionSubmissionBadges);
   }
 
   getObtainedBadges(
