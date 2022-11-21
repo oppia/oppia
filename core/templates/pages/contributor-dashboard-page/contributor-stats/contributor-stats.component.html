@@ -1,0 +1,600 @@
+<div class="stats-container">
+  <div class="stats-contribution-type-mobile-container">
+    <div class="dropdown-label">Type</div>
+    <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
+      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleMobileDropdown()">
+        {{selectedContributionType}}
+        <span class="fas fa-sort-down oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': mobileDropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+        </span>
+      </div>
+
+      <div *ngIf="mobileDropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
+        <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
+             (click)="selectOption(option.contributionType)"
+             *ngFor="let option of options"
+             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
+            {{option.displayName}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="stats-contribution-type-label">
+    Contribution Type
+  </div>
+  <div class="stats-welcome-text-container">
+    Explore the impact of your contributions!
+  </div>
+  <div class="stats-contribution-type-container">
+    <div #dropdown class="oppia-stats-type-selector-container e2e-test-topic-selector">
+      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleDropdown()">
+        {{selectedContributionType}}
+        <span class="fas fa-caret-down oppia-stats-type-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+        </span>
+      </div>
+
+      <div *ngIf="dropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
+        <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
+             *ngFor="let option of options"
+             (click)="selectOption(option.contributionType)"
+             [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : option === activeTopicName}">
+          {{option.displayName}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-cards-container">
+    <mat-card *ngFor="let translationStatByLanguageAndTopic of statsData[type] | keyvalue" layout="row" class="list-view-item">
+      <div>
+        {{selectedContributionType}} - {{translationStatByLanguageAndTopic.key}}
+      </div>
+      <table class="dashboard-table e2e-test-topics-table">
+        <tr>
+          <th *ngFor="let column of COLUMNS[type] | keyvalue: provideOriginalOrder"
+              class="dashboard-table-headings stats-data">
+            <div class="stats-column-name-container">
+              {{column.value}}
+            </div>
+          </th>
+        </tr>
+        <tr *ngFor="let translationStat of translationStatByLanguageAndTopic.value.data.slice(translationStatByLanguageAndTopic.value.currentPageStartIndex, translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE)" class="stats-row">
+          <td class="stats-data">
+            {{translationStat.firstContributionDate}} - {{translationStat.lastContributionDate}}
+          </td>
+          <td class="stats-data">
+            {{translationStat.topicName}}
+          </td>
+          <td *ngIf="type == 'translationReview'" class="stats-data">
+            {{translationStat.reviewedCards}}
+          </td>
+          <td *ngIf="type == 'translationReview'" class="stats-data">
+            {{translationStat.reviewedWordCount}}
+          </td>
+          <td *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-data">
+            {{translationStat.acceptedCards}}
+          </td>
+          <td *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-data">
+            {{translationStat.acceptedWordCount}}
+          </td>
+        </tr>
+      </table>
+      <div *ngIf="type == 'translationContribution'" class="mobile-stats-page">
+        <div class="mobile-stats-data-container" *ngFor="let translationStat of translationStatByLanguageAndTopic.value.data.slice(translationStatByLanguageAndTopic.value.currentPageStartIndex, translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE)">
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].months}}</b>
+            </div>
+            <div>
+              {{translationStat.firstContributionDate}} - {{translationStat.lastContributionDate}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].topicNames}}</b>
+            </div>
+            <div>
+              {{translationStat.topicName}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].acceptedCards}}</b>
+            </div>
+            <div>
+              {{translationStat.acceptedCards}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].acceptedWordCount}}</b>
+            </div>
+            <div>
+              {{translationStat.acceptedWordCount}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="type == 'translationReview'" class="mobile-stats-page">
+        <div class="mobile-stats-data-container" *ngFor="let translationStat of translationStatByLanguageAndTopic.value.data.slice(translationStatByLanguageAndTopic.value.currentPageStartIndex, translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE)">
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].months}}</b>
+            </div>
+            <div>
+              {{translationStat.firstContributionDate}} - {{translationStat.lastContributionDate}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].topicNames}}</b>
+            </div>
+            <div>
+              {{translationStat.topicName}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].reviewedCards}}</b>
+            </div>
+            <div>
+              {{translationStat.reviewedCards}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].reviewedWordCount}}</b>
+            </div>
+            <div>
+              {{translationStat.reviewedWordCount}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].acceptedCards}}</b>
+            </div>
+            <div>
+              {{translationStat.acceptedCards}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].acceptedWordCount}}</b>
+            </div>
+            <div>
+              {{translationStat.acceptedWordCount}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="oppia-pagination-container">
+        <button type="button"
+                class="oppia-pagination-button"
+                (click)="goToPreviousPage(translationStatByLanguageAndTopic.value)"
+                [disabled]="translationStatByLanguageAndTopic.value.currentPageStartIndex === 0">
+          <span class="material-icons">navigate_before</span>Previous
+        </button>
+        <button type="button"
+                class="oppia-pagination-button"
+                (click)="goToNextPage(translationStatByLanguageAndTopic.value)"
+                [disabled]="translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE >= translationStatByLanguageAndTopic.value.data.length">
+          Next<span class="material-icons">navigate_next</span>
+        </button>
+      </div>
+    </mat-card>
+    <mat-card *ngIf="statsData[type].size === 0" layout="row" class="list-view-item oppia-contributions-required-message-container">
+      <div class="oppia-contributions-required-message">
+        Start contributing to see your stats!
+      </div>
+    </mat-card>
+  </div>
+
+  <div *ngIf="type == 'questionContribution' || type == 'questionReview'" class="stats-cards-container">
+    <mat-card *ngIf="statsData[type]" layout="row" class="list-view-item">
+      <div>
+        {{selectedContributionType}}
+      </div>
+      <table class="dashboard-table e2e-test-topics-table">
+        <tr>
+          <th *ngFor="let column of COLUMNS[type] | keyvalue: provideOriginalOrder"
+              class="dashboard-table-headings stats-data">
+            <div class="stats-column-name-container">
+              {{column.value}}
+            </div>
+          </th>
+        </tr>
+        <tr *ngFor="let questionStat of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageStartIndex + ITEMS_PER_PAGE)" class="stats-row">
+          <td class="stats-data">
+            {{questionStat.firstContributionDate}} - {{questionStat.lastContributionDate}}
+          </td>
+          <td class="stats-data">
+            {{questionStat.topicName}}
+          </td>
+          <td *ngIf="type == 'questionReview'" class="stats-data">
+            {{questionStat.reviewedQuestions}}
+          </td>
+          <td class="stats-data">
+            {{questionStat.acceptedQuestions}}
+          </td>
+          <td *ngIf="type == 'questionContribution'" class="stats-data">
+            {{questionStat.acceptedQuestionsWithoutEdits}}
+          </td>
+        </tr>
+      </table>
+      <div *ngIf="type == 'questionContribution'" class="mobile-stats-page">
+        <div class="mobile-stats-data-container" *ngFor="let questionStat of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageStartIndex + ITEMS_PER_PAGE)">
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].months}}</b>
+            </div>
+            <div>
+              {{questionStat.firstContributionDate}} - {{questionStat.lastContributionDate}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].topicNames}}</b>
+            </div>
+            <div>
+              {{questionStat.topicName}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].acceptedQuestions}}</b>
+            </div>
+            <div>
+              {{questionStat.acceptedQuestions}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].acceptedQuestionsWithoutEdits}}</b>
+            </div>
+            <div>
+              {{questionStat.acceptedQuestionsWithoutEdits}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="type == 'questionReview'" class="mobile-stats-page">
+        <div class="mobile-stats-data-container" *ngFor="let questionStat of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageStartIndex + ITEMS_PER_PAGE)">
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].months}}</b>
+            </div>
+            <div>
+              {{questionStat.firstContributionDate}} - {{questionStat.lastContributionDate}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].topicNames}}</b>
+            </div>
+            <div>
+              {{questionStat.topicName}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].reviewedQuestions}}</b>
+            </div>
+            <div>
+              {{questionStat.reviewedQuestions}}
+            </div>
+          </div>
+          <div class="mobile-stats-row">
+            <div class="mobile-stats-name">
+              <b>{{COLUMNS[type].acceptedQuestions}}</b>
+            </div>
+            <div>
+              {{questionStat.acceptedQuestions}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="oppia-pagination-container">
+        <button type="button"
+                class="oppia-pagination-button"
+                (click)="goToPreviousPage(statsData[type])"
+                [disabled]="statsData[type].currentPageStartIndex === 0">
+          <span class="material-icons">navigate_before</span>Previous
+        </button>
+        <button type="button"
+                class="oppia-pagination-button"
+                (click)="goToNextPage(statsData[type])"
+                [disabled]="statsData[type].currentPageStartIndex + ITEMS_PER_PAGE >= statsData[type].data.length">
+          Next<span class="material-icons">navigate_next</span>
+        </button>
+      </div>
+    </mat-card>
+    <mat-card *ngIf="!statsData[type]" layout="row" class="list-view-item oppia-contributions-required-message-container">
+      <div class="oppia-contributions-required-message">
+        Start contributing to see your stats!
+      </div>
+    </mat-card>
+  </div>
+</div>
+
+<style>
+  .oppia-contributions-required-message-container {
+    height: 300px;
+  }
+  .oppia-contributions-required-message {
+    align-items: center;
+    color: #4a4a4a;
+    display: flex;
+    font-size: 28px;
+    height: 100%;
+    justify-content: center;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .oppia-pagination-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    width: 100%;
+  }
+  .oppia-pagination-button {
+    background-color: transparent;
+    border: none;
+    box-sizing: border-box;
+    color: #000;
+    font-size: 18px;
+    font-weight: bold;
+    min-height: 40px;
+    min-width: 100px;
+    text-align: center;
+  }
+  .oppia-pagination-button:hover {
+    border: 2px solid #000;
+    border-radius: 5px;
+  }
+  .oppia-pagination-button[disabled] {
+    color: #000;
+    opacity: 0.239;
+  }
+  .oppia-contributions-dropdown-arrow {
+    color: #009688;
+  }
+  .stats-contribution-type-mobile-container {
+    background-color: #fff;
+    display: none;
+    font-size: 20px;
+    margin-bottom: 3%;
+    padding: 0 20px;
+    width: 100%;
+  }
+  .mobile-stats-page {
+    margin-top: 30px;
+  }
+  .mobile-stats-data-container {
+    display: none;
+    font-size: 2.5vw;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    width: 100%;
+  }
+  .mobile-stats-row {
+    display: flex;
+    margin-bottom: 5px;
+  }
+  .mobile-stats-name {
+    width: 50%;
+  }
+  .mobile-stats-data-container:not(:last-child) {
+    border-bottom: 1px solid #bbb;
+  }
+  .stats-column-name-container {
+    margin-left: auto;
+    margin-right: auto;
+    width: 75%;
+  }
+  .stats-data {
+    text-align: center;
+  }
+  .stats-cards-container {
+    margin-top: 30px;
+  }
+  .stats-welcome-text-container {
+    color: #00645c;
+    display: inline-block;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 24px;
+    height: 30%;
+    vertical-align: middle;
+    width: 65%;
+  }
+  .stats-contribution-type-container {
+    display: inline-block;
+    vertical-align: top;
+    width: 35%;
+  }
+  .stats-contribution-type-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: 65%;
+  }
+  .list-view-item {
+    background: #fff;
+    border: 1px solid #000;
+    box-shadow: none;
+    margin-top: 10px;
+  }
+  .dashboard-table {
+    font-size: 1.2vw;
+    margin-top: 40px;
+    width: 100%;
+  }
+  .dashboard-table .dashboard-table-headings {
+    border-bottom: 2px solid black;
+    padding-bottom: 0.7em;
+    text-align: center;
+  }
+
+  .dashboard-table .dashboard-table-headings p {
+    display: inline;
+  }
+  .dashboard-table #dashboard-table-headings-details {
+    display: inline-block;
+    text-align: left;
+    width: 100%;
+  }
+  .stats-row {
+    height: 50px;
+    text-align: left;
+    vertical-align: baseline;
+  }
+  .stats-row td {
+    padding-top: 15px;
+  }
+  .stats-row:not(:last-child) {
+    border-bottom: 1px solid #bbb;
+  }
+  .oppia-stats-type-selector-container {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    justify-content: space-between;
+    padding: 10px 20px;
+    position: relative;
+    vertical-align: top;
+  }
+  .oppia-stats-type-selector-inner-container {
+    display: flex;
+    flex: 1;
+    font-size: 16px;
+    justify-content: space-between;
+  }
+
+  .oppia-stats-type-selector-inner-container-arrow {
+    color: #009688;
+    cursor: pointer;
+    padding-top: 3px;
+  }
+  .oppia-stats-type-selector-dropdown-container {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    height: auto;
+    left: 0;
+    overflow-y: scroll;
+    padding: 8px 12px;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 1;
+  }
+  .oppia-stats-type-selector-dropdown-container::-webkit-scrollbar {
+    width: 7px;
+  }
+  .oppia-stats-type-selector-dropdown-container::-webkit-scrollbar-track {
+    border-radius: 5px;
+    box-shadow: inset 0 0 3px #808080;
+  }
+  .oppia-stats-type-selector-dropdown-container::-webkit-scrollbar-thumb {
+    background: #808080;
+    border-radius: 5px;
+    transition: background 0.5s ease;
+  }
+  .oppia-stats-type-selector-dropdown-container::-webkit-scrollbar-thumb:hover {
+    background: black;
+  }
+  .oppia-stats-type-selector-dropdown-option {
+    color: rgb(104, 104, 104);
+    display: flex;
+    flex: 1;
+    margin-left: 16px;
+    padding: 8px;
+  }
+  .oppia-stats-type-selector-dropdown-option-selected,
+  .oppia-stats-type-selector-dropdown-option:hover {
+    background-color: rgb(238, 238, 238);
+    border-radius: 4px;
+  }
+  @media (min-width: 700px) {
+    .stats-container {
+      margin-left: 50px;
+    }
+  }
+  @media only screen and (max-width: 700px) {
+    .list-view-item {
+      margin-bottom: 30px;
+    }
+    .stats-welcome-text-container {
+      width: 100%;
+    }
+    .stats-contribution-type-label {
+      display: none;
+    }
+    .stats-contribution-type-container {
+      display: none;
+    }
+    .dropdown-label {
+      color: #4a4a4a;
+      font-size: 18px;
+      margin-right: 10px;
+      width: 175px;
+    }
+    .stats-contribution-type-mobile-container {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      margin-left: calc(-50vw + 50% + 0px);
+      padding-bottom: 30px;
+      padding-top: 5px;
+      width: 100vw;
+    }
+    .dashboard-table {
+      display: none;
+    }
+    .mobile-stats-data-container {
+      display: table;
+    }
+    .oppia-contribution-stats-type-selector-mobile-container {
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+      cursor: pointer;
+      display: inline-block;
+      justify-content: space-between;
+      padding: 10px 20px;
+      position: relative;
+      width: 100%;
+    }
+    .stats-column-name-container {
+      font-size: 12px;
+    }
+    .stats-data {
+      font-size: 12px;
+    }
+    .oppia-stats-type-selector-inner-container {
+      font-size: 20px;
+    }
+  }
+  @media only screen and (max-width: 420px) {
+    .dropdown-label {
+      font-size: 18px;
+      margin-right: 2vw;
+      width: 100px;
+    }
+    .oppia-contribution-stats-type-selector-mobile-container {
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+      cursor: pointer;
+      display: inline-block;
+      justify-content: space-between;
+      padding: 10px 20px;
+      position: relative;
+      width: 100%;
+    }
+    .stats-column-name-container {
+      font-size: 10px;
+    }
+    .stats-data {
+      font-size: 10px;
+    }
+  }
+</style>

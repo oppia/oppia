@@ -35,6 +35,7 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { AlertsService } from 'services/alerts.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 
 class MockNgbModalRef {
@@ -54,10 +55,19 @@ class MockNgbModal {
   }
 }
 
+class MockPlatformFeatureService {
+  status = {
+    ContributorDashboardAccomplishments: {
+      isEnabled: false
+    }
+  };
+}
+
 describe('Contributions and review component', () => {
   let component: ContributionsAndReview;
   let fixture: ComponentFixture<ContributionsAndReview>;
   let ngbModal: NgbModal = null;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   var contextService: ContextService;
   var contributionAndReviewService: ContributionAndReviewService;
   var contributionOpportunitiesService: ContributionOpportunitiesService;
@@ -94,6 +104,10 @@ describe('Contributions and review component', () => {
         CsrfTokenService,
         AlertsService,
         TranslationTopicService,
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        },
         UserService
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -470,6 +484,8 @@ describe('Contributions and review component', () => {
         },
         more: false
       }));
+    mockPlatformFeatureService.
+      status.ContributorDashboardAccomplishments.isEnabled = true;
 
     fixture.detectChanges();
 
@@ -690,7 +706,49 @@ describe('Contributions and review component', () => {
       }));
 
     it('should return true on Review Translations tab', fakeAsync(() => {
-      component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');
+      component.contributionTabs = [
+        {
+          tabType: 'contributions',
+          tabSubType: 'translate_content',
+          text: 'Questions',
+          enabled: false
+        },
+        {
+          tabType: 'contributions',
+          tabSubType: 'add_question',
+          text: 'Translations',
+          enabled: true
+        }
+      ];
+      component.accomplishmentsTabs = [
+        {
+          tabSubType: 'stats',
+          tabType: 'accomplishments',
+          text: 'Contribution Stats',
+          enabled: true
+        },
+        {
+          tabSubType: 'badges',
+          tabType: 'accomplishments',
+          text: 'Badges',
+          enabled: true
+        }
+      ];
+      component.reviewTabs = [
+        {
+          tabType: 'reviews',
+          tabSubType: 'add_question',
+          text: 'Review Questions',
+          enabled: false
+        },
+        {
+          tabType: 'reviews',
+          tabSubType: 'translate_content',
+          text: 'Review Translations',
+          enabled: false
+        }
+      ];
+      component.switchToTab('reviews', 'translate_content');
       spyOn(alertsService, 'addSuccessMessage').and.stub();
 
       let suggestion = {
@@ -1307,14 +1365,14 @@ describe('Contributions and review component', () => {
       spyOn(component, 'getContributionSummaries').and.returnValue(null);
 
       component.activeTabType = 'activeTabType';
-      component.activeSuggestionType = 'activeSuggestionType';
+      component.activeTabSubtype = 'activeTabSubtype';
       component.contributions = {
         1: null,
         2: null,
       };
 
       component.tabNameToOpportunityFetchFunction = {
-        activeSuggestionType: {
+        activeTabSubtype: {
           activeTabType: (shouldResetOffset) => {
             return Promise.resolve({
               suggestionIdToDetails: {
@@ -1416,11 +1474,11 @@ describe('Contributions and review component', () => {
       spyOn(component, 'getTranslationContributionsSummary').and.stub();
       spyOn(component, 'getQuestionContributionsSummary').and.stub();
 
-      component.activeSuggestionType = component.SUGGESTION_TYPE_TRANSLATE;
+      component.activeTabSubtype = component.SUGGESTION_TYPE_TRANSLATE;
       component.getContributionSummaries(null);
       tick();
 
-      component.activeSuggestionType = component.SUGGESTION_TYPE_QUESTION;
+      component.activeTabSubtype = component.SUGGESTION_TYPE_QUESTION;
       component.getContributionSummaries(null);
       tick();
 
@@ -1534,7 +1592,7 @@ describe('Contributions and review component', () => {
     it('should initialize $scope properties after controller is' +
     ' initialized', () => {
       expect(component.activeTabType).toBe('reviews');
-      expect(component.activeSuggestionType).toBe('add_question');
+      expect(component.activeTabSubtype).toBe('add_question');
       expect(component.activeDropdownTabChoice).toBe('Review Questions');
       expect(component.userIsLoggedIn).toBe(true);
       expect(component.userDetailsLoading).toBe(false);
@@ -1584,11 +1642,40 @@ describe('Contributions and review component', () => {
     });
 
     it('should return correctly check the active tab', () => {
-      component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');
-      component.isActiveTab(component.TAB_TYPE_REVIEWS, 'translate_content');
+      component.contributionTabs = [
+        {
+          tabType: 'contributions',
+          tabSubType: 'translate_content',
+          text: 'Questions',
+          enabled: false
+        },
+        {
+          tabType: 'contributions',
+          tabSubType: 'add_question',
+          text: 'Translations',
+          enabled: true
+        }
+      ];
+      component.reviewTabs = [
+        {
+          tabType: 'reviews',
+          tabSubType: 'add_question',
+          text: 'Review Questions',
+          enabled: false
+        },
+        {
+          tabType: 'reviews',
+          tabSubType: 'translate_content',
+          text: 'Review Translations',
+          enabled: false
+        }
+      ];
 
-      component.switchToTab(component.TAB_TYPE_CONTRIBUTIONS, 'add_question');
-      component.isActiveTab(component.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+      component.switchToTab('reviews', 'translate_content');
+      component.isActiveTab('reviews', 'translate_content');
+
+      component.switchToTab('contributions', 'add_question');
+      component.isActiveTab('contributions', 'add_question');
     });
 
     it('should toggle dropdown when it is clicked', () => {
@@ -1602,26 +1689,128 @@ describe('Contributions and review component', () => {
     });
 
     it('should set active dropdown choice correctly', () => {
-      component.activeTabType = component.TAB_TYPE_REVIEWS;
-      component.activeSuggestionType = 'add_question';
+      component.contributionTabs = [
+        {
+          tabType: 'contributions',
+          tabSubType: 'translate_content',
+          text: 'Translations',
+          enabled: false
+        },
+        {
+          tabType: 'contributions',
+          tabSubType: 'add_question',
+          text: 'Questions',
+          enabled: true
+        }
+      ];
+      component.accomplishmentsTabs = [
+        {
+          tabSubType: 'stats',
+          tabType: 'accomplishments',
+          text: 'Contribution Stats',
+          enabled: true
+        },
+        {
+          tabSubType: 'badges',
+          tabType: 'accomplishments',
+          text: 'Badges',
+          enabled: true
+        }
+      ];
+      component.reviewTabs = [
+        {
+          tabType: 'reviews',
+          tabSubType: 'add_question',
+          text: 'Review Questions',
+          enabled: false
+        },
+        {
+          tabType: 'reviews',
+          tabSubType: 'translate_content',
+          text: 'Review Translations',
+          enabled: false
+        }
+      ];
 
-      expect(component.getActiveDropdownTabChoice()).toBe('Review Questions');
-
-      component.activeTabType = component.TAB_TYPE_REVIEWS;
-      component.activeSuggestionType = 'translate_content';
-
-      expect(component.getActiveDropdownTabChoice())
+      expect(
+        component.getActiveDropdownTabText(
+          'reviews',
+          'add_question')).toBe('Review Questions');
+      expect(
+        component.getActiveDropdownTabText(
+          'reviews',
+          'translate_content'))
         .toBe('Review Translations');
 
-      component.activeTabType = component.TAB_TYPE_CONTRIBUTIONS;
-      component.activeSuggestionType = 'add_question';
+      expect(
+        component.getActiveDropdownTabText(
+          'contributions',
+          'add_question')).toBe('Questions');
+      expect(
+        component.getActiveDropdownTabText(
+          'contributions',
+          'translate_content')).toBe('Translations');
 
-      expect(component.getActiveDropdownTabChoice()).toBe('Questions');
+      expect(
+        component.getActiveDropdownTabText(
+          'accomplishments',
+          'stats')).toBe('Contribution Stats');
+      expect(
+        component.getActiveDropdownTabText(
+          'accomplishments',
+          'badges')).toBe('Badges');
+    });
 
-      component.activeTabType = component.TAB_TYPE_CONTRIBUTIONS;
-      component.activeSuggestionType = 'translate_content';
+    it('should throw an error when invalid tab names given', () => {
+      component.contributionTabs = [
+        {
+          tabType: 'contributions',
+          tabSubType: 'translate_content',
+          text: 'Translations',
+          enabled: false
+        },
+        {
+          tabType: 'contributions',
+          tabSubType: 'add_question',
+          text: 'Questions',
+          enabled: true
+        }
+      ];
+      component.accomplishmentsTabs = [
+        {
+          tabSubType: 'stats',
+          tabType: 'accomplishments',
+          text: 'Contribution Stats',
+          enabled: true
+        },
+        {
+          tabSubType: 'badges',
+          tabType: 'accomplishments',
+          text: 'Badges',
+          enabled: true
+        }
+      ];
+      component.reviewTabs = [
+        {
+          tabType: 'reviews',
+          tabSubType: 'add_question',
+          text: 'Review Questions',
+          enabled: false
+        },
+        {
+          tabType: 'reviews',
+          tabSubType: 'translate_content',
+          text: 'Review Translations',
+          enabled: false
+        }
+      ];
 
-      expect(component.getActiveDropdownTabChoice()).toBe('Translations');
+      expect(() => {
+        component.getActiveDropdownTabText(
+          'xxx',
+          'xxx');
+        tick();
+      }).toThrowError();
     });
 
     it('should close dropdown when a click is made outside', () => {
