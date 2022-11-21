@@ -72,6 +72,9 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
                     'labelled_as_correct': False
                 },
                 'customization_args': {
+                    'catchMisspellings': {
+                        'value': False
+                    },
                     'rows': {
                         'value': 1
                     },

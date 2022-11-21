@@ -9977,7 +9977,7 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
-next_content_id_index: 9
+next_content_id_index: 10
 objective: ''
 param_changes: []
 param_specs: {}
@@ -10004,12 +10004,12 @@ states:
         rule_specs:
         - inputs:
             x:
-            - ca_choices_4
             - ca_choices_5
+            - ca_choices_6
           rule_type: Equals
         - inputs:
             x:
-            - ca_choices_4
+            - ca_choices_5
           rule_type: ContainsAtLeastOneOf
         tagged_skill_misconception_id: null
         training_data: []
@@ -10026,14 +10026,14 @@ states:
         rule_specs:
         - inputs:
             x:
-            - ca_choices_4
+            - ca_choices_5
           rule_type: Equals
         - inputs:
             x:
-            - ca_choices_4
             - ca_choices_5
             - ca_choices_6
             - ca_choices_7
+            - ca_choices_8
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -10041,14 +10041,14 @@ states:
       customization_args:
         choices:
           value:
-          - content_id: ca_choices_4
-            html: <p>1</p>
           - content_id: ca_choices_5
+            html: <p>1</p>
+          - content_id: ca_choices_6
             html: <p>2<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;"
               caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image></p>
-          - content_id: ca_choices_6
-            html: <p>3</p>
           - content_id: ca_choices_7
+            html: <p>3</p>
+          - content_id: ca_choices_8
             html: <p>4</p>
         maxAllowableSelectionCount:
           value: 4
@@ -10069,29 +10069,29 @@ states:
       solution:
         answer_is_exclusive: true
         correct_answer:
-        - ca_choices_4
+        - ca_choices_5
         explanation:
-          content_id: solution_8
+          content_id: solution_4
           html: This is <i>solution</i> for state1
     linked_skill_id: null
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        ca_choices_4: {}
         ca_choices_5: {}
         ca_choices_6: {}
         ca_choices_7: {}
+        ca_choices_8: {}
         content_0: {}
         default_outcome_1: {}
         feedback_2: {}
         feedback_3: {}
-        solution_8: {}
+        solution_4: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_8
+      content_id: content_9
       html: <p>End interaction</p>
     interaction:
       answer_groups: []
@@ -10107,7 +10107,7 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content_8: {}
+        content_9: {}
     solicit_answer_details: false
 states_schema_version: 55
 tags: []
@@ -11476,15 +11476,15 @@ states:
             - - ca_choices_6
           rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
         - inputs:
-            x: ca_choices_27
+            x: ca_choices_4
             y: 4
           rule_type: HasElementXAtPositionY
         - inputs:
             x:
-            - - ca_choices_29
-              - ca_choices_27
-              - ca_choices_28
-              - ca_choices_26
+            - - ca_choices_6
+              - ca_choices_4
+              - ca_choices_5
+              - ca_choices_3
           rule_type: IsEqualToOrdering
         tagged_skill_misconception_id: null
         training_data: []

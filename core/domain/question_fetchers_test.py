@@ -219,17 +219,3 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION
         )
-
-    def test_get_questions_by_ids_with_older_valid_schema_version(self) -> None:
-        question_id = question_services.get_new_question_id()
-        self.save_new_question_with_state_data_schema_v27(
-            question_id, self.editor_id, [])
-
-        current_state_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 52)
-        with current_state_schema_version_swap:
-            question = question_fetchers.get_questions_by_ids([question_id])[0]
-
-        assert question is not None
-        self.assertEqual(
-            question.question_state_data_schema_version, 52)
