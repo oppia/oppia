@@ -74,7 +74,6 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
 
 class ContributorDashboardAchievementEmailHandler(base.BaseHandler):
     """Handler task of sending email of contributor dashboard achievements."""
-
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
@@ -153,9 +152,8 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
-        payload = json.loads(self.request.body)
-        user_id = payload['user_id']
-        reference_dict = payload['reference_dict']
+        user_id = self.normalized_payload.get("user_id")
+        reference_dict = self.normalized_payload.get("reference_dict")
 
         message = feedback_services.get_message(
             reference_dict['thread_id'], reference_dict['message_id'])
@@ -188,7 +186,6 @@ class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
         exploration = exp_fetchers.get_exploration_by_id(
             reference_dict['entity_id'])
         thread = feedback_services.get_thread(reference_dict['thread_id'])
-
         text = 'changed status from %s to %s' % (old_status, new_status)
         subject = 'Oppia thread status change: "%s"' % thread.subject
         email_manager.send_instant_feedback_message_email(

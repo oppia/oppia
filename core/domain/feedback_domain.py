@@ -381,10 +381,15 @@ class FeedbackMessageReference:
             FeedbackMessageReference. The corresponding FeedbackMessageReference
             domain object.
         """
-        # Investigate why reference_dict is passed as
-        # string and not FeedbackMessageReferenceDict when called from Postman.
-        if isinstance(reference_dict, str):
-            reference_dict = json.loads(reference_dict)
+        feedback_properties = [
+            'entity_type', 'entity_id', 
+            'thread_id', 'message_id']
+        for feedback_property in feedback_properties:
+            if feedback_property not in reference_dict:
+                raise utils.ValidationError(
+                    '%s not in reference dict.' % (
+                        feedback_property))
+                        
         return cls(
             reference_dict['entity_type'],
             reference_dict['entity_id'],
