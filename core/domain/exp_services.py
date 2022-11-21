@@ -4002,7 +4002,7 @@ def rollback_exploration_to_safe_state(exp_id: str) -> int:
     return last_known_safe_version
 
 
-def fix_commit_commands():
+def fix_commit_commands() -> None:
     """Fixes the commit commands for a problematic exploration with
     ID Q4POXOibJEH6.
     """

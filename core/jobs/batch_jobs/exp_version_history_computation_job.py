@@ -828,14 +828,14 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     try:
                         new_states_vh = (
                             exp_services.update_states_version_history(
-                                old_states_vh, change_list, old_states_dict,
-                                new_states_dict, version, committer_id
+                                old_states_vh, change_list, old_states_dict, # type: ignore[arg-type]
+                                new_states_dict, version, committer_id # type: ignore[arg-type]
                             )
                         )
                         new_metadata_vh = (
                             exp_services.update_metadata_version_history(
-                                old_metadata_vh, change_list, old_metadata_dict,
-                                new_metadata_dict, version, committer_id
+                                old_metadata_vh, change_list, old_metadata_dict, # type: ignore[arg-type]
+                                new_metadata_dict, version, committer_id # type: ignore[arg-type]
                             )
                         )
                         new_committer_ids = (

@@ -1579,13 +1579,11 @@ class FixCommitCommandsHandler(
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'POST': {}
-    }
+    URL_PATH_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_access_admin_page
-    def post(self):
+    def post(self) -> None:
         """Handles POST request to fix the commit commands."""
 
         exp_services.fix_commit_commands()
