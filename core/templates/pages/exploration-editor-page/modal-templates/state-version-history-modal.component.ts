@@ -131,7 +131,8 @@ export class StateVersionHistoryModalComponent
       this.newState = diffData.newState;
       if (diffData.newState.name === null) {
         // The state name is null before having a state
-        // (Please refer StateObjectFactory). This cannot happen here because
+        // (please refer to the implementation of State object from
+        // StateObjectFactory.ts). This cannot happen here because
         // all the states will be properly defined and will have a name during
         // version history navigation.
         throw new Error('State name cannot be null');
@@ -142,7 +143,8 @@ export class StateVersionHistoryModalComponent
       this.oldState = diffData.oldState;
       if (diffData.oldState.name === null) {
         // The state name is null before having a state
-        // (Please refer StateObjectFactory). This cannot happen here because
+        // (please refer to the implementation of State object from
+        // StateObjectFactory.ts). This cannot happen here because
         // all the states will be properly defined and will have a name during
         // version history navigation.
         throw new Error('State name cannot be null');
@@ -175,7 +177,8 @@ export class StateVersionHistoryModalComponent
       this.newState = diffData.newState;
       if (diffData.newState.name === null) {
         // The state name is null before having a state
-        // (Please refer StateObjectFactory). This cannot happen here because
+        // (please refer to the implementation of State object from
+        // StateObjectFactory.ts). This cannot happen here because
         // all the states will be properly defined and will have a name during
         // version history navigation.
         throw new Error('State name cannot be null');
@@ -186,7 +189,8 @@ export class StateVersionHistoryModalComponent
       this.oldState = diffData.oldState;
       if (diffData.oldState.name === null) {
         // The state name is null before having a state
-        // (Please refer StateObjectFactory). This cannot happen here because
+        // (please refer to the implementation of State object from
+        // StateObjectFactory.ts). This cannot happen here because
         // all the states will be properly defined and will have a name during
         // version history navigation.
         throw new Error('State name cannot be null');
@@ -221,7 +225,8 @@ export class StateVersionHistoryModalComponent
     }
     if (diffData.oldState.name === null) {
       // The state name is null before having a state
-      // (Please refer StateObjectFactory). This cannot happen here because
+      // (please refer to the implementation of State object from
+      // StateObjectFactory.ts). This cannot happen here because
       // all the states will be properly defined and will have a name during
       // version history navigation.
       throw new Error(

@@ -75,7 +75,8 @@ export class StateVersionHistoryComponent {
       modalRef.componentInstance.newState = stateDiffData.newState;
       if (stateDiffData.newState.name === null) {
         // The state name is null before having a state
-        // (Please refer StateObjectFactory). This cannot happen here because
+        // (please refer to the implementation of State object from
+        // StateObjectFactory.ts). This cannot happen here because
         // all the states will be properly defined and will have a name during
         // version history navigation.
         throw new Error('State name cannot be null');
@@ -86,7 +87,8 @@ export class StateVersionHistoryComponent {
       modalRef.componentInstance.oldState = stateDiffData.oldState;
       if (stateDiffData.oldState.name === null) {
         // The state name is null before having a state
-        // (Please refer StateObjectFactory). This cannot happen here because
+        // (please refer to the implementation of State object from
+        // StateObjectFactory.ts). This cannot happen here because
         // all the states will be properly defined and will have a name during
         // version history navigation.
         throw new Error('State name cannot be null');
