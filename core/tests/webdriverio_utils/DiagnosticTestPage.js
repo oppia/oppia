@@ -31,9 +31,7 @@ var DiagnosticTestPage = function() {
   var recommendedTopicSummaryTilesSelector = function() {
     return $$('.e2e-test-recommended-topic-summary-tile');
   };
-  var classroomTileSelector = function() {
-    return $$('.e2e-test-classroom-tile');
-  };
+  var classroomTileSelector = $('.e2e-test-classroom-tile');
   var editClassroomConfigButton = $('.e2e-test-edit-classroom-config-button');
   var addTopicToClassroomButton = $('.e2e-test-add-topic-to-classroom-button');
   var addTopicToClassroomInput = $('.e2e-test-add-topic-to-classroom-input');
@@ -93,14 +91,13 @@ var DiagnosticTestPage = function() {
   };
 
   this.addTopicIdToClassroomConfig = async function(topicId, index) {
-    var classroomTile = await classroomTileSelector();
-
+    // var classroomTile = await classroomTileSelector();
     await waitFor.visibilityOf(
       classroomTileContainerSelector,
       'Classroom tile is not visible'
     );
     await action.click(
-      'Classroom config tile', classroomTile);
+      'Classroom config tile', classroomTileSelector);
 
     await waitFor.elementToBeClickable(
       editClassroomConfigButton,
