@@ -62,9 +62,9 @@
           Language
         </div>
         <div #dropdown
-              class="oppia-stats-type-selector-container e2e-test-topic-selector">
+             class="oppia-stats-type-selector-container e2e-test-topic-selector">
           <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected"
-                (click)="toggleLanguageDropdown()">
+               (click)="toggleLanguageDropdown()">
             {{selectedLanguage}}
             <span class="fas fa-caret-down oppia-stats-type-selector-inner-container-arrow"
                   [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }"
@@ -74,9 +74,9 @@
 
           <div *ngIf="dropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
             <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
-                  *ngFor="let language of languages"
-                  (click)="selectLanguageOption(language)"
-                  [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : language === selectedLanguage}">
+                 *ngFor="let language of languages"
+                 (click)="selectLanguageOption(language)"
+                 [ngClass]="{'oppia-stats-type-selector-dropdown-option-selected' : language === selectedLanguage}">
                 {{language}}
             </div>
           </div>
@@ -481,8 +481,8 @@
   }
   .oppia-stats-type-selector-inner-container {
     display: flex;
-    font-size: 16px;
     flex: 1;
+    font-size: 16px;
     justify-content: space-between;
   }
 
