@@ -3158,7 +3158,12 @@ title: Title
             ca_value = ca_spec.default_value
             traverse_schema_and_assign_content_ids(
                 ca_value, ca_spec.schema, 'ca_%s' % ca_name)
-            customization_args[ca_name] = {'value': ca_value}
+            # Here we use cast because these ca_values are fetched dynamically
+            # and contain only default types.
+            customization_args_value = cast(
+                state_domain.UnionOfCustomizationArgsDictValues, ca_value
+            )
+            customization_args[ca_name] = {'value': customization_args_value}
 
         state.update_interaction_id(interaction_id)
         state.update_interaction_customization_args(customization_args)

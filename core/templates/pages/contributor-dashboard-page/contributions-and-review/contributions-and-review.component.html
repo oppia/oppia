@@ -15,8 +15,8 @@
         </div>
         <div class="oppia-contributions-dropdown-list-option"
              *ngFor="let tab of reviewTabs"
-             (click)="switchToTab(TAB_TYPE_REVIEWS, tab.suggestionType)"
-             [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+             (click)="switchToTab(TAB_TYPE_REVIEWS, tab.tabSubType)"
+             [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.tabSubType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
           {{ tab.text }}
         </div>
         <div class="oppia-contributions-option-group-label"
@@ -25,8 +25,19 @@
         </div>
         <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of contributionTabs">
           <div *ngIf="tab && tab.enabled"
-               (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
-               [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+               (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.tabSubType)"
+               [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.tabSubType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+            {{ tab.text }}
+          </div>
+        </div>
+        <div class="oppia-contributions-option-group-label"
+             *ngIf="accomplishmentsTabIsEnabled && userIsLoggedIn">
+          Accomplishments
+        </div>
+        <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of accomplishmentsTabs">
+          <div *ngIf="tab && tab.enabled"
+               (click)="switchToTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType)"
+               [ngClass]="isActiveTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
             {{ tab.text }}
           </div>
         </div>
@@ -39,8 +50,8 @@
       <div class="oppia-contributions-navbar-items-list" navbar-label="Available Tasks">
         <div class="oppia-contributions-navbar-item" *ngFor="let tab of reviewTabs">
           <button class="oppia-contributions-navbar-button"
-                  (click)="switchToTab(TAB_TYPE_REVIEWS, tab.suggestionType)"
-                  [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.suggestionType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
+                  (click)="switchToTab(TAB_TYPE_REVIEWS, tab.tabSubType)"
+                  [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.tabSubType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
           </button>
         </div>
       </div>
@@ -50,25 +61,36 @@
         <div class="oppia-contributions-navbar-item" *ngFor="let tab of contributionTabs">
           <button *ngIf="tab && tab.enabled"
                   class="oppia-contributions-navbar-button"
-                  (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
-                  [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
+                  (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.tabSubType)"
+                  [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.tabSubType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
           </button>
+        </div>
+      </div>
+      <div class="oppia-contributions-side-navbar-part" *ngIf="accomplishmentsTabIsEnabled && userIsLoggedIn">
+        <div class="oppia-contributions-navbar-items-list" navbar-label="Accomplishments">
+          <div class="oppia-contributions-navbar-item" *ngFor="let tab of accomplishmentsTabs">
+            <button *ngIf="tab && tab.enabled"
+                    class="oppia-contributions-navbar-button"
+                    (click)="switchToTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType)"
+                    [ngClass]="isActiveTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="oppia-contributions-show-review-container">
+  <div [ngClass]="!isAccomplishmentsTabActive() ? 'oppia-contributions-show-review-container' : 'oppia-contributor-accomplishments-container'">
     <div class="oppia-login-required" *ngIf="!userDetailsLoading && !userIsLoggedIn">
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
-      <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab()"
+      <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
                                 [labelRequired]="!activeReviewTab"
                                 [showOpportunityButton]="true">
       </oppia-opportunities-list>
-      <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab()">
+      <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab() && !isAccomplishmentsTabActive()">
         <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
           <button aria-label="Back to reviewable lessons"
                   (click)="onClickBackToReviewableLessons()"
@@ -84,6 +106,10 @@
                                   [opportunityHeadingTruncationLength]="30"
                                   [showOpportunityButton]="false">
         </oppia-opportunities-list>
+      </div>
+      <div *ngIf="accomplishmentsTabIsEnabled && isAccomplishmentsTabActive() && activeTabSubtype === 'stats'">
+        <contributor-stats [type]="defaultContributionType">
+        </contributor-stats>
       </div>
     </div>
   </div>
@@ -108,7 +134,6 @@
     background-color: white;
     display: none;
     font-size: 20px;
-    margin-bottom: 3%;
     padding: 0 20px;
     width: 100%;
   }
@@ -178,6 +203,10 @@
 
   .oppia-contributions-show-review-container {
     background-color: white;
+    width: 75%;
+  }
+
+  .oppia-contributor-accomplishments-container {
     width: 75%;
   }
 
@@ -298,7 +327,6 @@
       align-items: center;
       display: flex;
       justify-content: space-between;
-      margin-bottom: 10px;
       padding-bottom: 30px;
       padding-top: 5px;
     }
@@ -334,7 +362,6 @@
       width: 100px;
     }
     .oppia-contributions-dropdown-section {
-      margin-bottom: 20px;
       padding: auto 2vw;
       width: 100%;
     }
