@@ -59,6 +59,10 @@ export class VersionHistoryService {
   fetchedMetadata: (ExplorationMetadata | null) [] = [];
 
   fetchedCommitterUsernames: string[] = [];
+
+  // The two below variables represent the current index of the version history
+  // list which the user is navigating i.e. index value for the lists
+  // fetchedStateVersionNumbers, fetchedMetadataVersionNumbers etc.
   currentPositionInStateVersionHistoryList: number = 0;
   currentPositionInMetadataVersionHistoryList: number = 0;
 
