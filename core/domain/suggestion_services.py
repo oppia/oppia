@@ -2437,6 +2437,7 @@ def update_translation_contribution_stats_at_submission(
         suggestion: Suggestion. The suggestion domain object that is being
             submitted.
     """
+    content_word_count = 0
     exp_opportunity = (
         opportunity_services.get_exploration_opportunity_summary_by_id(
             suggestion.target_id))
@@ -2446,9 +2447,14 @@ def update_translation_contribution_stats_at_submission(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    content_plain_text = html_cleaner.strip_html_tags(
-        suggestion.change.translation_html)
-    content_word_count = len(content_plain_text.split())
+    if isinstance(suggestion.change.translation_html, list):
+        for content in suggestion.change.translation_html:
+            content_plain_text = html_cleaner.strip_html_tags(content)
+            content_word_count += len(content_plain_text.split())
+    else:
+        content_plain_text = html_cleaner.strip_html_tags(
+            suggestion.change.translation_html)
+        content_word_count = len(content_plain_text.split())
 
     translation_contribution_stat_model = (
         suggestion_models.TranslationContributionStatsModel.get(
@@ -2494,6 +2500,7 @@ def update_translation_contribution_stats_at_review(
         suggestion: Suggestion. The suggestion domain object that is being
             reviewed.
     """
+    content_word_count = 0
     exp_opportunity = (
         opportunity_services.get_exploration_opportunity_summary_by_id(
             suggestion.target_id))
@@ -2503,9 +2510,14 @@ def update_translation_contribution_stats_at_review(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    content_plain_text = html_cleaner.strip_html_tags(
-        suggestion.change.translation_html)
-    content_word_count = len(content_plain_text.split())
+    if isinstance(suggestion.change.translation_html, list):
+        for content in suggestion.change.translation_html:
+            content_plain_text = html_cleaner.strip_html_tags(content)
+            content_word_count += len(content_plain_text.split())
+    else:
+        content_plain_text = html_cleaner.strip_html_tags(
+            suggestion.change.translation_html)
+        content_word_count = len(content_plain_text.split())
 
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
@@ -2571,6 +2583,7 @@ def update_translation_review_stats(
     Raises:
         Exception. The final_reviewer_id of the suggestion should not be None.
     """
+    content_word_count = 0
     if suggestion.final_reviewer_id is None:
         raise Exception(
             'The final_reviewer_id in the suggestion should not be None.'
@@ -2587,9 +2600,14 @@ def update_translation_review_stats(
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
 
-    content_plain_text = html_cleaner.strip_html_tags(
-        suggestion.change.translation_html)
-    content_word_count = len(content_plain_text.split())
+    if isinstance(suggestion.change.translation_html, list):
+        for content in suggestion.change.translation_html:
+            content_plain_text = html_cleaner.strip_html_tags(content)
+            content_word_count += len(content_plain_text.split())
+    else:
+        content_plain_text = html_cleaner.strip_html_tags(
+            suggestion.change.translation_html)
+        content_word_count = len(content_plain_text.split())
 
     translation_review_stat_model = (
         # This function is called when reviewing a translation and hence
