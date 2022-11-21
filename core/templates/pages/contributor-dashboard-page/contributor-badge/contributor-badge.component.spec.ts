@@ -307,10 +307,30 @@ describe('Contributor badge component', () => {
 
         it('should not display any badge', fakeAsync(() => {
           expect(component.translationBadges).toEqual({});
-          expect(component.questionSubmissionBadges).toEqual(undefined);
+          expect(component.questionSubmissionBadges).toEqual([]);
         }));
       });
   });
+
+  describe('when user contribution rights can not be fetched',
+    () => {
+      it('should throw error to mention the error',
+        fakeAsync(() => {
+          spyOn(userService, 'getUserInfoAsync')
+            .and.returnValue(Promise.resolve({
+              isLoggedIn: () => true,
+              getUsername: () => 'user'
+            } as UserInfo));
+          spyOn(userService, 'getUserContributionRightsDataAsync')
+            .and.returnValue(Promise.resolve(null));
+
+          expect(() => {
+            component.ngOnInit();
+            tick();
+          }).toThrowError();
+          flush();
+        }));
+    });
 
   describe('when user navigates to contributor stats page without login',
     () => {

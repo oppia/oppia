@@ -63,7 +63,7 @@ export class ContributorBadgeComponent {
   questionSubmissionBadges: Badge[] = [];
   questionReviewBadges: Badge[] = [];
   questionCorrectionBadges: Badge[] = [];
-  selectedLanguage: string;
+  selectedLanguage: string = '';
   totalQuestionStats: ContributionCounts = {
     submissions: 0,
     reviews: 0,
@@ -98,6 +98,10 @@ export class ContributorBadgeComponent {
 
     const userContributionRights =
       await this.userService.getUserContributionRightsDataAsync();
+
+    if (userContributionRights === null) {
+      throw new Error('Cannot fetch user contribution rights.');
+    }
     userContributionRights.can_review_translation_for_language_codes.map(
       (languageCode) => {
         const languageDescription = this.languageUtilService
