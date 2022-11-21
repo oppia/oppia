@@ -31,7 +31,6 @@ import numbers
 import re
 import urllib
 
-
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -41,7 +40,6 @@ from core.domain import user_domain
 from extensions.objects.models import objects
 
 import mutagen
-from mutagen import mp3
 
 from typing import Any, Callable, Dict, List, Optional, cast
 
@@ -819,7 +817,7 @@ class _Validators:
         # .mp3 is the only allowed extension.
         extension = 'mp3'
         try:
-            audio = mp3.MP3(tempbuffer)
+            audio = mutagen.mp3.MP3(tempbuffer)
         except mutagen.MutagenError as e:
             raise Exception(
                 'Audio not recognized as a %s file' % extension
