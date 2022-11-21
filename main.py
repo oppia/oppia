@@ -81,7 +81,7 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 
 import google.cloud.logging
-from typing import Any, Dict, Optional, Type, TypeVar
+from typing import Dict, Optional, Type, TypeVar
 import webapp2
 from webapp2_extras import routes
 
@@ -117,12 +117,8 @@ class InternetConnectivityHandler(
     frontend to check for internet connection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    # Here we use type Any because this class inherits this attribute
-    # from core.controllers.base.BaseModel.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Here we use type Any because this class inherits this attribute
-    # from core.controllers.base.BaseModel.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self) -> None:
@@ -136,11 +132,24 @@ class FrontendErrorHandler(
     """Handles errors arising from the frontend."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'error': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def post(self) -> None:
         """Records errors reported by the frontend."""
-        logging.error('Frontend error: %s' % self.payload.get('error'))
+        assert self.normalized_payload is not None
+        logging.error(
+            'Frontend error: %s' % self.normalized_payload.get('error')
+        )
         self.render_json(self.values)
 
 
