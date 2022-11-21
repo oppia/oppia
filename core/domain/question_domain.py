@@ -1764,7 +1764,7 @@ class Question(translation_domain.BaseTranslatableObject):
         conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
             current_state_schema_version, current_state_schema_version + 1))
 
-        if current_state_schema_version == 53:
+        if current_state_schema_version == 54:
             versioned_question_state['state'], next_content_id_index = (
                 conversion_fn(versioned_question_state['state'])
             )

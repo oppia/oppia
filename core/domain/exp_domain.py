@@ -5073,7 +5073,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         elif current_states_schema_version == 52:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'], language_code)
-        elif current_states_schema_version == 53:
+        elif current_states_schema_version == 54:
             versioned_exploration_states['states'], next_content_id_index = (
                 conversion_fn(versioned_exploration_states['states']))
             assert isinstance(next_content_id_index, int)
@@ -5432,7 +5432,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             cls._convert_states_v54_dict_to_v55_dict(
                 exploration_dict['states'])
         )
-        exploration_dict['states_schema_version'] = 54
+        exploration_dict['states_schema_version'] = 55
         exploration_dict['next_content_id_index'] = next_content_id_index
 
         return exploration_dict
