@@ -171,15 +171,27 @@ class DraftUpgradeUtil:
                 )
                 new_value = edit_interaction_cust_args_cmd.new_value
                 if 'choices' in new_value.keys():
+                    # Here we use cast because we are narrowing down the type
+                    # from various customization args value types to List[
+                    # SubtitledHtmlDict] type, and this is done because here
+                    # we are accessing 'choices' keys over customization_args
+                    # and every customization arg that has a 'choices' key will
+                    # contain values of type List[SubtitledHtmlDict].
+                    subtitled_html_new_value_dicts = cast(
+                        List[state_domain.SubtitledHtmlDict],
+                        new_value['choices']['value']
+                    )
                     for value_index, value in enumerate(
-                            new_value['choices']['value']):
+                        subtitled_html_new_value_dicts
+                    ):
                         if isinstance(value, dict) and 'html' in value:
-                            new_value['choices']['value'][value_index][
+                            subtitled_html_new_value_dicts[value_index][
                                 'html'
                             ] = conversion_fn(value['html'])
                         elif isinstance(value, str):
-                            new_value['choices']['value'][value_index] = (
-                                conversion_fn(value))
+                            subtitled_html_new_value_dicts[value_index] = (
+                                conversion_fn(value)
+                            )
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
                 # Here we use cast because this 'elif' condition forces change

@@ -46,7 +46,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, Union
+from typing import Dict, Final, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -2862,9 +2862,17 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         # Create a translation suggestion for the Continue button text.
         self.login(self.AUTHOR_EMAIL)
         continue_state = exp_100.states['continue state']
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to 'SubtitledUnicode' type, and this
+        # is done because here we are accessing 'buttontext' key from continue
+        # customization arg whose value is always of SubtitledUnicode type.
+        subtitled_unicode_of_continue_button_text = cast(
+            state_domain.SubtitledUnicode,
+            continue_state.interaction.customization_args['buttonText'].value
+        )
         content_id_of_continue_button_text = (
-            continue_state.interaction.customization_args[
-                'buttonText'].value.content_id)
+            subtitled_unicode_of_continue_button_text.content_id
+        )
         change_dict = {
             'cmd': 'add_translation',
             'content_id': content_id_of_continue_button_text,

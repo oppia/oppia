@@ -26,7 +26,7 @@ from core.jobs.batch_jobs import opportunity_management_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Final, Type
+from typing import Dict, Final, List, Type, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -899,27 +899,30 @@ class GenerateExplorationOpportunitySummariesJobTests(
                 'html': '<p>This is content</p>'
             })
         )
+        choices_cust_args_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>option 1</p>'
+            },
+            {
+                'content_id': 'ca_choices_1',
+                'html': '<p>1,000</p>'
+            },
+            {
+                'content_id': 'ca_choices_2',
+                'html': '<p>100</p>'
+            }
+        ]
         # Set the multiple choice interaction.
         init_state.update_interaction_id('MultipleChoiceInput')
-        state_interaction_cust_args: state_domain.CustomizationArgsDictType = {
+        state_interaction_cust_args: Dict[
+            str, Dict[str, Union[bool, List[state_domain.SubtitledHtmlDict]]]
+        ] = {
             'showChoicesInShuffledOrder': {
                 'value': True
             },
             'choices': {
-                'value': [
-                    {
-                        'content_id': 'ca_choices_0',
-                        'html': '<p>option 1</p>'
-                    },
-                    {
-                        'content_id': 'ca_choices_1',
-                        'html': '<p>1,000</p>'
-                    },
-                    {
-                        'content_id': 'ca_choices_2',
-                        'html': '<p>100</p>'
-                    }
-                ]
+                'value': choices_cust_args_dicts
             }
         }
         init_state.update_interaction_customization_args(

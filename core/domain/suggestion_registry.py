@@ -38,9 +38,12 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
+from extensions import domain
 
 from typing import (
-    Any, Callable, Dict, List, Mapping, Optional, Set, Type, TypedDict, Union)
+    Any, Callable, Dict, List, Mapping, Optional, Set, Type, TypedDict, Union,
+    cast
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -303,11 +306,12 @@ class BaseSuggestion:
             'Subclasses of BaseSuggestion should implement '
             'populate_old_value_of_change.')
 
-    # TODO(#16047): Here we use type Any because BaseSuggestion class is not
-    # implemented according to the strict typing which forces us to use Any
-    # here so that MyPy does not throw errors for different types of values
-    # used in sub-classes. Once this BaseSuggestion is refactored, we can
-    # remove type Any from here.
+    # TODO(#16047): Here we use type Any because the method pre_update_validate
+    # is used inside sub-classes with different argument types, which according
+    # to MyPy violates the 'Liskov substitution principle' and throws an error
+    # in every sub-class where this pre_update_validate method is used. So, to
+    # avoid the error in every sub-class, we have used Any type here but once
+    # this BaseSuggestion class is refactored, we can remove type Any from here.
     def pre_update_validate(self, change: Any) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
@@ -1044,17 +1048,18 @@ class SuggestionAddQuestion(BaseSuggestion):
         # Drop Sort have ck editor that includes the images of the interactions
         # so that references for those images are included as html strings.
         if question.question_state_data.interaction.id == 'ImageClickInput':
-            # TODO(#15982): Currently, we have broader type for interaction
-            # customization args and due to this we have to use assert to
-            # narrow down the type. So, once each customization_arg is defined
-            # explicitly, we can remove this todo.
-            assert isinstance(
+            # Here we use cast because we are narrowing down the type from
+            # various types of cust. arg values to ImageAndRegionDict, and
+            # here we are sure that the type is always going to be
+            # ImageAndRegionDict because imageAndRegions customization arg
+            # object always contain values of type ImageAndRegionDict.
+            customization_arg_image_dict = cast(
+                domain.ImageAndRegionDict,
                 question.question_state_data.interaction.customization_args[
-                    'imageAndRegions'].value, dict
+                    'imageAndRegions'].value
             )
             new_image_filenames.append(
-                question.question_state_data.interaction.customization_args[
-                    'imageAndRegions'].value['imagePath'])
+                customization_arg_image_dict['imagePath'])
         fs_services.copy_images(
             self.image_context, self.target_id, feconf.ENTITY_TYPE_QUESTION,
             question_dict['id'], new_image_filenames)

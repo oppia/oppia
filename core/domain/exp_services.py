@@ -63,6 +63,7 @@ from core.domain import taskqueue_services
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
+from extensions import domain
 
 import deepdiff
 from typing import (
@@ -1956,9 +1957,17 @@ def validate_exploration_for_story(
             validation_error_messages.append(error_string)
 
         if state.interaction.id == 'EndExploration':
-            recommended_exploration_ids = (
+            # Here we use cast because we are narrowing down the type
+            # from various customization args value types to List[str]
+            # type, and this is done because here we are accessing
+            # 'recommendedExplorationIds' key from EndExploration
+            # customization arg whose value is always of List[str] type.
+            recommended_exploration_ids = cast(
+                List[str],
                 state.interaction.customization_args[
-                    'recommendedExplorationIds'].value)
+                    'recommendedExplorationIds'
+                ].value
+            )
             if len(recommended_exploration_ids) != 0:
                 error_string = (
                     'Explorations in a story are not expected to contain '
@@ -1970,8 +1979,15 @@ def validate_exploration_for_story(
                 validation_error_messages.append(error_string)
 
         if state.interaction.id == 'MultipleChoiceInput':
-            choices = (
-                state.interaction.customization_args['choices'].value)
+            # Here we use cast because we are narrowing down the type from
+            # various customization args value types to List[SubtitledHtml]
+            # type, and this is done because here we are accessing 'choices'
+            # key from MultipleChoiceInput customization arg whose value is
+            # always of List[SubtitledHtml] type.
+            choices = cast(
+                List[state_domain.SubtitledHtml],
+                state.interaction.customization_args['choices'].value
+            )
             if len(choices) < 4:
                 error_string = (
                     'Exploration in a story having MultipleChoiceInput '
@@ -2811,11 +2827,15 @@ def get_image_filenames_from_exploration(
     filenames = []
     for state in exploration.states.values():
         if state.interaction.id == 'ImageClickInput':
-            image_paths = state.interaction.customization_args[
-                'imageAndRegions'].value
-            # Ruling out the possibility of any other type for mypy
-            # type checking.
-            assert isinstance(image_paths, dict)
+            # Here we use cast because we are narrowing down the type from
+            # various customization args value types to ImageAndRegionDict
+            # type, and this is done because here we are accessing
+            # 'imageAndRegions' key from ImageClickInput customization arg
+            # whose values is always of ImageAndRegionDict type.
+            image_paths = cast(
+                domain.ImageAndRegionDict,
+                state.interaction.customization_args['imageAndRegions'].value
+            )
             filenames.append(image_paths['imagePath'])
 
     html_list = exploration.get_all_html_content_strings()
