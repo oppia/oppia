@@ -250,6 +250,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                 feconf.SUBTOPIC_DATA_HANDLER, 'invalidname',
                 'sub-url-frag-one'),
             expected_status_int=404)
+        self.assertIn('Could not find the page', response['error'])
 
     def test_cannot_get_with_invalid_subtopic_id(self) -> None:
         response = self.get_json(
