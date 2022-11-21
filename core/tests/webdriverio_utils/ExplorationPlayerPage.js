@@ -308,6 +308,10 @@ var ExplorationPlayerPage = function() {
   };
 
   this.skipQuestion = async function() {
+    await waitFor.elementToBeClickable(
+      skipQuestionButton,
+      'Skip question button taking longer than expected'
+    );
     await action.click('Skip question button', skipQuestionButton);
   };
 

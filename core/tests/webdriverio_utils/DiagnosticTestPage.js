@@ -33,6 +33,7 @@ var DiagnosticTestPage = function() {
   };
 
   this.startDiagnosticTest = async function() {
+    await waitFor.pageToFullyLoad();
     await waitFor.elementToBeClickable(
       startDiagnosticTestButton,
       'Start diagnostic test button taking too long to be clickable'
