@@ -1,14 +1,16 @@
 <div class="donate-page">
   <div class="oppia-donate-page-banner">
     <div class="container">
-      <h1 class="text-light oppia-donate-page-heading">Donate to the Oppia Foundation</h1>
+      <h1 class="text-light oppia-donate-page-heading">
+        {{ 'I18N_DONATE_PAGE_TITLE' | translate }}
+      </h1>
       <picture class="oppia-donate-page-img">
         <source type="image/webp" [srcset]="getImageSet('/splash/volunteer_section', 'webp')">
         <source type="image/png" [srcset]="getImageSet('/splash/volunteer_section', 'png')">
         <img [src]="getStaticImageUrl('/splash/volunteer_section', 'png')"
-            width="200px"
-            loading="lazy"
-            alt="Logo of Oppia containing photos of contributors">
+             width="200px"
+             loading="lazy"
+             alt="Logo of Oppia containing photos of contributors">
       </picture>
     </div>
   </div>
@@ -17,8 +19,8 @@
       <div class="row">
         <div class="col-sm-7">
           <div class="oppia-donation-card-content-wide oppia-donate-page-video-section bg-white mt-0 d-block">
-            <div class="mb-5">
-              To date, Oppia has served more than <b>1.5 million</b> learners around the world - many of whom come from the world's more underserved areas. Oppia relies on donations, and with <b>just $11</b>, you can help us continue our work and expand the reach of our platform, to expand equitable education for all.
+            <div class="mb-5"
+                 [innerHTML]="'I18N_DONATE_PAGE_VISION_TEXT' | translate">
             </div>
             <iframe class="oppia-donate-page-video"
                     src="https://www.youtube.com/embed/oJQrQK8cdoM"
@@ -38,9 +40,9 @@
                     seamless="seamless"
                     frameborder="0"
                     scrolling="no"
-                    height="600px"
+                    height="650px"
                     width="100%"
-                    style="max-width: 500px; min-width: 250px; max-height:none!important">
+                    class="donate-page-iframe">
             </iframe>
           </div>
         </div>
@@ -177,8 +179,8 @@
                   <source type="image/webp" [srcset]="getImageSet('/splash/Gaurav', 'webp')">
                   <source type="image/png" [srcset]="getImageSet('/splash/Gaurav', 'png')">
                   <img [src]="getStaticImageUrl('/splash/Gaurav', 'png')"
-                        class="rounded-circle oppia-donate-contributor-img"
-                        alt="Logo of Oppia containing photos of contributors">
+                       class="rounded-circle oppia-donate-contributor-img"
+                       alt="Logo of Oppia containing photos of contributors">
                 </picture>
               </div>
             </div>
@@ -190,7 +192,7 @@
             </div>
           </div>
         </div>
-        <!-- <div class="carousel-item">
+        <div class="carousel-item">
           <div class="container">
             <div class="row justify-content-center pt-5">
               <div class="oppia-donate-page-carousel-img-wrapper">
@@ -198,9 +200,9 @@
                   <source type="image/webp" [srcset]="getImageSet('/splash/mira', 'webp')">
                   <source type="image/png" [srcset]="getImageSet('/splash/mira', 'png')">
                   <img [src]="getStaticImageUrl('/splash/mira', 'png')"
-                        class="rounded-circle"
-                        width="200px"
-                        alt="Logo of Oppia containing photos of contributors">
+                       class="rounded-circle"
+                       width="200px"
+                       alt="Logo of Oppia containing photos of contributors">
                 </picture>
               </div>
             </div>
@@ -220,9 +222,9 @@
                   <source type="image/webp" [srcset]="getImageSet('/splash/Dheeraj', 'webp')">
                   <source type="image/png" [srcset]="getImageSet('/splash/Dheeraj', 'png')">
                   <img [src]="getStaticImageUrl('/splash/Dheeraj', 'png')"
-                        class="rounded-circle"
-                        width="200px"
-                        alt="Logo of Oppia containing photos of contributors">
+                       class="rounded-circle"
+                       width="200px"
+                       alt="Logo of Oppia containing photos of contributors">
                 </picture>
               </div>
             </div>
@@ -230,13 +232,13 @@
               <div class="carousel-caption text-dark mb-5">
                 <h3 class="text-center">From India</h3>
                 <p class="text-center oppia-donate-student-feedback-text">
-                  “I really had fun while solving the questions because they had many colorful shapes and images. 
+                  “I really had fun while solving the questions because they had many colorful shapes and images.
                   The images made it easier to understand the topics as well!”
                 </p>
               </div>
             </div>
           </div>
-        </div> -->
+        </div>
       </div>
       <div class="carousel-control-prev" type="button" data-target="#donate-page-learner-carousel" data-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -508,24 +510,24 @@
   }
   .oppia-donate-page .carousel-control-prev-icon,
   .oppia-donate-page .carousel-control-next-icon {
-    height: 40px;
-    width: 40px;
-    background-size: 100%, 100%;
-    border-radius: 50%;
     background-color: #094142;
     background-image: none;
+    background-size: 100%, 100%;
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
   }
 
   .oppia-donate-page .carousel-control-next-icon:after {
+    color: #fff;
     content: '>';
     font-size: 25px;
-    color: #fff;
   }
 
   .oppia-donate-page .carousel-control-prev-icon:after {
+    color: #fff;
     content: '<';
     font-size: 25px;
-    color: #fff;
   }
 
   .oppia-donate-student-feedback-text {
@@ -533,16 +535,16 @@
     max-width: 800px;
   }
   .oppia-donate-page-banner {
-    background: #879AA1;
+    background: #879aa1;
     height: 350px;
   }
   .oppia-donate-page-main-content-container {
     margin-top: -97px;
   }
   .oppia-donate-page-heading {
-    text-align: center;
     padding-top: 120px;
     position: relative;
+    text-align: center;
     z-index: 10;
   }
   .oppia-donate-page-img {
@@ -558,22 +560,22 @@
     width: 100%;
   }
   .donate-page-section-heading {
-    font-family:'Capriola', 'Roboto', Arial, sans-serif;
-    font-weight: 400;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 32px;
+    font-weight: 400;
   }
   .oppia-donate-page-section-gray-bg {
-    background: #F4F4F4;
+    background: #f4f4f4;
   }
   .oppia-donate-page-learner-img-container {
     display: block;
     text-align: center;
   }
   .oppia-donate-page-text-color {
-    color: #015C53;
+    color: #015c53;
   }
   .oppia-donate-page-feature-text {
-    font-family: 'Roboto';
+    font-family: 'Roboto', Arial, sans-serif;
     font-weight: 700;
     margin-top: 50px;
   }
@@ -587,9 +589,9 @@
     margin: 0 auto;
   }
   .oppia-donate-page-money-main-text {
-    color: #252B42;
+    color: #252b42;
     display: block;
-    font-family: 'Capriola';
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 23px;
     font-weight: 400;
     padding-top: 10px;
@@ -598,7 +600,7 @@
   .oppia-donate-page-money-sub-text {
     color: #737373;
     display: block;
-    font-family: 'Roboto';
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 14px;
     padding-top: 10px;
     text-align: center;
@@ -610,15 +612,15 @@
     background-color: #00645c;
     border-radius: 4px;
     color: #fff;
-    width: 100%;
     margin: 10px auto;
+    width: 100%;
   }
   .oppia-donate-page-read-blog-btn {
-    border-radius: 4px;
     border: 1px solid #00645c;
+    border-radius: 4px;
     color: #00645c;
-    width: 100%;
     margin: 10px auto;
+    width: 100%;
   }
   .oppia-donate-page-feature-text-container {
     height: 50px;
@@ -627,9 +629,9 @@
     padding-left: 30px;
   }
   .oppia-donate-page-hr {
-    background-color: #E74040;
+    background-color: #e74040;
     border: none;
-    color: #E74040;
+    color: #e74040;
     height: 1px;
   }
   .oppia-donate-page-carousel-img-wrapper {
@@ -641,30 +643,17 @@
   }
   .donate-page .mat-expansion-panel-header,
   .donate-page .mat-expansion-panel-header:hover {
-    background: #C6DCDA;
+    background: #c6dcda;
     height: auto;
     min-height: 48px;
   }
   @media (hover: none) {
     .donate-page .mat-expansion-panel:not(.mat-expanded):not([aria-disabled='true'])
     .donate-page .mat-expansion-panel-header:hover {
-      background: #C6DCDA;
+      background: #c6dcda;
       height: auto;
       min-height: 48px;
     }
-  }
-  h1.oppia-donate-h1 {
-    color: #fff;
-    font-size: 1.5em;
-    line-height: 1.7em;
-    margin-top: 60px;
-    text-align: center;
-  }
-  h3.oppia-donate-h3 {
-    font-size: .80em;
-    font-weight: normal;
-    margin: 2.33em 0;
-    text-align: center;
   }
   .carousel-indicators li {
     background-color: #00645c;
@@ -672,68 +661,12 @@
   .donate-page .oppia-donation-card-content-wide {
     border-radius: 5px;
     box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 24%);
+    margin: 40px auto 80px;
     margin-bottom: 80px;
     margin-left: auto;
     margin-right: auto;
-    padding: 30px 55px 30px 45px;
-    margin: 40px auto 80px;
     overflow: auto;
-  }
-  .donate-page .oppia-donate-options {
-    background-color: #009688;
-    display: block;
-    float: right;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    padding: 10px 10px 35px 10px;
-    width: 340px;
-  }
-  .donate-page .btn.oppia-donate-options-button {
-    background-color: #00645c;
-    border-radius: 4px;
-    color: rgba(255,255,255,1.0);
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    height: 40px;
-    letter-spacing: 0.7px;
-    margin: 10px auto;
-    width: 180px;
-  }
-  .donate-page .btn.oppia-donate-options-button:hover,
-  .donate-page .btn.oppia-donate-options-button:focus {
-    background-color: #3d9991;
-    color: rgba(255,255,255,1);
-  }
-  .donate-page .oppia-donate-info {
-    float: left;
-    padding-bottom: 30px;
-    width: calc(100% - 340px);
-  }
-  .donate-page .oppia-gift-funds-text {
-    color: #fff;
-    font-size: 24px;
-    margin-bottom: 20px;
-    margin-top: 20px;
-  }
-  .donate-page .oppia-donate-img-container {
-    margin-bottom: 16px;
-  }
-  .donate-page .oppia-meet-contributors-iframe-container {
-    height: 0;
-    margin: 60px auto 0 auto;
-    padding-bottom: 56.25%;
-    width: 70%;
-  }
-  .donate-page .oppia-meet-contributors-iframe {
-    left: 0;
-    top: 0;
-  }
-  .donate-page .oppia-vision-text-container {
-    margin: 0 auto;
-    width: 70%;
-  }
-  .donate-page .oppia-vision-text {
-    font-size: 0.825em;
+    padding: 30px 55px 30px 45px;
   }
 
   @media (max-width: 600px) {
@@ -742,25 +675,12 @@
       flex-direction: column-reverse;
       width: 100%;
     }
-    .donate-page .oppia-donate-info {
-      width: 100%;
-    }
-    .donate-page .oppia-donate-options {
-      width: 100%;
-    }
-    .oppia-donate-info, .oppia-donate-options {
-      flex: 1;
-    }
   }
   @media only screen and (max-width: 1160px) and (min-width: 600px) {
     .oppia-donation-card-content-wide {
       display: flex;
       flex-direction: row-reverse;
       width: 100%;
-    }
-
-    .oppia-donate-info, .oppia-donate-options {
-      flex: 1;
     }
   }
   @media (max-width: 700px) {
@@ -772,5 +692,10 @@
     .oppia-donate-page-carousel-img-wrapper {
       height: 600px;
     }
+  }
+  .donate-page-iframe {
+    max-height: none;
+    max-width: 500px;
+    min-width: 250px;
   }
 </style>

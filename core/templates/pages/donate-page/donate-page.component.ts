@@ -23,7 +23,6 @@ import { Subscription } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { PageTitleService } from 'services/page-title.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowDimensionsService } from
@@ -35,6 +34,7 @@ import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
 import { AndroidUpdatesBackendApiService } from 'domain/android-updates/android-updates-backend-api.service';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
+import { ThanksForSubscribingModalComponent } from './thanks-for-subscribing-modal.component';
 
 @Component({
   selector: 'donate-page',
@@ -50,9 +50,9 @@ export class DonatePageComponent implements OnInit, OnDestroy {
   OPPIA_AVATAR_IMAGE_URL = (
     this.urlInterpolationService
       .getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg'));
+
   constructor(
     private pageTitleService: PageTitleService,
-    private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef,
@@ -113,7 +113,13 @@ export class DonatePageComponent implements OnInit, OnDestroy {
       String(this.emailAddress), String(this.name)
     ).then((status) => {
       if (status) {
-        this.alertsService.addInfoMessage('Done!', 1000);
+        this.ngbModal.open(
+          ThanksForSubscribingModalComponent,
+          {
+            backdrop: 'static',
+            size: 'xl'
+          }
+        );
       } else {
         this.alertsService.addInfoMessage(
           'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +

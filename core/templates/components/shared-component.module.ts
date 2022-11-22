@@ -181,6 +181,7 @@ import { ComponentOverviewComponent } from './copy-url/copy-url.component';
 import { MatMenuModule} from '@angular/material/menu';
 import { DynamicComponentModule } from 'value_generators/templates/dynamic-component.module';
 import { ThanksForDonatingModalComponent } from 'pages/donate-page/thanks-for-donating-modal.component';
+import { ThanksForSubscribingModalComponent } from 'pages/donate-page/thanks-for-subscribing-modal.component';
 
 @NgModule({
   imports: [
@@ -295,6 +296,7 @@ import { ThanksForDonatingModalComponent } from 'pages/donate-page/thanks-for-do
     EditThumbnailModalComponent,
     SupplementalCardComponent,
     ThanksForDonatingModalComponent,
+    ThanksForSubscribingModalComponent,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -424,6 +426,7 @@ import { ThanksForDonatingModalComponent } from 'pages/donate-page/thanks-for-do
     SummaryListHeaderComponent,
     SupplementalCardComponent,
     ThanksForDonatingModalComponent,
+    ThanksForSubscribingModalComponent,
     ThumbnailDisplayComponent,
     TutorCardComponent,
     ThumbnailUploaderComponent,
@@ -567,6 +570,7 @@ import { ThanksForDonatingModalComponent } from 'pages/donate-page/thanks-for-do
     TakeBreakModalComponent,
     ThreadTableComponent,
     ThanksForDonatingModalComponent,
+    ThanksForSubscribingModalComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,

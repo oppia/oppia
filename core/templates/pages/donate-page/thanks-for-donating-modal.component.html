@@ -2,13 +2,11 @@
   <div class="row">
     <div class="col-md-6 p-0 thanks-image-container">
       <picture>
-        <source type="image/webp"
-                [srcset]="'/assets/images/about_foundation/20180826_161603.webp'">
         <source type="image/jpg"
-                [srcset]="'/assets/images/20180826_161603.jpg'">
+                [srcset]="'/assets/images/donate/thanks-for-donating.jpeg'">
         <img alt="Education Equality Infographic"
              class="w-100 h-100"
-             src="/assets/images/about_foundation/20180826_161603.jpg">
+             src="/assets/images/donate/thanks-for-donating.jpeg">
       </picture>
     </div>
     <div class="col-md-6">
@@ -16,18 +14,15 @@
         <i class="fas fa-times-circle" (click)="dismiss()"></i>
       </div>
       <div class="row">
-        <h3 class="thanks-subscribe-header">
-          Thanks for subscribing!
-        </h3>
+        <h2 class="thanks-subscribe-header">
+          Thanks for donating!
+        </h2>
         <div class="thanks-paragraph">
-          You will start receiving updates in your inbox
-          soon. We promise not to spam, and you can
-          unsubscribe at any time.
+          With your help and support, Oppia will be able to continue serving
+          the most underserved learners around the world.
         </div>
         <div class="thanks-paragraph">
-          With help and support from our community (including you!), Oppia has
-          and continues to serve the most under-resourced learners around the
-          world.
+          Learn more about Oppia and the impact that you support will have
         </div>
         <div class="row container mt-3">
           <div class="col-sm-6">
@@ -37,36 +32,39 @@
             <a class="btn thanks-read-blog-btn" href="https://medium.com/oppia-org">Read our blog</a>
           </div>
         </div>
+        <div class="thanks-paragraph mt-4">
+          If you have any questions, please reach out at anytime.
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <style>
-.thanks-image-container {
-  margin: -10px 0 -10px -10px;
-}
-.thanks-watch-video-btn {
-  background-color: #00645c;
-  border-radius: 4px;
-  color: #fff;
-  width: 100%;
-  margin: 10px auto;
-}
-.thanks-read-blog-btn {
-  border-radius: 4px;
-  border: 1px solid #00645c;
-  color: #00645c;
-  width: 100%;
-  margin: 10px auto;
-}
-.thanks-subscribe-header {
-  margin-bottom: 40px;
-  margin-left: 15px;
-  margin-top: 75px;
-}
-.thanks-paragraph {
-  margin-left: 15px;
-  margin-bottom: 30px;
-}
+  .thanks-image-container {
+    margin: -10px 0 -10px -10px;
+  }
+  .thanks-watch-video-btn {
+    background-color: #00645c;
+    border-radius: 4px;
+    color: #fff;
+    margin: 10px auto;
+    width: 100%;
+  }
+  .thanks-read-blog-btn {
+    border: 1px solid #00645c;
+    border-radius: 4px;
+    color: #00645c;
+    margin: 10px auto;
+    width: 100%;
+  }
+  .thanks-subscribe-header {
+    margin-bottom: 40px;
+    margin-left: 15px;
+    margin-top: 75px;
+  }
+  .thanks-paragraph {
+    margin-bottom: 30px;
+    margin-left: 15px;
+  }
 </style>
