@@ -83,10 +83,10 @@
           </div>
           <div class="row mt-5">
             <div class="col-sm-6">
-              <button class="btn oppia-donate-page-watch-video-btn">Watch a video</button>
+              <a class="btn oppia-donate-page-watch-video-btn" href="https://youtu.be/OConyxG7HaM">Watch a video</a>
             </div>
             <div class="col-sm-6">
-              <button class="btn oppia-donate-page-read-blog-btn">Read our blog</button>
+              <a class="btn oppia-donate-page-read-blog-btn" href="https://medium.com/oppia-org">Read our blog</a>
             </div>
           </div>
         </div>
@@ -177,8 +177,7 @@
                   <source type="image/webp" [srcset]="getImageSet('/splash/Gaurav', 'webp')">
                   <source type="image/png" [srcset]="getImageSet('/splash/Gaurav', 'png')">
                   <img [src]="getStaticImageUrl('/splash/Gaurav', 'png')"
-                        class="rounded-circle"
-                        width="200px"
+                        class="rounded-circle oppia-donate-contributor-img"
                         alt="Logo of Oppia containing photos of contributors">
                 </picture>
               </div>
@@ -191,7 +190,7 @@
             </div>
           </div>
         </div>
-        <div class="carousel-item">
+        <!-- <div class="carousel-item">
           <div class="container">
             <div class="row justify-content-center pt-5">
               <div class="oppia-donate-page-carousel-img-wrapper">
@@ -237,7 +236,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
       <div class="carousel-control-prev" type="button" data-target="#donate-page-learner-carousel" data-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -432,7 +431,7 @@
   <div class="oppia-page-card mt-0 mb-0 bg-white">
     <div class="container">
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-7">
           <div class="donate-page-section-heading oppia-donate-page-text-color mb-5">Join us today!</div>
           <div class="mb-5">
             <div>Become a part of the movement in bringing effective,</div>
@@ -440,18 +439,67 @@
             <div>Sign up for our newsletter to get updates and learn more</div>
             <div>about how you can get involved.</div>
           </div>
-          <div>
-            <img class="oppia-donate-page-avatar-img" [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
+        </div>
+        <div class="col-md-5">
+          <div class="p-5">
+            <div class="m-4">
+              <div>
+                Name (optional)
+              </div>
+              <input class="w-100"
+                     type="text"
+                     [(ngModel)]="name"
+                     [ngModelOptions]="{standalone: true}"
+                     required="true">
+            </div>
+            <div class="m-4">
+              <div>
+                Email address
+                <span class="oppia-donate-asterisk-color">*</span>
+              </div>
+              <input class="w-100"
+                     type="email"
+                     [(ngModel)]="emailAddress"
+                     [ngModelOptions]="{standalone: true}"
+                     required="true">
+            </div>
+            <div class="text-center m-4">
+              <button [disabled]="!validateEmailAddress()"
+                      (click)="subscribeToMailingList()"
+                      class="btn oppia-donate-subscribe-button">
+                Subscribe now
+              </button>
+            </div>
           </div>
         </div>
-        <div class="col-md-4">
-
+      </div>
+      <div class="row">
+        <div class="col-md-8">
+          <img class="oppia-donate-page-avatar-img" [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
         </div>
       </div>
     </div>
   </div>
 </div>
 <style>
+  .oppia-donate-asterisk-color {
+    color: #ff3a44;
+    font-weight: 700;
+  }
+  .oppia-donate-subscribe-button {
+    background: #00645c;
+    border-radius: 4px;
+    color: #fff;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    width: 100%;
+  }
+  .oppia-donate-contributor-img {
+    max-width: 200px;
+  }
   .oppia-donate-page-avatar-img {
     margin-bottom: -53px;
     margin-left: 70px;
@@ -594,11 +642,15 @@
   .donate-page .mat-expansion-panel-header,
   .donate-page .mat-expansion-panel-header:hover {
     background: #C6DCDA;
+    height: auto;
+    min-height: 48px;
   }
   @media (hover: none) {
     .donate-page .mat-expansion-panel:not(.mat-expanded):not([aria-disabled='true'])
     .donate-page .mat-expansion-panel-header:hover {
       background: #C6DCDA;
+      height: auto;
+      min-height: 48px;
     }
   }
   h1.oppia-donate-h1 {
@@ -709,6 +761,16 @@
 
     .oppia-donate-info, .oppia-donate-options {
       flex: 1;
+    }
+  }
+  @media (max-width: 700px) {
+    .oppia-donate-page-carousel-img-wrapper {
+      height: 500px;
+    }
+  }
+  @media (max-width: 400px) {
+    .oppia-donate-page-carousel-img-wrapper {
+      height: 600px;
     }
   }
 </style>

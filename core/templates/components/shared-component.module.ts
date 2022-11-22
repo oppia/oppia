@@ -180,6 +180,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ComponentOverviewComponent } from './copy-url/copy-url.component';
 import { MatMenuModule} from '@angular/material/menu';
 import { DynamicComponentModule } from 'value_generators/templates/dynamic-component.module';
+import { ThanksForDonatingModalComponent } from 'pages/donate-page/thanks-for-donating-modal.component';
 
 @NgModule({
   imports: [
@@ -293,6 +294,7 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
     SupplementalCardComponent,
+    ThanksForDonatingModalComponent,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -421,6 +423,7 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     SupplementalCardComponent,
+    ThanksForDonatingModalComponent,
     ThumbnailDisplayComponent,
     TutorCardComponent,
     ThumbnailUploaderComponent,
@@ -563,6 +566,7 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
     SupplementalCardComponent,
     TakeBreakModalComponent,
     ThreadTableComponent,
+    ThanksForDonatingModalComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,

@@ -20,6 +20,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -30,6 +31,10 @@ import { WindowDimensionsService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import 'popper.js';
 import 'bootstrap';
+import { AppConstants } from 'app.constants';
+import { AlertsService } from 'services/alerts.service';
+import { AndroidUpdatesBackendApiService } from 'domain/android-updates/android-updates-backend-api.service';
+import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
 
 @Component({
   selector: 'donate-page',
@@ -40,6 +45,8 @@ export class DonatePageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   windowIsNarrow: boolean = false;
   donateImgUrl: string = '';
+  emailAddress: string | null = null;
+  name: string | null = null;
   OPPIA_AVATAR_IMAGE_URL = (
     this.urlInterpolationService
       .getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg'));
@@ -49,7 +56,10 @@ export class DonatePageComponent implements OnInit, OnDestroy {
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private alertsService: AlertsService,
+    private androidUpdatesBackendApiService: AndroidUpdatesBackendApiService,
+    private ngbModal: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -61,6 +71,18 @@ export class DonatePageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
+    this.windowRef.nativeWindow.onhashchange = () => {
+      let newHash: string = this.windowRef.nativeWindow.location.hash;
+      if (newHash === '#thank-you') {
+        this.ngbModal.open(
+          ThanksForDonatingModalComponent,
+          {
+            backdrop: 'static',
+            size: 'xl'
+          }
+        );
+      }
+    };
   }
 
   setPageTitle(): void {
@@ -81,25 +103,27 @@ export class DonatePageComponent implements OnInit, OnDestroy {
     );
   }
 
-  onDonateThroughAmazon(): boolean {
-    this.siteAnalyticsService.registerGoToDonationSiteEvent('Amazon');
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = (
-        'https://smile.amazon.com/ch/81-1740068');
-    }, 150);
-    return false;
+  validateEmailAddress(): boolean {
+    let regex = new RegExp(AppConstants.EMAIL_REGEX);
+    return regex.test(String(this.emailAddress));
   }
 
-  onDonateThroughPayPal(): void {
-    // Redirection to PayPal will be initiated at the same time as this
-    // function is run, but should be slow enough to allow this function
-    // time to complete. It is not possible to do $http.post() in
-    // javascript after a delay because cross-site POSTing is not
-    // permitted in scripts; see
-    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control
-    // _CORS
-    // for more information.
-    this.siteAnalyticsService.registerGoToDonationSiteEvent('PayPal');
+  subscribeToMailingList(): void {
+    this.androidUpdatesBackendApiService.subscribeUserToAndroidList(
+      String(this.emailAddress), String(this.name)
+    ).then((status) => {
+      if (status) {
+        this.alertsService.addInfoMessage('Done!', 1000);
+      } else {
+        this.alertsService.addInfoMessage(
+          'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
+          'to be added to the mailing list.', 10000);
+      }
+    }).catch(errorResponse => {
+      this.alertsService.addInfoMessage(
+        'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
+        'to be added to the mailing list.', 10000);
+    });
   }
 
   ngOnDestroy(): void {
