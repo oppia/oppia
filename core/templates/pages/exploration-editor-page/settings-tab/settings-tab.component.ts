@@ -58,6 +58,10 @@ import { UserEmailPreferencesService } from '../services/user-email-preferences.
 import { UserExplorationPermissionsService } from '../services/user-exploration-permissions.service';
 import { ExplorationEditorPageConstants } from '../exploration-editor-page.constants';
 import { AppConstants } from 'app.constants';
+import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
+import { MetadataDiffData, VersionHistoryService } from '../services/version-history.service';
+import { MetadataVersionHistoryResponse, VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
+import { MetadataVersionHistoryModalComponent } from '../modal-templates/metadata-version-history-modal.component';
 
 @Component({
   selector: 'oppia-settings-tab',
@@ -139,6 +143,7 @@ export class SettingsTabComponent
     private explorationFeaturesService: ExplorationFeaturesService,
     private explorationInitStateNameService: ExplorationInitStateNameService,
     private explorationLanguageCodeService: ExplorationLanguageCodeService,
+    private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
     private explorationObjectiveService: ExplorationObjectiveService,
     private explorationParamChangesService: ExplorationParamChangesService,
     private explorationParamSpecsService: ExplorationParamSpecsService,
@@ -154,6 +159,8 @@ export class SettingsTabComponent
     private userExplorationPermissionsService:
       UserExplorationPermissionsService,
     private userService: UserService,
+    private versionHistoryBackendApiService: VersionHistoryBackendApiService,
+    private versionHistoryService: VersionHistoryService,
     private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
   ) {}
@@ -265,6 +272,96 @@ export class SettingsTabComponent
       }
       this.hasPageLoaded = true;
     });
+  }
+
+  getLastEditedVersionNumber(): number {
+    const lastEditedVersionNumber = this
+      .versionHistoryService
+      .getBackwardMetadataDiffData()
+      .oldVersionNumber;
+    if (lastEditedVersionNumber === null) {
+      // A null value for lastEditedVersionNumber marks the end of the version
+      // history for the exploration metadata. This is impossible here because
+      // this function 'getLastEditedVersionNumber' is called only when
+      // canShowExploreVersionHistoryButton() returns true. This function will
+      // not return true when we reach the end of the version history list.
+      throw new Error('Last edited version number cannot be null');
+    }
+    return lastEditedVersionNumber;
+  }
+
+  getLastEditedCommitterUsername(): string {
+    return (
+      this
+        .versionHistoryService
+        .getBackwardMetadataDiffData()
+        .committerUsername
+    );
+  }
+
+  canShowExploreVersionHistoryButton(): boolean {
+    return this.versionHistoryService.canShowBackwardMetadataDiffData();
+  }
+
+  onClickExploreVersionHistoryButton(): void {
+    const modalRef: NgbModalRef = this.ngbModal.open(
+      MetadataVersionHistoryModalComponent, {
+        backdrop: true,
+        windowClass: 'metadata-diff-modal',
+        size: 'xl'
+      });
+
+    const metadataDiffData: MetadataDiffData = this
+      .versionHistoryService
+      .getBackwardMetadataDiffData();
+
+    modalRef.componentInstance.newMetadata = metadataDiffData.newMetadata;
+    modalRef.componentInstance.oldMetadata = metadataDiffData.oldMetadata;
+    modalRef.componentInstance.committerUsername = (
+      metadataDiffData.committerUsername);
+    modalRef.componentInstance.oldVersion = metadataDiffData.oldVersionNumber;
+
+    modalRef.result.then(() => {
+      this.versionHistoryService
+        .setCurrentPositionInMetadataVersionHistoryList(0);
+    }, () => {
+      this.versionHistoryService
+        .setCurrentPositionInMetadataVersionHistoryList(0);
+    });
+  }
+
+  async updateMetadataVersionHistory(): Promise<void> {
+    this.versionHistoryService.resetMetadataVersionHistory();
+
+    const explorationData = (
+      await this.explorationDataService.getDataAsync(() => {}));
+
+    const explorationMetadata = this
+      .explorationMetadataObjectFactory
+      .createFromBackendDict(explorationData.exploration_metadata);
+
+    this.versionHistoryService.insertMetadataVersionHistoryData(
+      this.versionHistoryService.getLatestVersionOfExploration(),
+      explorationMetadata, '');
+
+    if (
+      this.versionHistoryService.getLatestVersionOfExploration() !== null
+    ) {
+      const metadataVersionHistory = await this
+        .versionHistoryBackendApiService
+        .fetchMetadataVersionHistoryAsync(
+          this.contextService.getExplorationId(),
+          this.versionHistoryService.getLatestVersionOfExploration() as number
+        );
+      this.versionHistoryService.insertMetadataVersionHistoryData(
+        (metadataVersionHistory as MetadataVersionHistoryResponse)
+          .lastEditedVersionNumber,
+        (metadataVersionHistory as MetadataVersionHistoryResponse)
+          .metadataInPreviousVersion,
+        (metadataVersionHistory as MetadataVersionHistoryResponse)
+          .lastEditedCommitterUsername
+      );
+    }
   }
 
   saveExplorationTitle(): void {
@@ -657,6 +754,7 @@ export class SettingsTabComponent
           () => {
             this.explorationTags = (
               this.explorationTagsService.displayed as string[]);
+            this.updateMetadataVersionHistory();
           }
         )
     );

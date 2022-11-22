@@ -35,7 +35,6 @@ import { ParameterMetadataService } from '../services/parameter-metadata.service
 import { PreviewTabComponent } from './preview-tab.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationDataService } from '../services/exploration-data.service';
-import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 import { NumberAttemptsService } from 'pages/exploration-player-page/services/number-attempts.service';
 import { RouterService } from '../services/router.service';
 
@@ -93,6 +92,22 @@ describe('Preview Tab Component', () => {
     title: 'Exploration Title',
     language_code: 'en',
     draft_change_list_id: 0,
+    exploration_metadata: {
+      title: 'Exploration',
+      category: 'Algebra',
+      objective: 'To learn',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: 'Introduction',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: true,
+      edits_allowed: true
+    }
   };
   let parameters = [{
     paramName: 'paramName1',
@@ -162,8 +177,7 @@ describe('Preview Tab Component', () => {
       parameters);
     spyOn(
       editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
-      .and.returnValue(Promise.resolve(
-        exploration as ExplorationBackendDict));
+      .and.returnValue(Promise.resolve(exploration));
     explorationParamChangesService.savedMemento = [
       paramChangeObjectFactory.createEmpty(changeObjectName).toBackendDict()
     ];

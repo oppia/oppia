@@ -371,6 +371,22 @@ describe('Image preloader service', () => {
     },
     param_specs: {},
     param_changes: [],
+    exploration_metadata: {
+      title: 'Exploration',
+      category: 'Algebra',
+      objective: 'To learn',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: 'Introduction',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: true,
+      edits_allowed: true
+    }
   } as unknown as ExplorationBackendDict;
   class mockReaderObject {
     result = null;

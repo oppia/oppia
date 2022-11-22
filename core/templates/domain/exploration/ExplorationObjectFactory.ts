@@ -47,6 +47,7 @@ import { UrlInterpolationService } from
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { ExplorationChange } from './exploration-draft.model';
+import { ExplorationMetadataBackendDict } from './ExplorationMetadataObjectFactory';
 
 export interface ExplorationBackendDict {
   'auto_tts_enabled': boolean;
@@ -62,6 +63,7 @@ export interface ExplorationBackendDict {
   'draft_change_list_id': number;
   'version'?: number;
   'edits_allowed'?: boolean;
+  'exploration_metadata': ExplorationMetadataBackendDict;
 }
 
 export class Exploration {
