@@ -37,18 +37,21 @@ import { ContextService } from 'services/context.service';
   templateUrl: './translator-overview.component.html'
 })
 export class TranslatorOverviewComponent implements OnInit {
-  @Input() isTranslationTabBusy: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() isTranslationTabBusy!: boolean;
 
-  inTranslationMode: boolean;
-  inVoiceoverMode: boolean;
-  languageCode: string;
-  numberOfRequiredAudio: number;
-  numberOfAudioNotAvailable: number;
-  VOICEOVER_MODE: string;
-  TRANSLATION_MODE: string;
-  allAudioLanguageCodes: string[];
-  LAST_SELECTED_TRANSLATION_LANGUAGE: string;
-  languageCodesAndDescriptions: { id: string; description: string }[];
+  inTranslationMode!: boolean;
+  inVoiceoverMode!: boolean;
+  languageCode!: string;
+  numberOfRequiredAudio!: number;
+  numberOfAudioNotAvailable!: number;
+  VOICEOVER_MODE!: string;
+  TRANSLATION_MODE!: string;
+  allAudioLanguageCodes!: string[];
+  LAST_SELECTED_TRANSLATION_LANGUAGE!: string;
+  languageCodesAndDescriptions!: { id: string; description: string}[];
 
   constructor(
     private contextService: ContextService,
@@ -131,8 +134,12 @@ export class TranslatorOverviewComponent implements OnInit {
 
   changeTranslationLanguage(): void {
     if (this.isTranslationTabBusy) {
-      this.languageCode = this.windowRef.nativeWindow.localStorage.getItem(
-        this.LAST_SELECTED_TRANSLATION_LANGUAGE);
+      let lastSelectedTranslationLanguage = (
+        this.windowRef.nativeWindow.localStorage.getItem(
+          this.LAST_SELECTED_TRANSLATION_LANGUAGE));
+      this.languageCode = lastSelectedTranslationLanguage ? (
+        lastSelectedTranslationLanguage) : (
+          ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE);
       this.stateEditorService.onShowTranslationTabBusyModal.emit();
       return;
     }
@@ -166,8 +173,12 @@ export class TranslatorOverviewComponent implements OnInit {
   ngOnInit(): void {
     this.LAST_SELECTED_TRANSLATION_LANGUAGE = (
       'last_selected_translation_lang');
-    let prevLanguageCode = this.windowRef.nativeWindow.localStorage.getItem(
-      this.LAST_SELECTED_TRANSLATION_LANGUAGE);
+    let lastSelectedTranslationLanguage = (
+      this.windowRef.nativeWindow.localStorage.getItem(
+        this.LAST_SELECTED_TRANSLATION_LANGUAGE));
+    let prevLanguageCode = lastSelectedTranslationLanguage ? (
+      lastSelectedTranslationLanguage) : (
+        ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE);
     let allAudioLanguageCodes = this.languageUtilService
       .getAllVoiceoverLanguageCodes();
 

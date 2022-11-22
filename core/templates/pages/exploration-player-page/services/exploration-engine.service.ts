@@ -329,7 +329,7 @@ export class ExplorationEngineService {
   init(
       explorationDict: ExplorationBackendDict,
       explorationVersion: number,
-      preferredAudioLanguage: string,
+      preferredAudioLanguage: string | null,
       autoTtsEnabled: boolean,
       preferredContentLanguageCodes: string[],
       displayableLanguageCodes: string[],

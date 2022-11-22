@@ -142,7 +142,7 @@ describe('Graph Data Service', () => {
     };
 
     graphDataService.recompute();
-    expect(graphDataService.getGraphData()).toBeNull();
+    expect(graphDataService.getGraphData()).toBeUndefined();
 
     explorationInitStateNameService.init('property_1');
     graphDataService.recompute();

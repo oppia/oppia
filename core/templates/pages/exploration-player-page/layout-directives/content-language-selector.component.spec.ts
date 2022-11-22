@@ -40,9 +40,10 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { AudioTranslationLanguageService} from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 
 class MockContentTranslationLanguageService {
-  currentLanguageCode: string;
+  currentLanguageCode!: string;
 
   getCurrentContentLanguageCode() {
     return this.currentLanguageCode;
@@ -74,6 +75,7 @@ describe('Content language selector component', () => {
   let playerTranscriptService: PlayerTranscriptService;
   let imagePreloaderService: ImagePreloaderService;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
+  let interactionObjectFactory: InteractionObjectFactory;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -101,6 +103,7 @@ describe('Content language selector component', () => {
     }).compileComponents();
     contentTranslationLanguageService = TestBed.get(
       ContentTranslationLanguageService);
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
     imagePreloaderService = TestBed.get(ImagePreloaderService);
     audioTranslationLanguageService = TestBed.get(
@@ -127,7 +130,58 @@ describe('Content language selector component', () => {
 
     const card = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
-      null,
+      interactionObjectFactory.createFromBackendDict({
+        id: 'GraphInput',
+        answer_groups: [
+          {
+            outcome: {
+              dest: 'State',
+              dest_if_really_stuck: null,
+              feedback: {
+                html: '',
+                content_id: 'This is a new feedback text',
+              },
+              refresher_exploration_id: 'test',
+              missing_prerequisite_skill_id: 'test_skill_id',
+              labelled_as_correct: true,
+              param_changes: [],
+            },
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: '',
+          },
+        ],
+        default_outcome: {
+          dest: 'Hola',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: '',
+            html: '',
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: 'test',
+          missing_prerequisite_skill_id: 'test_skill_id',
+        },
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: true,
+          },
+          placeholder: {
+            value: 1,
+          },
+        },
+        hints: [],
+        solution: {
+          answer_is_exclusive: true,
+          correct_answer: 'test_answer',
+          explanation: {
+            content_id: '2',
+            html: 'test_explanation1',
+          },
+        }
+      }),
       RecordedVoiceovers.createEmpty(),
       'content', audioTranslationLanguageService);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
@@ -148,7 +202,58 @@ describe('Content language selector component', () => {
 
     const card = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
-      null,
+      interactionObjectFactory.createFromBackendDict({
+        id: 'GraphInput',
+        answer_groups: [
+          {
+            outcome: {
+              dest: 'State',
+              dest_if_really_stuck: null,
+              feedback: {
+                html: '',
+                content_id: 'This is a new feedback text',
+              },
+              refresher_exploration_id: 'test',
+              missing_prerequisite_skill_id: 'test_skill_id',
+              labelled_as_correct: true,
+              param_changes: [],
+            },
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: '',
+          },
+        ],
+        default_outcome: {
+          dest: 'Hola',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: '',
+            html: '',
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: 'test',
+          missing_prerequisite_skill_id: 'test_skill_id',
+        },
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: true,
+          },
+          placeholder: {
+            value: 1,
+          },
+        },
+        hints: [],
+        solution: {
+          answer_is_exclusive: true,
+          correct_answer: 'test_answer',
+          explanation: {
+            content_id: '2',
+            html: 'test_explanation1',
+          },
+        }
+      }),
       RecordedVoiceovers.createEmpty(),
       'content', audioTranslationLanguageService);
     card.addInputResponsePair({

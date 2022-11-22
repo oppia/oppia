@@ -51,7 +51,7 @@ class MockResponsesService {
     ], null, ['trainingData 1', 'trainingData 2'], null)
   ];
 
-  getAnswerGroup(index) {
+  getAnswerGroup(index: number) {
     return this.AnswerGroupArray[index];
   }
 
@@ -59,15 +59,23 @@ class MockResponsesService {
     return this.AnswerGroupArray;
   }
 
-  updateAnswerGroup(item1, item2, item3) {
+  updateAnswerGroup(
+      item1: string,
+      item2: string,
+      item3: (arg0: string) => void
+  ) {
     item3(null);
   }
 
-  save(item1, item2, item3) {
+  save(
+      item1: string,
+      item2: string,
+      item3: (arg0: string) => void
+  ) {
     item3(null);
   }
 
-  updateConfirmedUnclassifiedAnswers(item1) { }
+  updateConfirmedUnclassifiedAnswers(item1: string) { }
   getConfirmedUnclassifiedAnswers() {
     return ['answer1', 'answer2'];
   }
@@ -78,11 +86,17 @@ class MockResponsesService {
 }
 
 class MockExplorationStatesService {
-  saveInteractionAnswerGroups(item1, item2) { }
+  saveInteractionAnswerGroups(
+      item1: string, item2: string
+  ) { }
 
-  saveInteractionDefaultOutcome(item1, item2) { }
+  saveInteractionDefaultOutcome(
+      item1: string, item2: string
+  ) { }
 
-  saveConfirmedUnclassifiedAnswers(item1, item2) { }
+  saveConfirmedUnclassifiedAnswers(
+      item1: string, item2: string
+  ) { }
 }
 
 class MockStateEditorService {
@@ -186,6 +200,11 @@ describe('Training Data Service', () => {
 
   it('should get all potential outcomes of an interaction', () => {
     // First the answer group's outcome is listed, then the default.
+
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'Outcome'." We need to suppress this error because of the need to
+    // test validations.
+    // @ts-ignore
     expect(trainingDataService.getAllPotentialOutcomes(
       new State(
         'State', 'id', 'some', null,

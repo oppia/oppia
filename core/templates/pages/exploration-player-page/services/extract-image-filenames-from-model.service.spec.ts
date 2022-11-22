@@ -61,6 +61,7 @@ describe('Extracting Image file names in the state service', () => {
       title: 'My Title',
       next_content_id_index: 3,
       init_state_name: 'Introduction',
+      auto_tts_enabled: false,
       states: {
         'State 1': {
           param_changes: [],

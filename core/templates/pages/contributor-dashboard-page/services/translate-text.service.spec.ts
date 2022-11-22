@@ -24,8 +24,8 @@ import { StateAndContent, TranslateTextService } from 'pages/contributor-dashboa
 describe('TranslateTextService', () => {
   let translateTextService: TranslateTextService;
   let stateContent: StateAndContent;
-  let httpTestingController;
-  const getTranslatableItem = (text) => {
+  let httpTestingController: HttpTestingController;
+  const getTranslatableItem = (text: string) => {
     return {
       content_format: 'html',
       content_value: text,

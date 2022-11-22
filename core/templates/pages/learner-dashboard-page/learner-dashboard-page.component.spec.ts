@@ -136,7 +136,8 @@ describe('Learner dashboard page', () => {
     version: 1,
     draft_change_list_id: 3,
     title: 'Test Exploration',
-    next_content_id_index: 3
+    next_content_id_index: 3,
+    auto_tts_enabled: true,
   };
 
   let titleList = [

@@ -18,12 +18,12 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
+import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
@@ -37,21 +37,22 @@ import {
   SubtitledHtml,
 } from 'domain/exploration/subtitled-html.model';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 describe('Responses Service', () => {
-  let alertsService: AlertsService = null;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory = null;
-  let explorationHtmlFormatterService: ExplorationHtmlFormatterService = null;
-  let interactionData = null;
-  let interactionDataWithRules = null;
-  let interactionObjectFactory: InteractionObjectFactory = null;
-  let loggerService: LoggerService = null;
-  let outcomeObjectFactory: OutcomeObjectFactory = null;
-  let responsesService: ResponsesService = null;
-  let savedMemento = null;
-  let stateEditorService: StateEditorService = null;
-  let stateInteractionIdService: StateInteractionIdService = null;
-  let stateSolutionService: StateSolutionService = null;
+  let alertsService: AlertsService;
+  let answerGroupObjectFactory: AnswerGroupObjectFactory;
+  let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
+  let interactionData: Interaction;
+  let interactionDataWithRules: Interaction;
+  let interactionObjectFactory: InteractionObjectFactory;
+  let loggerService: LoggerService;
+  let outcomeObjectFactory: OutcomeObjectFactory;
+  let responsesService: ResponsesService;
+  let savedMemento: Solution;
+  let stateEditorService: StateEditorService;
+  let stateInteractionIdService: StateInteractionIdService;
+  let stateSolutionService: StateSolutionService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -70,23 +71,10 @@ describe('Responses Service', () => {
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
     stateSolutionService = TestBed.get(StateSolutionService);
 
-    savedMemento = {
-      ehfs: explorationHtmlFormatterService,
-      shof: SubtitledHtml,
-      answerIsExclusive: true,
-      correctAnswer: 'This is the correct answer',
-      explanation: new SubtitledHtml('', 'tesster'),
-      toBackendDict: jasmine.createSpy('toBackendDict'),
-      getSummary: jasmine.createSpy('getSummary'),
-      setCorrectAnswer: jasmine.createSpy('setCorrectAnswer'),
-      setExplanation: jasmine.createSpy('setExplanation'),
-      getOppiaSolutionExplanationResponseHtml: jasmine.createSpy(
-        'getOppiaSolutionExplanationResponseHtml'
-      ),
-      getOppiaShortAnswerResponseHtml: jasmine.createSpy(
-        'getOppiaShortAnswerResponseHtml'
-      ),
-    };
+    savedMemento = new Solution(
+      explorationHtmlFormatterService, true, 'This is the correct answer',
+      new SubtitledHtml('', 'tesster')
+    );
 
     interactionData = interactionObjectFactory.createFromBackendDict({
       id: 'TextInput',
@@ -319,40 +307,14 @@ describe('Responses Service', () => {
     responsesService.init(interactionData);
     stateEditorService.setInteraction(interactionData);
 
-    const updatedAnswerGroup = {
-      rules: [
-        {
-          type: 'Contains',
-          inputs: {
-            x: 'correct',
-          },
-          inputTypes: {},
-          toBackendDict: jasmine.createSpy('toBackendDict'),
-        },
-      ],
-      outcome: {
-        dest: 'State',
-        destIfReallyStuck: null,
-        feedback: new SubtitledHtml('', 'This is a new feedback text'),
-        refresherExplorationId: 'test',
-        missingPrerequisiteSkillId: 'test_skill_id',
-        labelledAsCorrect: true,
-        paramChanges: [],
-        toBackendDict: jasmine.createSpy('toBackendDict'),
-        setDestination: jasmine.createSpy('setDestination'),
-        hasNonemptyFeedback: jasmine.createSpy('hasNonemptyFeedback'),
-        isConfusing: jasmine.createSpy('isConfusing'),
-      },
-      taggedSkillMisconceptionId: '',
-      feedback: new SubtitledHtml('', 'This is a new feedback text'),
-      dest: 'State',
-      dest_if_really_stuck: null,
-      refresherExplorationId: 'test',
-      missingPrerequisiteSkillId: 'test_skill_id',
-      labelledAsCorrect: true,
-      trainingData: ['This is training data text'],
-      toBackendDict: jasmine.createSpy('toBackendDict'),
-    };
+    const updatedAnswerGroup = new AnswerGroup(
+      [new Rule('Contains', { x: 'correct' }, {})],
+      new Outcome(
+        'State', '',
+        new SubtitledHtml('', 'This is a new feedback text'),
+        true, [], 'test', 'test_skill_id'),
+      [], ''
+    );
     const callbackSpy = jasmine.createSpy('callback');
     responsesService.changeActiveAnswerGroupIndex(0);
     expect(responsesService.getActiveRuleIndex()).toBe(-1);
@@ -974,4 +936,18 @@ describe('Responses Service', () => {
       initializeAnswerGroupsEventEmitter
     );
   });
+
+  it('should throw error if background image are empty', fakeAsync(() => {
+    const updatedDefaultOutcome = outcomeObjectFactory.createNew(
+      'Hola',
+      'new_id',
+      'This is a new feedback text',
+      []
+    );
+    const callbackSpy = jasmine.createSpy('callback');
+    interactionData.defaultOutcome = null;
+    responsesService.init(interactionData);
+    responsesService.updateDefaultOutcome(updatedDefaultOutcome, callbackSpy);
+    expect(callbackSpy).not.toHaveBeenCalled();
+  }));
 });
