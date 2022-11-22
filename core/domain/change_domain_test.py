@@ -108,22 +108,6 @@ class ChangeDomainTests(test_utils.GenericTestBase):
             feconf.CMD_DELETE_COMMIT,
             valid_cmd_dict, actual_cmd_attributes)
 
-    def test_that_thing(self) -> None:
-        # Does not seem to work.
-        change_domain.BaseChange.ALLOWED_COMMANDS = [{
-        'name': 'CMD_CHANGE_PROPERTY_VALUE',
-        'required_attribute_names': ['new_value'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-        }]
-        change_object = change_domain.BaseChange({
-            'cmd': feconf.CMD_DELETE_COMMIT
-        })
-        base = change_domain.BaseChange(change_object.to_dict())
-        self.assertEqual(change_object.to_dict(), base.to_dict())
-
     def test_from_dict_returns_correct_basechange(self) -> None:
         expected_change_object_dict = change_domain.BaseChange({
             'cmd': feconf.CMD_DELETE_COMMIT
@@ -143,10 +127,19 @@ class ChangeDomainTests(test_utils.GenericTestBase):
         change_object.__getattr__('cmd'),
         feconf.CMD_DELETE_COMMIT)
 
-    def test_getattr_returns_attribute_error(self) -> None:
+    def test_getattr_returns_attribute_error(self) -> None: # no assert?
         with self.assertRaisesRegex(AttributeError, (
             'invalid_name')):
             change_object = change_domain.BaseChange({
                 'cmd': feconf.CMD_DELETE_COMMIT
             })
             change_object.__getattr__('invalid_name')
+
+    def test_that_cmd_not_present_returns_error(self) -> None:
+        with self.assertRaisesRegex(utils.ValidationError, (
+            'Missing cmd key in change dict')):
+            change_object = change_domain.BaseChange({
+            'not_cmd': feconf.CMD_DELETE_COMMIT
+            })
+            change_dict = change_object.to_dict()
+            change_object.validate_dict(change_dict)
