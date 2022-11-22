@@ -135,14 +135,15 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
+        self.entity_type = feconf.ENTITY_TYPE_EXPLORATION
         self.exp_id = 'exp'
         self.message_id = 10
-        self.thread_id = 'exp.thread'
+        self.thread_id = 'exploration.a.b'
 
         self.feedback_message_reference_dict: (
             feedback_domain.FeedbackMessageReferenceDict
         ) = {
-            'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
+            'entity_type': self.entity_type,
             'entity_id': self.exp_id,
             'thread_id': self.thread_id,
             'message_id': self.message_id
@@ -150,7 +151,7 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
 
         self.feedback_message_reference = (
             feedback_domain.FeedbackMessageReference(
-                feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.thread_id,
+                self.entity_type, self.exp_id, self.thread_id,
                 self.message_id))
 
     def test_to_dict(self) -> None:
@@ -167,3 +168,68 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
             observed_reference.entity_type, feconf.ENTITY_TYPE_EXPLORATION)
         self.assertEqual(observed_reference.message_id, self.message_id)
         self.assertEqual(observed_reference.thread_id, self.thread_id)
+
+    def test_valid_feedback_message_reference(self) -> None:
+        try:
+            self.feedback_message_reference.validate()
+        except utils.ValidationError:
+            self.fail(
+                "Failed to validate 'valid' FeedbackMessageReference")
+
+    def test_invalid_entity_type(self) -> None:
+        reference_dict = self.feedback_message_reference
+
+        reference_dict.entity_type = 10
+        with self.assertRaisesRegex(utils.ValidationError,
+            'Expected entity type to be a string, received: %s.'
+            % reference_dict.entity_type):
+            reference_dict.validate()
+
+        reference_dict.entity_type = "invalid_entity_type"
+        with self.assertRaisesRegex(utils.ValidationError,
+            'Entity type is not in list of allowed types'
+                ', received: \'%s\' and allowed types are: \'%s\''
+                % (
+                    reference_dict.entity_type,
+                    ', '.join(map(str, feconf.ALLOWED_ENTITY_TYPES)))):
+            reference_dict.validate()
+
+    def test_invalid_entity_id(self) -> None:
+        reference_dict = self.feedback_message_reference
+
+        reference_dict.entity_id = 10
+        with self.assertRaisesRegex(utils.ValidationError,
+            'Expected entity ID to be a string, received: %s.'
+                % reference_dict.entity_id):
+            reference_dict.validate()
+
+        reference_dict.entity_id = "invalid_entity_id"
+        with self.assertRaisesRegex(utils.ValidationError,
+            'Entity ID is not a valid id'
+                ', received: \'%s\'' % reference_dict.entity_id):
+            reference_dict.validate()
+
+    def test_invalid_thread_id(self) -> None:
+        reference_dict = self.feedback_message_reference
+
+        reference_dict.thread_id = 10
+        with self.assertRaisesRegex(utils.ValidationError,
+            'Expected thread ID to be a string, received: %s.'
+                % reference_dict.thread_id):
+            reference_dict.validate()
+
+        reference_dict.thread_id = "invalid_thread_id"
+        with self.assertRaisesRegex(utils.ValidationError,
+            'Thread ID did not match expected pattern'
+                ', received: \'%s\'' % reference_dict.thread_id):
+            reference_dict.validate()
+
+    def test_invalid_message_id(self) -> None:
+        reference_dict = self.feedback_message_reference
+
+        reference_dict.message_id = "id"
+        with self.assertRaisesRegex(utils.ValidationError,
+            'Expected message ID to be an integer, received: %s.'
+                % reference_dict.message_id):
+            reference_dict.validate()
+    
