@@ -23,20 +23,21 @@ import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { ExplorationRightsService } from './exploration-rights.service';
-import { ExplorationRightsBackendApiService } from './exploration-rights-backend-api.service';
+import { ExplorationRightsBackendApiService, ExplorationRightsBackendData } from './exploration-rights-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 
 describe('Exploration rights service', () => {
-  let ers: ExplorationRightsService = null;
-  let als: AlertsService = null;
-  let httpTestingController: HttpTestingController = null;
+  let ers: ExplorationRightsService;
+  let als: AlertsService;
+  let httpTestingController: HttpTestingController;
+  let explorationDataService: ExplorationDataService;
   let explorationRightsBackendApiService: ExplorationRightsBackendApiService;
-  let csrfService = null;
-  let clearWarningsSpy = null;
-  let successHandler = null;
-  let failHandler = null;
+  let csrfService: CsrfTokenService;
+  let clearWarningsSpy: jasmine.Spy;
+  let successHandler: jasmine.Spy;
+  let failHandler: jasmine.Spy;
   let alertsService: AlertsService;
-  let serviceData = {
+  let serviceData: ExplorationRightsBackendData = {
     rights: {
       owner_names: ['abc'],
       editor_names: [],
@@ -70,6 +71,7 @@ describe('Exploration rights service', () => {
     als = TestBed.inject(AlertsService);
     csrfService = TestBed.inject(CsrfTokenService);
     ers = TestBed.inject(ExplorationRightsService);
+    explorationDataService = TestBed.inject(ExplorationDataService);
     httpTestingController = TestBed.inject(HttpTestingController);
     explorationRightsBackendApiService =
       TestBed.inject(ExplorationRightsBackendApiService);
@@ -124,14 +126,38 @@ describe('Exploration rights service', () => {
       serviceData.rights.viewable_if_private);
   });
 
+  it('should throw error if version of data is null', fakeAsync(() => {
+    explorationDataService.data.version = undefined;
+    expect(() => {
+      ers.makeCommunityOwned();
+      tick();
+    }).toThrowError();
+  }));
+
+  it('should throw error if version of data is null', fakeAsync(() => {
+    explorationDataService.data.version = undefined;
+    expect(() => {
+      ers.saveRoleChanges('name', 'role');
+      tick();
+    }).toThrowError();
+  }));
+
+  it('should throw error if version of data is null', fakeAsync(() => {
+    explorationDataService.data.version = undefined;
+    expect(() => {
+      ers.setViewability(true);
+      tick();
+    }).toThrowError();
+  }));
+
   it('should reports the correct cloning status', () => {
     ers.init(['abc'], [], [], [], 'public', '1234', true, false);
     expect(ers.isCloned()).toBe(true);
     expect(ers.clonedFrom()).toEqual('1234');
 
-    ers.init(['abc'], [], [], [], 'public', null, true, false);
+    ers.init(['abc'], [], [], [], 'public', '', true, false);
     expect(ers.isCloned()).toBe(false);
-    expect(ers.clonedFrom()).toBeNull();
+    expect(ers.clonedFrom()).toEqual('');
   });
 
   it('should reports the correct community-owned status', () => {
@@ -450,14 +476,14 @@ describe('Exploration rights service', () => {
       tick();
 
       expect(clearWarningsSpy).not.toHaveBeenCalled();
-      expect(ers.ownerNames).toBeNull();
-      expect(ers.editorNames).toBeNull();
-      expect(ers.voiceArtistNames).toBeNull();
-      expect(ers.viewerNames).toBeNull();
-      expect(ers.isPrivate()).toBe(false);
-      expect(ers.isPublic()).toBe(false);
-      expect(ers.clonedFrom()).toBeNull();
-      expect(ers.isCommunityOwned()).toBeNull();
-      expect(ers.viewableIfPrivate()).toBeNull();
+      expect(ers.ownerNames).toBeUndefined();
+      expect(ers.editorNames).toBeUndefined();
+      expect(ers.voiceArtistNames).toBeUndefined();
+      expect(ers.viewerNames).toBeUndefined();
+      expect(ers.isPrivate()).toBeFalsy();
+      expect(ers.isPublic()).toBeFalsy();
+      expect(ers.clonedFrom()).toBeUndefined();
+      expect(ers.isCommunityOwned()).toBeUndefined();
+      expect(ers.viewableIfPrivate()).toBeUndefined();
     }));
 });

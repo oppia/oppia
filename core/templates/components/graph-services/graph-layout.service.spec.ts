@@ -624,7 +624,7 @@ describe('Graph Layout Service', () => {
       }
     ];
 
-    expect(sgls.getAugmentedLinks(nodeData, links)).toBeUndefined();
+    expect(sgls.getAugmentedLinks(nodeData, links)).toEqual([]);
   });
 
   it('should get correct graph width and height', () => {

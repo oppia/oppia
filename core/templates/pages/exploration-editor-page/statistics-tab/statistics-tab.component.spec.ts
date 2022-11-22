@@ -25,7 +25,7 @@ import { AlertsService } from 'services/alerts.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService, ReadOnlyExplorationBackendDict } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { RouterService } from '../services/router.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
@@ -33,8 +33,6 @@ import { StatisticsTabComponent } from './statistics-tab.component';
 import { ExplorationDataService } from '../services/exploration-data.service';
 import { ExplorationStats } from 'domain/statistics/exploration-stats.model';
 import { StateStatsModalComponent } from './templates/state-stats-modal.component';
-import { State, StateBackendDict } from 'domain/state/StateObjectFactory';
-import { InteractionBackendDict } from 'domain/exploration/InteractionObjectFactory';
 
 describe('Statistics Tab Component', () => {
   let component: StatisticsTabComponent;
@@ -54,27 +52,6 @@ describe('Statistics Tab Component', () => {
   }
 
   let explorationId = 'exp1';
-  let state = {
-    card_is_checkpoint: false,
-    classifier_model_id: '1',
-    content: {
-      content_id: 'content1',
-      html: 'This is a html text'
-    },
-    interaction: {
-      customization_args: null
-    } as InteractionBackendDict,
-    linked_skill_id: null,
-    next_content_id_index: 0,
-    param_changes: [],
-    recorded_voiceovers: {
-      voiceovers_mapping: {}
-    },
-    solicit_answer_details: true,
-    written_translations: {
-      translations_mapping: {}
-    }
-  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -118,41 +95,289 @@ describe('Statistics Tab Component', () => {
     computeGraphService = TestBed.inject(
       ComputeGraphService);
 
+    // This throws "Argument of type 'null' is not assignable to
+    // parameter of type 'State'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     spyOn(statesObjectFactory, 'createFromBackendDict').and.returnValue(null);
 
-    spyOn(
-      readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync').and
-      .returnValue(Promise.resolve({
-        exploration: {
-          init_state_name: 'State1',
-          states: {
-            State1: state as StateBackendDict
+    let explorationDict = {
+      states: {
+        Start: {
+          classifier_model_id: null,
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              ca_placeholder_0: {},
+              feedback_1: {},
+              rule_input_2: {},
+              content: {},
+              default_outcome: {}
+            }
           },
-          param_changes: null,
-          param_specs: null,
-          title: null,
-          language_code: null,
-          objective: null,
-          correctness_feedback_enabled: null,
-        } as ReadOnlyExplorationBackendDict,
-        can_edit: null,
-        exploration_metadata: null,
-        exploration_id: null,
-        is_logged_in: null,
-        session_id: null,
-        version: null,
-        preferred_audio_language_code: null,
-        preferred_language_codes: null,
-        auto_tts_enabled: null,
-        correctness_feedback_enabled: null,
-        record_playthrough_probability: null,
-        draft_change_list_id: null,
-        has_viewed_lesson_info_modal_once: null,
-        furthest_reached_checkpoint_exp_version: null,
-        furthest_reached_checkpoint_state_name: null,
-        most_recently_reached_checkpoint_state_name: null,
-        most_recently_reached_checkpoint_exp_version: null,
-      } as FetchExplorationBackendResponse));
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              ca_placeholder_0: {},
+              feedback_1: {},
+              rule_input_2: {},
+              content: {},
+              default_outcome: {}
+            }
+          },
+          interaction: {
+            solution: null,
+            confirmed_unclassified_answers: [],
+            id: 'TextInput',
+            hints: [],
+            customization_args: {
+              rows: {
+                value: 1
+              },
+              placeholder: {
+                value: {
+                  unicode_str: '',
+                  content_id: 'ca_placeholder_0'
+                }
+              }
+            },
+            answer_groups: [
+              {
+                outcome: {
+                  missing_prerequisite_skill_id: null,
+                  refresher_exploration_id: null,
+                  labelled_as_correct: false,
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: '<p>Good Job</p>'
+                  },
+                  param_changes: [],
+                  dest_if_really_stuck: null,
+                  dest: 'Mid'
+                },
+                training_data: [],
+                rule_specs: [
+                  {
+                    inputs: {
+                      x: {
+                        normalizedStrSet: [
+                          'answer'
+                        ],
+                        contentId: 'rule_input_2'
+                      }
+                    },
+                    rule_type: 'FuzzyEquals'
+                  }
+                ],
+                tagged_skill_misconception_id: null
+              }
+            ],
+            default_outcome: {
+              missing_prerequisite_skill_id: null,
+              refresher_exploration_id: null,
+              labelled_as_correct: false,
+              feedback: {
+                content_id: 'default_outcome',
+                html: '<p>Try again.</p>'
+              },
+              param_changes: [],
+              dest_if_really_stuck: null,
+              dest: 'Start'
+            }
+          },
+          param_changes: [],
+          next_content_id_index: 3,
+          card_is_checkpoint: true,
+          linked_skill_id: null,
+          content: {
+            content_id: 'content',
+            html: '<p>First Question</p>'
+          }
+        },
+        End: {
+          classifier_model_id: null,
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {}
+            }
+          },
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {}
+            }
+          },
+          interaction: {
+            solution: null,
+            confirmed_unclassified_answers: [],
+            id: 'EndExploration',
+            hints: [],
+            customization_args: {
+              recommendedExplorationIds: {
+                value: ['recommnendedExplorationId']
+              }
+            },
+            answer_groups: [],
+            default_outcome: null
+          },
+          param_changes: [],
+          next_content_id_index: 0,
+          card_is_checkpoint: false,
+          linked_skill_id: null,
+          content: {
+            content_id: 'content',
+            html: 'Congratulations, you have finished!'
+          }
+        },
+        Mid: {
+          classifier_model_id: null,
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              ca_placeholder_0: {},
+              feedback_1: {},
+              rule_input_2: {},
+              content: {},
+              default_outcome: {}
+            }
+          },
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              ca_placeholder_0: {},
+              feedback_1: {},
+              rule_input_2: {},
+              content: {},
+              default_outcome: {}
+            }
+          },
+          interaction: {
+            solution: null,
+            confirmed_unclassified_answers: [],
+            id: 'TextInput',
+            hints: [],
+            customization_args: {
+              rows: {
+                value: 1
+              },
+              placeholder: {
+                value: {
+                  unicode_str: '',
+                  content_id: 'ca_placeholder_0'
+                }
+              }
+            },
+            answer_groups: [
+              {
+                outcome: {
+                  missing_prerequisite_skill_id: null,
+                  refresher_exploration_id: null,
+                  labelled_as_correct: false,
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: ' <p>Good Job</p>'
+                  },
+                  param_changes: [],
+                  dest_if_really_stuck: null,
+                  dest: 'End'
+                },
+                training_data: [],
+                rule_specs: [
+                  {
+                    inputs: {
+                      x: {
+                        normalizedStrSet: [
+                          'answer'
+                        ],
+                        contentId: 'rule_input_2'
+                      }
+                    },
+                    rule_type: 'FuzzyEquals'
+                  }
+                ],
+                tagged_skill_misconception_id: null
+              }
+            ],
+            default_outcome: {
+              missing_prerequisite_skill_id: null,
+              refresher_exploration_id: null,
+              labelled_as_correct: false,
+              feedback: {
+                content_id: 'default_outcome',
+                html: '<p>try again.</p>'
+              },
+              param_changes: [],
+              dest_if_really_stuck: null,
+              dest: 'Mid'
+            }
+          },
+          param_changes: [],
+          next_content_id_index: 3,
+          card_is_checkpoint: false,
+          linked_skill_id: null,
+          content: {
+            content_id: 'content',
+            html: '<p>Second Question</p>'
+          }
+        }
+      },
+      auto_tts_enabled: true,
+      version: 2,
+      draft_change_list_id: 9,
+      is_version_of_draft_valid: null,
+      title: 'Exploration',
+      language_code: 'en',
+      correctness_feedback_enabled: true,
+      init_state_name: 'Start',
+      param_changes: [],
+      param_specs: null,
+      draft_changes: null,
+    };
+
+    let explorationResponse: FetchExplorationBackendResponse = {
+      exploration_id: 'exp_id',
+      is_logged_in: true,
+      session_id: 'KERH',
+      exploration: {
+        init_state_name: 'Start',
+        param_changes: [],
+        param_specs: {},
+        title: 'Exploration',
+        language_code: 'en',
+        correctness_feedback_enabled: true,
+        objective: 'To learn',
+        states: explorationDict.states
+      },
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: true,
+        edits_allowed: true
+      },
+      version: 2,
+      can_edit: true,
+      preferred_audio_language_code: 'en',
+      preferred_language_codes: [],
+      auto_tts_enabled: true,
+      correctness_feedback_enabled: true,
+      record_playthrough_probability: 1,
+      draft_change_list_id: 0,
+      has_viewed_lesson_info_modal_once: false,
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'End',
+      most_recently_reached_checkpoint_state_name: 'Mid',
+      most_recently_reached_checkpoint_exp_version: 2
+    };
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
+      .and.returnValue(Promise.resolve(explorationResponse));
 
     spyOn(explorationStatsService, 'getExplorationStatsAsync').and.returnValue(
       Promise.resolve({
@@ -168,18 +393,20 @@ describe('Statistics Tab Component', () => {
 
     spyOn (computeGraphService, 'compute').and.stub();
     component.states = {
-      getState: (name) => {
+      getState: (name: string) => {
         return {
           interaction: {
             customizationArgs: null,
           }
-        } as State;
+        };
       }
-    } as States;
+    // Using unknown type conversion to check for an invalid graph.
+    } as unknown as States;
 
     component.expStats = {
-      getStateStats: (name) => null
-    } as ExplorationStats;
+      getStateStats: (name: string) => null
+    // Using unknown type conversion to check for an invalid graph.
+    } as unknown as ExplorationStats;
 
     component.ngOnInit();
   });
