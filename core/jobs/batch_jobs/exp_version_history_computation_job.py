@@ -675,6 +675,10 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 return int(change.version_number)
         return None
 
+    # Here we use type Any because the custom dict FormattedModelGroupDict is
+    # not compatible here as because the explorations in that dict are of type
+    # Exploration domain object. On the other hand, we are using
+    # ExplorationModels in this job.
     def create_version_history_models(
         self, model_group: Any
     ) -> Union[
