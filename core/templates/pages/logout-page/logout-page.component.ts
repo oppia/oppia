@@ -49,7 +49,7 @@ export class LogoutPageComponent implements OnInit {
     this.windowRef.nativeWindow.location.assign(
       this.utilsService.getSafeReturnUrl(redirectUrl));
   }
-''
+
   private onSignOutError(error: firebase.auth.Error): void {
     this.loaderService.hideLoadingScreen();
     this.alertsService.addWarning(error.message);
