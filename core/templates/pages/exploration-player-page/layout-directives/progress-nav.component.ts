@@ -61,8 +61,8 @@ export class ProgressNavComponent {
   @Input() isLearnAgainButton!: boolean;
   @Input() displayedCard!: StateCard;
   @Input() submitButtonIsShown!: boolean;
-  @Input() navigationThroughCardHistoryIsEnabled: boolean;
-  @Input() skipButtonIsShown: boolean;
+  @Input() navigationThroughCardHistoryIsEnabled!: boolean;
+  @Input() skipButtonIsShown!: boolean;
   displayedCardIndex!: number;
   hasPrevious!: boolean;
   hasNext!: boolean;
