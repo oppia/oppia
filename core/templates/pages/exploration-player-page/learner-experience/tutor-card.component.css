@@ -270,7 +270,7 @@ oppia-tutor-card .checkpoint-celebration-modal-container {
 
 oppia-tutor-card .oppia-mcq-question-description-text {
   display: block;
-  padding: 0 10px;
+  padding: 0 20px;
 }
 
 /* When the size of the browser is reduced, and the answer submitted is
