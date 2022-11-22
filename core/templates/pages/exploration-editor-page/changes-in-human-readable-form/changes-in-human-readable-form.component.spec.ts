@@ -31,7 +31,7 @@ describe('Changes in Human Readable Form Component', () => {
 
   // This is a helper function to clean the compiled html
   // for each test, in order to make a cleaner assertion.
-  const removeComments = (HTML: string ) => {
+  const removeComments = (HTML: string) => {
     HTML = HTML.toString();
     // Removes Comments.
     while (HTML.includes('<!--')) {
