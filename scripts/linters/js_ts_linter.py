@@ -554,41 +554,6 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
-        """Perform all the lint checks and returns the messages returned by all
-        the checks.
-
-        Returns:
-            list(TaskResult). A list of TaskResult objects representing the
-            results of the lint checks.
-        """
-
-        if not self.all_filepaths:
-            return [
-                concurrent_task_utils.TaskResult(
-                    'JS TS lint', False, [],
-                    ['There are no JavaScript or Typescript files to lint.'])]
-
-        # Clear temp compiled typescipt files from the previous runs.
-        shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        # Compiles all typescipt files into COMPILED_TYPESCRIPT_TMP_PATH.
-        compile_all_ts_files()
-
-        self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
-        self.parsed_expressions_in_files = (
-            self._get_expressions_from_parsed_script())
-
-        linter_stdout = []
-
-        linter_stdout.append(self._check_constants_declaration())
-        linter_stdout.append(self._check_angular_services_index())
-        linter_stdout.append(self._check_unknown_type())
-
-        # Clear temp compiled typescipt files.
-        shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-
-        return linter_stdout
-
     def _check_unknown_type(self):
         """Prints a list of lint errors if an unknown type is used. This lint
         check is not enabled by default. Add proper comment if unknown is needed.
@@ -651,6 +616,42 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
 
         return concurrent_task_utils.TaskResult(
             name, failed, sorted(error_messages), sorted(error_messages))
+
+    def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
+        """Perform all the lint checks and returns the messages returned by all
+        the checks.
+
+        Returns:
+            list(TaskResult). A list of TaskResult objects representing the
+            results of the lint checks.
+        """
+
+        if not self.all_filepaths:
+            return [
+                concurrent_task_utils.TaskResult(
+                    'JS TS lint', False, [],
+                    ['There are no JavaScript or Typescript files to lint.'])]
+
+        # Clear temp compiled typescipt files from the previous runs.
+        shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
+        # Compiles all typescipt files into COMPILED_TYPESCRIPT_TMP_PATH.
+        compile_all_ts_files()
+
+        self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
+        self.parsed_expressions_in_files = (
+            self._get_expressions_from_parsed_script())
+
+        linter_stdout = []
+
+        linter_stdout.append(self._check_constants_declaration())
+        linter_stdout.append(self._check_angular_services_index())
+        linter_stdout.append(self._check_unknown_type())
+
+        # Clear temp compiled typescipt files.
+        shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
+
+        return linter_stdout
+
 
 class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
     """Manages all the third party Python linting functions."""
