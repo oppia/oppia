@@ -27,7 +27,6 @@ from core.domain import blog_services
 from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
-from core.domain import user_services
 
 from typing import Dict, List, Optional, TypedDict
 

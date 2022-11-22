@@ -72,6 +72,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
             constants.TASK_STATUS_RESOLVED, self.owner_id,
             self.MOCK_DATE)
+        self.maxDiff = None
         self.assertEqual(task_entry.to_dict(), {
             'entity_type': 'exploration',
             'entity_id': self.exp_id,
@@ -82,7 +83,6 @@ class TaskEntryTests(test_utils.GenericTestBase):
             'issue_description': 'issue description',
             'status': 'resolved',
             'resolver_username': None,
-            'resolver_profile_picture_data_url': None,
             'resolved_on_msecs': utils.get_time_in_millisecs(self.MOCK_DATE),
         })
 
