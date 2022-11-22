@@ -152,6 +152,18 @@ describe('State version history component', () => {
       expect(component.getLastEditedCommitterUsername()).toEqual('some');
     });
 
+  it('should throw error when last edited version number is null', () => {
+    spyOn(
+      versionHistoryService, 'getBackwardStateDiffData'
+    ).and.returnValue({
+      oldVersionNumber: null
+    } as StateDiffData);
+
+    expect(
+      () =>component.getLastEditedVersionNumber()
+    ).toThrowError('The value of last edited version number cannot be null');
+  });
+
   it('should get whether version history can be explored', () => {
     spyOn(
       versionHistoryService, 'canShowBackwardStateDiffData'
@@ -194,5 +206,45 @@ describe('State version history component', () => {
     expect(ngbModal.open).toHaveBeenCalled();
 
     component.onClickExploreVersionHistoryButton();
+  });
+
+  it('should throw error on exploring version history when state' +
+  ' names from version history data are not defined', () => {
+    class MockComponentInstance {
+      componentInstance = {
+        newState: null,
+        newStateName: 'A',
+        oldState: null,
+        oldStateName: 'B',
+        headers: {
+          leftPane: '',
+          rightPane: '',
+        }
+      };
+    }
+    spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValues({
+      oldState: stateObjectFactory.createFromBackendDict(
+        null, stateObject),
+      newState: stateObjectFactory.createFromBackendDict(
+        null, stateObject),
+      oldVersionNumber: 3
+    } as StateDiffData, {
+      oldState: stateObjectFactory.createFromBackendDict(
+        null, stateObject),
+      newState: stateObjectFactory.createFromBackendDict(
+        'State', stateObject),
+      oldVersionNumber: 3
+    } as StateDiffData);
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: MockComponentInstance,
+      result: Promise.resolve()
+    } as NgbModalRef);
+
+    expect(
+      () => component.onClickExploreVersionHistoryButton()
+    ).toThrowError('State name cannot be null');
+    expect(
+      () => component.onClickExploreVersionHistoryButton()
+    ).toThrowError('State name cannot be null');
   });
 });
