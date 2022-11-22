@@ -179,13 +179,6 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
     def test_invalid_entity_type(self) -> None:
         reference_dict = self.feedback_message_reference
 
-        reference_dict.entity_type = 10
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected entity type to be a string, received: %s.'
-            % reference_dict.entity_type):
-            reference_dict.validate()
-
         reference_dict.entity_type = 'invalid_entity_type'
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -199,13 +192,6 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
     def test_invalid_entity_id(self) -> None:
         reference_dict = self.feedback_message_reference
 
-        reference_dict.entity_id = 10
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected entity ID to be a string, received: %s.'
-                % reference_dict.entity_id):
-            reference_dict.validate()
-
         reference_dict.entity_id = 'invalid_entity_id'
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -216,26 +202,9 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
     def test_invalid_thread_id(self) -> None:
         reference_dict = self.feedback_message_reference
 
-        reference_dict.thread_id = 10
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected thread ID to be a string, received: %s.'
-                % reference_dict.thread_id):
-            reference_dict.validate()
-
         reference_dict.thread_id = 'invalid_thread_id'
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Thread ID did not match expected pattern'
                 ', received: \'%s\'' % reference_dict.thread_id):
-            reference_dict.validate()
-
-    def test_invalid_message_id(self) -> None:
-        reference_dict = self.feedback_message_reference
-
-        reference_dict.message_id = 'id'
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected message ID to be an integer, received: %s.'
-                % reference_dict.message_id):
             reference_dict.validate()
