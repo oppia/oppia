@@ -27,6 +27,8 @@ import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { QuestionSuggestionReviewModalComponent } from './question-suggestion-review-modal.component';
 import { ThreadDataBackendApiService, ThreadMessages } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { ContextService } from 'services/context.service';
+import { Question } from 'domain/question/QuestionObjectFactory';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 
 class MockActiveModal {
   close(): void {
@@ -55,16 +57,16 @@ describe('Question Suggestion Review Modal component', () => {
   let skillBackendApiService: SkillBackendApiService;
   let skillObjectFactory: SkillObjectFactory;
   let contextService: ContextService;
-  let cancelSuggestionSpy = null;
+  let cancelSuggestionSpy: jasmine.Spy;
   let threadDataBackendApiService: ThreadDataBackendApiService;
   const authorName = 'Username 1';
   const contentHtml = 'Content html';
-  let question = null;
+  let question: Question;
   const questionHeader = 'Question header';
   const reviewable = true;
   const skillDifficulty = 0.3;
   const suggestionId = '1';
-  let misconceptionsBySkill = null;
+  let misconceptionsBySkill: MisconceptionSkillMap;
   let suggestionIdToContribution = {
     1: {
       details: {
@@ -409,10 +411,37 @@ describe('Question Suggestion Review Modal component', () => {
             }) as NgbModalRef;
       });
 
+      component.suggestion.change.skill_id = 'skill_1';
       component.edit();
       tick();
 
       expect(ngbModal.open).toHaveBeenCalled();
+    }));
+
+    it('should throw error edit if skill id is null', fakeAsync(() => {
+      class MockNgbModalRef {
+        componentInstance = {
+          suggestionId: suggestionId,
+          question: question,
+          questionId: '',
+          questionStateData: question.getStateData(),
+          skill: null,
+          skillDifficulty: 0.3
+        };
+      }
+
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return (
+            { componentInstance: MockNgbModalRef,
+              result: Promise.resolve()
+            }) as NgbModalRef;
+      });
+
+      component.suggestion.change.skill_id = undefined;
+      expect(() => {
+        component.edit();
+        tick();
+      }).toThrowError();
     }));
 
     it('should open edit question modal when clicking on' +
@@ -436,6 +465,7 @@ describe('Question Suggestion Review Modal component', () => {
             }) as NgbModalRef;
       });
 
+      component.suggestion.change.skill_id = 'skill_1';
       component.edit();
       tick();
 
@@ -463,6 +493,7 @@ describe('Question Suggestion Review Modal component', () => {
             }) as NgbModalRef;
       });
 
+      component.suggestion.change.skill_id = 'skill_1';
       component.edit();
       tick();
 
@@ -493,7 +524,7 @@ describe('Question Suggestion Review Modal component', () => {
       () => {
         component.validationError = 'component is an error message';
         component.questionChanged();
-        expect(component.validationError).toBe(null);
+        expect(component.validationError).toBeNull();
       });
 
     it('should accept suggestion in suggestion modal when clicking accept' +
@@ -620,17 +651,40 @@ describe('Question Suggestion Review Modal component', () => {
     expect(component.isFirstItem).toBeTrue();
   }));
 
+  it('should throw Error if selection is null', fakeAsync(() => {
+    component.remainingContributionIdStack = [];
+    expect(() => {
+      component.goToNextItem();
+    }).toThrowError();
+  }));
+
+  it('should throw Error if skip contribution id is null', fakeAsync(() => {
+    component.isFirstItem = false;
+    component.skippedContributionIds = [];
+    expect(() => {
+      component.goToPreviousItem();
+    }).toThrowError();
+  }));
+
   it('should not navigate if the corresponding opportunity is deleted',
     function() {
       spyOn(component, 'cancel');
       let details1 = component.allContributions['1'].details;
       let details2 = component.allContributions['2'].details;
+      // This throws "Type 'null' is not assignable to type
+      // 'ActiveContributionDetailsDict'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
       component.allContributions['2'].details = null;
 
       component.goToNextItem();
       expect(component.cancel).toHaveBeenCalled();
       component.allContributions['2'].details = details2;
       component.goToNextItem();
+      // This throws "Type 'null' is not assignable to type
+      // 'ActiveContributionDetailsDict'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
       component.allContributions['1'].details = null;
 
       component.goToPreviousItem();

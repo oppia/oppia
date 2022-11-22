@@ -39,7 +39,6 @@ class MockNgbModal {
 
 describe('Entity creation service', () => {
   let topic: Topic;
-  let topicObjectFactory: TopicObjectFactory;
   let topicEditorStateService: TopicEditorStateService;
   let topicEditorRoutingService: TopicEditorRoutingService;
   let entityCreationService: EntityCreationService;
@@ -76,11 +75,14 @@ describe('Entity creation service', () => {
   beforeEach(() => {
     ngbModal = TestBed.inject(NgbModal);
     topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
-    topicObjectFactory = TestBed.inject(TopicObjectFactory);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
     entityCreationService = TestBed.inject(EntityCreationService);
     createNewSkillModalService = TestBed.inject(CreateNewSkillModalService);
-    topic = topicObjectFactory.createInterstitialTopic();
+    topic = new Topic(
+      'id', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+    );
     let subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     let subtopic2 = Subtopic.createFromTitle(2, 'Subtopic2');
     let subtopic3 = Subtopic.createFromTitle(3, 'Subtopic3');

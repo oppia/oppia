@@ -31,7 +31,10 @@ import { TranslationStatusService } from '../services/translation-status.service
   templateUrl: './state-translation-status-graph.component.html'
 })
 export class StateTranslationStatusGraphComponent {
-  @Input() isTranslationTabBusy: boolean;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() isTranslationTabBusy!: boolean;
 
   constructor(
     private explorationStatesService: ExplorationStatesService,
@@ -47,7 +50,7 @@ export class StateTranslationStatusGraphComponent {
     return this.translationStatusService.getAllStateStatusColors();
   }
 
-  getActiveStateName(): string {
+  getActiveStateName(): string | null {
     return this.stateEditorService.getActiveStateName();
   }
 
@@ -58,15 +61,16 @@ export class StateTranslationStatusGraphComponent {
     }
     this.stateEditorService.setActiveStateName(newStateName);
     let stateName = this.stateEditorService.getActiveStateName();
+    if (!stateName) {
+      throw new Error('Active state name cannot be null.');
+    }
     let stateData = this.explorationStatesService.getState(stateName);
 
     if (stateName && stateData) {
       this.stateRecordedVoiceoversService.init(
-        this.stateEditorService.getActiveStateName(),
-        stateData.recordedVoiceovers);
+        stateName, stateData.recordedVoiceovers);
       this.stateWrittenTranslationsService.init(
-        this.stateEditorService.getActiveStateName(),
-        stateData.writtenTranslations);
+        stateName, stateData.writtenTranslations);
       this.stateEditorService.onRefreshStateTranslation.emit();
     }
     this.routerService.onCenterGraph.emit();
