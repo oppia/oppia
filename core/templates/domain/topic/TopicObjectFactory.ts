@@ -58,9 +58,7 @@ export interface TopicBackendDict {
 import constants from 'assets/constants';
 
 export class Topic {
-  // The 'id' and 'thumbnailFilename' is 'null' for an interstitial
-  // topic until the actual is fetched from the backend.
-  _id: string | null;
+  _id: string;
   _name: string;
   _abbreviatedName: string;
   _description: string;
@@ -71,7 +69,7 @@ export class Topic {
   _nextSubtopicId: number;
   _version: number;
   _subtopics: Subtopic[];
-  _thumbnailFilename: string | null;
+  _thumbnailFilename: string;
   _thumbnailBgColor: string;
   _urlFragment: string;
   _practiceTabIsDisplayed: boolean;
@@ -79,7 +77,7 @@ export class Topic {
   _pageTitleFragmentForWeb: string;
   _skillSummariesForDiagnosticTest: ShortSkillSummary[];
   constructor(
-      id: string | null,
+      id: string,
       name: string,
       abbreviatedName: string,
       urlFragment: string,
@@ -91,7 +89,7 @@ export class Topic {
       nextSubtopicId: number,
       version: number,
       subtopics: Subtopic[],
-      thumbnailFilename: string | null,
+      thumbnailFilename: string,
       thumbnailBgColor: string,
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
       practiceTabIsDisplayed: boolean,
@@ -127,9 +125,7 @@ export class Topic {
       });
   }
 
-  // Returns 'null' when the topic is not yet fetched from the backend,
-  // not saved.
-  getId(): string | null {
+  getId(): string {
     return this._id;
   }
 
@@ -181,11 +177,11 @@ export class Topic {
     this._urlFragment = urlFragment;
   }
 
-  setThumbnailFilename(thumbnailFilename: string | null): void {
+  setThumbnailFilename(thumbnailFilename: string): void {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailFilename(): string | null {
+  getThumbnailFilename(): string {
     return this._thumbnailFilename;
   }
 
@@ -667,18 +663,6 @@ export class TopicObjectFactory {
       topicBackendDict.meta_tag_content,
       topicBackendDict.page_title_fragment_for_web,
       topicBackendDict.skill_ids_for_diagnostic_test
-    );
-  }
-
-  // TODO(#14309): Remove the interstitial topic so that full topic can be
-  // created from start.
-  // Create an interstitial topic that until
-  // the actual topic is fetched from the backend.
-  createInterstitialTopic(): Topic {
-    return new Topic(
-      null, 'Topic name loading', 'Abbrev. name loading',
-      'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], null, '', {}, false, '', '', []
     );
   }
 }
