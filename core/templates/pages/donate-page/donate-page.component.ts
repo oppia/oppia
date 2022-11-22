@@ -40,6 +40,9 @@ export class DonatePageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   windowIsNarrow: boolean = false;
   donateImgUrl: string = '';
+  OPPIA_AVATAR_IMAGE_URL = (
+    this.urlInterpolationService
+      .getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg'));
   constructor(
     private pageTitleService: PageTitleService,
     private siteAnalyticsService: SiteAnalyticsService,
