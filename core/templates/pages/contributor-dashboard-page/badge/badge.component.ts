@@ -58,12 +58,14 @@ export class BadgeComponent {
       this.contributionSubTypeText += 's';
     }
 
-    if (this.language.length >= 10) {
-      this.fontSize = '10px';
-    }
+    if (this.language) {
+      if (this.language.length >= 10) {
+        this.fontSize = '10px';
+      }
 
-    if (this.language.split(' ').length > 1) {
-      this.lineHeight = '90%';
+      if (this.language.split(' ').length > 1) {
+        this.lineHeight = '90%';
+      }
     }
   }
 }
