@@ -527,8 +527,9 @@ def verify_user_deleted(
 
     # Verify if user is deleted.
     user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-    username = user_settings_model.username
-    _verify_profile_picture_is_deleted(username)
+    if user_settings_model:
+        username = user_settings_model.username
+        _verify_profile_picture_is_deleted(username)
 
     policies_not_to_verify = [
         base_models.DELETION_POLICY.KEEP,
