@@ -21,6 +21,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { VersionDiffVisualizationComponent } from './version-diff-visualization.component';
+import { State } from 'domain/state/StateObjectFactory';
 
 class MockNgbModal {
   open() {
@@ -58,8 +59,8 @@ describe('Version Diff Visualization Component', () => {
     ngbModal = TestBed.inject(NgbModal);
 
     component.diffData = {
-      v1InitStateId: 'A',
-      v2InitStateId: 'B',
+      v1InitStateId: 0,
+      v2InitStateId: 1,
       links: [],
       finalStateIds: ['C', 'D'],
       nodes: {
@@ -95,12 +96,12 @@ describe('Version Diff Visualization Component', () => {
         },
       },
       v2States: {
-        C: {},
-        D: {}
+        C: {} as State,
+        D: {} as State
       },
       v1States: {
-        A: {},
-        B: {}
+        A: {} as State,
+        B: {} as State,
       }
     };
   });
@@ -108,7 +109,7 @@ describe('Version Diff Visualization Component', () => {
   it('should set component properties on initialization', () => {
     expect(component.diffGraphSecondaryLabels).toEqual(undefined);
     expect(component.diffGraphNodeColors).toEqual(undefined);
-    expect(component.v1InitStateId).toEqual(undefined);
+    expect(component.v1InitStateId).toBeUndefined();
     expect(component.diffGraphData).toEqual(undefined);
     expect(component.legendGraph).toEqual(undefined);
 
@@ -126,11 +127,11 @@ describe('Version Diff Visualization Component', () => {
       5: '#1E90FF',
       6: 'beige'
     });
-    expect(component.v1InitStateId).toEqual('A');
+    expect(component.v1InitStateId).toEqual(0);
     expect(component.diffGraphData).toEqual(
       {
         nodes: { 1: 'A', 2: 'B', 3: 'B', 4: 'D', 5: 'E', 6: 'F' },
-        links: [], initStateId: 'B', finalStateIds: ['C', 'D']
+        links: [], initStateId: 1, finalStateIds: ['C', 'D']
       }
     );
     expect(component.legendGraph).toEqual({
@@ -178,12 +179,12 @@ describe('Version Diff Visualization Component', () => {
             originalStateName: 'A'
           }
         },
-        v2States: null,
-        v1States: null,
-        finalStateIds: null,
-        v2InitStateId: null,
-        links: null,
-        v1InitStateId: null,
+        v2States: {},
+        v1States: {},
+        finalStateIds: [],
+        v2InitStateId: 0,
+        links: [],
+        v1InitStateId: 0,
       }
     );
 
@@ -193,7 +194,7 @@ describe('Version Diff Visualization Component', () => {
   it('should open state diff modal when user clicks on a state in' +
     ' difference graph', () => {
     class MockComponentInstance {
-      compoenentInstance: {
+      compoenentInstance!: {
         newState: null;
         newStateName: 'A';
         oldState: null;
@@ -230,22 +231,22 @@ describe('Version Diff Visualization Component', () => {
           }
         },
         v2States: {
-          A: {},
-          B: {}
+          A: {} as State,
+          B: {} as State,
         },
         v1States: {
-          A: {},
-          B: {}
+          A: {} as State,
+          B: {} as State,
         },
-        finalStateIds: null,
-        v2InitStateId: null,
-        links: null,
-        v1InitStateId: null,
+        finalStateIds: [],
+        v2InitStateId: 0,
+        links: [],
+        v1InitStateId: 0,
       }
     );
 
     class MockComponentInstance {
-      compoenentInstance: {
+      compoenentInstance!: {
         newState: {};
         newStateName: 'A';
         oldState: {};

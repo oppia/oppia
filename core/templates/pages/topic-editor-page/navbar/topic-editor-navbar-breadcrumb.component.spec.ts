@@ -18,7 +18,7 @@
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Subtopic } from 'domain/topic/subtopic.model';
-import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/TopicObjectFactory';
 import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 import { TopicEditorNavbarBreadcrumbComponent } from './topic-editor-navbar-breadcrumb.component';
@@ -28,7 +28,6 @@ describe('TopicEditorNavbarBreadcrumbComponent', () => {
   let component: TopicEditorNavbarBreadcrumbComponent;
   let fixture: ComponentFixture<TopicEditorNavbarBreadcrumbComponent>;
   let topicEditorStateService: TopicEditorStateService;
-  let topicObjectFactory: TopicObjectFactory;
   let topicEditorRoutingService: TopicEditorRoutingService;
 
   beforeEach(async(() => {
@@ -41,13 +40,16 @@ describe('TopicEditorNavbarBreadcrumbComponent', () => {
   beforeEach(() => {
     topicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
-    topicObjectFactory = TestBed.inject(TopicObjectFactory);
     fixture = TestBed.createComponent(TopicEditorNavbarBreadcrumbComponent);
     component = fixture.componentInstance;
   });
 
   it('should initialise component when user opens topic editor page', () => {
-    let topic = topicObjectFactory.createInterstitialTopic();
+    let topic = new Topic(
+      'id', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+    );
     let subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic1.setUrlFragment('subtopic-one');
     let subtopic2 = Subtopic.createFromTitle(1, 'Subtopic2');

@@ -41,6 +41,7 @@ import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory'
 import { StateStats } from 'domain/statistics/state-stats-model';
 import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
 import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { ExplorationTask } from 'domain/improvements/exploration-task.model';
 
 class MockNgbModal {
   open() {
@@ -54,8 +55,8 @@ class MockNgbModal {
 describe('Exploration Improvements Service', () => {
   let changeListService: ChangeListService;
   let contextService: ContextService;
-  let eibasGetTasksAsyncSpy;
-  let essGetExplorationStatsSpy;
+  let eibasGetTasksAsyncSpy: jasmine.Spy;
+  let essGetExplorationStatsSpy: jasmine.Spy;
   let explorationImprovementsBackendApiService:
     ExplorationImprovementsBackendApiService;
   let explorationImprovementsService: ExplorationImprovementsService;
@@ -65,10 +66,10 @@ describe('Exploration Improvements Service', () => {
   let explorationStatesService: ExplorationStatesService;
   let explorationStatsService: ExplorationStatsService;
   let ngbModal: NgbModal;
-  let pibasFetchIssuesSpy;
+  let pibasFetchIssuesSpy: jasmine.Spy;
   let playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService;
   let playthroughObjectFactory: PlaythroughObjectFactory;
-  let stassGetTopAnswersByStateNameAsyncSpy;
+  let stassGetTopAnswersByStateNameAsyncSpy: jasmine.Spy;
   let stateTopAnswersStatsService: StateTopAnswersStatsService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
 
@@ -148,7 +149,7 @@ describe('Exploration Improvements Service', () => {
   const newExpPermissions = (canEdit: boolean) => {
     return (
       new ExplorationPermissions(
-        null, null, null, null, null, null, canEdit, null));
+        false, false, false, false, false, false, canEdit, false));
   };
 
   beforeEach(() => {
@@ -310,8 +311,8 @@ describe('Exploration Improvements Service', () => {
   }));
 
   describe('Flushing updated tasks', () => {
-    let eibasPostTasksAsyncSpy;
-    let eibasGetConfigAsyncSpy;
+    let eibasPostTasksAsyncSpy: jasmine.Spy;
+    let eibasGetConfigAsyncSpy: jasmine.Spy;
 
     beforeEach(() => {
       eibasPostTasksAsyncSpy = (
@@ -363,10 +364,11 @@ describe('Exploration Improvements Service', () => {
         [eqPlaythrough]));
 
       // The newly open HBR tasks should be flushed to the back-end.
-      eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
-        expect(tasks.length).toEqual(1);
-        expect(tasks[0].taskType).toEqual('high_bounce_rate');
-      });
+      eibasPostTasksAsyncSpy.and.callFake(
+        async(_: number, tasks: ExplorationTask[]) => {
+          expect(tasks.length).toEqual(1);
+          expect(tasks[0].taskType).toEqual('high_bounce_rate');
+        });
 
       explorationImprovementsService.initAsync();
       let p = explorationImprovementsService.flushUpdatedTasksToBackend();
@@ -377,9 +379,10 @@ describe('Exploration Improvements Service', () => {
 
       // Each newly opened HBR task is flushed once and only once.
       eibasPostTasksAsyncSpy.calls.reset();
-      eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
-        expect(tasks.length).toEqual(0);
-      });
+      eibasPostTasksAsyncSpy.and.callFake(
+        async(_: number, tasks: ExplorationTask[]) => {
+          expect(tasks.length).toEqual(0);
+        });
 
       p = explorationImprovementsService.flushUpdatedTasksToBackend();
       flushMicrotasks();
@@ -430,9 +433,10 @@ describe('Exploration Improvements Service', () => {
         .toEqual(0);
 
       // The HBR task should be flushed.
-      eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
-        expect(tasks).toEqual([hbrTask]);
-      });
+      eibasPostTasksAsyncSpy.and.callFake(
+        async(_: number, tasks: ExplorationTask[]) => {
+          expect(tasks).toEqual([hbrTask]);
+        });
 
       p = explorationImprovementsService.flushUpdatedTasksToBackend();
       flushMicrotasks();
@@ -442,9 +446,10 @@ describe('Exploration Improvements Service', () => {
 
       // The HBR task should not be flushed again.
       eibasPostTasksAsyncSpy.calls.reset();
-      eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
-        expect(tasks).toEqual([]);
-      });
+      eibasPostTasksAsyncSpy.and.callFake(
+        async(_: number, tasks: ExplorationTask[]) => {
+          expect(tasks).toEqual([]);
+        });
 
       p = explorationImprovementsService.flushUpdatedTasksToBackend();
       flushMicrotasks();
@@ -479,9 +484,10 @@ describe('Exploration Improvements Service', () => {
 
         // There should be no tasks to flush, because the NGR task is still
         // open.
-        eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
-          expect(tasks).toEqual([]);
-        });
+        eibasPostTasksAsyncSpy.and.callFake(
+          async(_: number, tasks: ExplorationTask[]) => {
+            expect(tasks).toEqual([]);
+          });
 
         p = explorationImprovementsService.flushUpdatedTasksToBackend();
         flushMicrotasks();
@@ -496,9 +502,10 @@ describe('Exploration Improvements Service', () => {
         expect(ngrTask.isResolved()).toBeTrue();
 
         eibasPostTasksAsyncSpy.calls.reset();
-        eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
-          expect(tasks).toEqual([ngrTask]);
-        });
+        eibasPostTasksAsyncSpy.and.callFake(
+          async(_: number, tasks: ExplorationTask[]) => {
+            expect(tasks).toEqual([ngrTask]);
+          });
 
         p = explorationImprovementsService.flushUpdatedTasksToBackend();
         flushMicrotasks();
@@ -508,9 +515,10 @@ describe('Exploration Improvements Service', () => {
 
         // The NGR task should be flushed once and only once.
         eibasPostTasksAsyncSpy.calls.reset();
-        eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
-          expect(tasks).toEqual([]);
-        });
+        eibasPostTasksAsyncSpy.and.callFake(
+          async(_: number, tasks: ExplorationTask[]) => {
+            expect(tasks).toEqual([]);
+          });
 
         p = explorationImprovementsService.flushUpdatedTasksToBackend();
         flushMicrotasks();
@@ -551,9 +559,10 @@ describe('Exploration Improvements Service', () => {
       expect(ngrTask.isResolved()).toBeTrue();
 
       // It should not be flushed because it wasn't created by initAsync().
-      eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
-        expect(tasks).toEqual([]);
-      });
+      eibasPostTasksAsyncSpy.and.callFake(
+        async(_: number, tasks: ExplorationTask[]) => {
+          expect(tasks).toEqual([]);
+        });
 
       p = explorationImprovementsService.flushUpdatedTasksToBackend();
       flushMicrotasks();

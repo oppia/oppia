@@ -37,6 +37,7 @@ import { AnswerGroup, AnswerGroupBackendDict } from 'domain/exploration/AnswerGr
 import { Hint, HintBackendDict } from 'domain/exploration/HintObjectFactory';
 import { Outcome, OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFactory';
 import { RecordedVoiceOverBackendDict, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
 
 export type StatePropertyValues = (
   AnswerGroup[] |
@@ -130,7 +131,10 @@ export class ChangeListService {
     written_translations: true
   };
 
-  changeListAddedTimeoutId = null;
+  // This property is initialized using private methods and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  changeListAddedTimeoutId!: ReturnType<typeof setTimeout>;
   DEFAULT_WAIT_FOR_AUTOSAVE_MSEC = 200;
 
   constructor(
@@ -159,7 +163,8 @@ export class ChangeListService {
       });
   }
 
-  private autosaveChangeListOnChange(explorationChangeList) {
+  private autosaveChangeListOnChange(
+      explorationChangeList: ExplorationChange[] | LostChange[]) {
     // Asynchronously send an autosave request, and check for errors in the
     // response:
     // If error is present -> Check for the type of error occurred
@@ -168,12 +173,12 @@ export class ChangeListService {
     // - Changes are not mergeable when a version mismatch occurs.
     // - Non-strict Validation Fail.
     this.explorationDataService.autosaveChangeListAsync(
-      explorationChangeList,
+      explorationChangeList as ExplorationChange[],
       response => {
         if (!response.changes_are_mergeable) {
           if (!this.autosaveInfoModalsService.isModalOpen()) {
             this.autosaveInfoModalsService.showVersionMismatchModal(
-              explorationChangeList);
+              explorationChangeList as LostChange[]);
           }
         }
         this.autosaveInProgressEventEmitter.emit(false);
@@ -397,7 +402,7 @@ export class ChangeListService {
       this.alertsService.addWarning('There are no changes to undo.');
       return;
     }
-    let lastChange = this.explorationChangeList.pop();
+    let lastChange = this.explorationChangeList.pop() as ExplorationChange;
     this.undoneChangeStack.push(lastChange);
     this.autosaveChangeListOnChange(this.explorationChangeList);
   }

@@ -82,42 +82,60 @@ interface OpacityMap {
 })
 export class StateGraphVisualization
   implements OnInit, OnDestroy {
-  @ViewChild('MainScreen') mainScreen: ElementRef;
-
-  @Input() allowPanning: boolean;
-  @Input() centerAtCurrentState: boolean;
-  @Input() currentStateId: string;
-  // Id of a second initial state, which will be styled as an initial
-  // state.
-  @Input() initStateId2: string;
-  @Input() isEditable: string;
-  // Object which maps linkProperty to a style.
-  @Input() linkPropertyMapping: {
-    added: string;
-    deleted: string;
-  };
-
-  @Input() versionGraphData: GraphData;
-  @Input() maximize: boolean = false;
-  // Object whose keys are node ids and whose values are node colors.
-  @Input() nodeColors: NodeColors;
-  // A value which is the color of all nodes.
-  @Input() nodeFill: string;
-  // Object whose keys are node ids with secondary labels and whose
-  // values are secondary labels. If this is undefined, it means no nodes
-  // have secondary labels.
-  @Input() nodeSecondaryLabels: NodeSecondaryLabels;
   // Function called when node is clicked. Should take a parameter
   // node.id.
   @Output() onClickFunction = new EventEmitter<string>();
   @Output() onDeleteFunction = new EventEmitter<string>();
   @Output() onMaximizeFunction = new EventEmitter<void>();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @ViewChild('MainScreen') mainScreen!: ElementRef;
+
+  @Input() allowPanning!: boolean;
+  @Input() centerAtCurrentState!: boolean;
+  @Input() currentStateId!: string;
+  // Id of a second initial state, which will be styled as an initial
+  // state.
+  @Input() initStateId2!: string;
+  @Input() isEditable!: string;
+  // Object which maps linkProperty to a style.
+  @Input() linkPropertyMapping!: {
+    added: string;
+    deleted: string;
+  };
+
+  @Input() versionGraphData!: GraphData;
+  @Input() maximize: boolean = false;
+  // Object whose keys are node ids and whose values are node colors.
+  @Input() nodeColors!: NodeColors;
+  // A value which is the color of all nodes.
+  @Input() nodeFill!: string;
+  // Object whose keys are node ids with secondary labels and whose
+  // values are secondary labels. If this is undefined, it means no nodes
+  // have secondary labels.
+  @Input() nodeSecondaryLabels!: NodeSecondaryLabels;
   // Object whose keys are ids of nodes, and whose values are the
   // corresponding node opacities.
-  @Input() opacityMap: OpacityMap;
-  @Input() showWarningSign: boolean;
-  @Input() showTranslationWarnings: boolean;
+  @Input() opacityMap!: OpacityMap;
+  @Input() showWarningSign!: boolean;
+  @Input() showTranslationWarnings!: boolean;
 
+  initStateId!: string;
+  finalStateIds!: string[];
+  graphLoaded!: boolean;
+  GRAPH_HEIGHT!: number;
+  GRAPH_WIDTH!: number;
+  VIEWPORT_WIDTH!: string;
+  VIEWPORT_HEIGHT!: string;
+  VIEWPORT_X!: string;
+  VIEWPORT_Y!: string;
+  nodeData!: NodeDataDict;
+  augmentedLinks!: AugmentedLink[];
+  nodeList!: NodeData[];
+  graphData!: GraphData;
+  overallTransformStr!: string;
+  innerTransformStr!: string;
   directiveSubscriptions = new Subscription();
   graphBounds = {
     bottom: 0,
@@ -126,23 +144,8 @@ export class StateGraphVisualization
     right: 0
   };
 
-  initStateId: string;
-  finalStateIds: string[];
   // The translation applied when the graph is first loaded.
-  origTranslations = [0, 0];
-  graphLoaded: boolean;
-  GRAPH_HEIGHT: number;
-  GRAPH_WIDTH: number;
-  VIEWPORT_WIDTH: string;
-  VIEWPORT_HEIGHT: string;
-  VIEWPORT_X: string;
-  VIEWPORT_Y: string;
-  nodeData: NodeDataDict;
-  augmentedLinks: AugmentedLink[];
-  nodeList: NodeData[];
-  graphData: GraphData;
-  overallTransformStr: string;
-  innerTransformStr: string;
+  origTranslations: number[] = [0, 0];
   switch: boolean = false;
   check: boolean = false;
 
@@ -187,6 +190,10 @@ export class StateGraphVisualization
       let dimensions = this.getElementDimensions();
       d3.selectAll('#pannableRect')
         .call(
+          // This throws "Object is possibly undefined." The type undefined
+          // comes here from d3-zoom dependency. We need to suppress this
+          // error because of strict type checking.
+          // @ts-ignore
           d3.zoom().scaleExtent([1, 1]).on('zoom', () => {
             if (this.graphBounds.right + this.graphBounds.left < dimensions.w) {
               (d3.event).transform.x = 0;
@@ -318,7 +325,7 @@ export class StateGraphVisualization
   }
 
   getNodeTitle(node: NodeTitle): string {
-    let warning = '';
+    let warning: string | null = '';
     if (node.reachable === false) {
       warning = 'Warning: this state is unreachable.';
     } else if (node.reachableFromEnd === false) {
@@ -402,11 +409,13 @@ export class StateGraphVisualization
     for (let i = 0; i < this.augmentedLinks.length; i++) {
     // Style links if link properties and style mappings are
     // provided.
-      if ('linkProperty' in links[i] &&
+      let linkProperty = links[i].linkProperty;
+      if ('linkProperty' in links[i] && linkProperty &&
         this.linkPropertyMapping) {
-        if (links[i].linkProperty in this.linkPropertyMapping) {
+        if (linkProperty in this.linkPropertyMapping) {
           this.augmentedLinks[i].style = (
-            this.linkPropertyMapping[links[i].linkProperty]);
+            this.linkPropertyMapping[
+              linkProperty as keyof typeof this.linkPropertyMapping]);
         }
       }
     }
@@ -466,7 +475,7 @@ export class StateGraphVisualization
     }
   }
 
-  getNodeErrorMessage(nodeLabel: string): string {
+  getNodeErrorMessage(nodeLabel: string): string | null {
     let warnings = null;
     if (this.showTranslationWarnings) {
       warnings =
@@ -476,8 +485,10 @@ export class StateGraphVisualization
       this.explorationWarningsService.getAllStateRelatedWarnings();
     }
     if (nodeLabel in warnings) {
-      return warnings[nodeLabel][0].toString();
+      let warning = warnings[nodeLabel][0];
+      return warning.toString();
     }
+    return null;
   }
 
   ngOnInit(): void {

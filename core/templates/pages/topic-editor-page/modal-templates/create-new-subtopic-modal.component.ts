@@ -34,23 +34,27 @@ import { SubtopicValidationService } from 'pages/topic-editor-page/services/subt
 
 export class CreateNewSubtopicModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  hostname: string;
-  classroomUrlFragment: string;
-  topic: Topic;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  hostname!: string;
+  classroomUrlFragment!: string;
+  topic!: Topic;
   SUBTOPIC_PAGE_SCHEMA!: object;
-  htmlData: string;
-  schemaEditorIsShown: boolean;
-  editableThumbnailFilename: string;
-  editableThumbnailBgColor: string;
-  editableUrlFragment: string;
-  allowedBgColors: readonly string[];
-  subtopicId: number;
-  subtopicTitle: string;
-  errorMsg: string;
-  subtopicUrlFragmentExists: boolean;
-  subtopicPage: SubtopicPage;
-  MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT: number;
-  MAX_CHARS_IN_SUBTOPIC_TITLE: number;
+  htmlData!: string;
+  schemaEditorIsShown!: boolean;
+  editableThumbnailFilename!: string;
+  editableThumbnailBgColor!: string;
+  editableUrlFragment!: string;
+  allowedBgColors!: readonly string[];
+  subtopicId!: number;
+  subtopicTitle!: string;
+  // Null when no error is raised.
+  errorMsg!: string | null;
+  subtopicUrlFragmentExists!: boolean;
+  subtopicPage!: SubtopicPage;
+  MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT!: number;
+  MAX_CHARS_IN_SUBTOPIC_TITLE!: number;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

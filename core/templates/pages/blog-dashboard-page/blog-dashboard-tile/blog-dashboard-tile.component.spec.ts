@@ -112,6 +112,33 @@ describe('Blog Dashboard Tile Component', () => {
     expect(component.lastUpdatedDateString).toEqual('Nov 21, 2014');
   });
 
+  it('should throw error if last updated value is undefined', fakeAsync(() => {
+    sampleBlogPostSummary = {
+      id: 'sampleId',
+      author_username: 'test_username',
+      displayed_author_name: 'test_user',
+      title: 'Title',
+      summary: 'Hello World',
+      tags: ['news'],
+      thumbnail_filename: 'image.png',
+      url_fragment: 'title',
+      // This throws "Value 'undefined' is not assignable to parameter of type
+      // 'String'." We need to suppress this error because of the need to
+      // test validations.
+      // @ts-ignore
+      last_updated: undefined,
+      published_on: '11/21/2014',
+    };
+
+    component.blogPostSummary = BlogPostSummary.createFromBackendDict(
+      sampleBlogPostSummary);
+
+    expect(() => {
+      component.ngOnInit();
+      tick();
+    }).toThrowError();
+  }));
+
   it('should get formatted date string from the timestamp in milliseconds',
     () => {
       // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.

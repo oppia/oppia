@@ -29,14 +29,17 @@ export type ChartLegendPosition = (
   templateUrl: './pie-chart.component.html'
 })
 export class PieChartComponent implements OnInit, OnDestroy, AfterViewInit {
-   @ViewChild('pieChart') pieChart: ElementRef;
+   // These properties are initialized using Angular lifecycle hooks
+   // and we need to do non-null assertion. For more information, see
+   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+   @ViewChild('pieChart') pieChart!: ElementRef;
 
    // A read-only array representing the table of chart data.
-   @Input() data: string[];
+   @Input() data!: string[];
    // A read-only object containing several chart options. This object
    // should have the following keys: pieHole, pieSliceTextStyleColor,
    // chartAreaWidth, colors, height, legendPosition, width.
-   @Input() options: {
+   @Input() options!: {
      chartAreaWidth: number;
      colors: string[];
      height: number;
@@ -49,8 +52,8 @@ export class PieChartComponent implements OnInit, OnDestroy, AfterViewInit {
      width: number;
    };
 
+   chart!: google.visualization.PieChart;
    directiveSubscriptions = new Subscription();
-   chart: google.visualization.PieChart;
 
    constructor(
      private windowDimensionsService: WindowDimensionsService,

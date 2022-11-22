@@ -77,10 +77,10 @@ describe('Parameter Metadata Service', () => {
         return statesObjectFactory.createFromBackendDict({
           Hola: {
             classifier_model_id: null,
-            solicit_answer_details: null,
-            card_is_checkpoint: null,
+            solicit_answer_details: false,
+            card_is_checkpoint: false,
             linked_skill_id: null,
-            next_content_id_index: null,
+            next_content_id_index: 0,
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}'
@@ -93,17 +93,17 @@ describe('Parameter Metadata Service', () => {
             },
             param_changes: [],
             interaction: {
-              confirmed_unclassified_answers: null,
-              customization_args: null,
+              confirmed_unclassified_answers: [],
+              customization_args: {},
               solution: null,
               id: null,
               answer_groups: [{
                 rule_specs: [],
-                training_data: null,
+                training_data: [],
                 tagged_skill_misconception_id: null,
                 outcome: {
                   labelled_as_correct: true,
-                  param_changes: null,
+                  param_changes: [],
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
@@ -116,7 +116,7 @@ describe('Parameter Metadata Service', () => {
               }],
               default_outcome: {
                 labelled_as_correct: true,
-                param_changes: null,
+                param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'Hola',
@@ -137,10 +137,10 @@ describe('Parameter Metadata Service', () => {
           },
           State: {
             classifier_model_id: null,
-            solicit_answer_details: null,
-            card_is_checkpoint: null,
+            solicit_answer_details: false,
+            card_is_checkpoint: false,
             linked_skill_id: null,
-            next_content_id_index: null,
+            next_content_id_index: 0,
             content: {
               content_id: 'content',
               html: 'content'
@@ -153,17 +153,17 @@ describe('Parameter Metadata Service', () => {
             },
             param_changes: [],
             interaction: {
-              confirmed_unclassified_answers: null,
-              customization_args: null,
+              confirmed_unclassified_answers: [],
+              customization_args: {},
               solution: null,
               id: null,
               answer_groups: [{
                 rule_specs: [],
-                training_data: null,
+                training_data: [],
                 tagged_skill_misconception_id: null,
                 outcome: {
                   labelled_as_correct: true,
-                  param_changes: null,
+                  param_changes: [],
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
@@ -176,7 +176,7 @@ describe('Parameter Metadata Service', () => {
               }],
               default_outcome: {
                 labelled_as_correct: true,
-                param_changes: null,
+                param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State',
@@ -197,10 +197,10 @@ describe('Parameter Metadata Service', () => {
           },
           State2: {
             classifier_model_id: null,
-            solicit_answer_details: null,
-            card_is_checkpoint: null,
+            solicit_answer_details: false,
+            card_is_checkpoint: false,
             linked_skill_id: null,
-            next_content_id_index: null,
+            next_content_id_index: 0,
             content: {
               content_id: 'content',
               html: 'content'
@@ -213,17 +213,17 @@ describe('Parameter Metadata Service', () => {
             },
             param_changes: [],
             interaction: {
-              confirmed_unclassified_answers: null,
-              customization_args: null,
+              confirmed_unclassified_answers: [],
+              customization_args: {},
               solution: null,
               id: null,
               answer_groups: [{
                 rule_specs: [],
-                training_data: null,
+                training_data: [],
                 tagged_skill_misconception_id: null,
                 outcome: {
                   labelled_as_correct: true,
-                  param_changes: null,
+                  param_changes: [],
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
@@ -236,7 +236,7 @@ describe('Parameter Metadata Service', () => {
               }],
               default_outcome: {
                 labelled_as_correct: true,
-                param_changes: null,
+                param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State2',
@@ -257,10 +257,10 @@ describe('Parameter Metadata Service', () => {
           },
           State3: {
             classifier_model_id: null,
-            solicit_answer_details: null,
-            card_is_checkpoint: null,
+            solicit_answer_details: false,
+            card_is_checkpoint: false,
             linked_skill_id: null,
-            next_content_id_index: null,
+            next_content_id_index: 0,
             content: {
               content_id: 'content',
               html: 'content'
@@ -273,17 +273,17 @@ describe('Parameter Metadata Service', () => {
             },
             param_changes: [],
             interaction: {
-              confirmed_unclassified_answers: null,
-              customization_args: null,
+              confirmed_unclassified_answers: [],
+              customization_args: {},
               solution: null,
               id: null,
               answer_groups: [{
                 rule_specs: [],
-                training_data: null,
+                training_data: [],
                 tagged_skill_misconception_id: null,
                 outcome: {
                   labelled_as_correct: true,
-                  param_changes: null,
+                  param_changes: [],
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
@@ -296,7 +296,7 @@ describe('Parameter Metadata Service', () => {
               }],
               default_outcome: {
                 labelled_as_correct: true,
-                param_changes: null,
+                param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State2',

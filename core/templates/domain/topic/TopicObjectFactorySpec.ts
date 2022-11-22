@@ -172,8 +172,12 @@ describe('Topic object factory', () => {
   });
 
   it('should be able to create an interstitial topic object', () => {
-    let topic = topicObjectFactory.createInterstitialTopic();
-    expect(topic.getId()).toEqual(null);
+    let topic = new Topic(
+      'id', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+    );
+    expect(topic.getId()).toEqual('id');
     expect(topic.getName()).toEqual('Topic name loading');
     expect(topic.getDescription()).toEqual('Topic description loading');
     expect(topic.getLanguageCode()).toBe('en');

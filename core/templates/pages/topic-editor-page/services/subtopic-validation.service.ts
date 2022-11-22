@@ -33,7 +33,7 @@ export class SubtopicValidationService {
   ) {}
 
   checkValidSubtopicName(title: string): boolean {
-    let subtopicTitles = [];
+    let subtopicTitles: string[] = [];
     let topic = this.topicEditorStateService.getTopic();
     topic.getSubtopics().forEach((subtopic) => {
       subtopicTitles.push(subtopic.getTitle());

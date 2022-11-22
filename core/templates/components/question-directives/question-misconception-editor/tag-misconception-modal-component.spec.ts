@@ -21,7 +21,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
+import { MisconceptionObjectFactory, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { TagMisconceptionModalComponent } from './tag-misconception-modal-component';
 
 class MockActiveModal {
@@ -41,7 +41,7 @@ describe('Tag Misconception Modal Component', () => {
   let stateEditorService: StateEditorService;
 
   let misconceptionObjectFactory: MisconceptionObjectFactory;
-  let mockMisconceptionObject;
+  let mockMisconceptionObject: MisconceptionSkillMap;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -87,7 +87,7 @@ describe('Tag Misconception Modal Component', () => {
   it('should initialize the properties correctly', () => {
     expect(component.misconceptionsBySkill).toEqual(mockMisconceptionObject);
     expect(component.tempSelectedMisconception).toEqual(null);
-    expect(component.tempSelectedMisconceptionSkillId).toEqual(null);
+    expect(component.tempSelectedMisconceptionSkillId).toBeNull();
     expect(component.tempMisconceptionFeedbackIsUsed).toEqual(true);
   });
 
@@ -99,7 +99,7 @@ describe('Tag Misconception Modal Component', () => {
     };
 
     expect(component.tempSelectedMisconception).toEqual(null);
-    expect(component.tempSelectedMisconceptionSkillId).toEqual(null);
+    expect(component.tempSelectedMisconceptionSkillId).toBeNull();
     expect(component.tempMisconceptionFeedbackIsUsed).toBeTrue();
 
     component.updateValues(updatedValues);

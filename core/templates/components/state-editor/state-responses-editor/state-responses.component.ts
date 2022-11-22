@@ -23,7 +23,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
 import { DeleteAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
-import { Misconception, TaggedMisconception } from 'domain/skill/MisconceptionObjectFactory';
+import { Misconception, MisconceptionSkillMap, TaggedMisconception } from 'domain/skill/MisconceptionObjectFactory';
 import { Subscription } from 'rxjs';
 import { AnswerChoice, StateEditorService } from '../state-editor-properties-services/state-editor.service';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
@@ -46,6 +46,8 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
 import { ItemSelectionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 import { EditabilityService } from 'services/editability.service';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 
 
 @Component({
@@ -53,12 +55,25 @@ import { EditabilityService } from 'services/editability.service';
   templateUrl: './state-responses.component.html'
 })
 export class StateResponsesComponent implements OnInit, OnDestroy {
-  @Input() addState: (value: string) => void;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() addState!: (value: string) => void;
+  inapplicableSkillMisconceptionIds!: string[];
+  // If the interaction is terminal, then the default outcome is null.
+  defaultOutcome!: Outcome | null;
+  misconceptionsBySkill!: MisconceptionSkillMap;
+  activeAnswerGroupIndex!: number;
+  // State name is null if their is no state selected or have no active state.
+  // This is the case when the user is creating a new state.
+  stateName!: string | null;
   @Output() onResponsesInitialized = new EventEmitter<void>();
   @Output() onSaveInteractionAnswerGroups = (
     new EventEmitter<AnswerGroup[] | AnswerGroup>());
 
-  @Output() onSaveInteractionDefaultOutcome = new EventEmitter<Outcome>();
+  @Output() onSaveInteractionDefaultOutcome = (
+    new EventEmitter<Outcome | null>());
+
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
   @Output() onSaveSolicitAnswerDetails = new EventEmitter<boolean>();
   @Output() navigateToState = new EventEmitter<string>();
@@ -70,18 +85,12 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     new EventEmitter<string[]>());
 
   directiveSubscriptions = new Subscription();
-
-  inapplicableSkillMisconceptionIds: string[];
-  activeEditOption: boolean;
-  misconceptionsBySkill: object;
+  activeEditOption: boolean = false;
   answerGroups: AnswerGroup[] = [];
-  defaultOutcome: Outcome;
-  activeAnswerGroupIndex: number;
-  SHOW_TRAINABLE_UNRESOLVED_ANSWERS: boolean;
-  responseCardIsShown: boolean;
-  stateName: string;
-  enableSolicitAnswerDetailsFeature: boolean;
-  containsOptionalMisconceptions: boolean;
+  SHOW_TRAINABLE_UNRESOLVED_ANSWERS: boolean = false;
+  responseCardIsShown: boolean = false;
+  enableSolicitAnswerDetailsFeature: boolean = false;
+  containsOptionalMisconceptions: boolean = false;
 
   constructor(
     private stateEditorService: StateEditorService,
@@ -142,7 +151,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     let answerChoices = [];
     let customizationArgs = (
       this.stateCustomizationArgsService.savedMemento);
-    let handledAnswersArray = [];
+    let handledAnswersArray: InteractionRuleInputs[] = [];
 
     if (interactionId === 'MultipleChoiceInput') {
       let numChoices = this.getAnswerChoices().length;
@@ -177,9 +186,10 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
           answerChoices.push(this.getAnswerChoices()[i].val);
         }
 
-        let answerChoiceToIndex = {};
+        let answerChoiceToIndex:
+         Record<string, number> = {};
         answerChoices.forEach((answerChoice, choiceIndex) => {
-          answerChoiceToIndex[answerChoice] = choiceIndex;
+          answerChoiceToIndex[answerChoice as string] = choiceIndex;
         });
 
         answerGroups.forEach((answerGroup) => {
@@ -221,12 +231,11 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.stateSolicitAnswerDetailsService.saveDisplayedValue();
   }
 
-  isSelfLoopWithNoFeedback(outcome: Outcome): boolean {
-    if (outcome && typeof outcome === 'object' &&
+  isSelfLoopWithNoFeedback(outcome: Outcome): boolean | void {
+    if (outcome && typeof outcome === 'object' && this.stateName &&
       outcome.constructor.name === 'Outcome') {
       return outcome.isConfusing(this.stateName);
     }
-    return false;
   }
 
   isSelfLoopThatIsMarkedCorrect(outcome: Outcome): boolean {
@@ -260,7 +269,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+    return Boolean(interactionId) && INTERACTION_SPECS[
+      interactionId as InteractionSpecsKey].is_linear;
   }
 
   isCurrentInteractionTrivial(): boolean {
@@ -271,7 +281,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       interactionId) !== -1;
   }
 
-  isLinearWithNoFeedback(outcome: Outcome): boolean {
+  isLinearWithNoFeedback(outcome: Outcome): boolean | void {
     // Returns false if current interaction is linear and has no
     // feedback.
     if (outcome && typeof outcome === 'object' &&
@@ -279,7 +289,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       return this.isCurrentInteractionLinear() &&
         !outcome.hasNonemptyFeedback();
     }
-    return false;
   }
 
   getOutcomeTooltip(outcome: Outcome): string {
@@ -365,12 +374,14 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
 
   verifyAndUpdateInapplicableSkillMisconceptionIds(): void {
     let answerGroups = this.responsesService.getAnswerGroups();
-    let taggedSkillMisconceptionIds = [];
+    let taggedSkillMisconceptionIds: string[] = [];
     for (let i = 0; i < answerGroups.length; i++) {
+      let taggedSkillMisconceptionId = (
+        answerGroups[i].taggedSkillMisconceptionId);
       if (!answerGroups[i].outcome.labelledAsCorrect &&
-          answerGroups[i].taggedSkillMisconceptionId !== null) {
+          taggedSkillMisconceptionId !== null) {
         taggedSkillMisconceptionIds.push(
-          answerGroups[i].taggedSkillMisconceptionId);
+          taggedSkillMisconceptionId);
       }
     }
     let commonSkillMisconceptionIds = (
@@ -530,9 +541,13 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     let summary = '';
     let hasFeedback = defaultOutcome.hasNonemptyFeedback();
 
-    if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
-      summary =
-        INTERACTION_SPECS[interactionId].default_outcome_heading;
+    if (interactionId && INTERACTION_SPECS[
+      interactionId as InteractionSpecsKey].is_linear) {
+      let defaultOutcomeHeading = INTERACTION_SPECS[
+        interactionId as InteractionSpecsKey].default_outcome_heading;
+      if (defaultOutcomeHeading) {
+        summary = defaultOutcomeHeading;
+      }
     } else if (answerGroupCount > 0) {
       summary = 'All other answers';
     } else {
@@ -563,15 +578,16 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
 
   getUnaddressedMisconceptionNames(): string[] {
     let answerGroups = this.responsesService.getAnswerGroups();
-    let taggedSkillMisconceptionIds = {};
+    let taggedSkillMisconceptionIds: Record<string, boolean> = {};
     for (let i = 0; i < answerGroups.length; i++) {
+      let taggedSkillMisconceptionId = (
+        answerGroups[i].taggedSkillMisconceptionId);
       if (!answerGroups[i].outcome.labelledAsCorrect &&
-          answerGroups[i].taggedSkillMisconceptionId !== null) {
-        taggedSkillMisconceptionIds[
-          answerGroups[i].taggedSkillMisconceptionId] = true;
+          taggedSkillMisconceptionId !== null) {
+        taggedSkillMisconceptionIds[taggedSkillMisconceptionId] = true;
       }
     }
-    let unaddressedMisconceptionNames = [];
+    let unaddressedMisconceptionNames: string[] = [];
     Object.keys(this.misconceptionsBySkill).forEach(
       (skillId) => {
         let misconceptions = this.misconceptionsBySkill[skillId];
@@ -596,10 +612,11 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     let answerGroups = this.responsesService.getAnswerGroups();
     let taggedSkillMisconceptionIds = [];
     for (let i = 0; i < answerGroups.length; i++) {
+      let taggedSkillMisconceptionId = (
+        answerGroups[i].taggedSkillMisconceptionId);
       if (!answerGroups[i].outcome.labelledAsCorrect &&
-          answerGroups[i].taggedSkillMisconceptionId !== null) {
-        taggedSkillMisconceptionIds.push(
-          answerGroups[i].taggedSkillMisconceptionId);
+          taggedSkillMisconceptionId !== null) {
+        taggedSkillMisconceptionIds.push(taggedSkillMisconceptionId);
       }
     }
     let skillMisconceptionIdIsAssigned = (
@@ -624,7 +641,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     }
     this.onSaveInapplicableSkillMisconceptionIds.emit(
       this.inapplicableSkillMisconceptionIds);
-    this.setActiveEditOption(null);
+    this.setActiveEditOption(false);
   }
 
   setActiveEditOption(activeEditOption: boolean): void {
@@ -699,8 +716,10 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
           // linear or non-terminal interaction and if an actual
           // interaction is specified (versus one being deleted).
           if (newInteractionId &&
-              !INTERACTION_SPECS[newInteractionId].is_linear &&
-              !INTERACTION_SPECS[newInteractionId].is_terminal) {
+              !INTERACTION_SPECS[
+                newInteractionId as InteractionSpecsKey].is_linear &&
+              !INTERACTION_SPECS[
+                newInteractionId as InteractionSpecsKey].is_terminal) {
             this.openAddAnswerGroupModal();
           }
         }
@@ -755,7 +774,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.stateEditorService.updateStateResponsesInitialised();
     this.inapplicableSkillMisconceptionIds = (
       this.stateEditorService.getInapplicableSkillMisconceptionIds());
-    this.activeEditOption = null;
+    this.activeEditOption = false;
   }
 
   ngOnDestroy(): void {

@@ -31,7 +31,10 @@ import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 export class ExplorationParamSpecsService extends
   ExplorationPropertyService {
   propertyName: string = 'param_specs';
-  savedMemento: ParamSpecs;
+  // This property is initialized using init method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  savedMemento!: ParamSpecs;
   constructor(
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,

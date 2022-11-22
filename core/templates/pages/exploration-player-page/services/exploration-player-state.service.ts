@@ -59,7 +59,7 @@ export class ExplorationPlayerStateService {
   editorPreviewMode: boolean;
   questionPlayerMode: boolean;
   explorationId: string;
-  version: number;
+  version: number | null;
   storyUrlFragment: string;
   lastCompletedCheckpoint: string;
   isLoggedOutProgressTracked: boolean = false;

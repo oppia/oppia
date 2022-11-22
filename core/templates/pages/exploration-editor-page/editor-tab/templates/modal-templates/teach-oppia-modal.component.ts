@@ -27,7 +27,7 @@ import { StateInteractionIdService } from 'components/state-editor/state-editor-
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
+import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
@@ -39,6 +39,14 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { State } from 'domain/state/StateObjectFactory';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { TeachOppiaModalBackendApiService } from './teach-oppia-modal-backend-api.service';
+import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
+
+interface UnresolvedAnswer {
+  answer: InteractionAnswer;
+  answerTemplate: string;
+  classificationResult: AnswerClassificationResult;
+  feedbackHtml: string;
+}
 
 @Component({
   selector: 'oppia-teach-oppia-modal',
@@ -47,16 +55,19 @@ import { TeachOppiaModalBackendApiService } from './teach-oppia-modal-backend-ap
 export class TeachOppiaModalComponent
   extends ConfirmOrCancelModal implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  interactionId: string;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  _stateName!: string;
+  _state!: State;
+  _explorationId!: string;
+  unresolvedAnswers!: UnresolvedAnswer[];
+  loadingDotsAreShown!: boolean;
+  rulesService!: InteractionRulesService;
+  interactionId!: string;
   // Timeout for the toast that is shown when a response has
   // been confirmed or fixed.
   TOAST_TIMEOUT: number = 2000;
-  _stateName: string;
-  _state: State;
-  _explorationId: string;
-  unresolvedAnswers;
-  loadingDotsAreShown: boolean;
-  rulesService;
 
   constructor(
     private alertsService: AlertsService,
@@ -135,7 +146,7 @@ export class TeachOppiaModalComponent
           answer: answer,
           answerTemplate: answerTemplate,
           classificationResult: classificationResult,
-          feedbackHtml: feedbackHtml
+          feedbackHtml: feedbackHtml,
         });
       }
     });
@@ -175,8 +186,9 @@ export class TeachOppiaModalComponent
       this.unresolvedAnswers[answerIndex]);
     const answer = unresolvedAnswer.answer;
 
+    let interactionId = this.stateInteractionIdService.savedMemento;
     this.trainingModalService.openTrainUnresolvedAnswerModal(
-      answer, null, answerIndex);
+      answer, interactionId, answerIndex);
   }
 
   ngOnInit(): void {
@@ -198,9 +210,12 @@ export class TeachOppiaModalComponent
 
     this._explorationId = (
       this.contextService.getExplorationId());
-    this._stateName = this.stateEditorService.getActiveStateName();
-    this._state = this.explorationStatesService.getState(this._stateName);
-    this.interactionId = this.stateInteractionIdService.savedMemento;
+    let stateName = this.stateEditorService.getActiveStateName();
+    if (stateName) {
+      this._stateName = stateName;
+      this._state = this.explorationStatesService.getState(this._stateName);
+      this.interactionId = this.stateInteractionIdService.savedMemento;
+    }
 
     const rulesServiceName = (
       this.angularNameService.getNameOfInteractionRulesService(

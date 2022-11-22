@@ -43,19 +43,22 @@ interface CategoryChoices {
 })
 export class ExplorationMetadataModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  categoryLocalValue: string;
-  objectiveHasBeenPreviouslyEdited: boolean;
-  requireTitleToBeSpecified: boolean;
-  requireObjectiveToBeSpecified: boolean;
-  requireCategoryToBeSpecified: boolean;
-  askForLanguageCheck: boolean;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  categoryLocalValue!: string;
+  objectiveHasBeenPreviouslyEdited!: boolean;
+  requireTitleToBeSpecified!: boolean;
+  requireObjectiveToBeSpecified!: boolean;
+  requireCategoryToBeSpecified!: boolean;
+  askForLanguageCheck!: boolean;
+  askForTags!: boolean;
+  newCategory!: CategoryChoices;
+  CATEGORY_LIST_FOR_SELECT2!: CategoryChoices[];
   isValueHasbeenUpdated: boolean = false;
-  askForTags: boolean;
   addOnBlur: boolean = true;
   explorationTags: string[] = [];
-  CATEGORY_LIST_FOR_SELECT2;
   filteredChoices: CategoryChoices[] = [];
-  newCategory: CategoryChoices;
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
   constructor(
@@ -133,7 +136,7 @@ export class ExplorationMetadataModalComponent
     }
 
     // Record any fields that have changed.
-    let metadataList = [];
+    let metadataList: string[] = [];
     if (this.explorationTitleService.hasChanged()) {
       metadataList.push('title');
     }
@@ -236,8 +239,8 @@ export class ExplorationMetadataModalComponent
       if (!categoryIsInSelect2 &&
             this.explorationCategoryService.savedMemento) {
         this.CATEGORY_LIST_FOR_SELECT2.unshift({
-          id: this.explorationCategoryService.savedMemento,
-          text: this.explorationCategoryService.savedMemento
+          id: this.explorationCategoryService.savedMemento as string,
+          text: this.explorationCategoryService.savedMemento as string
         });
       }
     }

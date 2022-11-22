@@ -22,7 +22,7 @@ import { Ratio } from 'domain/objects/ratio.model';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
-import { FractionAnswer, NumberWithUnitsAnswer, RatioInputAnswer } from 'interactions/answer-defs';
+import { FractionAnswer, MusicNotesAnswer, NumberWithUnitsAnswer, RatioInputAnswer } from 'interactions/answer-defs';
 import { TranslatableSetOfNormalizedString, TranslatableSetOfUnicodeString } from 'interactions/rule-input-defs';
 import { AnswerChoice } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { AppConstants } from 'app.constants';
@@ -49,9 +49,16 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
       console.error('Cannot find interaction with id ' + interactionId);
       return '';
     }
-    let description = INTERACTION_SPECS[
-      interactionId as InteractionSpecsKey].rule_descriptions[
-      rule.type];
+
+    let ruleTypesToDescriptions = INTERACTION_SPECS[
+      interactionId as InteractionSpecsKey].rule_descriptions;
+
+    type RuleTypeToDescription = {
+      [key in keyof typeof ruleTypesToDescriptions]: string;
+    };
+
+    let description: string = ruleTypesToDescriptions[
+      rule.type as keyof RuleTypeToDescription];
     if (!description) {
       console.error(
         'Cannot find description for rule ' + rule.type +
@@ -62,16 +69,17 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
     var inputs = rule.inputs;
     var finalDescription = description;
 
-    var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-    var iter = 0;
+    let PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+    let iter = 0;
     while (true) {
-      if (!description.match(PATTERN) || iter === 100) {
+      const match = description.match(PATTERN);
+      if (!match || iter === 100) {
         break;
       }
       iter++;
 
-      var varName = description.match(PATTERN)[1];
-      var varType = description.match(PATTERN)[2];
+      let varName = match[1];
+      let varType = match[2];
       if (varType) {
         varType = varType.substring(1);
       }
@@ -85,7 +93,7 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
           const key = inputs[varName] as string[];
           const contentIds = choices.map(choice => choice.val);
 
-          for (var i = 0; i < key.length; i++) {
+          for (let i = 0; i < key.length; i++) {
             const choiceIndex = contentIds.indexOf(key[i]);
             if (choiceIndex === -1) {
               replacementText += 'INVALID';
@@ -137,24 +145,26 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
         // of an object type.
       } else if (varType === 'MusicPhrase') {
         replacementText = '[';
-        for (var i = 0; i < Object.keys(inputs[varName]).length; i++) {
+        const key = inputs[varName] as MusicNotesAnswer[];
+        for (var i = 0; i < Object.keys(key).length; i++) {
           if (i !== 0) {
             replacementText += ', ';
           }
-          replacementText += inputs[varName][i].readableNoteName;
+          replacementText += key[i].readableNoteName;
         }
         replacementText += ']';
       } else if (varType === 'CoordTwoDim') {
-        var latitude = inputs[varName][0] || 0.0;
-        var longitude = inputs[varName][1] || 0.0;
+        const key = inputs[varName] as Record<number, number>;
+        let latitude = key[0] || 0.0;
+        let longitude = key[1] || 0.0;
         replacementText = '(';
         replacementText += (
-           inputs[varName][0] >= 0.0 ?
+           key[0] >= 0.0 ?
            latitude.toFixed(2) + '°N' :
            -latitude.toFixed(2) + '°S');
         replacementText += ', ';
         replacementText += (
-           inputs[varName][1] >= 0.0 ?
+           key[1] >= 0.0 ?
            longitude.toFixed(2) + '°E' :
            -longitude.toFixed(2) + '°W');
         replacementText += ')';

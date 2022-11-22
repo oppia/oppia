@@ -26,7 +26,7 @@ import { ExplorationDataService } from 'pages/exploration-editor-page/services/e
 import { ExplorationDiffService, StateData, StateLink } from 'pages/exploration-editor-page/services/exploration-diff.service';
 import { VersionTreeService } from './version-tree.service';
 
-interface CompareVersionData {
+export interface CompareVersionData {
   nodes: StateData;
   links: StateLink[];
   finalStateIds: string[];
@@ -77,7 +77,7 @@ export class CompareVersionsService {
     }
 
     // The full changelist that is applied to go from v1 to v2.
-    let combinedChangeList = [];
+    let combinedChangeList: ExplorationChange[] = [];
     versionPath.forEach((version) => {
       let changeListForVersion = this.versionTreeService.getChangeList(version);
       if (!directionForwards) {

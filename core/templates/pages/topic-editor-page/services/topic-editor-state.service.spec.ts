@@ -116,7 +116,7 @@ describe('Topic editor state service', () => {
               ]
             }
           ],
-          skill_id_2: null
+          skill_id_2: []
         },
         skillIdToDescriptionDict: {
           skill_id_1: 'Description 1',
@@ -286,6 +286,20 @@ describe('Topic editor state service', () => {
     spyOn(mockEditableTopicBackendApiService, 'fetchSubtopicPageAsync')
       .and.returnValue(Promise.reject());
     spyOn(alertsService, 'addWarning');
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'string'" We need to suppress this error because of the need to test
+    // validations.
+    // @ts-ignore
+    topicEditorStateService.loadSubtopicPage(null, null);
+    tick();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'There was an error when loading the topic.');
+  }));
+
+  it('should show error when loading subtopic page fails', fakeAsync(() => {
+    spyOn(mockEditableTopicBackendApiService, 'fetchSubtopicPageAsync')
+      .and.returnValue(Promise.reject());
+    spyOn(alertsService, 'addWarning');
     topicEditorStateService.loadSubtopicPage('1', 2);
     tick();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
@@ -296,7 +310,7 @@ describe('Topic editor state service', () => {
     spyOn(mockEditableTopicBackendApiService, 'fetchSubtopicPageAsync')
       .and.returnValue(Promise.reject());
     spyOn(alertsService, 'addWarning');
-    topicEditorStateService.loadSubtopicPage(null, 2);
+    topicEditorStateService.loadSubtopicPage('', 2);
     tick();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'There was an error when loading the topic.');

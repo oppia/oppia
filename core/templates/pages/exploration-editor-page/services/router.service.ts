@@ -189,6 +189,7 @@ export class RouterService {
     }
   }
 
+  // New state name is null when navigating to the main tab.
   _actuallyNavigate(pathType: string, newStateName: string): void {
     if (newStateName) {
       this.stateEditorService.setActiveStateName(newStateName);
@@ -227,7 +228,7 @@ export class RouterService {
     return this._getCurrentStateFromLocationPath();
   }
 
-  navigateToMainTab(stateName: string): void {
+  navigateToMainTab(stateName: string | null): void {
     this._savePendingChanges();
     let oldState = decodeURI(
       this._getCurrentStateFromLocationPath());

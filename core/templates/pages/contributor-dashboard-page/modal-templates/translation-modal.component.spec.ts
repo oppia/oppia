@@ -28,11 +28,14 @@ import { TranslationModalComponent, TranslationOpportunity } from 'pages/contrib
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { ContextService } from 'services/context.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { ImageLocalStorageService, ImagesData } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { TranslateTextService } from '../services/translate-text.service';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+// This throws "TS2307". We need to
+// suppress this error because rte-text-components are not strictly typed yet.
+// @ts-ignore
 import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
 
 enum ExpansionTabType {
@@ -51,6 +54,7 @@ describe('Translation Modal Component', () => {
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let siteAnalyticsService: SiteAnalyticsService;
   let imageLocalStorageService: ImageLocalStorageService;
+  let getUserContributionRightsDataAsyncSpy: jasmine.Spy;
   let userService: UserService;
   let activeModal: NgbActiveModal;
   let httpTestingController: HttpTestingController;
@@ -68,7 +72,7 @@ describe('Translation Modal Component', () => {
     totalCount: 50,
     translationsCount: 20
   };
-  const getContentTranslatableItemWithText = (text) => {
+  const getContentTranslatableItemWithText = (text: string) => {
     return {
       data_format: 'html',
       content: text,
@@ -117,18 +121,21 @@ describe('Translation Modal Component', () => {
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
     component.contentPanel = new RteOutputDisplayComponent(
+      // This throws "Argument of type 'null' is not assignable to parameter of
+      // type 'ViewContainerRef'." We need to suppress this error because of
+      // the need to test validations.
+      // @ts-ignore
       null, null, new ElementRef({offsetHeight: 200}), null);
-    spyOn(
-      userService,
-      'getUserContributionRightsDataAsync')
-      .and.returnValue(Promise.resolve(
-        {
-          can_suggest_questions: false,
-          can_review_translation_for_language_codes: ['ar'],
-          can_review_voiceover_for_language_codes: [],
-          can_review_questions: false
-        }
-      ));
+    getUserContributionRightsDataAsyncSpy = spyOn(
+      userService, 'getUserContributionRightsDataAsync');
+    getUserContributionRightsDataAsyncSpy.and.returnValue(Promise.resolve(
+      {
+        can_suggest_questions: false,
+        can_review_translation_for_language_codes: ['ar'],
+        can_review_voiceover_for_language_codes: [],
+        can_review_questions: false
+      }
+    ));
   });
 
   it('should invoke change detection when html is updated', () => {
@@ -288,6 +295,16 @@ describe('Translation Modal Component', () => {
         expect(component.getHtmlSchema().ui_config.languageDirection)
           .toBe('ltr');
       });
+
+      it('should throw error if contribution rights is null', fakeAsync(
+        () => {
+          getUserContributionRightsDataAsyncSpy.and.returnValue(Promise.resolve(
+            null));
+          expect(() => {
+            component.ngOnInit();
+            tick();
+          }).toThrowError();
+        }));
     });
 
     it('should set context correctly', fakeAsync(() => {
@@ -475,7 +492,8 @@ describe('Translation Modal Component', () => {
   });
 
   describe('when suggesting translated text', () => {
-    let expectedPayload, imagesData;
+    let expectedPayload: Object;
+    let imagesData: ImagesData[];
     beforeEach(fakeAsync(() => {
       expectedPayload = {
         suggestion_type: 'translate_content',
@@ -715,10 +733,10 @@ describe('Translation Modal Component', () => {
       fakeAsync(() => {
         imagesData = [{
           filename: 'imageFilename1',
-          imageBlob: 'imageBlob1'
+          imageBlob: new Blob(['imageBlob1'])
         }, {
           filename: 'imageFilename2',
-          imageBlob: 'imageBlob2'
+          imageBlob: new Blob(['imageBlob2'])
         }];
         const imageToBase64Mapping = {
           imageFilename1: 'img1Base64',

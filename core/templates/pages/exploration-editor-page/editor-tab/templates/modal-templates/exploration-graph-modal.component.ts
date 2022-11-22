@@ -30,10 +30,14 @@ import { GraphData } from 'services/compute-graph.service';
 })
 export class ExplorationGraphModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() isEditable: boolean;
-
-  currentStateName: string;
-  graphData: GraphData;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() isEditable!: boolean;
+  // State name is null if their is no state selected or have no active state.
+  // This is the case when the user is creating a new state.
+  currentStateName!: string | null;
+  graphData!: GraphData;
 
   constructor(
     private graphDataService: GraphDataService,

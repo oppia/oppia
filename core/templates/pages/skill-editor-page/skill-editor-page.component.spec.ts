@@ -40,7 +40,7 @@ import { SkillEditorPageComponent } from './skill-editor-page.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance!: {
     body: 'xyz';
   };
 }
@@ -55,10 +55,12 @@ class MockWindowRef {
     onresize: () => {
     },
     dispatchEvent: (ev: Event) => true,
-    addEventListener(event: string, callback) {
+    addEventListener(
+        event: string,
+        callback: (arg0: { returnValue: null }) => void) {
       callback({returnValue: null});
     },
-    scrollTo: (x, y) => {}
+    scrollTo: () => {}
   };
 }
 
@@ -194,7 +196,7 @@ describe('Skill editor page', () => {
     spyOn(urlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);
     spyOn(preventPageUnloadEventService, 'addListener').and
-      .callFake((callback: () => {}) => callback());
+      .callFake((callback: () => false) => callback());
 
     component.ngOnInit();
 
@@ -327,7 +329,8 @@ describe('Skill editor page', () => {
     let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
       localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
+          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()
+      ) as EntityEditorBrowserTabsInfo);
 
     expect(skillEditorBrowserTabsInfo).toBe(skillEditorBrowserTabsInfo);
 
@@ -336,7 +339,8 @@ describe('Skill editor page', () => {
     skillEditorBrowserTabsInfo = (
       localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
+          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()
+      ) as EntityEditorBrowserTabsInfo);
 
     expect(skillEditorBrowserTabsInfo).toBeDefined();
     expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
@@ -347,7 +351,8 @@ describe('Skill editor page', () => {
     skillEditorBrowserTabsInfo = (
       localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
+          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()
+      ) as EntityEditorBrowserTabsInfo);
 
     expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
     expect(skillEditorBrowserTabsInfo.getLatestVersion()).toEqual(3);
@@ -358,7 +363,8 @@ describe('Skill editor page', () => {
     skillEditorBrowserTabsInfo = (
       localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
+          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()
+      ) as EntityEditorBrowserTabsInfo);
 
     expect(skillEditorBrowserTabsInfo.getLatestVersion()).toEqual(4);
   });
@@ -381,8 +387,7 @@ describe('Skill editor page', () => {
     spyOn(
       localStorageService, 'getEntityEditorBrowserTabsInfo'
     ).and.returnValue(BrowserTabsInfo);
-    spyOn(preventPageUnloadEventService, 'addListener').and
-      .callFake((callback) => callback());
+    spyOn(preventPageUnloadEventService, 'addListener');
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
     spyOn(skillEditorStateService, 'loadSkill').and.stub();
     spyOn(urlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
@@ -397,7 +402,8 @@ describe('Skill editor page', () => {
     let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
       localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
+          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()
+      ) as EntityEditorBrowserTabsInfo);
 
     // Making some unsaved changes on the editor page.
     skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
@@ -414,7 +420,8 @@ describe('Skill editor page', () => {
     skillEditorBrowserTabsInfo = (
       localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
+          .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()
+      ) as EntityEditorBrowserTabsInfo);
 
     expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(0);
 

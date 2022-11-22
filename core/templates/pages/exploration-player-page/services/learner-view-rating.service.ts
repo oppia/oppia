@@ -27,7 +27,10 @@ import { LearnerViewRatingBackendApiService } from './learner-view-rating-backen
   providedIn: 'root'
 })
 export class LearnerViewRatingService {
-  userRating: number;
+  // This property is initialized using int method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  userRating!: number;
   private _ratingUpdatedEventEmitter: EventEmitter<void> = new EventEmitter();
 
   constructor(
@@ -36,7 +39,7 @@ export class LearnerViewRatingService {
     LearnerViewRatingBackendApiService
   ) {}
 
-  init(successCallback: (usrRating) => void): void {
+  init(successCallback: (usrRating: number) => void): void {
     this.learnerViewRatingBackendApiService.getUserRatingAsync()
       .then((response) => {
         successCallback(response.user_rating);

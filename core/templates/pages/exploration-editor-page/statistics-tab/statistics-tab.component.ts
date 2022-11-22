@@ -53,15 +53,18 @@ interface PieChartOptions {
 export class StatisticsTabComponent implements
     OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  stateStatsModalIsOpen: boolean;
-  explorationHasBeenVisited: boolean;
-  pieChartOptions: PieChartOptions;
-  pieChartData: ((string | number)[] | string[]) [];
-  statsGraphData: GraphData;
-  numPassersby: number;
-  states: States;
-  expStats: ExplorationStats;
-  expId: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  stateStatsModalIsOpen!: boolean;
+  explorationHasBeenVisited!: boolean;
+  pieChartOptions!: PieChartOptions;
+  pieChartData!: ((string | number)[] | string[]) [];
+  statsGraphData!: GraphData;
+  numPassersby!: number;
+  states!: States;
+  expStats!: ExplorationStats;
+  expId!: string;
 
   constructor(
     private alertsService: AlertsService,

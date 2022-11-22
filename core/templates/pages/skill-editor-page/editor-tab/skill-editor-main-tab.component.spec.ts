@@ -28,7 +28,7 @@ import { SkillEditorStateService } from '../services/skill-editor-state.service'
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance!: {
     body: 'xyz';
   };
 }
@@ -138,6 +138,11 @@ describe('Skill editor main tab component', () => {
   });
 
   it('should change subtopic when selected topic is changed', () => {
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'string'" We need to suppress this error because of the need to test
+    // validations.
+    // @ts-ignore
+    component.changeSelectedTopic(null);
     component.assignedSkillTopicData = assignedSkillTopicData;
     component.changeSelectedTopic('topic1');
     expect(component.getSubtopicName()).toEqual(assignedSkillTopicData.topic1);

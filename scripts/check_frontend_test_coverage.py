@@ -54,11 +54,9 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-interactive-music-notes-input.component.ts',
     'oppia-interactive-pencil-code-editor.component.ts',
     'oppia-root.directive.ts',
-    'parameterize-rule-description.filter.ts',
     'python-program.tokenizer.ts',
     'question-update.service.ts',
     'rule-type-selector.directive.ts',
-    'select2-dropdown.directive.ts',
     'translation-file-hash-loader-backend-api.service.ts',
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
     'unit-test-utils.ajs.ts',

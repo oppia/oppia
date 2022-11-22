@@ -20,7 +20,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
-import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { Misconception, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { State } from 'domain/state/StateObjectFactory';
@@ -38,7 +38,7 @@ interface QuestionSuggestionModalValue {
   suggestionId: string;
   suggestion: ActiveSuggestionDict;
   reviewable: boolean;
-  question: Question;
+  question?: Question;
 }
 
 interface SkillRubrics {
@@ -87,7 +87,7 @@ interface ActiveSuggestionDict {
 }
 
 interface ActiveContributionDict {
-  'details': ActiveContributionDetailsDict | null;
+  'details': ActiveContributionDetailsDict;
   'suggestion': ActiveSuggestionDict;
 }
 
@@ -97,37 +97,41 @@ interface ActiveContributionDict {
 })
 export class QuestionSuggestionReviewModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() reviewable: boolean;
-  @Input() suggestionId: string;
-  @Input() misconceptionsBySkill: MisconceptionSkillMap;
-
   @Output() editSuggestionEmitter = (
     new EventEmitter<QuestionSuggestionModalValue>());
 
-  reviewMessage: string;
-  questionStateData: State;
-  questionId: string;
-  canEditQuestion: boolean;
-  skillDifficultyLabel: string;
-  skillRubricExplanations: string | string[];
-  suggestionIsRejected: boolean;
-  validationError: string;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() reviewable!: boolean;
+  @Input() suggestionId!: string;
+  @Input() misconceptionsBySkill!: MisconceptionSkillMap;
+  reviewMessage!: string;
+  questionStateData!: State;
+  canEditQuestion!: boolean;
+  skillDifficultyLabel!: string;
+  skillRubricExplanations!: string | string[];
+  suggestionIsRejected!: boolean;
   allContributions!: Record<string, ActiveContributionDict>;
   suggestion!: ActiveSuggestionDict;
   question!: Question;
   skillDifficulty!: number;
   currentSuggestionId!: string;
-  isFirstItem: boolean = true;
-  isLastItem: boolean = true;
   remainingContributionIdStack!: string[];
   skippedContributionIds!: string[];
   showQuestion: boolean = true;
   skillRubrics!: SkillRubrics[];
-  currentSuggestion: ActiveContributionDict;
+  currentSuggestion!: ActiveContributionDict;
   suggestionIdToContribution!: Record<string, ActiveContributionDict>;
   contentHtml!: string;
   questionHeader!: string;
   authorName!: string;
+  // Below property is null if there is no error.
+  validationError: string | null = null;
+  // Question ID is null when it is not used in the backend.
+  questionId: string | null = null;
+  isFirstItem: boolean = true;
+  isLastItem: boolean = true;
 
   constructor(
     private contextService: ContextService,
@@ -149,8 +153,11 @@ export class QuestionSuggestionReviewModalComponent
 
   edit(): void {
     this.ngbActiveModal.dismiss();
-    this.skillBackendApiService.fetchSkillAsync(
-      this.suggestion.change.skill_id).then((skillDict) => {
+    const skillId = this.suggestion.change.skill_id;
+    if (!skillId) {
+      throw new Error('Skill ID is null.');
+    }
+    this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
       const modalRef = this.ngbModal.open(
         QuestionSuggestionEditorModalComponent, {
           size: 'lg',
@@ -224,15 +231,16 @@ export class QuestionSuggestionReviewModalComponent
       return;
     }
 
-    this.skillBackendApiService.fetchSkillAsync(
-      this.suggestion.change.skill_id
-    ).then((skillDict) => {
-      let misconceptionsBySkill = {};
-      const skill = skillDict.skill;
-      misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
-      this.misconceptionsBySkill = misconceptionsBySkill;
-      this.refreshContributionState();
-    });
+    const skillId = this.suggestion.change.skill_id;
+    if (skillId) {
+      this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
+        let misconceptionsBySkill: Record<string, Misconception[]> = {};
+        const skill = skillDict.skill;
+        misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
+        this.misconceptionsBySkill = misconceptionsBySkill;
+        this.refreshContributionState();
+      });
+    }
   }
 
   goToNextItem(): void {
@@ -242,7 +250,11 @@ export class QuestionSuggestionReviewModalComponent
     this.showQuestion = false;
     this.skippedContributionIds.push(this.currentSuggestionId);
 
-    this.currentSuggestionId = this.remainingContributionIdStack.pop();
+    const currentSuggestionId = this.remainingContributionIdStack.pop();
+    if (currentSuggestionId === undefined) {
+      throw new Error('currentSuggestionId should not be undefined.');
+    }
+    this.currentSuggestionId = currentSuggestionId;
 
     this.refreshActiveContributionState();
   }
@@ -254,14 +266,19 @@ export class QuestionSuggestionReviewModalComponent
     this.showQuestion = false;
     this.remainingContributionIdStack.push(this.currentSuggestionId);
 
-    this.currentSuggestionId = this.skippedContributionIds.pop();
+    const currentSuggestionId = this.skippedContributionIds.pop();
+
+    if (currentSuggestionId === undefined) {
+      throw new Error('currentSuggestionId should not be undefined.');
+    }
+    this.currentSuggestionId = currentSuggestionId;
 
     this.refreshActiveContributionState();
   }
 
-  invertMap(originalMap: Object): Object {
+  invertMap(originalMap: Record<string, number>): Record<number, string> {
     return Object.keys(originalMap).reduce(
-      (invertedMap, key) => {
+      (invertedMap: Record<number, string>, key: string) => {
         invertedMap[originalMap[key]] = key;
         return invertedMap;
       },

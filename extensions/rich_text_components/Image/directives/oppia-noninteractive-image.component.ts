@@ -56,19 +56,22 @@ interface Dimension {
   styleUrls: []
 })
 export class NoninteractiveImage implements OnInit, OnChanges {
-  @Input() filepathWithValue: string;
   @Input() altWithValue: string = '';
   @Input() captionWithValue: string = '';
-  filepath: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() filepathWithValue!: string;
+  filepath!: string;
+  dimensions!: ImageDimensions;
+  imageContainerStyle!: Dimension;
+  loadingIndicatorStyle!: Dimension;
   imageUrl: SafeResourceUrl | string = '';
   imageAltText: string = '';
   imageCaption: string = '';
-  loadingIndicatorUrl;
+  loadingIndicatorUrl: string = '';
   isLoadingIndicatorShown: boolean = false;
   isTryAgainShown: boolean = false;
-  dimensions: ImageDimensions;
-  imageContainerStyle: Dimension;
-  loadingIndicatorStyle: Dimension;
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
@@ -133,25 +136,36 @@ export class NoninteractiveImage implements OnInit, OnChanges {
             this.imageLocalStorageService.isInStorage(this.filepath))) {
           const base64Url = this.imageLocalStorageService.getRawImageData(
             this.filepath);
-          const mimeType = base64Url.split(';')[0];
-          if (mimeType === AppConstants.SVG_MIME_TYPE) {
-            this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
-              base64Url);
-          } else {
-            this.imageUrl = base64Url;
+          if (base64Url) {
+            const mimeType = base64Url.split(';')[0];
+            if (mimeType === AppConstants.SVG_MIME_TYPE) {
+              const svgResourceUrl = (
+                this.svgSanitizerService.getTrustedSvgResourceUrl(base64Url));
+              if (svgResourceUrl) {
+                this.imageUrl = svgResourceUrl;
+              }
+            } else {
+              this.imageUrl = base64Url;
+            }
           }
         } else {
-          this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
-            this.contextService.getEntityType(),
-            this.contextService.getEntityId(),
-            this.filepath);
+          const entityType = this.contextService.getEntityType();
+          if (entityType) {
+            this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
+              entityType, this.contextService.getEntityId(), this.filepath);
+          }
         }
-      } catch (e) {
-        const additionalInfo = (
-          '\nEntity type: ' + this.contextService.getEntityType() +
-          '\nEntity ID: ' + this.contextService.getEntityId() +
-          '\nFilepath: ' + this.filepath);
-        e.message += additionalInfo;
+      } catch (e: unknown) {
+        const entityType = this.contextService.getEntityType();
+        if (entityType) {
+          const additionalInfo = (
+            '\nEntity type: ' + entityType +
+            '\nEntity ID: ' + this.contextService.getEntityId() +
+            '\nFilepath: ' + this.filepath);
+          if (e instanceof Error) {
+            e.message += additionalInfo;
+          }
+        }
         throw e;
       }
 
@@ -179,6 +193,9 @@ export class NoninteractiveImage implements OnInit, OnChanges {
       this.filepath).then(objectUrl => {
       this.isTryAgainShown = false;
       this.isLoadingIndicatorShown = false;
+      if (objectUrl === null) {
+        throw new Error('Object url is null');
+      }
       this.imageUrl = objectUrl;
     }, () => {
       this.isTryAgainShown = true;

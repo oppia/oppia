@@ -149,10 +149,10 @@ export class QuestionUpdateService {
     this._applyPropertyChange(
       question, QuestionDomainConstants.QUESTION_PROPERTY_LANGUAGE_CODE,
       newLanguageCode, oldLanguageCode,
-      (changeDict, question) => {
+      (changeDict: BackendChangeObject, question: Question) => {
         let languageCode = this._getNewPropertyValueFromChangeDict(changeDict);
         question.setLanguageCode(languageCode);
-      }, (changeDict, question) => {
+      }, (changeDict: BackendChangeObject, question: Question) => {
         question.setLanguageCode(oldLanguageCode);
       });
   }
@@ -167,10 +167,10 @@ export class QuestionUpdateService {
         .QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
       newInapplicableSkillMisconceptionIds,
       oldInapplicableSkillMisconceptionIds,
-      (changeDict, question) => {
+      (changeDict: BackendChangeObject, question: Question) => {
         let languageCode = this._getNewPropertyValueFromChangeDict(changeDict);
-        question.setInapplicableSkillMisconceptionIds(languageCode);
-      }, (changeDict, question) => {
+        question.setInapplicableSkillMisconceptionIds([languageCode]);
+      }, (changeDict: BackendChangeObject, question: Question) => {
         question.setInapplicableSkillMisconceptionIds(
           oldInapplicableSkillMisconceptionIds);
       });
@@ -199,9 +199,9 @@ export class QuestionUpdateService {
         QUESTION_PROPERTY_QUESTION_STATE_DATA,
       newStateData.toBackendDict(),
       oldStateData.toBackendDict(),
-      (changeDict, question) => {
+      (changeDict: BackendChangeObject, question: Question) => {
         // Unused (see comment above).
-      }, (changeDict, question) => {
+      }, (changeDict: BackendChangeObject, question: Question) => {
         question.setStateData(oldStateData);
       });
   }

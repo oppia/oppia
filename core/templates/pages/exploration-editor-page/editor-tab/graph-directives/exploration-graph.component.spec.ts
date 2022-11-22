@@ -41,7 +41,7 @@ describe('Exploration Graph Component', () => {
   let routerService: RouterService;
   let stateEditorService: StateEditorService;
   let ngbModal: NgbModal;
-  let isEditableSpy;
+  let isEditableSpy: jasmine.Spy;
 
   class MockNgbModal {
     open() {
@@ -112,7 +112,7 @@ describe('Exploration Graph Component', () => {
   it('should get null graph data from graph data service when it is not' +
     ' recomputed', () => {
     expect(component.isGraphShown()).toBe(false);
-    expect(component.getGraphData()).toBe(null);
+    expect(component.getGraphData()).toBeUndefined();
   });
 
   it('should evaluate if exploration graph is editable', () => {

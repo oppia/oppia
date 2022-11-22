@@ -134,7 +134,7 @@ describe('Topic creation service', () => {
     spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
     spyOn(ngbModal, 'open').and.returnValue({
       result: {
-        then: (successCallback: (arg1) => void, errorCallback) => {
+        then: (successCallback: (arg1: {}) => void, errorCallback) => {
           successCallback({
             isValid: () => {
               return false;
@@ -150,6 +150,28 @@ describe('Topic creation service', () => {
     expect(contextService.setImageSaveDestinationToLocalStorage)
       .toHaveBeenCalled();
     expect(ngbModal.open).toHaveBeenCalled();
+  }));
+
+  it('should throw error if new topic is invalid', fakeAsync(() => {
+    topicCreationService.topicCreationInProgress = false;
+    spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: {
+        then: (successCallback: (arg1: {}) => void, errorCallback) => {
+          successCallback({
+            isValid: () => {
+              return true;
+            }
+          });
+        }
+      }
+    } as NgbModalRef);
+    spyOn(imageLocalStorageService, 'getThumbnailBgColor').and.returnValue(
+      null);
+    expect(() => {
+      topicCreationService.createNewTopic();
+      tick();
+    }).toThrowError('Background color not found.');
   }));
 
   it('should handle error if topic creation fails', fakeAsync(() => {

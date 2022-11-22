@@ -38,21 +38,26 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class ContributorDashboardPageComponent
   implements OnInit {
-  OPPIA_AVATAR_LINK_URL: string = AppConstants.OPPIA_AVATAR_LINK_URL;
-  defaultHeaderVisible: boolean;
-  profilePictureDataUrl: SafeUrl | string;
-  username: string;
-  userInfoIsLoading: boolean;
-  userIsLoggedIn: boolean;
-  userIsReviewer: boolean;
-  userCanReviewTranslationSuggestionsInLanguages: string[];
-  userCanReviewVoiceoverSuggestionsInLanguages: string[];
-  userCanReviewQuestions: boolean;
-  tabsDetails: ContributorDashboardTabsDetails;
-  OPPIA_AVATAR_IMAGE_URL: string;
-  languageCode: string;
-  topicName: string;
-  activeTabName: string;
+  OPPIA_AVATAR_LINK_URL: string | null = AppConstants.OPPIA_AVATAR_LINK_URL;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  defaultHeaderVisible!: boolean;
+  profilePictureDataUrl!: SafeUrl | string;
+  userInfoIsLoading!: boolean;
+  userIsLoggedIn!: boolean;
+  userIsReviewer!: boolean;
+  userCanReviewTranslationSuggestionsInLanguages!: string[];
+  userCanReviewVoiceoverSuggestionsInLanguages!: string[];
+  userCanReviewQuestions!: boolean;
+  tabsDetails!: ContributorDashboardTabsDetails;
+  OPPIA_AVATAR_IMAGE_URL!: string;
+  languageCode!: string;
+  topicName!: string;
+  activeTabName!: string;
+  // The following property is set to null when the
+  // user is not logged in.
+  username: string | null = null;
 
   constructor(
     private contributionAndReviewService: ContributionAndReviewService,
@@ -92,7 +97,8 @@ export class ContributorDashboardPageComponent
   }
 
   showLanguageSelector(): boolean {
-    const activeTabDetail = this.tabsDetails[this.activeTabName];
+    const activeTabDetail = this.tabsDetails[
+      this.activeTabName as keyof ContributorDashboardTabsDetails];
     return activeTabDetail.customizationOptions.includes('language');
   }
 
@@ -104,7 +110,8 @@ export class ContributorDashboardPageComponent
   }
 
   showTopicSelector(): boolean {
-    const activeTabDetail = this.tabsDetails[this.activeTabName];
+    const activeTabDetail = this.tabsDetails[
+      this.activeTabName as keyof ContributorDashboardTabsDetails];
     const activeSuggestionType =
       this.contributionAndReviewService.getActiveSuggestionType();
     const activeTabType = this.contributionAndReviewService.getActiveTabType();
@@ -125,7 +132,7 @@ export class ContributorDashboardPageComponent
   }
 
   getLanguageDescriptions(languageCodes: string[]): string[] {
-    const languageDescriptions = [];
+    const languageDescriptions: string[] = [];
     languageCodes.forEach((languageCode) => {
       languageDescriptions.push(
         this.languageUtilService.getAudioLanguageDescription(
@@ -135,7 +142,6 @@ export class ContributorDashboardPageComponent
   }
 
   ngOnInit(): void {
-    this.profilePictureDataUrl = null;
     this.username = '';
     this.userInfoIsLoading = true;
     this.userIsLoggedIn = false;
@@ -154,6 +160,9 @@ export class ContributorDashboardPageComponent
 
     this.userService.getUserContributionRightsDataAsync().then(
       (userContributionRights) => {
+        if (userContributionRights === null) {
+          throw new Error('User contribution rights not found.');
+        }
         this.userCanReviewTranslationSuggestionsInLanguages = (
           this.getLanguageDescriptions(
             userContributionRights
@@ -201,7 +210,10 @@ export class ContributorDashboardPageComponent
           return;
         }
         this.topicName = topicNames[0];
-        if (topicNames.indexOf(prevSelectedTopicName) !== -1) {
+        if (
+          prevSelectedTopicName &&
+          topicNames.indexOf(prevSelectedTopicName) !== -1
+        ) {
           this.topicName = prevSelectedTopicName;
         }
         this.translationTopicService.setActiveTopicName(this.topicName);

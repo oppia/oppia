@@ -24,10 +24,13 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './RandomSelector.component.html'
 })
 export class RandomSelectorComponent implements OnInit {
-  @Input() generatorId: string;
-  @Input() initArgs: string;
-  @Input() objType: string;
-  @Input() customizationArgs: {
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() generatorId!: string;
+  @Input() initArgs!: string;
+  @Input() objType!: string;
+  @Input() customizationArgs!: {
     value: string;
     list_of_values: string[];
   };

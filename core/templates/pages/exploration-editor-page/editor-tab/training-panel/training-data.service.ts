@@ -32,7 +32,7 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
 interface AnswerGroupData {
   answerGroupIndex: number;
-  answers: InteractionAnswer[];
+  answers: readonly InteractionAnswer[];
 }
 
 @Injectable({
@@ -100,13 +100,14 @@ export class TrainingDataService {
       this.responsesService.save(
         answerGroups, this.responsesService.getDefaultOutcome(),
         (newAnswerGroups, newDefaultOutcome) => {
-          this.explorationStatesService.saveInteractionAnswerGroups(
-            this.stateEditorService.getActiveStateName(),
-            cloneDeep(newAnswerGroups));
+          let stateName = this.stateEditorService.getActiveStateName();
+          if (stateName) {
+            this.explorationStatesService.saveInteractionAnswerGroups(
+              stateName, cloneDeep(newAnswerGroups));
 
-          this.explorationStatesService.saveInteractionDefaultOutcome(
-            this.stateEditorService.getActiveStateName(),
-            cloneDeep(newDefaultOutcome));
+            this.explorationStatesService.saveInteractionDefaultOutcome(
+              stateName, cloneDeep(newDefaultOutcome) as Outcome);
+          }
 
           this.graphDataService.recompute();
         });
@@ -115,20 +116,21 @@ export class TrainingDataService {
     if (updatedConfirmedUnclassifiedAnswers) {
       this.responsesService.updateConfirmedUnclassifiedAnswers(
         confirmedUnclassifiedAnswers);
-
-      // TODO(#13015): Remove use of unknown as a type.
-      // unknown has been used here becuase
-      // explorationStatesService.saveConfirmedUnclassifiedAnswers
-      // wants variable of type AnswerGroup[] but
-      // confirmedUnclassifiedAnswers is of InteractionAnswer[] type.
-      this.explorationStatesService.saveConfirmedUnclassifiedAnswers(
-        this.stateEditorService.getActiveStateName(),
-        confirmedUnclassifiedAnswers as unknown as AnswerGroup[]);
+      let stateName = this.stateEditorService.getActiveStateName();
+      if (stateName) {
+        // TODO(#13015): Remove use of unknown as a type.
+        // unknown has been used here becuase
+        // explorationStatesService.saveConfirmedUnclassifiedAnswers
+        // wants variable of type AnswerGroup[] but
+        // confirmedUnclassifiedAnswers is of InteractionAnswer[] type.
+        this.explorationStatesService.saveConfirmedUnclassifiedAnswers(
+          stateName, confirmedUnclassifiedAnswers as unknown as AnswerGroup[]);
+      }
     }
   }
 
   getTrainingDataAnswers(): AnswerGroupData[] {
-    let trainingDataAnswers = [];
+    let trainingDataAnswers: AnswerGroupData[] = [];
     let answerGroups = this.responsesService.getAnswerGroups();
 
     for (let i = 0; i < answerGroups.length; i++) {
@@ -178,9 +180,11 @@ export class TrainingDataService {
     this.responsesService.updateAnswerGroup(answerGroupIndex, {
       trainingData: answerGroup.trainingData
     } as AnswerGroup, (newAnswerGroups) => {
-      this.explorationStatesService.saveInteractionAnswerGroups(
-        this.stateEditorService.getActiveStateName(),
-        [newAnswerGroups]);
+      let stateName = this.stateEditorService.getActiveStateName();
+      if (stateName) {
+        this.explorationStatesService.saveInteractionAnswerGroups(
+          stateName, newAnswerGroups);
+      }
 
       this.graphDataService.recompute();
     });
@@ -198,14 +202,16 @@ export class TrainingDataService {
     this.responsesService.updateConfirmedUnclassifiedAnswers(
       confirmedUnclassifiedAnswers);
 
-    // TODO(#13015): Remove use of unknown as a type.
-    // unknown has been used here becuase
-    // explorationStatesService.saveConfirmedUnclassifiedAnswers
-    // wants variable of type AnswerGroup[] but
-    // confirmedUnclassifiedAnswers is of InteractionAnswer[] type.
-    this.explorationStatesService.saveConfirmedUnclassifiedAnswers(
-      this.stateEditorService.getActiveStateName(),
-      confirmedUnclassifiedAnswers as unknown as AnswerGroup[]);
+    let stateName = this.stateEditorService.getActiveStateName();
+    if (stateName) {
+      // TODO(#13015): Remove use of unknown as a type.
+      // unknown has been used here becuase
+      // explorationStatesService.saveConfirmedUnclassifiedAnswers
+      // wants variable of type AnswerGroup[] but
+      // confirmedUnclassifiedAnswers is of InteractionAnswer[] type.
+      this.explorationStatesService.saveConfirmedUnclassifiedAnswers(
+        stateName, confirmedUnclassifiedAnswers as unknown as AnswerGroup[]);
+    }
   }
 
   isConfirmedUnclassifiedAnswer(answer: InteractionAnswer): boolean {
@@ -231,9 +237,11 @@ export class TrainingDataService {
     this.responsesService.updateAnswerGroup(answerGroupIndex, {
       trainingData: trainingData
     } as unknown as AnswerGroup, (newAnswerGroups) => {
-      this.explorationStatesService.saveInteractionAnswerGroups(
-        this.stateEditorService.getActiveStateName(),
-        [newAnswerGroups]);
+      let stateName = this.stateEditorService.getActiveStateName();
+      if (stateName) {
+        this.explorationStatesService.saveInteractionAnswerGroups(
+          stateName, newAnswerGroups);
+      }
 
       this.graphDataService.recompute();
     });

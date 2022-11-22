@@ -26,7 +26,7 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { UserService } from 'services/user.service';
-import { Answer, QuestionPlayerComponent, QuestionPlayerConfig } from './question-player.component';
+import { Answer, QuestionData, QuestionPlayerComponent, QuestionPlayerConfig } from './question-player.component';
 import { QuestionPlayerStateService } from './services/question-player-state.service';
 import { Location } from '@angular/common';
 import { UserInfo } from 'domain/user/user-info.model';
@@ -55,7 +55,7 @@ describe('Question Player Component', () => {
   let questionPlayerStateServiceEmitter = new EventEmitter();
   let urlService: UrlService;
   let userInfo = new UserInfo(
-    null, true, false, false, false,
+    [], true, false, false, false,
     true, 'en', 'username1', 'tester@example.org', true);
 
   class MockWindowRef {
@@ -83,7 +83,7 @@ describe('Question Player Component', () => {
   }
 
   class MockLocation {
-    onUrlChange(callback) {
+    onUrlChange(callback: () => void) {
       callback();
     }
   }
@@ -311,8 +311,14 @@ describe('Question Player Component', () => {
     expect(component.showActionButtonsFooter()).toBe(true);
 
     component.questionPlayerConfig = {
-      resultActionButtons: []
-    } as QuestionPlayerConfig;
+      resultActionButtons: [],
+      questionPlayerMode: {
+        modeType: '',
+        passCutoff: 0,
+      },
+      skillDescriptions: [],
+      skillList: []
+    };
     expect(component.showActionButtonsFooter()).toBe(false);
   });
 
@@ -368,10 +374,10 @@ describe('Question Player Component', () => {
       'topic_url_fragment');
     let questionStateData = {
       ques1: {
-        answers: null,
+        answers: [],
         usedHints: [],
         viewedSolution: false,
-        linkedSkillIds: null
+        linkedSkillIds: []
       },
       ques2: {
         answers: [{
@@ -387,16 +393,65 @@ describe('Question Player Component', () => {
       }
     };
     component.questionPlayerConfig = {
+      resultActionButtons: [],
+      questionPlayerMode: {
+        modeType: '',
+        passCutoff: 0,
+      },
       skillList: ['skillId1'],
       skillDescriptions: ['description1']
     } as QuestionPlayerConfig;
     component.totalScore = 0.0;
 
-    component.calculateScores(questionStateData);
+    component.calculateScores(
+      questionStateData as {[key: string]: QuestionData});
 
-    expect(component.totalScore).toBe(50);
+    expect(component.totalScore).toBe(55);
     expect(questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit)
       .toHaveBeenCalledWith(true);
+  });
+
+  it('should calculate score based on question state data', () => {
+    spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
+      'classroom_url_fragment');
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic_url_fragment');
+    let questionStateData = {
+      ques1: {
+        answers: [],
+        usedHints: [],
+        viewedSolution: false,
+        linkedSkillIds: []
+      },
+      ques2: {
+        answers: [{
+          isCorrect: false,
+          taggedSkillMisconceptionId: 'skillId1-misconception1'
+        } as Answer, {
+          isCorrect: true,
+        } as Answer
+        ],
+        usedHints: ['hint1'],
+        viewedSolution: true,
+        linkedSkillIds: []
+      }
+    };
+    component.questionPlayerConfig = {
+      resultActionButtons: [],
+      questionPlayerMode: {
+        modeType: '',
+        passCutoff: 0,
+      },
+      skillList: ['skillId1'],
+      skillDescriptions: ['description1']
+    } as QuestionPlayerConfig;
+    component.totalScore = 0.0;
+
+    component.calculateScores(
+      questionStateData as {[key: string]: QuestionData});
+
+    expect(questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit)
+      .not.toHaveBeenCalledWith(false);
   });
 
   it('should calculate mastery degrees', () => {
@@ -409,7 +464,7 @@ describe('Question Player Component', () => {
         answers: [],
         usedHints: ['hint1'],
         viewedSolution: false,
-        linkedSkillIds: null
+        linkedSkillIds: []
       },
       ques2: {
         answers: [{
@@ -646,7 +701,7 @@ describe('Question Player Component', () => {
   it('should prevent page reload or exit in between' +
   'practice session', () => {
     spyOn(preventPageUnloadEventService, 'addListener').and
-      .callFake((callback) => callback());
+      .callFake((callback: () => boolean) => callback() as boolean);
 
     component.ngOnInit();
 

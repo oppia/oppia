@@ -250,6 +250,16 @@ describe('Lesson Information card modal component', () => {
       expect(componentInstance.explorationIsPrivate).toBe(false);
     });
 
+  it('should throw error if unique url id is null', fakeAsync(() => {
+    spyOn(userService, 'getLoginUrlAsync').and.returnValue(
+      Promise.resolve('https://oppia.org/login'));
+    componentInstance.loggedOutProgressUniqueUrlId = null;
+    expect(() => {
+      componentInstance.onLoginButtonClicked();
+      tick();
+    }).toThrowError();
+  }));
+
   it('should generate checkpoint status array upon initialization', () => {
     componentInstance.checkpointCount = 3;
     componentInstance.completedCheckpointsCount = 1;

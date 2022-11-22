@@ -33,18 +33,24 @@ import { TopicEditorStateService } from '../services/topic-editor-state.service'
 })
 export class SubtopicPreviewTab {
   directiveSubscriptions = new Subscription();
-  topic: Topic;
-  subtopicId: number;
-  subtopic: Subtopic;
-  editableTitle: string;
-  editableThumbnailFilename: string;
-  editableThumbnailBgColor: string;
-  subtopicPage: SubtopicPage;
-  pageContents: SubtopicPageContents;
-  htmlData: string;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  topic!: Topic;
+  subtopicId!: number;
+  // Below property is null when their is no subtopic for the topic.
+  subtopic!: Subtopic | null;
+  editableTitle!: string;
+  // 'null' if there is no thumbnail file.
+  editableThumbnailFilename!: string | null;
+  // 'null' if there is no thumbnail background color.
+  editableThumbnailBgColor!: string | null;
+  subtopicPage!: SubtopicPage;
+  pageContents!: SubtopicPageContents;
+  htmlData!: string;
+  thumbnailIsShown!: boolean;
   THUMBNAIL: string = 'thumbnail';
   CONTENT: string = 'content';
-  thumbnailIsShown: boolean;
 
   constructor(
     private topicEditorRoutingService: TopicEditorRoutingService,

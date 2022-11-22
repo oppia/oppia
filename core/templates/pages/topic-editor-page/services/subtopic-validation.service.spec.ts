@@ -19,13 +19,12 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { Subtopic } from 'domain/topic/subtopic.model';
-import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { SubtopicValidationService } from './subtopic-validation.service';
 import { TopicEditorStateService } from './topic-editor-state.service';
 
 describe('Subtopic validation service', () => {
   let subtopicValidationService: SubtopicValidationService;
-  let topicObjectFactory: TopicObjectFactory;
   let topicEditorStateService: TopicEditorStateService;
 
   beforeEach(waitForAsync(() => {
@@ -42,10 +41,13 @@ describe('Subtopic validation service', () => {
 
   beforeEach(() => {
     subtopicValidationService = TestBed.inject(SubtopicValidationService);
-    topicObjectFactory = TestBed.inject(TopicObjectFactory);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
 
-    let topic = topicObjectFactory.createInterstitialTopic();
+    let topic = new Topic(
+      'id', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+    );
     let subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic1.setUrlFragment('subtopic-one');
     let subtopic2 = Subtopic.createFromTitle(1, 'Subtopic2');

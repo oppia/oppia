@@ -532,7 +532,7 @@ export class StateGraphLayoutService {
   getAugmentedLinks(
       nodeData: NodeDataDict,
       nodeLinks: GraphLink[]
-  ): AugmentedLink[] | undefined {
+  ): AugmentedLink[] {
     var links = cloneDeep(nodeLinks);
     var augmentedLinks: AugmentedLink[] = links.map(link => {
       return {
@@ -552,7 +552,7 @@ export class StateGraphLayoutService {
 
         if (sourcex === targetx && sourcey === targety) {
           // TODO(sll): Investigate why this happens.
-          return;
+          return [];
         }
 
         var sourceWidth = link.source.width;

@@ -38,6 +38,9 @@ import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
 } from 'domain/exploration/WrittenTranslationObjectFactory';
+// This throws "TS2307". We need to
+// suppress this error because rte-output-display is not strictly typed yet.
+// @ts-ignore
 import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
@@ -98,24 +101,29 @@ export class TranslationError {
   templateUrl: './translation-modal.component.html'
 })
 export class TranslationModalComponent {
-  @Input() opportunity: TranslationOpportunity;
-  activeDataFormat: string;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() opportunity!: TranslationOpportunity;
+  activeDataFormat!: string;
   activeWrittenTranslation: string | string[] = '';
-  activeContentType: string;
-  activeRuleDescription: string;
-  uploadingTranslation = false;
-  subheading: string;
-  heading: string;
-  loadingData = true;
-  moreAvailable = false;
+  activeContentType!: string;
+  activeRuleDescription!: string;
+  uploadingTranslation: boolean = false;
+  subheading!: string;
+  heading!: string;
+  loadingData: boolean = true;
+  moreAvailable: boolean = false;
   textToTranslate: string | string[] = '';
-  languageDescription: string;
-  activeStatus: Status;
-  HTML_SCHEMA: {
+  activeStatus!: Status;
+  activeLanguageCode!: string;
+  HTML_SCHEMA!: {
     'type': string;
     'ui_config': UiConfig;
   };
 
+  // Language description is null when active language code is invalid.
+  languageDescription: string | null = null;
   UNICODE_SCHEMA: UnicodeSchema = { type: 'unicode' };
   SET_OF_STRINGS_SCHEMA: ListSchema = {
     type: 'list',
@@ -125,12 +133,11 @@ export class TranslationModalComponent {
   };
 
   TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
-  activeLanguageCode: string;
   isActiveLanguageReviewer: boolean = false;
-  hadCopyParagraphError = false;
-  hasImgTextError = false;
-  hasIncompleteTranslationError = false;
-  editorIsShown = true;
+  hadCopyParagraphError: boolean = false;
+  hasImgTextError: boolean = false;
+  hasIncompleteTranslationError: boolean = false;
+  editorIsShown: boolean = true;
   isContentExpanded: boolean = false;
   isTranslationExpanded: boolean = true;
   isContentOverflowing: boolean = false;
@@ -200,6 +207,9 @@ export class TranslationModalComponent {
       });
     this.userService.getUserContributionRightsDataAsync().then(
       userContributionRights => {
+        if (!userContributionRights) {
+          throw new Error('User contribution rights not found.');
+        }
         const reviewableLanguageCodes = (
           userContributionRights.can_review_translation_for_language_codes);
         if (reviewableLanguageCodes.includes(this.activeLanguageCode)) {
@@ -373,7 +383,7 @@ export class TranslationModalComponent {
   }
 
   getFormattedContentType(
-      contentType: string, interactionId: string): string {
+      contentType: string, interactionId: string | undefined): string {
     if (contentType === 'interaction') {
       return interactionId + ' interaction';
     } else if (contentType === 'rule') {
@@ -382,7 +392,7 @@ export class TranslationModalComponent {
     return contentType;
   }
 
-  getRuleDescription(ruleType: string, interactionId: string): string {
+  getRuleDescription(ruleType?: string, interactionId?: string): string {
     if (!ruleType || !interactionId) {
       return '';
     }
@@ -404,12 +414,16 @@ export class TranslationModalComponent {
       // img_2021029_210552_zbmdt94_height_54_width_490.png&amp;quot;">
       // </oppia-noninteractive-image>
       if (element.localName === 'oppia-noninteractive-image') {
-        const attribute = element.attributes[type].value;
-        return attribute.substring(
-          textWrapperLength, attribute.length - textWrapperLength);
+        const attribute = element.attributes[
+          type as keyof NamedNodeMap] as Attr;
+        const attributeValue = attribute.value;
+        return attributeValue.substring(
+          textWrapperLength, attributeValue.length - textWrapperLength);
       }
     });
-    return attributes.filter(attribute => attribute);
+    // Typecasted to string[] because Array.from() returns
+    // (string | undefined)[] and we need to remove the undefined elements.
+    return attributes.filter(attributeValues => attributeValues) as string[];
   }
 
   getImageAttributeTexts(
@@ -436,7 +450,7 @@ export class TranslationModalComponent {
     if (originalElements.length === 0) {
       return false;
     }
-    const hasMatchingTranslatedElement = element => (
+    const hasMatchingTranslatedElement = (element: string) => (
       translatedElements.includes(element) && originalElements.length > 0 &&
       !mathEquationRegex.test(element));
     return originalElements.some(hasMatchingTranslatedElement);

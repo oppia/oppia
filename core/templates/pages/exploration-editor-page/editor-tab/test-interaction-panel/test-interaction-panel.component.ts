@@ -22,16 +22,19 @@ import { ExplorationStatesService } from 'pages/exploration-editor-page/services
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { AppConstants } from 'app.constants';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 @Component({
   selector: 'oppia-test-interaction-panel',
   templateUrl: './test-interaction-panel.component.html'
 })
 export class TestInteractionPanel implements OnInit {
-  @Input() inputTemplate: string;
-  @Input() stateName: string;
-
-  interactionIsInline: boolean;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() inputTemplate!: string;
+  @Input() stateName!: string;
+  interactionIsInline!: boolean;
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
@@ -50,7 +53,9 @@ export class TestInteractionPanel implements OnInit {
     let _stateName = this.stateName;
     let _state = this.explorationStatesService.getState(_stateName);
     this.interactionIsInline = (
-      INTERACTION_SPECS[_state.interaction.id].display_mode ===
+      INTERACTION_SPECS[
+        _state.interaction.id as InteractionSpecsKey
+      ].display_mode ===
       AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
   }
 }

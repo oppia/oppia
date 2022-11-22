@@ -66,7 +66,7 @@ describe('Editor Navigation Component', () => {
     jasmine.createSpy('openTranslationTutorial'));
 
   let explorationId = 'exp1';
-  let isImprovementsTabEnabledAsyncSpy = null;
+  let isImprovementsTabEnabledAsyncSpy: jasmine.Spy;
 
   class MockInternetConnectivityService {
     onInternetStateChange = mockConnectionServiceEmitter;
@@ -201,7 +201,7 @@ describe('Editor Navigation Component', () => {
       isImprovementsTabEnabledAsyncSpy = spyOn(
         explorationImprovementsService, 'isImprovementsTabEnabledAsync');
 
-      isImprovementsTabEnabledAsyncSpy.and.returnValue(false);
+      isImprovementsTabEnabledAsyncSpy.and.returnValue(Promise.resolve(false));
     });
 
     beforeEach(() => {
@@ -361,7 +361,7 @@ describe('Editor Navigation Component', () => {
       spyOn(routerService, 'getActiveTabName')
         .and.returnValue('main');
 
-      component.selectMainTab(null);
+      component.selectMainTab('');
 
       expect(component.getActiveTabName()).toBe('main');
     });
@@ -411,7 +411,7 @@ describe('Editor Navigation Component', () => {
         .and.returnValue('improvements');
 
       spyOn(explorationFeaturesService, 'isInitialized').and.returnValue(true);
-      isImprovementsTabEnabledAsyncSpy.and.returnValue(true);
+      isImprovementsTabEnabledAsyncSpy.and.returnValue(Promise.resolve(true));
       component.selectImprovementsTab();
 
       expect(component.getActiveTabName()).toBe('improvements');

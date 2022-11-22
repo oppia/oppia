@@ -371,17 +371,17 @@ describe('Image preloader service', () => {
     },
     param_specs: {},
     param_changes: [],
-  };
+  } as unknown as ExplorationBackendDict;
   class mockReaderObject {
     result = null;
-    onloadend = null;
+    onloadend: () => string;
     constructor() {
       this.onloadend = () => {
         return 'Fake onload executed';
       };
     }
 
-    readAsDataURL(file) {
+    readAsDataURL(file: File) {
       this.onloadend();
       return 'The file is loaded';
     }

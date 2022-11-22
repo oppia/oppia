@@ -31,24 +31,28 @@ import './oppia-visualization-sorted-tiles.component.css';
   templateUrl: './oppia-visualization-sorted-tiles.component.html'
 })
 export class VisualizationSortedTilesComponent implements OnInit {
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @ViewChildren('oppiaVisualizationSortedTileAnswers')
-    oppiaVisualizationSortedTileAnswers;
+    oppiaVisualizationSortedTileAnswers!: HTMLElement;
 
-  @Input() data: AnswerStats[];
-  @Input() totalFrequency: number;
-  @Input() options: {
+  @Input() data!: AnswerStats[];
+  @Input() totalFrequency!: number;
+  @Input() options!: {
     use_percentages: boolean;
   };
 
-  isSelected: boolean[];
-  percentages: number[];
+  isSelected!: boolean[];
+  percentages!: number[];
 
   constructor(
      private utilsService: UtilsService,
      private ngbModal: NgbModal,
   ) {}
 
-  isAnswerTooLong(visualizationSortedTileAnswersElement: HTMLElement): boolean {
+  isAnswerTooLong(visualizationSortedTileAnswersElement: HTMLElement):
+    boolean | void {
     if (!visualizationSortedTileAnswersElement) {
       return;
     }

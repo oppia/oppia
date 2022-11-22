@@ -53,15 +53,51 @@ describe('ExplorationFeatureService', () => {
         testState: {
           param_changes: [testParamChange],
           classifier_model_id: '',
-          content: null,
-          interaction: null,
+          content: {
+            content_id: 'content',
+            html: ''
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
+          interaction: {
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              buttonText: {
+                value: 'Continue'
+              }
+            },
+            default_outcome: {
+              dest: 'End State',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
+              param_changes: [],
+              labelled_as_correct: true,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            hints: [],
+            solution: null,
+            id: 'Continue'
+          },
           linked_skill_id: null,
-          recorded_voiceovers: null,
           solicit_answer_details: false,
           card_is_checkpoint: false,
-          written_translations: null,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
           next_content_id_index: 1,
-        }
+        },
       }
     };
     testParamChange = {

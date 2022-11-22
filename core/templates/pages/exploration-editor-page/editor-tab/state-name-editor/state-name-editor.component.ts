@@ -37,9 +37,12 @@ import { EditabilityService } from 'services/editability.service';
 export class StateNameEditorComponent
   implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  maxLen: number;
-  tmpStateName: string;
-  stateNameEditorIsShown: boolean;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  maxLen!: number;
+  tmpStateName!: string;
+  stateNameEditorIsShown!: boolean;
 
   constructor(
     private editabilityService: EditabilityService,
@@ -54,6 +57,9 @@ export class StateNameEditorComponent
 
   openStateNameEditor(): void {
     let stateName = this.stateEditorService.getActiveStateName();
+    if (stateName === null) {
+      throw new Error('Cannot open state name editor for null state.');
+    }
     this.stateNameService.setStateNameEditorVisibility(true);
     this.stateNameService.setStateNameSavedMemento(stateName);
     this.maxLen = AppConstants.MAX_STATE_NAME_LENGTH;
@@ -72,8 +78,11 @@ export class StateNameEditorComponent
       this.stateNameService.setStateNameEditorVisibility(false);
       return false;
     } else {
-      this.explorationStatesService.renameState(
-        this.stateEditorService.getActiveStateName(), normalizedNewName);
+      let stateName = this.stateEditorService.getActiveStateName();
+      if (stateName) {
+        this.explorationStatesService.renameState(
+          stateName, normalizedNewName);
+      }
       this.stateNameService.setStateNameEditorVisibility(false);
       // Save the contents of other open fields.
       this.externalSaveService.onExternalSave.emit();

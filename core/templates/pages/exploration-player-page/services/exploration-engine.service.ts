@@ -328,7 +328,7 @@ export class ExplorationEngineService {
   init(
       explorationDict: ExplorationBackendDict,
       explorationVersion: number,
-      preferredAudioLanguage: string,
+      preferredAudioLanguage: string | null,
       autoTtsEnabled: boolean,
       preferredContentLanguageCodes: string[],
       successCallback: (stateCard: StateCard, label: string) => void

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the create new subtopic modal component.
  */
 
-import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/TopicObjectFactory';
 import { ComponentFixture, waitForAsync, TestBed, fakeAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -47,6 +47,11 @@ class MockActiveModal {
 }
 class MockTopicEditorStateService {
   getTopic() {
+    return new Topic(
+      '', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], '', '', {}, false, '', '', []
+    );
   }
 
   getClassroomUrlFragment() {
@@ -73,8 +78,7 @@ describe('create new subtopic modal', function() {
   let topicUpdateService: TopicUpdateService;
   let topicEditorStateService: MockTopicEditorStateService;
   let subtopicValidationService: SubtopicValidationService;
-  let topicObjectFactory: TopicObjectFactory;
-  let topic = null;
+  let topic: Topic;
   let DefaultSubtopicPageSchema = {
     type: 'html',
     ui_config: {
@@ -117,12 +121,15 @@ describe('create new subtopic modal', function() {
       (TestBed.inject(TopicEditorStateService) as unknown) as
       jasmine.SpyObj<MockTopicEditorStateService>;
     subtopicValidationService = TestBed.inject(SubtopicValidationService);
-    topicObjectFactory = TestBed.inject(TopicObjectFactory);
 
-    topic = topicObjectFactory.createInterstitialTopic();
+    topic = new Topic(
+      '', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], '', '', {}, false, '', '', []
+    );
     let subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     topic.getSubtopics = function() {
-      return subtopic1;
+      return [subtopic1];
     };
     topic.getId = function() {
       return '1';

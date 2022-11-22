@@ -30,7 +30,7 @@ import { StoryUpdateService } from 'domain/story/story-update.service';
 require('domain/story/story-update.service.ts');
 
 class MockEditableStoryBackendApiService {
-  newBackendStoryObject: StoryBackendDict;
+  newBackendStoryObject!: StoryBackendDict;
   failure: string | null = null;
 
   async fetchStoryAsync() {
@@ -47,8 +47,8 @@ class MockEditableStoryBackendApiService {
             version: 1,
             misconception_count: 0,
             worked_examples_count: 0,
-            skill_model_created_on: null,
-            skill_model_last_updated: null,
+            skill_model_created_on: 0,
+            skill_model_last_updated: 0,
           }],
           classroomUrlFragment: 'classroomUrlFragment',
           topicUrlFragment: 'topicUrlFragment'
@@ -126,7 +126,7 @@ describe('Story editor state service', () => {
       version: 1,
       corresponding_topic_id: 'topic_id',
       thumbnail_filename: 'img.svg',
-      thumbnail_bg_color: null,
+      thumbnail_bg_color: '',
       url_fragment: 'url_fragment1',
       meta_tag_content: 'meta_content1'
     };
@@ -145,7 +145,7 @@ describe('Story editor state service', () => {
       version: 1,
       corresponding_topic_id: 'topic_id',
       thumbnail_filename: 'img.svg',
-      thumbnail_bg_color: null,
+      thumbnail_bg_color: '',
       url_fragment: 'url_fragment2',
       meta_tag_content: 'meta_content2'
     };
@@ -562,8 +562,8 @@ describe('Story editor state service', () => {
       version: 1,
       misconception_count: 0,
       worked_examples_count: 0,
-      skill_model_created_on: null,
-      skill_model_last_updated: null,
+      skill_model_created_on: 0,
+      skill_model_last_updated: 0,
     }]);
   }));
 });

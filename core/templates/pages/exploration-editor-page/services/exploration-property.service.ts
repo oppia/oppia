@@ -26,19 +26,35 @@ import cloneDeep from 'lodash/cloneDeep';
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { AlertsService } from 'services/alerts.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
+import { ParamChange, ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
 import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
+
+export type ExplorationPropertyValues = (
+  null |
+  string |
+  string[] |
+  boolean |
+  ParamChange |
+  ParamChange[] |
+  ParamSpecs |
+  ParamChangeBackendDict |
+  ParamChangeBackendDict[]
+);
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExplorationPropertyService {
-  public displayed: unknown;
-  savedMemento: unknown;
+  // These properties are initialized using private methods and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  public displayed!: ExplorationPropertyValues;
+  savedMemento!: ExplorationPropertyValues;
 
   // The backend name for this property. THIS MUST BE SPECIFIED BY
   // SUBCLASSES.
-  propertyName: string = null;
+  // Null if this property is not saved to the backend.
+  propertyName: string | null = null;
 
   _explorationPropertyChangedEventEmitter = new EventEmitter();
   constructor(
@@ -48,12 +64,12 @@ export class ExplorationPropertyService {
   ) {}
 
   private BACKEND_CONVERSIONS = {
-    param_changes: (paramChanges) => {
+    param_changes: (paramChanges: ParamChange[]) => {
       return paramChanges.map(paramChange => {
         return paramChange.toBackendDict();
       });
     },
-    param_specs: (paramSpecs) => {
+    param_specs: (paramSpecs: ParamChange) => {
       return paramSpecs.toBackendDict();
     },
   };
@@ -85,14 +101,14 @@ export class ExplorationPropertyService {
 
   // Transforms the given value into a normalized form. THIS CAN BE
   // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
-  _normalize(value: unknown): unknown {
+  _normalize(value: ExplorationPropertyValues): ExplorationPropertyValues {
     return value;
   }
 
   // Validates the given value and returns a boolean stating whether it
   // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
   // behavior is to always return true.
-  _isValid(value: unknown): boolean {
+  _isValid(value: ExplorationPropertyValues): boolean {
     return true;
   }
 
@@ -118,9 +134,13 @@ export class ExplorationPropertyService {
 
     if (this.BACKEND_CONVERSIONS.hasOwnProperty(this.propertyName)) {
       newBackendValue =
-        this.BACKEND_CONVERSIONS[this.propertyName](this.displayed);
+        this.BACKEND_CONVERSIONS[
+          this.propertyName as keyof typeof this.BACKEND_CONVERSIONS
+        ](this.displayed as ParamChange[] & ParamChange);
       oldBackendValue =
-        this.BACKEND_CONVERSIONS[this.propertyName](this.savedMemento);
+        this.BACKEND_CONVERSIONS[
+          this.propertyName as keyof typeof this.BACKEND_CONVERSIONS
+        ](this.savedMemento as ParamChange[] & ParamChange);
     }
 
     this.changeListService.editExplorationProperty(

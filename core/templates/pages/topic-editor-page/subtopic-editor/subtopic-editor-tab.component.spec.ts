@@ -28,7 +28,7 @@ import { TopicEditorStateService } from '../services/topic-editor-state.service'
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { SubtopicValidationService } from '../services/subtopic-validation.service';
 import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
-import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/TopicObjectFactory';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -73,7 +73,6 @@ describe('Subtopic editor tab', () => {
   let topicUpdateService: TopicUpdateService;
   let subtopicValidationService: SubtopicValidationService;
   let topicEditorRoutingService: TopicEditorRoutingService;
-  let topicObjectFactory: TopicObjectFactory;
   let subtopic: Subtopic;
   let wds: WindowDimensionsService;
   let topicInitializedEventEmitter = new EventEmitter();
@@ -110,10 +109,13 @@ describe('Subtopic editor tab', () => {
     topicUpdateService = TestBed.inject(TopicUpdateService);
     subtopicValidationService = TestBed.inject(SubtopicValidationService);
     topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
-    topicObjectFactory = TestBed.inject(TopicObjectFactory);
     wds = TestBed.inject(WindowDimensionsService);
 
-    let topic = topicObjectFactory.createInterstitialTopic();
+    let topic = new Topic(
+      'id', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+    );
     let subtopic = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic._skillIds = ['skill_1'];
     subtopic.setUrlFragment('dummy-url');

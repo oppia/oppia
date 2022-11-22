@@ -34,6 +34,10 @@ import { ProgressNavComponent } from './progress-nav.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 
 describe('Progress nav component', () => {
   let fixture: ComponentFixture<ProgressNavComponent>;
@@ -42,7 +46,7 @@ describe('Progress nav component', () => {
   let urlService: UrlService;
   let playerPositionService: PlayerPositionService;
   let browserCheckerService: BrowserCheckerService;
-  let explorationPlayerStateService;
+  let explorationPlayerStateService: ExplorationPlayerStateService;
   let focusManagerService: FocusManagerService;
   let playerTranscriptService: PlayerTranscriptService;
   let windowDimensionsService: WindowDimensionsService;
@@ -50,7 +54,13 @@ describe('Progress nav component', () => {
   let schemaFormSubmittedService: SchemaFormSubmittedService;
   let contentTranslationManagerService: ContentTranslationManagerService;
   let mockDisplayedCard = new StateCard(
-    '', '', '', null, [], null, null, '', null);
+    '', '', '', {} as Interaction, [],
+    {} as RecordedVoiceovers, {} as WrittenTranslations, '',
+    {} as AudioTranslationLanguageService);
+  let mockDisplayedCard2 = new StateCard(
+    'state', 'name', 'html', {} as Interaction, [],
+    {} as RecordedVoiceovers, {} as WrittenTranslations, '',
+    {} as AudioTranslationLanguageService);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -260,7 +270,7 @@ describe('Progress nav component', () => {
 
   it('should update displayed card info when view updates', () => {
     spyOn(componentInstance, 'updateDisplayedCardInfo');
-    componentInstance.lastDisplayedCard = null;
+    componentInstance.lastDisplayedCard = mockDisplayedCard2;
     componentInstance.displayedCard = mockDisplayedCard;
 
     componentInstance.ngOnChanges();

@@ -37,6 +37,7 @@ import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-b
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factory';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 
 class MockPlatformFeatureService {
   get status(): object {
@@ -137,10 +138,10 @@ describe('Ratings and recommendations component', () => {
     const mockOnRatingUpdated = new EventEmitter<void>();
     const readOnlyStoryNode1 = new ReadOnlyStoryNode(
       'node_1', '', '', [], [], [], '', false, '',
-      null, false, 'bg_color_1', 'filename_1');
+      {} as LearnerExplorationSummary, false, 'bg_color_1', 'filename_1');
     const readOnlyStoryNode2 = new ReadOnlyStoryNode(
       'node_2', '', '', [], [], [], '', false, '',
-      null, false, 'bg_color_2', 'filename_2');
+      {} as LearnerExplorationSummary, false, 'bg_color_2', 'filename_2');
 
     expect(componentInstance.inStoryMode).toBe(undefined);
     expect(componentInstance.storyViewerUrl).toBe(undefined);
@@ -176,6 +177,10 @@ describe('Ratings and recommendations component', () => {
         'topic_name', 'topic_Id', 'description',
         [], [], [], [], {}, {}, true, 'metatag', 'page_title_fragment')));
 
+    // This throws "Type 'null' is not assignable to parameter of type
+    // 'QuestionPlayerConfig'." We need to suppress this error because
+    // of the need to test validations.
+    // @ts-ignore
     componentInstance.questionPlayerConfig = null;
 
     componentInstance.ngOnInit();

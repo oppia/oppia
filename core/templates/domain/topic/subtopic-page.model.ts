@@ -31,19 +31,14 @@ export interface SubtopicPageBackendDict {
 }
 
 export class SubtopicPage {
-  // When creating a subtopicPage, property below are always
-  // initialized with null values. These are null until populated
-  // from the backend and are not null afterwards.
   constructor(
-    private id: string | null,
-    private topicId: string | null,
-    private pageContents: SubtopicPageContents | null,
+    private id: string,
+    private topicId: string,
+    private pageContents: SubtopicPageContents,
     private languageCode: string,
   ) {}
 
-  // Returns 'null' when the subtopic page is not yet saved on the backend.
-  // Returns the id of the subtopic page.
-  getId(): string | null {
+  getId(): string {
     return this.id;
   }
 
@@ -51,13 +46,11 @@ export class SubtopicPage {
     this.id = id;
   }
 
-  // Returns the topic id that the subtopic page is linked to.
-  getTopicId(): string | null {
+  getTopicId(): string {
     return this.topicId;
   }
 
-  // Returns the page data for the subtopic page.
-  getPageContents(): SubtopicPageContents | null {
+  getPageContents(): SubtopicPageContents {
     return this.pageContents;
   }
 
@@ -97,13 +90,5 @@ export class SubtopicPage {
       this.getSubtopicPageId(topicId, subtopicId),
       topicId, SubtopicPageContents.createDefault(),
       'en');
-  }
-
-  // TODO(#14310): Remove the interstitial subtopic so that full subtopic can be
-  // created from start.
-  // Create an interstitial subtopic that would be displayed in the editor until
-  // the actual subtopic is fetched from the backend.
-  static createInterstitialSubtopicPage(): SubtopicPage {
-    return new SubtopicPage(null, null, null, 'en');
   }
 }

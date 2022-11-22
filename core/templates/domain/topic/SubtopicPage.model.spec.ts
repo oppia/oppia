@@ -17,6 +17,8 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 import { SubtopicPageContents } from './subtopic-page-contents.model';
@@ -39,14 +41,20 @@ describe('Subtopic page Model', () => {
     expect(subtopicPage.getLanguageCode()).toEqual('en');
   });
 
-  it('should be able to create an interstitial subtopic page object',
+  it('should be able to set language code',
     () => {
-      var subtopicPage =
-      SubtopicPage.createInterstitialSubtopicPage();
-      expect(subtopicPage.getId()).toEqual(null);
-      expect(subtopicPage.getTopicId()).toEqual(null);
-      expect(subtopicPage.getPageContents()).toEqual(null);
-      expect(subtopicPage.getLanguageCode()).toBe('en');
+      let recordedVoiceovers = RecordedVoiceovers.createEmpty();
+      recordedVoiceovers.addContentId('content');
+      let subtopicPage = new SubtopicPage(
+        'id', 'topic_id', SubtopicPageContents.createDefault(), 'en');
+      expect(subtopicPage.getId()).toEqual('id');
+      expect(subtopicPage.getTopicId()).toEqual('topic_id');
+      expect(subtopicPage.getPageContents()).toEqual(
+        new SubtopicPageContents(
+          SubtitledHtml.createDefault('', 'content'),
+          recordedVoiceovers)
+      );
+      expect(subtopicPage.getLanguageCode()).toEqual('en');
     });
 
   it('should be able to copy from another subtopic page', () => {

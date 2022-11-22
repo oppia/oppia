@@ -39,6 +39,7 @@ describe('Exploration data service', function() {
   let sampleDataResults: ExplorationBackendDict = {
     draft_change_list_id: 3,
     version: 1,
+    auto_tts_enabled: false,
     draft_changes: [],
     is_version_of_draft_valid: true,
     init_state_name: 'init',
@@ -178,6 +179,7 @@ describe('Exploration data service', function() {
       let dataResults: ExplorationBackendDict = {
         draft_change_list_id: 3,
         version: undefined,
+        auto_tts_enabled: false,
         draft_changes: [],
         is_version_of_draft_valid: true,
         init_state_name: 'init',

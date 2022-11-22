@@ -193,7 +193,7 @@ export class ContributionAndReviewService {
 
   async getReviewableTranslationSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      explorationId: string
+      explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher,

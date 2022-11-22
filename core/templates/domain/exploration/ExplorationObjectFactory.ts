@@ -49,7 +49,7 @@ import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { ExplorationChange } from './exploration-draft.model';
 
 export interface ExplorationBackendDict {
-  'auto_tts_enabled'?: boolean;
+  'auto_tts_enabled': boolean;
   'correctness_feedback_enabled': boolean;
   'draft_changes': ExplorationChange[];
   'is_version_of_draft_valid': boolean;

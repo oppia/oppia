@@ -63,6 +63,10 @@ describe('Oppia sorted tiles visualization', function() {
     component.options = {
       use_percentages: true
     };
+    // This throws "Type 'null' is not assignable to type
+    // 'InteractionAnswer'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     component.data = [new AnswerStats(null, 'answerHtml', 0, true)];
     component.ngOnInit();
     fixture.detectChanges();
@@ -74,6 +78,10 @@ describe('Oppia sorted tiles visualization', function() {
     component.isSelected = [false, true];
     component.select(0);
     component.unselect(1);
+    // This throws "Type 'null' is not assignable to type
+    // 'HTMLElement'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     component.isAnswerTooLong(null);
 
     tick();
