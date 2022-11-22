@@ -2312,6 +2312,7 @@ describe('Conversation skin component', () => {
 
       componentInstance.diagnosticTestTopicTrackerModel = (
         new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds));
+      tick();
 
       componentInstance.ngOnInit();
       tick(2000);

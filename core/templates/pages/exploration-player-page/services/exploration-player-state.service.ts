@@ -67,7 +67,7 @@ export class ExplorationPlayerStateService {
   questionPlayerMode: boolean;
   diagnosticTestPlayerMode: boolean;
   explorationId: string;
-  version: number;
+  version: number | null;
   storyUrlFragment: string;
   lastCompletedCheckpoint: string;
   isLoggedOutProgressTracked: boolean = false;

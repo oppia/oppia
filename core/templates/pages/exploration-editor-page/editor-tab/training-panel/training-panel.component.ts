@@ -32,7 +32,7 @@ import { InteractionAnswer } from 'interactions/answer-defs';
 
 interface ClassificationInterface {
   answerGroupIndex: number;
-  newOutcome: Outcome;
+  newOutcome: Outcome | null;
 }
 
 @Component({
@@ -41,7 +41,10 @@ interface ClassificationInterface {
 })
 export class TrainingPanelComponent
   implements OnInit {
-  @Input() answer: InteractionAnswer;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() answer!: InteractionAnswer;
   // The classification input is an object with two keys:
   //   -answerGroupIndex: This refers to which answer group the answer
   //      being trained has been classified to (for displaying feedback
@@ -53,12 +56,11 @@ export class TrainingPanelComponent
   //      list of feedback and a destination state name) which is
   //      non-null if, and only if, the creator has specified that a new
   //      response should be created for the trained answer.
-  @Input() classification: ClassificationInterface;
-  @Input() addingNewResponse: boolean;
-
+  @Input() classification!: ClassificationInterface;
+  @Input() addingNewResponse!: boolean;
+  selectedAnswerGroupIndex!: number;
+  allOutcomes!: Outcome[];
   answerTemplate: string = '';
-  selectedAnswerGroupIndex: number;
-  allOutcomes: Outcome[];
 
   constructor(
     private stateEditorService: StateEditorService,
@@ -86,8 +88,11 @@ export class TrainingPanelComponent
   beginAddingNewResponse(): void {
     let contentId = this.generateContentIdService.getNextStateId(
       AppConstants.COMPONENT_NAME_FEEDBACK);
-    this.classification.newOutcome = this.outcomeObjectFactory.createNew(
-      this.stateEditorService.getActiveStateName(), contentId, '', []);
+    let currentStateName = this.stateEditorService.getActiveStateName();
+    if (currentStateName) {
+      this.classification.newOutcome = this.outcomeObjectFactory.createNew(
+        currentStateName, contentId, '', []);
+    }
     this.addingNewResponse = true;
   }
 
@@ -117,9 +122,11 @@ export class TrainingPanelComponent
     this.addingNewResponse = false;
 
     let _stateName = this.stateEditorService.getActiveStateName();
-    let _state = this.explorationStatesService.getState(_stateName);
-    this.allOutcomes = this.trainingDataService.getAllPotentialOutcomes(
-      _state);
+    if (_stateName) {
+      let _state = this.explorationStatesService.getState(_stateName);
+      this.allOutcomes = this.trainingDataService.getAllPotentialOutcomes(
+        _state);
+    }
 
     this._updateAnswerTemplate();
     this.selectedAnswerGroupIndex = (
