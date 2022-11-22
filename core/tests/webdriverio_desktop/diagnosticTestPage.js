@@ -138,14 +138,15 @@ describe('Diagnostic test page functionality', function() {
     });
 
   it(
-    'should be able to skip questions and get topic recommendation',
+    'should be able to skip questions and a get topic recommendation',
     async function() {
       await classroomPage.get('math');
       await classroomPage.launchDiagnosticTestPage();
       await waitFor.pageToFullyLoad();
       await diagnosticTestPage.startDiagnosticTest();
       await explorationPlayerPage.skipQuestion();
-      await explorationPlayerPage.skipQuestion();
+      // Skipping question functionality is similar to incorrect attempt.
+      await explorationPlayerPage.submitAnswer('TextInput', 'wrong answer');
       await diagnosticTestPage.expectNumberOfRecommendedTopicsToBe(1);
     });
 

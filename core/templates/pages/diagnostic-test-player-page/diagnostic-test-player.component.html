@@ -49,7 +49,9 @@
   <div *ngIf="diagnosticTestIsFinished" class="oppia-result-page-container">
     <mat-card class="oppia-recommendation-card">
       <div *ngIf="recommendedTopicSummaries.length > 0">
-        <h3 class="oppia-recommendation-card-heading">Test complete. Well done!</h3>
+        <h3 class="oppia-recommendation-card-heading">
+          {{ 'I18N_DIAGNOSTIC_TEST_RESULT_HEADER_TEXT' | translate }}
+        </h3>
         <p *ngIf="recommendedTopicSummaries.length === 1" class="oppia-recommendation-card-text">
           {{'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_FOR_ONE_TOPIC' | translate}}
         </p>

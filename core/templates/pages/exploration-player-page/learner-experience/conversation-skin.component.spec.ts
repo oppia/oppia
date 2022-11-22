@@ -2314,7 +2314,7 @@ describe('Conversation skin component', () => {
         new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds));
 
       componentInstance.ngOnInit();
-      tick(200);
+      tick(2000);
 
       expect(componentInstance.feedbackIsEnabled).toBeFalse();
       expect(componentInstance.learnerCanOnlyAttemptQuestionOnce).toBeTrue();
