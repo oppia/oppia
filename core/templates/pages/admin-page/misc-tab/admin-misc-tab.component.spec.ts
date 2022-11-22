@@ -23,6 +23,7 @@ import { FormsModule } from '@angular/forms';
 
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { FixCommitCommandBackendApiService } from 'services/fix-commit-command-backend-api.service';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
 import { AdminMiscTabComponent } from './admin-misc-tab.component';
 
@@ -66,6 +67,7 @@ describe('Admin misc tab component ', () => {
   let adminBackendApiService: AdminBackendApiService;
   let adminTaskManagerService: AdminTaskManagerService;
   let mockWindowRef: MockWindowRef;
+  let fixCommitCommandBackendApiService: FixCommitCommandBackendApiService;
 
   let statusMessageSpy: jasmine.Spy;
   let confirmSpy: jasmine.Spy;
@@ -96,6 +98,8 @@ describe('Admin misc tab component ', () => {
   beforeEach(() => {
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
+    fixCommitCommandBackendApiService = TestBed.inject(
+      FixCommitCommandBackendApiService);
 
     statusMessageSpy = spyOn(component.setStatusMessage, 'emit')
       .and.returnValue();
@@ -643,4 +647,18 @@ describe('Admin misc tab component ', () => {
     expect(component.expVersion).toBe(0);
     expect(component.stateName).toBe('');
   });
+
+  it('should fix the commit commands of the problematic exploration',
+    fakeAsync(() => {
+      spyOn(
+        fixCommitCommandBackendApiService, 'fixCommitCommandsAsync'
+      ).and.resolveTo('success');
+
+      expect(component.message).toEqual('');
+
+      component.fixCommitCommands();
+      tick();
+
+      expect(component.message).toEqual('success');
+    }));
 });
