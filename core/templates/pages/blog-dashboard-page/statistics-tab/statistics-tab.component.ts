@@ -32,6 +32,8 @@ import { BlogDashboardPageConstants } from '../blog-dashboard-page.constants';
 import { BlogDashboardPageService } from '../services/blog-dashboard-page.service';
 import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
+import { NumberValue } from 'd3';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 interface BlogPostStatsDict {
   [blogPostId: string]: {
@@ -56,10 +58,15 @@ export class BlogStatisticsTabComponent implements OnInit {
   @Input() publishedBlogPostList!: BlogPostSummary[];
   @ViewChild('barStats') chartContainer: ElementRef;
 
-  private _svg;
+  private _svg: d3.Selection<SVGGElement, unknown, null, undefined>;
   private _width: number;
   private _height: number;
   private _dataForActiveChart: Stats | ReadingTimeStats;
+  private _x: d3.ScaleBand<string>;
+  private _y: d3.ScaleLinear<number, number>;
+  private xAxis: d3.Selection<SVGGElement, unknown, null, undefined>;
+  private yAxis: d3.Selection<SVGGElement, unknown, null, undefined>;
+  private _currentPlotData: {[statsKey: string]: number} | ReadingTimeStats;
 
   margin = { top: 20, right: 20, bottom: 50, left: 60 };
   authorAggregatedStatsShown!: boolean;
@@ -78,11 +85,29 @@ export class BlogStatisticsTabComponent implements OnInit {
     private blogDashboardBackendApiService: BlogDashboardBackendApiService,
     private blogDashboardPageService: BlogDashboardPageService,
     private alertsService: AlertsService,
+    private windowDimensionsService: WindowDimensionsService,
   ) {}
 
   ngOnInit(): void {
     this.authorAggregatedStatsShown = true;
+    this.activeStatsBlogPostId = 'all';
     this.showViewsChartStats();
+    if (this.isSmallScreenViewActive()) {
+      this.margin = { top: 10, right: 10, bottom: 30, left: 40 };
+    }
+    this.windowDimensionsService.getResizeEvent().subscribe(() => {
+      if (this.isSmallScreenViewActive()) {
+        this.margin = { top: 10, right: 10, bottom: 30, left: 40 };
+      } else {
+        this.margin = { top: 20, right: 20, bottom: 50, left: 60 };
+      }
+      this.showLoadingChartSpinner();
+      this.plotStatsGraph(this._currentPlotData);
+    });
+  }
+
+  isSmallScreenViewActive(): boolean {
+    return this.windowDimensionsService.getWidth() <= 900;
   }
 
   showViewsChartStats(): void {
@@ -130,7 +155,6 @@ export class BlogStatisticsTabComponent implements OnInit {
         (viewsStats: Stats) => {
           this._dataForActiveChart = viewsStats;
           this.authorAggregatedStats.views = viewsStats;
-          console.log(this.authorAggregatedStats);
           this.showHourlyStats();
         }, (error) => {
           this.alertsService.addWarning(error);
@@ -289,7 +313,6 @@ export class BlogStatisticsTabComponent implements OnInit {
   }
 
   showHourlyStats(): void {
-    this.showLoadingChartSpinner();
     let data = (this._dataForActiveChart as Stats).hourlyStats;
     let statsKeys = Object.keys(data);
     let hourOffset = statsKeys.length - 1;
@@ -304,7 +327,6 @@ export class BlogStatisticsTabComponent implements OnInit {
   }
 
   showMonthlyStats(): void {
-    this.showLoadingChartSpinner();
     let data = (this._dataForActiveChart as Stats).monthlyStats;
     let statsKeys = Object.keys(data);
     let dayOffset = 0;
@@ -319,7 +341,6 @@ export class BlogStatisticsTabComponent implements OnInit {
   }
 
   showWeeklyStats(): void {
-    this.showLoadingChartSpinner();
     let data = (this._dataForActiveChart as Stats).weeklyStats;
     let statsKeys = Object.keys(data);
     let dayOffset = statsKeys.length - 1;
@@ -334,7 +355,6 @@ export class BlogStatisticsTabComponent implements OnInit {
   }
 
   showYearlyStats(): void {
-    this.showLoadingChartSpinner();
     let data = (this._dataForActiveChart as Stats).yearlyStats;
     let statsKeys = Object.keys(data);
     let monthOffset = 0;
@@ -349,9 +369,7 @@ export class BlogStatisticsTabComponent implements OnInit {
   }
 
   showAllStats(): void {
-    this.showLoadingChartSpinner();
     this.selectedTimePeriod = 'all';
-    let data = (this._dataForActiveChart as Stats).yearlyStats;
   }
 
   plotReadingTimeStatsChart(): void {
@@ -389,9 +407,12 @@ export class BlogStatisticsTabComponent implements OnInit {
   }
 
   plotStatsGraph(data: {[statsKey: string]: number} | ReadingTimeStats): void {
+    const element = this.chartContainer.nativeElement;
     setTimeout(() => {
       this.loadingChartSpinnerShown = false;
-      this._createSvg();
+      if (element.childNodes[1].nodeName.toLowerCase() !== 'svg') {
+        this._createSvg();
+      }
       this._drawBars(data);
     });
   }
@@ -417,17 +438,35 @@ export class BlogStatisticsTabComponent implements OnInit {
 
     this._width = element.offsetWidth - this.margin.left - this.margin.right;
     this._height = element.offsetHeight - this.margin.top - this.margin.bottom;
+
+    this._x = d3.scaleBand()
+      .range([0, this._width])
+      .padding(0.1);
+    this.xAxis = this._svg.append('g');
+    this.xAxis.attr('transform', 'translate(0,' + this._height + ')');
+
+    // Draw the Y-axis on the DOM.
+    this._y = d3.scaleLinear()
+      .range([this._height, 0]);
+    this.yAxis = this._svg.append('g');
+
+    // Y axis label.
+    this._svg.append('text')
+      .attr('text-anchor', 'middle')
+      .attr('transform', 'rotate(-90)')
+      .attr('y', 0 - this.margin.left + 20)
+      .attr('x', 0 - this._height / 2)
+      .text(this.getYaxisLabel())
+      .style('fill', '#00645c');
   }
 
   private _drawBars(data): void {
+    this._currentPlotData = data;
     let plotData = d3.entries(data);
     // Create the X-axis band scale.
-    const x = d3.scaleBand()
-      .range([0, this._width])
-      .domain(plotData.map(d => d.key))
-      .padding(0.1);
+    this._x.domain(plotData.map(d => d.key));
 
-    let xAxisGenerator = d3.axisBottom(x);
+    let xAxisGenerator = d3.axisBottom(this._x);
     if (this.viewsChartShown || this.readsChartShown) {
       xAxisGenerator.tickSize(0);
     } else {
@@ -435,17 +474,23 @@ export class BlogStatisticsTabComponent implements OnInit {
     }
     xAxisGenerator.tickFormat((d, i) => this.xAxisLabels[i]);
     // Draw the X-axis on the DOM.
-    let xAxis = this._svg.append('g')
-      .call(xAxisGenerator.tickSizeOuter(-this._height));
-    xAxis.attr('transform', 'translate(0,' + this._height + ')');
-    xAxis.selectAll('text')
-      .style('text-anchor', 'middle');
-    xAxis.select('.domain')
+    this.xAxis.call(
+      xAxisGenerator.tickSizeOuter(-this._height)
+    );
+    this.xAxis.select('.domain')
       .attr('stroke', '#000');
-    xAxis.selectAll('.tick:not(:first-of-type) line')
+    this.xAxis.selectAll('.tick:not(:first-of-type) line')
       .attr('stroke', '#4682B4')
       .attr('stroke-width', 2.5)
       .attr('opacity', 0.5);
+    if (this.isSmallScreenViewActive()) {
+      this.xAxis.selectAll('text')
+        .style('text-anchor', 'middle')
+        .attr('transform', 'translate(-8,8)rotate(-45)');
+    } else {
+      this.xAxis.selectAll('text')
+        .style('text-anchor', 'middle');
+    }
 
     // Create the Y-axis band scale.
     let yAxisMaxValue = d3.max(plotData, d => Number(d.value));
@@ -454,42 +499,38 @@ export class BlogStatisticsTabComponent implements OnInit {
     } else {
       yAxisMaxValue += 50;
     }
-    const y = d3.scaleLinear()
-      .domain([0, Number(yAxisMaxValue)])
-      .range([this._height, 0]);
-
+    this._y.domain([0, Number(yAxisMaxValue)]);
     // Draw the Y-axis on the DOM.
-    let yAxis = this._svg.append('g')
-      .call(d3.axisLeft(y).ticks(10).tickSize(-this._width));
+    this.yAxis.transition().duration(1000).call(
+      d3.axisLeft(this._y).ticks(10).tickSize(-this._width)
+    );
 
-    yAxis.select('.domain')
+    this.yAxis.select('.domain')
       .attr('stroke-width', 1)
       .attr('stroke', '#000');
-    yAxis.selectAll('.tick:not(:first-of-type) line')
+    this.yAxis.selectAll('.tick:not(:first-of-type) line')
       .attr('stroke', '#4682B4')
       .attr('stroke-width', 2.5)
       .attr('opacity', 0.5);
 
-
     d3.scaleBand().paddingOuter(0.35);
-    // Y axis label.
-    this._svg.append('text')
-      .attr('text-anchor', 'middle')
-      .attr('transform', 'rotate(-90)')
-      .attr('y', 0 - this.margin.left + 20)
-      .attr('x', 0 - this._height / 2)
-      .text(this.getYaxisLabel());
 
+    // Remove already existing bars.
+    this._svg.selectAll('rect').remove().transition().attr('opacity', 0);
     // Create and fill the bars.
-    this._svg.selectAll('bars')
-      .data(plotData)
+    let bar = this._svg.selectAll('bars')
+      .data(plotData);
+
+    bar
       .enter()
-      .append('rect')
+      .append('rect') // Add a new rect for each new elements.
       .attr('class', 'bar')
-      .attr('x', d => x(d.key))
-      .attr('y', d => y(d.value))
-      .attr('width', x.bandwidth())
-      .attr('height', d => this._height - y(d.value))
+      .attr('x', d => this._x(d.key))
+      .attr('y', d => this._y(d.value as NumberValue))
+      .transition()
+      .attr('opacity', 1)
+      .attr('width', this._x.bandwidth())
+      .attr('height', d => this._height - this._y(d.value as NumberValue))
       .attr('fill', '#1F78B4');
   }
 

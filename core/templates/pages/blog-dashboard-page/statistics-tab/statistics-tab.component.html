@@ -1,5 +1,5 @@
-<div class="blog-dashboard-statistics-container mt-3 mb-5 mx-auto row">
-  <div class="blog-post-list col-3 px-0">
+<div class="blog-dashboard-statistics-container mt-3 mb-5" [ngClass]="{'row mx-auto': !isSmallScreenViewActive(), 'px-4': isSmallScreenViewActive()}">
+  <div class="blog-post-list col-3 px-0" *ngIf="!isSmallScreenViewActive()">
     <mat-selection-list #blogPostSelectionList [multiple]="false" class="pt-0">
       <mat-list-option class="blog-post-list-option blog-post-title"
                        (click)="authorAggregatedStatsShown = true; showViewsChartStats()"
@@ -15,14 +15,19 @@
       </mat-list-option>
     </mat-selection-list>
   </div>
-  <div class="statistics-plot-container col">
-    <div class="statistics-plot-header  mt-5 ml-5">
+  <div class="statistics-plot-container col" [ngClass]="{'px-0': isSmallScreenViewActive()}">
+    <div class="statistics-plot-header mt-5" [ngClass]="{'ml-5': !isSmallScreenViewActive(), 'px-0': isSmallScreenViewActive()}">
       <div class="statistics-plot-heading">
         <span *ngIf="authorAggregatedStatsShown">
           {{ 'I18N_BLOG_DASHBOARD_STATISTICS_ALL_BLOG_POSTS_HEADING' | translate }}
         </span>
         <span *ngIf="!authorAggregatedStatsShown">
-          {{ blogPostSelectionList.selectedOptions.selected[0]?.value?.title }}
+          <span *ngIf="!isSmallScreenViewActive()">
+            {{ blogPostSelectionList.selectedOptions.selected[0]?.value?.title }}
+          </span>
+          <span *ngIf="isSmallScreenViewActive()">
+            {{ blogPostTitle }}
+          </span>
         </span>
       </div>
       <div class="statistics-plot-subheading mt-2" *ngIf="authorAggregatedStatsShown">
@@ -30,7 +35,7 @@
         </span>
       </div>
     </div>
-    <div class="statistics-chart-container mt-5 mr-4 ml-auto mb-3">
+    <div class="statistics-chart-container mt-5 mb-3" [ngClass]="{'mr-4 ml-auto': !isSmallScreenViewActive()}">
       <mat-button-toggle-group name="chartTypes"
                                aria-label="chart Types"
                                class="d-flex"
@@ -38,7 +43,8 @@
         <mat-button-toggle (click)="showViewsChartStats(); selectedChartType = 'VIEWS_CHART'"
                            value="VIEWS_CHART"
                            class="statistics-chart-toggle-button">
-          <div class="mt-4 mx-1 statistics-chart-toggle-button-heading">
+          <div class="statistics-chart-toggle-button-heading mx-1"
+               [ngClass]="{'mt-1': isSmallScreenViewActive(), 'mt-4': isSmallScreenViewActive()}">
             {{ 'I18N_BLOG_DASHBOARD_STATISTICS_VIEWS_CHART_HEADING' | translate }}
           </div>
           <div class="mt-2 statistics-chart-toggle-button-description">
@@ -48,7 +54,8 @@
         <mat-button-toggle (click)="showReadsChartStats(); selectedChartType = 'READS_CHART'"
                            value="READS_CHART"
                            class="statistics-chart-toggle-button">
-          <div class="mt-4 mx-1 statistics-chart-toggle-button-heading">
+          <div class="mx-1 statistics-chart-toggle-button-heading"
+               [ngClass]="{'mt-1': isSmallScreenViewActive(), 'mt-4': isSmallScreenViewActive()}">
             {{ 'I18N_BLOG_DASHBOARD_STATISTICS_READS_CHART_HEADING' | translate }}
           </div>
           <div class="mt-2 statistics-chart-toggle-button-description">
@@ -58,7 +65,8 @@
         <mat-button-toggle (click)="showReadingTimeChartStats(); selectedChartType = 'READING_TIME'"
                            value="READING_TIME"
                            class="statistics-chart-toggle-button">
-          <div class="mt-4 mx-1 statistics-chart-toggle-button-heading">
+          <div class="mx-1 statistics-chart-toggle-button-heading"
+               [ngClass]="{'mt-1': isSmallScreenViewActive(), 'mt-4': isSmallScreenViewActive()}">
             {{ 'I18N_BLOG_DASHBOARD_STATISTICS_READING_TIME_CHART_HEADING' | translate }}
           </div>
           <div class="mt-2 statistics-chart-toggle-button-description">
@@ -66,7 +74,7 @@
           </div>
         </mat-button-toggle>
       </mat-button-toggle-group>
-      <div class="statistics-chart-heading mt-3 mx-5 mb-3">
+      <div class="statistics-chart-heading" [ngClass]="{'mt-3 mx-5 mb-3': isSmallScreenViewActive(), 'my-1 mx-3': isSmallScreenViewActive()}">
         <span *ngIf="viewsChartShown">
           {{ 'I18N_BLOG_DASHBOARD_STATISTICS_VIEWS_CHART_HEADING' | translate }}
         </span>
@@ -94,15 +102,65 @@
       </div>
     </div>
   </div>
+  <div *ngIf="isSmallScreenViewActive()" class="w-100">
+    <mat-form-field appearance="fill" class="w-100 blog-post-title">
+      <mat-select [(value)]="activeStatsBlogPostId">
+        <mat-option class="blog-post-list-option"
+                    (click)="authorAggregatedStatsShown = true; showViewsChartStats(); activeStatsBlogPostId = 'all'"
+                    [value]="'all'">
+          {{ 'I18N_BLOG_DASHBOARD_STATISTICS_ALL_BLOG_POSTS_STATS_BUTTON' | translate }}
+        </mat-option>
+        <mat-option class="blog-post-list-option"
+                    *ngFor="let blogPostSummary of publishedBlogPostList"
+                    [value]="blogPostSummary.id"
+                    (click)="getBlogPostStats(blogPostSummary.id); blogPostTitle = blogPostSummary.title">
+          <span class="blog-post-title">{{ blogPostSummary.title }}</span>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
 </div>
 <style>
-  @media(min-width: 880px) {
-    .blog-stats {
-      height: 320px;
-      width: 550px;
-    }
+
+  .blog-stats {
+    height: 320px;
+    width: 550px;
   }
 
+  @media(max-width: 650px) {
+    .time-period-button {
+      padding: 0;
+      font-size: 14px;
+      text-align: center;
+    }
+    .blog-stats {
+      height: 250px;
+      width: 100%;
+    }
+
+    .statistics-chart-container .statistics-chart-toggle-button-heading {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 18px;
+    }
+
+    .statistics-chart-container .statistics-chart-toggle-button-description {
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .statistics-chart-heading .statistics-plot-heading {
+      font-size: 20px;
+      font-weight: 400;
+      letter-spacing: 0;
+      line-height: 24px;
+    }
+
+    .statistics-chart-heading .statistics-plot-subheading {
+      font-size: 12px;
+      line-height: 14px;
+    }
+  }
 
   .mat-list-item .blog-post-title {
     color: #fff;
