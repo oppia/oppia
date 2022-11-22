@@ -67,25 +67,10 @@ import { StateEditorRefreshService } from './services/state-editor-refresh.servi
 import { StateTutorialFirstTimeService } from './services/state-tutorial-first-time.service';
 import { UserEmailPreferencesService } from './services/user-email-preferences.service';
 import { UserExplorationPermissionsService } from './services/user-exploration-permissions.service';
-import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
-import { ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
-import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { VersionHistoryService } from './services/version-history.service';
+import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 
-interface ExplorationData {
-  auto_tts_enabled: boolean;
-  correctness_feedback_enabled: boolean;
-  draft_changes: ExplorationChange[];
-  is_version_of_draft_valid: boolean;
-  init_state_name: string;
-  param_changes: ParamChangeBackendDict[];
-  param_specs: ParamSpecsBackendDict;
-  states: StateObjectsBackendDict;
-  title: string;
-  language_code: string;
-  draft_change_list_id: number;
-  version: number;
-  edits_allowed: boolean;
+interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: string;
   category: string;
   objective: string;
@@ -230,8 +215,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       this.userService.getUserInfoAsync()
     ]).then(async(
         [explorationData, featuresData, _, userInfo]) => {
-      if ((explorationData as ExplorationData)
-        .exploration_is_linked_to_story) {
+      if ((explorationData as ExplorationData).exploration_is_linked_to_story) {
         this.explorationIsLinkedToStory = true;
         this.contextService.setExplorationIsLinkedToStory();
       }
@@ -276,14 +260,12 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       this.explorationRightsService.init(
         (explorationData as ExplorationData).rights.owner_names,
         (explorationData as ExplorationData).rights.editor_names,
-        (explorationData as ExplorationData)
-          .rights.voice_artist_names,
+        (explorationData as ExplorationData).rights.voice_artist_names,
         (explorationData as ExplorationData).rights.viewer_names,
         (explorationData as ExplorationData).rights.status,
         (explorationData as ExplorationData).rights.cloned_from,
         (explorationData as ExplorationData).rights.community_owned,
-        (explorationData as ExplorationData)
-          .rights.viewable_if_private);
+        (explorationData as ExplorationData).rights.viewable_if_private);
       this.userEmailPreferencesService.init(
         (
            explorationData as ExplorationData
@@ -351,8 +333,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       }
 
       this.stateTutorialFirstTimeService.initEditor(
-        (explorationData as ExplorationData)
-          .show_state_editor_tutorial_on_load,
+        (explorationData as ExplorationData).show_state_editor_tutorial_on_load,
         this.explorationId);
 
       if ((

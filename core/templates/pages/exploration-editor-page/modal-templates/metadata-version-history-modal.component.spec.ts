@@ -23,11 +23,12 @@ import { ContextService } from 'services/context.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
 import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
-import { VersionHistoryService } from '../services/version-history.service';
+import { MetadataDiffData, VersionHistoryService } from '../services/version-history.service';
 import { MetadataVersionHistoryModalComponent } from './metadata-version-history-modal.component';
 import { ExplorationMetadata } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
+import { AlertsService } from 'services/alerts.service';
 
 describe('Metadata version history modal', () => {
   let component: MetadataVersionHistoryModalComponent;
@@ -38,6 +39,7 @@ describe('Metadata version history modal', () => {
   let contextService: ContextService;
   let explorationMetadata: ExplorationMetadata;
   let paramSpecObjectFactory: ParamSpecObjectFactory;
+  let alertsService: AlertsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -65,6 +67,7 @@ describe('Metadata version history modal', () => {
     );
     contextService = TestBed.inject(ContextService);
     paramSpecObjectFactory = TestBed.inject(ParamSpecObjectFactory);
+    alertsService = TestBed.inject(AlertsService);
 
     explorationMetadata = new ExplorationMetadata(
       'title', 'category', 'objective', 'en',
@@ -103,6 +106,18 @@ describe('Metadata version history modal', () => {
     expect(component.getLastEditedVersionNumber()).toEqual(2);
   });
 
+  it('should throw error when last edited version number is null', () => {
+    spyOn(
+      versionHistoryService, 'getBackwardMetadataDiffData'
+    ).and.returnValue({
+      oldVersionNumber: null
+    } as MetadataDiffData);
+
+    expect(
+      () =>component.getLastEditedVersionNumber()
+    ).toThrowError('Last edited version number cannot be null');
+  });
+
   it('should get the last edited committer username', () => {
     spyOn(
       versionHistoryService, 'getBackwardMetadataDiffData'
@@ -127,6 +142,18 @@ describe('Metadata version history modal', () => {
     });
 
     expect(component.getNextEditedVersionNumber()).toEqual(3);
+  });
+
+  it('should throw error when next edited version number is null', () => {
+    spyOn(
+      versionHistoryService, 'getForwardMetadataDiffData'
+    ).and.returnValue({
+      oldVersionNumber: null
+    } as MetadataDiffData);
+
+    expect(
+      () =>component.getNextEditedVersionNumber()
+    ).toThrowError('Next edited version number cannot be null');
   });
 
   it('should get the next edited committer username', () => {
@@ -237,6 +264,34 @@ describe('Metadata version history modal', () => {
     expect(
       versionHistoryService.getCurrentPositionInMetadataVersionHistoryList()
     ).toEqual(1);
+  }));
+
+  it('should be show alert message if the backend api fails', fakeAsync(() => {
+    spyOn(
+      versionHistoryService, 'shouldFetchNewMetadataVersionHistory'
+    ).and.returnValue(true);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp_1');
+    spyOn(
+      versionHistoryService, 'getBackwardMetadataDiffData'
+    ).and.returnValue({
+      oldMetadata: explorationMetadata,
+      newMetadata: explorationMetadata,
+      oldVersionNumber: 2,
+      newVersionNumber: 3,
+      committerUsername: 'some'
+    });
+    spyOn(
+      versionHistoryBackendApiService, 'fetchMetadataVersionHistoryAsync'
+    ).and.resolveTo(null);
+    spyOn(alertsService, 'addWarning').and.callFake(() => {});
+
+    component.fetchPreviousVersionHistory();
+    tick();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Could not fetch the version history data. ' +
+      'Please reload the page and try again.'
+    );
   }));
 
   it('should update the left and right side yaml strings on initialization',

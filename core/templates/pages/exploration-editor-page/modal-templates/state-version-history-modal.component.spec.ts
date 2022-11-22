@@ -23,9 +23,10 @@ import { ContextService } from 'services/context.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
 import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
-import { VersionHistoryService } from '../services/version-history.service';
+import { StateDiffData, VersionHistoryService } from '../services/version-history.service';
 import { StateVersionHistoryModalComponent } from './state-version-history-modal.component';
 import { StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { AlertsService } from 'services/alerts.service';
 
 describe('State version history modal', () => {
   let component: StateVersionHistoryModalComponent;
@@ -36,6 +37,7 @@ describe('State version history modal', () => {
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
   let contextService: ContextService;
   let stateObject: StateBackendDict;
+  let alertsService: AlertsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -63,6 +65,7 @@ describe('State version history modal', () => {
       VersionHistoryBackendApiService
     );
     contextService = TestBed.inject(ContextService);
+    alertsService = TestBed.inject(AlertsService);
 
     stateObject = {
       classifier_model_id: null,
@@ -152,6 +155,18 @@ describe('State version history modal', () => {
     expect(component.getLastEditedVersionNumber()).toEqual(2);
   });
 
+  it('should throw error when last edited version number is null', () => {
+    spyOn(
+      versionHistoryService, 'getBackwardStateDiffData'
+    ).and.returnValue({
+      oldVersionNumber: null
+    } as StateDiffData);
+
+    expect(
+      () =>component.getLastEditedVersionNumber()
+    ).toThrowError('Last edited version number cannot be null');
+  });
+
   it('should get the last edited committer username', () => {
     const stateData = stateObjectFactory.createFromBackendDict(
       'State', stateObject);
@@ -178,6 +193,18 @@ describe('State version history modal', () => {
     });
 
     expect(component.getNextEditedVersionNumber()).toEqual(3);
+  });
+
+  it('should throw error when next edited version number is null', () => {
+    spyOn(
+      versionHistoryService, 'getForwardStateDiffData'
+    ).and.returnValue({
+      oldVersionNumber: null
+    } as StateDiffData);
+
+    expect(
+      () =>component.getNextEditedVersionNumber()
+    ).toThrowError('Next edited version number cannot be null');
   });
 
   it('should get the next edited committer username', () => {
@@ -219,6 +246,30 @@ describe('State version history modal', () => {
     expect(component.yamlStrs.currentVersionStateYaml).toEqual('YAML STRING');
   }));
 
+  it('should throw error on exploring forward version history when state' +
+  ' names from version history data are not defined', () => {
+    spyOn(versionHistoryService, 'getForwardStateDiffData').and.returnValues({
+      oldState: stateObjectFactory.createFromBackendDict(
+        'State', stateObject),
+      newState: stateObjectFactory.createFromBackendDict(
+        null, stateObject),
+      oldVersionNumber: 3
+    } as StateDiffData, {
+      oldState: stateObjectFactory.createFromBackendDict(
+        null, stateObject),
+      newState: stateObjectFactory.createFromBackendDict(
+        'State', stateObject),
+      oldVersionNumber: 3
+    } as StateDiffData);
+
+    expect(
+      () => component.onClickExploreForwardVersionHistory()
+    ).toThrowError('State name cannot be null');
+    expect(
+      () => component.onClickExploreForwardVersionHistory()
+    ).toThrowError('State name cannot be null');
+  });
+
   it('should update the left and the right side yaml strings on exploring' +
   ' backward version history', fakeAsync(() => {
     const stateData = stateObjectFactory.createFromBackendDict(
@@ -244,6 +295,30 @@ describe('State version history modal', () => {
     expect(component.yamlStrs.previousVersionStateYaml).toEqual('YAML STRING');
     expect(component.yamlStrs.currentVersionStateYaml).toEqual('YAML STRING');
   }));
+
+  it('should throw error on exploring backward version history when state' +
+  ' names from version history data are not defined', () => {
+    spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValues({
+      oldState: stateObjectFactory.createFromBackendDict(
+        'State', stateObject),
+      newState: stateObjectFactory.createFromBackendDict(
+        null, stateObject),
+      oldVersionNumber: 3
+    } as StateDiffData, {
+      oldState: stateObjectFactory.createFromBackendDict(
+        null, stateObject),
+      newState: stateObjectFactory.createFromBackendDict(
+        'State', stateObject),
+      oldVersionNumber: 3
+    } as StateDiffData);
+
+    expect(
+      () => component.onClickExploreBackwardVersionHistory()
+    ).toThrowError('State name cannot be null');
+    expect(
+      () => component.onClickExploreBackwardVersionHistory()
+    ).toThrowError('State name cannot be null');
+  });
 
   it('should be able to fetch the backward version history', fakeAsync(() => {
     spyOn(
@@ -285,6 +360,63 @@ describe('State version history modal', () => {
     expect(
       versionHistoryService.getCurrentPositionInStateVersionHistoryList()
     ).toEqual(1);
+  }));
+
+  it('should throw error while fetching previous version history data if the ' +
+  'state data for previous version is not available', () => {
+    spyOn(
+      versionHistoryService, 'shouldFetchNewStateVersionHistory'
+    ).and.returnValue(true);
+    const stateData = stateObjectFactory.createFromBackendDict(
+      null, stateObject);
+    spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValues({
+      oldState: null,
+      newState: null,
+      oldVersionNumber: 2,
+      newVersionNumber: 3,
+      committerUsername: 'some'
+    }, {
+      oldState: stateData,
+      newState: stateData,
+      oldVersionNumber: 2,
+      newVersionNumber: 3,
+      committerUsername: 'some'
+    });
+
+    expect(() => component.fetchPreviousVersionHistory()).toThrowError(
+      'The state data for the previous version is not available.'
+    );
+    expect(() => component.fetchPreviousVersionHistory()).toThrowError(
+      'The name of the state in the previous version was not specified.'
+    );
+  });
+
+  it('should be show alert message if the backend api fails', fakeAsync(() => {
+    spyOn(
+      versionHistoryService, 'shouldFetchNewStateVersionHistory'
+    ).and.returnValue(true);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp_1');
+    const stateData = stateObjectFactory.createFromBackendDict(
+      'State', stateObject);
+    spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
+      oldState: stateData,
+      newState: stateData,
+      oldVersionNumber: 2,
+      newVersionNumber: 3,
+      committerUsername: 'some'
+    });
+    spyOn(
+      versionHistoryBackendApiService, 'fetchStateVersionHistoryAsync'
+    ).and.resolveTo(null);
+    spyOn(alertsService, 'addWarning').and.callFake(() => {});
+
+    component.fetchPreviousVersionHistory();
+    tick();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Could not fetch the version history data. ' +
+      'Please reload the page and try again.'
+    );
   }));
 
   it('should update the left and right side yaml strings on initialization',
