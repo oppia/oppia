@@ -140,7 +140,7 @@ class InstantFeedbackMessageEmailHandler(
 ):
     """Handles task of sending feedback message emails instantly."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'user_id': {
@@ -160,9 +160,10 @@ class InstantFeedbackMessageEmailHandler(
     }
 
     @acl_decorators.can_perform_tasks_in_taskqueue
-    def post(self):
-        user_id = self.normalized_payload.get('user_id')
-        reference_dict = self.normalized_payload.get('reference_dict')
+    def post(self) -> None:
+        payload = json.loads(self.request.body)
+        user_id = payload['user_id']
+        reference_dict = payload['reference_dict']
 
         message = feedback_services.get_message(
             reference_dict['thread_id'], reference_dict['message_id'])
