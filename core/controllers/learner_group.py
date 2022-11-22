@@ -343,8 +343,6 @@ class LearnerGroupLearnerProgressHandler(
             )
         )
 
-        all_users_settings = user_services.get_users_settings(
-            learner_user_ids, strict=True)
         all_learners_progress = []
         for i, user_id in enumerate(learner_user_ids):
             learner_progress = {

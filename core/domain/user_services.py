@@ -1424,7 +1424,7 @@ def update_profile_picture_data_url(
     profile_picture_binary = utils.convert_png_data_url_to_binary(
         profile_picture_data_url)
     output = io.BytesIO()
-    image = Image.open(io.BytesIO(profile_picture_binary)).convert("RGB")
+    image = Image.open(io.BytesIO(profile_picture_binary)).convert('RGB')
     image.save(output, 'webp')
     webp_binary = output.getvalue()
     filename_webp = 'profile_picture.webp'

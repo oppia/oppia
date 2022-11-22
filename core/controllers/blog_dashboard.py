@@ -124,7 +124,6 @@ class BlogDashboardDataHandler(
     def get(self) -> None:
         """Handles GET requests."""
         assert self.user_id is not None
-        user_settings = user_services.get_user_settings(self.user_id)
         author_details = (
             blog_services.get_blog_author_details(self.user_id).to_dict())
         no_of_published_blog_posts = 0
@@ -259,9 +258,6 @@ class BlogPostHandler(
         if blog_post is None:
             raise self.PageNotFoundException(
                 'The blog post with the given id or url doesn\'t exist.')
-
-        user_settings = user_services.get_user_settings(
-            blog_post.author_id, strict=False)
 
         author_details = blog_services.get_blog_author_details(
             blog_post.author_id)

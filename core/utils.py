@@ -400,11 +400,14 @@ def get_url_scheme(url: str) -> str:
 
 def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
     """Converts a PNG base64 data URL to a PNG binary data.
+
     Args:
         image_data_url: str. A string that is to be interpreted as a PNG
             data URL.
+
     Returns:
         bytes. Binary content of the PNG created from the data URL.
+
     Raises:
         Exception. The given string does not represent a PNG data URL.
     """

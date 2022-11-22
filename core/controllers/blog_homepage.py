@@ -43,7 +43,6 @@ class BlogCardSummaryDict(TypedDict):
     title: str
     summary: str
     author_username: Optional[str]
-    profile_pic_url: Optional[str]
     url_fragment: str
     tags: List[str]
     thumbnail_filename: Optional[str]

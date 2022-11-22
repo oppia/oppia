@@ -52,7 +52,6 @@ class SuggestionSummaryDict(TypedDict):
     current_content_html: str
     description: str
     author_username: Optional[str]
-    author_picture_data_url: Optional[str]
     created_on_msecs: float
 
 

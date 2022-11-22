@@ -35,7 +35,7 @@ from core.domain import takeout_service
 from core.domain import user_services
 from core.domain import wipeout_service
 
-from typing import Callable, Dict, Optional, TypedDict
+from typing import Callable, Dict, TypedDict
 
 
 class ProfileHandler(
