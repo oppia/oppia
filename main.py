@@ -1087,6 +1087,8 @@ URLS = [
         r'/user_progress_in_stories_chapters_handler/<username>',
         learner_group.LearnerStoriesChaptersProgressHandler),
     get_redirect_route(
+        r'/fix_commit_commands/', editor.FixCommitCommandsHandler),
+    get_redirect_route(
         '/learner_groups_feature_status_handler',
         learner_group.LearnerGroupsFeatureStatusHandler)
 ]

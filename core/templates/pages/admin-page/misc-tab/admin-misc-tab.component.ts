@@ -21,6 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { FixCommitCommandBackendApiService } from 'services/fix-commit-command-backend-api.service';
 import { AdminPageConstants } from '../admin-page.constants';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
 
@@ -58,11 +59,14 @@ export class AdminMiscTabComponent {
   publishedOn!: string;
   showDataExtractionQueryStatus: boolean = false;
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
+  message: string = '';
 
   constructor(
-    private windowRef: WindowRef,
     private adminBackendApiService: AdminBackendApiService,
-    private adminTaskManagerService: AdminTaskManagerService
+    private adminTaskManagerService: AdminTaskManagerService,
+    private fixCommitCommandBackendApiService:
+      FixCommitCommandBackendApiService,
+    private windowRef: WindowRef
   ) {}
 
   clearSearchIndex(): void {
@@ -290,6 +294,14 @@ export class AdminMiscTabComponent {
     this.stateName = '';
     this.numAnswers = 0;
     this.showDataExtractionQueryStatus = false;
+  }
+
+  fixCommitCommands(): void {
+    this.fixCommitCommandBackendApiService
+      .fixCommitCommandsAsync()
+      .then((message) => {
+        this.message = message;
+      });
   }
 }
 
