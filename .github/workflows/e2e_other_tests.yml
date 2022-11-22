@@ -10,7 +10,7 @@ on:
       - release-*
 
 jobs:
-  e2e_other_tests:
+  build:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
@@ -21,6 +21,12 @@ jobs:
         with:
           python-version: '3.8.12'
           architecture: 'x64'
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements.in
+            requirements.txt
+            requirements_dev.in
+            requirements_dev.txt
       - uses: ./.github/actions/merge
       - name: Cache node modules
         uses: actions/cache@v3
@@ -46,6 +52,61 @@ jobs:
       - name: Build Webpack
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: python -m scripts.build --prod_env
+      - name: Upload build files artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build_files
+          path: |
+            /home/runner/work/oppia/oppia/third_party
+            /home/runner/work/oppia/oppia_tools
+            /home/runner/work/oppia/oppia/build
+          retention-days: 1
+  e2e_collections:
+    needs: build
+    # TODO: Use a strategy matrix to auto-generate the jobs for all the e2e
+    # tests without copy-pasting code.
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.8.12'
+          architecture: 'x64'
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements.in
+            requirements.txt
+            requirements_dev.in
+            requirements_dev.txt
+      - uses: ./.github/actions/merge
+      - name: Cache node modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: /home/runner/work/oppia/yarn_cache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Download build files artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build_files
+      - uses: ./.github/actions/install-oppia-dependencies
+      - id: check-risk
+        name: Check if PR is low-risk
+        uses: ./.github/actions/check-if-pr-is-low-risk
+      - name: Install chrome
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: python -m scripts.install_chrome_for_ci
+      - name: Install ffmpeg
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: sudo apt install ffmpeg
       - name: Run e2e Collections Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
