@@ -60,7 +60,7 @@ import { ExplorationEditorPageConstants } from '../exploration-editor-page.const
 import { AppConstants } from 'app.constants';
 import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { MetadataDiffData, VersionHistoryService } from '../services/version-history.service';
-import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
+import { MetadataVersionHistoryResponse, VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 import { MetadataVersionHistoryModalComponent } from '../modal-templates/metadata-version-history-modal.component';
 
 @Component({
@@ -351,12 +351,15 @@ export class SettingsTabComponent
         .versionHistoryBackendApiService
         .fetchMetadataVersionHistoryAsync(
           this.contextService.getExplorationId(),
-          this.versionHistoryService.getLatestVersionOfExploration()
+          this.versionHistoryService.getLatestVersionOfExploration() as number
         );
       this.versionHistoryService.insertMetadataVersionHistoryData(
-        metadataVersionHistory.lastEditedVersionNumber,
-        metadataVersionHistory.metadataInPreviousVersion,
-        metadataVersionHistory.lastEditedCommitterUsername
+        (metadataVersionHistory as MetadataVersionHistoryResponse)
+          .lastEditedVersionNumber,
+        (metadataVersionHistory as MetadataVersionHistoryResponse)
+          .metadataInPreviousVersion,
+        (metadataVersionHistory as MetadataVersionHistoryResponse)
+          .lastEditedCommitterUsername
       );
     }
   }

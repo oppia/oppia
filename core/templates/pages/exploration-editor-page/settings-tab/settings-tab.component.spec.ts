@@ -1199,13 +1199,13 @@ describe('Settings Tab Component', () => {
   it('should open the metadata version history modal on clicking the explore ' +
     'version history button', () => {
       class MockComponentInstance {
-        compoenentInstance: {
-          newMetadata: null;
-          oldMetadata: null;
+        compoenentInstance = {
+          newMetadata: null,
+          oldMetadata: null,
           headers: {
-            leftPane: '';
-            rightPane: '';
-          };
+            leftPane: '',
+            rightPane: '',
+          },
         };
       }
       spyOn(ngbModal, 'open').and.returnValues({
