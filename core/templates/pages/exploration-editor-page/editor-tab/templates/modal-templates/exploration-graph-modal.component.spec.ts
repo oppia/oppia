@@ -81,7 +81,7 @@ describe('Exploration Graph Modal Component', () => {
     graphDataService = TestBed.inject(GraphDataService);
     stateEditorService = TestBed.inject(StateEditorService);
 
-    spyOn(graphDataService, 'getGraphData').and.returnValue(null);
+    spyOn(graphDataService, 'getGraphData').and.callThrough();
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
     spyOn(ngbActiveModal, 'close').and.stub();
 
@@ -93,7 +93,7 @@ describe('Exploration Graph Modal Component', () => {
   it('should initialize component properties after Component is initialized',
     () => {
       expect(component.currentStateName).toBe(stateName);
-      expect(component.graphData).toEqual(null);
+      expect(component.graphData).toBeUndefined();
       expect(component.isEditable).toBe(isEditable);
     });
 
