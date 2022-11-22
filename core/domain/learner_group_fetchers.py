@@ -42,22 +42,56 @@ def get_new_learner_group_id() -> str:
     return learner_group_models.LearnerGroupModel.get_new_id()
 
 
+@overload
+def get_learner_group_by_id(
+    group_id: str, *, strict: Literal[True]
+) -> learner_group_domain.LearnerGroup: ...
+
+
+@overload
 def get_learner_group_by_id(
     group_id: str
+) -> Optional[learner_group_domain.LearnerGroup]: ...
+
+
+@overload
+def get_learner_group_by_id(
+    group_id: str, *, strict: Literal[False]
+) -> Optional[learner_group_domain.LearnerGroup]: ...
+
+
+@overload
+def get_learner_group_by_id(
+    group_id: str, strict: bool
+) -> Optional[learner_group_domain.LearnerGroup]: ...
+
+
+def get_learner_group_by_id(
+    group_id: str, strict: bool = False
 ) -> Optional[learner_group_domain.LearnerGroup]:
     """Returns the learner group domain object given the learner group id.
 
     Args:
         group_id: str. The id of the learner group.
+        strict: bool. Whether to fail noisily if no LearnerGroupModel with the
+            given group_id exists in the datastore.
 
     Returns:
         LearnerGroup or None. The learner group domain object corresponding to
         the given id or None if no learner group exists for the given group id.
+
+    Raises:
+        Exception. No LearnerGroupModel found for the given group_id.
     """
     learner_group_model = learner_group_models.LearnerGroupModel.get(
         group_id, strict=False)
 
     if not learner_group_model:
+        if strict:
+            raise Exception(
+                'No LearnerGroupModel found for the given group_id: %s' %
+                group_id
+            )
         return None
 
     return learner_group_services.get_learner_group_from_model(

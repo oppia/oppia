@@ -27,7 +27,7 @@ import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TopicQuestionsTabComponent } from './topic-questions-tab.component';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
-import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/TopicObjectFactory';
 
 let skillSummaryBackendDict: SkillSummaryBackendDict = {
   id: 'test_id',
@@ -74,15 +74,19 @@ const topicsAndSkillsDashboardData: TopicsAndSkillDashboardData = {
     }
   ],
   totalSkillCount: 1,
-  topicSummaries: null,
-  categorizedSkillsDict: categorizedSkillsDictData
+  topicSummaries: [],
+  // This throws "Argument of type 'null' is not assignable to parameter of
+  // type 'object'" We need to suppress this error because of the need to test
+  // validations.
+  // @ts-ignore
+  categorizedSkillsDict: categorizedSkillsDictData,
 };
 
 class MockTopicsAndSkillsDashboardBackendApiService {
   success: boolean = true;
   fetchDashboardDataAsync() {
     return {
-      then: (callback: (resp) => void) => {
+      then: (callback: (resp: TopicsAndSkillDashboardData) => void) => {
         callback(topicsAndSkillsDashboardData);
       }
     };
@@ -93,7 +97,6 @@ describe('Topic questions tab', () => {
   let component: TopicQuestionsTabComponent;
   let fixture: ComponentFixture<TopicQuestionsTabComponent>;
   let topicEditorStateService: TopicEditorStateService;
-  let topicObjectFactory: TopicObjectFactory;
   let focusManagerService: FocusManagerService;
   let qls: QuestionsListService;
   let subtopic1: Subtopic;
@@ -122,11 +125,14 @@ describe('Topic questions tab', () => {
     qls = TestBed.inject(QuestionsListService);
     focusManagerService = TestBed.inject(FocusManagerService);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
-    topicObjectFactory = TestBed.inject(TopicObjectFactory);
     topicInitializedEventEmitter = new EventEmitter();
     topicReinitializedEventEmitter = new EventEmitter();
 
-    topic = topicObjectFactory.createInterstitialTopic();
+    topic = new Topic(
+      '', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], '', '', {}, false, '', '', []
+    );
     subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic1.addSkill('skill1', 'subtopic1 skill');
     topic.getSubtopics = () => {
@@ -152,7 +158,7 @@ describe('Topic questions tab', () => {
   });
 
   it('should initialize the variables when topic is initialized', () => {
-    const topicRights = TopicRights.createInterstitialRights();
+    const topicRights = new TopicRights(false, false, false);
     const allSkillSummaries = subtopic1.getSkillSummaries();
     spyOn(topicEditorStateService, 'getSkillIdToRubricsObject').and
       .returnValue(skillIdToRubricsObject);
@@ -208,7 +214,7 @@ describe('Topic questions tab', () => {
 
   it('should initialize tab when topic is initialized', () => {
     // Setup.
-    const topicRights = TopicRights.createInterstitialRights();
+    const topicRights = new TopicRights(false, false, false);
     const allSkillSummaries = subtopic1.getSkillSummaries();
 
     // Action.
@@ -221,7 +227,7 @@ describe('Topic questions tab', () => {
   });
 
   it('should initialize tab when topic is reinitialized', () => {
-    const topicRights = TopicRights.createInterstitialRights();
+    const topicRights = new TopicRights(false, false, false);
     const allSkillSummaries = subtopic1.getSkillSummaries();
 
     topicInitializedEventEmitter.emit();
