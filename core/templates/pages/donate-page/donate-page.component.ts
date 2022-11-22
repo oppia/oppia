@@ -48,8 +48,8 @@ export class DonatePageComponent implements OnInit, OnDestroy {
   emailAddress: string | null = null;
   name: string | null = null;
   OPPIA_AVATAR_IMAGE_URL = (
-    this.urlInterpolationService
-      .getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg'));
+    this.getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg')
+  );
 
   constructor(
     private pageTitleService: PageTitleService,
@@ -64,8 +64,7 @@ export class DonatePageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-    this.donateImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/general/opp_donate_text.svg');
+    this.donateImgUrl = this.getStaticImageUrl('/general/opp_donate_text.svg');
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {
         this.setPageTitle();
@@ -113,6 +112,7 @@ export class DonatePageComponent implements OnInit, OnDestroy {
       String(this.emailAddress), String(this.name)
     ).then((status) => {
       if (status) {
+        this.alertsService.addInfoMessage('Done!', 1000);
         this.ngbModal.open(
           ThanksForSubscribingModalComponent,
           {
