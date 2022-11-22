@@ -192,13 +192,6 @@ class DraftUpgradeUtil:
                                 conversion_fn(value)
                             )
             elif (change.property_name == 'written_translations'):
-                # Here we use cast because this 'elif' condition forces change
-                # to have type EditExpStatePropertyWrittenTranslationsCmd.
-                edit_written_translations_dict_cmd = cast(
-                    exp_domain.EditExpStatePropertyWrittenTranslationsCmd,
-                    change
-                )
-                new_value = edit_written_translations_dict_cmd.new_value
                 # Here we use MyPy ignore because the latest schema of state
                 # dict doesn't contains translations_mapping of
                 # written_translations property.

@@ -2328,7 +2328,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'cmd': 'add_written_translation',
             'content_id': 'content_0',
             'language_code': 'hi',
-            'content_html': '',
+            'content_html': '<p>A content to translate.</p>',
             'state_name': 'Introduction',
             'translation_html': '<p>Translation for content.</p>',
             'data_format': 'html'
@@ -2344,7 +2344,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         """
         return {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>A content to translate.</p>',
             'state_name': 'Introduction',

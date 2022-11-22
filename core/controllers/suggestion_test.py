@@ -748,8 +748,18 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                         'state_name': 'State 1',
-                        'new_value': self.resubmit_change_content,
-                        'old_value': self.old_content
+                        'old_value': {
+                            'content_id': (
+                                self.exploration.states['State 1']
+                                .content.content_id),
+                            'html': self.old_content_html
+                        },
+                        'new_value': {
+                            'content_id': (
+                                self.exploration.states['State 1']
+                                .content.content_id),
+                            'html': ''
+                        }
                     }
                 }, csrf_token=csrf_token, expected_status_int=400)
 
@@ -1029,12 +1039,12 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'change': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 1',
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'language_code': 'hi',
                     'content_html': '<p>old content html</p>',
                     'translation_html': ['test1', 'test2'],
                     'data_format': (
-                        state_domain.WrittenTranslation
+                        translation_domain.WrittenTranslation
                         .DATA_FORMAT_SET_OF_NORMALIZED_STRING
                     ),
                 },
@@ -1318,7 +1328,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {
-                'content_id': 'solution',
+                'content_id': 'solution_2',
                 'html': '<p>This is the updated solution.</p>',
             },
         }
@@ -1334,7 +1344,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             ),
             {
                 'question_state_data': question_state_data,
-                'skill_difficulty': 'string_value'
+                'skill_difficulty': 'string_value',
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             csrf_token=csrf_token,
             expected_status_int=400
@@ -1375,7 +1387,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {
-                'content_id': 'solution',
+                'content_id': 'solution_2',
                 'html': '<p>This is the updated solution.</p>',
             },
         }
@@ -1398,7 +1410,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 suggestion.suggestion_id
             ),
             {
-                'skill_difficulty': 0.6
+                'skill_difficulty': 0.6,
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             csrf_token=csrf_token,
             expected_status_int=400
@@ -1439,7 +1453,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {
-                'content_id': 'solution',
+                'content_id': 'solution_2',
                 'html': '<p>This is the updated solution.</p>',
             },
         }
@@ -1462,7 +1476,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 suggestion.suggestion_id
             ),
             {
-                'question_state_data': question_state_data
+                'question_state_data': question_state_data,
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             csrf_token=csrf_token,
             expected_status_int=400
@@ -1502,7 +1518,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {
-                'content_id': 'solution',
+                'content_id': 'solution_2',
                 'html': '<p>This is the updated solution.</p>',
             },
         }
@@ -1534,7 +1550,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'The parameter \'next_content_id_index\' is missing.'
+            'Missing key in handler args: next_content_id_index.'
         )
         self.logout()
 
@@ -1567,7 +1583,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {
-                'content_id': 'solution',
+                'content_id': 'solution_2',
                 'html': '<p>This is the updated solution.</p>',
             },
         }
@@ -1594,7 +1610,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             ),
             {
                 'question_state_data': question_state_data,
-                'skill_difficulty': '0.6'
+                'skill_difficulty': '0.6',
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             csrf_token=csrf_token,
             expected_status_int=400
@@ -1652,7 +1670,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             ),
             {
                 'question_state_data': invalid_question_state_data,
-                'skill_difficulty': '0.6'
+                'skill_difficulty': '0.6',
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             csrf_token=csrf_token,
             expected_status_int=400

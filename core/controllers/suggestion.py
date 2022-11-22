@@ -1070,7 +1070,7 @@ class UpdateQuestionSuggestionHandler(
             suggestion_id,
             self.normalized_payload['skill_difficulty'],
             self.normalized_payload['question_state_data'],
-            self.normalized_payload('next_content_id_index')
+            self.normalized_payload['next_content_id_index']
         )
 
         self.render_json(self.values)

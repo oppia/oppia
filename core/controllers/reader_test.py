@@ -370,13 +370,20 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         story_services.update_story(
             'user', story_id, change_list, 'Updated Node 1.')
         question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id, 'user',
-            self._create_valid_question_data('ABC'), [self.skill_id])
+            self._create_valid_question_data('ABC', content_id_generator),
+            [self.skill_id],
+            content_id_generator.next_content_id_index
+        )
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             question_id_2, 'user',
-            self._create_valid_question_data('ABC'), [self.skill_id])
+            self._create_valid_question_data('ABC', content_id_generator),
+            [self.skill_id],
+            content_id_generator.next_content_id_index
+        )
         question_services.create_new_question_skill_link(
             self.editor_id, question_id, self.skill_id, 0.3)
         question_services.create_new_question_skill_link(

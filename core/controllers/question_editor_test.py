@@ -741,6 +741,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             'cmd': 'update_question_property',
             'property_name': 'next_content_id_index',
             'new_value': self.content_id_generator.next_content_id_index,
+            'old_value': 0
         }]
         payload = {
             'change_list': change_list,
@@ -815,7 +816,8 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_put_with_topic_manager_email_allows_question_editing(self) -> None:
-        new_question_data = self._create_valid_question_data('DEF')
+        new_question_data = self._create_valid_question_data(
+            'DEF', self.content_id_generator)
         change_list = [{
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
