@@ -174,19 +174,21 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
             self.feedback_message_reference.validate()
         except utils.ValidationError:
             self.fail(
-                "Failed to validate 'valid' FeedbackMessageReference")
+                'Failed to validate correct FeedbackMessageReference')
 
     def test_invalid_entity_type(self) -> None:
         reference_dict = self.feedback_message_reference
 
         reference_dict.entity_type = 10
-        with self.assertRaisesRegex(utils.ValidationError,
+        with self.assertRaisesRegex(
+            utils.ValidationError,
             'Expected entity type to be a string, received: %s.'
             % reference_dict.entity_type):
             reference_dict.validate()
 
-        reference_dict.entity_type = "invalid_entity_type"
-        with self.assertRaisesRegex(utils.ValidationError,
+        reference_dict.entity_type = 'invalid_entity_type'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
             'Entity type is not in list of allowed types'
                 ', received: \'%s\' and allowed types are: \'%s\''
                 % (
@@ -198,13 +200,15 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
         reference_dict = self.feedback_message_reference
 
         reference_dict.entity_id = 10
-        with self.assertRaisesRegex(utils.ValidationError,
+        with self.assertRaisesRegex(
+            utils.ValidationError,
             'Expected entity ID to be a string, received: %s.'
                 % reference_dict.entity_id):
             reference_dict.validate()
 
-        reference_dict.entity_id = "invalid_entity_id"
-        with self.assertRaisesRegex(utils.ValidationError,
+        reference_dict.entity_id = 'invalid_entity_id'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
             'Entity ID is not a valid id'
                 ', received: \'%s\'' % reference_dict.entity_id):
             reference_dict.validate()
@@ -213,13 +217,15 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
         reference_dict = self.feedback_message_reference
 
         reference_dict.thread_id = 10
-        with self.assertRaisesRegex(utils.ValidationError,
+        with self.assertRaisesRegex(
+            utils.ValidationError,
             'Expected thread ID to be a string, received: %s.'
                 % reference_dict.thread_id):
             reference_dict.validate()
 
-        reference_dict.thread_id = "invalid_thread_id"
-        with self.assertRaisesRegex(utils.ValidationError,
+        reference_dict.thread_id = 'invalid_thread_id'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
             'Thread ID did not match expected pattern'
                 ', received: \'%s\'' % reference_dict.thread_id):
             reference_dict.validate()
@@ -227,9 +233,9 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
     def test_invalid_message_id(self) -> None:
         reference_dict = self.feedback_message_reference
 
-        reference_dict.message_id = "id"
-        with self.assertRaisesRegex(utils.ValidationError,
+        reference_dict.message_id = 'id'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
             'Expected message ID to be an integer, received: %s.'
                 % reference_dict.message_id):
             reference_dict.validate()
-    
