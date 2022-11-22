@@ -29,11 +29,17 @@ import { MisconceptionUpdatedValues } from './question-misconception-editor.comp
 })
 export class TagMisconceptionModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() taggedSkillMisconceptionId: string;
-  misconceptionsBySkill: MisconceptionSkillMap;
-  tempSelectedMisconception: Misconception;
-  tempSelectedMisconceptionSkillId: string;
-  tempMisconceptionFeedbackIsUsed: boolean;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() taggedSkillMisconceptionId!: string;
+  misconceptionsBySkill!: MisconceptionSkillMap;
+  // Below temporary variables are used to store the values of the
+  // misconception, these can be null if the user has not selected any
+  // misconception.
+  tempSelectedMisconception!: Misconception | null;
+  tempSelectedMisconceptionSkillId!: string | null;
+  tempMisconceptionFeedbackIsUsed!: boolean;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

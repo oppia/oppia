@@ -28,14 +28,17 @@ import './oppia-visualization-enumerated-frequency-table.directive.css';
 })
 export class OppiaVisualizationEnumeratedFrequencyTableComponent
    implements OnInit {
-  @Input() data: AnswerStats[];
-  @Input() addressedInfoIsSupported: string[];
-  @Input() options: {
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() data!: AnswerStats[];
+  @Input() addressedInfoIsSupported!: string[];
+  @Input() options!: {
     title: string;
     column_headers: string;
   };
 
-  answerVisible: boolean[];
+  answerVisible!: boolean[];
 
   constructor() { }
 

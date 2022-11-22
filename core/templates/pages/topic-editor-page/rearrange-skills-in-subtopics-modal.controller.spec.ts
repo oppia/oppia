@@ -19,6 +19,7 @@
 import { EventEmitter } from '@angular/core';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
+import { Topic } from 'domain/topic/TopicObjectFactory';
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
@@ -29,7 +30,6 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
   var $uibModalInstance = null;
   var TopicEditorStateService = null;
   var TopicUpdateService;
-  var TopicObjectFactory;
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
 
@@ -38,12 +38,15 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
     TopicUpdateService = $injector.get('TopicUpdateService');
     $uibModalInstance = $injector.get('$uibModal');
     $scope = $rootScope.$new();
     var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
-    topic = TopicObjectFactory.createInterstitialTopic();
+    topic = new Topic(
+      'id', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+    );
     topic._subtopics = [subtopic];
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     ctrl = $controller('RearrangeSkillsInSubtopicsModalController', {
