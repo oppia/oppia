@@ -54,7 +54,7 @@ INJECTABLES_TO_IGNORE: Final = [
     # Route guards cannot be made injectables until migration is complete.
     'CanAccessSplashPageGuard',
 ]
-# pylint: enable=line-too-long, single-line-pragma
+# pylint: disable=line-too-long, single-line-pragma
 FILES_CONTAIN_UNKNOWN_TYPE: Final = [
     'core/templates/App.ts',
     'core/templates/app-events/event-bus.service.ts',
@@ -100,6 +100,7 @@ FILES_CONTAIN_UNKNOWN_TYPE: Final = [
     'core/templates/pages/exploration-editor-page/modal-templates/save-version-mismatch-modal.component.spec.ts',
     'core/templates/pages/exploration-editor-page/services/change-list.service.ts',
     'core/templates/pages/exploration-editor-page/services/exploration-data.service.spec.ts',
+    'core/templates/pages/exploration-editor-page/services/exploration-diff.service.spec.ts',
     'core/templates/pages/exploration-editor-page/services/exploration-property.service.ts',
     'core/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.spec.ts',
     'core/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.spec.ts',
@@ -107,6 +108,7 @@ FILES_CONTAIN_UNKNOWN_TYPE: Final = [
     'core/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.ts',
     'core/templates/pages/exploration-player-page/modals/display-hint-modal.component.spec.ts',
     'core/templates/pages/exploration-player-page/modals/display-solution-modal.component.spec.ts',
+    'core/templates/pages/exploration-player-page/modals/flag-exploration-modal.component.spec.ts',
     'core/templates/pages/exploration-player-page/modals/refresher-exploration-confirmation-modal.component.spec.ts',
     'core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts',
     'core/templates/pages/learner-dashboard-page/learner-dashboard-page.component.spec.ts',
@@ -122,6 +124,7 @@ FILES_CONTAIN_UNKNOWN_TYPE: Final = [
     'core/templates/pages/topic-editor-page/services/topic-editor-state.service.spec.ts',
     'core/templates/pages/topics-and-skills-dashboard-page/modals/unassign-skill-from-topics-modal.component.spec.ts',
     'core/templates/pages/topics-and-skills-dashboard-page/skills-list/skills-list.component.spec.ts',
+    'core/templates/pages/topics-and-skills-dashboard-page/topics-list/topics-list.component.spec.ts',
     'core/templates/services/UpgradedServices.ts',
     'core/templates/services/assets-backend-api.service.ts',
     'core/templates/services/audio-player.service.spec.ts',
@@ -157,6 +160,7 @@ FILES_CONTAIN_UNKNOWN_TYPE: Final = [
     'extensions/objects/templates/image-editor.component.spec.ts',
     'extensions/objects/templates/list-of-tabs-editor.component.ts',
     'extensions/objects/templates/list-of-unicode-string-editor.component.ts',
+    'extensions/objects/templates/math-expression-content-editor.component.spec.ts',
     'extensions/objects/templates/music-phrase-editor.component.ts',
     'extensions/objects/templates/number-with-units-editor.component.ts',
     'extensions/objects/templates/parameter-name-editor.component.spec.ts',
