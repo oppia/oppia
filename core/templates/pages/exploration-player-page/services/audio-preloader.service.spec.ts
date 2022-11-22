@@ -49,6 +49,7 @@ describe('Audio preloader service', () => {
     correctness_feedback_enabled: false,
     draft_change_list_id: 1,
     draft_changes: [],
+    auto_tts_enabled: false,
     version: 1,
     is_version_of_draft_valid: true,
     language_code: 'en',
@@ -248,6 +249,9 @@ describe('Audio preloader service', () => {
             },
             placeholder: {
               value: ''
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           solution: null,

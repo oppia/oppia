@@ -18,6 +18,7 @@
 import { Injectable } from '@angular/core';
 import { BlogPostData } from 'domain/blog/blog-post.model';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { ImagesData } from 'services/image-local-storage.service';
 
 export interface BlogPostChangeDict {
   'title'?: string;
@@ -26,10 +27,6 @@ export interface BlogPostChangeDict {
   'tags'?: string[];
 }
 
-interface ImageData {
-  filename: string;
-  imageBlob: Blob;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -42,7 +39,7 @@ export class BlogPostUpdateService {
     this.changeDict.title = title;
   }
 
-  setBlogPostThumbnail(blogPost: BlogPostData, image: ImageData[]): void {
+  setBlogPostThumbnail(blogPost: BlogPostData, image: ImagesData[]): void {
     let filename = image[0].filename;
     blogPost.thumbnailFilename = filename;
     this.changeDict.thumbnail_filename = filename;

@@ -84,7 +84,10 @@ describe('Exploration object factory', () => {
               unicode_str: ''
             }
           },
-          rows: { value: 1 }
+          rows: { value: 1 },
+          catchMisspellings: {
+            value: false
+          }
         },
         default_outcome: {
           dest: 'new state',
@@ -167,6 +170,7 @@ describe('Exploration object factory', () => {
       title: 'My Title',
       init_state_name: 'Introduction',
       language_code: 'en',
+      auto_tts_enabled: false,
       states: {
         'first state': firstState,
         'second state': secondState},
@@ -269,6 +273,9 @@ describe('Exploration object factory', () => {
         },
         rows: {
           value: 1
+        },
+        catchMisspellings: {
+          value: false
         }
       });
     expect(exploration.getInteractionCustomizationArgs('second state'))

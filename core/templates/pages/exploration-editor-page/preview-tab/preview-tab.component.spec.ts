@@ -41,7 +41,7 @@ import { RouterService } from '../services/router.service';
 
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance!: {
     manualParamChanges: null;
   };
 }
@@ -77,18 +77,22 @@ describe('Preview Tab Component', () => {
   let mockPlayerStateChangeEventEmitter = new EventEmitter();
   let numberAttemptsService: NumberAttemptsService;
 
-  let getUnsetParametersInfo;
+  let getUnsetParametersInfo: jasmine.Spy;
   let explorationId = 'exp1';
   let stateName = 'State1';
   let changeObjectName = 'change';
   let exploration = {
+    auto_tts_enabled: false,
+    correctness_feedback_enabled: true,
+    draft_changes: [],
+    is_version_of_draft_valid: false,
     init_state_name: stateName,
     param_changes: [],
     param_specs: {},
     states: {},
     title: 'Exploration Title',
     language_code: 'en',
-    correctness_feedback_enabled: true
+    draft_change_list_id: 0,
   };
   let parameters = [{
     paramName: 'paramName1',
@@ -184,9 +188,12 @@ describe('Preview Tab Component', () => {
       spyOn(explorationStatesService, 'init').and.stub();
       spyOn(explorationInitStateNameService, 'init').and.stub();
       spyOn(graphDataService, 'recompute').and.stub();
+      // This throws "Type 'null' is not assignable to type 'State'."
+      // We need to suppress this error because of the need to test validations.
+      // @ts-ignore
       spyOn(explorationStatesService, 'getState').and.returnValue(null);
       spyOn(component, 'getManualParamChanges').and.returnValue(
-        Promise.resolve(null));
+        Promise.resolve([]));
       spyOn(component, 'loadPreviewState').and.stub();
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: new MockNgbModalRef(),
@@ -213,9 +220,12 @@ describe('Preview Tab Component', () => {
       spyOn(explorationStatesService, 'init').and.stub();
       spyOn(explorationInitStateNameService, 'init').and.stub();
       spyOn(graphDataService, 'recompute').and.stub();
+      // This throws "Type 'null' is not assignable to type 'State'."
+      // We need to suppress this error because of the need to test validations.
+      // @ts-ignore
       spyOn(explorationStatesService, 'getState').and.returnValue(null);
       spyOn(component, 'getManualParamChanges').and.returnValue(
-        Promise.resolve(null));
+        Promise.resolve([]));
       spyOn(component, 'loadPreviewState').and.stub();
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: new MockNgbModalRef(),
@@ -252,7 +262,7 @@ describe('Preview Tab Component', () => {
       } as NgbModalRef);
 
       component.loadPreviewState('', '');
-      component.showSetParamsModal(null, () => {});
+      component.showSetParamsModal([], () => {});
       tick();
       tick();
       flush();
@@ -298,6 +308,10 @@ describe('Preview Tab Component', () => {
     spyOn(numberAttemptsService, 'reset').and.stub();
     spyOn(explorationEngineService, 'init').and.callFake(
       (value, value1, value2, value3, value4, callback) => {
+        // This throws "Type 'null' is not assignable to type 'State'."
+        // We need to suppress this error because of the need to test
+        // validations.
+        // @ts-ignore
         callback(null, null);
       });
 
