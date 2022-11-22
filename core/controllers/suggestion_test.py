@@ -1509,12 +1509,14 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'linked_skill_ids': ['skill_1'],
                 'inapplicable_skill_misconception_ids': ['skillid12345-1'],
                 'next_content_id_index': (
-                    content_id_generator.next_content_id_index)
+                    content_id_generator.next_content_id_index),
+                'id': None,
+                'version': 40
             },
             'skill_id': skill_id,
             'skill_difficulty': 0.3
         }
-        new_solution_dict = {
+        new_solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {

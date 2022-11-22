@@ -80,7 +80,7 @@ class FrontendBaseSuggestionDict(TypedDict):
     language_code: str
     last_updated: float
     edited_by_reviewer: bool
-    exploration_content_html: str
+    exploration_content_html: Union[str, List[str]]
 
 
 SuggestionsProviderHandlerUrlPathArgsSchemaDictType = Dict[
@@ -1003,6 +1003,7 @@ class UpdateQuestionSuggestionHandlerNormalizedPayloadDict(TypedDict):
 
     skill_difficulty: float
     question_state_data: state_domain.StateDict
+    next_content_id_index: int
 
 
 class UpdateQuestionSuggestionHandler(

@@ -3761,9 +3761,9 @@ class CheckpointsFeatureStatusHandlerTests(test_utils.GenericTestBase):
 class EntityTranslationHandlerTest(test_utils.GenericTestBase):
     """Unit test for the EntityTranslationHandler."""
 
-    def test_fetching_entity_translations(self):
+    def test_fetching_entity_translations(self) -> None:
         """Test giving feedback handler."""
-        translations_mapping = {
+        translations_mapping: Dict[str, feconf.TranslatedContentDict] = {
             'content_0': {
                 'content_value': 'Translated content',
                 'content_format': 'html',

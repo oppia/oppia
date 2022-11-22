@@ -185,7 +185,7 @@ class EditorTests(BaseEditorControllerTests):
         def _get_payload(
             new_state_name: str,
             version: Optional[int] = None
-        ) -> Dict[str, Union[str, List[Dict[str, str]], int]]:
+        ) -> Dict[str, Union[str, List[Dict[str, Union[str, int]]], int]]:
             """Gets the payload in the dict format."""
             result: Dict[
                 str, Union[
@@ -217,7 +217,8 @@ class EditorTests(BaseEditorControllerTests):
             return result
 
         def _put_and_expect_400_error(
-            payload: Dict[str, Union[str, List[Dict[str, str]], int]]
+            payload: Dict[
+                str, Union[str, List[Dict[str, Union[str, int]]], int]]
         ) -> Dict[str, str]:
             """Puts a request with no version number and hence, expects 400
             error.

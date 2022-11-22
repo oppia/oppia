@@ -675,7 +675,9 @@ class MachineTranslationStateTextsHandler(
         exp = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if exp is None:
             raise self.PageNotFoundException()
-        state_names_to_content_id_mapping = (
+        state_names_to_content_id_mapping: (
+            Dict[str, Dict[str, translation_domain.TranslatableContent]]
+        ) = (
             translation_services.get_translatable_text(
                 exp, target_language_code)
         )

@@ -464,7 +464,9 @@ class ExplorationHandler(
         self.render_json(self.values)
 
 
-class EntityTranslationHandler(base.BaseHandler):
+class EntityTranslationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The handler to fetch translations for a given entity in a given
     language.
     """
@@ -508,12 +510,18 @@ class EntityTranslationHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {}
     }
 
     @acl_decorators.open_access
-    def get(self, entity_type, entity_id, entity_version, language_code):
+    def get(
+        self,
+        entity_type: str,
+        entity_id: str,
+        entity_version: int,
+        language_code: str
+    ) -> None:
         entity_translation = translation_fetchers.get_entity_translation(
             feconf.TranslatableEntityType(entity_type), entity_id,
             entity_version, language_code)

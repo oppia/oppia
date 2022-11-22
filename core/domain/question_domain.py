@@ -221,6 +221,7 @@ class QuestionSuggestionChangeDict(TypedDict):
     version: int
     linked_skill_ids: List[str]
     inapplicable_skill_misconception_ids: List[str]
+    next_content_id_index: int
 
 
 class QuestionSuggestionChange(change_domain.BaseChange):
