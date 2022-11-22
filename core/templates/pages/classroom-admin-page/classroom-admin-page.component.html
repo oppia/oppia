@@ -37,12 +37,12 @@
 
         <div class="classroom-details"
              *ngIf="classroomDetailsIsShown && tempClassroomData.getClassroomId() === classroom.key">
-          <div *ngIf="classroomViewerMode"
-               (click)="openClassroomInEditorMode()"
-               class="e2e-test-edit-classroom-config-button">
-            <i class="material-icons oppia-edit-icon" title="Edit Classroom">
-              &#xE254;
-            </i>
+          <div *ngIf="classroomViewerMode">
+              <i class="material-icons oppia-edit-icon e2e-test-edit-classroom-config-button"
+                 title="Edit Classroom"
+                 (click)="openClassroomInEditorMode()">
+                &#xE254;
+              </i>
           </div>
 
           <div class="row oppia-description-text-container">
