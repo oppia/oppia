@@ -437,6 +437,7 @@ import { ContributionAndReviewStatsBackendApiService } from 'pages/contributor-d
 import { ContributionAndReviewStatsService } from 'pages/contributor-dashboard-page/services/contribution-and-review-stats.service';
 import { EntityCreationService } from 'pages/topic-editor-page/services/entity-creation.service';
 import { ClassroomAdminDataService } from 'pages/classroom-admin-page/services/classroom-admin-data.service';
+import { FixCommitCommandBackendApiService } from './fix-commit-command-backend-api.service';
 import { VoiceoverRecordingService } from 'pages/exploration-editor-page/translation-tab/services/voiceover-recording.service';
 import { ConceptCardManagerService } from 'pages/exploration-player-page/services/concept-card-manager.service';
 import { DiagnosticTestPlayerEngineService } from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
@@ -915,5 +916,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['CompareVersionsService', CompareVersionsService],
   ['EntityCreationService', EntityCreationService],
   ['ClassroomAdminDataService', ClassroomAdminDataService],
+  ['FixCommitCommandBackendApiService', FixCommitCommandBackendApiService],
   ['VoiceoverRecordingService', VoiceoverRecordingService]
 ];
