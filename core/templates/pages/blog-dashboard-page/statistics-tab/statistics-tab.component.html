@@ -4,7 +4,9 @@
       <mat-list-option class="blog-post-list-option blog-post-title"
                        (click)="authorAggregatedStatsShown = true; showViewsChartStats()"
                        selected="authorAggregatedStatsShown">
-      {{ 'I18N_BLOG_DASHBOARD_STATISTICS_ALL_BLOG_POSTS_STATS_BUTTON' | translate }}
+      <span class="blog-post-title">
+        {{ 'I18N_BLOG_DASHBOARD_STATISTICS_ALL_BLOG_POSTS_STATS_BUTTON' | translate }}
+      </span>
       </mat-list-option>
       <mat-list-option *ngFor="let blogPostSummary of publishedBlogPostList"
                        [value]="blogPostSummary"
@@ -175,6 +177,7 @@
   .mat-list-item .blog-post-published-on-date {
     color: #fff;
     font-size: 16px;
+    line-height: 18px;
   }
 
   .time-period-button-row {
@@ -288,9 +291,22 @@
   .mat-list-single-selected-option:focus {
     background: #e8e7e3;
     border-right: unset;
+  }
+
+  .mat-list-single-selected-option span.blog-post-title,
+  .mat-list-single-selected-option:hover span.blog-post-title,
+  .mat-list-single-selected-option:focus span.blog-post-title {
     color: #00645c;
     font-size: 22px;
     font-weight: 400;
+  }
+
+  .mat-list-single-selected-option span.blog-post-published-on-date,
+  .mat-list-single-selected-option:hover span.blog-post-published-on-date,
+  .mat-list-single-selected-option:focus span.blog-post-published-on-date {
+    color: #00645c;
+    font-size: 16px;
+    line-height: 18px;
   }
 
   .blog-post-list-option {
