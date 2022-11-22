@@ -124,15 +124,14 @@ describe('Diagnostic test page functionality', function() {
     await waitFor.pageToFullyLoad();
     await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
     await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
-
-    await classroomPage.get('math');
-    await classroomPage.launchDiagnosticTestPage();
-    await waitFor.pageToFullyLoad();
   });
 
   it(
     'should be able to submit correct answer and get no topic recommendation',
     async function() {
+      await classroomPage.get('math');
+      await classroomPage.launchDiagnosticTestPage();
+      await waitFor.pageToFullyLoad();
       await diagnosticTestPage.startDiagnosticTest();
       await explorationPlayerPage.submitAnswer('TextInput', 'correct');
       await diagnosticTestPage.expectNumberOfRecommendedTopicsToBe(0);
@@ -141,6 +140,9 @@ describe('Diagnostic test page functionality', function() {
   it(
     'should be able to skip questions and get topic recommendation',
     async function() {
+      await classroomPage.get('math');
+      await classroomPage.launchDiagnosticTestPage();
+      await waitFor.pageToFullyLoad();
       await diagnosticTestPage.startDiagnosticTest();
       await explorationPlayerPage.skipQuestion();
       await explorationPlayerPage.skipQuestion();
@@ -150,6 +152,9 @@ describe('Diagnostic test page functionality', function() {
   it(
     'should be able to submit correct answer after incorrect attempt',
     async function() {
+      await classroomPage.get('math');
+      await classroomPage.launchDiagnosticTestPage();
+      await waitFor.pageToFullyLoad();
       await diagnosticTestPage.startDiagnosticTest();
       // Skipping question functionality is similar to incorrect attempt.
       await explorationPlayerPage.skipQuestion();
