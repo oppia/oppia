@@ -127,7 +127,7 @@ class ChangeDomainTests(test_utils.GenericTestBase):
         change_object.__getattr__('cmd'),
         feconf.CMD_DELETE_COMMIT)
 
-    def test_getattr_returns_attribute_error(self) -> None: # no assert?
+    def test_getattr_returns_attribute_error(self) -> None:
         with self.assertRaisesRegex(AttributeError, (
             'invalid_name')):
             change_object = change_domain.BaseChange({
