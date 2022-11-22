@@ -54,6 +54,10 @@ import { ExplorationMetadata } from 'domain/exploration/ExplorationMetadataObjec
 import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
 import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 describe('Settings Tab Component', () => {
   let component: SettingsTabComponent;
@@ -79,9 +83,9 @@ describe('Settings Tab Component', () => {
   let userService: UserService;
   let windowRef: WindowRef;
   let settingTabBackendApiService: SettingTabBackendApiService;
-  let ngbModal: NgbModal = null;
-  let eeabas: ExplorationEditsAllowedBackendApiService = null;
-  let editabilityService: EditabilityService = null;
+  let ngbModal: NgbModal;
+  let eeabas: ExplorationEditsAllowedBackendApiService;
+  let editabilityService: EditabilityService;
   let explorationId = 'exp1';
   let userPermissions = {
     canDelete: true,
@@ -474,8 +478,11 @@ describe('Settings Tab Component', () => {
   it('should not save exploration init state name if it\'s invalid',
     () => {
       explorationInitStateNameService.init('First State');
-      spyOn(explorationStatesService, 'getState').and.returnValue(
-        null);
+      // This throws "Argument of type 'null' is not assignable to
+      // parameter of type 'state'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+      spyOn(explorationStatesService, 'getState').and.returnValue(null);
       spyOn(alertsService, 'addWarning');
 
       component.saveExplorationInitStateName();
@@ -488,8 +495,9 @@ describe('Settings Tab Component', () => {
       explorationInitStateNameService.init('Introduction');
       spyOn(explorationStatesService, 'getState').and.returnValue(
         new State(
-          null, null, null, null, null,
-          null, null, null, null, null, null));
+          null, null, null, {} as SubtitledHtml, {} as Interaction,
+          [], {} as RecordedVoiceovers, false, false,
+          {} as WrittenTranslations, 0));
       spyOn(explorationInitStateNameService, 'saveDisplayedValue');
 
       component.saveExplorationInitStateName();
@@ -1080,7 +1088,7 @@ describe('Settings Tab Component', () => {
 
   it('should disable save button when adding another role to itself',
     () => {
-      component.newMemberUsername = component.loggedInUser;
+      component.newMemberUsername = component.loggedInUser as string;
       component.rolesSaveButtonEnabled = true;
       explorationTitleService.init('Exploration title');
       component.saveExplorationTitle();
