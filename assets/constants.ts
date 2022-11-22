@@ -5965,8 +5965,9 @@ export default {
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
   // This represents the maximum number of characters in the URL fragment for
-  // the blog post.
-  "MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT": 65,
+  // the blog post. It is generated using blog post title which can be 65
+  // characters long and the blog post id which is 12 characters long.
+  "MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT": 77,
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,
@@ -6062,7 +6063,7 @@ export default {
 
   // A regular expression for allowed characters in Title field for Blog Post.
   // eslint-disable-next-line max-len
-  "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+([-:][ a-zA-Z0-9]+)*$",
+  "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9(&!,'/)][a-zA-Z0-9(&!,'/) ]+([-:][ a-zA-Z0-9(&!,'/)]+)*$",
 
   // A regular expression for allowed characters in URL fragment for Blog Post.
   "VALID_URL_BLOG_FRAGMENT_REGEX": "^[a-z0-9]+(-[a-z0-9]+)*$",

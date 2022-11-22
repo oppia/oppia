@@ -175,7 +175,7 @@ export class BlogDashboardPageService {
     let day = (
       new Date(
         now.getFullYear(),
-        1 + monthOffset,
+        monthOffset,
         now.getDate()
       )
     );

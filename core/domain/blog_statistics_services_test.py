@@ -358,7 +358,9 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
             blog_statistics_services.generate_stats_by_date_dict(2, 2022)
         )
 
-    def test_create_aggregated_stats_model_for_newly_published_blog_post(self) -> None:
+    def test_create_aggregated_stats_model_for_newly_published_blog_post(
+        self
+    ) -> None:
         blog_post_id = 'sample_id'
         self.assertIsNone(
             blog_stats_models.BlogPostViewsAggregatedStatsModel.get(

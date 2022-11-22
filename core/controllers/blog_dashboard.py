@@ -388,26 +388,24 @@ class BlogDashboardBlogPostStatisticsHandler(
     def get(self, blog_post_id: str, chart_type: str) -> None:
         """Populates the data for generating statistics plot."""
 
-        stats: Union[
-            blog_statistics_domain.BlogPostViewsAggregatedStats,
-            blog_statistics_domain.BlogPostReadsAggregatedStats,
-            blog_statistics_domain.BlogPostReadingTimeDict
-            ]
-
         if chart_type == 'views':
+            stats = blog_statistics_domain.BlogPostViewsAggregatedStats
             stats = blog_statistics_services.get_blog_post_views_stats_by_id(
                 blog_post_id
             )
         elif chart_type == 'reads':
+            stats: blog_statistics_domain.BlogPostReadsAggregatedStats
             stats = blog_statistics_services.get_blog_post_reads_stats_by_id(
                 blog_post_id
             )
         else:
+            stats: blog_statistics_domain.BlogPostReadingTime
             stats = (
                 blog_statistics_services.get_blog_post_reading_time_stats_by_id(
                     blog_post_id
                 )
             )
+
         stats_dict = stats.to_frontend_dict()
 
         self.values.update({
@@ -444,24 +442,23 @@ class BlogDashboardAuthorBlogPostsStatisticsHandler(
     def get(self, chart_type: str) -> None:
         """Populates the data for generating author statistics plot."""
         author_id = self.user_id
-        stats: Union[
-            blog_statistics_domain.AuthorBlogPostViewsAggregatedStats,
-            blog_statistics_domain.AuthorBlogPostReadsAggregatedStats,
-            blog_statistics_domain.AuthorBlogPostReadingTimeDict
-            ]
+        assert author_id is not None
         if chart_type == 'views':
+            stats: blog_statistics_domain.AuthorBlogPostViewsAggregatedStats
             stats = (
                 blog_statistics_services.get_author_blog_post_views_stats_by_id(
                     author_id
                 )
             )
         elif chart_type == 'reads':
+            stats: blog_statistics_domain.AuthorBlogPostReadsAggregatedStats
             stats = (
                 blog_statistics_services.get_author_blog_post_reads_stats_by_id(
                     author_id
                 )
             )
         else:
+            stats: blog_statistics_domain.AuthorBlogPostsReadingTime
             stats = (
                 blog_statistics_services.get_author_blog_posts_reading_time_stats_by_id( # pylint: disable=line-too-long
                     author_id

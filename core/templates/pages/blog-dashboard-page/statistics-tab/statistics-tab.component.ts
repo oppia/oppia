@@ -64,6 +64,7 @@ export class BlogStatisticsTabComponent implements OnInit {
   margin = { top: 20, right: 20, bottom: 50, left: 60 };
   authorAggregatedStatsShown!: boolean;
   selectedChartType!: string;
+  selectedTimePeriod!: string;
   viewsChartShown: boolean = true;
   readsChartShown: boolean = false;
   readingTimeChartShown: boolean = false;
@@ -120,7 +121,7 @@ export class BlogStatisticsTabComponent implements OnInit {
   showAuthorAggregatedViewsStats(): void {
     this.authorAggregatedStatsShown = true;
     this.viewsChartShown = true;
-    this.loadingChartSpinnerShown = true;
+    this.showLoadingChartSpinner();
     if (this.authorAggregatedStats.hasOwnProperty('views')) {
       this._dataForActiveChart = this.authorAggregatedStats.views;
       this.showHourlyStats();
@@ -129,6 +130,7 @@ export class BlogStatisticsTabComponent implements OnInit {
         (viewsStats: Stats) => {
           this._dataForActiveChart = viewsStats;
           this.authorAggregatedStats.views = viewsStats;
+          console.log(this.authorAggregatedStats);
           this.showHourlyStats();
         }, (error) => {
           this.alertsService.addWarning(error);
@@ -139,7 +141,7 @@ export class BlogStatisticsTabComponent implements OnInit {
 
   showAuthorAggregatedReadsStats(): void {
     this.readsChartShown = true;
-    this.loadingChartSpinnerShown = true;
+    this.showLoadingChartSpinner();
     if (this.authorAggregatedStats.hasOwnProperty('reads')) {
       this._dataForActiveChart = this.authorAggregatedStats.reads;
       this.showHourlyStats();
@@ -158,7 +160,7 @@ export class BlogStatisticsTabComponent implements OnInit {
 
   showAuthorAggregatedReadingTimeStats(): void {
     this.readingTimeChartShown = true;
-    this.loadingChartSpinnerShown = true;
+    this.showLoadingChartSpinner();
     if (this.authorAggregatedStats.hasOwnProperty('readingTime')) {
       this._dataForActiveChart = this.authorAggregatedStats.readingTime;
       this.plotReadingTimeStatsChart();
@@ -178,7 +180,7 @@ export class BlogStatisticsTabComponent implements OnInit {
 
   showblogPostViewsChart(): void {
     this.viewsChartShown = true;
-    this.loadingChartSpinnerShown = true;
+    this.showLoadingChartSpinner();
     if (this.activeStatsBlogPostId in this.loadedBlogPostStats) {
       if (
         this.loadedBlogPostStats[this.activeStatsBlogPostId].hasOwnProperty(
@@ -212,7 +214,7 @@ export class BlogStatisticsTabComponent implements OnInit {
 
   showblogPostReadsChart(): void {
     this.readsChartShown = true;
-    this.loadingChartSpinnerShown = true;
+    this.showLoadingChartSpinner();
     if (this.activeStatsBlogPostId in this.loadedBlogPostStats) {
       if (
         this.loadedBlogPostStats[this.activeStatsBlogPostId].hasOwnProperty(
@@ -247,7 +249,7 @@ export class BlogStatisticsTabComponent implements OnInit {
 
   showblogPostReadingTimeChart(): void {
     this.readingTimeChartShown = true;
-    this.loadingChartSpinnerShown = true;
+    this.showLoadingChartSpinner();
     if (this.activeStatsBlogPostId in this.loadedBlogPostStats) {
       if (
         this.loadedBlogPostStats[this.activeStatsBlogPostId].hasOwnProperty(
@@ -287,7 +289,7 @@ export class BlogStatisticsTabComponent implements OnInit {
   }
 
   showHourlyStats(): void {
-    this.loadingChartSpinnerShown = true;
+    this.showLoadingChartSpinner();
     let data = (this._dataForActiveChart as Stats).hourlyStats;
     let statsKeys = Object.keys(data);
     let hourOffset = statsKeys.length - 1;
@@ -302,7 +304,7 @@ export class BlogStatisticsTabComponent implements OnInit {
   }
 
   showMonthlyStats(): void {
-    this.loadingChartSpinnerShown = true;
+    this.showLoadingChartSpinner();
     let data = (this._dataForActiveChart as Stats).monthlyStats;
     let statsKeys = Object.keys(data);
     let dayOffset = 0;
@@ -317,10 +319,10 @@ export class BlogStatisticsTabComponent implements OnInit {
   }
 
   showWeeklyStats(): void {
-    this.loadingChartSpinnerShown = true;
+    this.showLoadingChartSpinner();
     let data = (this._dataForActiveChart as Stats).weeklyStats;
     let statsKeys = Object.keys(data);
-    let dayOffset = statsKeys.length;
+    let dayOffset = statsKeys.length - 1;
     this.xAxisLabels = [];
     statsKeys.map(() => {
       this.xAxisLabels.push(
@@ -332,7 +334,7 @@ export class BlogStatisticsTabComponent implements OnInit {
   }
 
   showYearlyStats(): void {
-    this.loadingChartSpinnerShown = true;
+    this.showLoadingChartSpinner();
     let data = (this._dataForActiveChart as Stats).yearlyStats;
     let statsKeys = Object.keys(data);
     let monthOffset = 0;
@@ -347,13 +349,15 @@ export class BlogStatisticsTabComponent implements OnInit {
   }
 
   showAllStats(): void {
-    this.loadingChartSpinnerShown = true;
+    this.showLoadingChartSpinner();
+    this.selectedTimePeriod = 'all';
+    let data = (this._dataForActiveChart as Stats).yearlyStats;
   }
 
   plotReadingTimeStatsChart(): void {
     let data = this._dataForActiveChart as ReadingTimeStats;
-    this.xAxisLabels = Object(
-      BlogDashboardPageConstants.READING_TIME_BUCKET_KEYS_TO_DISPLAY).values;
+    this.xAxisLabels = Object.values(
+      BlogDashboardPageConstants.READING_TIME_BUCKET_KEYS_TO_DISPLAY);
     this.plotStatsGraph(data);
   }
 
@@ -385,14 +389,20 @@ export class BlogStatisticsTabComponent implements OnInit {
   }
 
   plotStatsGraph(data: {[statsKey: string]: number} | ReadingTimeStats): void {
-    const element = this.chartContainer.nativeElement;
-    d3.select(element).select('svg').selectAll('*').remove();
-    d3.select(element).select('svg').remove();
     setTimeout(() => {
       this.loadingChartSpinnerShown = false;
       this._createSvg();
       this._drawBars(data);
     });
+  }
+
+  showLoadingChartSpinner(): void {
+    if (this.chartContainer) {
+      const element = this.chartContainer.nativeElement;
+      d3.select(element).select('svg').selectAll('*').remove();
+      d3.select(element).select('svg').remove();
+    }
+    this.loadingChartSpinnerShown = true;
   }
 
   private _createSvg(): void {

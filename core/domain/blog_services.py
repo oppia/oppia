@@ -416,19 +416,22 @@ def get_published_blog_post_summaries_by_user_id(
         list(BlogPostSummary). The summary objects associated with the
         blog posts assigned to given user.
     """
-    blog_rights_models = (
-        blog_models.BlogPostRightsModel.get_published_models_by_user(
-            user_id, offset, max_limit
+    blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
+        blog_models.BlogPostSummaryModel.query(
+            blog_models.BlogPostSummaryModel.author_id == user_id
+        ).filter(
+            blog_models.BlogPostSummaryModel.published_on != None
+        ).order(
+            -blog_models.BlogPostSummaryModel.published_on
+        ).fetch(
+            max_limit, offset=offset
         )
     )
-    if not blog_rights_models:
+    if not blog_post_summary_models:
         return []
-    blog_post_ids = [model.id for model in blog_rights_models]
-    blog_summary_models = (
-        blog_models.BlogPostSummaryModel.get_multi(blog_post_ids))
     blog_post_summaries = [
         get_blog_post_summary_from_model(model)
-        for model in blog_summary_models if model is not None]
+        for model in blog_post_summary_models if model is not None]
     return blog_post_summaries
 
 
@@ -647,8 +650,11 @@ def generate_url_fragment(title: str, blog_post_id: str) -> str:
     Returns:
         str. The url fragment of the blog post.
     """
-    lower_title = title.lower().replace(':', '')
-    hyphenated_title = lower_title.replace('  ', ' ').replace(' ', '-')
+    lower_title = title.lower()
+    # Removing special characters from url fragment.
+    simple_title = re.sub(r'[^a-zA-Z0-9 ]','', lower_title)
+    hyphenated_title = (
+        simple_title.replace('-', ' ').replace('  ', ' ').replace(' ', '-'))
     lower_id = blog_post_id.lower()
     return hyphenated_title + '-' + lower_id
 
@@ -720,9 +726,9 @@ def apply_change_dict(
     blog_post = get_blog_post_by_id(blog_post_id, strict=True)
 
     if 'title' in change_dict:
-        blog_post.update_title(change_dict['title'])
+        blog_post.update_title(change_dict['title'].strip())
         url_fragment = generate_url_fragment(
-            change_dict['title'], blog_post_id)
+            change_dict['title'].strip(), blog_post_id)
         blog_post.update_url_fragment(url_fragment)
     if 'thumbnail_filename' in change_dict:
         blog_post.update_thumbnail_filename(change_dict['thumbnail_filename'])
@@ -819,20 +825,17 @@ def get_published_blog_post_summaries(
         max_limit = size
     else:
         max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
-    blog_post_rights_models: Sequence[blog_models.BlogPostRightsModel] = (
-        blog_models.BlogPostRightsModel.query(
-            blog_models.BlogPostRightsModel.blog_post_is_published == True  # pylint: disable=singleton-comparison
+    blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
+        blog_models.BlogPostSummaryModel.query(
+            blog_models.BlogPostSummaryModel.published_on != None
         ).order(
-            -blog_models.BlogPostRightsModel.last_updated
+            -blog_models.BlogPostSummaryModel.published_on
         ).fetch(
             max_limit, offset=offset
         )
     )
-    if len(blog_post_rights_models) == 0:
+    if len(blog_post_summary_models) == 0:
         return []
-    blog_post_ids = [model.id for model in blog_post_rights_models]
-    blog_post_summary_models = (
-        blog_models.BlogPostSummaryModel.get_multi(blog_post_ids))
     blog_post_summaries = []
     blog_post_summaries = [
         get_blog_post_summary_from_model(model)

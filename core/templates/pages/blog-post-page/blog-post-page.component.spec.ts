@@ -238,8 +238,6 @@ describe('Blog home page component', () => {
     expect(
       blogHomePageBackendApiService.recordBlogPostViewedEventAsync
     ).toHaveBeenCalledWith('sample-post-url');
-    expect(component.hiddenPropertyString).toEqual('hidden');
-    expect(component.visibilityChangeEvent).toEqual('visibilitychange');
   });
 
   it('should fire blog post exited event after 45 minutes', fakeAsync(() => {
@@ -273,7 +271,6 @@ describe('Blog home page component', () => {
 
   it('should handle changing of browser tabs by user while recording active' +
   ' time user stayed on blog post.', () => {
-    component.hiddenPropertyString = 'hidden';
     let baseTime = new Date();
     baseTime.setMinutes(0);
     component.timeUserStartedViewingPost = baseTime.getTime();

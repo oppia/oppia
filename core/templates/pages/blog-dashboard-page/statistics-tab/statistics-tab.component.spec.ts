@@ -18,8 +18,6 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
-import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
-import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { BlogPostViewsStats,
   BlogPostReadsStats,
   Stats,
@@ -27,7 +25,6 @@ import { BlogPostViewsStats,
   BlogPostReadingTimeStats,
   BlogDashboardBackendApiService
 } from 'domain/blog/blog-dashboard-backend-api.service';
-import * as d3 from 'd3';
 import { MaterialModule } from 'modules/material.module';
 import { BlogDashboardPageConstants } from '../blog-dashboard-page.constants';
 import { BlogDashboardPageService } from '../services/blog-dashboard-page.service';
@@ -182,7 +179,16 @@ describe('Blog Dashboard Statistics Component', () => {
     blogDashboardBackendApiService = TestBed.inject(
       BlogDashboardBackendApiService);
     alertsService = TestBed.inject(AlertsService);
-    component.chartContainer = new ElementRef(document.createElement('div'));
+    let svgContainer = document.createElement('div');
+    svgContainer.setAttribute('id', 'barStats');
+    svgContainer.appendChild(document.createElement('svg'));
+    component.chartContainer = new ElementRef(
+      document.createElement('div').appendChild(svgContainer));
+    let baseTime = new Date();
+    baseTime.setHours(5);
+    baseTime.setDate(20);
+    baseTime.setMonth(10);
+    jasmine.clock().mockDate(baseTime);
   });
 
   it('should initialize', fakeAsync(() => {
@@ -625,5 +631,135 @@ describe('Blog Dashboard Statistics Component', () => {
       expect(component.loadedBlogPostStats.sample_id.readingTime).toEqual(
         readingTimeStatsObj);
     }));
-;});
+
+  it('should show and plot hourly stats', fakeAsync(() => {
+    component.loadingChartSpinnerShown = false;
+    component.activeStatsBlogPostId = 'sample_id';
+    component.loadedBlogPostStats.sample_id = {};
+    component.loadedBlogPostStats.sample_id.reads = statsObject;
+    component.viewsChartShown = false;
+    spyOn(blogDashboardBackendApiService, 'fetchBlogPostReadsStatsAsync');
+    expect(component.chartContainer.nativeElement.hasChildNodes()).toBeTrue();
+    expect((
+      component.chartContainer.nativeElement.childNodes[0].nodeName
+    ).toLowerCase()).toEqual('svg');
+
+    component.showblogPostReadsChart();
+
+    expect(component.chartContainer.nativeElement.hasChildNodes()).toBeFalse();
+    expect(component.loadingChartSpinnerShown).toBeTrue();
+
+    tick();
+
+    expect(component.loadingChartSpinnerShown).toBeFalse();
+    expect(component.chartContainer.nativeElement.hasChildNodes()).toBeTrue();
+    expect((
+      component.chartContainer.nativeElement.childNodes[0].nodeName
+        .toLowerCase()).toLowerCase()
+    ).toEqual('svg');
+    expect(blogDashboardBackendApiService.fetchBlogPostReadsStatsAsync)
+      .not.toHaveBeenCalled();
+    expect(component.xAxisLabels).toEqual(['2h', '3h', '4h', '5h']);
+  }));
+
+  it('should show and plot weekly stats', fakeAsync(() => {
+    component.loadingChartSpinnerShown = false;
+    component.activeStatsBlogPostId = 'sample_id';
+    component.loadedBlogPostStats.sample_id = {};
+    component.loadedBlogPostStats.sample_id.views = statsObject;
+    // Changing value of all stats to less than 10 to calculate  yAxisMaxValue
+    //  for cases with less than 10 as max value for any statistic key.
+    component.loadedBlogPostStats.sample_id.views.weeklyStats = {
+      '01': 1,
+      '02': 2,
+      '03': 4,
+      '04': 1,
+      '06': 3,
+      '07': 1,
+      '08': 2
+    };
+    component.viewsChartShown = true;
+    spyOn(blogDashboardBackendApiService, 'fetchBlogPostViewsStatsAsync');
+    expect(component.chartContainer.nativeElement.hasChildNodes()).toBeTrue();
+    expect((
+      component.chartContainer.nativeElement.childNodes[0].nodeName
+    ).toLowerCase()).toEqual('svg');
+
+    component.showblogPostViewsChart();
+    component.showWeeklyStats();
+
+    expect(component.chartContainer.nativeElement.hasChildNodes()).toBeFalse();
+    expect(component.loadingChartSpinnerShown).toBeTrue();
+
+    tick();
+
+    expect(component.loadingChartSpinnerShown).toBeFalse();
+    expect(component.chartContainer.nativeElement.hasChildNodes()).toBeTrue();
+    expect((
+      component.chartContainer.nativeElement.childNodes[0].nodeName
+        .toLowerCase()).toLowerCase()
+    ).toEqual('svg');
+    expect(blogDashboardBackendApiService.fetchBlogPostViewsStatsAsync)
+      .not.toHaveBeenCalled();
+    expect(component.xAxisLabels).toEqual(
+      ['13-Nov', '14-Nov', '15-Nov', '16-Nov', '17-Nov', '18-Nov', '19-Nov']
+    );
+  }));
+
+  it('should show and plot yearly stats', () => {
+    spyOn(component, 'plotStatsGraph');
+    component.loadingChartSpinnerShown = false;
+    component.activeStatsBlogPostId = 'sample_id';
+    component.loadedBlogPostStats.sample_id = {};
+    component.loadedBlogPostStats.sample_id.views = statsObject;
+    component.viewsChartShown = true;
+
+    component.showblogPostViewsChart();
+    component.showYearlyStats();
+
+    expect(component.loadingChartSpinnerShown).toBeTrue();
+    expect(component.xAxisLabels).toEqual(
+      [
+        'Feb-22', 'Mar-22', 'Apr-22', 'May-22', 'Jun-22', 'Jul-22', 'Aug-22',
+        'Sep-22', 'Oct-22', 'Nov-22', 'Dec-22'
+      ]
+    );
+    expect(component.plotStatsGraph).toHaveBeenCalled();
+  });
+
+  it('should show and plot monthly stats', () => {
+    spyOn(component, 'plotStatsGraph');
+    component.loadingChartSpinnerShown = false;
+    component.activeStatsBlogPostId = 'sample_id';
+    component.loadedBlogPostStats.sample_id = {};
+    component.loadedBlogPostStats.sample_id.views = statsObject;
+    component.viewsChartShown = true;
+
+    component.showblogPostViewsChart();
+    component.showMonthlyStats();
+
+    expect(component.loadingChartSpinnerShown).toBeTrue();
+    expect(component.xAxisLabels).toEqual(
+      ['1', '2', '3', '4', '5', '6', '7']);
+    expect(component.plotStatsGraph).toHaveBeenCalled();
+  });
+
+  it('should show and plot reading time stats', () => {
+    component.loadingChartSpinnerShown = false;
+    component.authorAggregatedStatsShown = false;
+    component.activeStatsBlogPostId = 'sample_id';
+    component.loadedBlogPostStats.sample_id = {};
+    component.loadedBlogPostStats.sample_id.readingTime = readingTimeStatsObj;
+    component.readingTimeChartShown = false;
+    spyOn(component, 'plotStatsGraph');
+
+    component.showblogPostReadingTimeChart();
+
+    expect(component.loadingChartSpinnerShown).toBeTrue();
+    expect(component.readingTimeChartShown).toBeTrue();
+    expect(component.xAxisLabels).toEqual(Object(
+      BlogDashboardPageConstants.READING_TIME_BUCKET_KEYS_TO_DISPLAY).values);
+    expect(component.plotStatsGraph).toHaveBeenCalled();
+  });
+});
 

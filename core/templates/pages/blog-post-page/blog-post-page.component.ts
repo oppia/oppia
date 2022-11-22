@@ -67,7 +67,17 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
     private convertToPlainTextPipe: ConvertToPlainTextPipe,
     private windowRef: WindowRef,
     private blogPostPageService: BlogPostPageService,
-  ) {}
+  ) {
+    this.startListening();
+  }
+
+  private startListening(): void {
+    window.addEventListener('beforeunload', this.ngOnDestroy.bind(this));
+  }
+
+  private stopListening(): void {
+    window.removeEventListener('beforeunload', this.ngOnDestroy.bind(this));
+  }
 
   ngOnInit(): void {
     this.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST = (
@@ -87,12 +97,8 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
     this.blogHomePageBackendApiService.recordBlogPostViewedEventAsync(
       this.blogPostUrlFragment
     );
-    if (typeof document.hidden !== 'undefined') {
-      this.hiddenPropertyString = 'hidden';
-      this.visibilityChangeEvent = 'visibilitychange';
-    }
     document.addEventListener(
-      this.visibilityChangeEvent, this.handleVisibilityChange, false
+      'visibilitychange', this.handleVisibilityChange, false
     );
     this.timeUserStartedViewingPost = new Date().getTime();
     // If user stays on the blog post for more than 45 minutes or
@@ -108,18 +114,19 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    let timeUserExitedFromPost: number = new Date().getTime();
     if (!this.blogPostExitedEventFired) {
       this.recordBlogPostExitedEvent();
     }
-    this.activeTimeUserStayedOnPostInMinutes += (
-      (timeUserExitedFromPost - this.timeUserStartedViewingPost) / 60000);
     if (this.isBlogPostRead() && !this.blogPostReadEventFired) {
       this.recordBlogPostReadEvent();
     }
+    this.stopListening();
   }
 
   recordBlogPostExitedEvent(): void {
+    let timeUserExitedFromPost: number = new Date().getTime();
+    this.activeTimeUserStayedOnPostInMinutes += (
+      (timeUserExitedFromPost - this.timeUserStartedViewingPost) / 60000);
     this.blogHomePageBackendApiService.recordBlogPostExitedEventAsync(
       this.blogPostUrlFragment, this.activeTimeUserStayedOnPostInMinutes
     );
@@ -166,12 +173,26 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
     return this.windowDimensionsService.getWidth() <= 900;
   }
 
+  isBlogPostRead(): boolean {
+    // If a user actively stays on a blog post for more than 50% of the
+    // calculated reading time of the blog post, we consider blogpost to be
+    // read by the user.
+    return (
+      (
+        this.activeTimeUserStayedOnPostInMinutes
+      ) > (
+        this.calculateEstimatedReadingTimeInMinutes() * 0.5
+      )
+    );
+  }
+
   handleVisibilityChange(): void {
-    if (document[this.hiddenPropertyString]) {
+    if (document.hidden) {
       let timeUserMovedAwayFromPost: number = new Date().getTime();
       this.activeTimeUserStayedOnPostInMinutes += (
         (timeUserMovedAwayFromPost - this.timeUserStartedViewingPost) / 60000);
-      if (this.isBlogPostRead() && !this.blogPostReadEventFired) {
+      let blogPostIsRead = this.isBlogPostRead();
+      if (blogPostIsRead && !this.blogPostReadEventFired) {
         this.recordBlogPostReadEvent();
       }
     } else {
@@ -185,19 +206,6 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
         this.blogPost.content).split(' ').length
     );
     return (numOfWordsInBlogPostContent / this.NUM_WORDS_READ_PER_MIN);
-  }
-
-  isBlogPostRead(): boolean {
-    // If a user actively stays on a blog post for more than 50% of the
-    // calculated reading time of the blog post, we consider blogpost to be
-    // read by the user.
-    return (
-      (
-        this.activeTimeUserStayedOnPostInMinutes
-      ) > (
-        this.calculateEstimatedReadingTimeInMinutes() * 0.5
-      )
-    );
   }
 
   navigateToAuthorProfilePage(): void {

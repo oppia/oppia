@@ -79,7 +79,7 @@
       </div>
       <div #barStats class="blog-stats ml-auto mr-auto mb-2">
         <div class="bar-chart-loading-spinner mx-auto" *ngIf="loadingChartSpinnerShown">
-          <mat-spinner class="mx-auto"></mat-spinner>
+          <mat-spinner class="mx-auto my-auto"></mat-spinner>
         </div>
       </div>
       <mat-divider class="mt-3 position-relative" *ngIf="!readingTimeChartShown"></mat-divider>
@@ -107,10 +107,10 @@
   .mat-list-item .blog-post-title {
     color: #fff;
     display: block;
-    overflow: hidden;
     font-size: 22px;
     font-weight: 400;
     text-overflow: ellipsis;
+    overflow: hidden;
     white-space: nowrap;
   }
 
