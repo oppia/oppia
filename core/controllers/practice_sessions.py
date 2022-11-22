@@ -23,8 +23,12 @@ from core.controllers import base
 from core.domain import skill_fetchers
 from core.domain import topic_fetchers
 
+from typing import Dict, List, TypedDict
 
-class PracticeSessionsPage(base.BaseHandler):
+
+class PracticeSessionsPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Renders the practice sessions page."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -43,12 +47,14 @@ class PracticeSessionsPage(base.BaseHandler):
     }
 
     @acl_decorators.can_access_topic_viewer_page
-    def get(self, _):
+    def get(self, _: str) -> None:
         """Handles GET requests."""
 
         self.render_template('practice-session-page.mainpage.html')
 
-    def handle_exception(self, exception, unused_debug_mode):
+    def handle_exception(
+        self, exception: BaseException, unused_debug_mode: bool
+    ) -> None:
         """Handles exceptions raised by this handler.
 
         Args:
@@ -73,7 +79,20 @@ class PracticeSessionsPage(base.BaseHandler):
         super().handle_exception(exception, unused_debug_mode)
 
 
-class PracticeSessionsPageDataHandler(base.BaseHandler):
+class PracticeSessionsPageDataHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of PracticeSessionsPageDataHandler's
+    normalized_request dictionary.
+    """
+
+    selected_subtopic_ids: List[int]
+
+
+class PracticeSessionsPageDataHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        PracticeSessionsPageDataHandlerNormalizedRequestDict
+    ]
+):
     """Fetches relevant data for the practice sessions page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -93,13 +112,13 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_topic_viewer_page
-    def get(self, topic_name):
-
+    def get(self, topic_name: str) -> None:
+        assert self.normalized_request is not None
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.
         topic = topic_fetchers.get_topic_by_name(topic_name)
         selected_subtopic_ids = (
-            self.normalized_request.get('selected_subtopic_ids'))
+            self.normalized_request['selected_subtopic_ids'])
 
         selected_skill_ids = []
         for subtopic in topic.subtopics:
