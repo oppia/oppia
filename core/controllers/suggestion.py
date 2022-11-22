@@ -221,6 +221,20 @@ class SuggestionHandler(
             self.normalized_payload['description']
         )
 
+        if suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        ):
+            (
+                suggestion_services
+            ).update_translation_contribution_stats_at_submission(suggestion)
+
+        if suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_ADD_QUESTION
+        ):
+            (
+                suggestion_services
+            ).update_question_contribution_stats_at_submission(suggestion)
+
         suggestion_change = suggestion.change
         if (
                 suggestion_change.cmd == 'add_written_translation' and
@@ -367,6 +381,11 @@ class SuggestionToExplorationActionHandler(
                 suggestion_id, self.user_id,
                 self.normalized_payload['review_message']
             )
+
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            suggestion_services.update_translation_review_stats(suggestion)
 
         self.render_json(self.values)
 
@@ -574,6 +593,10 @@ class SuggestionToSkillActionHandler(
                 self.normalized_payload['review_message']
             )
 
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+            suggestion_services.update_question_review_stats(suggestion)
+
         self.render_json(self.values)
 
 
@@ -729,18 +752,21 @@ class ReviewableSuggestionsHandler(
         suggestions: Sequence[suggestion_registry.BaseSuggestion] = []
         next_offset = 0
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-            suggestions, next_offset = (
-                suggestion_services.
-                get_reviewable_translation_suggestions_by_offset(
-                    self.user_id,
-                    exp_ids,
-                    limit, offset
-                )
-            )
+            reviewable_suggestions, next_offset = (
+                suggestion_services
+                .get_reviewable_translation_suggestions_by_offset(
+                    self.user_id, exp_ids, limit, offset))
+            # Filter out obsolete translation suggestions, i.e. suggestions with
+            # translations that no longer match the current exploration content
+            # text. See issue #16536 for more details.
+            suggestions = (
+                suggestion_services
+                .get_suggestions_with_translatable_explorations(
+                    reviewable_suggestions))
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             suggestions, next_offset = (
-                suggestion_services.
-                get_reviewable_question_suggestions_by_offset(
+                suggestion_services
+                .get_reviewable_question_suggestions_by_offset(
                     self.user_id, limit, offset))
         self._render_suggestions(target_type, suggestions, next_offset)
 

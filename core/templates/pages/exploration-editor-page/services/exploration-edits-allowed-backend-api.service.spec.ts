@@ -21,7 +21,7 @@ import { ExplorationEditsAllowedBackendApiService } from './exploration-edits-al
 
 
 describe('Exploration edits allowed backend API service', () => {
-  let eeabas: ExplorationEditsAllowedBackendApiService = null;
+  let eeabas: ExplorationEditsAllowedBackendApiService;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {

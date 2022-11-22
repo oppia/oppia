@@ -65,7 +65,8 @@ export class PreviewSummaryTileModalComponent extends ConfirmOrCancelModal {
     if (!AppConstants.CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
       color = AppConstants.DEFAULT_COLOR;
     } else {
-      color = AppConstants.CATEGORIES_TO_COLORS[category];
+      color = AppConstants.CATEGORIES_TO_COLORS[
+        category as keyof typeof AppConstants.CATEGORIES_TO_COLORS];
     }
     return color;
   }
