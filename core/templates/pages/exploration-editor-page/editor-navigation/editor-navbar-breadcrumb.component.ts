@@ -31,7 +31,10 @@ import { RouterService } from '../services/router.service';
 })
 export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  navbarTitle: string;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  navbarTitle!: string;
   _TAB_NAMES_TO_HUMAN_READABLE_NAMES: object = {
     main: 'Edit',
     translation: 'Translation',
@@ -56,16 +59,19 @@ export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   }
 
   getCurrentTabName(): string {
+    type TabNamesToHumanReadableNamesKeys = (
+      keyof typeof this._TAB_NAMES_TO_HUMAN_READABLE_NAMES);
     if (!this.routerService.getActiveTabName()) {
       return '';
     } else {
       return this._TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-        this.routerService.getActiveTabName()];
+        this.routerService.getActiveTabName() as
+          TabNamesToHumanReadableNamesKeys
+      ];
     }
   }
 
   ngOnInit(): void {
-    this.navbarTitle = null;
     this.directiveSubscriptions.add(
       this.explorationTitleService.onExplorationPropertyChanged.subscribe(
         (propertyName) => {

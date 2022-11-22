@@ -29,7 +29,9 @@ import { ContextService } from 'services/context.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 interface ImageCallback {
-  resolveMethod: (_: string) => void;
+  // This property will be null when the SVG uploaded is not valid or when
+  // the image is not yet uploaded.
+  resolveMethod: (src: string | SafeResourceUrl | null) => void;
   rejectMethod: () => void;
 }
 
@@ -51,10 +53,13 @@ export class ImagePreloaderService {
         ExtractImageFilenamesFromModelService,
       private svgSanitizerService: SvgSanitizerService) {}
 
+  // This property is initialized using int method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private exploration!: Exploration;
   private filenamesOfImageCurrentlyDownloading: string[] = [];
   private filenamesOfImageToBeDownloaded: string[] = [];
   private filenamesOfImageFailedToDownload: string[] = [];
-  private exploration: Exploration = null;
   private imagePreloaderServiceHasStarted: boolean = false;
   // Variable imageLoadedCallback is an object of objects (identified by the
   // filenames which are being downloaded at the time they are required by the
@@ -92,12 +97,16 @@ export class ImagePreloaderService {
     this.filenamesOfImageFailedToDownload = (
       this.filenamesOfImageFailedToDownload.filter(
         filename => !imageFilesInGivenState.includes(filename)));
-    while (this.filenamesOfImageCurrentlyDownloading.length <
-        AppConstants.MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY &&
-        this.filenamesOfImageToBeDownloaded.length > 0) {
+    while (
+      this.filenamesOfImageCurrentlyDownloading.length <
+      AppConstants.MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY &&
+      this.filenamesOfImageToBeDownloaded.length > 0
+    ) {
       const imageFilename = this.filenamesOfImageToBeDownloaded.shift();
-      this.filenamesOfImageCurrentlyDownloading.push(imageFilename);
-      this.loadImage(imageFilename);
+      if (imageFilename) {
+        this.filenamesOfImageCurrentlyDownloading.push(imageFilename);
+        this.loadImage(imageFilename);
+      }
     }
   }
 
@@ -203,12 +212,19 @@ export class ImagePreloaderService {
 
   private convertImageFileToSafeBase64Url(
       imageFile: Blob,
-      callback: (src: string | ArrayBuffer | SafeResourceUrl) => void): void {
+      callback: (
+        // This property will be null when the SVG uploaded is not valid or when
+        // the image is not yet uploaded. Also FileReader.result dependency is
+        // of type null.
+        src: string | SafeResourceUrl | null
+      ) => void): void {
     const reader = new FileReader();
     reader.onloadend = () => {
       if (imageFile.type === 'image/svg+xml') {
         callback(
           this.svgSanitizerService.getTrustedSvgResourceUrl(
+            // Typecasting is needed because FileReader.result dependency is of
+            // type ArrayBuffer | string | null.
             reader.result as string));
       } else {
         callback(reader.result);
@@ -224,13 +240,15 @@ export class ImagePreloaderService {
    * @param {function} onLoadCallback - Function that is called when the
    *                                    Url of the loaded image is obtained.
    */
-  async getImageUrlAsync(filename: string): Promise<string|ArrayBuffer> {
+  async getImageUrlAsync(
+      filename: string
+  ): Promise<string | SafeResourceUrl | null> {
     return new Promise((resolve, reject) => {
-      if (this.assetsBackendApiService.isCached(filename) ||
-          this.isInFailedDownload(filename)) {
+      let entityType = this.contextService.getEntityType();
+      if (entityType && (this.assetsBackendApiService.isCached(filename) ||
+          this.isInFailedDownload(filename))) {
         this.assetsBackendApiService.loadImage(
-          this.contextService.getEntityType(),
-          this.contextService.getEntityId(), filename
+          entityType, this.contextService.getEntityId(), filename
         ).then(
           loadedImageFile => {
             if (this.isInFailedDownload(loadedImageFile.filename)) {
@@ -270,17 +288,20 @@ export class ImagePreloaderService {
    *                                   be obtained.
    */
   private getImageFilenamesInBfsOrder(sourceStateName: string): string[] {
-    var stateNamesInBfsOrder = (
-      this.computeGraphService.computeBfsTraversalOfStates(
-        this.exploration.getInitialState().name, this.exploration.getStates(),
-        sourceStateName));
-    var imageFilenames = [];
+    const explorationInitStateName = this.exploration.getInitialState().name;
+    var imageFilenames: string[] = [];
+    if (explorationInitStateName) {
+      var stateNamesInBfsOrder = (
+        this.computeGraphService.computeBfsTraversalOfStates(
+          explorationInitStateName, this.exploration.getStates(),
+          sourceStateName));
 
-    stateNamesInBfsOrder.forEach(stateName => {
-      var state = this.exploration.states.getState(stateName);
-      this.ExtractImageFilenamesFromModelService.getImageFilenamesInState(state)
-        .forEach(filename => imageFilenames.push(filename));
-    });
+      stateNamesInBfsOrder.forEach(stateName => {
+        var state = this.exploration.states.getState(stateName);
+        this.ExtractImageFilenamesFromModelService.getImageFilenamesInState(
+          state).forEach(filename => imageFilenames.push(filename));
+      });
+    }
     return imageFilenames;
   }
 
@@ -297,8 +318,10 @@ export class ImagePreloaderService {
       1);
     if (this.filenamesOfImageToBeDownloaded.length > 0) {
       var nextImageFilename = this.filenamesOfImageToBeDownloaded.shift();
-      this.filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
-      this.loadImage(nextImageFilename);
+      if (nextImageFilename) {
+        this.filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
+        this.loadImage(nextImageFilename);
+      }
     }
   }
 
@@ -318,13 +341,13 @@ export class ImagePreloaderService {
             this.imageLoadedCallback[loadedImage.filename].resolveMethod);
           this.convertImageFileToSafeBase64Url(
             loadedImage.data, onLoadImageResolve);
-          this.imageLoadedCallback[loadedImage.filename] = null;
+          delete this.imageLoadedCallback[loadedImage.filename];
         }
       },
       filename => {
         if (this.imageLoadedCallback[filename]) {
           this.imageLoadedCallback[filename].rejectMethod();
-          this.imageLoadedCallback[filename] = null;
+          delete this.imageLoadedCallback[filename];
         }
         this.filenamesOfImageFailedToDownload.push(filename);
         this.removeCurrentAndLoadNextImage(filename);

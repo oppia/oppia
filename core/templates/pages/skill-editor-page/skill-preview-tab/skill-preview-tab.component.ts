@@ -47,18 +47,21 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     private questionObjectFactory: QuestionObjectFactory
   ) {}
 
-  displayedCard: StateCard;
-  skillId: string;
-  questionTextFilter: string;
-  interactionFilter: string;
-  displayCardIsInitialized = false;
-  questionsFetched: boolean;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  displayedCard!: StateCard;
+  skillId!: string;
+  questionTextFilter!: string;
+  interactionFilter!: string;
+  questionsFetched!: boolean;
+  skill!: Skill;
+  htmlData!: string;
+  questionDicts!: QuestionBackendDict[];
+  displayedQuestions!: QuestionBackendDict[];
+  displayCardIsInitialized: boolean = false;
   ALLOWED_QUESTION_INTERACTIONS: string[] = [];
-  skill: Skill;
-  htmlData: string;
-  questionDicts: QuestionBackendDict[];
-  displayedQuestions: QuestionBackendDict[];
-  QUESTION_COUNT = 20;
+  QUESTION_COUNT: number = 20;
   INTERACTION_TYPES = {
     ALL: 'All',
     TEXT_INPUT: 'Text Input',
@@ -77,7 +80,8 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     this.questionsFetched = false;
     for (let interaction in this.INTERACTION_TYPES) {
       this.ALLOWED_QUESTION_INTERACTIONS.push(
-        this.INTERACTION_TYPES[interaction]);
+        this.INTERACTION_TYPES[
+          interaction as keyof typeof this.INTERACTION_TYPES]);
     }
     this.skill = this.skillEditorStateService.getSkill();
     this.htmlData = (
@@ -149,7 +153,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
           this.displayedQuestions[index]
         )
       ],
-      this.initializeQuestionCard.bind(this)
+      this.initializeQuestionCard.bind(this), () => {}
     );
   }
 
