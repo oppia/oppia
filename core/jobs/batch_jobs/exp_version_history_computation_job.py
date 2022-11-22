@@ -30,7 +30,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Optional, Tuple, TypedDict, Union
+from typing import Any, Dict, List, Optional, Tuple, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -676,7 +676,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         return None
 
     def create_version_history_models(
-        self, model_group: FormattedModelGroupDict
+        self, model_group: Any
     ) -> Union[
         Tuple[str, List[exp_models.ExplorationVersionHistoryModel]],
         Tuple[
@@ -768,7 +768,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 else:
                     old_states_dict = old_exploration.states
                     new_states_dict = new_exploration.states
-                    old_metadata_dict = {
+                    old_metadata_dict: exp_domain.ExplorationMetadataDict = {
                         'title': old_exploration.title,
                         'category': old_exploration.category,
                         'objective': old_exploration.objective,
@@ -788,7 +788,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         ),
                         'edits_allowed': old_exploration.edits_allowed
                     }
-                    new_metadata_dict = {
+                    new_metadata_dict: exp_domain.ExplorationMetadataDict = {
                         'title': new_exploration.title,
                         'category': new_exploration.category,
                         'objective': new_exploration.objective,
@@ -828,14 +828,14 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     try:
                         new_states_vh = (
                             exp_services.update_states_version_history(
-                                old_states_vh, change_list, old_states_dict, # type: ignore[arg-type]
-                                new_states_dict, version, committer_id # type: ignore[arg-type]
+                                old_states_vh, change_list, old_states_dict,
+                                new_states_dict, version, committer_id
                             )
                         )
                         new_metadata_vh = (
                             exp_services.update_metadata_version_history(
-                                old_metadata_vh, change_list, old_metadata_dict, # type: ignore[arg-type]
-                                new_metadata_dict, version, committer_id # type: ignore[arg-type]
+                                old_metadata_vh, change_list, old_metadata_dict,
+                                new_metadata_dict, version, committer_id
                             )
                         )
                         new_committer_ids = (
