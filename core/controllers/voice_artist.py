@@ -33,8 +33,16 @@ from mutagen import mp3
 from typing import Dict, TypedDict, cast
 
 
+class AudioUploadHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of AudioUploadHandler's
+    normalized_request dictionary.
+    """
+
+    raw_audio_file: bytes
+
+
 class AudioUploadHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
+    base.BaseHandler[Dict[str, str], AudioUploadHandlerNormalizedRequestDict]
 ):
     """Handles audio file uploads (to Google Cloud Storage in production, and
     to the local datastore in dev).
@@ -86,10 +94,16 @@ class AudioUploadHandler(
         assert self.normalized_payload is not None
         assert self.normalized_request is not None
 
-        filename = self.normalized_payload['filename']
         # Here we use cast because we want to narrow down the type
-        # of normalized_request['raw_audio_file'] from  str to bytes.
-        raw_audio_file = cast(bytes, self.normalized_request['raw_audio_file'])
+        # of 'normalized_request' to a particular TypedDict that
+        # was defined according to the schemas so that the type
+        # of fetched value is considered bytes and not str.
+        request_data = cast(
+            AudioUploadHandlerNormalizedRequestDict,
+            self.normalized_request
+        )
+        raw_audio_file = request_data['raw_audio_file']
+        filename = self.normalized_payload['filename']
 
         tempbuffer = io.BytesIO()
         tempbuffer.write(raw_audio_file)
