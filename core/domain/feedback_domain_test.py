@@ -196,8 +196,9 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
         reference_dict.entity_id = 'invalid_entity_id'
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Entity ID is not a valid id'
-                ', received: \'%s\'' % reference_dict.entity_id):
+            'Entity ID is not a valid id, '
+            'received: \'%s\'' % reference_dict.entity_id
+        ):
             reference_dict.validate()
 
     def test_invalid_thread_id(self) -> None:
