@@ -367,9 +367,8 @@ class FeedbackMessageReference:
 
     @classmethod
     def from_dict(
-        cls,
-        reference_dict: FeedbackMessageReferenceDict
-        ) -> FeedbackMessageReference:
+        cls, reference_dict: FeedbackMessageReferenceDict
+    ) -> FeedbackMessageReference:
         """Return a FeedbackMessageReference domain object from a dict.
 
         Args:
