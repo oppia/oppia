@@ -182,11 +182,12 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
         reference_dict.entity_type = 'invalid_entity_type'
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Entity type is not in list of allowed types'
-                ', received: \'%s\' and allowed types are: \'%s\''
-                % (
-                    reference_dict.entity_type,
-                    ', '.join(map(str, feconf.ALLOWED_ENTITY_TYPES)))):
+            'Entity type is not in list of allowed types, '
+            'received: \'%s\' and allowed types are: \'%s\'' % (
+                reference_dict.entity_type,
+                ', '.join(map(str, feconf.ALLOWED_ENTITY_TYPES))
+            )
+        ):
             reference_dict.validate()
 
     def test_invalid_entity_id(self) -> None:
