@@ -28,6 +28,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { AppConstants } from 'app.constants';
 import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 interface AvailabilityStatus {
   available: boolean;
@@ -42,13 +43,16 @@ export class TranslationStatusService implements OnInit {
   ALL_ASSETS_AVAILABLE_COLOR: string = '#16A765';
   FEW_ASSETS_AVAILABLE_COLOR: string = '#E9B330';
   NO_ASSETS_AVAILABLE_COLOR: string = '#D14836';
-  langCode: string;
-  stateNeedsUpdateWarnings: object;
-  stateWiseStatusColor: object;
-  explorationTranslationContentRequiredCount: number;
-  explorationVoiceoverContentRequiredCount: number;
-  explorationTranslationContentNotAvailableCount: number;
-  explorationVoiceoverContentNotAvailableCount: number;
+  // These properties are initialized using init method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  langCode!: string;
+  stateNeedsUpdateWarnings!: Record<string, string[]>;
+  stateWiseStatusColor!: Record<string, string>;
+  explorationTranslationContentRequiredCount!: number;
+  explorationVoiceoverContentRequiredCount!: number;
+  explorationTranslationContentNotAvailableCount!: number;
+  explorationVoiceoverContentNotAvailableCount!: number;
 
 
   constructor(
@@ -116,7 +120,7 @@ export class TranslationStatusService implements OnInit {
       let writtenTranslations = (
         this.explorationStatesService.getWrittenTranslationsMemento(stateName));
       return this._getTranslationStatus(writtenTranslations, contentId);
-    } else if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+    } else {
       let recordedVoiceovers = (
         this.explorationStatesService.getRecordedVoiceoversMemento(stateName));
       return this._getVoiceOverStatus(recordedVoiceovers, contentId);
@@ -128,7 +132,7 @@ export class TranslationStatusService implements OnInit {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       let writtenTranslations = this.stateWrittenTranslationsService.displayed;
       return this._getTranslationStatus(writtenTranslations, contentId);
-    } else if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+    } else {
       let recordedVoiceovers = this.stateRecordedVoiceoversService.displayed;
       return this._getVoiceOverStatus(recordedVoiceovers, contentId);
     }
@@ -160,8 +164,8 @@ export class TranslationStatusService implements OnInit {
           // interaction, so these hints audio are not counted in checking
           // status of a state.
           if (!interactionId ||
-          INTERACTION_SPECS[interactionId].is_linear ||
-          INTERACTION_SPECS[interactionId].is_terminal) {
+          INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear ||
+          INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_terminal) {
             let contentIdToRemove = this._getContentIdListRelatedToComponent(
               AppConstants.COMPONENT_NAME_HINT,
               allContentIds);
@@ -260,26 +264,24 @@ export class TranslationStatusService implements OnInit {
       componentName, this._getAvailableContentIds());
     let availableAudioCount = 0;
 
-    if (contentIdList) {
-      contentIdList.forEach((contentId) => {
-        let availabilityStatus = this._getActiveStateContentAvailabilityStatus(
-          contentId);
-        if (availabilityStatus.available) {
-          availableAudioCount++;
-        }
-      });
-      if (contentIdList.length === availableAudioCount) {
-        return this.ALL_ASSETS_AVAILABLE_COLOR;
-      } else if (availableAudioCount === 0) {
-        return this.NO_ASSETS_AVAILABLE_COLOR;
-      } else {
-        return this.FEW_ASSETS_AVAILABLE_COLOR;
+    contentIdList.forEach((contentId) => {
+      let availabilityStatus = this._getActiveStateContentAvailabilityStatus(
+        contentId);
+      if (availabilityStatus.available) {
+        availableAudioCount++;
       }
+    });
+    if (contentIdList.length === availableAudioCount) {
+      return this.ALL_ASSETS_AVAILABLE_COLOR;
+    } else if (availableAudioCount === 0) {
+      return this.NO_ASSETS_AVAILABLE_COLOR;
+    } else {
+      return this.FEW_ASSETS_AVAILABLE_COLOR;
     }
   }
 
   _getAvailableContentIds(): string[] {
-    let availableContentIds = [];
+    let availableContentIds: string[] = [];
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       let writtenTranslations = this.stateWrittenTranslationsService.displayed;
       availableContentIds = writtenTranslations.getAllContentIds();
@@ -327,7 +329,7 @@ export class TranslationStatusService implements OnInit {
   _getExplorationContentRequiredCount(): number {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return this.explorationTranslationContentRequiredCount;
-    } else if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+    } else {
       return this.explorationVoiceoverContentRequiredCount;
     }
   }
@@ -335,7 +337,7 @@ export class TranslationStatusService implements OnInit {
   _getExplorationContentNotAvailableCount(): number {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return this.explorationTranslationContentNotAvailableCount;
-    } else if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+    } else {
       return this.explorationVoiceoverContentNotAvailableCount;
     }
   }
@@ -344,7 +346,7 @@ export class TranslationStatusService implements OnInit {
     this._computeAllStatesStatus();
   }
 
-  getAllStatesNeedUpdatewarning(): object {
+  getAllStatesNeedUpdatewarning(): Record<string, string[]> {
     return this.stateNeedsUpdateWarnings;
   }
 

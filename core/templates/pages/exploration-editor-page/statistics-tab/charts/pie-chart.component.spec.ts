@@ -27,7 +27,7 @@ describe('Pie Chart component', () => {
   let component: PieChartComponent;
   let fixture: ComponentFixture<PieChartComponent>;
   let resizeEvent = new EventEmitter();
-  let mockedChart = null;
+  let mockedChart: google.visualization.PieChart;
 
   class MockWindowDimensionsService {
     getResizeEvent() {
@@ -60,9 +60,9 @@ describe('Pie Chart component', () => {
     component = fixture.componentInstance;
 
     mockedChart = {
-      draw: () => {},
+      draw: () => { },
       data: 1
-    };
+    } as unknown as google.visualization.PieChart;
 
     // This approach was choosen because spyOnProperty() doesn't work on
     // properties that doesn't have a get access type.
@@ -78,8 +78,8 @@ describe('Pie Chart component', () => {
     component.chart = mockedChart;
     component.options = {
       title: 'Pie title',
-      legendPosition: null,
-      pieHole: null,
+      legendPosition: '',
+      pieHole: 0,
       pieSliceTextStyleColor: '#fff',
       pieSliceBorderColor: '#fff',
       left: 0,
@@ -103,7 +103,7 @@ describe('Pie Chart component', () => {
         }
       },
       charts: {
-        setOnLoadCallback: (callback) => {
+        setOnLoadCallback: (callback: () => void) => {
           callback();
         }
       }
@@ -121,12 +121,12 @@ describe('Pie Chart component', () => {
     spyOnProperty(window, 'google').and.returnValue({
       visualization: {
         PieChart: class Mockdraw {
-          constructor(value) {}
+          constructor(value: string) {}
           draw() {}
         }
       },
       charts: {
-        setOnLoadCallback: (callback) => {
+        setOnLoadCallback: (callback: () => void) => {
           callback();
         }
       }
@@ -134,6 +134,10 @@ describe('Pie Chart component', () => {
     component.pieChart = {
       nativeElement: null
     };
+    // This throws "Type 'null' is not assignable to
+    // parameter of type 'Piechart'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     component.chart = null;
     component.ngAfterViewInit();
     tick();
@@ -145,12 +149,12 @@ describe('Pie Chart component', () => {
     spyOnProperty(window, 'google').and.returnValue({
       visualization: {
         PieChart: class Mockdraw {
-          constructor(value) {}
+          constructor(value: string) {}
           draw() {}
         }
       },
       charts: {
-        setOnLoadCallback: (callback) => {
+        setOnLoadCallback: (callback: () => void) => {
           callback();
         }
       }
@@ -168,12 +172,12 @@ describe('Pie Chart component', () => {
     spyOnProperty(window, 'google').and.returnValue({
       visualization: {
         PieChart: class Mockdraw {
-          constructor(value) {}
+          constructor(value: string) {}
           draw() {}
         }
       },
       charts: {
-        setOnLoadCallback: (callback) => {
+        setOnLoadCallback: (callback: () => void) => {
           callback();
         }
       }
