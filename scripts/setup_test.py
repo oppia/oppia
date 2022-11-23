@@ -498,11 +498,14 @@ class SetupTests(test_utils.GenericTestBase):
                     common.YARN_VERSION, common.YARN_VERSION)])
 
     def test_package_install_with_incompatible_system_raises_error(
-            self) -> None:
+        self
+    ) -> None:
         def mock_exists(unused_path: str) -> bool:
             return False
+
         def mock_is_x64() -> bool:
             return True
+
         os_name_swap = self.swap(common, 'OS_NAME', 'Solaris')
         architecture_swap = self.swap(
             common, 'is_x64_architecture', mock_is_x64)
@@ -511,121 +514,6 @@ class SetupTests(test_utils.GenericTestBase):
         with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
             with self.rename_swap, self.chown_swap, architecture_swap:
                 with self.assertRaisesRegex(
-                        Exception,
-                        'System\'s Operating System is not compatible.'):
+                    Exception, 'System\'s Operating System is not compatible.'
+                ):
                     setup.main(args=[])
-
-    def test_chrome_bin_setup_with_google_chrome(self) -> None:
-        def mock_isfile(path: str) -> bool:
-            return path == '/usr/bin/google-chrome'
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        with self.test_py_swap, self.create_swap, self.uname_swap:
-            with self.exists_swap, self.chown_swap, self.chmod_swap:
-                with self.get_swap, isfile_swap:
-                    setup.main(args=[])
-        self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/google-chrome')
-
-    def test_chrome_bin_setup_with_brave_browser(self) -> None:
-        def mock_isfile(path: str) -> bool:
-            return path == '/usr/bin/brave'
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        with self.test_py_swap, self.create_swap, self.uname_swap:
-            with self.exists_swap, self.chown_swap, self.chmod_swap:
-                with self.get_swap, isfile_swap:
-                    setup.main(args=[])
-        self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/brave')
-
-    def test_chrome_bin_setup_with_chromium_browser(self) -> None:
-        def mock_isfile(path: str) -> bool:
-            return path == '/usr/bin/chromium-browser'
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        with self.test_py_swap, self.create_swap, self.uname_swap:
-            with self.exists_swap, self.chown_swap, self.chmod_swap:
-                with self.get_swap, isfile_swap:
-                    setup.main(args=[])
-        self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/chromium-browser')
-
-    def test_chrome_bin_setup_with_chromium_browser_arch(self) -> None:
-        def mock_isfile(path: str) -> bool:
-            return path == '/usr/bin/chromium'
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        with self.test_py_swap, self.create_swap, self.uname_swap:
-            with self.exists_swap, self.chown_swap, self.chmod_swap:
-                with self.get_swap, isfile_swap:
-                    setup.main(args=[])
-        self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/chromium')
-
-    def test_chrome_bin_setup_with_chrome_exe_c_files(self) -> None:
-        def mock_isfile(path: str) -> bool:
-            return (
-                path == (
-                    '/c/Program Files (x86)/Google/Chrome/'
-                    'Application/chrome.exe'))
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        with self.test_py_swap, self.create_swap, self.uname_swap:
-            with self.exists_swap, self.chown_swap, self.chmod_swap:
-                with self.get_swap, isfile_swap:
-                    setup.main(args=[])
-        self.assertEqual(
-            os.environ['CHROME_BIN'],
-            '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
-
-    def test_chrome_bin_setup_with_windows_chrome(self) -> None:
-        def mock_isfile(path: str) -> bool:
-            return path == (
-                'c:\\Program Files (x86)\\Google\\Chrome\\' +
-                'Application\\Chrome.exe')
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        with self.test_py_swap, self.create_swap, self.uname_swap:
-            with self.exists_swap, self.chown_swap, self.chmod_swap:
-                with self.get_swap, isfile_swap:
-                    setup.main(args=[])
-        self.assertEqual(
-            os.environ['CHROME_BIN'],
-            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe')
-
-    def test_chrome_bin_setup_with_chrome_exe_mnt_files(self) -> None:
-        def mock_isfile(path: str) -> bool:
-            return (
-                path == (
-                    '/mnt/c/Program Files (x86)/Google/Chrome/'
-                    'Application/chrome.exe'))
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        with self.test_py_swap, self.create_swap, self.uname_swap:
-            with self.exists_swap, self.chown_swap, self.chmod_swap:
-                with self.get_swap, isfile_swap:
-                    setup.main(args=[])
-        self.assertEqual(
-            os.environ['CHROME_BIN'],
-            '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
-
-    def test_chrome_bin_setup_with_mac_google_chrome(self) -> None:
-        def mock_isfile(path: str) -> bool:
-            return (
-                path == (
-                    '/Applications/Google Chrome.app/Contents/MacOS/'
-                    'Google Chrome'))
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        with self.test_py_swap, self.create_swap, self.uname_swap:
-            with self.exists_swap, self.chown_swap, self.chmod_swap:
-                with self.get_swap, isfile_swap:
-                    setup.main(args=[])
-        self.assertEqual(
-            os.environ['CHROME_BIN'],
-            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
-
-    def test_chrome_bin_setup_with_error(self) -> None:
-        def mock_isfile(unused_path: str) -> bool:
-            return False
-        print_arr: List[str] = []
-        def mock_print(msg: str) -> None:
-            print_arr.append(msg)
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        print_swap = self.swap(builtins, 'print', mock_print)
-
-        with self.test_py_swap, self.create_swap, self.uname_swap:
-            with self.exists_swap, self.chown_swap, self.chmod_swap, print_swap:
-                with isfile_swap, self.get_swap, self.assertRaisesRegex(
-                    Exception, 'Chrome not found.'):
-                    setup.main(args=[])
-        self.assertTrue('Chrome is not found, stopping ...' in print_arr)
