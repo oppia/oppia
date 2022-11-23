@@ -71,11 +71,13 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
   declarations: [
     CertificateDownloadModalComponent,
     CkEditorCopyToolbarComponent,
+    ContributorBadgesComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
     OpportunitiesListComponent,
     ContributorStatsComponent,
+    BadgeComponent,
     TranslationLanguageSelectorComponent,
     TranslationOpportunitiesComponent,
     TranslationSuggestionReviewModalComponent,
@@ -88,11 +90,13 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
   entryComponents: [
     CertificateDownloadModalComponent,
     CkEditorCopyToolbarComponent,
+    ContributorBadgesComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
     OpportunitiesListComponent,
     ContributorStatsComponent,
+    BadgeComponent,
     TranslationLanguageSelectorComponent,
     TranslationOpportunitiesComponent,
     TranslationSuggestionReviewModalComponent,
@@ -136,6 +140,8 @@ import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { ToastrModule } from 'ngx-toastr';
 import { ContributorStatsComponent } from './contributor-stats/contributor-stats.component';
 import { CertificateDownloadModalComponent } from './modal-templates/certificate-download-modal.component';
+import { ContributorBadgesComponent } from './contributor-badges/contributor-badges.component';
+import { BadgeComponent } from './badge/badge.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

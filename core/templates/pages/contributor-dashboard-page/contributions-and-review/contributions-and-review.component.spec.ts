@@ -265,7 +265,10 @@ describe('Contributions and review component', () => {
                             unicode_str: ''
                           }
                         },
-                        rows: { value: 1 }
+                        rows: { value: 1 },
+                        catchMisspellings: {
+                          value: false
+                        }
                       },
                       default_outcome: {
                         dest: null,
@@ -360,7 +363,10 @@ describe('Contributions and review component', () => {
                             unicode_str: ''
                           }
                         },
-                        rows: { value: 1 }
+                        rows: { value: 1 },
+                        catchMisspellings: {
+                          value: false
+                        }
                       },
                       default_outcome: {
                         dest: null,
@@ -599,7 +605,10 @@ describe('Contributions and review component', () => {
                     unicode_str: ''
                   }
                 },
-                rows: { value: 1 }
+                rows: { value: 1 },
+                catchMisspellings: {
+                  value: false
+                }
               },
               default_outcome: {
                 dest: null,
@@ -884,7 +893,10 @@ describe('Contributions and review component', () => {
                   unicode_str: ''
                 }
               },
-              rows: { value: 1 }
+              rows: { value: 1 },
+              catchMisspellings: {
+                value: false
+              }
             },
             default_outcome: {
               dest: null,
@@ -1010,7 +1022,10 @@ describe('Contributions and review component', () => {
                           unicode_str: ''
                         }
                       },
-                      rows: { value: 1 }
+                      rows: { value: 1 },
+                      catchMisspellings: {
+                        value: false
+                      }
                     },
                     default_outcome: {
                       dest: null,
@@ -1744,6 +1759,58 @@ describe('Contributions and review component', () => {
         component.getActiveDropdownTabText(
           'accomplishments',
           'badges')).toBe('Badges');
+    });
+
+    it('should throw an error when invalid tab names given', () => {
+      component.contributionTabs = [
+        {
+          tabType: 'contributions',
+          tabSubType: 'translate_content',
+          text: 'Translations',
+          enabled: false
+        },
+        {
+          tabType: 'contributions',
+          tabSubType: 'add_question',
+          text: 'Questions',
+          enabled: true
+        }
+      ];
+      component.accomplishmentsTabs = [
+        {
+          tabSubType: 'stats',
+          tabType: 'accomplishments',
+          text: 'Contribution Stats',
+          enabled: true
+        },
+        {
+          tabSubType: 'badges',
+          tabType: 'accomplishments',
+          text: 'Badges',
+          enabled: true
+        }
+      ];
+      component.reviewTabs = [
+        {
+          tabType: 'reviews',
+          tabSubType: 'add_question',
+          text: 'Review Questions',
+          enabled: false
+        },
+        {
+          tabType: 'reviews',
+          tabSubType: 'translate_content',
+          text: 'Review Translations',
+          enabled: false
+        }
+      ];
+
+      expect(() => {
+        component.getActiveDropdownTabText(
+          'xxx',
+          'xxx');
+        tick();
+      }).toThrowError();
     });
 
     it('should close dropdown when a click is made outside', () => {

@@ -188,7 +188,7 @@
         </button>
       </div>
     </mat-card>
-    <mat-card *ngIf="(statsData[type] | json) === '{}'" layout="row" class="list-view-item oppia-contributions-required-message-container">
+    <mat-card *ngIf="statsData[type].size === 0" layout="row" class="list-view-item oppia-contributions-required-message-container">
       <div class="oppia-contributions-required-message">
         Start contributing to see your stats!
       </div>
@@ -438,9 +438,6 @@
     font-weight: bold;
     margin-left: 65%;
   }
-  .stats-container {
-    margin-left: 50px;
-  }
   .list-view-item {
     background: #fff;
     border: 1px solid #000;
@@ -539,12 +536,15 @@
     background-color: rgb(238, 238, 238);
     border-radius: 4px;
   }
-  @media (max-width: 768px) {
-    .list-view-item {
-      margin-bottom: 30px;
+  @media (min-width: 700px) {
+    .stats-container {
+      margin-left: 50px;
     }
   }
   @media only screen and (max-width: 700px) {
+    .list-view-item {
+      margin-bottom: 30px;
+    }
     .stats-welcome-text-container {
       width: 100%;
     }

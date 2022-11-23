@@ -295,36 +295,6 @@ describe('Contributor stats component', () => {
       }).toThrowError('There are no more pages before this one.');
     }));
 
-    it('should throw errors when translation contributions are undefined',
-      fakeAsync(() => {
-        component.statsData.translationContribution = undefined;
-
-        expect(() => {
-          component.fetchStats();
-        }).toThrowError('Translation contributions are undefined.');
-      }));
-
-    it('should throw errors when translation reviews are undefined',
-      fakeAsync(() => {
-        component.statsData.translationReview = undefined;
-
-        expect(() => {
-          component.fetchStats();
-        }).toThrowError('Translation reviews are undefined.');
-      }));
-
-    it('should throw errors when data are undefined when paging',
-      fakeAsync(() => {
-        const pagedStats = {
-          currentPageStartIndex: 0,
-          data: undefined
-        };
-
-        expect(() => {
-          component.goToNextPage(pagedStats);
-        }).toThrowError('Data does not exist.');
-      }));
-
     it('should provide 0 to get original order of keyvaluea', fakeAsync(() => {
       expect(component.provideOriginalOrder()).toEqual(0);
     }));

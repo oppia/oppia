@@ -35,12 +35,12 @@ class PageableStats {
   currentPageStartIndex: number;
   data: (
     TranslationContributionStats | TranslationReviewStats |
-    QuestionContributionStats | QuestionReviewStats)[] | undefined;
+    QuestionContributionStats | QuestionReviewStats)[];
 
   constructor(
       data: (
       TranslationContributionStats | TranslationReviewStats |
-      QuestionContributionStats | QuestionReviewStats)[] | undefined) {
+      QuestionContributionStats | QuestionReviewStats)[]) {
     this.data = data;
     this.currentPageStartIndex = 0;
   }
@@ -158,12 +158,14 @@ export class ContributorStatsComponent {
   ];
 
   statsData: {
-    translationContribution?: {[key: string]: PageableStats | undefined} |
-      undefined;
-    translationReview?: {[key: string]: PageableStats | undefined} | undefined;
+    translationContribution: Map<string, PageableStats>;
+    translationReview: Map<string, PageableStats>;
     questionContribution?: PageableStats;
     questionReview?: PageableStats;
-  } = {};
+  } = {
+      translationContribution: new Map<string, PageableStats>(),
+      translationReview: new Map<string, PageableStats>()
+    };
 
   constructor(
     private readonly languageUtilService: LanguageUtilService,
@@ -175,8 +177,6 @@ export class ContributorStatsComponent {
   }
 
   async ngOnInit(): Promise<void> {
-    this.statsData.translationContribution = {};
-    this.statsData.translationReview = {};
     const userInfo = await this.userService.getUserInfoAsync();
     const username = userInfo.getUsername();
 
@@ -239,37 +239,42 @@ export class ContributorStatsComponent {
 
     if (response.translation_contribution_stats.length > 0) {
       response.translation_contribution_stats.map((stat) => {
-        if (
-          this.statsData.translationContribution === null ||
-          this.statsData.translationContribution === undefined) {
-          throw new Error('Translation contributions are undefined.');
-        }
-        if (!this.statsData.translationContribution[stat.language_code]) {
-          this.statsData.translationContribution[
-            stat.language_code] = new PageableStats(
-            [this.createTranslationContributionStat(stat)]);
+        const language = this.languageUtilService.getAudioLanguageDescription(
+          stat.language_code);
+        const translationContributionStatsData = this
+          .statsData?.translationContribution.get(language);
+        if (translationContributionStatsData === undefined) {
+          this.statsData?.translationContribution.set(
+            language,
+            new PageableStats([this.createTranslationContributionStat(stat)]));
         } else {
-          this.statsData?.translationContribution[
-            stat.language_code]?.data?.push(
+          translationContributionStatsData.data?.push(
             this.createTranslationContributionStat(stat));
+          this.statsData?.translationContribution.set(
+            language,
+            translationContributionStatsData
+          );
         }
       });
     }
 
     if (response.translation_review_stats.length > 0) {
       response.translation_review_stats.map((stat) => {
-        if (
-          this.statsData.translationReview === null ||
-          this.statsData.translationReview === undefined) {
-          throw new Error('Translation reviews are undefined.');
-        }
-        if (!this.statsData.translationReview[stat.language_code]) {
-          this.statsData.translationReview[
-            stat.language_code] = new PageableStats(
-            [this.createTranslationReviewStat(stat)]);
+        const language = this.languageUtilService.getAudioLanguageDescription(
+          stat.language_code);
+        const translationReviewStatsData = this
+          .statsData?.translationReview.get(language);
+        if (translationReviewStatsData === undefined) {
+          this.statsData.translationReview.set(
+            language,
+            new PageableStats([this.createTranslationReviewStat(stat)]));
         } else {
-          this.statsData?.translationReview[stat.language_code]?.data?.push(
+          translationReviewStatsData.data?.push(
             this.createTranslationReviewStat(stat));
+          this.statsData?.translationReview.set(
+            language,
+            translationReviewStatsData
+          );
         }
       });
     }
@@ -339,9 +344,6 @@ export class ContributorStatsComponent {
   }
 
   goToNextPage(page: PageableStats): void {
-    if (typeof page.data === 'undefined') {
-      throw new Error('Data does not exist.');
-    }
     if (
       page.currentPageStartIndex + this.ITEMS_PER_PAGE >=
       page.data?.length) {
