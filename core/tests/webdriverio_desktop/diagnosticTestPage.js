@@ -57,7 +57,7 @@ describe('Diagnostic test page functionality', function() {
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
-      'Addition', 'add', 'Addition of numbers', false);
+      'Diagnostic test addition', 'add', 'Addition of numbers', false);
     await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
     await topicEditorPage.updateMetaTagContent('topic meta tag');
     await topicEditorPage.updatePageTitleFragment('topic page title');
@@ -85,7 +85,7 @@ describe('Diagnostic test page functionality', function() {
     (
       await
       topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill Addition', 'Concept card explanation', false));
+        'Diagnostic test skill', 'Concept card explanation', false));
     await skillEditorPage.addRubricExplanationForDifficulty(
       'Easy', 'Explanation for easy difficulty.');
     await skillEditorPage.saveOrPublishSkill('Edited rubrics');
@@ -98,21 +98,21 @@ describe('Diagnostic test page functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
-      'Skill Addition', 'Addition');
+      'Diagnostic test skill', 'Diagnostic test addition');
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
 
-    await topicEditorPage.addDiagnosticTestSkill('Skill Addition');
+    await topicEditorPage.addDiagnosticTestSkill('Diagnostic test skill');
 
     await topicEditorPage.addSubtopic(
-      'Subtopic for Addition', 'subtopic-one', '../data/test2_svg.svg',
-      'Subtopic content');
+      'Subtopic for Diagnostic test addition', 'subtopic-one',
+      '../data/test2_svg.svg', 'Subtopic content');
     await topicEditorPage.saveTopic('Added subtopic.');
 
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToReassignModal();
 
-    await topicEditorPage.dragSkillToSubtopic('Skill Addition', 0);
+    await topicEditorPage.dragSkillToSubtopic('Diagnostic test skill', 0);
     await topicEditorPage.saveRearrangedSkills();
     await topicEditorPage.saveTopic('Added skill to subtopic.');
 

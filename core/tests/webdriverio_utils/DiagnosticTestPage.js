@@ -41,11 +41,6 @@ var DiagnosticTestPage = function() {
   var classroomTileContainerSelector = $('.e2e-test-classroom-tile-container');
 
   this.startDiagnosticTest = async function() {
-    await waitFor.pageToFullyLoad();
-    await waitFor.elementToBeClickable(
-      startDiagnosticTestButton,
-      'Start diagnostic test button taking too long to be clickable'
-    );
     await action.click(
       'Start diagnostic test button', startDiagnosticTestButton);
   };
@@ -53,12 +48,8 @@ var DiagnosticTestPage = function() {
   this.createNewClassroomConfig = async function(
       classroomName, classroomUrlFragment
   ) {
-    await waitFor.elementToBeClickable(
-      addNewClassroomButton,
-      'Add new classroom button taking too long to be clickable'
-    );
     await action.click(
-      'Add new classroom config data', addNewClassroomButton);
+      'Add new classroom config button', addNewClassroomButton);
 
     await waitFor.modalPopupToAppear();
 
@@ -82,12 +73,8 @@ var DiagnosticTestPage = function() {
       classroomUrlFragment
     );
 
-    await waitFor.elementToBeClickable(
-      createNewClassroomButton,
-      'Create new classroom button taking too long to be clickable'
-    );
     await action.click(
-      'Create new classroom config', createNewClassroomButton);
+      'Create new classroom config button', createNewClassroomButton);
   };
 
   this.addTopicIdToClassroomConfig = async function(topicId, index) {
@@ -96,14 +83,11 @@ var DiagnosticTestPage = function() {
       'Classroom tile is not visible'
     );
     await action.click(
-      'Classroom config tile', classroomTileSelector);
+      'Classroom config tile selector', classroomTileSelector);
 
     await action.click(
       'Edit classroom config button', editClassroomConfigButton);
 
-    await waitFor.elementToBeClickable(
-      addTopicToClassroomButton,
-      'Add topic to classroom button is not clickable');
     await action.click(
       'Add topic to classroom button', addTopicToClassroomButton);
 
@@ -111,24 +95,16 @@ var DiagnosticTestPage = function() {
       addTopicToClassroomInput,
       'Add topic to classroom input field is not visible');
     await action.setValue(
-      'Add topic ID to classroom input field',
+      'Add topic ID to classroom input',
       addTopicToClassroomInput,
       topicId
     );
 
-    await waitFor.elementToBeClickable(
-      submitTopicIdToClassroomButton,
-      'Submit topic ID to classroom button is not clickable'
-    );
     await action.click(
       'Add topic ID to classroom submit button',
       submitTopicIdToClassroomButton
     );
 
-    await waitFor.elementToBeClickable(
-      saveClassroomConfigButton,
-      'Save classroom config button is not clickable'
-    );
     await action.click(
       'Save classroom config button', saveClassroomConfigButton);
   };

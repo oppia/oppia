@@ -44,10 +44,6 @@ var ClassroomPage = function() {
   };
 
   this.launchDiagnosticTestPage = async function() {
-    await waitFor.elementToBeClickable(
-      launchDiagnosticTestPageButton,
-      'Launch diagnostic test button taking longer than expected'
-    );
     await action.click(
       'Launch diagnostic test page button', launchDiagnosticTestPageButton);
   };
