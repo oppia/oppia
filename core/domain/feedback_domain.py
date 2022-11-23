@@ -399,26 +399,6 @@ class FeedbackMessageReference:
     def validate(self) -> None:
         """Validates various properties of the FeedbackMessageReference."""
 
-        if not isinstance(self.entity_type, str):
-            raise utils.ValidationError(
-                'Expected entity type to be a string, received: %s.'
-                % self.entity_type)
-
-        if not isinstance(self.entity_id, str):
-            raise utils.ValidationError(
-                'Expected entity ID to be a string, received: %s.'
-                % self.entity_id)
-
-        if not isinstance(self.thread_id, str):
-            raise utils.ValidationError(
-                'Expected thread ID to be a string, received: %s.'
-                % self.thread_id)
-
-        if not isinstance(self.message_id, int):
-            raise utils.ValidationError(
-                'Expected message ID to be an integer, received: %s.'
-                % self.message_id)
-
         if not re.match(constants.VALID_THREAD_ID_REGEX, self.thread_id):
             raise utils.ValidationError(
                 'Thread ID did not match expected pattern'
