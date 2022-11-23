@@ -140,6 +140,17 @@ describe('Splash Page', () => {
       '/assets/images/path/to/image');
   });
 
+  it('should record analytics when start learning is clicked', function() {
+    spyOn(
+      siteAnalyticsService, 'registerClickHomePageStartLearningButtonEvent')
+      .and.callThrough();
+
+    component.onClickStartLearningButton();
+
+    expect(siteAnalyticsService.registerClickHomePageStartLearningButtonEvent)
+      .toHaveBeenCalled();
+  });
+
   it('should record analytics when Browse Lessons is clicked', function() {
     spyOn(
       siteAnalyticsService, 'registerClickBrowseLessonsButtonEvent')
@@ -256,6 +267,9 @@ describe('Splash Page', () => {
   });
 
   it('should show android button if the feature is enabled', () => {
+    // The androidPageIsEnabled property is set when the component is
+    // constructed and the value is not modified after that so there is no
+    // pre-check for this test.
     mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
 
     const component = TestBed.createComponent(SplashPageComponent);

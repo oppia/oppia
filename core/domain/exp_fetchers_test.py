@@ -28,7 +28,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing_extensions import Final
+from typing import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -166,7 +166,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 'does not match the latest schema version %s' % (
                     self.EXP_1_ID,
                     '1',
-                    '52',
+                    '54',
                     '60'
                 )
         )
@@ -465,6 +465,8 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0

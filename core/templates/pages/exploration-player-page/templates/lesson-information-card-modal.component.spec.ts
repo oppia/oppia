@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for lesson information card modal component.
  */
 
-import { Clipboard } from '@angular/cdk/clipboard';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick } from '@angular/core/testing';
@@ -115,7 +114,6 @@ describe('Lesson Information card modal component', () => {
   let userService: UserService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let localStorageService: LocalStorageService;
-  let clipboard: Clipboard;
   let checkpointCelebrationUtilityService:
     CheckpointCelebrationUtilityService;
 
@@ -196,7 +194,6 @@ describe('Lesson Information card modal component', () => {
     localStorageService = TestBed.inject(LocalStorageService);
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
-    clipboard = TestBed.inject(Clipboard);
     checkpointCelebrationUtilityService = TestBed.inject(
       CheckpointCelebrationUtilityService);
 
@@ -252,6 +249,16 @@ describe('Lesson Information card modal component', () => {
 
       expect(componentInstance.explorationIsPrivate).toBe(false);
     });
+
+  it('should throw error if unique url id is null', fakeAsync(() => {
+    spyOn(userService, 'getLoginUrlAsync').and.returnValue(
+      Promise.resolve('https://oppia.org/login'));
+    componentInstance.loggedOutProgressUniqueUrlId = null;
+    expect(() => {
+      componentInstance.onLoginButtonClicked();
+      tick();
+    }).toThrowError();
+  }));
 
   it('should generate checkpoint status array upon initialization', () => {
     componentInstance.checkpointCount = 3;
@@ -400,17 +407,6 @@ describe('Lesson Information card modal component', () => {
       'https://oppia.org/progress/abcdef');
     expect(componentInstance.loggedOutProgressUniqueUrlId).toEqual('abcdef');
   }));
-
-  it('should correctly copy progress URL', () => {
-    spyOn(clipboard, 'copy');
-    let loggedOutProgressUrl = 'https://oppia.org/progress/abcdef';
-    componentInstance.loggedOutProgressUniqueUrl = loggedOutProgressUrl;
-
-    componentInstance.copyProgressUrl();
-
-    expect(clipboard.copy).toHaveBeenCalledWith(
-      loggedOutProgressUrl);
-  });
 
   it('should store unique progress URL ID when login button is clicked',
     fakeAsync(() => {

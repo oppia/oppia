@@ -35,6 +35,8 @@ import shutil
 import subprocess
 import sys
 
+from typing import Final, List, Optional, Tuple
+
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
@@ -42,25 +44,25 @@ sys.path.append(os.getcwd())
 from scripts import common  # isort:skip # pylint: disable=wrong-import-position
 from core import utils  # isort:skip # pylint: disable=wrong-import-position
 
-FECONF_FILEPATH = os.path.join('core', 'feconf.py')
-CONSTANTS_FILEPATH = os.path.join('.', 'assets', 'constants.ts')
-RELEASE_CONSTANTS_FILEPATH = os.path.join(
+FECONF_FILEPATH: Final = os.path.join('core', 'feconf.py')
+CONSTANTS_FILEPATH: Final = os.path.join('.', 'assets', 'constants.ts')
+RELEASE_CONSTANTS_FILEPATH: Final = os.path.join(
     '.', 'assets', 'release_constants.json')
-KEYS_UPDATED_IN_FECONF = [
+KEYS_UPDATED_IN_FECONF: Final = [
     b'INCOMING_EMAILS_DOMAIN_NAME', b'ADMIN_EMAIL_ADDRESS',
     b'SYSTEM_EMAIL_ADDRESS', b'NOREPLY_EMAIL_ADDRESS', b'CAN_SEND_EMAILS',
     b'CAN_SEND_EDITOR_ROLE_EMAILS', b'CAN_SEND_FEEDBACK_MESSAGE_EMAILS',
     b'CAN_SEND_SUBSCRIPTION_EMAILS', b'DEFAULT_EMAIL_UPDATES_PREFERENCE',
     b'REQUIRE_EMAIL_ON_MODERATOR_ACTION', b'EMAIL_SERVICE_PROVIDER',
     b'SYSTEM_EMAIL_NAME', b'MAILGUN_DOMAIN_NAME']
-KEYS_UPDATED_IN_CONSTANTS = [
+KEYS_UPDATED_IN_CONSTANTS: Final = [
     b'SITE_FEEDBACK_FORM_URL', b'FIREBASE_CONFIG_API_KEY',
     b'FIREBASE_CONFIG_APP_ID', b'FIREBASE_CONFIG_AUTH_DOMAIN',
     b'FIREBASE_CONFIG_MESSAGING_SENDER_ID', b'FIREBASE_CONFIG_PROJECT_ID',
     b'FIREBASE_CONFIG_STORAGE_BUCKET', b'FIREBASE_CONFIG_GOOGLE_CLIENT_ID']
 
 
-def install_hook():
+def install_hook() -> None:
     """Installs the pre_commit_hook script and makes it executable.
     It ensures that oppia/ is the root folder.
 
@@ -101,7 +103,7 @@ def install_hook():
             raise ValueError(err_chmod_cmd)
 
 
-def start_subprocess_for_result(cmd):
+def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
     """Starts subprocess and returns (stdout, stderr)."""
     task = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -109,7 +111,7 @@ def start_subprocess_for_result(cmd):
     return out, err
 
 
-def does_diff_include_package_lock_file():
+def does_diff_include_package_lock_file() -> bool:
     """Checks whether the diff includes package-lock.json.
 
     Returns:
@@ -129,7 +131,7 @@ def does_diff_include_package_lock_file():
         raise ValueError(err)
 
 
-def does_current_folder_contain_have_package_lock_file():
+def does_current_folder_contain_have_package_lock_file() -> bool:
     """Checks whether package-lock.json exists in the current folder.
 
     Returns:
@@ -138,7 +140,7 @@ def does_current_folder_contain_have_package_lock_file():
     return os.path.isfile('package-lock.json')
 
 
-def check_changes(filetype):
+def check_changes(filetype: str) -> bool:
     """Checks if diff in feconf or constants file includes
     changes made for release.
 
@@ -166,7 +168,7 @@ def check_changes(filetype):
     return True
 
 
-def check_changes_in_config():
+def check_changes_in_config() -> None:
     """Checks whether feconf and assets have changes made for release
     deployment.
 
@@ -184,7 +186,7 @@ def check_changes_in_config():
                 CONSTANTS_FILEPATH))
 
 
-def check_changes_in_gcloud_path():
+def check_changes_in_gcloud_path() -> None:
     """Checks that the gcloud path in common.py matches with the path in
     release_constants.json.
 
@@ -205,7 +207,7 @@ def check_changes_in_gcloud_path():
                 common.GCLOUD_PATH, release_constants_gcloud_path))
 
 
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> None:
     """Main method for pre-commit hook that checks files added/modified
     in a commit.
     """
@@ -213,8 +215,8 @@ def main(args=None):
     parser.add_argument(
         '--install', action='store_true', default=False,
         help='Install pre_commit_hook to the .git/hooks dir')
-    args = parser.parse_args(args=args)
-    if args.install:
+    parsed_args = parser.parse_args(args=args)
+    if parsed_args.install:
         install_hook()
         return
 

@@ -34,8 +34,7 @@ from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, overload
-from typing_extensions import Literal
+from typing import Dict, List, Literal, Optional, Sequence, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -51,7 +50,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 def _migrate_states_schema(
     versioned_exploration_states: exp_domain.VersionedExplorationStatesDict,
-    init_state_name: str
+    init_state_name: str, language_code: str
 ) -> None:
     """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
@@ -70,6 +69,7 @@ def _migrate_states_schema(
             - states: the dict of states comprising the exploration. The keys in
                 this dict are state names.
         init_state_name: str. Name of initial state.
+        language_code: str. The language code of the exploration.
 
     Raises:
         Exception. The given states_schema_version is invalid.
@@ -90,7 +90,7 @@ def _migrate_states_schema(
            feconf.CURRENT_STATE_SCHEMA_VERSION):
         exp_domain.Exploration.update_states_from_model(
             versioned_exploration_states,
-            states_schema_version, init_state_name)
+            states_schema_version, init_state_name, language_code)
         states_schema_version += 1
 
 
@@ -189,12 +189,14 @@ def get_exploration_from_model(
         'states': copy.deepcopy(exploration_model.states)
     }
     init_state_name = exploration_model.init_state_name
+    language_code = exploration_model.language_code
 
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
     if (run_conversion and exploration_model.states_schema_version !=
             feconf.CURRENT_STATE_SCHEMA_VERSION):
-        _migrate_states_schema(versioned_exploration_states, init_state_name)
+        _migrate_states_schema(
+            versioned_exploration_states, init_state_name, language_code)
 
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
@@ -556,14 +558,40 @@ def get_exploration_user_data(
     )
 
 
+@overload
+def get_logged_out_user_progress(
+    unique_progress_url_id: str, *, strict: Literal[True]
+) -> exp_domain.TransientCheckpointUrl: ...
+
+
+@overload
 def get_logged_out_user_progress(
     unique_progress_url_id: str
+) -> Optional[exp_domain.TransientCheckpointUrl]: ...
+
+
+@overload
+def get_logged_out_user_progress(
+    unique_progress_url_id: str, *, strict: Literal[False]
+) -> Optional[exp_domain.TransientCheckpointUrl]: ...
+
+
+@overload
+def get_logged_out_user_progress(
+    unique_progress_url_id: str, *, strict: bool
+) -> Optional[exp_domain.TransientCheckpointUrl]: ...
+
+
+def get_logged_out_user_progress(
+    unique_progress_url_id: str, strict: bool = False
 ) -> Optional[exp_domain.TransientCheckpointUrl]:
     """Returns an TransientCheckpointUrl domain object.
 
     Args:
         unique_progress_url_id: str. The 6 digit long unique id
             assigned to the progress made by a logged-out user.
+        strict: bool. Whether to fail noisily if no TransientCheckpointUrlModel
+            with the given unique_progress_url_id exists in the datastore.
 
     Returns:
         TransientCheckpointUrl or None. The domain object corresponding to the
@@ -572,7 +600,7 @@ def get_logged_out_user_progress(
     """
     logged_out_user_progress_model = (
         exp_models.TransientCheckpointUrlModel.get(
-        unique_progress_url_id, strict=False))
+        unique_progress_url_id, strict=strict))
 
     if logged_out_user_progress_model is None:
         return None

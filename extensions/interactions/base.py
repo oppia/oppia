@@ -45,32 +45,34 @@ from core.domain import object_registry
 from core.domain import visualization_registry
 from extensions import domain
 from extensions.objects.models import objects
+from extensions.visualizations import models
 
-from typing import Any, Dict, List, Optional
-from typing_extensions import TypedDict
+from typing import Dict, Final, List, Optional, Tuple, Type, TypedDict
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from core.domain import state_domain
 
 # Indicates that the learner view of the interaction should be displayed in the
 # context of the conversation.
-DISPLAY_MODE_INLINE = 'inline'
+DISPLAY_MODE_INLINE: Final = 'inline'
 # Indicates that the learner view of the interaction should be displayed as a
 # separate object from the conversation.
-DISPLAY_MODE_SUPPLEMENTAL = 'supplemental'
+DISPLAY_MODE_SUPPLEMENTAL: Final = 'supplemental'
 
-ALLOWED_DISPLAY_MODES = [DISPLAY_MODE_SUPPLEMENTAL, DISPLAY_MODE_INLINE]
+ALLOWED_DISPLAY_MODES: Final = [
+    DISPLAY_MODE_SUPPLEMENTAL,
+    DISPLAY_MODE_INLINE
+]
 
 
-class CustomizationArgSpecsDict(TypedDict):
-    """Dictionary representing the _customization_arg_specs variable."""
+class AnswerVisualizationSpecsDict(TypedDict):
+    """Type for the _answer_visualization_specs variable."""
 
-    name: str
-    description: str
-    # Here we used Any because values in schema dictionary can be of type str,
-    # List, Dict and other types too.
-    schema: Dict[str, Any]
-    # Here, default_value can accept values of type List[str], str, bool and
-    # other types too. So to make it generalize for every default_value, we
-    # used Any type here.
-    default_value: Any
+    id: str
+    options: models.OptionsDictType
+    calculation_id: str
+    addressed_info_is_supported: bool
 
 
 class BaseInteractionDict(TypedDict):
@@ -85,7 +87,7 @@ class BaseInteractionDict(TypedDict):
     is_trainable: bool
     is_linear: bool
     needs_summary: bool
-    customization_arg_specs: List[CustomizationArgSpecsDict]
+    customization_arg_specs: List[domain.CustomizationArgSpecsDict]
     instructions: Optional[str]
     narrow_instructions: Optional[str]
     default_outcome_heading: Optional[str]
@@ -135,10 +137,10 @@ class BaseInteraction:
     answer_type: Optional[str] = None
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
-    _customization_arg_specs: List[CustomizationArgSpecsDict] = []
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = []
     # Specs for desired visualizations of recorded state answers. Overridden
     # in subclasses.
-    _answer_visualization_specs = []
+    _answer_visualization_specs: List[AnswerVisualizationSpecsDict] = []
     # Instructions for using this interaction, to be shown to the learner. Only
     # relevant for supplemental interactions.
     instructions: Optional[str] = None
@@ -162,27 +164,27 @@ class BaseInteraction:
     show_generic_submit_button: bool = False
 
     # Temporary cache for the rule definitions.
-    _cached_rules_dict = None
+    _cached_rules_dict: Optional[Dict[str, Dict[str, str]]] = None
 
     @property
-    def id(self):
+    def id(self) -> str:
         """The name of the class."""
         return self.__class__.__name__
 
     @property
-    def customization_arg_specs(self):
+    def customization_arg_specs(self) -> List[domain.CustomizationArgSpec]:
         """The customization arg specs for the interaction."""
         return [
             domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
 
     @property
-    def answer_visualization_specs(self):
+    def answer_visualization_specs(self) -> List[AnswerVisualizationSpecsDict]:
         """The answer visualization specs for the interaction."""
         return self._answer_visualization_specs
 
     @property
-    def answer_visualizations(self):
+    def answer_visualizations(self) -> List[models.BaseVisualization]:
         """A list of answer visualization specs of the interaction."""
         result = []
         for spec in self._answer_visualization_specs:
@@ -196,20 +198,25 @@ class BaseInteraction:
         return result
 
     @property
-    def dependency_ids(self):
+    def dependency_ids(self) -> List[str]:
         """A copy of dependency ids of the interaction."""
         return copy.deepcopy(self._dependency_ids)
 
-    def normalize_answer(self, answer):
+    def normalize_answer(
+        self, answer: state_domain.AcceptableCorrectAnswerTypes
+    ) -> state_domain.AcceptableCorrectAnswerTypes:
         """Normalizes a learner's input to this interaction."""
         if self.answer_type is None:
             return None
         else:
-            return object_registry.Registry.get_object_class_by_type(
-                self.answer_type).normalize(answer)
+            answers: state_domain.AcceptableCorrectAnswerTypes = (
+                    object_registry.Registry.get_object_class_by_type(
+                        self.answer_type).normalize(answer)
+                )
+            return answers
 
     @property
-    def rules_dict(self):
+    def rules_dict(self) -> Dict[str, Dict[str, str]]:
         """A dict of rule names to rule properties."""
         if self._cached_rules_dict is not None:
             return self._cached_rules_dict
@@ -262,14 +269,16 @@ class BaseInteraction:
             'show_generic_submit_button': self.show_generic_submit_button,
         }
 
-    def get_rule_description(self, rule_name):
+    def get_rule_description(self, rule_name: str) -> str:
         """Gets a rule description, given its name."""
         if rule_name not in self.rules_dict:
             raise Exception('Could not find rule with name %s' % rule_name)
 
         return self.rules_dict[rule_name]['description']
 
-    def get_rule_param_list(self, rule_name):
+    def get_rule_param_list(
+        self, rule_name: str
+    ) -> List[Tuple[str, Type[objects.BaseObject]]]:
         """Gets the parameter list for a given rule."""
         description = self.get_rule_description(rule_name)
 
@@ -292,7 +301,9 @@ class BaseInteraction:
 
         return param_list
 
-    def get_rule_param_type(self, rule_name, rule_param_name):
+    def get_rule_param_type(
+        self, rule_name: str, rule_param_name: str
+    ) -> Type[objects.BaseObject]:
         """Gets the parameter type for a given rule parameter name."""
         rule_param_list = self.get_rule_param_list(rule_name)
 

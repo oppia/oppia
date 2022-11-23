@@ -25,6 +25,13 @@
             (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)" >
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate"></span>
         </h4>
+        <h4 class="oppia-learner-dashboard-menu oppia-learner-dashborad-menu-hover e2e-test-learner-groups-section" tabindex="0"
+            [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS}"
+            *ngIf="LEARNER_GROUP_FEATURE_IS_ENABLED"
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS)"
+            (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS)" >
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS | translate"></span>
+        </h4>
         <h4 class="oppia-learner-dashboard-menu oppia-learner-dashborad-menu-hover e2e-test-community-lessons-section" tabindex="0"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS}"
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)"
@@ -52,7 +59,11 @@
         </div>
         <div class="oppia-buttons" (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)" [ngClass]="{'oppia-learner-dashboard-section-active-button': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS, 'oppia-learner-dashboard-section-not-active-button': activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS}">
           <img [src]="progressImageUrl" alt="progress image" class="oppia-svg-image">
-          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate"></span>
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate" class="progress-button"></span>
+        </div>
+        <div class="oppia-buttons" (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS)" [ngClass]="{'oppia-learner-dashboard-section-active-button': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS, 'oppia-learner-dashboard-section-not-active-button': activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS}">
+          <i class="fa fa-users learner-groups-icon" aria-hidden="true"></i>
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS | translate" class="learner-groups-button"></span>
         </div>
       </mat-card>
     </footer>
@@ -128,6 +139,11 @@
                               [learntTopicsList]="learntTopicsList"
                               [activeSubsection]="activeSubsection">
           </oppia-progress-tab>
+        </div>
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS && LEARNER_GROUP_FEATURE_IS_ENABLED">
+          <oppia-learner-groups-tab [username]="username"
+                                    (setActiveSection)="setActiveSection($event)">
+          </oppia-learner-groups-tab>
         </div>
         <div *ngIf="((!windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS) || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS)) && communtiyLessonsDataLoaded">
           <oppia-community-lessons-tab [incompleteExplorationsList]="incompleteExplorationsList"
@@ -222,10 +238,9 @@
             <tr>
               <td>
                 <button (click)="showAllThreads()"
-                        class="btn btn-secondary oppia-btn-secondary">
-                  <i class="material-icons oppia-vcenter"
+                        class="btn btn-secondary oppia-btn-secondary oppia-box-size">
+                  <i class="fas fa-chevron-left"
                      title="{{ 'I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE' | translate }}">
-                     &#xE5CB;
                   </i>
                 </button>
                 <span class="oppia-exploration-title">{{ explorationTitle }}</span>
@@ -255,7 +270,7 @@
 
                         <span *ngIf="!message.authorPictureDataUrl"
                               class="d-inline-block">
-                          <i class="material-icons md-40 oppia-profile-picture">&#xE853;</i>
+                          <i class="oppia-profile-alignment fas fa-user-circle fa-2x"></i>
                         </span>
                       </span>
 
@@ -333,7 +348,7 @@
           </table>
           <div class="feedback-thread-warning"
                *ngIf="feedbackThreadActive">
-            <i class="material-icons">&#xE88F;</i>
+            <i class="fas fa-exclamation-circle"></i>
             <span [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_WARNING' | translate"></span>
           </div>
           <div class="oppia-learnerdashboard-pagination-container" *ngIf="paginatedThreadsList.length > 0">
@@ -356,3 +371,12 @@
     </div>
   </div>
 </div>
+
+<style>
+  .oppia-profile-alignment {
+    vertical-align: middle;
+  }
+  .oppia-box-size {
+    padding: 2px 10px;
+  }
+</style>

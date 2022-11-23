@@ -308,6 +308,25 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.dummy_entity_translations = translation_domain.EntityTranslation(
             'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
             translation_dict)
+        self.state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                None, None, state_domain.SubtitledHtml(
+                    'feedback_1', 'Feedback'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            None
+        )
 
     def test_to_and_from_dict(self) -> None:
         """Test to verify to_dict and from_dict methods
@@ -335,6 +354,33 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Checks that the skill passes strict validation."""
         with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring
+        ):
+            self.question.validate()
+
+    def test_tagged_skill_misconception_id(self) -> None:
+        """Checks the tagged skill misconception id's format."""
+        state = self.question.question_state_data
+        state.update_interaction_answer_groups(
+            [self.state_answer_group])
+        state.interaction.answer_groups[0].tagged_skill_misconception_id = (
+            'invalid_tagged_skill_misconception_id'
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected the format of tagged skill misconception id '
+            'to be <skill_id>-<misconception_id>, received '
+            'invalid_tagged_skill_misconception_id'
+        ):
+            self.question.validate()
+
+        # Here we use MyPy ignore because we want to add a test which would
+        # check the tagged_skill_misconception_id's format as well as the
+        # regex.
+        state.interaction.answer_groups[
+            0].tagged_skill_misconception_id = 1 # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected tagged skill misconception id to be a str, received 1'
         ):
             self.question.validate()
 
@@ -1715,15 +1761,17 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'answer_is_exclusive': False
         }
 
+        ca_choices_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {'html': 'correct_value', 'content_id': 'content_id_1'},
+            {'html': 'value_2', 'content_id': 'content_id_2'},
+            {'html': 'value_3', 'content_id': 'content_id_3'}
+        ]
+
         question_data['interaction']['id'] = 'ItemSelectionInput'
         question_data['interaction']['solution'] = test_solution_dict
         question_data['interaction']['customization_args'] = {
             'choices': {
-                'value': [
-                    {'html': 'correct_value', 'content_id': 'content_id_1'},
-                    {'html': 'value_2', 'content_id': 'content_id_2'},
-                    {'html': 'value_3', 'content_id': 'content_id_3'}
-                ]
+                'value': ca_choices_dicts
             }
         }
         question_data['interaction']['answer_groups'] = [{
@@ -1768,14 +1816,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_solution_dict
         )
 
+        ca_choices_dicts = [
+            {'html': 'correct_value', 'content_id': 'content_id_1'},
+        ]
+
         # Testing with invalid 'x' input.
         test_value['state']['interaction']['id'] = 'ItemSelectionInput'
         test_value['state']['interaction']['solution'] = test_solution_dict
         test_value['state']['interaction']['customization_args'] = {
             'choices': {
-                'value': [
-                    {'html': 'correct_value', 'content_id': 'content_id_1'},
-                ]
+                'value': ca_choices_dicts
             }
         }
         test_value['state']['interaction']['answer_groups'] = [{
@@ -1826,13 +1876,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_value['state']['interaction']['solution'] = (
             drag_and_drop_test_solution_dict
         )
+        ca_choices_dicts = [
+            {'html': 'correct_value', 'content_id': 'content_id_1'},
+            {'html': 'value_2', 'content_id': 'content_id_2'},
+            {'html': 'value_3', 'content_id': 'content_id_3'}
+        ]
         test_value['state']['interaction']['customization_args'] = {
             'choices': {
-                'value': [
-                    {'html': 'correct_value', 'content_id': 'content_id_1'},
-                    {'html': 'value_2', 'content_id': 'content_id_2'},
-                    {'html': 'value_3', 'content_id': 'content_id_3'}
-                ]
+                'value': ca_choices_dicts
             }
         }
         test_value['state']['interaction']['answer_groups'] = [{
@@ -2211,6 +2262,20 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 52)
+
+    def test_question_state_dict_conversion_from_v52_to_v53(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        test_value: question_domain.VersionedQuestionStateDict = {
+            'state': question_data,
+            'state_schema_version': 52
+        }
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 53)
 
 
 class QuestionSummaryTest(test_utils.GenericTestBase):

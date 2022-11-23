@@ -25,11 +25,13 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
 
+from typing import Dict
+
 
 class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
     """Tests update skill mastery degree."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the setup for SkillMasteryDataHandler."""
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
@@ -45,7 +47,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         self.degree_of_mastery_1 = 0.3
         self.degree_of_mastery_2 = 0.5
 
-    def test_get_with_valid_skill_ids_list(self):
+    def test_get_with_valid_skill_ids_list(self) -> None:
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
         skill_services.create_user_skill_mastery(
@@ -68,7 +70,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_with_skill_without_skill_mastery(self):
+    def test_get_with_skill_without_skill_mastery(self) -> None:
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
 
@@ -89,7 +91,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_with_no_skill_ids_returns_400(self):
+    def test_get_with_no_skill_ids_returns_400(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         json_response = self.get_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
@@ -101,7 +103,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_with_invalid_skill_ids_returns_400(self):
+    def test_get_with_invalid_skill_ids_returns_400(self) -> None:
         skill_ids = ['invalid_skill_id']
 
         self.login(self.NEW_USER_EMAIL)
@@ -117,7 +119,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_with_nonexistent_skill_ids_returns_404(self):
+    def test_get_with_nonexistent_skill_ids_returns_404(self) -> None:
         skill_id_3 = skill_services.get_new_skill_id()
         skill_ids = [self.skill_id_1, skill_id_3]
 
@@ -130,7 +132,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_valid_skill_mastery_dict(self):
+    def test_put_with_valid_skill_mastery_dict(self) -> None:
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
         skill_services.create_user_skill_mastery(
@@ -161,7 +163,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_skill_with_no_skill_mastery(self):
+    def test_put_with_skill_with_no_skill_mastery(self) -> None:
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
 
@@ -190,7 +192,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_skill_mastery_lower_than_zero(self):
+    def test_put_with_skill_mastery_lower_than_zero(self) -> None:
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
         skill_services.create_user_skill_mastery(
@@ -221,7 +223,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_skill_mastery_higher_than_one(self):
+    def test_put_with_skill_mastery_higher_than_one(self) -> None:
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
         skill_services.create_user_skill_mastery(
@@ -252,7 +254,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_invalid_type_returns_400(self):
+    def test_put_with_invalid_type_returns_400(self) -> None:
         payload = {}
         mastery_change_per_skill = [self.skill_id_1, self.skill_id_2]
         payload['mastery_change_per_skill'] = mastery_change_per_skill
@@ -271,8 +273,8 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_no_mastery_change_per_skill_returns_400(self):
-        payload = {}
+    def test_put_with_no_mastery_change_per_skill_returns_400(self) -> None:
+        payload: Dict[str, str] = {}
 
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -287,7 +289,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_invalid_skill_ids_returns_400(self):
+    def test_put_with_invalid_skill_ids_returns_400(self) -> None:
         payload = {}
         mastery_change_per_skill = {
             'invalid_skill_id': 0.3
@@ -305,7 +307,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_nonexistent_skill_ids_returns_404(self):
+    def test_put_with_nonexistent_skill_ids_returns_404(self) -> None:
         skill_id_3 = skill_services.get_new_skill_id()
         payload = {}
         mastery_change_per_skill = {
@@ -323,7 +325,9 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_invalid_type_of_degree_of_mastery_returns_400(self):
+    def test_put_with_invalid_type_of_degree_of_mastery_returns_400(
+        self
+    ) -> None:
         payload = {}
         mastery_change_per_skill = {
             self.skill_id_1: 0.1,
@@ -359,7 +363,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_no_logged_in_user_returns_401(self):
+    def test_put_with_no_logged_in_user_returns_401(self) -> None:
         payload = {}
         mastery_change_per_skill = {
             self.skill_id_1: 0.3,
@@ -380,7 +384,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
     """Tests get subtopic mastery degree."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the setup for SubtopicMasteryDataHandler."""
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
@@ -413,7 +417,7 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         self.degree_of_mastery_5 = 0.9
         self.degree_of_mastery_6 = 0.6
 
-    def test_get_with_valid_topic_ids(self):
+    def test_get_with_valid_topic_ids(self) -> None:
         topic_id_1 = topic_fetchers.get_new_topic_id()
         topic_id_2 = topic_fetchers.get_new_topic_id()
 
@@ -597,7 +601,7 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
             })
         self.logout()
 
-    def test_get_with_invalid_topic_id_returns_400(self):
+    def test_get_with_invalid_topic_id_returns_400(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         response_json = self.get_json(
             '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
@@ -612,7 +616,7 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_with_no_topic_ids_returns_400(self):
+    def test_get_with_no_topic_ids_returns_400(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         json_response = self.get_json(
             '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
@@ -624,7 +628,7 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_with_delete_topic_id(self):
+    def test_with_delete_topic_id(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         topic_id_1 = topic_fetchers.get_new_topic_id()
         topic_id_2 = topic_fetchers.get_new_topic_id()

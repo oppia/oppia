@@ -35,7 +35,8 @@
       </span>
       <div class="oppia-android-key-feature-image-container">
         <img *ngIf="featuresShown === 1" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="">
-        <img *ngIf="featuresShown === 2 || featuresShown === 3" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="">
+        <img *ngIf="featuresShown === 2" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="">
+        <img *ngIf="featuresShown === 3" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-3.svg" alt="">
         <img *ngIf="featuresShown >= 4" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-4.svg" alt="">
       </div>
       <div class="oppia-android-key-feature-container">
@@ -98,7 +99,8 @@
         </div>
         <div class="oppia-android-key-feature-image-container oppia-web-only">
           <img *ngIf="featuresShown === 1" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="">
-          <img *ngIf="featuresShown === 2 || featuresShown === 3" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="">
+          <img *ngIf="featuresShown === 2" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="">
+          <img *ngIf="featuresShown === 3" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-3.svg" alt="">
           <img *ngIf="featuresShown >= 4" [@fadeIn] class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-4.svg" alt="">
         </div>
       </div>
@@ -114,7 +116,7 @@
       <div class="oppia-android-empty-div"></div>
     </div>
     <div #androidUpdatesSection class="oppia-android-app-updates-container oppia-android-app-updates-background">
-      <div *ngIf="false" class="d-flex">
+      <div class="d-flex">
         <div class="oppia-android-updates-text-container">
           <div class="oppia-android-updates-main-text"
                [innerHTML]="'I18N_ANDROID_PAGE_UPDATES_MAIN_TEXT' | translate">
@@ -130,7 +132,7 @@
               <span class="oppia-android-updates-asterisk-color">*</span>
             </div>
             <input class="oppia-android-updates-input"
-                   type="text"
+                   type="email"
                    [(ngModel)]="emailAddress"
                    [ngModelOptions]="{standalone: true}"
                    required="true">
@@ -144,14 +146,20 @@
                    required="true">
           </div>
           <div class="oppia-android-updates-input-padding">
-            <input class="oppia-android-updates-checkbox" type="checkbox">
+            <input class="oppia-android-updates-checkbox"
+                   [(ngModel)]="userCanSubscribe"
+                   type="checkbox">
             <span class="oppia-android-updates-checkbox-label">
               {{ 'I18N_ANDROID_PAGE_CONSENT_CHECKBOX_LABEL' | translate }}
               <span class="oppia-android-updates-asterisk-color">*</span>
             </span>
           </div>
           <div class="oppia-android-updates-input-padding text-center">
-            <button class="btn oppia-android-updates-button">{{ 'I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT' | translate }}</button>
+            <button [disabled]="!userCanSubscribe || !validateEmailAddress()"
+                    (click)="subscribeToAndroidList()"
+                    class="btn oppia-android-updates-button">
+              {{ 'I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT' | translate }}
+            </button>
           </div>
         </div>
       </div>

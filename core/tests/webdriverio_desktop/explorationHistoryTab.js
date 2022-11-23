@@ -81,7 +81,7 @@ describe('Exploration history', function() {
       'NumericInput', null, 'second', true, 'Equals', 6);
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('this is card 2'));
+      await forms.toRichText('this is card 2'), true);
     await explorationEditorMainTab.setInteraction('Continue');
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
@@ -588,7 +588,7 @@ describe('Exploration history', function() {
     await responseEditor.setDestination('second', true, null);
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('this is card 2'));
+      await forms.toRichText('this is card 2'), true);
     await explorationEditorMainTab.setInteraction('Continue');
 
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
@@ -629,7 +629,7 @@ describe('Exploration history', function() {
       'tags: []\n' +
       'blurb: \'\'\n' +
       'author_notes: \'\'\n' +
-      'states_schema_version: 52\n' +
+      'states_schema_version: 54\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +
@@ -647,7 +647,7 @@ describe('Exploration history', function() {
       'tags: []\n' +
       'blurb: \'\'\n' +
       'author_notes: \'\'\n' +
-      'states_schema_version: 52\n' +
+      'states_schema_version: 54\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +
@@ -725,6 +725,7 @@ describe('Exploration history', function() {
     // Revert to version 2.
     await explorationEditorPage.navigateToHistoryTab();
     await explorationEditorHistoryTab.revertToVersion(2);
+    await explorationEditorHistoryTab.expectRevertToVersion(2);
 
     // Verify exploration is version 2.
     await general.moveToPlayer();

@@ -23,21 +23,23 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.tests import test_utils
 
+from typing import List
+
 
 class BlogAdminPageTests(test_utils.GenericTestBase):
     """Checks the access to the blog admin page and its rendering."""
 
-    def test_blog_admin_page_access_without_logging_in(self):
+    def test_blog_admin_page_access_without_logging_in(self) -> None:
         """Tests access to the Blog Admin page."""
         self.get_html_response('/blog-admin', expected_status_int=302)
 
-    def test_blog_admin_page_acess_without_being_blog_admin(self):
+    def test_blog_admin_page_acess_without_being_blog_admin(self) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.get_html_response('/blog-admin', expected_status_int=401)
         self.logout()
 
-    def test_blog_admin_page_acess_as_blog_admin(self):
+    def test_blog_admin_page_acess_as_blog_admin(self) -> None:
         self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.add_user_role(
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
@@ -49,7 +51,7 @@ class BlogAdminPageTests(test_utils.GenericTestBase):
 class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
     """Checks the user role handling on the blog admin page."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Complete the signup process for self.ADMIN_EMAIL."""
         super().setUp()
         self.signup(
@@ -59,7 +61,9 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
             self.BLOG_ADMIN_USERNAME,
             feconf.ROLE_ID_BLOG_ADMIN)
 
-    def test_updating_and_removing_blog_editor_role_successfully(self):
+    def test_updating_and_removing_blog_editor_role_successfully(
+        self
+    ) -> None:
         user_email = 'user1@example.com'
         username = 'user1'
 
@@ -87,7 +91,7 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
             expected_status_int=200)
         self.assertEqual(response_dict, {})
 
-    def test_updating_blog_editor_role_for_invalid_user(self):
+    def test_updating_blog_editor_role_for_invalid_user(self) -> None:
         username = 'invaliduser'
 
         self.login(self.BLOG_ADMIN_EMAIL)
@@ -102,7 +106,7 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
 
-    def test_removing_blog_editor_role_for_invalid_user(self):
+    def test_removing_blog_editor_role_for_invalid_user(self) -> None:
         username = 'invaliduser'
 
         self.login(self.BLOG_ADMIN_EMAIL)
@@ -125,7 +129,7 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
 class BlogAdminHandlerTest(test_utils.GenericTestBase):
     """Checks the user role handling on the blog admin page."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Complete the signup process for self.ADMIN_EMAIL."""
         super().setUp()
         self.signup(
@@ -137,7 +141,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
 
         self.blog_admin_id = self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL)
 
-    def test_update_configuration_property(self):
+    def test_update_configuration_property(self) -> None:
         """Test that configuration properties can be updated."""
 
         self.login(self.BLOG_ADMIN_EMAIL)
@@ -169,10 +173,10 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_revert_config_property(self):
-        observed_log_messages = []
+    def test_revert_config_property(self) -> None:
+        observed_log_messages: List[str] = []
 
-        def _mock_logging_function(msg, *args):
+        def _mock_logging_function(msg: str, *args: str) -> None:
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
@@ -203,7 +207,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_invalid_values_for_updating_config_properties(self):
+    def test_invalid_values_for_updating_config_properties(self) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         new_config_value = [20]
@@ -229,7 +233,47 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             response_dict['error'], 'Schema validation for \'new_config_'
             'property_values\' failed: Could not convert list to int: [20]')
 
-    def test_raise_error_for_updating_value_to_zero_for_max_tags(self):
+    def test_config_prop_cannot_be_saved_without_new_config_property_values(
+        self
+    ) -> None:
+        self.login(self.BLOG_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': None
+        }
+        response_dict = self.post_json(
+            '/blogadminhandler', payload, csrf_token=csrf_token,
+            expected_status_int=500
+        )
+        self.assertEqual(
+            response_dict['error'],
+            'The new_config_property_values cannot be None when the '
+            'action is save_config_properties.'
+        )
+
+    def test_config_id_cannot_be_none_when_action_is_revert_config_property(
+        self
+    ) -> None:
+        self.login(self.BLOG_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'action': 'revert_config_property',
+            'config_property_id': None
+        }
+        response_dict = self.post_json(
+            '/blogadminhandler', payload, csrf_token=csrf_token,
+            expected_status_int=500
+        )
+        self.assertEqual(
+            response_dict['error'],
+            'The config_property_id cannot be None when the action '
+            'is revert_config_property.'
+        )
+
+    def test_raise_error_for_updating_value_to_zero_for_max_tags(self) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         new_config_value = 0
@@ -257,7 +301,9 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             ' ({\'min_value\': 1}) for object 0'
         )
 
-    def test_raise_error_for_updating_to_negative_value_for_max_tags(self):
+    def test_raise_error_for_updating_to_negative_value_for_max_tags(
+        self
+    ) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         new_config_value = -2

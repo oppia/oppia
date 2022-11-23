@@ -33,8 +33,11 @@ var LibraryPage = function() {
   var explorationObjective = $('.e2e-test-exp-summary-tile-objective');
   var expHoverElement = $('.e2e-test-exploration-dashboard-card');
   var expSummaryTileTitleLocator = '.e2e-test-exp-summary-tile-title';
+  var homeSection = $('.e2e-test-home-section');
   var mainHeader = $('.e2e-test-library-main-header');
+  var oppiaLogo = $('.e2e-test-oppia-main-logo');
   var searchButton = $('.e2e-test-search-button');
+  var searchInputElement = $('.e2e-test-search-input');
   var searchInputsSelector = function() {
     return $$('.e2e-test-search-input');
   };
@@ -48,13 +51,22 @@ var LibraryPage = function() {
   };
   var categorySelector = forms.MultiSelectEditor(
     $('.e2e-test-search-bar-category-selector'));
+  var expSummaryTileRatingLocator = '.e2e-test-exp-summary-tile-rating';
+  var expSummaryTileObjectiveLocator = '.e2e-test-exp-summary-tile-objective';
   var languageSelector = forms.MultiSelectEditor(
     $('.e2e-test-search-bar-language-selector'));
 
   // Returns a promise of all explorations with the given name.
-  var _getExplorationElements = async function(name) {
-    var allExplorationSummaryTile = allExplorationSummaryTileSelector();
-    return await allExplorationSummaryTile.filter(
+  // When there is no exploration present on the Library page 'isHidden'
+  // will be true and we do not need to wait for the visiblity of explorations.
+  var _getExplorationElements = async function(name, isHidden = false) {
+    if (!isHidden) {
+      await waitFor.visibilityOf(
+        allExplorationSummaryTile,
+        'All Exploration summary tile is taking too long to appear');
+    }
+    var allExplorationSummaryTiles = allExplorationSummaryTileSelector();
+    return await allExplorationSummaryTiles.filter(
       async function(tile) {
         var tileTitle = await action.getText('Exp Summary Title', tile.$(
           expSummaryTileTitleLocator));
@@ -69,6 +81,8 @@ var LibraryPage = function() {
     // browser and is invisible in case of a mobile browser.
     // The second search bar input element is visible when the library
     // page is rendered for mobile device.
+    await waitFor.visibilityOf(
+      searchInputElement, 'Search input takes too long to appear');
 
     // Function get is a zero-based index.
     var searchInputs = await searchInputsSelector();
@@ -87,6 +101,12 @@ var LibraryPage = function() {
   this.get = async function() {
     await browser.url(LIBRARY_URL_SUFFIX);
     await waitFor.pageToFullyLoad();
+  };
+
+  this.getHomePage = async function() {
+    await action.click('Oppia logo', oppiaLogo);
+    await waitFor.textToBePresentInElement(
+      homeSection, 'Home', 'Library page takes too long to load');
   };
 
   this.addSelectedExplorationToPlaylist = async function() {
@@ -140,7 +160,7 @@ var LibraryPage = function() {
   };
 
   this.expectExplorationToBeHidden = async function(name) {
-    var elems = await _getExplorationElements(name);
+    var elems = await _getExplorationElements(name, true);
     expect(elems.length).toBe(0);
   };
 
