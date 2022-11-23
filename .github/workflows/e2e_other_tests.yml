@@ -54,12 +54,10 @@ jobs:
         run: python -m scripts.build --prod_env
       - name: Zip build files
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: |
-          cd /home/runner/work/oppia
-          # We avoid using ../ or absolute paths because unzip treats these as
-          # security issues and will refuse to follow them.
-          zip build_files.zip oppia/third_party oppia_tools oppia/build
-          cd -
+        # We avoid using ../ or absolute paths because unzip treats these as
+        # security issues and will refuse to follow them.
+        run: zip build_files.zip oppia/third_party oppia_tools oppia/build
+        working-directory: /home/runner/work/oppia
       - name: Upload build files artifact
         uses: actions/upload-artifact@v3
         with:
@@ -105,14 +103,12 @@ jobs:
           path: /home/runner/work/oppia/build_files.zip
       - name: Unzip build files
         run: |
-          # Move to the same directory where we created the zip to ensure that
-          # the unzipped files are created in the correct places.
-          cd /home/runner/work/oppia
           pwd
+          whoami
           ls -la
           unzip build_files.zip
           rm build_files.zip
-          cd -
+        working-directory: /home/runner/work/oppia
       - uses: ./.github/actions/install-oppia-dependencies
       - id: check-risk
         name: Check if PR is low-risk
