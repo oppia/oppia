@@ -85,6 +85,10 @@ var suites = {
     './core/tests/webdriverio_desktop/creatorDashboard.js'
   ],
 
+  diagnosticTestPage: [
+    './core/tests/webdriverio_desktop/diagnosticTestPage.js'
+  ],
+
   embedding: [
     './core/tests/webdriverio_desktop/embedding.js'
   ],

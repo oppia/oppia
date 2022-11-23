@@ -135,8 +135,30 @@ describe('Classroom Page Component', () => {
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(classroomBackendApiService.onInitializeTranslation, 'emit');
     spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
+    let topicSummaryDicts = [{
+      id: 'topic1',
+      name: 'Topic name',
+      description: 'Topic description',
+      canonical_story_count: 4,
+      subtopic_count: 5,
+      total_skill_count: 20,
+      uncategorized_skill_count: 5,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      language_code: 'en',
+      version: 1,
+      additional_story_count: 0,
+      total_published_node_count: 4,
+      topic_model_created_on: 20160101,
+      topic_model_last_updated: 20160110,
+      can_edit_topic: true,
+      is_published: true,
+      url_fragment: 'some-url-fragment',
+      classroom: 'math'
+    }];
+
     let classroomData = ClassroomData.createFromBackendData(
-      'Math', [], 'Course details', 'Topics covered');
+      'Math', topicSummaryDicts, 'Course details', 'Topics covered');
     spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
       .and.returnValues(
         Promise.reject(),
