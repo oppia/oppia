@@ -38,7 +38,6 @@ var DiagnosticTestPage = function() {
   var submitTopicIdToClassroomButton = $(
     '.e2e-test-submit-topic-id-to-classroom-button');
   var saveClassroomConfigButton = $('.e2e-test-save-classroom-config-button');
-  var classroomTileContainerSelector = $('.e2e-test-classroom-tile-container');
 
   this.startDiagnosticTest = async function() {
     await action.click(
@@ -53,20 +52,12 @@ var DiagnosticTestPage = function() {
 
     await waitFor.modalPopupToAppear();
 
-    await waitFor.visibilityOf(
-      newClassrooomNameInput,
-      'New classroom name input is not visible'
-    );
     await action.setValue(
       'New classroom name input',
       newClassrooomNameInput,
       classroomName
     );
 
-    await waitFor.visibilityOf(
-      newClassrooomNameInput,
-      'New classroom URL fragment input is not visible'
-    );
     await action.setValue(
       'New classroom URL fragment input',
       newClassroomUrlFragmentInput,
@@ -78,10 +69,6 @@ var DiagnosticTestPage = function() {
   };
 
   this.addTopicIdToClassroomConfig = async function(topicId, index) {
-    await waitFor.visibilityOf(
-      classroomTileContainerSelector,
-      'Classroom tile is not visible'
-    );
     await action.click(
       'Classroom config tile selector', classroomTileSelector);
 
@@ -91,9 +78,6 @@ var DiagnosticTestPage = function() {
     await action.click(
       'Add topic to classroom button', addTopicToClassroomButton);
 
-    await waitFor.visibilityOf(
-      addTopicToClassroomInput,
-      'Add topic to classroom input field is not visible');
     await action.setValue(
       'Add topic ID to classroom input',
       addTopicToClassroomInput,

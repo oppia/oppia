@@ -14,8 +14,7 @@
         No classroom exists at this moment.
       </em>
 
-      <div *ngFor="let classroom of classroomIdToClassroomName | keyvalue"
-           class="e2e-test-classroom-tile-container">
+      <div *ngFor="let classroom of classroomIdToClassroomName | keyvalue">
         <div class="oppia-classroom-tile e2e-test-classroom-tile"
              (click)="getClassroomData(classroom.key)">
           <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())">
