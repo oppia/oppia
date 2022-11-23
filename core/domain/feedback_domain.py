@@ -379,21 +379,19 @@ class FeedbackMessageReference:
             FeedbackMessageReference. The corresponding FeedbackMessageReference
             domain object.
         """
-        feedback_properties = [
-            'entity_type', 'entity_id',
-            'thread_id', 'message_id']
-        for feedback_property in feedback_properties:
-            if feedback_property not in reference_dict:
-                raise utils.ValidationError(
-                    '%s not in reference dict.' % (
-                        feedback_property))
 
-        return cls(
-            reference_dict['entity_type'],
-            reference_dict['entity_id'],
-            reference_dict['thread_id'],
-            reference_dict['message_id']
-        )
+        try:
+            feedback_message_reference = cls(
+                reference_dict['entity_type'],
+                reference_dict['entity_id'],
+                reference_dict['thread_id'],
+                reference_dict['message_id']
+            )
+        except utils.ValidationError as error:
+            raise utils.ValidationError(
+                'Missing property in reference dict.') from error
+
+        return feedback_message_reference
 
     def validate(self) -> None:
         """Validates various properties of the FeedbackMessageReference."""
