@@ -20,7 +20,6 @@ Usage: Run this script from your oppia root folder:
 
     python -m scripts.release_scripts.update_configs
 """
-from cryptography.fernet import Fernet
 from __future__ import annotations
 
 import argparse
@@ -28,6 +27,7 @@ import getpass
 import os
 import re
 
+from cryptography.fernet import Fernet
 import github
 from typing import Final, List, Optional
 
