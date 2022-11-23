@@ -49,7 +49,23 @@ describe('Exploration data service', function() {
     states: {},
     title: 'Test Exploration',
     language_code: 'en',
-    correctness_feedback_enabled: false
+    correctness_feedback_enabled: false,
+    exploration_metadata: {
+      title: 'Exploration',
+      category: 'Algebra',
+      objective: 'To learn',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: 'Introduction',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: true,
+      edits_allowed: true
+    }
   };
   let sampleExploration: FetchExplorationBackendResponse = {
     can_edit: true,
@@ -190,7 +206,23 @@ describe('Exploration data service', function() {
         title: 'Test Exploration',
         language_code: 'en',
         next_content_id_index: 5,
-        correctness_feedback_enabled: false
+        correctness_feedback_enabled: false,
+        exploration_metadata: {
+          title: 'Exploration',
+          category: 'Algebra',
+          objective: 'To learn',
+          language_code: 'en',
+          tags: [],
+          blurb: '',
+          author_notes: '',
+          states_schema_version: 50,
+          init_state_name: 'Introduction',
+          param_specs: {},
+          param_changes: [],
+          auto_tts_enabled: false,
+          correctness_feedback_enabled: true,
+          edits_allowed: true
+        }
       };
       eds.data = dataResults;
       const errorCallback = jasmine.createSpy('error');

@@ -48,6 +48,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { ExplorationChange } from './exploration-draft.model';
 import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
+import { ExplorationMetadataBackendDict } from './ExplorationMetadataObjectFactory';
 
 export interface ExplorationBackendDict {
   'auto_tts_enabled': boolean;
@@ -64,6 +65,7 @@ export interface ExplorationBackendDict {
   'version'?: number;
   'next_content_id_index': number;
   'edits_allowed'?: boolean;
+  'exploration_metadata': ExplorationMetadataBackendDict;
 }
 
 export class Exploration extends BaseTranslatableObject {

@@ -163,7 +163,8 @@ export class ExplorationPlayerStateService {
         draft_change_list_id: returnDict.draft_change_list_id,
         language_code: returnDict.exploration.language_code,
         version: returnDict.version,
-        next_content_id_index: returnDict.exploration.next_content_id_index
+        next_content_id_index: returnDict.exploration.next_content_id_index,
+        exploration_metadata: returnDict.exploration_metadata
       },
       returnDict.version,
       returnDict.preferred_audio_language_code,

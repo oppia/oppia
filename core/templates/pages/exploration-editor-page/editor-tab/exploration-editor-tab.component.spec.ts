@@ -46,11 +46,13 @@ import { DomRefService, JoyrideDirective, JoyrideOptionsService, JoyrideService,
 import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 import { Router } from '@angular/router';
 import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
-import { State } from 'domain/state/StateObjectFactory';
+import { State, StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { ContextService } from 'services/context.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ExplorationNextContentIdIndexService } from '../services/exploration-next-content-id-index.service';
+import { VersionHistoryService } from '../services/version-history.service';
+import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 
 describe('Exploration editor tab component', () => {
   let component: ExplorationEditorTabComponent;
@@ -77,6 +79,10 @@ describe('Exploration editor tab component', () => {
   var explorationNextContentIdIndexService:
     ExplorationNextContentIdIndexService;
   let mockRefreshStateEditorEventEmitter = null;
+  let versionHistoryService: VersionHistoryService;
+  let stateObjectFactory: StateObjectFactory;
+  let stateObject: StateBackendDict;
+  let versionHistoryBackendApiService: VersionHistoryBackendApiService;
 
   class MockNgbModal {
     open() {
@@ -189,7 +195,8 @@ describe('Exploration editor tab component', () => {
               return;
             }
           }
-        }
+        },
+        VersionHistoryService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -224,6 +231,10 @@ describe('Exploration editor tab component', () => {
     contextService = TestBed.inject(ContextService);
     explorationNextContentIdIndexService = TestBed.inject(
       ExplorationNextContentIdIndexService);
+    versionHistoryService = TestBed.inject(VersionHistoryService);
+    stateObjectFactory = TestBed.inject(StateObjectFactory);
+    versionHistoryBackendApiService = TestBed.inject(
+      VersionHistoryBackendApiService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
     spyOn(contextService, 'getExplorationId').and.returnValue(
@@ -239,6 +250,67 @@ describe('Exploration editor tab component', () => {
     let element = document.createElement('div');
     spyOn(document, 'querySelector').and.returnValue((
       element as HTMLElement));
+    spyOn(
+      versionHistoryService, 'getLatestVersionOfExploration'
+    ).and.returnValue(3);
+
+    stateObject = {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: ''
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: 1
+          },
+          placeholder: {
+            value: {
+              unicode_str: 'Type your answer here.',
+              content_id: ''
+            }
+          }
+        },
+        default_outcome: {
+          dest: '(untitled state)',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'default_outcome',
+            html: ''
+          },
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        hints: [],
+        solution: null,
+        id: 'TextInput'
+      },
+      linked_skill_id: null,
+      param_changes: [],
+      solicit_answer_details: false,
+      card_is_checkpoint: false
+    };
+    let stateData = stateObjectFactory.createFromBackendDict(
+      'State', stateObject);
+    spyOn(
+      versionHistoryBackendApiService, 'fetchStateVersionHistoryAsync'
+    ).and.resolveTo({
+      lastEditedVersionNumber: 2,
+      stateNameInPreviousVersion: 'State',
+      stateInPreviousVersion: stateData,
+      lastEditedCommitterUsername: 'some'
+    });
 
     explorationStatesService.init({
       'First State': {

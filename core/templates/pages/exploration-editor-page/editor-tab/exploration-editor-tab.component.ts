@@ -47,6 +47,9 @@ import { LoaderService } from 'services/loader.service';
 import { GraphDataService } from '../services/graph-data.service';
 import { ExplorationNextContentIdIndexService } from '../services/exploration-next-content-id-index.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { VersionHistoryService } from '../services/version-history.service';
+import { StateVersionHistoryResponse, VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
+import { ContextService } from 'services/context.service';
 
 @Component({
   selector: 'oppia-exploration-editor-tab',
@@ -79,6 +82,7 @@ export class ExplorationEditorTabComponent
       private editabilityService: EditabilityService,
       private explorationNextContentIdIndexService:
         ExplorationNextContentIdIndexService,
+      private generateContentIdService: GenerateContentIdService,
       private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
       private siteAnalyticsService: SiteAnalyticsService,
       private explorationStatesService: ExplorationStatesService,
@@ -94,11 +98,13 @@ export class ExplorationEditorTabComponent
       private explorationCorrectnessFeedbackService:
         ExplorationCorrectnessFeedbackService,
       private focusManagerService: FocusManagerService,
-      private generateContentIdService: GenerateContentIdService,
       private stateEditorRefreshService: StateEditorRefreshService,
       private loaderService: LoaderService,
       private graphDataService: GraphDataService,
       private joyride: JoyrideService,
+      private versionHistoryService: VersionHistoryService,
+      private versionHistoryBackendApiService: VersionHistoryBackendApiService,
+      private contextService: ContextService
     ) { }
 
     startTutorial(): void {
@@ -353,6 +359,26 @@ export class ExplorationEditorTabComponent
           this.stateName);
         if (content.html || stateData.interaction.id) {
           this.interactionIsShown = true;
+        }
+
+        this.versionHistoryService.resetStateVersionHistory();
+        this.versionHistoryService.insertStateVersionHistoryData(
+          this.versionHistoryService.getLatestVersionOfExploration(),
+          stateData, '');
+
+        if (
+          this.versionHistoryService.getLatestVersionOfExploration() !== null
+        ) {
+          this.versionHistoryBackendApiService.fetchStateVersionHistoryAsync(
+            this.contextService.getExplorationId(), stateData.name,
+            this.versionHistoryService.getLatestVersionOfExploration()
+          ).then((response: StateVersionHistoryResponse) => {
+            this.versionHistoryService.insertStateVersionHistoryData(
+              response.lastEditedVersionNumber,
+              response.stateInPreviousVersion,
+              response.lastEditedCommitterUsername
+            );
+          });
         }
 
         this.loaderService.hideLoadingScreen();

@@ -56,6 +56,7 @@ import { ExplorationNextContentIdIndexService } from 'pages/exploration-editor-p
 import { MarkTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-translations-as-needing-update-modal.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { BaseTranslatableObject, TranslatableField } from 'domain/objects/BaseTranslatableObject.model';
+import { TextInputRuleInputs } from 'interactions/rule-input-defs';
 
 interface ContentsMapping {
   [contentId: string]: TranslatableField;
@@ -171,7 +172,7 @@ export class ExplorationStatesService {
   };
 
   private _CONTENT_EXTRACTORS = {
-    answer_groups: (answerGroups) => {
+    answer_groups: (answerGroups: AnswerGroup[]) => {
       let contents = [];
       answerGroups.forEach(
         answerGroup => {
@@ -179,20 +180,22 @@ export class ExplorationStatesService {
         });
       return contents;
     },
-    default_outcome: (defaultOutcome) => {
+    default_outcome: (defaultOutcome: Outcome) => {
       return defaultOutcome ? defaultOutcome.getAllContents() : [];
     },
-    hints: (hints) => {
+    hints: (hints: Hint[]) => {
       let contents = [];
       hints.forEach(hint => {
         contents = contents.concat(hint.getAllContents());
       });
       return contents;
     },
-    solution: (solution) => {
+    solution: (solution: Solution) => {
       return solution ? solution.getAllContents() : [];
     },
-    widget_customization_args: (customizationArgs) => {
+    widget_customization_args: (
+      customizationArgs: InteractionCustomizationArgs
+    ) => {
       return customizationArgs ? Interaction.getCustomizationArgContents(
         customizationArgs) : [];
     }
@@ -252,8 +255,9 @@ export class ExplorationStatesService {
     return diffList as string[];
   }
 
-  private _setState(stateName: string, stateData, refreshGraph: boolean): void {
-    this._states.setState(stateName, cloneDeep(stateData));
+  private _setState(
+      stateName: string, stateData: State, refreshGraph: boolean): void {
+    (this._states as States).setState(stateName, cloneDeep(stateData));
     if (refreshGraph) {
       this._refreshGraphEventEmitter.emit();
     }
@@ -297,8 +301,8 @@ export class ExplorationStatesService {
   getStatePropertyMemento(
       stateName: string, backendName: StatePropertyNames
   ): StatePropertyValues {
-    let accessorList = this.PROPERTY_REF_DATA[backendName];
-    let propertyRef = this._states.getState(stateName);
+    let accessorList: string[] = this.PROPERTY_REF_DATA[backendName];
+    let propertyRef = (this._states as States).getState(stateName);
     try {
       accessorList.forEach((key: string) => {
         propertyRef = propertyRef[key];
