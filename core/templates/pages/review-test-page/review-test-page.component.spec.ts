@@ -77,8 +77,6 @@ describe('Review test page component', () => {
 
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       'topic_1');
-    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
-      'story_1');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'classroom_1');
 
@@ -94,6 +92,8 @@ describe('Review test page component', () => {
 
   it('should initialize correctly controller properties after its' +
   ' initialization and get skill details from backend', fakeAsync(() => {
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+      'story_1');
     spyOn(component, 'subscribeToOnLanguageCodeChange');
 
     component.ngOnInit();
@@ -124,7 +124,18 @@ describe('Review test page component', () => {
     });
   }));
 
+  it('should throw error if story url is null', fakeAsync(() => {
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+      null);
+    expect(() => {
+      component.ngOnInit();
+      tick();
+    }).toThrowError('Story url fragment cannot be null.');
+  }));
+
   it('should subscribe to onLanguageCodeChange', () => {
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+      'story_1');
     spyOn(component.directiveSubscriptions, 'add');
     spyOn(i18nLanguageCodeService.onI18nLanguageCodeChange, 'subscribe');
 
@@ -136,6 +147,8 @@ describe('Review test page component', () => {
   });
 
   it('should update title whenever the language changes', () => {
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+      'story_1');
     component.subscribeToOnLanguageCodeChange();
     spyOn(component, 'setPageTitle');
 
@@ -145,6 +158,8 @@ describe('Review test page component', () => {
   });
 
   it('should obtain translated title and set it', () => {
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+      'story_1');
     spyOn(pageTitleService, 'setDocumentTitle');
     component.storyName = 'dummy_story_name';
 
@@ -155,6 +170,8 @@ describe('Review test page component', () => {
   });
 
   it('should unsubscribe on component destruction', () => {
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+      'story_1');
     spyOn(component.directiveSubscriptions, 'unsubscribe');
 
     component.ngOnDestroy();

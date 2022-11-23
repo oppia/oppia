@@ -51,8 +51,11 @@ export class PreviewTabComponent
   implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  previewWarning: string;
-  isExplorationPopulated: boolean;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  previewWarning!: string;
+  isExplorationPopulated!: boolean;
   allParams: ExplorationParams | object = {};
 
   constructor(
@@ -80,12 +83,12 @@ export class PreviewTabComponent
   ) { }
 
   getManualParamChanges(
-      initStateNameForPreview: string): Promise<string[] | string> {
+      initStateNameForPreview: string): Promise<ParamChange[]> {
     let unsetParametersInfo = this.parameterMetadataService
       .getUnsetParametersInfo([initStateNameForPreview]);
 
     // Construct array to hold required parameter changes.
-    let manualParamChanges = [];
+    let manualParamChanges: ParamChange[] = [];
     for (let i = 0; i < unsetParametersInfo.length; i++) {
       let newParamChange = this.paramChangeObjectFactory.createEmpty(
         unsetParametersInfo[i].paramName);
@@ -97,9 +100,9 @@ export class PreviewTabComponent
       this.showSetParamsModal(manualParamChanges, () => {
         return Promise.resolve(manualParamChanges);
       });
-    } else {
-      return Promise.resolve([]);
     }
+
+    return Promise.resolve([]);
   }
 
   showParameterSummary(): boolean {
@@ -108,7 +111,10 @@ export class PreviewTabComponent
       !isEqual({}, this.allParams));
   }
 
-  showSetParamsModal(manualParamChanges: string[], callback: Function): void {
+  showSetParamsModal(
+      manualParamChanges: ParamChange[],
+      callback: Function
+  ): void {
     const modalRef = this.ngbModal.open(PreviewSetParametersModalComponent, {
       backdrop: 'static',
       windowClass: 'oppia-preview-set-params-modal',
@@ -142,7 +148,7 @@ export class PreviewTabComponent
       this.editableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
         explorationId).then((returnDict) => {
         this.explorationEngineService.init(
-          returnDict, null, null, null, null,
+          returnDict, 0, null, false, [],
           () => {
             this.loadPreviewState(initStateNameForPreview, []);
           });
@@ -187,11 +193,9 @@ export class PreviewTabComponent
           this.explorationInitStateNameService.init(
             explorationData.init_state_name);
           this.graphDataService.recompute();
+          let stateName = this.stateEditorService.getActiveStateName();
           if (
-            !this.stateEditorService.getActiveStateName() ||
-                !this.explorationStatesService.getState(
-                  this.stateEditorService.getActiveStateName()
-                )
+            !stateName || !this.explorationStatesService.getState(stateName)
           ) {
             this.stateEditorService.setActiveStateName(
               this.explorationInitStateNameService.displayed as string);
@@ -202,7 +206,7 @@ export class PreviewTabComponent
 
         // Show a warning message if preview doesn't start from the first
         // state.
-        if (initStateNameForPreview !==
+        if (initStateNameForPreview && initStateNameForPreview !==
                 this.explorationInitStateNameService.savedMemento) {
           this.previewWarning =
                 'Preview started from \"' + initStateNameForPreview + '\"';
@@ -210,13 +214,17 @@ export class PreviewTabComponent
           this.previewWarning = '';
         }
 
-        // Prompt user to enter any unset parameters, then populate
-        // exploration.
-        this.getManualParamChanges(initStateNameForPreview).then(
-          (manualParamChanges) => {
-            this.loadPreviewState(
-              initStateNameForPreview, manualParamChanges);
-          });
+        if (initStateNameForPreview) {
+          // Prompt user to enter any unset parameters, then populate
+          // exploration.
+          this.getManualParamChanges(initStateNameForPreview).then(
+            (manualParamChanges) => {
+              if (initStateNameForPreview) {
+                this.loadPreviewState(
+                  initStateNameForPreview, manualParamChanges);
+              }
+            });
+        }
       });
   }
 
