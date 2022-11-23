@@ -30,7 +30,7 @@ from core.domain import rights_manager
 from core.domain import user_services
 
 from mutagen import mp3
-from typing import Dict, TypedDict, cast
+from typing import Dict, TypedDict
 
 
 class AudioUploadHandlerNormalizedRequestDict(TypedDict):
@@ -94,15 +94,7 @@ class AudioUploadHandler(
         assert self.normalized_payload is not None
         assert self.normalized_request is not None
 
-        # Here we use cast because we want to narrow down the type
-        # of 'normalized_request' to a particular TypedDict that
-        # was defined according to the schemas so that the type
-        # of fetched value is considered bytes and not str.
-        request_data = cast(
-            AudioUploadHandlerNormalizedRequestDict,
-            self.normalized_request
-        )
-        raw_audio_file = request_data['raw_audio_file']
+        raw_audio_file = self.normalized_request['raw_audio_file']
         filename = self.normalized_payload['filename']
 
         tempbuffer = io.BytesIO()
