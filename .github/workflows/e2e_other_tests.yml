@@ -107,7 +107,10 @@ jobs:
         run: |
           # Move to the same directory where we created the zip to ensure that
           # the unzipped files are created in the correct places.
+          ls /home/runner/work/oppia
           cd /home/runner/work/oppia
+          pwd
+          ls
           unzip build_files.zip
           rm build_files.zip
           cd -
