@@ -20,7 +20,7 @@ Usage: Run this script from your oppia root folder:
 
     python -m scripts.release_scripts.update_configs
 """
-
+from cryptography.fernet import Fernet
 from __future__ import annotations
 
 import argparse
@@ -262,6 +262,7 @@ def add_mailgun_api_key(release_feconf_path: str) -> None:
         release_feconf_path: str. The path to feconf file in release
             directory.
     """
+
     mailgun_api_key = getpass.getpass(
         prompt=('Enter mailgun api key from the release process doc.'))
     mailgun_api_key = mailgun_api_key.strip()
@@ -278,10 +279,13 @@ def add_mailgun_api_key(release_feconf_path: str) -> None:
 
     assert 'MAILGUN_API_KEY = None\n' in feconf_lines, 'Missing mailgun API key'
 
+    key = Fernet.generate_key()
+    f = Fernet(key)
+    mailgun_api_key_encrypted = f.encrypt(mailgun_api_key)
     with utils.open_file(release_feconf_path, 'w') as f:
         for line in feconf_lines:
             if line == 'MAILGUN_API_KEY = None\n':
-                line = line.replace('None', '\'%s\'' % mailgun_api_key)
+                line = line.replace('None', '\'%s\'' % f.decrypt(mailgun_api_key_encrypted).decode())
             f.write(line)
 
 
