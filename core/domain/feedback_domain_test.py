@@ -206,6 +206,7 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
         reference_dict.thread_id = 'invalid_thread_id'
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Thread ID did not match expected pattern'
-                ', received: \'%s\'' % reference_dict.thread_id):
+            'Thread ID did not match expected pattern, '
+            'received: \'%s\'' % reference_dict.thread_id
+        ):
             reference_dict.validate()
