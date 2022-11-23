@@ -64,7 +64,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build_files
-          path: build_files.zip
+          path: /home/runner/work/oppia/build_files.zip
           retention-days: 1
   e2e_collections:
     needs: build
