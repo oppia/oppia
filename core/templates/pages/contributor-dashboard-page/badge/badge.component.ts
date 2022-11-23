@@ -34,25 +34,17 @@ export class BadgeComponent {
 
   fontSize: string = '13px';
   lineHeight: string = '20px';
+  CONTRIBUTION_SUB_TYPE_TEXTS = {
+    [AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION]: 'Submission',
+    [AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW]: 'Review',
+    [AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION]: 'Correction'
+  };
 
   constructor() {}
 
   ngOnInit(): void {
-    if (
-      this.contributionSubType === AppConstants
-        .CONTRIBUTION_STATS_SUBTYPE_SUBMISSION) {
-      this.contributionSubTypeText = 'Submission';
-    } else if (this.contributionSubType === AppConstants
-      .CONTRIBUTION_STATS_SUBTYPE_REVIEW) {
-      this.contributionSubTypeText = 'Review';
-    } else if (
-      this.contributionSubType === AppConstants
-        .CONTRIBUTION_STATS_SUBTYPE_CORRECTION
-    ) {
-      this.contributionSubTypeText = 'Correction';
-    } else {
-      throw new Error('Invalid contribution type.');
-    }
+    this.contributionSubTypeText = this.CONTRIBUTION_SUB_TYPE_TEXTS[
+      this.contributionSubType];
 
     if (this.contributionCount > 1) {
       this.contributionSubTypeText += 's';
