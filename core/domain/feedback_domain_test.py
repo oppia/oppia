@@ -170,10 +170,8 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
         self.assertEqual(observed_reference.thread_id, self.thread_id)
 
     def test_invalid_from_dict(self) -> None:
-        """
-            Test that `from_dict` throws validation exception when called 
+        """Test that `from_dict` throws validation exception when called
             with missing attribute.
-
         """
 
         feedback_message_reference_dict: (
