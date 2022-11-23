@@ -7875,6 +7875,8 @@ states:
         <oppia-noninteractive-math math_content-with-value="{&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math>
         <oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math>
         <oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math>
+        <oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;&amp;quot;}"></oppia-noninteractive-math>
+        <oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\frac{x}{y}&amp;quot;}"></oppia-noninteractive-math>
         <oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;skill id&amp;quot;" text-with-value="&amp;quot;concept card&amp;quot;"></oppia-noninteractive-skillreview>
         <oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;&amp;quot;" text-with-value="&amp;quot;concept card&amp;quot;"></oppia-noninteractive-skillreview>
         <oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;&amp;quot;" text-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-skillreview>
