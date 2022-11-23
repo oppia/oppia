@@ -100,7 +100,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build_files
-          path: /home/runner/work/oppia/build_files.zip
+          path: /home/runner/work/oppia/
       - name: Unzip build files
         run: |
           pwd
