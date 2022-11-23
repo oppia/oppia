@@ -169,6 +169,27 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
         self.assertEqual(observed_reference.message_id, self.message_id)
         self.assertEqual(observed_reference.thread_id, self.thread_id)
 
+    def test_invalid_from_dict(self) -> None:
+        """
+            Test that `from_dict` throws validation exception when called 
+            with missing attribute.
+
+        """
+
+        feedback_message_reference_dict: (
+            feedback_domain.FeedbackMessageReferenceDict
+        ) = {
+            'entity_id': self.exp_id,
+            'thread_id': self.thread_id,
+            'message_id': self.message_id
+        }
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            '%s not in reference dict.' % ('entity_type')):
+            feedback_domain.FeedbackMessageReference.from_dict(
+            feedback_message_reference_dict)
+
     def test_valid_feedback_message_reference(self) -> None:
         try:
             self.feedback_message_reference.validate()
