@@ -311,7 +311,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 to be converted into Exploration domain object.
 
         Returns:
-            Optional[exp_domain.Exploration]: The Exploration domain object
+            Optional[exp_domain.Exploration]. The Exploration domain object
             for the given exploration model.
         """
         try:
