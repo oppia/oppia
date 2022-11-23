@@ -409,7 +409,7 @@ class FeedbackMessageReference:
                 'Entity ID is not a valid id'
                 ', received: \'%s\'' % self.entity_id)
 
-        if not self.entity_type in feconf.ALLOWED_ENTITY_TYPES:
+        if self.entity_type not in feconf.ALLOWED_ENTITY_TYPES:
             raise utils.ValidationError(
                 'Entity type is not in list of allowed types'
                 ', received: \'%s\' and allowed types are: \'%s\''
