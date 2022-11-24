@@ -7,8 +7,7 @@
            [ngClass]="{ 'conversation-skin-animate-tutor-card-on-narrow': !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty()}">
         <oppia-tutor-card [displayedCard]="displayedCard"
                           [avatarImageIsShown]="true"
-                          [startCardChangeAnimation]="startCardChangeAnimation"
-                          [feedbackIsEnabled]="true">
+                          [startCardChangeAnimation]="startCardChangeAnimation">
         </oppia-tutor-card>
         <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
           <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"

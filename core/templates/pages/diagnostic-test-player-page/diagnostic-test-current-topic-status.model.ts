@@ -71,7 +71,6 @@ export class DiagnosticTestCurrentTopicStatusModel {
 
   recordCorrectAttempt(skillId: string): void {
     this._skillIdToTestStatus[skillId] = true;
-    this._pendingSkillIdsToTest.shift();
     this.numberOfAttemptedQuestions += 1;
   }
 
@@ -85,6 +84,10 @@ export class DiagnosticTestCurrentTopicStatusModel {
       this._lifelineIsConsumed = true;
     }
     this.numberOfAttemptedQuestions += 1;
+  }
+
+  getNextSkill(): string {
+    return this._pendingSkillIdsToTest.shift() || '';
   }
 
   getNextQuestion(skillId: string): Question {

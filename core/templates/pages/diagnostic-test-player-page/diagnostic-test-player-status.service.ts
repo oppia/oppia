@@ -31,19 +31,12 @@ export class DiagnosticTestPlayerStatusService {
   private _diagnosticTestPlayerProgressChangeEventEmitter = (
     new EventEmitter<number>());
 
-  private _diagnosticTestSkipQuestionEventEmitter = (
-    new EventEmitter<void>());
-
   get onDiagnosticTestSessionCompleted(): EventEmitter<string[]> {
     return this._diagnosticTestPlayerCompletedEventEmitter;
   }
 
   get onDiagnosticTestSessionProgressChange(): EventEmitter<number> {
     return this._diagnosticTestPlayerProgressChangeEventEmitter;
-  }
-
-  get onDiagnosticTestSkipButtonClick(): EventEmitter<void> {
-    return this._diagnosticTestSkipQuestionEventEmitter;
   }
 }
 
