@@ -223,6 +223,186 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
             unmigrated_suggestion_model.change_cmd['content_id'], 'invalid_id')
 
 
+class AuditMigrateSuggestionJobTests(job_test_utils.JobTestBase):
+
+    JOB_CLASS = (
+        suggestion_migration_jobs
+        .AuditRegenerateContentIdForTranslationSuggestionsInReviewJob
+    )
+    TARGET_ID = 'exp1'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.STATE_DICT_IN_V52 = {
+            'content': {'content_id': 'content', 'html': ''},
+            'param_changes': [],
+            'interaction': {
+                'solution': None,
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': 'Default outcome'
+                    },
+                    'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'catchMisspellings': {
+                        'value': False
+                    },
+                    'rows': {
+                        'value': 1
+                    },
+                    'placeholder': {
+                        'value': {
+                            'unicode_str': '',
+                            'content_id': 'ca_placeholder_1'
+                        }
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'TextInput',
+                'hints': []
+            },
+            'linked_skill_id': None,
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {},
+                    'default_outcome': {},
+                    'ca_placeholder_1': {}
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {},
+                    'default_outcome': {},
+                    'ca_placeholder_1': {}
+                }
+            },
+            'classifier_model_id': None,
+            'card_is_checkpoint': False,
+            'solicit_answer_details': False,
+            'next_content_id_index': 2
+        }
+        self.exp_1 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.TARGET_ID,
+            title='title',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code='en',
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=52,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_DICT_IN_V52},
+        )
+        self.put_multi([self.exp_1])
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_unmigrated_suggestion_is_not_migrated(self) -> None:
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'default_outcome',
+            'language_code': 'hi',
+            'content_html': 'Content',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+
+        suggestion_1_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id='user1',
+            change_cmd=change_dict,
+            score_category='irrelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type='exploration',
+            target_id=self.TARGET_ID,
+            target_version_at_submission=0,
+            language_code='bn'
+        )
+        suggestion_1_model.update_timestamps()
+        suggestion_models.GeneralSuggestionModel.put_multi([
+            suggestion_1_model])
+        unmigrated_suggestion_model = (
+            suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
+        )
+        self.assertEqual(
+            unmigrated_suggestion_model.change_cmd['content_id'],
+            'default_outcome'
+        )
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='SUGGESTION TARGET PROCESSED SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult(
+                stdout='SUGGESTION MIGRATED SUCCESS: 1'
+            )
+        ])
+
+        migrated_suggestion_model = (
+            suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
+        )
+        self.assertEqual(
+            migrated_suggestion_model.change_cmd['content_id'],
+            'default_outcome'
+        )
+
+    def test_suggestion_with_invalid_content_id_raise_error(self) -> None:
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'invalid_id',
+            'language_code': 'hi',
+            'content_html': 'Content',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+
+        suggestion_1_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id='user1',
+            change_cmd=change_dict,
+            score_category='irrelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type='exploration',
+            target_id=self.TARGET_ID,
+            target_version_at_submission=0,
+            language_code='bn'
+        )
+        suggestion_1_model.update_timestamps()
+        suggestion_models.GeneralSuggestionModel.put_multi([
+            suggestion_1_model])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stderr=(
+                    'SUGGESTION TARGET PROCESSED ERROR: "(1, '
+                    '\'Content ID invalid_id does not exist in the exploration'
+                    '\')": 1')),
+        ])
+
+        unmigrated_suggestion_model = (
+            suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
+        )
+        self.assertEqual(
+            unmigrated_suggestion_model.change_cmd['content_id'], 'invalid_id')
+
+
 class MigrateQuestionSuggestionsJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase):
 

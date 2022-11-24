@@ -3934,7 +3934,7 @@ title: Title
         skill_id: str,
         suggestion_id: Optional[str] = None,
         language_code: str = constants.DEFAULT_LANGUAGE_CODE
-    ) -> Optional[str]:
+    ) -> str:
         """Saves a new question suggestion with a default version 27 state data
         dict.
 

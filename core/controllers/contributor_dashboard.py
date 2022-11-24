@@ -693,9 +693,15 @@ class MachineTranslationStateTextsHandler(
 
             source_text = content_id_to_translatable_item_mapping[
                 content_id].content_value
+
+            # Here we use MyPy ignore because the flag the
+            # get_and_cache_machine_translation is not written correctly and it
+            # only handles str.
+            # TODO(#16621): Fix get_and_cache_machine_translation to handle
+            # translatable content of rule_spec [list(str)].
             translated_texts[content_id] = (
                 translation_services.get_and_cache_machine_translation(
-                    exp.language_code, target_language_code, source_text)
+                    exp.language_code, target_language_code, source_text) # type: ignore[arg-type]
             )
 
         self.values = {

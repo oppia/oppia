@@ -833,7 +833,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         new_question_data = self._create_valid_question_data(
             'GHI', self.content_id_generator)
-        change_list = [{
+        new_change_list = [{
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
             'new_value': new_question_data.to_dict(),
@@ -844,7 +844,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             'new_value': self.content_id_generator.next_content_id_index,
             'old_value': 2
         }]
-        payload['change_list'] = change_list
+        payload['change_list'] = new_change_list
         payload['commit_message'] = 'update question data'
         response_json = self.put_json(
             '%s/%s' % (
