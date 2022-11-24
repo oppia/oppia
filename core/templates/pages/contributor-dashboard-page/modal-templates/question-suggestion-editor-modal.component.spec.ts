@@ -336,8 +336,8 @@ describe('Question Suggestion Editor Modal Component', () => {
       // because of the need to test validations.
       // @ts-ignore
       .and.callFake((
-        suggestionId, skillDifficulty, questionStateData, nextContentIdIndex,
-        imagesData, successCallback, errorCallback
+          suggestionId, skillDifficulty, questionStateData, nextContentIdIndex,
+          imagesData, successCallback, errorCallback
       ) => {
         // This throws "Argument of type 'null' is not assignable to parameter
         // of type 'string'." We need to suppress
@@ -365,8 +365,8 @@ describe('Question Suggestion Editor Modal Component', () => {
         // because of the need to test validations.
         // @ts-ignore
         .and.callFake((
-          suggestionId, skillDifficulty, questionStateData, nextContentIdIndex,
-          imagesData, successCallback, errorCallback) => {
+            suggestionId, skillDifficulty, questionStateData,
+            nextContentIdIndex, imagesData, successCallback, errorCallback) => {
           // This throws "Argument of type 'null' is not assignable to parameter
           // of type 'string'." We need to suppress
           // this error because of the need to test validations.
