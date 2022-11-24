@@ -332,7 +332,6 @@ describe('ExplorationFooterComponent', () => {
         }
       }),
       RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
 
     component.ngOnInit();

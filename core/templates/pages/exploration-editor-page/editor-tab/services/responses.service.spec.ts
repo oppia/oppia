@@ -283,21 +283,7 @@ describe('Responses Service', () => {
 
     // Reassign only updated properties.
     const expectedAnswerGroup = interactionData.answerGroups;
-    expectedAnswerGroup[0].rules = updatedAnswerGroup.rules;
-    expectedAnswerGroup[0].taggedSkillMisconceptionId =
-      updatedAnswerGroup.taggedSkillMisconceptionId;
-    expectedAnswerGroup[0].outcome.feedback =
-      updatedAnswerGroup.outcome.feedback;
-    expectedAnswerGroup[0].outcome.dest = updatedAnswerGroup.outcome.dest;
-    expectedAnswerGroup[0].outcome.destIfReallyStuck =
-      updatedAnswerGroup.outcome.destIfReallyStuck;
-    expectedAnswerGroup[0].outcome.refresherExplorationId =
-      updatedAnswerGroup.outcome.refresherExplorationId;
-    expectedAnswerGroup[0].outcome.missingPrerequisiteSkillId =
-      updatedAnswerGroup.outcome.missingPrerequisiteSkillId;
-    expectedAnswerGroup[0].outcome.labelledAsCorrect =
-      updatedAnswerGroup.outcome.labelledAsCorrect;
-    expectedAnswerGroup[0].trainingData = updatedAnswerGroup.trainingData;
+    expectedAnswerGroup[0] = updatedAnswerGroup;
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(responsesService.getAnswerGroup(0)).toEqual(expectedAnswerGroup[0]);

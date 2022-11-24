@@ -68,20 +68,10 @@ describe('Diagnostic test engine service', () => {
       question_state_data: {
         classifier_model_id: null,
         param_changes: [],
-        next_content_id_index: 1,
         solicit_answer_details: false,
         content: {
           content_id: '2',
           html: 'Question 2'
-        },
-        written_translations: {
-          translations_mapping: {
-            1: {},
-            ca_placeholder_0: {},
-            feedback_id: {},
-            solution: {},
-            hint_1: {}
-          }
         },
         interaction: {
           answer_groups: [{
@@ -162,22 +152,26 @@ describe('Diagnostic test engine service', () => {
       language_code: '',
       version: 1,
       linked_skill_ids: [],
-      inapplicable_skill_misconception_ids: []
+      inapplicable_skill_misconception_ids: [],
+      next_content_id_index: 5
     };
 
     question1 = questionObjectFactory.createFromBackendDict(
       questionBackendDict1);
     question2 = new Question(
-      'question2', stateObject.createDefaultState('state'), '', 1,
-      ['skillID2'], []
+      'question2',
+      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      '', 1, ['skillID2'], [], 5
     );
     question3 = new Question(
-      'question3', stateObject.createDefaultState('state'), '', 1,
-      ['skillID3'], []
+      'question3',
+      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      '', 1, ['skillID3'], [], 5
     );
     question4 = new Question(
-      'question4', stateObject.createDefaultState('state'), '', 1,
-      ['skillID4'], []
+      'question4',
+      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      '', 1, ['skillID4'], [], 5
     );
   });
 
