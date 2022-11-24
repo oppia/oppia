@@ -58,7 +58,7 @@ export class ExplorationLanguageCodeService extends ExplorationPropertyService {
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  _isValid(value) {
+  _isValid(value: string) {
     return constants.SUPPORTED_CONTENT_LANGUAGES.some((elt) => {
       return elt.code === value;
     });

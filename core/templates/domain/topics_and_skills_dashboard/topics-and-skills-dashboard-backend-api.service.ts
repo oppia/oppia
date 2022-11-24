@@ -117,13 +117,13 @@ export interface CategorizedAndUntriagedSkillsData {
 
 export interface SkillsDashboardDataBackendDict {
   'skill_summary_dicts': AugmentedSkillSummaryBackendDict[];
-  'next_cursor': string;
+  'next_cursor': string | null;
   'more': boolean;
 }
 
 export interface SkillsDashboardData {
   skillSummaries: AugmentedSkillSummary[];
-  nextCursor: string;
+  nextCursor: string | null;
   more: boolean;
 }
 
@@ -271,7 +271,8 @@ export class TopicsAndSkillsDashboardBackendApiService {
 
   async fetchSkillsDashboardDataAsync(
       filter: TopicsAndSkillsDashboardFilter,
-      itemsPerPage: number, nextCursor: string): Promise<SkillsDashboardData> {
+      itemsPerPage: number,
+      nextCursor: string | null): Promise<SkillsDashboardData> {
     return this.http.post<SkillsDashboardDataBackendDict>(
       TopicsAndSkillsDashboardDomainConstants.SKILL_DASHBOARD_DATA_URL, {
         classroom_name: filter.classroom,

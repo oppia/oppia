@@ -272,7 +272,7 @@ describe('Question update service', function() {
       .toBe(undefined);
 
     QuestionUpdateService.setQuestionInapplicableSkillMisconceptionIds(
-      sampleQuestion, ['id1']);
+      sampleQuestion, 'id1');
 
     expect(sampleQuestion.getInapplicableSkillMisconceptionIds())
       .toEqual(['id1']);
