@@ -51,6 +51,7 @@ export class StateVersionHistoryModalComponent
   @Input() oldState!: State;
   @Input() newStateName!: string;
   @Input() oldStateName!: string;
+  validationError: boolean = false;
   yamlStrs: HeadersAndYamlStrs = {
     previousVersionStateYaml: '',
     currentVersionStateYaml: '',
@@ -94,6 +95,13 @@ export class StateVersionHistoryModalComponent
       throw new Error('Last edited version number cannot be null');
     }
     return lastEditedVersionNumber;
+  }
+
+  getLastEditedVersionNumberInCaseOfError(): number {
+    return (
+      this.versionHistoryService.fetchedStateVersionNumbers[
+        this.versionHistoryService
+          .getCurrentPositionInStateVersionHistoryList()]);
   }
 
   getLastEditedCommitterUsername(): string {
@@ -157,6 +165,8 @@ export class StateVersionHistoryModalComponent
     this.updateLeftPane();
     this.updateRightPane();
 
+    this.validationError = false;
+
     this
       .versionHistoryService
       .decrementCurrentPositionInStateVersionHistoryList();
@@ -203,6 +213,8 @@ export class StateVersionHistoryModalComponent
     this.updateLeftPane();
     this.updateRightPane();
 
+    this.validationError = false;
+
     this.fetchPreviousVersionHistory();
   }
 
@@ -247,12 +259,9 @@ export class StateVersionHistoryModalComponent
           this.versionHistoryService
             .incrementCurrentPositionInStateVersionHistoryList();
         } else {
-          this.ngbActiveModal.close(
-            'Version history cannot be explored further.');
-          this.alertsService.addWarning(
-            'Version history cannot be explored further ' +
-            'due to some internal validation error.'
-          );
+          this.validationError = true;
+          this.versionHistoryService
+            .incrementCurrentPositionInStateVersionHistoryList();
         }
       });
     }

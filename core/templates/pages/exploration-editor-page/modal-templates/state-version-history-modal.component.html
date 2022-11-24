@@ -42,9 +42,12 @@
 
 <div class="modal-footer">
   <ng-template [ngIf]="yamlStrs.previousVersionStateYaml && yamlStrs.currentVersionStateYaml">
-    <button class="btn btn-outline-primary previous-commit" *ngIf="canExploreBackwardVersionHistory()" (click)="onClickExploreBackwardVersionHistory()">
-      View previous commit by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 }}</strong>
+    <button [disabled]="validationError" class="btn btn-outline-primary previous-commit" *ngIf="canExploreBackwardVersionHistory() || validationError" (click)="onClickExploreBackwardVersionHistory()">
+      View previous commit by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 || (validationError && getLastEditedVersionNumberInCaseOfError()) }}</strong>
     </button>
+    <span *ngIf="validationError" class="error-message">
+      Unable to display version history for version {{ getLastEditedVersionNumberInCaseOfError() }}, due to an error loading that version of the exploration.
+    </span>
     <button class="btn btn-outline-primary next-commit" *ngIf="canExploreForwardVersionHistory()" (click)="onClickExploreForwardVersionHistory()">
       View next commit by <strong>{{ getNextEditedCommitterUsername() }}</strong> at <strong>version {{ getNextEditedVersionNumber() + 1 }}</strong>
     </button>
@@ -90,5 +93,11 @@
   .spinner-border {
     height: 4rem;
     width: 4rem;
+  }
+  .error-message {
+    color: red;
+    font-size: 1.3rem;
+    padding: 10px;
+    text-align: center;
   }
 </style>
