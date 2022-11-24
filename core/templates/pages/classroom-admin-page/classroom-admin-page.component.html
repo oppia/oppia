@@ -191,6 +191,14 @@
                           </mat-autocomplete>
                         </mat-form-field>
                       </div>
+
+                      <div *ngIf="classroomEditorMode">
+                        <button (click)="deleteTopic(topicName)"
+                                mat-button matSuffix mat-icon-button
+                                aria-label="Clear">
+                          <mat-icon matListIcon>close</mat-icon>
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -198,14 +206,6 @@
                      class="oppia-warning-text cyclic-check-error">
                     {{ classroomAdminDataService.topicsGraphValidationError }}
                   </p>
-                </div>
-
-                <div *ngIf="classroomEditorMode">
-                  <button (click)="deleteTopic(topicName)"
-                          mat-button matSuffix mat-icon-button
-                          aria-label="Clear">
-                    <mat-icon matListIcon>close</mat-icon>
-                  </button>
                 </div>
               </div>
             </div>
@@ -340,8 +340,9 @@
     width: 200px;
   }
   .topics-name {
+    overflow: auto;
     padding: 10px;
-    width: 33%;
+    width: 100px;
   }
   .topic-dependency-description {
     margin: 10px 0;

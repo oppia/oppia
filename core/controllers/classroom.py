@@ -243,7 +243,7 @@ class ClassroomHandler(
         'DELETE': {}
     }
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.open_access
     def get(self, classroom_id: str) -> None:
         """Handles GET requests."""
         classroom = classroom_config_services.get_classroom_by_id(
