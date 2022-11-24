@@ -21,11 +21,7 @@
                         [inStoryMode]="inStoryMode"
                         [nextLessonLink]="getExplorationLink()"
                         [completedChaptersCount]="completedChaptersCount"
-                        [milestoneMessageIsToBeDisplayed]="chapterIsCompletedForTheFirstTime"
-                        [feedbackIsEnabled]="feedbackIsEnabled"
-                        [learnerCanOnlyAttemptQuestionOnce]="learnerCanOnlyAttemptQuestionOnce"
-                        [inputOutputHistoryIsShown]="inputOutputHistoryIsShown"
-                        [checkpointCelebrationModalIsEnabled]="checkpointCelebrationModalIsEnabled">
+                        [milestoneMessageIsToBeDisplayed]="chapterIsCompletedForTheFirstTime">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
@@ -42,11 +38,8 @@
                             [isLearnAgainButton]="isLearnAgainButton()"
                             [displayedCard]="displayedCard"
                             [submitButtonIsShown]="!answerIsBeingProcessed"
-                            [navigationThroughCardHistoryIsEnabled]="navigationThroughCardHistoryIsEnabled"
-                            [skipButtonIsShown]="skipButtonIsShown"
                             (clickContinueButton)="showUpcomingCard()"
-                            (changeCard)="changeCard($event)"
-                            (skipQuestion)="skipCurrentQuestion()">
+                            (changeCard)="changeCard($event)">
         </oppia-progress-nav>
       </div>
       <div *ngIf="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && ((!isEndChapterCelebrationFeatureEnabled() && inStoryMode) || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">

@@ -113,10 +113,6 @@ export class TutorCardComponent {
   @Input() nextLessonLink!: string;
   @Input() completedChaptersCount!: number;
   @Input() milestoneMessageIsToBeDisplayed!: boolean;
-  @Input() feedbackIsEnabled!: boolean;
-  @Input() learnerCanOnlyAttemptQuestionOnce!: boolean;
-  @Input() inputOutputHistoryIsShown!: boolean;
-  @Input() checkpointCelebrationModalIsEnabled!: boolean;
   private _editorPreviewMode!: boolean;
   lastAnswer!: string | null;
   conceptCardIsBeingShown!: boolean;
