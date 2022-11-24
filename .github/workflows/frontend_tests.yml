@@ -18,8 +18,8 @@ jobs:
       - name: Generate job strategy matrix
         id: generate
         env:
-          standard-test-runs: 1
-          flakes-test-runs: 50
+          standard-test-runs: 2
+          flakes-test-runs: 40
         run: |
           if ${{ github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
           then
