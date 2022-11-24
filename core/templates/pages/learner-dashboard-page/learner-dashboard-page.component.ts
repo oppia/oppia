@@ -91,8 +91,6 @@ import './learner-dashboard-page.component.css';
   ]
 })
 export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
-  threadIndex: number;
-
   FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS = (
     LearnerDashboardPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
 
@@ -106,50 +104,54 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
-  isCurrentFeedbackSortDescending: boolean;
-  currentFeedbackThreadsSortType: string;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  threadIndex!: number;
+  isCurrentFeedbackSortDescending!: boolean;
+  currentFeedbackThreadsSortType!: string;
 
-  completedExplorationsList: LearnerExplorationSummary[];
-  completedCollectionsList: CollectionSummary[];
-  completedStoriesList: StorySummary[];
-  learntTopicsList: LearnerTopicSummary[];
-  partiallyLearntTopicsList: LearnerTopicSummary[];
-  incompleteExplorationsList: LearnerExplorationSummary[];
-  incompleteCollectionsList: CollectionSummary[];
-  topicsToLearn: LearnerTopicSummary[];
-  allTopics: LearnerTopicSummary[];
-  untrackedTopics: Record<string, LearnerTopicSummary[]>;
-  subscriptionsList: ProfileSummary[];
-  communtiyLessonsDataLoaded: boolean = false;
+  completedExplorationsList!: LearnerExplorationSummary[];
+  completedCollectionsList!: CollectionSummary[];
+  completedStoriesList!: StorySummary[];
+  learntTopicsList!: LearnerTopicSummary[];
+  partiallyLearntTopicsList!: LearnerTopicSummary[];
+  incompleteExplorationsList!: LearnerExplorationSummary[];
+  incompleteCollectionsList!: CollectionSummary[];
+  topicsToLearn!: LearnerTopicSummary[];
+  allTopics!: LearnerTopicSummary[];
+  untrackedTopics!: Record<string, LearnerTopicSummary[]>;
+  subscriptionsList!: ProfileSummary[];
 
-  completedToIncompleteCollections: string[];
-  learntToPartiallyLearntTopics: string[];
+  completedToIncompleteCollections!: string[];
+  learntToPartiallyLearntTopics!: string[];
   threadSummaries: FeedbackThreadSummary[] = [];
-  numberOfUnreadThreads: number;
-  explorationPlaylist: LearnerExplorationSummary[];
-  collectionPlaylist: CollectionSummary[];
-  activeSection: string;
-  activeSubsection: string;
-  feedbackThreadActive: boolean;
+  numberOfUnreadThreads!: number;
+  explorationPlaylist!: LearnerExplorationSummary[];
+  collectionPlaylist!: CollectionSummary[];
+  activeSection!: string;
+  activeSubsection!: string;
+  feedbackThreadActive!: boolean;
   paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
-  loadingIndicatorIsShown = false;
 
-  messageSendingInProgress: boolean;
-  profilePictureDataUrl: SafeResourceUrl;
-  newMessage: {
-    'text': string;
+  messageSendingInProgress!: boolean;
+  profilePictureDataUrl!: SafeResourceUrl;
+  newMessage!: {
+    'text': string | null;
   };
 
-  loadingFeedbacks: boolean;
-  explorationTitle: string;
-  threadStatus: string;
-  explorationId: string;
-  threadId: string;
-  messageSummaries: FeedbackMessageSummary[];
-  threadSummary: FeedbackThreadSummary;
+  loadingFeedbacks!: boolean;
+  explorationTitle!: string;
+  threadStatus!: string;
+  explorationId!: string;
+  threadId!: string;
+  messageSummaries!: FeedbackMessageSummary[];
+  threadSummary!: FeedbackThreadSummary;
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
 
+  communtiyLessonsDataLoaded: boolean = false;
+  loadingIndicatorIsShown: boolean = false;
   homeImageUrl: string = '';
   todolistImageUrl: string = '';
   progressImageUrl: string = '';
@@ -190,7 +192,10 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
     let userInfoPromise = this.userService.getUserInfoAsync();
     userInfoPromise.then(userInfo => {
-      this.username = userInfo.getUsername();
+      const username = userInfo.getUsername();
+      if (username) {
+        this.username = username;
+      }
     });
     this.homeImageUrl = this.getStaticImageUrl('/learner_dashboard/home.svg');
     this.todolistImageUrl = this.getStaticImageUrl(
@@ -524,7 +529,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
   showAllThreads(): void {
     this.feedbackThreadActive = false;
-    this.threadIndex = null;
   }
 
   addNewMessage(threadId: string, newMessage: string): void {
@@ -533,7 +537,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         threadId: threadId
       });
     let payload = {
-      updated_status: null,
+      updated_status: false,
       updated_subject: null,
       text: newMessage
     };

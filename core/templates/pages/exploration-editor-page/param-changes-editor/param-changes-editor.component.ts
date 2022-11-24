@@ -112,9 +112,9 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
   }
 
   generateParamNameChoices(): {id: string; text: string}[] {
-    return (this.explorationParamSpecsService.displayed as {
-       getParamNames: () => {sort: () => []};
-     }).getParamNames().sort()
+    return (
+      this.explorationParamSpecsService.displayed as ParamSpecs
+    ).getParamNames().sort()
       .map((paramName) => {
         return {
           id: paramName,
@@ -217,9 +217,9 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     // dropdowns may turn blank.
     (this.paramChangesService.displayed as ParamChange[]).forEach(
       (paramChange) => {
-        (this.explorationParamSpecsService.displayed as {
-           addParamIfNew: (value) => void;}).addParamIfNew(
-          paramChange.name);
+        (
+          this.explorationParamSpecsService.displayed as ParamSpecs
+        ).addParamIfNew(paramChange.name, null);
       });
     this.paramNameChoices = this.generateParamNameChoices();
 

@@ -195,7 +195,7 @@
       </div>
 
       <div>
-        <strong *ngIf="displayFeedback">(Optional) Direct the stuck learner to...</strong>
+        <strong *ngIf="displayFeedback">(Optional) If the learner is really stuck, direct them to</strong>
         <strong *ngIf="!displayFeedback">(Optional) Oppia directs the stuck learner to...</strong>
         <span *ngIf="outcome && !isSelfLoopDestStuck(outcome)" class="position-relative">
           {{ outcome.destIfReallyStuck }}

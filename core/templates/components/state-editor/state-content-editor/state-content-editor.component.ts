@@ -44,16 +44,16 @@ export class StateContentEditorComponent implements OnInit {
   @Output() intialize: EventEmitter<void> = new EventEmitter();
   @Output() saveStateContent = new EventEmitter<SubtitledHtml>();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = (
-    new EventEmitter<string[]>());
+    new EventEmitter<(string | null)[]>());
 
-  @Input() stateContentPlaceholder: string;
-  @Input() stateContentSaveButtonPlaceholder: string;
-  cardHeightLimitWarningIsShown: boolean;
-  contentId: string;
+  @Input() stateContentPlaceholder!: string;
+  @Input() stateContentSaveButtonPlaceholder!: string;
+  cardHeightLimitWarningIsShown!: boolean;
+  contentId!: string | null;
   contentEditorIsOpen: boolean = false;
   directiveSubscriptions = new Subscription();
-  isEditable: boolean;
-  HTML_SCHEMA: HTMLSchema;
+  isEditable!: boolean;
+  HTML_SCHEMA!: HTMLSchema;
 
   cardHeightLimitReached = false;
 
@@ -75,7 +75,6 @@ export class StateContentEditorComponent implements OnInit {
           this.contextService.getEntityType() === 'question')
       }
     };
-    this.contentId = null;
     if (this.stateContentService.displayed) {
       this.contentId = this.stateContentService.displayed.contentId;
     }
@@ -102,7 +101,7 @@ export class StateContentEditorComponent implements OnInit {
     let shadowPreviewCard = $(
       '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
     );
-    let height = shadowPreviewCard.height();
+    let height = shadowPreviewCard.height() as number;
     return (height > 630);
   }
 

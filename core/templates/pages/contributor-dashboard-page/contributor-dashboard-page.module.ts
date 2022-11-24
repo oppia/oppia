@@ -69,10 +69,13 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
+    CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
     OpportunitiesListComponent,
+    ContributorStatsComponent,
+    BadgeComponent,
     TranslationLanguageSelectorComponent,
     TranslationOpportunitiesComponent,
     TranslationSuggestionReviewModalComponent,
@@ -83,10 +86,13 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     ContributorDashboardPageComponent
   ],
   entryComponents: [
+    ContributorBadgesComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
     OpportunitiesListComponent,
+    ContributorStatsComponent,
+    BadgeComponent,
     TranslationLanguageSelectorComponent,
     TranslationOpportunitiesComponent,
     TranslationSuggestionReviewModalComponent,
@@ -129,6 +135,9 @@ import { downgradeModule } from '@angular/upgrade/static';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { ToastrModule } from 'ngx-toastr';
 import { OppiaCkEditorCopyToolBarModule } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
+import { ContributorStatsComponent } from './contributor-stats/contributor-stats.component';
+import { ContributorBadgesComponent } from './contributor-badges/contributor-badges.component';
+import { BadgeComponent } from './badge/badge.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

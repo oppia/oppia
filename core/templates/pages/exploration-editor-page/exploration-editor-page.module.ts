@@ -176,13 +176,16 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     AddAudioTranslationModalComponent,
     AudioTranslationBarComponent,
     StateTranslationEditorComponent,
+    StateVersionHistoryModalComponent,
+    MetadataVersionHistoryModalComponent,
     ValueGeneratorEditorComponent,
     ParamChangesEditorComponent,
     StateTranslationComponent,
     TranslatorOverviewComponent,
     StateTranslationStatusGraphComponent,
     TranslationTabComponent,
-    ExplorationEditorPageComponent
+    ExplorationEditorPageComponent,
+    StateVersionHistoryComponent
   ],
   entryComponents: [
     DeleteStateSkillModalComponent,
@@ -239,13 +242,16 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     AddAudioTranslationModalComponent,
     AudioTranslationBarComponent,
     StateTranslationEditorComponent,
+    StateVersionHistoryModalComponent,
+    MetadataVersionHistoryModalComponent,
     ValueGeneratorEditorComponent,
     ParamChangesEditorComponent,
     StateTranslationComponent,
     TranslatorOverviewComponent,
     StateTranslationStatusGraphComponent,
     TranslationTabComponent,
-    ExplorationEditorPageComponent
+    ExplorationEditorPageComponent,
+    StateVersionHistoryComponent
   ],
   providers: [
     {
@@ -282,6 +288,9 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OppiaCkEditorCopyToolBarModule } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
 import { ExplorationPlayerViewerCommonModule } from 'pages/exploration-player-page/exploration-player-viewer-common.module';
+import { StateVersionHistoryModalComponent } from './modal-templates/state-version-history-modal.component';
+import { MetadataVersionHistoryModalComponent } from './modal-templates/metadata-version-history-modal.component';
+import { StateVersionHistoryComponent } from './editor-tab/state-version-history/state-version-history.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
