@@ -108,6 +108,16 @@ jobs:
           ls -la
           unzip build_files.zip
           rm build_files.zip
+          echo "Files in ./:"
+          ls -la .
+          echo "Files in oppia_tools:"
+          ls -la oppia_tools
+          echo "Files in oppia:"
+          ls -la oppia
+          echo "Files in build:"
+          ls -la oppia/build
+          echo "Files in third_party:"
+          ls -la oppia/third_party
         working-directory: /home/runner/work/oppia
         shell: bash
       - uses: ./.github/actions/install-oppia-dependencies
