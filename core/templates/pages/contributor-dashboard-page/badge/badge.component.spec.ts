@@ -121,16 +121,4 @@ describe('Badge component', () => {
       expect(component.lineHeight).toEqual('90%');
     }));
   });
-
-  describe('when an invalid type is passed ', () => {
-    it('should throw an error', fakeAsync(() => {
-      component.contributionSubType = 'invalid';
-
-      expect(() => {
-        fixture.detectChanges();
-        tick();
-      }).toThrowError();
-      flush();
-    }));
-  });
 });

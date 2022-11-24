@@ -49,13 +49,8 @@ export class BadgeComponent {
   constructor() {}
 
   ngOnInit(): void {
-    const contributionSubType = this.CONTRIBUTION_SUB_TYPE_TEXTS[
+    this.contributionSubTypeText = this.CONTRIBUTION_SUB_TYPE_TEXTS[
       this.contributionSubType];
-
-    if (contributionSubType === null) {
-      throw new Error('Invalid contributin sub type');
-    }
-    this.contributionSubTypeText = contributionSubType;
 
     if (this.contributionCount > 1) {
       this.contributionSubTypeText += 's';
