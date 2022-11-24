@@ -989,6 +989,96 @@ def add_missing_stat_keys_with_default_values_in_reads_stats(stats: Union[
 
     return stats
 
+@overload
+def get_blog_post_stats_by_blog_post_id(
+    blog_post_id: str, stats_type: str
+) -> blog_statistics_domain.BlogPostReadsAggregatedStats: ...
+
+
+@overload
+def get_blog_post_stats_by_blog_post_id(
+    blog_post_id: str, stats_type: str
+) -> blog_statistics_domain.BlogPostViewsAggregatedStats: ...
+
+
+@overload
+def get_blog_post_stats_by_blog_post_id(
+    blog_post_id: str, stats_type: str
+) -> blog_statistics_domain.BlogPostReadingTime: ...
+
+
+def get_blog_post_stats_by_blog_post_id(
+    blog_post_id: str, stats_type: str
+) -> Union[
+    blog_statistics_domain.BlogPostReadsAggregatedStats,
+    blog_statistics_domain.BlogPostViewsAggregatedStats,
+    blog_statistics_domain.BlogPostReadingTime
+]:
+    """Returns aggregated stats domain object for the given blog post id and
+    chart type.
+
+    Args:
+        blog_post_id: ID of the blog post for which the stats are to be loaded.
+        stats_type: the type of stats object, views, reads or reading time for
+            which the stats are required.
+
+    Returns:
+        BlogPostReadsAggregatedStats|BlogPostViewsAggregatedStats|
+        BlogPostReadingTime. Stats domain object for the given blog post ID and
+        chart type.
+    """
+    if stats_type == 'views':
+        return get_blog_post_views_stats_by_id(blog_post_id)
+    elif stats_type == 'reads':
+        return get_blog_post_reads_stats_by_id(blog_post_id)
+    else:
+        return get_blog_post_reading_time_stats_by_id(blog_post_id)
+
+
+@overload
+def get_author_aggregated_stats_by_author_id(
+    author_id: str, stats_type: str
+) -> blog_statistics_domain.AuthorBlogPostReadsAggregatedStats: ...
+
+
+@overload
+def get_author_aggregated_stats_by_author_id(
+    author_id: str, stats_type: str
+) -> blog_statistics_domain.AuthorBlogPostViewsAggregatedStats: ...
+
+
+@overload
+def get_author_aggregated_stats_by_author_id(
+    author_id: str, stats_type: str
+) -> blog_statistics_domain.AuthorBlogPostsReadingTime: ...
+
+
+def get_author_aggregated_stats_by_author_id(
+    author_id: str, stats_type: str
+) -> Union[
+    blog_statistics_domain.AuthorBlogPostReadsAggregatedStats,
+    blog_statistics_domain.AuthorBlogPostViewsAggregatedStats,
+    blog_statistics_domain.AuthorBlogPostsReadingTime,
+]:
+    """Returns aggregated stats domain object for the given blog post id and
+    chart type.
+
+    Args:
+        blog_post_id: ID of the blog post for which the stats are to be loaded.
+        stats_type: the type of stats object, views, reads or reading time for
+            which the stats are required.
+
+    Returns:
+        AuthorBlogPostReadsAggregatedStats|AuthorBlogPostViewsAggregatedStats|
+        AuthorBlogPostsReadingTime. Stats domain object for the given
+        author ID and chart type.
+    """
+    if stats_type == 'views':
+        return get_author_blog_post_views_stats_by_id(author_id)
+    elif stats_type == 'reads':
+        return get_author_blog_post_reads_stats_by_id(author_id)
+    else:
+        return get_author_blog_posts_reading_time_stats_by_id(author_id)
 
 class BlogPostViewedEventHandler(event_services.BaseEventHandler):
     """Event handler for recording blog post view events."""

@@ -80,6 +80,7 @@ export class BlogStatisticsTabComponent implements OnInit {
   activeStatsBlogPostId!: string;
   loadingChartSpinnerShown: boolean = false;
   xAxisLabels: string[] = [];
+  smallScreenViewIsActive: boolean = false;
   directiveSubscriptions = new Subscription();
   constructor(
     private blogDashboardBackendApiService: BlogDashboardBackendApiService,
@@ -93,12 +94,15 @@ export class BlogStatisticsTabComponent implements OnInit {
     this.activeStatsBlogPostId = 'all';
     this.showViewsChartStats();
     if (this.isSmallScreenViewActive()) {
+      this.smallScreenViewIsActive = true;
       this.margin = { top: 10, right: 10, bottom: 30, left: 40 };
     }
     this.windowDimensionsService.getResizeEvent().subscribe(() => {
       if (this.isSmallScreenViewActive()) {
+        this.smallScreenViewIsActive = true;
         this.margin = { top: 10, right: 10, bottom: 30, left: 40 };
       } else {
+        this.smallScreenViewIsActive = false;
         this.margin = { top: 20, right: 20, bottom: 50, left: 60 };
       }
       this.showLoadingChartSpinner();
@@ -449,15 +453,6 @@ export class BlogStatisticsTabComponent implements OnInit {
     this._y = d3.scaleLinear()
       .range([this._height, 0]);
     this.yAxis = this._svg.append('g');
-
-    // Y axis label.
-    this._svg.append('text')
-      .attr('text-anchor', 'middle')
-      .attr('transform', 'rotate(-90)')
-      .attr('y', 0 - this.margin.left + 20)
-      .attr('x', 0 - this._height / 2)
-      .text(this.getYaxisLabel())
-      .style('fill', '#00645c');
   }
 
   private _drawBars(data): void {
@@ -532,6 +527,21 @@ export class BlogStatisticsTabComponent implements OnInit {
       .attr('width', this._x.bandwidth())
       .attr('height', d => this._height - this._y(d.value as NumberValue))
       .attr('fill', '#1F78B4');
+
+    // Y axis label.
+    let yAxisLabel = this._svg.append('text')
+      .attr('text-anchor', 'middle')
+      .attr('transform', 'rotate(-90)')
+      .attr('y', 0 - this.margin.left + 20)
+      .attr('x', 0 - this._height / 2)
+      .text(this.getYaxisLabel())
+      .style('fill', '#00645c');
+
+    if (this.isSmallScreenViewActive()) {
+      yAxisLabel.style('font-size', '12px');
+    } else {
+      yAxisLabel.style('font-size', '14px');
+    }
   }
 
   getYaxisLabel(): string {

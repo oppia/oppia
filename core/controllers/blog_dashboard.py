@@ -387,27 +387,11 @@ class BlogDashboardBlogPostStatisticsHandler(
     @acl_decorators.can_access_blog_dashboard
     def get(self, blog_post_id: str, chart_type: str) -> None:
         """Populates the data for generating statistics plot."""
-
-        if chart_type == 'views':
-            stats = blog_statistics_domain.BlogPostViewsAggregatedStats
-            stats = blog_statistics_services.get_blog_post_views_stats_by_id(
-                blog_post_id
-            )
-        elif chart_type == 'reads':
-            stats: blog_statistics_domain.BlogPostReadsAggregatedStats
-            stats = blog_statistics_services.get_blog_post_reads_stats_by_id(
-                blog_post_id
-            )
-        else:
-            stats: blog_statistics_domain.BlogPostReadingTime
-            stats = (
-                blog_statistics_services.get_blog_post_reading_time_stats_by_id(
-                    blog_post_id
-                )
-            )
-
-        stats_dict = stats.to_frontend_dict()
-
+        stats_dict = (
+            blog_statistics_services.get_blog_post_stats_by_blog_post_id(
+                blog_post_id, chart_type
+            ).to_frontend_dict()
+        )
         self.values.update({
             'chart_type': chart_type,
             'stats': stats_dict
@@ -443,29 +427,11 @@ class BlogDashboardAuthorBlogPostsStatisticsHandler(
         """Populates the data for generating author statistics plot."""
         author_id = self.user_id
         assert author_id is not None
-        if chart_type == 'views':
-            stats: blog_statistics_domain.AuthorBlogPostViewsAggregatedStats
-            stats = (
-                blog_statistics_services.get_author_blog_post_views_stats_by_id(
-                    author_id
-                )
-            )
-        elif chart_type == 'reads':
-            stats: blog_statistics_domain.AuthorBlogPostReadsAggregatedStats
-            stats = (
-                blog_statistics_services.get_author_blog_post_reads_stats_by_id(
-                    author_id
-                )
-            )
-        else:
-            stats: blog_statistics_domain.AuthorBlogPostsReadingTime
-            stats = (
-                blog_statistics_services.get_author_blog_posts_reading_time_stats_by_id( # pylint: disable=line-too-long
-                    author_id
-                )
-            )
-
-        stats_dict = stats.to_frontend_dict()
+        stats_dict = (
+            blog_statistics_services.get_author_aggregated_stats_by_author_id(
+                author_id, chart_type
+            ).to_frontend_dict()
+        )
         self.values.update({
             'chart_type': chart_type,
             'stats': stats_dict

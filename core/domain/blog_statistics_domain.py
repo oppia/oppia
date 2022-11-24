@@ -136,8 +136,8 @@ def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
     if yesterdays_date in stats.views_by_hour.keys():
         yesterday_stats = stats.views_by_hour[yesterdays_date]
         # We add '_' infront of hour key to avoid auto ordering of keys in
-        # frontend, as keys get treated like numeric keys instead of strings
-        # by typescript.
+        # frontend, otherwise the keys get treated like numeric keys instead of
+        # strings by typescript.
         hourly_stats = {
             '_' + k: yesterday_stats[k] for k in list(
                 yesterday_stats)[-deficit_hours_in_current_date:]
@@ -186,6 +186,9 @@ def _generate_past_week_views_stats_from_views_by_date(
             datetime.datetime.utcnow() - datetime.timedelta(days=7)
         ).strftime('%Y-%m')
         last_month_stats = stats.views_by_date[last_month_year]
+        # We add '_' infront of weekly stats keys to avoid auto ordering of keys
+        # in frontend, otherwise the keys get treated like numeric keys instead
+        # of strings by typescript.
         weekly_stats = {
             '_' + k: last_month_stats[k] for k in list(
                 last_month_stats)[- (7 - current_day):]
@@ -231,11 +234,14 @@ def _generate_monthly_views_from_views_by_date(
         the ongoing month.
     """
     current_month_year = datetime.datetime.utcnow().strftime('%Y-%m')
-    stats = {
+    # We add '_' infront of day stat keys to avoid auto ordering of keys
+    # in frontend, otherwise the keys get treated like numeric keys instead of
+    # strings by typescript.
+    stats_dict = {
         '_' + k: stats.views_by_date[current_month_year][k] for k in list(
             stats.views_by_date[current_month_year])
     }
-    return stats
+    return stats_dict
 
 
 @overload
@@ -267,11 +273,14 @@ def _generate_yearly_views_from_views_by_month(
         ongoing year.
     """
     current_year = datetime.datetime.utcnow().strftime('%Y')
-    stats = {
+    # We add '_' infront of month keys to avoid auto ordering of keys
+    # in frontend, otherwise the keys get treated like numeric keys instead of
+    # strings by typescript.
+    stats_dict = {
         '_' + k: stats.views_by_month[current_year][k] for k in list(
             stats.views_by_month[current_year])
     }
-    return stats
+    return stats_dict
 
 
 @overload
@@ -312,6 +321,9 @@ def _generate_past_twenty_four_hour_reads_stats_from_reads_by_hour(
     hourly_stats = {}
     if yesterdays_date in stats.reads_by_hour.keys():
         yesterday_stats = stats.reads_by_hour[yesterdays_date]
+        # We add '_' infront of hour key to avoid auto ordering of keys in
+        # frontend, otherwise the keys get treated like numeric keys instead of
+        # strings by typescript.
         hourly_stats = {
             '_' + k: yesterday_stats[k] for k in list(
                 yesterday_stats)[- deficit_hours_in_current_date:]
@@ -360,6 +372,9 @@ def _generate_past_week_reads_stats_from_reads_by_date(
             datetime.datetime.utcnow() - datetime.timedelta(days=7)
         ).strftime('%Y-%m')
         last_month_stats = stats.reads_by_date[last_month_year]
+        # We add '_' infront of weekly stats keys to avoid auto ordering of keys
+        # in frontend, otherwise the keys get treated like numeric keys instead
+        # of strings by typescript.
         weekly_stats = {
             '_' + k: last_month_stats[k] for k in list(
                 last_month_stats)[- (7 - current_day):]
@@ -405,11 +420,14 @@ def _generate_monthly_reads_from_reads_by_date(
         the ongoing month.
     """
     current_month_year = datetime.datetime.utcnow().strftime('%Y-%m')
-    stats = {
+    # We add '_' infront of day stat keys to avoid auto ordering of keys
+    # in frontend, otherwise the keys get treated like numeric keys instead of
+    # strings by typescript.
+    stats_dict = {
         '_' + k: stats.reads_by_date[current_month_year][k] for k in list(
             stats.reads_by_date[current_month_year])
     }
-    return stats
+    return stats_dict
 
 
 @overload
@@ -441,11 +459,14 @@ def _generate_yearly_reads_from_reads_by_month(
         ongoing year.
     """
     current_year = datetime.datetime.utcnow().strftime('%Y')
-    stats = {
+    # We add '_' infront of month keys to avoid auto ordering of keys
+    # in frontend, otherwise the keys get treated like numeric keys instead of
+    # strings by typescript.
+    stats_dict = {
         '_' + k: stats.reads_by_month[current_year][k] for k in list(
             stats.reads_by_month[current_year])
     }
-    return stats
+    return stats_dict
 
 
 class BlogPostViewsAggregatedStatsFrontendDict(TypedDict):
