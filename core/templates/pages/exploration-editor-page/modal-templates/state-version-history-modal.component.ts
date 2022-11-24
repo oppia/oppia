@@ -247,9 +247,12 @@ export class StateVersionHistoryModalComponent
           this.versionHistoryService
             .incrementCurrentPositionInStateVersionHistoryList();
         } else {
+          this.ngbActiveModal.close(
+            'Version history cannot be explored further.');
           this.alertsService.addWarning(
-            'Could not fetch the version history data. ' +
-            'Please reload the page and try again.');
+            'Version history cannot be explored further ' +
+            'due to some internal validation error.'
+          );
         }
       });
     }

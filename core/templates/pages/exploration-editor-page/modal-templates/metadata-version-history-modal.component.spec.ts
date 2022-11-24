@@ -289,8 +289,8 @@ describe('Metadata version history modal', () => {
     tick();
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Could not fetch the version history data. ' +
-      'Please reload the page and try again.'
+      'Version history of cannot be explored further ' +
+      'due to some internal validation error.'
     );
   }));
 
