@@ -81,7 +81,7 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 
 import google.cloud.logging
-from typing import Any, Dict, Optional, Type, TypeVar
+from typing import Dict, Optional, Type, TypeVar
 import webapp2
 from webapp2_extras import routes
 
@@ -117,12 +117,8 @@ class InternetConnectivityHandler(
     frontend to check for internet connection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    # Here we use type Any because this class inherits this attribute
-    # from core.controllers.base.BaseModel.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Here we use type Any because this class inherits this attribute
-    # from core.controllers.base.BaseModel.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self) -> None:
@@ -136,11 +132,24 @@ class FrontendErrorHandler(
     """Handles errors arising from the frontend."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'error': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def post(self) -> None:
         """Records errors reported by the frontend."""
-        logging.error('Frontend error: %s' % self.payload.get('error'))
+        assert self.normalized_payload is not None
+        logging.error(
+            'Frontend error: %s' % self.normalized_payload.get('error')
+        )
         self.render_json(self.values)
 
 
@@ -230,6 +239,11 @@ URLS = [
         r'%s/can_access_blog_post_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.BlogPostPageAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_blog_author_profile_page/<author_username>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.BlogAuthorProfilePageAccessValidationHandler),
 
     get_redirect_route(
         r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
@@ -394,6 +408,10 @@ URLS = [
         diagnostic_test_player.DiagnosticTestPlayerPage
     ),
     get_redirect_route(
+        r'%s/<topic_id>' % feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL,
+        diagnostic_test_player.DiagnosticTestQuestionsHandler
+    ),
+    get_redirect_route(
         r'%s' % feconf.CLASSROOM_ADMIN_PAGE_URL,
         classroom.ClassroomAdminPage),
     get_redirect_route(
@@ -507,7 +525,7 @@ URLS = [
         blog_homepage.BlogPostDataHandler),
     get_redirect_route(
         r'%s/<author_username>' %
-        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX,
+        feconf.BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_PREFIX,
         blog_homepage.AuthorsPageHandler),
     get_redirect_route(
         r'%s' % feconf.BLOG_HOMEPAGE_DATA_URL,
@@ -1069,6 +1087,8 @@ URLS = [
         r'/user_progress_in_stories_chapters_handler/<username>',
         learner_group.LearnerStoriesChaptersProgressHandler),
     get_redirect_route(
+        r'/fix_commit_commands/', editor.FixCommitCommandsHandler),
+    get_redirect_route(
         '/learner_groups_feature_status_handler',
         learner_group.LearnerGroupsFeatureStatusHandler)
 ]
@@ -1122,6 +1142,10 @@ URLS.extend((
         r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
         oppia_root.OppiaRootPage
     ),
+    get_redirect_route(
+        r'%s/<author_username>' % feconf.BLOG_AUTHOR_PROFILE_PAGE_URL_PREFIX,
+        oppia_root.OppiaRootPage
+    )
 ))
 
 # Add cron urls. Note that cron URLs MUST start with /cron for them to work

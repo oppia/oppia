@@ -404,8 +404,8 @@ describe('Param Changes Editor Component', () => {
     jasmine.createSpy('moveItemInArray').and.stub();
 
     component.paramChangesService.displayed = [
-      new ParamChangeObjectFactory(),
-      new ParamChangeObjectFactory()
+      paramChangeObjectFactory.createDefault(''),
+      paramChangeObjectFactory.createDefault('')
     ];
 
     component.drop({

@@ -43,6 +43,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import app_identity_services
     from mypy_imports import email_models
+    from mypy_imports import secrets_services
     from mypy_imports import suggestion_models
     from mypy_imports import transaction_services
 
@@ -52,6 +53,7 @@ if MYPY: # pragma: no cover
 ])
 app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()
+secrets_services = models.Registry.import_secrets_services()
 
 
 NEW_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
@@ -2253,3 +2255,28 @@ def send_not_mergeable_change_list_to_admin_for_review(
         email_body = email_body_template % (
             exp_id, change_list_dict, frontend_version, backend_version)
         send_mail_to_admin(email_subject, email_body)
+
+
+def verify_mailchimp_secret(secret: str) -> bool:
+    """Verifies the secret key for the mailchimp webhook.
+
+    Args:
+        secret: str. The secret key provided by the mailchimp webhook.
+
+    Returns:
+        bool. Whether the secret key is valid.
+    """
+    mailchimp_webhook_secret = secrets_services.get_secret(
+        'MAILCHIMP_WEBHOOK_SECRET')
+    if mailchimp_webhook_secret is None:
+        logging.error(
+            'Cloud Secret Manager is not able to get MAILCHIMP_WEBHOOK_SECRET.')
+        # TODO(#16197): Remove MAILCHIMP_WEBHOOK_SECRET from feconf after we
+        # verify that secrets work.
+        if feconf.MAILCHIMP_WEBHOOK_SECRET is None:
+            logging.error('Mailchimp webhook secret is not available.')
+            return False
+
+        return secret == feconf.MAILCHIMP_WEBHOOK_SECRET
+
+    return secret == mailchimp_webhook_secret

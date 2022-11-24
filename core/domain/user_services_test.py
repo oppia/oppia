@@ -385,6 +385,16 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
 
+        # Raises error for usernames which don't exist, if
+        # 'get_user_id_from_username' called with strict.
+        with self.assertRaisesRegex(
+            Exception,
+            'No user_id found for the given username: fakeUsername'
+        ):
+            user_services.get_user_id_from_username(
+                'fakeUsername', strict=True
+            )
+
     def test_get_multi_user_ids_from_usernames(self) -> None:
         auth_id1 = 'someUser1'
         username1 = 'username1'
@@ -435,6 +445,17 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_multi_user_ids_from_usernames([]), []
         )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No user_id found for the username: fakeusername1'
+        ):
+            user_services.get_multi_user_ids_from_usernames(
+                ['fakeUsername1', 'USERNAME1', 'fakeUsername3',
+                'fakeUsername4', 'fakeUsername5', 'fakeUsername6',
+                'fakeUsername7', username2, 'fakeUsername9'],
+                strict=True
+            )
 
     def test_get_user_settings_from_username_returns_user_settings(
         self
@@ -1293,6 +1314,36 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, error_msg):
             user_services.add_user_role(
                 user_id, feconf.ROLE_ID_MOBILE_LEARNER)
+
+    def test_is_user_blog_post_author_returns_true_for_authors(self) -> None:
+        # When user is a blog admin.
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        blog_admin_id = (
+            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+        # Precheck before adding blog admin role.
+        self.assertFalse(user_services.is_user_blog_post_author(blog_admin_id))
+
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+
+        self.assertTrue(user_services.is_user_blog_post_author(blog_admin_id))
+
+        # When user is a blog editor.
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        blog_editor_id = (
+            self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
+        # Precheck before adding blog editor role.
+        self.assertFalse(user_services.is_user_blog_post_author(blog_editor_id))
+
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+
+        self.assertTrue(user_services.is_user_blog_post_author(blog_editor_id))
+
+        #  Assigning multiple roles to blog editor.
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_RELEASE_COORDINATOR)
+        self.assertTrue(user_services.is_user_blog_post_author(blog_editor_id))
 
     def test_removing_role_from_mobile_learner_user_raises_exception(
         self
@@ -2192,6 +2243,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ):
             user_services.get_checkpoints_in_order('Introduction', states)
 
+    def test_raises_error_if_sync_logged_in_learner_checkpoint_with_invalid_id(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No ExplorationUserDataModel found for the given user and '
+            'exploration ids: invalid_user_id, exp_1'
+        ):
+            user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version(   # pylint: disable=line-too-long
+                'invalid_user_id', 'exp_1', strict=True
+            )
+
 
 class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
     """Tests whether user checkpoint progress is updated correctly"""
@@ -2246,6 +2309,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: Introduction
         feedback:

@@ -20,6 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { EditableExplorationBackendApiService }
   from 'domain/exploration/editable-exploration-backend-api.service';
+import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService }
   from 'domain/exploration/read-only-exploration-backend-api.service';
 import { PretestQuestionBackendApiService }
@@ -147,7 +148,7 @@ describe('Exploration Player State Service', () => {
             rule_type: 'Equals',
             inputs: {x: 0}
           }],
-          training_data: null,
+          training_data: [],
           tagged_skill_misconception_id: null,
         },
         {
@@ -167,11 +168,11 @@ describe('Exploration Player State Service', () => {
             rule_type: 'Equals',
             inputs: {x: 0}
           }],
-          training_data: null,
+          training_data: [],
           tagged_skill_misconception_id: 'misconceptionId',
         }],
         default_outcome: {
-          dest: null,
+          dest: 'dest',
           dest_if_really_stuck: null,
           labelled_as_correct: true,
           missing_prerequisite_skill_id: null,
@@ -192,6 +193,9 @@ describe('Exploration Player State Service', () => {
               unicode_str: '',
               content_id: 'ca_placeholder_0'
             }
+          },
+          catchMisspellings: {
+            value: false
           }
         },
         confirmed_unclassified_answers: [],
@@ -369,7 +373,7 @@ describe('Exploration Player State Service', () => {
   it('should initialize pretest services', () => {
     spyOn(playerCorrectnessFeedbackEnabledService, 'init');
     spyOn(questionPlayerEngineService, 'init');
-    let pretestQuestionObjects = [];
+    let pretestQuestionObjects: Question[] = [];
     let callback = () => {};
 
     explorationPlayerStateService.initializePretestServices(
@@ -437,17 +441,34 @@ describe('Exploration Player State Service', () => {
     spyOn(
       editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
       .and.returnValue(Promise.resolve({
+        auto_tts_enabled: false,
         correctness_feedback_enabled: false,
         draft_changes: [],
         is_version_of_draft_valid: true,
         init_state_name: '',
         param_changes: [],
-        param_specs: null,
-        states: null,
+        param_specs: {},
+        states: {},
         title: '',
         draft_change_list_id: 0,
-        language_code: ''
-      }));
+        language_code: '',
+        exploration_metadata: {
+          title: 'Exploration',
+          category: 'Algebra',
+          objective: 'To learn',
+          language_code: 'en',
+          tags: [],
+          blurb: '',
+          author_notes: '',
+          states_schema_version: 50,
+          init_state_name: 'Introduction',
+          param_specs: {},
+          param_changes: [],
+          auto_tts_enabled: false,
+          correctness_feedback_enabled: true,
+          edits_allowed: true
+        }
+      } as ExplorationBackendDict));
     spyOn(explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
       .and.returnValue(Promise.resolve({
         isExplorationWhitelisted: true,

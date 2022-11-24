@@ -215,6 +215,7 @@ import { AdminRouterService } from 'pages/admin-page/services/admin-router.servi
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
 import { BlogAdminDataService } from 'pages/blog-admin-page/services/blog-admin-data.service';
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
+import { BlogPostPageService } from 'pages/blog-post-page/services/blog-post-page.service';
 import { CollectionEditorStateService } from 'pages/collection-editor-page/services/collection-editor-state.service';
 import { ContributionOpportunitiesBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { ContributorDashboardAdminBackendApiService } from 'pages/contributor-dashboard-admin-page/services/contributor-dashboard-admin-backend-api.service';
@@ -436,7 +437,12 @@ import { ContributionAndReviewStatsBackendApiService } from 'pages/contributor-d
 import { ContributionAndReviewStatsService } from 'pages/contributor-dashboard-page/services/contribution-and-review-stats.service';
 import { EntityCreationService } from 'pages/topic-editor-page/services/entity-creation.service';
 import { ClassroomAdminDataService } from 'pages/classroom-admin-page/services/classroom-admin-data.service';
+import { FixCommitCommandBackendApiService } from './fix-commit-command-backend-api.service';
 import { VoiceoverRecordingService } from 'pages/exploration-editor-page/translation-tab/services/voiceover-recording.service';
+import { VersionHistoryService } from 'pages/exploration-editor-page/services/version-history.service';
+import { ConceptCardManagerService } from 'pages/exploration-player-page/services/concept-card-manager.service';
+import { DiagnosticTestPlayerEngineService } from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
+import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -472,6 +478,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['BlogDashboardBackendApiService', BlogDashboardBackendApiService],
   ['BlogHomePageBackendApiService', BlogHomePageBackendApiService],
   ['BlogDashboardPageService', BlogDashboardPageService],
+  ['BlogPostPageService', BlogPostPageService],
   ['BlogPostEditorBackendApiService', BlogPostEditorBackendApiService],
   ['BottomNavbarStatusService', BottomNavbarStatusService],
   ['BrowserCheckerService', BrowserCheckerService],
@@ -494,6 +501,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CollectionValidationService', CollectionValidationService],
   ['CollectionUpdateService', CollectionUpdateService],
   ['ComputeGraphService', ComputeGraphService],
+  ['ConceptCardManagerService', ConceptCardManagerService],
   ['InternetConnectivityService', InternetConnectivityService],
   ['ConceptCardBackendApiService', ConceptCardBackendApiService],
   ['ConceptCardObjectFactory', ConceptCardObjectFactory],
@@ -525,6 +533,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['DateTimeFormatService', DateTimeFormatService],
   ['DebouncerService', DebouncerService],
   ['DeviceInfoService', DeviceInfoService],
+  ['DiagnosticTestPlayerEngineService', DiagnosticTestPlayerEngineService],
+  ['DiagnosticTestPlayerStatusService', DiagnosticTestPlayerStatusService],
   ['DocumentAttributeCustomizationService',
     DocumentAttributeCustomizationService],
   ['DragAndDropSortInputRulesService', DragAndDropSortInputRulesService],
@@ -907,5 +917,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['CompareVersionsService', CompareVersionsService],
   ['EntityCreationService', EntityCreationService],
   ['ClassroomAdminDataService', ClassroomAdminDataService],
+  ['VoiceoverRecordingService', VoiceoverRecordingService],
+  ['VersionHistoryService', VersionHistoryService],
+  ['FixCommitCommandBackendApiService', FixCommitCommandBackendApiService],
   ['VoiceoverRecordingService', VoiceoverRecordingService]
 ];

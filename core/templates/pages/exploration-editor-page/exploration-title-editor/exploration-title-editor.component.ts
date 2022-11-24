@@ -31,13 +31,16 @@ import { ExplorationTitleService } from '../services/exploration-title.service';
 export class ExplorationTitleEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  @Input() labelText: string;
-  @Input() titleEditorClass: string;
-  @Input() formStyle: string;
-  @Input() focusLabel: string;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() labelText!: string;
+  @Input() titleEditorClass!: string;
+  @Input() formStyle!: string;
+  @Input() focusLabel!: string;
   @Output() onInputFieldBlur = new EventEmitter<void>();
 
-  MAX_CHARS_IN_EXPLORATION_TITLE: number;
+  MAX_CHARS_IN_EXPLORATION_TITLE!: number;
 
   constructor(
     private explorationTitleService: ExplorationTitleService,

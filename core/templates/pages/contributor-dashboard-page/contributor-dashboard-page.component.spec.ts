@@ -46,8 +46,8 @@ describe('Contributor dashboard page', () => {
   };
   let focusManagerService: FocusManagerService;
   let windowRef: WindowRef;
-  let getTranslatableTopicNamesAsyncSpy;
-  let getUserInfoAsyncSpy;
+  let getTranslatableTopicNamesAsyncSpy: jasmine.Spy;
+  let getUserInfoAsyncSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -99,8 +99,6 @@ describe('Contributor dashboard page', () => {
 
     spyOn(userService, 'getProfileImageDataUrlAsync')
       .and.returnValue(Promise.resolve(userProfileImage));
-    spyOn(userService, 'getUserContributionRightsDataAsync')
-      .and.returnValue(Promise.resolve(userContributionRights));
     getUserInfoAsyncSpy = spyOn(userService, 'getUserInfoAsync');
     getUserInfoAsyncSpy.and.returnValue(
       Promise.resolve(userInfo as UserInfo));
@@ -109,6 +107,8 @@ describe('Contributor dashboard page', () => {
   });
 
   it('should set focus on select lang field', fakeAsync(() => {
+    spyOn(userService, 'getUserContributionRightsDataAsync')
+      .and.returnValue(Promise.resolve(userContributionRights));
     let focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
 
     component.onTabClick('translateTextTab');
@@ -118,7 +118,19 @@ describe('Contributor dashboard page', () => {
     expect(focusSpy).toHaveBeenCalled();
   }));
 
+  it('should throw error if contribution rights is null', fakeAsync(() => {
+    spyOn(userService, 'getUserContributionRightsDataAsync')
+      .and.returnValue(Promise.resolve(null));
+    expect(() => {
+      component.ngOnInit();
+      tick();
+      flush();
+    }).toThrowError();
+  }));
+
   it('should scroll properly', () => {
+    spyOn(userService, 'getUserContributionRightsDataAsync')
+      .and.returnValue(Promise.resolve(userContributionRights));
     const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
     nativeWindowSpy.and.returnValue({
       pageYOffset: 11
@@ -130,6 +142,8 @@ describe('Contributor dashboard page', () => {
   });
 
   it('should username equal to "" when user is not loggedIn', fakeAsync(() => {
+    spyOn(userService, 'getUserContributionRightsDataAsync')
+      .and.returnValue(Promise.resolve(userContributionRights));
     let userInfo = {
       isLoggedIn: () => false,
       getUsername: () => 'username1'
@@ -148,6 +162,8 @@ describe('Contributor dashboard page', () => {
   describe('when user is logged in', () => {
     it('should set specific properties after $onInit is called',
       fakeAsync(() => {
+        spyOn(userService, 'getUserContributionRightsDataAsync')
+          .and.returnValue(Promise.resolve(userContributionRights));
         component.ngOnInit();
         tick();
 
@@ -161,23 +177,22 @@ describe('Contributor dashboard page', () => {
 
     it('should not set active topic name when no topics are returned',
       fakeAsync(() => {
+        spyOn(userService, 'getUserContributionRightsDataAsync')
+          .and.returnValue(Promise.resolve(userContributionRights));
         getTranslatableTopicNamesAsyncSpy.and.returnValue(
           Promise.resolve([]));
-        // The `topicName` is set to undefined below since ngOnInit() does not
-        // initialize the variable as undefined. This means that if another
-        // frontend test is run before this test, the topicName will be set to
-        // the value of the previous test.
-        component.topicName = undefined;
 
         component.ngOnInit();
         tick();
 
-        expect(component.topicName).toBe(undefined);
+        expect(component.topicName).toBeUndefined();
         expect(translationTopicService.setActiveTopicName)
           .not.toHaveBeenCalled();
       }));
 
     it('should return language description in kebab case format', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync')
+        .and.returnValue(Promise.resolve(userContributionRights));
       let languageDescription = 'Deutsch (German)';
 
       expect(component.provideLanguageForProtractorClass(
@@ -186,15 +201,19 @@ describe('Contributor dashboard page', () => {
 
     it('should initialize $scope properties after controller is initialized' +
       ' and get data from backend', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync')
+        .and.returnValue(Promise.resolve(userContributionRights));
       expect(component.userIsLoggedIn).toBe(false);
       expect(component.username).toBe('');
       expect(component.userCanReviewQuestions).toBe(false);
       expect(component.userIsReviewer).toBe(false);
-      expect(component.profilePictureDataUrl).toBe(null);
+      expect(component.profilePictureDataUrl).toBeUndefined();
     });
 
     it('should change active tab name when clicking on translate text tab',
       () => {
+        spyOn(userService, 'getUserContributionRightsDataAsync')
+          .and.returnValue(Promise.resolve(userContributionRights));
         let changedTab = 'translateTextTab';
         expect(component.activeTabName).toBe('myContributionTab');
         component.onTabClick(changedTab);
@@ -203,6 +222,8 @@ describe('Contributor dashboard page', () => {
 
     it('should change active language when clicking on language selector',
       () => {
+        spyOn(userService, 'getUserContributionRightsDataAsync')
+          .and.returnValue(Promise.resolve(userContributionRights));
         spyOn(localStorageService, 'updateLastSelectedTranslationLanguageCode')
           .and.callThrough();
 
@@ -215,6 +236,8 @@ describe('Contributor dashboard page', () => {
       });
 
     it('should show language selector based on active tab', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync')
+        .and.returnValue(Promise.resolve(userContributionRights));
       let changedTab = 'translateTextTab';
 
       expect(component.activeTabName).toBe('myContributionTab');
@@ -227,6 +250,8 @@ describe('Contributor dashboard page', () => {
 
     it('should change active topic when clicking on topic selector',
       () => {
+        spyOn(userService, 'getUserContributionRightsDataAsync')
+          .and.returnValue(Promise.resolve(userContributionRights));
         spyOn(localStorageService, 'updateLastSelectedTranslationTopicName')
           .and.callThrough();
 
@@ -239,6 +264,8 @@ describe('Contributor dashboard page', () => {
       });
 
     it('should show topic selector based on active tab', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync')
+        .and.returnValue(Promise.resolve(userContributionRights));
       let changedTab = 'translateTextTab';
 
       expect(component.activeTabName).toBe('myContributionTab');
@@ -250,6 +277,8 @@ describe('Contributor dashboard page', () => {
     });
 
     it('should call scrollFunction on scroll', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync')
+        .and.returnValue(Promise.resolve(userContributionRights));
       let dummyScrollEvent = new Event('scroll');
       let scrollSpy = spyOn(component, 'scrollFunction');
 
@@ -260,6 +289,8 @@ describe('Contributor dashboard page', () => {
 
     it('should show default header if window pageYOffset is ' +
       'less than 80', function() {
+      spyOn(userService, 'getUserContributionRightsDataAsync')
+        .and.returnValue(Promise.resolve(userContributionRights));
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
         pageYOffset: 79
@@ -272,6 +303,8 @@ describe('Contributor dashboard page', () => {
 
     it('should show collapsed header if window pageYOffset is' +
       ' scrolled greater than 80', fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync')
+        .and.returnValue(Promise.resolve(userContributionRights));
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
         pageYOffset: 81
