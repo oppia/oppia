@@ -267,6 +267,15 @@ export class ConversationSkinComponent {
       this.collectionTitle = null;
     }
 
+    if (this.diagnosticTestTopicTrackerModel) {
+      this.feedbackIsEnabled = false;
+      this.learnerCanOnlyAttemptQuestionOnce = true;
+      this.inputOutputHistoryIsShown = false;
+      this.navigationThroughCardHistoryIsEnabled = false;
+      this.checkpointCelebrationModalIsEnabled = false;
+      this.skipButtonIsShown = true;
+    }
+
     this.explorationId = this.explorationEngineService.getExplorationId();
     this.isInPreviewMode = this.explorationEngineService.isInPreviewMode();
     this.isIframed = this.urlService.isIframed();
@@ -479,15 +488,6 @@ export class ConversationSkinComponent {
             }
           );
         this.visitedStateNames.push(firstStateName);
-      }
-
-      if (this.diagnosticTestTopicTrackerModel) {
-        this.feedbackIsEnabled = false;
-        this.learnerCanOnlyAttemptQuestionOnce = true;
-        this.inputOutputHistoryIsShown = false;
-        this.navigationThroughCardHistoryIsEnabled = false;
-        this.checkpointCelebrationModalIsEnabled = false;
-        this.skipButtonIsShown = true;
       }
     });
   }
