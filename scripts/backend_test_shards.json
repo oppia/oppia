@@ -1,7 +1,6 @@
 {
     "1": [
         "core.jobs.transforms.job_result_transforms_test",
-        "core.jobs.transforms.results_transforms_test",
         "scripts.linters.pre_commit_linter_test",
         "core.controllers.base_test",
         "core.controllers.collection_editor_test",
@@ -193,6 +192,7 @@
         "core.storage.job.gae_models_test",
         "core.storage.base_model.gae_models_test",
         "core.jobs.jobs_manager_test",
+        "core.jobs.transforms.results_transforms_test",
         "core.schema_utils_test",
         "core.domain.story_services_test",
         "core.domain.taskqueue_services_test",
