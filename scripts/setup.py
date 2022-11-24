@@ -169,8 +169,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
     # The second option allows this script to also be run from deployment
     # folders.
-    if not os.getcwd().endswith('oppia') and not os.getcwd().endswith(
-            'deploy-'):
+    if not os.getcwd().endswith(('oppia', 'deploy-')):
         print('')
         print('WARNING This script should be run from the oppia/ root folder.')
         print('')
