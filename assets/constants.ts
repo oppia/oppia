@@ -4980,6 +4980,11 @@ export default {
     "direction": "ltr",
     "decimal_separator": ","
   }, {
+    "code": "am",
+    "description": "አማርኛ (Amharic)",
+    "direction": "ltr",
+    "decimal_separator": "."
+  }, {
     "code": "az",
     "description": "Azeri (Azerbaijani)",
     "direction": "ltr",
@@ -5346,6 +5351,11 @@ export default {
     "id": "sq",
     "description": "shqip (Albanian)",
     "relatedLanguages": ["sq"],
+    "direction": "ltr"
+  }, {
+    "id": "am",
+    "description": "አማርኛ (Amharic)",
+    "relatedLanguages": ["am"],
     "direction": "ltr"
   }, {
     "id": "ar",
