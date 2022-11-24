@@ -255,6 +255,16 @@ export class StateCard {
     }
   }
 
+  addToExistingFeedback(response: string): void {
+    if (this._inputResponsePairs.length >= 1) {
+      let newResponse = this._inputResponsePairs[
+        this._inputResponsePairs.length - 1].oppiaResponse + '\n' +
+        response;
+      this._inputResponsePairs[
+        this._inputResponsePairs.length - 1].oppiaResponse = newResponse;
+    }
+  }
+
   setInteractionHtml(interactionHtml: string): void {
     this._interactionHtml = interactionHtml;
   }

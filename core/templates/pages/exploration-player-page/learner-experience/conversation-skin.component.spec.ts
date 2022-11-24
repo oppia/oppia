@@ -1115,7 +1115,7 @@ describe('Conversation skin component', () => {
   ' predetermined time', fakeAsync(() => {
     spyOn(componentInstance, 'showPendingCard');
     spyOn(translateService, 'instant').and.callThrough();
-    spyOn(playerTranscriptService, 'addNewResponse');
+    spyOn(playerTranscriptService, 'addNewResponseToExistingFeedback');
 
     componentInstance.nextCardIfStuck = new StateCard(
       null, null, null, new Interaction(
@@ -1150,7 +1150,7 @@ describe('Conversation skin component', () => {
   ' when the learner gets stuck and such a state exists', fakeAsync(() => {
     spyOn(translateService, 'instant').and.callThrough();
     spyOn(componentInstance, 'showPendingCard');
-    spyOn(playerTranscriptService, 'addNewResponse');
+    spyOn(playerTranscriptService, 'addNewResponseToExistingFeedback');
 
     componentInstance.nextCardIfStuck = new StateCard(
       null, null, null, new Interaction(

@@ -109,6 +109,11 @@ export class PlayerTranscriptService {
     card.setLastOppiaResponse(response);
   }
 
+  addNewResponseToExistingFeedback(response: string): void {
+    let card = this.getLastCard();
+    card.addToExistingFeedback(response);
+  }
+
   getNumCards(): number {
     return this.transcript.length;
   }
