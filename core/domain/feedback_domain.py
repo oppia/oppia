@@ -387,7 +387,7 @@ class FeedbackMessageReference:
                 reference_dict['thread_id'],
                 reference_dict['message_id']
             )
-        except utils.ValidationError as error:
+        except Exception as error:
             raise utils.ValidationError(
                 'Missing property in reference dict.') from error
 
