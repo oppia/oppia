@@ -211,6 +211,7 @@ export const AppConstants = {
   CONTRIBUTION_STATS_TYPE_QUESTION: 'question',
   CONTRIBUTION_STATS_SUBTYPE_SUBMISSION: 'submission',
   CONTRIBUTION_STATS_SUBTYPE_REVIEW: 'review',
+  CONTRIBUTION_STATS_SUBTYPE_CORRECTION: 'correction',
   CONTRIBUTION_STATS_TYPES: {
     TRANSLATION_CONTRIBUTION: {
       NAME: 'translationContribution',
@@ -228,5 +229,6 @@ export const AppConstants = {
       NAME: 'questionReview',
       DISPLAY_NAME: 'Question Reviews'
     }
-  }
+  },
+  CONTRIBUTOR_BADGE_INITIAL_LEVELS: [1, 10, 20, 50, 100, 200, 300, 400, 500]
 } as const;
