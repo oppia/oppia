@@ -26,11 +26,11 @@ from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
-from core.domain import translation_domain
 from core.domain import story_fetchers
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
+from core.domain import translation_domain
 from core.domain import translation_services
 from core.domain import user_services
 

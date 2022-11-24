@@ -191,7 +191,7 @@ class DraftUpgradeUtil:
                             subtitled_html_new_value_dicts[value_index] = (
                                 conversion_fn(value)
                             )
-            elif (change.property_name == 'written_translations'):
+            elif change.property_name == 'written_translations':
                 # Here we use MyPy ignore because the latest schema of state
                 # dict doesn't contains translations_mapping of
                 # written_translations property.

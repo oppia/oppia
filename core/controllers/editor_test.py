@@ -3705,7 +3705,15 @@ class FixCommitCommandsHandlerTests(BaseEditorControllerTests):
             self.editor_id, self.EXP_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': 'add_state',
-                    'state_name': '1'
+                    'state_name': '1',
+                    'content_id_for_default_outcome': 'default_outcome_3',
+                    'content_id_for_state_content': 'content_4'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': 5,
+                    'old_value': 0
                 })
             ], ''
         )
@@ -3713,7 +3721,15 @@ class FixCommitCommandsHandlerTests(BaseEditorControllerTests):
             self.editor_id, self.EXP_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': 'add_state',
-                    'state_name': 'END'
+                    'state_name': 'END',
+                    'content_id_for_default_outcome': 'default_outcome_5',
+                    'content_id_for_state_content': 'content_6'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': 7,
+                    'old_value': 5
                 })
             ], ''
         )
@@ -3742,5 +3758,10 @@ class FixCommitCommandsHandlerTests(BaseEditorControllerTests):
 
         self.assertEqual(
             metadata_model.commit_cmds,
-            [{'cmd': 'add_state', 'state_name': 'END'}]
+            [{
+                'cmd': 'add_state',
+                'state_name': 'END',
+                'content_id_for_default_outcome': 'default_outcome_5',
+                'content_id_for_state_content': 'content_6'
+            }]
         )

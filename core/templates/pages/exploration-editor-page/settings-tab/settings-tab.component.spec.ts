@@ -57,7 +57,6 @@ import { VersionHistoryBackendApiService } from '../services/version-history-bac
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 describe('Settings Tab Component', () => {
   let component: SettingsTabComponent;
