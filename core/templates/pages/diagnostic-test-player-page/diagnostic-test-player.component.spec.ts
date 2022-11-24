@@ -55,7 +55,6 @@ describe('Diagnostic test player component', () => {
   let fixture: ComponentFixture<DiagnosticTestPlayerComponent>;
   let windowRef: MockWindowRef;
   let preventPageUnloadEventService: PreventPageUnloadEventService;
-  let diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService;
   let classroomBackendApiService: ClassroomBackendApiService;
   let translateService: TranslateService;
   let sessionCompleteEmitter = new EventEmitter<string[]>();
@@ -101,8 +100,6 @@ describe('Diagnostic test player component', () => {
     component = fixture.componentInstance;
     preventPageUnloadEventService = TestBed.inject(
       PreventPageUnloadEventService);
-    diagnosticTestPlayerStatusService = TestBed.inject(
-      DiagnosticTestPlayerStatusService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     translateService = TestBed.inject(TranslateService);
   });
@@ -136,14 +133,8 @@ describe('Diagnostic test player component', () => {
     'should be able to subscribe event emitters after initialization',
     fakeAsync(() => {
       spyOn(preventPageUnloadEventService, 'addListener');
-      spyOn(
-        diagnosticTestPlayerStatusService.onDiagnosticTestSessionCompleted,
-        'subscribe'
-      );
-      spyOn(
-        diagnosticTestPlayerStatusService.onDiagnosticTestSessionProgressChange,
-        'subscribe'
-      );
+      spyOn(component, 'getRecommendedTopicSummaries');
+      spyOn(component, 'getProgressText');
 
       component.ngOnInit();
       sessionCompleteEmitter.emit(['recommendedTopicId']);
@@ -151,13 +142,11 @@ describe('Diagnostic test player component', () => {
       tick(200);
 
       expect(
-        diagnosticTestPlayerStatusService
-          .onDiagnosticTestSessionCompleted.subscribe
-      ).toHaveBeenCalled();
+        component.getRecommendedTopicSummaries
+      ).toHaveBeenCalledWith(['recommendedTopicId']);
 
       expect(
-        diagnosticTestPlayerStatusService
-          .onDiagnosticTestSessionProgressChange.subscribe
+        component.getProgressText
       ).toHaveBeenCalled();
     }));
 
