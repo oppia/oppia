@@ -56,7 +56,9 @@ jobs:
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         # We avoid using ../ or absolute paths because unzip treats these as
         # security issues and will refuse to follow them.
-        run: zip -rq build_files.zip oppia/third_party oppia_tools oppia/build
+        run: |
+          zip -rq build_files.zip \
+            oppia/third_party oppia_tools oppia/build oppia/webpack_bundles oppia/proto_files
         working-directory: /home/runner/work/oppia
       - name: Upload build files artifact
         uses: actions/upload-artifact@v3
