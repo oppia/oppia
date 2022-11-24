@@ -28,6 +28,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { SkillEditorStateService } from '../services/skill-editor-state.service';
 import { SkillPreviewTabComponent } from './skill-preview-tab.component';
 import { QuestionPlayerEngineService } from 'pages/exploration-player-page/services/question-player-engine.service';
+import { StateCard } from 'domain/state_card/state-card.model';
 
 const questionDict = {
   id: 'question_id',
@@ -219,7 +220,7 @@ describe('Skill Preview Tab Component', () => {
 
   it('should initialize the question card', () => {
     expect(component.displayCardIsInitialized).toEqual(false);
-    component.initializeQuestionCard(null);
+    component.initializeQuestionCard({} as StateCard);
     expect(component.displayCardIsInitialized).toEqual(true);
   });
 

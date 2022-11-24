@@ -47,7 +47,7 @@ from core.platform import models
 from core.tests import test_utils
 import main
 
-from typing import Dict, Final, FrozenSet, List, Optional, TypedDict, cast
+from typing import Dict, Final, FrozenSet, List, Optional, TypedDict
 import webapp2
 from webapp2_extras import routes
 import webtest
@@ -108,12 +108,19 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     DELETED_USER_USERNAME: Final = 'deleteduser'
     PARTIALLY_LOGGED_IN_USER_EMAIL: Final = 'partial@example.com'
 
-    class MockHandlerWithInvalidReturnType(base.BaseHandler):
+    class MockHandlerWithInvalidReturnType(
+        base.BaseHandler[Dict[str, str], Dict[str, str]]
+    ):
         GET_HANDLER_ERROR_RETURN_TYPE = 'invalid_type'
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        def get(self) -> None:
+        # Here we use MyPy ignore because the signature of 'get' method does not
+        # match with the signature of super class's (BaseHandler) 'get' method,
+        # and this happens because all handler methods in the main codebase have
+        # decorators which modify the function signature accordingly, but these
+        # methods in base_test.py do not.
+        def get(self) -> None:  # type: ignore[override]
             self.render_template('invalid_page.html')
 
         def options(self) -> None:
@@ -122,27 +129,48 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             """
             self.render_template('invalid_page.html')
 
-    class MockHandlerForTestingErrorPageWithIframed(base.BaseHandler):
+    class MockHandlerForTestingErrorPageWithIframed(
+        base.BaseHandler[Dict[str, str], Dict[str, str]]
+    ):
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        def get(self) -> None:
+        # Here we use MyPy ignore because the signature of 'get' method does not
+        # match with the signature of super class's (BaseHandler) 'get' method,
+        # and this happens because all handler methods in the main codebase have
+        # decorators which modify the function signature accordingly, but these
+        # methods in base_test.py do not.
+        def get(self) -> None:  # type: ignore[override]
             self.iframed = True
             self.render_template('invalid_page.html')
 
-    class MockHandlerForTestingUiAccessWrapper(base.BaseHandler):
+    class MockHandlerForTestingUiAccessWrapper(
+        base.BaseHandler[Dict[str, str], Dict[str, str]]
+    ):
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        def get(self) -> None:
+        # Here we use MyPy ignore because the signature of 'get' method does not
+        # match with the signature of super class's (BaseHandler) 'get' method,
+        # and this happens because all handler methods in the main codebase have
+        # decorators which modify the function signature accordingly, but these
+        # methods in base_test.py do not.
+        def get(self) -> None:  # type: ignore[override]
             """Handles GET requests."""
             pass
 
-    class MockHandlerForTestingAuthorizationWrapper(base.BaseHandler):
+    class MockHandlerForTestingAuthorizationWrapper(
+        base.BaseHandler[Dict[str, str], Dict[str, str]]
+    ):
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        def get(self) -> None:
+        # Here we use MyPy ignore because the signature of 'get' method does not
+        # match with the signature of super class's (BaseHandler) 'get' method,
+        # and this happens because all handler methods in the main codebase have
+        # decorators which modify the function signature accordingly, but these
+        # methods in base_test.py do not.
+        def get(self) -> None:  # type: ignore[override]
             """Handles GET requests."""
             pass
 
@@ -517,11 +545,18 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
 class MissingHandlerArgsTests(test_utils.GenericTestBase):
 
-    class MissingArgsHandler(base.BaseHandler):
+    class MissingArgsHandler(
+        base.BaseHandler[Dict[str, str], Dict[str, str]]
+    ):
         """Mock handler for testing."""
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
 
-        def post(self) -> None:
+        # Here we use MyPy ignore because the signature of 'post' method does
+        # not match with the signature of super class's (BaseHandler) 'post'
+        # method, and this happens because all handler methods in the main
+        # codebase have decorators which modify the function signature
+        # accordingly, but these methods in base_test.py do not.
+        def post(self) -> None:  # type: ignore[override]
             """Handles POST requests."""
             self.render_json({})
 
@@ -741,12 +776,17 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
 
 class EscapingTests(test_utils.GenericTestBase):
 
-    class FakePage(base.BaseHandler):
+    class FakePage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Fake page for testing autoescaping."""
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
-        def post(self) -> None:
+        # Here we use MyPy ignore because the signature of 'post' method does
+        # not match with the signature of super class's (BaseHandler) 'post'
+        # method, and this happens because all handler methods in the main
+        # codebase have decorators which modify the function signature
+        # accordingly, but these methods in base_test.py do not.
+        def post(self) -> None:  # type: ignore[override]
             """Handles POST requests."""
             self.render_json({'big_value': u'\n<script>马={{'})
 
@@ -775,14 +815,19 @@ class EscapingTests(test_utils.GenericTestBase):
 
 class RenderDownloadableTests(test_utils.GenericTestBase):
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Mock handler that subclasses BaseHandler and serves a response
         that is of a 'downloadable' type.
         """
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        def get(self) -> None:
+        # Here we use MyPy ignore because the signature of 'get' method does not
+        # match with the signature of super class's (BaseHandler) 'get' method,
+        # and this happens because all handler methods in the main codebase have
+        # decorators which modify the function signature accordingly, but these
+        # methods in base_test.py do not.
+        def get(self) -> None:  # type: ignore[override]
             """Handles GET requests."""
             file_contents = io.BytesIO(b'example')
             self.render_downloadable_file(
@@ -1031,13 +1076,18 @@ class I18nDictsTests(test_utils.GenericTestBase):
 
 class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
 
-    class FakeHandler(base.BaseHandler):
+    class FakeHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """A fake handler class."""
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        def get(self) -> None:
+        # Here we use MyPy ignore because the signature of 'get' method does not
+        # match with the signature of super class's (BaseHandler) 'get' method,
+        # and this happens because all handler methods in the main codebase have
+        # decorators which modify the function signature accordingly, but these
+        # methods in base_test.py do not.
+        def get(self) -> None:  # type: ignore[override]
             """Handles get requests."""
             raise self.InternalErrorException('fake exception')
 
@@ -1120,11 +1170,16 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
 
 class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
     """Test that request.GET.items() correctly retrieves escaped characters."""
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        def get(self) -> None:
+        # Here we use MyPy ignore because the signature of 'get' method does not
+        # match with the signature of super class's (BaseHandler) 'get' method,
+        # and this happens because all handler methods in the main codebase have
+        # decorators which modify the function signature accordingly, but these
+        # methods in base_test.py do not.
+        def get(self) -> None:  # type: ignore[override]
             self.values.update(list(self.request.GET.items()))
             self.render_json(self.values)
 
@@ -1232,7 +1287,12 @@ class MockHandlerForTestingPageIframingNormalizedRequestDict(TypedDict):
 
 class IframeRestrictionTests(test_utils.GenericTestBase):
 
-    class MockHandlerForTestingPageIframing(base.BaseHandler):
+    class MockHandlerForTestingPageIframing(
+        base.BaseHandler[
+            Dict[str, str],
+            MockHandlerForTestingPageIframingNormalizedRequestDict
+        ]
+    ):
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS = {
             'GET': {
@@ -1245,16 +1305,14 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
             }
         }
 
-        def get(self) -> None:
-            # Here we use cast because we are narrowing down the type of
-            # 'normalized_request' from Dict[str, Any] to a particular
-            # TypedDict that was defined according to the schemas. So that
-            # the type of fetched values is not considered as Any type.
-            request_data = cast(
-                MockHandlerForTestingPageIframingNormalizedRequestDict,
-                self.normalized_request
-            )
-            iframe_restriction = request_data.get('iframe_restriction', None)
+        # Here we use MyPy ignore because the signature of 'get' method does not
+        # match with the signature of super class's (BaseHandler) 'get' method,
+        # and this happens because all handler methods in the main codebase have
+        # decorators which modify the function signature accordingly, but these
+        # methods in base_test.py do not.
+        def get(self) -> None:  # type: ignore[override]
+            assert self.normalized_request is not None
+            iframe_restriction = self.normalized_request.get('iframe_restriction')
             self.render_template(
                 'oppia-root.mainpage.html',
                 iframe_restriction=iframe_restriction)
@@ -1329,7 +1387,10 @@ class SignUpTests(test_utils.GenericTestBase):
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'can_receive_email_updates': (
+                    feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                )
             }, csrf_token=csrf_token,
         )
 
@@ -1380,7 +1441,9 @@ class CorrectMockVMHandlerNormalizedPayloadDict(TypedDict):
 class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
     """Unit tests for OppiaMLVMHandler class."""
 
-    class IncorrectMockVMHandler(base.OppiaMLVMHandler):
+    class IncorrectMockVMHandler(
+        base.OppiaMLVMHandler[Dict[str, str], Dict[str, str]]
+    ):
         """Derived VM Handler class with missing function implementation for
         extract_request_message_vm_id_and_signature function.
         """
@@ -1399,7 +1462,12 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         def post(self) -> None:
             return self.render_json({})
 
-    class CorrectMockVMHandler(base.OppiaMLVMHandler):
+    class CorrectMockVMHandler(
+        base.OppiaMLVMHandler[
+            CorrectMockVMHandlerNormalizedPayloadDict,
+            Dict[str, str]
+        ]
+    ):
         """Derived VM Handler class with
         extract_request_message_vm_id_and_signature function implementation.
         """
@@ -1420,17 +1488,10 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
             """Returns the message, vm_id and signature retrieved from the
             incoming requests.
             """
-            # Here we use cast because we are narrowing down the type of
-            # 'normalized_payload' from Dict[str, Any] to a particular
-            # TypedDict that was defined according to the schemas. So that
-            # the type of fetched values is not considered as Any type.
-            payload_data = cast(
-                CorrectMockVMHandlerNormalizedPayloadDict,
-                self.normalized_payload
-            )
-            signature = payload_data['signature']
-            vm_id = payload_data['vm_id']
-            message = payload_data['message']
+            assert self.normalized_payload is not None
+            signature = self.normalized_payload['signature']
+            vm_id = self.normalized_payload['vm_id']
+            message = self.normalized_payload['message']
             return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
 
         @acl_decorators.is_from_oppia_ml
@@ -1546,12 +1607,23 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                 continue
 
             regex_pattern = r'<.*?>'
-            url_path_elements = [
-                keyword[1:-1] for keyword in re.findall(
-                    regex_pattern, route.name)]
+            url_path_arg_names = []
+            for url_path_element in re.findall(regex_pattern, route.name):
+                url_path_keyword = url_path_element[1: -1]
+                # In some cases, url_path_arguments are defined with specific
+                # acceptable values, e.g: /<asset_type:(image|audio|thumbnail)>.
+                # So, to separate out the argument name from acceptable values,
+                # we have used ':' delimiter's index so that we can strip the
+                # part after ':'.
+                url_argument_delimiter_index = url_path_keyword.find(':')
+                url_path_arg_name = (
+                    url_path_keyword[:url_argument_delimiter_index]
+                    if url_argument_delimiter_index != -1 else url_path_keyword
+                )
+                url_path_arg_names.append(url_path_arg_name)
             schema_keys = handler.URL_PATH_ARGS_SCHEMAS.keys()
 
-            missing_schema_keys = set(url_path_elements) - set(schema_keys)
+            missing_schema_keys = set(url_path_arg_names) - set(schema_keys)
             if missing_schema_keys:
                 handlers_with_missing_url_schema_keys.append(handler_class_name)
                 self.log_line(
@@ -1710,7 +1782,9 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
 
     exp_id = 'exp_id'
 
-    class MockHandlerWithInvalidSchema(base.BaseHandler):
+    class MockHandlerWithInvalidSchema(
+        base.BaseHandler[Dict[str, str], Dict[str, str]]
+    ):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
@@ -1725,7 +1799,9 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
         def get(self, exploration_id: str) -> None:
             self.render_json({'exploration_id': exploration_id})
 
-    class MockHandlerWithValidSchema(base.BaseHandler):
+    class MockHandlerWithValidSchema(
+        base.BaseHandler[Dict[str, str], Dict[str, str]]
+    ):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
@@ -1740,7 +1816,9 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
         def get(self, exploration_id: str) -> None:
             self.render_json({'exploration_id': exploration_id})
 
-    class MockHandlerWithMissingUrlPathSchema(base.BaseHandler):
+    class MockHandlerWithMissingUrlPathSchema(
+        base.BaseHandler[Dict[str, str], Dict[str, str]]
+    ):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -1835,7 +1913,12 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 
     exp_id: Final = 'exp_id'
 
-    class MockHandlerWithInvalidSchema(base.BaseHandler):
+    class MockHandlerWithInvalidSchema(
+        base.BaseHandler[
+            Dict[str, str],
+            MockHandlerWithInvalidSchemaNormalizedRequestDict
+        ]
+    ):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS = {
@@ -1850,33 +1933,29 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_play_exploration
         def get(self) -> None:
-            # Here we use cast because we are narrowing down the type of
-            # 'normalized_request' from Dict[str, Any] to a particular
-            # TypedDict that was defined according to the schemas. So that
-            # the type of fetched values is not considered as Any type.
-            request_data = cast(
-                MockHandlerWithInvalidSchemaNormalizedRequestDict,
-                self.normalized_request
-            )
-            exploration_id = request_data['exploration_id']
+            assert self.normalized_request is not None
+            exploration_id = self.normalized_request['exploration_id']
             self.render_json({'exploration_id': exploration_id})
 
-    class MockHandlerWithMissingRequestSchema(base.BaseHandler):
+    class MockHandlerWithMissingRequestSchema(
+        base.BaseHandler[Dict[str, str], Dict[str, str]]
+    ):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, str] = {}
 
         @acl_decorators.can_play_exploration
         def get(self) -> None:
-            # Here we use cast because we are narrowing down the type of
-            # 'normalized_request' from Dict[str, Any] to a particular
-            # Dict type that was defined according to the schemas. So that
-            # the type of fetched values is not considered as Any type.
-            payload = cast(Dict[str, str], self.normalized_request)
-            exploration_id = payload.get('exploration_id')
+            assert self.normalized_request is not None
+            exploration_id = self.normalized_request.get('exploration_id')
             self.render_json({'exploration_id': exploration_id})
 
-    class MockHandlerWithDefaultGetSchema(base.BaseHandler):
+    class MockHandlerWithDefaultGetSchema(
+        base.BaseHandler[
+            Dict[str, str],
+            MockHandlerWithDefaultGetSchemaNormalizedRequestDict
+        ]
+    ):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS = {
@@ -1896,23 +1975,26 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
             }
         }
 
-        def get(self) -> None:
-            # Here we use cast because we are narrowing down the type of
-            # 'normalized_request' from Dict[str, Any] to a particular
-            # TypedDict that was defined according to the schemas. So that
-            # the type of fetched values is not considered as Any type.
-            request_data = cast(
-                MockHandlerWithDefaultGetSchemaNormalizedRequestDict,
-                self.normalized_request
-            )
-            exploration_id = request_data['exploration_id']
+        # Here we use MyPy ignore because the signature of 'get' method does not
+        # match with the signature of super class's (BaseHandler) 'get' method,
+        # and this happens because all handler methods in the main codebase have
+        # decorators which modify the function signature accordingly, but these
+        # methods in base_test.py do not.
+        def get(self) -> None:  # type: ignore[override]
+            assert self.normalized_request is not None
+            exploration_id = self.normalized_request['exploration_id']
             if exploration_id != 'random_exp_id':
                 raise self.InvalidInputException(
                     'Expected exploration_id to be random_exp_id received %s'
                     % exploration_id)
             return self.render_json({'exploration_id': exploration_id})
 
-    class MockHandlerWithDefaultPutSchema(base.BaseHandler):
+    class MockHandlerWithDefaultPutSchema(
+        base.BaseHandler[
+            MockHandlerWithDefaultPutSchemaNormalizedPayloadDict,
+            Dict[str, str]
+        ]
+    ):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS = {
@@ -1926,16 +2008,14 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
             }
         }
 
-        def put(self) -> None:
-            # Here we use cast because we are narrowing down the type of
-            # 'normalized_payload' from Dict[str, Any] to a particular
-            # TypedDict that was defined according to the schemas. So that
-            # the type of fetched values is not considered as Any type.
-            payload_data = cast(
-                MockHandlerWithDefaultPutSchemaNormalizedPayloadDict,
-                self.normalized_payload
-            )
-            exploration_id = payload_data['exploration_id']
+        # Here we use MyPy ignore because the signature of 'put' method does
+        # not match with the signature of super class's (BaseHandler) 'put'
+        # method, and this happens because all handler methods in the main
+        # codebase have decorators which modify the function signature
+        # accordingly, but these methods in base_test.py do not.
+        def put(self) -> None:  # type: ignore[override]
+            assert self.normalized_payload is not None
+            exploration_id = self.normalized_payload['exploration_id']
             if exploration_id != 'random_exp_id':
                 raise self.InvalidInputException(
                     'Expected exploration_id to be random_exp_id received %s'
@@ -2013,7 +2093,7 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
     HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS.
     """
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Mock handler with schema."""
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS = {
@@ -2026,7 +2106,12 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
             }
         }
 
-        def post(self) -> None:
+        # Here we use MyPy ignore because the signature of 'post' method does
+        # not match with the signature of super class's (BaseHandler) 'post'
+        # method, and this happens because all handler methods in the main
+        # codebase have decorators which modify the function signature
+        # accordingly, but these methods in base_test.py do not.
+        def post(self) -> None:  # type: ignore[override]
             self.render_json({})
 
     def setUp(self) -> None:
@@ -2053,7 +2138,7 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
 class HeaderRequestsTests(test_utils.GenericTestBase):
     """Tests to check header requests."""
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'entity_id': {
@@ -2064,7 +2149,12 @@ class HeaderRequestsTests(test_utils.GenericTestBase):
         }
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        def get(self, entity_id: str) -> None:
+        # Here we use MyPy ignore because the signature of 'get' method does not
+        # match with the signature of super class's (BaseHandler) 'get' method,
+        # and this happens because all handler methods in the main codebase have
+        # decorators which modify the function signature accordingly, but these
+        # methods in base_test.py do not.
+        def get(self, entity_id: str) -> None:  # type: ignore[override]
             self.render_json({'entity_id': entity_id})
 
     def setUp(self) -> None:
@@ -2092,7 +2182,7 @@ class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
     the request method which are not present in the handler class.
     """
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Mock handler with no get method.
         """
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -2126,7 +2216,11 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
     """This test class ensures that SVS architecture validates both request args
     and payload args if they are present in a single request method."""
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(
+        base.BaseHandler[
+            MockHandlerNormalizedRequestDict, Dict[str, str]
+        ]
+    ):
         """Fake page for testing autoescaping."""
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS = {
@@ -2144,25 +2238,23 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
             }
         }
 
-        def post(self) -> None:
+        # Here we use MyPy ignore because the signature of 'post' method does
+        # not match with the signature of super class's (BaseHandler) 'post'
+        # method, and this happens because all handler methods in the main
+        # codebase have decorators which modify the function signature
+        # accordingly, but these methods in base_test.py do not.
+        def post(self) -> None:  # type: ignore[override]
             """Handles POST requests. This request method contains both type
             of args, i.e., request args as well as payload args.
             """
-            # Here we use cast because we are narrowing down the type of
-            # 'normalized_request' from Dict[str, Any] to a particular
-            # TypedDict that was defined according to the schemas. So that
-            # the type of fetched values is not considered as Any type.
-            request_data = cast(
-                MockHandlerNormalizedRequestDict,
-                self.normalized_request
-            )
+            assert self.normalized_request is not None
             # arg_a = self.request.get('arg_a') is not used, since we
             # intend to use normalized value.
-            arg_a = request_data.get('arg_a')
+            arg_a = self.normalized_request.get('arg_a')
 
             # arg_b = self.payload.get('arg_b') is not used, since we
             # intend to use normalized value.
-            arg_b = request_data.get('arg_b')
+            arg_b = self.normalized_request.get('arg_b')
 
             self.render_json({'arg_a': arg_a, 'arg_b': arg_b})
 
@@ -2222,7 +2314,12 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
     TEST_LEARNER_EMAIL: Final = 'test.learner@example.com'
     TEST_LEARNER_USERNAME: Final = 'testlearneruser'
 
-    class MockUploadHandler(base.BaseHandler):
+    class MockUploadHandler(
+        base.BaseHandler[
+            MockUploadHandlerNormalizedPayloadDict,
+            MockUploadHandlerNormalizedRequestDict
+        ]
+    ):
         """Handles image uploads."""
         URL_PATH_ARGS_SCHEMAS = {
             'entity_type': {
@@ -2257,29 +2354,18 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
             }
         }
 
-        def post(self, entity_type: str, entity_id: str) -> None:
+        # Here we use MyPy ignore because the signature of 'post' method does
+        # not match with the signature of super class's (BaseHandler) 'post'
+        # method, and this happens because all handler methods in the main
+        # codebase have decorators which modify the function signature
+        # accordingly, but these methods in base_test.py do not.
+        def post(self, entity_type: str, entity_id: str) -> None:  # type: ignore[override]
             """Saves an image uploaded by a content creator."""
-
-            # Here we use cast because we are narrowing down the type of
-            # 'normalized_payload' from Dict[str, Any] to a particular
-            # TypedDict that was defined according to the schemas. So that
-            # the type of fetched values is not considered as Any type.
-            payload_data = cast(
-                MockUploadHandlerNormalizedPayloadDict,
-                self.normalized_payload
-            )
-
-            # Here we use cast because we are narrowing down the type of
-            # 'normalized_request' from Dict[str, Any] to a particular
-            # TypedDict that was defined according to the schemas. So that
-            # the type of fetched values is not considered as Any type.
-            request_data = cast(
-                MockUploadHandlerNormalizedRequestDict,
-                self.normalized_request
-            )
-            raw = request_data.get('image')
-            filename = payload_data.get('filename')
-            filename_prefix = payload_data.get('filename_prefix')
+            assert self.normalized_payload is not None
+            assert self.normalized_request is not None
+            raw = self.normalized_request.get('image')
+            filename = self.normalized_payload.get('filename')
+            filename_prefix = self.normalized_payload.get('filename_prefix')
 
             self.render_json({'filename': filename})
 
@@ -2322,7 +2408,7 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
 class UrlPathNormalizationTest(test_utils.GenericTestBase):
     """Tests that ensure url path arguments are normalized"""
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         URL_PATH_ARGS_SCHEMAS = {
             'mock_list': {
                 'schema': {
@@ -2340,7 +2426,12 @@ class UrlPathNormalizationTest(test_utils.GenericTestBase):
             'GET': {}
         }
 
-        def get(self, mock_list: List[str], mock_int: int) -> None:
+        # Here we use MyPy ignore because the signature of 'get' method does not
+        # match with the signature of super class's (BaseHandler) 'get' method,
+        # and this happens because all handler methods in the main codebase have
+        # decorators which modify the function signature accordingly, but these
+        # methods in base_test.py do not.
+        def get(self, mock_list: List[str], mock_int: int) -> None:  # type: ignore[override]
             if not isinstance(mock_list, list):
                 raise self.InvalidInputException(
                     'Expected arg mock_list to be a list. Was type %s' %
@@ -2373,7 +2464,9 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
     """This test class is to ensure handlers with schema raises error
     when they use self.request or self.payload."""
 
-    class MockHandlerWithSchema(base.BaseHandler):
+    class MockHandlerWithSchema(
+        base.BaseHandler[Dict[str, str], Dict[str, str]]
+    ):
         """Mock handler with schema."""
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS = {
@@ -2386,14 +2479,26 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
             }
         }
 
-        def post(self) -> None:
+        # Here we use MyPy ignore because the signature of 'post' method does
+        # not match with the signature of super class's (BaseHandler) 'post'
+        # method, and this happens because all handler methods in the main
+        # codebase have decorators which modify the function signature
+        # accordingly, but these methods in base_test.py do not.
+        def post(self) -> None:  # type: ignore[override]
             self.payload.get('mock_int')
             return self.render_json({})
 
-    class MockHandlerWithoutSchema(base.BaseHandler):
+    class MockHandlerWithoutSchema(
+        base.BaseHandler[Dict[str, str], Dict[str, str]]
+    ):
         """Mock handler without schema."""
 
-        def post(self) -> None:
+        # Here we use MyPy ignore because the signature of 'post' method does
+        # not match with the signature of super class's (BaseHandler) 'post'
+        # method, and this happens because all handler methods in the main
+        # codebase have decorators which modify the function signature
+        # accordingly, but these methods in base_test.py do not.
+        def post(self) -> None:  # type: ignore[override]
             self.payload.get('mock_int')
             return self.render_json({})
 

@@ -21,6 +21,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { ExplorationCategoryService } from '../services/exploration-category.service';
 import { ExplorationDataService } from '../services/exploration-data.service';
@@ -114,7 +115,7 @@ describe('Exploration Metadata Modal Component', () => {
       explorationTitleService.init('');
       explorationCategoryService.init('');
       explorationLanguageCodeService.init('en');
-      explorationStatesService.init(null);
+      explorationStatesService.init({} as StateObjectsBackendDict);
       explorationTagsService.init('');
 
       fixture.detectChanges();
@@ -302,7 +303,7 @@ describe('Exploration Metadata Modal Component', () => {
       explorationTitleService.init('');
       explorationCategoryService.init('Generic category');
       explorationLanguageCodeService.init('en');
-      explorationStatesService.init(null);
+      explorationStatesService.init({} as StateObjectsBackendDict);
       explorationTagsService.init('');
 
       fixture.detectChanges();
