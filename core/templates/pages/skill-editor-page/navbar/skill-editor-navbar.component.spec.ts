@@ -33,7 +33,7 @@ import { SkillEditorNavabarComponent } from './skill-editor-navbar.component';
 import { SkillEditorRoutingService } from '../services/skill-editor-routing.service';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance!: {
     body: 'xyz';
   };
 }
@@ -153,9 +153,9 @@ describe('Skill Editor Navbar Component', () => {
   it('should discard changes when calling ' +
     '\'discardChanges\'', () => {
     let discardSpy = spyOn(undoRedoService, 'clearChanges')
-      .and.returnValue(null);
+      .and.returnValue();
     let loadSkillSpy = spyOn(skillEditorStateService, 'loadSkill')
-      .and.returnValue(null);
+      .and.returnValue();
     let urlSpy = spyOn(urlService, 'getSkillIdFromUrl')
       .and.returnValue('');
 
@@ -207,7 +207,7 @@ describe('Skill Editor Navbar Component', () => {
     'calling \'selectMainTab\'', () => {
     let navigateToMainTabSpy = spyOn(
       skillEditorRoutingService, 'navigateToMainTab')
-      .and.returnValue(null);
+      .and.returnValue();
 
     component.selectMainTab();
 
@@ -218,7 +218,7 @@ describe('Skill Editor Navbar Component', () => {
     'calling \'selectPreviewTab\'', () => {
     let navigateToPreviewTabSpy = spyOn(
       skillEditorRoutingService, 'navigateToPreviewTab')
-      .and.returnValue(null);
+      .and.returnValue();
 
     component.selectPreviewTab();
 
@@ -265,7 +265,7 @@ describe('Skill Editor Navbar Component', () => {
           result: Promise.reject()
         } as NgbModalRef);
       });
-    spyOn(skillEditorStateService, 'saveSkill').and.returnValue(null);
+    spyOn(skillEditorStateService, 'saveSkill');
 
     component.saveChanges();
     tick();
@@ -287,7 +287,7 @@ describe('Skill Editor Navbar Component', () => {
       });
       let navigateToQuestionsTabSpy = spyOn(
         skillEditorRoutingService, 'navigateToQuestionsTab')
-        .and.returnValue(null);
+        .and.returnValue();
 
       component.selectQuestionsTab();
       tick();
@@ -309,7 +309,7 @@ describe('Skill Editor Navbar Component', () => {
       });
       let navigateToQuestionsTabSpy = spyOn(
         skillEditorRoutingService, 'navigateToQuestionsTab')
-        .and.returnValue(null);
+        .and.returnValue();
 
       component.selectQuestionsTab();
       tick();
@@ -325,7 +325,7 @@ describe('Skill Editor Navbar Component', () => {
         .and.returnValue(0);
       let navigateToQuestionsTabSpy = spyOn(
         skillEditorRoutingService, 'navigateToQuestionsTab')
-        .and.returnValue(null);
+        .and.returnValue();
 
       component.selectQuestionsTab();
 

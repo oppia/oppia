@@ -59,7 +59,7 @@ export class ExplorationPlayerStateService {
   editorPreviewMode: boolean;
   questionPlayerMode: boolean;
   explorationId: string;
-  version: number;
+  version: number | null;
   storyUrlFragment: string;
   lastCompletedCheckpoint: string;
   isLoggedOutProgressTracked: boolean = false;
@@ -162,7 +162,8 @@ export class ExplorationPlayerStateService {
         title: returnDict.exploration.title,
         draft_change_list_id: returnDict.draft_change_list_id,
         language_code: returnDict.exploration.language_code,
-        version: returnDict.version
+        version: returnDict.version,
+        exploration_metadata: returnDict.exploration_metadata
       },
       returnDict.version,
       returnDict.preferred_audio_language_code,

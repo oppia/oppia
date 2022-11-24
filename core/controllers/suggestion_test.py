@@ -46,7 +46,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, Union
+from typing import Dict, Final, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -62,13 +62,18 @@ datastore_services = models.Registry.import_datastore_services()
 class SuggestionUnitTests(test_utils.GenericTestBase):
 
     ASSET_HANDLER_URL_PREFIX: Final = '/assetsdevhandler'
+    TOPIC_ID = 'topic'
+    STORY_ID = 'story'
     EXP_ID: Final = 'exp1'
+    SKILL_ID = 'skill1234567'
+    SKILL_DESCRIPTION = 'skill to link question to'
     TRANSLATION_LANGUAGE_CODE: Final = 'en'
 
     AUTHOR_EMAIL: Final = 'author@example.com'
     AUTHOR_EMAIL_2: Final = 'author2@example.com'
     REVIEWER_EMAIL: Final = 'reviewer@example.com'
     TRANSLATOR_EMAIL: Final = 'translator@example.com'
+    STRINGS_TRANSLATOR_EMAIL: Final = 'translator1@example.com'
     NORMAL_USER_EMAIL: Final = 'user@example.com'
 
     def setUp(self) -> None:
@@ -81,13 +86,17 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.signup(self.NORMAL_USER_EMAIL, 'normalUser')
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.signup(self.TRANSLATOR_EMAIL, 'translator')
+        self.signup(self.STRINGS_TRANSLATOR_EMAIL, 'stranslator')
 
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.author_id_2 = self.get_user_id_from_email(self.AUTHOR_EMAIL_2)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
+        self.strings_translator_id = self.get_user_id_from_email(
+            self.STRINGS_TRANSLATOR_EMAIL)
         self.normal_useer_id = self.get_user_id_from_email(
             self.NORMAL_USER_EMAIL)
 
@@ -102,7 +111,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
                 self.EXP_ID, self.editor_id, ['State 1', 'State 2', 'State 3'],
-                ['TextInput'], category='Algebra'))
+                ['TextInput'], category='Algebra',
+                correctness_feedback_enabled=True))
 
         self.old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
@@ -133,6 +143,44 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'content', '<p>resubmit change content html</p>').to_dict()
         self.update_change_content = state_domain.SubtitledHtml(
             'content', '<p>update change content html</p>').to_dict()
+
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_333'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_333']
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID, 'story-a')
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, self.STORY_ID)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
+
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': self.EXP_ID
+            })], 'Changes.')
+
+        self.save_new_skill(
+            self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION)
 
         self.logout()
 
@@ -759,7 +807,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
                 exp_id, self.editor_id, ['State 1'],
-                ['EndExploration'], category='Algebra'))
+                ['EndExploration'], category='Algebra',
+                correctness_feedback_enabled=True))
 
         state_content_dict = {
             'content_id': 'content',
@@ -792,6 +841,27 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'new_value': state_content_dict
             })], 'Changes content.')
         rights_manager.publish_exploration(self.editor, exp_id)
+
+        story = story_domain.Story.create_default_story(
+            'story_123', 'A story', 'Description', self.TOPIC_ID, 'story-a')
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, 'story_123')
+        topic_services.publish_story(
+            self.TOPIC_ID, 'story_123', self.admin_id)
+
+        story_services.update_story(
+            self.owner_id, 'story_123', [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': exp_id
+            })], 'Changes.')
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         text_to_translate = exploration.states['State 1'].content.html
@@ -897,6 +967,63 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
             )['suggestions']
         self.assertEqual(len(suggestions), 2)
+
+    def test_set_of_strings_translation_suggestion_review(self) -> None:
+        self.login(self.STRINGS_TRANSLATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
+                'target_id': self.EXP_ID,
+                'target_version_at_submission': self.exploration.version,
+                'change': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'State 1',
+                    'content_id': 'content',
+                    'language_code': 'hi',
+                    'content_html': '<p>old content html</p>',
+                    'translation_html': ['test1', 'test2'],
+                    'data_format': (
+                        state_domain.WrittenTranslation
+                        .DATA_FORMAT_SET_OF_NORMALIZED_STRING
+                    ),
+                },
+                'description': 'description',
+            }, csrf_token=csrf_token)
+        self.logout()
+
+        suggestions = self.get_json(
+            '%s?author_id=%s&target_type=%s&target_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX, self.strings_translator_id,
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
+            )['suggestions']
+        self.assertEqual(len(suggestions), 1)
+
+        # Test reviewer can accept successfully.
+        self.login(self.REVIEWER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        suggestion_to_accept = suggestions[0]
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json('%s/exploration/%s/%s' % (
+            feconf.SUGGESTION_ACTION_URL_PREFIX,
+            suggestion_to_accept['target_id'],
+            suggestion_to_accept['suggestion_id']), {
+                'action': u'accept',
+                'commit_message': u'commit message',
+                'review_message': u'Accepted'
+            }, csrf_token=csrf_token)
+        suggestion_post_accept = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.strings_translator_id))['suggestions'][0]
+        self.assertEqual(
+            suggestion_post_accept['status'],
+            suggestion_models.STATUS_ACCEPTED)
+        self.logout()
 
     def test_update_suggestion_updates_translation_html(self) -> None:
         self.login(self.TRANSLATOR_EMAIL)
@@ -2735,9 +2862,17 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         # Create a translation suggestion for the Continue button text.
         self.login(self.AUTHOR_EMAIL)
         continue_state = exp_100.states['continue state']
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to 'SubtitledUnicode' type, and this
+        # is done because here we are accessing 'buttontext' key from continue
+        # customization arg whose value is always of SubtitledUnicode type.
+        subtitled_unicode_of_continue_button_text = cast(
+            state_domain.SubtitledUnicode,
+            continue_state.interaction.customization_args['buttonText'].value
+        )
         content_id_of_continue_button_text = (
-            continue_state.interaction.customization_args[
-                'buttonText'].value.content_id)
+            subtitled_unicode_of_continue_button_text.content_id
+        )
         change_dict = {
             'cmd': 'add_translation',
             'content_id': content_id_of_continue_button_text,

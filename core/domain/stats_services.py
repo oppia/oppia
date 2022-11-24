@@ -31,7 +31,9 @@ from core.domain import question_services
 from core.domain import stats_domain
 from core.platform import models
 
-from typing import Dict, List, Literal, Optional, Sequence, Union, overload
+from typing import (
+    Dict, List, Literal, Optional, Sequence, Union, cast, overload
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -569,26 +571,30 @@ def get_updated_exp_issues_models_for_new_exp_version(
         playthrough = get_playthrough_from_model(playthrough_model)
 
         if 'state_names' in playthrough.issue_customization_args:
-            state_names = (
-                playthrough.issue_customization_args['state_names']['value'])
-            # TODO(#15995): Currently, we are define all issue customization
-            # args in one Dict type which forces us to use assert here, but once
-            # we have a more narrower and specific type for a specific issue
-            # customization args then we can remove assert from here.
-            assert isinstance(state_names, list)
+            # Here we use cast because we need to narrow down the type from
+            # various allowed issue customization arg types to List[str] type,
+            # and here we are sure that the type is always going to be List[str]
+            # because above 'if' condition forces 'state_names' issue
+            # customization arg to have values of type List[str].
+            state_names = cast(
+                List[str],
+                playthrough.issue_customization_args['state_names']['value']
+            )
             playthrough.issue_customization_args['state_names']['value'] = [
                 state_name if state_name not in old_to_new_state_names else
                 old_to_new_state_names[state_name] for state_name in state_names
             ]
 
         if 'state_name' in playthrough.issue_customization_args:
-            state_name = (
-                playthrough.issue_customization_args['state_name']['value'])
-            # TODO(#15995): Currently, we are define all issue customization
-            # args in one Dict type which forces us to use assert here, but once
-            # we have a more narrower and specific type for a specific issue
-            # customization args then we can remove assert from here.
-            assert isinstance(state_name, str)
+            # Here we use cast because we need to narrow down the type from
+            # various allowed issue customization arg types to str type, and
+            # here we are sure that the type is always going to be str because
+            # above 'if' condition forces 'state_name' issue customization arg
+            # to have values of type str.
+            state_name = cast(
+                str,
+                playthrough.issue_customization_args['state_name']['value']
+            )
             playthrough.issue_customization_args['state_name']['value'] = (
                 state_name if state_name not in old_to_new_state_names else
                 old_to_new_state_names[state_name])
@@ -597,24 +603,28 @@ def get_updated_exp_issues_models_for_new_exp_version(
             action_customization_args = action.action_customization_args
 
             if 'state_name' in action_customization_args:
-                state_name = action_customization_args['state_name']['value']
-                # TODO(#15995): Currently, we are define all issue customization
-                # args in one Dict type which forces us to use assert here, but
-                # once we have a more narrower and specific type for a specific
-                # issue customization args then we can remove assert from here.
-                assert isinstance(state_name, str)
+                # Here we use cast because we need to narrow down the type from
+                # various allowed action customization arg types to str type,
+                # and here we are sure that the type is always going to be str
+                # because above 'if' condition forces 'state_name' action
+                # customization arg to have values of type str.
+                state_name = cast(
+                    str, action_customization_args['state_name']['value']
+                )
                 action_customization_args['state_name']['value'] = (
                     state_name if state_name not in old_to_new_state_names else
                     old_to_new_state_names[state_name])
 
             if 'dest_state_name' in action_customization_args:
-                dest_state_name = (
-                    action_customization_args['dest_state_name']['value'])
-                # TODO(#15995): Currently, we are define all issue customization
-                # args in one Dict type which forces us to use assert here, but
-                # once we have a more narrower and specific type for a specific
-                # issue customization args then we can remove assert from here.
-                assert isinstance(dest_state_name, str)
+                # Here we use cast because we need to narrow down the type from
+                # various allowed action customization arg types to str type,
+                # and here we are sure that the type is always going to be str
+                # because above 'if' condition forces 'dest_state_name' action
+                # customization arg to have values of type str.
+                dest_state_name = cast(
+                    str,
+                    action_customization_args['dest_state_name']['value']
+                )
                 action_customization_args['dest_state_name']['value'] = (
                     dest_state_name
                     if dest_state_name not in old_to_new_state_names else
@@ -630,14 +640,15 @@ def get_updated_exp_issues_models_for_new_exp_version(
 
     for exp_issue in exp_issues.unresolved_issues:
         if 'state_names' in exp_issue.issue_customization_args:
-            state_names = (
-                exp_issue.issue_customization_args['state_names']['value'])
-            # TODO(#15995): Currently, we are define all issue customization
-            # args in one Dict type which forces us to use assert here, but
-            # once we have a more narrower and specific type for a specific
-            # issue customization args then we can remove assert from here.
-            assert isinstance(state_names, list)
-
+            # Here we use cast because we need to narrow down the type from
+            # various allowed issue customization arg types to List[str] type,
+            # and here we are sure that the type is always going to be List[str]
+            # because above 'if' condition forces 'state_names' issue
+            # customization arg to have values of type List[str].
+            state_names = cast(
+                List[str],
+                exp_issue.issue_customization_args['state_names']['value']
+            )
             if any(name in deleted_state_names for name in state_names):
                 exp_issue.is_valid = False
 
@@ -648,14 +659,15 @@ def get_updated_exp_issues_models_for_new_exp_version(
             ]
 
         if 'state_name' in exp_issue.issue_customization_args:
-            state_name = (
-                exp_issue.issue_customization_args['state_name']['value'])
-
-            # TODO(#15995): Currently, we are define all issue customization
-            # args in one Dict type which forces us to use assert here, but
-            # once we have a more narrower and specific type for a specific
-            # issue customization args then we can remove assert from here.
-            assert isinstance(state_name, str)
+            # Here we use cast because we need to narrow down the type from
+            # various allowed issue customization arg types to str type, and
+            # here we are sure that the type is always going to be str because
+            # above 'if' condition forces 'state_name' issue customization arg
+            # to have values of type str.
+            state_name = cast(
+                str,
+                exp_issue.issue_customization_args['state_name']['value']
+            )
             if state_name in deleted_state_names:
                 exp_issue.is_valid = False
 
