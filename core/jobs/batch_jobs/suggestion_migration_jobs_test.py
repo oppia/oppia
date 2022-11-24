@@ -280,8 +280,20 @@ class MigrateQuestionSuggestionsJobTests(
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.author_id, description='description')
-        self.save_new_question_suggestion_with_state_data_schema_v27(
-            self.author_id, skill_id)
+        suggestion_id = (
+            self.save_new_question_suggestion_with_state_data_schema_v27(
+                self.author_id, skill_id
+            )
+        )
+
+        suggestion = suggestion_models.GeneralSuggestionModel.get_by_id(
+            suggestion_id)
+
+        self.assertEqual(
+            suggestion.change_cmd['question_dict'][
+                'question_state_data_schema_version'],
+            27
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -290,7 +302,87 @@ class MigrateQuestionSuggestionsJobTests(
                 stdout='SUGGESTION MIGRATED SUCCESS: 1')
         ])
 
+        suggestion = suggestion_models.GeneralSuggestionModel.get_by_id(
+            suggestion_id)
+
+        self.assertEqual(
+            suggestion.change_cmd['question_dict'][
+                'question_state_data_schema_version'],
+            feconf.CURRENT_STATE_SCHEMA_VERSION
+        )
+
     def test_migration_errors_are_reported_in_job_result(self) -> None:
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.author_id, description='description')
+        suggestion_id = (
+            self.save_new_question_suggestion_with_state_data_schema_v27(
+            self.author_id, skill_id)
+        )
+        migrate_state_schema_raise = self.swap_to_always_raise(
+            question_fetchers, 'migrate_state_schema')
+        with migrate_state_schema_raise:
+            self.assert_job_output_is([
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'SUGGESTION MIGRATED ERROR: "(\'%s\', '
+                        'Exception())": 1' % suggestion_id)
+                ),
+                job_run_result.JobRunResult(
+                    stdout='QUESTION MODELS COUNT SUCCESS: 1'),
+            ])
+
+
+class AuditMigrateQuestionSuggestionsJobTests(
+    job_test_utils.JobTestBase, test_utils.GenericTestBase):
+
+    JOB_CLASS = suggestion_migration_jobs.AuditMigrateQuestionSuggestionsJob
+
+    AUTHOR_EMAIL: Final = 'author@example.com'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_unmigrated_question_suggestion_is_not_migrated(self) -> None:
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.author_id, description='description')
+        suggestion_id = (
+            self.save_new_question_suggestion_with_state_data_schema_v27(
+                self.author_id, skill_id
+            )
+        )
+        suggestion = suggestion_models.GeneralSuggestionModel.get_by_id(
+            suggestion_id)
+
+        self.assertEqual(
+            suggestion.change_cmd['question_dict'][
+                'question_state_data_schema_version'],
+            27
+        )
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='QUESTION MODELS COUNT SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='SUGGESTION MIGRATED SUCCESS: 1')
+        ])
+
+        suggestion = suggestion_models.GeneralSuggestionModel.get_by_id(
+            suggestion_id)
+
+        self.assertEqual(
+            suggestion.change_cmd['question_dict'][
+                'question_state_data_schema_version'],
+            27
+        )
+
+    def test_audit_errors_are_reported_in_job_result(self) -> None:
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.author_id, description='description')

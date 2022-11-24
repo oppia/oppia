@@ -25,7 +25,6 @@ import { StateCard } from 'domain/state_card/state-card.model';
 import { ExtensionTagAssemblerService } from 'services/extension-tag-assembler.service';
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
 import { EntityTranslationBackendApiService } from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
@@ -63,11 +62,6 @@ export class ContentTranslationManagerService {
   ) {}
 
   fetchAndDisplayTranslations(languageCode: string): void {
-    let modalRef = this.ngbModal.open(
-      TranslationsFetchingMessageModalComponent, {
-        backdrop: 'static',
-      }
-    );
     this.entityTranslationBackendApiService.fetchEntityTranslationAsync(
       this.entityId,
       this.entityType,
@@ -76,10 +70,7 @@ export class ContentTranslationManagerService {
     ).then((entityTranslation) => {
       this.languageCodeToEntityTranslations[languageCode] = entityTranslation;
       this.displayTranslations(languageCode);
-      modalRef.close();
-    }, () => {
-      modalRef.close();
-    });
+    }, () => { });
   }
 
   getHtmlTranslations(

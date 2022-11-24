@@ -51,6 +51,8 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
 ):
     """Regenerate content_id field for suggestions in review."""
 
+    DATASTORE_UPDATES_ALLOWED = True
+
     @staticmethod
     def _update_content_id_in_translation_suggestions(
         suggestions: List[suggestion_models.GeneralSuggestionModel],
@@ -169,10 +171,11 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
                     'SUGGESTION MIGRATED'))
         )
 
-        unused_put_results = (
-            migrated_suggestion_models
-            | 'Put models into the datastore' >> ndb_io.PutModels()
-        )
+        if self.DATASTORE_UPDATES_ALLOWED:
+            unused_put_results = (
+                migrated_suggestion_models
+                | 'Put models into the datastore' >> ndb_io.PutModels()
+            )
 
         return (
             (
@@ -183,8 +186,18 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
         )
 
 
+class AuditRegenerateContentIdForTranslationSuggestionsInReviewJob(
+    RegenerateContentIdForTranslationSuggestionsInReviewJob
+):
+    """Audit RegenerateContentIdForTranslationSuggestionsInReviewJob."""
+
+    DATASTORE_UPDATES_ALLOWED = False
+
+
 class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
     """Migrate question dict in question suggestion to the latest schema."""
+
+    DATASTORE_UPDATES_ALLOWED = True
 
     @staticmethod
     def _migrate_question_dict(
@@ -271,10 +284,11 @@ class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
                     'SUGGESTION MIGRATED'))
         )
 
-        unused_put_results = (
-            migrated_suggestions
-            | 'Put models into the datastore' >> ndb_io.PutModels()
-        )
+        if self.DATASTORE_UPDATES_ALLOWED:
+            unused_put_results = (
+                migrated_suggestions
+                | 'Put models into the datastore' >> ndb_io.PutModels()
+            )
 
         return (
             (
@@ -283,3 +297,9 @@ class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
             )
             | beam.Flatten()
         )
+
+
+class AuditMigrateQuestionSuggestionsJob(MigrateQuestionSuggestionsJob):
+    """Audit MigrateQuestionSuggestionsJob."""
+
+    DATASTORE_UPDATES_ALLOWED = False

@@ -48,6 +48,8 @@ datastore_services = models.Registry.import_datastore_services()
 class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
     """Generate EntityTranslation models for explorations."""
 
+    DATASTORE_UPDATES_ALLOWED = True
+
     @staticmethod
     def _generate_validated_entity_translations_for_exploration(
         exploration: exp_models.ExplorationModel
@@ -156,14 +158,15 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
                 self._create_entity_translation_model)
         )
 
-        unused_data = (
-            new_translation_models_results
-            | 'Filter model results with OK status' >> beam.Filter(
-                lambda result: result.is_ok())
-            | 'Fetch the models to be put' >> beam.Map(
-                lambda result: result.unwrap())
-            | 'Put models into the datastore' >> ndb_io.PutModels()
-        )
+        if self.DATASTORE_UPDATES_ALLOWED:
+            unused_data = (
+                new_translation_models_results
+                | 'Filter model results with OK status' >> beam.Filter(
+                    lambda result: result.is_ok())
+                | 'Fetch the models to be put' >> beam.Map(
+                    lambda result: result.unwrap())
+                | 'Put models into the datastore' >> ndb_io.PutModels()
+            )
 
         traverse_exp_job_run_results = (
             entity_translations_result
@@ -187,3 +190,11 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
             | beam.Flatten()
 
         )
+
+
+class AuditEntityTranslationsModelGenerationOneOffJob(
+    EntityTranslationsModelGenerationOneOffJob
+):
+    """Audit EntityTranslationsModelGenerationOneOffJob."""
+
+    DATASTORE_UPDATES_ALLOWED = False

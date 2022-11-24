@@ -19,7 +19,7 @@
 
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { ContentTranslationLanguageService } from
   'pages/exploration-player-page/services/content-translation-language.service';
@@ -36,6 +36,8 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
+import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'oppia-content-language-selector',
@@ -62,6 +64,8 @@ export class ContentLanguageSelectorComponent implements OnInit {
   selectedLanguageCode!: string;
   languageOptions!: ExplorationLanguageInfo[];
   currentGlobalLanguageCode!: string;
+  directiveSubscriptions = new Subscription();
+  translationFetchingModelRef: NgbModalRef;
 
   ngOnInit(): void {
     this.currentGlobalLanguageCode = (
@@ -80,6 +84,14 @@ export class ContentLanguageSelectorComponent implements OnInit {
         break;
       }
     }
+
+    this.directiveSubscriptions.add(
+      this.contentTranslationManagerService.onStateCardContentUpdate.subscribe(
+        () => {
+          this.translationFetchingModelRef.close();
+        }
+      )
+    );
   }
 
   onSelectLanguage(newLanguageCode: string): void {
@@ -88,6 +100,8 @@ export class ContentLanguageSelectorComponent implements OnInit {
         SwitchContentLanguageRefreshRequiredModalComponent);
       modalRef.componentInstance.languageCode = newLanguageCode;
     } else {
+      this.translationFetchingModelRef = this.ngbModal.open(
+        TranslationsFetchingMessageModalComponent, { backdrop: 'static' });
       this.contentTranslationLanguageService.setCurrentContentLanguageCode(
         newLanguageCode);
       this.selectedLanguageCode = newLanguageCode;
