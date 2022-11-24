@@ -1076,7 +1076,7 @@ export class ConversationSkinComponent {
     }
     // Directly trigger action for the really stuck learner.
     if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
-      this.playerTranscriptService.addNewResponse(
+      this.playerTranscriptService.addNewResponseToExistingFeedback(
         this.translateService.instant(
           'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE'));
       setTimeout(() => {
