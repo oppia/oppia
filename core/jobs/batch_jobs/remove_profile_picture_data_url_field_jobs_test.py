@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,10 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf
+from core import utils
 from core.domain import user_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import remove_profile_picture_data_url_field_jobs
@@ -83,3 +86,36 @@ class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
                     stdout='USER MODELS UPDATED SUCCESS: 2'
                 )
             ])
+
+            expected_user_1_settings_model_dict = {
+                'banned': False,
+                'created_on': user_1.created_on,
+                'creator_dashboard_display_pref': 'card',
+                'default_dashboard': 'learner',
+                'deleted': False,
+                'display_alias': None,
+                'email': 'test_1@example.com',
+                'first_contribution_msec': None,
+                'has_viewed_lesson_info_modal_once': False,
+                'last_agreed_to_terms': None,
+                'last_created_an_exploration': None,
+                'last_edited_an_exploration': None,
+                'last_logged_in': None,
+                'last_started_state_editor_tutorial': None,
+                'last_started_state_translation_tutorial': None,
+                'last_updated': user_1.last_updated,
+                'normalized_username': None,
+                'pin': None,
+                'preferred_audio_language_code': None,
+                'preferred_language_codes': [],
+                'preferred_site_language_code': None,
+                'preferred_translation_language_code': None,
+                'role': 'EXPLORATION_EDITOR',
+                'roles': ['EXPLORATION_EDITOR', 'ADMIN'],
+                'subject_interests': [],
+                'user_bio': None,
+                'username': 'test_1'
+            }
+
+            self.assertEqual(
+                user_1.to_dict(), expected_user_1_settings_model_dict)

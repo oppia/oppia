@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ class RemoveProfilePictureFieldJob(base_jobs.JobBase):
         users_with_updated_fields = (
             self.pipeline
             | 'Get all non-deleted UserSettingsModel' >> ndb_io.GetModels(
-                user_models.UserSettingsModel.get_all(include_deleted=False))
+                user_models.UserSettingsModel.get_all(include_deleted=True))
             | 'Remove the profile_picture_data_url field' >> beam.Map(
                 self._remove_profile_field)
         )
