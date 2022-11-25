@@ -419,24 +419,39 @@ def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
         raise Exception('The given string does not represent a PNG data URL.')
 
 
-def convert_png_binary_to_data_url(content: bytes) -> str:
-    """Converts a PNG image string (represented by 'content') to a data URL.
+def convert_png_or_webp_binary_to_data_url(
+    content: bytes, is_webp: bool = False
+) -> str:
+    """Converts a PNG or WEBP image string (represented by 'content')
+    to a data URL.
 
     Args:
-        content: str. PNG binary file content.
+        content: str. PNG or WEBP binary file content.
+        is_webp: bool. True when the given binary file content is WEBP.
 
     Returns:
-        str. Data URL created from the binary content of the PNG.
+        str. Data URL created from the binary content of the PNG or WEBP.
 
     Raises:
         Exception. The given binary string does not represent a PNG image.
+        Exception. The given binary string does not represent a WEBP image.
     """
-    if imghdr.what(None, h=content) == 'png':
-        return '%s%s' % (
-            PNG_DATA_URL_PREFIX, urllib.parse.quote(base64.b64encode(content))
-        )
+    if is_webp:
+        if imghdr.what(None, h=content) == 'webp':
+            return '%s%s' % (
+                WEBP_DATA_URL_PREFIX, urllib.parse.quote(
+                    base64.b64encode(content))
+            )
+        else:
+            raise Exception('The given string does not represent a WEBP image.')
     else:
-        raise Exception('The given string does not represent a PNG image.')
+        if imghdr.what(None, h=content) == 'png':
+            return '%s%s' % (
+                PNG_DATA_URL_PREFIX, urllib.parse.quote(
+                    base64.b64encode(content))
+            )
+        else:
+            raise Exception('The given string does not represent a PNG image.')
 
 
 def is_base64_encoded(content: str) -> bool:
@@ -465,7 +480,7 @@ def convert_png_to_data_url(filepath: str) -> str:
         str. Data url created from the filepath of the PNG.
     """
     file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
-    return convert_png_binary_to_data_url(file_contents)
+    return convert_png_or_webp_binary_to_data_url(file_contents)
 
 
 def camelcase_to_hyphenated(camelcase_str: str) -> str:

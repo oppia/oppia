@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import io
+
 from core import feconf
 from core import utils
 from core.domain import user_services
@@ -27,6 +29,7 @@ from core.jobs.io import gcs_io_test
 from core.jobs.types import job_run_result
 from core.platform import models
 
+from PIL import Image
 from apache_beam.io.gcp import gcsio_test
 
 MYPY = False
@@ -71,13 +74,13 @@ class StoreProfilePictureToGCSJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([])
 
     def test_profile_picture_stored_to_gcs(self) -> None:
-        self.put_multi([self.user_1])
+        self.put_multi([self.user_1, self.user_2])
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='TOTAL PNG IMAGES SUCCESS: 1'
+                stdout='TOTAL PNG IMAGES SUCCESS: 2'
             ),
             job_run_result.JobRunResult(
-                stdout='TOTAL WEBP IMAGES SUCCESS: 1'
+                stdout='TOTAL WEBP IMAGES SUCCESS: 2'
             )
         ])
 
@@ -112,40 +115,85 @@ class AuditProfilePictureFromGCSJobTests(job_test_utils.JobTestBase):
             profile_picture_data_url=user_services.DEFAULT_IDENTICON_DATA_URL
         )
 
-    def _push_file_to_gcs(self) -> None:
+        self.user_2 = self.create_model(
+            user_models.UserSettingsModel,
+            id='test_id_2',
+            email='test_2@example.com',
+            username='test_2',
+            roles=[feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
+            profile_picture_data_url=VALID_IMAGE
+        )
+
+    def _push_file_to_gcs(self, username: str, data_url: str) -> None:
         """Push file to the fake gcs client."""
         _, bucket = gcs_io_test.get_client_and_bucket()
-        gcs_url = f'gs://{bucket}/user/test_1/profile_picture.png'
-        data = utils.convert_png_data_url_to_binary(
-            user_services.DEFAULT_IDENTICON_DATA_URL)
-        gcs_io_test.insert_random_file(self.client, gcs_url, data)
+        gcs_url_png = f'gs://{bucket}/user/{username}/profile_picture.png'
+        gcs_url_webp = f'gs://{bucket}/user/{username}/profile_picture.webp'
+        png_binary = utils.convert_png_data_url_to_binary(data_url)
+        output = io.BytesIO()
+        image = Image.open(io.BytesIO(png_binary)).convert('RGB')
+        image.save(output, 'webp')
+        webp_binary = output.getvalue()
+        gcs_io_test.insert_random_file(self.client, gcs_url_png, png_binary)
+        gcs_io_test.insert_random_file(self.client, gcs_url_webp, webp_binary)
 
     def test_images_on_gcs_and_model_are_same(self) -> None:
-        self.put_multi([self.user_1])
-        self._push_file_to_gcs()
+        self.put_multi([self.user_1, self.user_2])
+        self._push_file_to_gcs(
+            'test_1', user_services.DEFAULT_IDENTICON_DATA_URL)
+        self._push_file_to_gcs('test_2', VALID_IMAGE)
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='TOTAL IMAGES ITERATED ON GCS SUCCESS: 1'
+                stdout='TOTAL PNG IMAGES ITERATED ON GCS SUCCESS: 2'
+            ),
+            job_run_result.JobRunResult(
+                stdout='TOTAL WEBP IMAGES ITERATED ON GCS SUCCESS: 2'
             )
         ])
 
     def test_images_on_gcs_and_model_are_not_same(self) -> None:
         self.user_1.profile_picture_data_url = VALID_IMAGE
-        self.put_multi([self.user_1])
-        self._push_file_to_gcs()
+        self.user_2.profile_picture_data_url = (
+            user_services.DEFAULT_IDENTICON_DATA_URL)
+        self.put_multi([self.user_1, self.user_2])
+        self._push_file_to_gcs(
+            'test_1', user_services.DEFAULT_IDENTICON_DATA_URL)
+        self._push_file_to_gcs('test_2', VALID_IMAGE)
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='TOTAL IMAGES ITERATED ON GCS SUCCESS: 1'
+                stdout='TOTAL PNG IMAGES ITERATED ON GCS SUCCESS: 2'
             ),
             job_run_result.JobRunResult(
-                stdout='TOTAL MISMATCHED IMAGES SUCCESS: 1'
+                stdout='TOTAL MISMATCHED PNG IMAGES SUCCESS: 2'
             ),
             job_run_result.JobRunResult(
-                stdout=(
-                    'The user having username test_1, have mismatched data '
-                    'on GCS and in the model. The data on GCS is %s and '
-                    'the data in model is %s' % (
-                        user_services.DEFAULT_IDENTICON_DATA_URL, VALID_IMAGE)
+                stderr=(
+                    'The user having username test_1, have mismatched png image'
+                    ' on GCS and in the model.'
+                )
+            ),
+            job_run_result.JobRunResult(
+                stdout='TOTAL WEBP IMAGES ITERATED ON GCS SUCCESS: 2'
+            ),
+            job_run_result.JobRunResult(
+                stdout='TOTAL MISMATCHED WEBP IMAGES SUCCESS: 2'
+            ),
+            job_run_result.JobRunResult(
+                stderr=(
+                    'The user having username test_1, has incompatible webp '
+                    'image on GCS and png in the model.'
+                )
+            ),
+            job_run_result.JobRunResult(
+                stderr=(
+                    'The user having username test_2, have mismatched png image'
+                    ' on GCS and in the model.'
+                )
+            ),
+            job_run_result.JobRunResult(
+                stderr=(
+                    'The user having username test_2, has incompatible webp '
+                    'image on GCS and png in the model.'
                 )
             )
         ])

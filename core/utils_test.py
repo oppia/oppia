@@ -948,11 +948,11 @@ class UtilsTests(test_utils.GenericTestBase):
                 ['-1', '-2', '-3', '-4', '-5']),
                 [])
 
-    def test_convert_png_binary_to_data_url(self) -> None:
+    def test_convert_png_or_webp_binary_to_data_url(self) -> None:
         filepath_png = os.path.join('core', 'tests', 'data', 'test_png_img.png')
         file_contents_png = utils.get_file_contents(
             filepath_png, raw_bytes=True, mode='rb')
-        self.assertEqual(utils.convert_png_binary_to_data_url(file_contents_png), 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAIAAACAbBMhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAySURBVBhXY/iPDYBEV6xY0draCuFDAEgUKMTAANUEUYFuAkQFihIIGwigosiG/P//HwD5HmjphyAmJQAAAABJRU5ErkJggg%3D%3D')  # pylint: disable=line-too-long
+        self.assertEqual(utils.convert_png_or_webp_binary_to_data_url(file_contents_png), 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAIAAACAbBMhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAySURBVBhXY/iPDYBEV6xY0draCuFDAEgUKMTAANUEUYFuAkQFihIIGwigosiG/P//HwD5HmjphyAmJQAAAABJRU5ErkJggg%3D%3D')  # pylint: disable=line-too-long
 
     def test_get_exploration_components_from_dir_with_yaml_content(self) -> None: # pylint: disable=line-too-long
         img1_path = 'images/sample_Img.svg'

@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ from typing import Optional
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
-
     from apache_beam.io.gcp import gcsio_test
 
 (user_models,) = models.Registry.import_models([models.Names.USER])
@@ -169,6 +168,24 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
         )
 
 
+def png_base64_to_webp_base64(png_base64: str) -> str:
+    """Convert png base64 to webp base64.
+
+    Args:
+        png_base64: str. The png base64 string.
+
+    Returns:
+        str. The webp base64 string.
+    """
+    png_binary = utils.convert_png_data_url_to_binary(png_base64)
+    output = io.BytesIO()
+    image = Image.open(io.BytesIO(png_binary)).convert('RGB')
+    image.save(output, 'webp')
+    webp_binary = output.getvalue()
+    return utils.convert_png_or_webp_binary_to_data_url(
+        webp_binary, True)
+
+
 class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
     """Audit profile pictures are present in GCS."""
 
@@ -190,6 +207,13 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
                 lambda model: model.username is not None)
         )
 
+        username_with_profile_data = (
+            users_with_valid_username
+            | 'map username and data url' >> beam.Map(
+                lambda model: (model.username, model.profile_picture_data_url))
+        )
+
+        # Audit png images.
         audit_png_profile_pictures = (
             users_with_valid_username
             | 'Map with username for png' >> beam.Map(
@@ -198,64 +222,117 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
                 lambda username: f'user/{username}/profile_picture.png')
             | 'Read png files from GCS' >> gcs_io.ReadFile(
                 client=self.client, mode_is_binary=True)
-            | 'Make tuple of username and data url' >> beam.Map(
+            | 'Make tuple of username and data url for png' >> beam.Map(
                 lambda data: (
                     data[0].split('/')[1],
-                    utils.convert_png_binary_to_data_url(data[1]))
+                    utils.convert_png_or_webp_binary_to_data_url(data[1]))
             )
         )
 
-        username_with_profile_data = (
-            users_with_valid_username
-            | 'map username and data url' >> beam.Map(
-                lambda model: (model.username, model.profile_picture_data_url))
-        )
-
-        mismatched_images_on_gcs_and_model = (
+        mismatched_png_images_on_gcs_and_model = (
             {
                 'gcs_picture': audit_png_profile_pictures,
                 'model_picture': username_with_profile_data
             }
-            | 'Merge models' >> beam.CoGroupByKey()
-            | 'Filter invalid images' >> beam.Filter(
+            | 'Merge models for png' >> beam.CoGroupByKey()
+            | 'Filter invalid png images' >> beam.Filter(
                 lambda object_image: (
                     object_image[1]['gcs_picture'] !=
                     object_image[1]['model_picture'])
             )
         )
 
-        report_mismatched_images_on_gcs_and_model = (
-            mismatched_images_on_gcs_and_model
-            | 'Report the data' >> beam.Map(lambda data: (
-                job_run_result.JobRunResult.as_stdout(
-                    'The user having username %s, have mismatched data on '
-                    'GCS and in the model. The data on GCS is %s and the '
-                    'data in model is %s' % (
-                        data[0], data[1]['gcs_picture'][0],
-                        data[1]['model_picture'][0])
+        report_mismatched_png_images_on_gcs_and_model = (
+            mismatched_png_images_on_gcs_and_model
+            | 'Report the png data' >> beam.Map(lambda data: (
+                job_run_result.JobRunResult.as_stderr(
+                    'The user having username %s, have mismatched png image on '
+                    'GCS and in the model.' % (data[0])
                 )
             ))
         )
 
-        total_mismatched_images = (
-            mismatched_images_on_gcs_and_model
-            | 'Total number of mismatched images' >> (
+        total_mismatched_png_images = (
+            mismatched_png_images_on_gcs_and_model
+            | 'Total number of mismatched png images' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'TOTAL MISMATCHED IMAGES'))
+                    'TOTAL MISMATCHED PNG IMAGES'))
         )
 
-        images_iterated_on_gcs = (
+        png_images_iterated_on_gcs = (
             audit_png_profile_pictures
-            | 'Total number of images iterated' >> (
+            | 'Total number of png images iterated' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'TOTAL IMAGES ITERATED ON GCS'))
+                    'TOTAL PNG IMAGES ITERATED ON GCS'))
+        )
+
+        # Audit webp images.
+        audit_webp_profile_pictures = (
+            users_with_valid_username
+            | 'Map with username for webp' >> beam.Map(
+                lambda model: model.username)
+            | 'Map with filename for webp' >> beam.Map(
+                lambda username: f'user/{username}/profile_picture.webp')
+            | 'Read webp files from GCS' >> gcs_io.ReadFile(
+                client=self.client, mode_is_binary=True)
+            | 'Make tuple of username and data url for webp' >> beam.Map(
+                lambda data: (
+                    data[0].split('/')[1],
+                    utils.convert_png_or_webp_binary_to_data_url(data[1], True))
+            )
+        )
+
+        username_with_profile_data_webp = (
+            username_with_profile_data
+            | 'Convert to webp base64 string' >> beam.Map(
+                lambda data: (data[0], png_base64_to_webp_base64(data[1])))
+        )
+
+        mismatched_webp_images_on_gcs_and_model = (
+            {
+                'gcs_picture': audit_webp_profile_pictures,
+                'model_picture': username_with_profile_data_webp
+            }
+            | 'Merge models for webp' >> beam.CoGroupByKey()
+            | 'Filter invalid webp images' >> beam.Filter(
+                lambda object_image: (
+                    object_image[1]['gcs_picture'] !=
+                    object_image[1]['model_picture'])
+            )
+        )
+
+        report_mismatched_webp_images_on_gcs_and_model = (
+            mismatched_webp_images_on_gcs_and_model
+            | 'Report the webp data' >> beam.Map(lambda data: (
+                job_run_result.JobRunResult.as_stderr(
+                    'The user having username %s, has incompatible webp image '
+                    'on GCS and png in the model.' % (data[0])
+                )
+            ))
+        )
+
+        total_mismatched_webp_images = (
+            mismatched_webp_images_on_gcs_and_model
+            | 'Total number of mismatched webp images' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL MISMATCHED WEBP IMAGES'))
+        )
+
+        webp_images_iterated_on_gcs = (
+            audit_webp_profile_pictures
+            | 'Total number of webp images iterated' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL WEBP IMAGES ITERATED ON GCS'))
         )
 
         return (
             (
-                report_mismatched_images_on_gcs_and_model,
-                total_mismatched_images,
-                images_iterated_on_gcs
+                report_mismatched_png_images_on_gcs_and_model,
+                total_mismatched_png_images,
+                png_images_iterated_on_gcs,
+                report_mismatched_webp_images_on_gcs_and_model,
+                total_mismatched_webp_images,
+                webp_images_iterated_on_gcs
             )
             | 'Combine results' >> beam.Flatten()
         )
