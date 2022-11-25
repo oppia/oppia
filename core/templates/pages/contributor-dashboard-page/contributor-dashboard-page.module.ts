@@ -69,7 +69,6 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
@@ -83,7 +82,8 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     TranslationModalComponent,
     ContributionsAndReview,
     QuestionOpportunitiesComponent,
-    ContributorDashboardPageComponent
+    ContributorDashboardPageComponent,
+    ContributorBadgesComponent
   ],
   entryComponents: [
     ContributorBadgesComponent,
