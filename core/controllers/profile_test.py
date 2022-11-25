@@ -1032,7 +1032,8 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
             json_response = self.put_json(
                 '/mailinglistsubscriptionhandler', {
                     'email': 'email@example.com',
-                    'name': 'Name'
+                    'name': 'Name',
+                    'tag': 'Web'
                 }, csrf_token=csrf_token)
             self.assertEqual(json_response, {'status': True})
 
@@ -1052,7 +1053,8 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
             self.put_json(
                 '/mailinglistsubscriptionhandler', {
                     'email': 'email@example.com',
-                    'name': 'Name'
+                    'name': 'Name',
+                    'tag': 'Web'
                 }, csrf_token=csrf_token, expected_status_int=500)
 
         self.logout()
@@ -1069,13 +1071,22 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
             self.put_json(
                 '/mailinglistsubscriptionhandler', {
                     'email': 'invalidemail.com',
-                    'name': 'Name'
+                    'name': 'Name',
+                    'tag': 'Web'
                 }, csrf_token=csrf_token, expected_status_int=400)
 
             self.put_json(
                 '/mailinglistsubscriptionhandler', {
                     'email': 'email@example.com',
-                    'name': ''
+                    'name': '',
+                    'tag': 'Web'
+                }, csrf_token=csrf_token, expected_status_int=400)
+
+            self.put_json(
+                '/mailinglistsubscriptionhandler', {
+                    'email': 'email@example.com',
+                    'name': 'Name',
+                    'tag': ''
                 }, csrf_token=csrf_token, expected_status_int=400)
 
         self.logout()

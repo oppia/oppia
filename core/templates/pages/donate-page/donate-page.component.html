@@ -34,7 +34,8 @@
                     scrolling="no"
                     height="650px"
                     width="100%"
-                    class="donate-page-iframe">
+                    class="donate-page-iframe"
+                    title="donorbox">
             </iframe>
           </div>
         </div>
@@ -118,7 +119,8 @@
             <div class="container">
               <div class="row">
                 <img class="oppia-donate-page-money-icon"
-                     [src]="getStaticImageUrl('/donate/oppia-donate-outreach.svg')">
+                     [src]="getStaticImageUrl('/donate/oppia-donate-outreach.svg')"
+                     alt="">
               </div>
               <div class="row oppia-donate-page-money-main-text">
                 {{ 'I18N_DONATE_PAGE_BUDGET_SUBHEADING_1' | translate }}
@@ -135,7 +137,8 @@
             <div class="container">
               <div class="row">
                 <img class="oppia-donate-page-money-icon"
-                     [src]="getStaticImageUrl('/donate/oppia-donate-spread-word.svg')">
+                     [src]="getStaticImageUrl('/donate/oppia-donate-spread-word.svg')"
+                     alt="">
               </div>
               <div class="row oppia-donate-page-money-main-text">
                 {{ 'I18N_DONATE_PAGE_BUDGET_SUBHEADING_2' | translate }}
@@ -152,7 +155,8 @@
             <div class="container">
               <div class="row">
                 <img class="oppia-donate-page-money-icon"
-                     [src]="getStaticImageUrl('/donate/oppia-donate-maintenance.svg')">
+                     [src]="getStaticImageUrl('/donate/oppia-donate-maintenance.svg')"
+                     alt="">
               </div>
               <div class="row oppia-donate-page-money-main-text">
                 {{ 'I18N_DONATE_PAGE_BUDGET_SUBHEADING_3' | translate }}
@@ -195,9 +199,9 @@
             </div>
             <div class="row">
               <div class="carousel-caption text-dark mb-5">
-                <h3 class="text-center">
+                <div class="text-center h2">
                   {{ 'I18N_DONATE_PAGE_LEARNER_FEEDBACK_PLACE_TEXT_1' | translate }}
-                </h3>
+                </div>
                 <p class="text-center oppia-donate-student-feedback-text">
                   “{{ 'I18N_DONATE_PAGE_LEARNER_FEEDBACK_TEXT_1' | translate }}”
                 </p>
@@ -221,9 +225,9 @@
             </div>
             <div class="row">
               <div class="carousel-caption text-dark mb-5">
-                <h3 class="text-center">
+                <div class="text-center h2">
                   {{ 'I18N_DONATE_PAGE_LEARNER_FEEDBACK_PLACE_TEXT_2' | translate }}
-                </h3>
+                </div>
                 <p class="text-center oppia-donate-student-feedback-text">
                   “{{ 'I18N_DONATE_PAGE_LEARNER_FEEDBACK_TEXT_2' | translate }}”
                 </p>
@@ -247,9 +251,9 @@
             </div>
             <div class="row">
               <div class="carousel-caption text-dark mb-5">
-                <h3 class="text-center">
+                <div class="text-center h2">
                   {{ 'I18N_DONATE_PAGE_LEARNER_FEEDBACK_PLACE_TEXT_3' | translate }}
-                </h3>
+                </div>
                 <p class="text-center oppia-donate-student-feedback-text">
                   “{{ 'I18N_DONATE_PAGE_LEARNER_FEEDBACK_TEXT_3' | translate }}”
                 </p>
@@ -449,9 +453,9 @@
         <div class="col-md-5">
           <div class="p-5">
             <div class="m-4">
-              <div>
+              <label>
                 {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_NAME_LABEL_TEXT' | translate }}
-              </div>
+              </label>
               <input class="w-100"
                      type="text"
                      [(ngModel)]="name"
@@ -459,10 +463,10 @@
                      required="true">
             </div>
             <div class="m-4">
-              <div>
+              <label>
                 {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_EMAIL_LABEL_TEXT' | translate }}
                 <span class="oppia-donate-asterisk-color">*</span>
-              </div>
+              </label>
               <input class="w-100"
                      type="email"
                      [(ngModel)]="emailAddress"
