@@ -192,6 +192,7 @@
         "core.storage.job.gae_models_test",
         "core.storage.base_model.gae_models_test",
         "core.jobs.jobs_manager_test",
+        "core.jobs.transforms.results_transforms_test",
         "core.schema_utils_test",
         "core.domain.story_services_test",
         "core.domain.taskqueue_services_test",
