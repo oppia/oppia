@@ -85,8 +85,13 @@ export class DiagnosticTestPlayerEngineService {
       this._currentTopicId, this._encounteredQuestionIds).then((response) => {
       this._diagnosticTestCurrentTopicStatusModel = (
         new DiagnosticTestCurrentTopicStatusModel(response));
+
+      // The diagnostic test current topic status model is initialized in the
+      // above step, so there will always be at least one skill ID in the
+      // pending list. Hence accessing the first element from the pending list
+      // in the below line is safe.
       this._currentSkillId = (
-        this._diagnosticTestCurrentTopicStatusModel.getNextSkill());
+        this._diagnosticTestCurrentTopicStatusModel.getPendingSkillIds()[0]);
       this._currentQuestion = (
         this._diagnosticTestCurrentTopicStatusModel.getNextQuestion(
           this._currentSkillId)
@@ -131,8 +136,14 @@ export class DiagnosticTestPlayerEngineService {
             new DiagnosticTestCurrentTopicStatusModel(
               skillIdToQuestionsModel)
           );
+          // The diagnostic test current topic status model is initialized in
+          // the above step, so there will always be at least one skill ID in
+          // the pending list. Hence accessing the first element from the
+          // pending list in the below line is safe.
           this._currentSkillId = (
-            this._diagnosticTestCurrentTopicStatusModel.getNextSkill());
+            this._diagnosticTestCurrentTopicStatusModel
+              .getPendingSkillIds()[0]
+          );
 
           this._currentQuestion = (
             this._diagnosticTestCurrentTopicStatusModel.getNextQuestion(
@@ -145,8 +156,11 @@ export class DiagnosticTestPlayerEngineService {
       );
     } else {
       if (!this._diagnosticTestCurrentTopicStatusModel.isLifelineConsumed()) {
+        // The topic completion is checked in the above step, so there will
+        // always be at least one skill ID left for checking. Hence accessing
+        // the first element from the pending list in the below line is safe.
         this._currentSkillId = (
-          this._diagnosticTestCurrentTopicStatusModel.getNextSkill());
+          this._diagnosticTestCurrentTopicStatusModel.getPendingSkillIds()[0]);
       }
 
       this._currentQuestion = (
@@ -178,9 +192,10 @@ export class DiagnosticTestPlayerEngineService {
         wasOldStateInitial: boolean,
         isFirstHit: boolean,
         isFinalQuestion: boolean,
+        nextCardIfReallyStuck: StateCard,
         focusLabel: string
       ) => void
-  ): void {
+  ): boolean {
     const oldState: State = this._currentQuestion.getStateData();
     const classificationResult: AnswerClassificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(
@@ -220,9 +235,33 @@ export class DiagnosticTestPlayerEngineService {
         feedbackAudioTranslations, refresherExplorationId,
         missingPrerequisiteSkillId, remainOnCurrentCard,
         taggedSkillMisconceptionId, wasOldStateInitial, isFirstHit,
-        isFinalQuestion, focusLabel
+        isFinalQuestion, stateCard, focusLabel
       );
-      return answerIsCorrect;
+      this.diagnosticTestPlayerStatusService
+        .onDiagnosticTestSessionProgressChange.emit(
+          this.computeProgressPercentage()
+        );
+    }, () => {
+      // Test is finished.
+      const recommendedTopicIds: string[] = this.getRecommendedTopicIds();
+      this.diagnosticTestPlayerStatusService
+        .onDiagnosticTestSessionCompleted.emit(recommendedTopicIds);
+    });
+    return answerIsCorrect;
+  }
+
+  skipCurrentQuestion(successCallback: (stateCard: StateCard) => void): void {
+    this._diagnosticTestCurrentTopicStatusModel.recordIncorrectAttempt(
+      this._currentSkillId);
+
+    this.getNextQuestionAsync().then((question: Question) => {
+      let stateCard = this.createCard(question);
+
+      successCallback(stateCard);
+      this.diagnosticTestPlayerStatusService
+        .onDiagnosticTestSessionProgressChange.emit(
+          this.computeProgressPercentage()
+        );
     }, () => {
       // Test is finished.
       const recommendedTopicIds: string[] = this.getRecommendedTopicIds();

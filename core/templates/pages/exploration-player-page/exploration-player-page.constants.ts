@@ -85,6 +85,7 @@ export const ExplorationPlayerConstants = {
   DEFAULT_OUTCOME_CLASSIFICATION: 'default_outcome',
 
   EXPLORATION_MODE: {
+    DIAGNOSTIC_TEST_PLAYER: 'diagnostic_test_player',
     EXPLORATION: 'exploration',
     PRETEST: 'pretest',
     QUESTION_PLAYER: 'question_player',

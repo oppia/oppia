@@ -18,9 +18,11 @@
  */
 
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var ClassroomPage = function() {
   var topicSummaryTile = $('.e2e-test-topic-summary-tile');
+  var launchDiagnosticTestPageButton = $('.e2e-test-take-diagnostic-test');
   var topicSummaryTilesSelector = function() {
     return $$('.e2e-test-topic-summary-tile');
   };
@@ -39,6 +41,11 @@ var ClassroomPage = function() {
     } else {
       expect(topicSummaryTiles.length).toEqual(0);
     }
+  };
+
+  this.launchDiagnosticTestPage = async function() {
+    await action.click(
+      'Launch diagnostic test page button', launchDiagnosticTestPageButton);
   };
 };
 

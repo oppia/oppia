@@ -243,7 +243,7 @@ class ClassroomHandler(
         'DELETE': {}
     }
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.open_access
     def get(self, classroom_id: str) -> None:
         """Handles GET requests."""
         classroom = classroom_config_services.get_classroom_by_id(
@@ -304,3 +304,27 @@ class ClassroomUrlFragmentHandler(
             'classroom_url_fragment_exists': classroom_url_fragment_exists
         })
         self.render_json(self.values)
+
+
+class ClassroomIdHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler class to get the classroom ID from the classroom URL fragment."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self, classroom_url_fragment: str) -> None:
+        classroom = classroom_config_services.get_classroom_by_url_fragment(
+            classroom_url_fragment)
+        if classroom is None:
+            raise self.PageNotFoundException(
+                'The classroom with the given url doesn\'t exist.')
+
+        self.render_json({
+            'classroom_id': classroom.classroom_id
+        })

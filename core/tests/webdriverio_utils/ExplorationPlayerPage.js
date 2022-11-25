@@ -74,6 +74,7 @@ var ExplorationPlayerPage = function() {
   var viewSolutionButton = $('.e2e-test-view-solution');
   var voiceoverLanguageSelector = $('.e2e-test-audio-lang-select');
   var waitingForResponseElem = $('.e2e-test-input-response-loading-dots');
+  var skipQuestionButton = $('.e2e-test-skip-question-button');
 
   this.expandAudioBar = async function() {
     await action.click('Audio Bar Expand Button', audioBarExpandButton);
@@ -304,6 +305,10 @@ var ExplorationPlayerPage = function() {
     await action.click('Feedback Close Button', feedbackCloseButton);
     await waitFor.invisibilityOf(
       feedbackCloseButton, 'Close Feedback button does not disappear');
+  };
+
+  this.skipQuestion = async function() {
+    await action.click('Skip question button', skipQuestionButton);
   };
 
   // `answerData` is a variable that is passed to the

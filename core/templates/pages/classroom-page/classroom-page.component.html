@@ -22,6 +22,43 @@
     <h2>{{ 'I18N_CLASSROOM_PAGE_TOPICS_COVERED' | translate }}</h2>
     <p>{{ 'I18N_MATH_TOPICS_COVERED' | translate }}</p>
   </div>
+  <div class="oppia-classroom-page-guidance-tile-container"
+       *ngIf="classroomData && classroomData.getTopicSummaries().length > 0">
+    <div class="oppia-classroom-page-guidance-tile">
+      <p>
+        <strong>
+          {{ 'I18N_CLASSROOM_PAGE_NEW_TO_MATH_HEADING' | translate}}
+        </strong>
+      </p>
+      <p>
+        {{ begineWithFirstTopicDescriptionText }}
+      </p>
+      <a [href]="firstTopicUrl">
+        <span class="oppia-classroom-page-tile-button-text">
+          <strong>
+            {{ beginWithFirstTopicButtonText }}
+          </strong>
+        </span>
+      </a>
+    </div>
+    <div class="oppia-classroom-page-guidance-tile">
+      <p>
+        <strong>
+          {{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_HEADING' | translate}}
+        </strong>
+      </p>
+      <p>
+        {{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_TEXT' | translate}}
+      </p>
+      <a href="/diagnostic-test-player" class="e2e-test-take-diagnostic-test">
+        <span class="oppia-classroom-page-tile-button-text">
+          <strong>
+            {{ 'I18N_CLASSROOM_PAGE_TAKE_A_TEST_BUTTON' | translate}}
+          </strong>
+        </span>
+      </a>
+    </div>
+  </div>
   <div class="oppia-topic-summary-tiles" *ngIf="classroomData">
     <div *ngFor="let topicSummary of classroomData.getTopicSummaries()"
          class="oppia-topic-summary-tile e2e-test-topic-summary-tile">
