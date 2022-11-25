@@ -4983,6 +4983,11 @@ export default {
     "direction": "ltr",
     "decimal_separator": ","
   }, {
+    "code": "am",
+    "description": "አማርኛ (Amharic)",
+    "direction": "ltr",
+    "decimal_separator": "."
+  }, {
     "code": "az",
     "description": "Azeri (Azerbaijani)",
     "direction": "ltr",
@@ -5349,6 +5354,11 @@ export default {
     "id": "sq",
     "description": "shqip (Albanian)",
     "relatedLanguages": ["sq"],
+    "direction": "ltr"
+  }, {
+    "id": "am",
+    "description": "አማርኛ (Amharic)",
+    "relatedLanguages": ["am"],
     "direction": "ltr"
   }, {
     "id": "ar",
@@ -5953,6 +5963,7 @@ export default {
   "MAX_CHARS_IN_BLOG_POST_TITLE": 65,
   "MIN_CHARS_IN_BLOG_POST_TITLE": 5,
   "MAX_CHARS_IN_BLOG_POST_SUMMARY": 300,
+  "MAX_CHARS_IN_LEARNER_GROUP_TITLE": 36,
   "STORY_ID_LENGTH": 12,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
@@ -6906,7 +6917,6 @@ export default {
 
   "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico",
 
-  "CAN_FETCH_VERSION_HISTORY_DATA": false,
   "METADATA_PROPERTIES": [
     "title", "category", "objective", "language_code", "tags", "blurb",
     "author_notes", "states_schema_version", "init_state_name", "param_specs",
