@@ -18,10 +18,7 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import feconf
-from core import utils
 from core.domain import user_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import remove_profile_picture_data_url_field_jobs
