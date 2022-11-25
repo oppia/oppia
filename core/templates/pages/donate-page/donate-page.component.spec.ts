@@ -29,7 +29,7 @@ import { WindowDimensionsService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PageTitleService } from 'services/page-title.service';
-import { AndroidUpdatesBackendApiService } from 'domain/android-updates/android-updates-backend-api.service';
+import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -69,7 +69,7 @@ describe('Donate page', () => {
   let translateService: TranslateService;
   let pageTitleService: PageTitleService;
   let windowRef: MockWindowRef;
-  let androidUpdatesBackendApiService: AndroidUpdatesBackendApiService;
+  let mailingListBackendApiService: MailingListBackendApiService;
   let alertsService: AlertsService;
   let ngbModal: NgbModal;
 
@@ -112,8 +112,8 @@ describe('Donate page', () => {
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
     alertsService = TestBed.inject(AlertsService);
-    androidUpdatesBackendApiService = TestBed.inject(
-      AndroidUpdatesBackendApiService);
+    mailingListBackendApiService = TestBed.inject(
+      MailingListBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
   });
 
@@ -178,7 +178,7 @@ describe('Donate page', () => {
       tick();
       component.emailAddress = 'validEmail@example.com';
       component.name = 'validName';
-      spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
         .and.returnValue(Promise.resolve(true));
 
       component.subscribeToMailingList();
@@ -196,7 +196,7 @@ describe('Donate page', () => {
       tick();
       component.emailAddress = 'validEmail@example.com';
       component.name = 'validName';
-      spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
         .and.returnValue(Promise.resolve(false));
 
       component.subscribeToMailingList();
@@ -215,7 +215,7 @@ describe('Donate page', () => {
       tick();
       component.emailAddress = 'validEmail@example.com';
       component.name = 'validName';
-      spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
         .and.returnValue(Promise.reject(false));
 
       component.subscribeToMailingList();

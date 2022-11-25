@@ -32,7 +32,7 @@ import 'popper.js';
 import 'bootstrap';
 import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
-import { AndroidUpdatesBackendApiService } from 'domain/android-updates/android-updates-backend-api.service';
+import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
 import { ThanksForSubscribingModalComponent } from './thanks-for-subscribing-modal.component';
 
@@ -58,7 +58,7 @@ export class DonatePageComponent implements OnInit, OnDestroy {
     private windowRef: WindowRef,
     private translateService: TranslateService,
     private alertsService: AlertsService,
-    private androidUpdatesBackendApiService: AndroidUpdatesBackendApiService,
+    private mailingListBackendApiService: MailingListBackendApiService,
     private ngbModal: NgbModal
   ) {}
 
@@ -108,8 +108,10 @@ export class DonatePageComponent implements OnInit, OnDestroy {
   }
 
   subscribeToMailingList(): void {
-    this.androidUpdatesBackendApiService.subscribeUserToAndroidList(
-      String(this.emailAddress), String(this.name)
+    this.mailingListBackendApiService.subscribeUserToMailingList(
+      String(this.emailAddress),
+      String(this.name),
+      AppConstants.MAILING_LIST_WEB_TAG
     ).then((status) => {
       if (status) {
         this.alertsService.addInfoMessage('Done!', 1000);
