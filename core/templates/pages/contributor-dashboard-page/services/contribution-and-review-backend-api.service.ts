@@ -211,8 +211,10 @@ export class ContributionAndReviewBackendApiService {
   }
 
   async downloadContributorCertificateAsync(
-      username: string, suggestionType: string,
-      languageCode: string, fromDate: string,
+      username: string,
+      suggestionType: string,
+      languageCode: string,
+      fromDate: string,
       toDate: string
   ): Promise<Blob> {
     const url = this.urlInterpolationService.interpolateUrl(

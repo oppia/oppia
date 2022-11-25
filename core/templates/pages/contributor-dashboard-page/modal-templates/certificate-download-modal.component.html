@@ -4,7 +4,10 @@
       <div class="oppia-opportunities-heading">
         Select the time range
       </div>
-      <button type="button" class="close oppia-close-button-position" (click)="close()" attr.aria-label="Close">
+      <button type="button"
+              class="close oppia-close-button-position"
+              (click)="close()"
+              attr.aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
@@ -32,7 +35,9 @@
   <button class="btn btn-default" (click)="close()">
     Cancel
   </button>
-  <button [disabled]="certificateDownloading" class="btn btn-success oppia-upload-translated-text-button" (click)="downloadCertificate()">
+  <button [disabled]="certificateDownloading"
+          class="btn btn-success oppia-upload-translated-text-button"
+          (click)="downloadCertificate()">
     <i [hidden]="!certificateDownloading" class="fa fa-spinner"></i>
     <span>
       Download
@@ -69,12 +74,12 @@
     justify-content: flex-end;
   }
   .oppia-translate-text-header-container .oppia-opportunities-heading {
-      display: block;
-      font-size: 20px;
-    }
-    .oppia-translate-text-header-container .oppia-mobile-opportunities-heading {
-      display: none;
-    }
+    display: block;
+    font-size: 20px;
+  }
+  .oppia-translate-text-header-container .oppia-mobile-opportunities-heading {
+    display: none;
+  }
   .oppia-translate-text-header-container .oppia-opportunities-subheading {
     color: #009688;
     display: block;

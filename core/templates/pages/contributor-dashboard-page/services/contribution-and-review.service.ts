@@ -289,8 +289,10 @@ export class ContributionAndReviewService {
   }
 
   async downloadContributorCertificateAsync(
-      username: string, suggestionType: string,
-      languageCode: string, fromDate: string,
+      username: string,
+      suggestionType: string,
+      languageCode: string,
+      fromDate: string,
       toDate: string
   ): Promise<Blob> {
     return this.contributionAndReviewBackendApiService

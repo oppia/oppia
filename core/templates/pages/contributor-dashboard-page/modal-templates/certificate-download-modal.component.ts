@@ -69,7 +69,8 @@ export class CertificateDownloadModalComponent {
       this.suggestionType,
       this.languageCode,
       this.fromDate,
-      this.toDate).then((response: Blob) => {
+      this.toDate
+    ).then((response: Blob) => {
       const dataType = response.type;
 
       const downloadLink = document.createElement('a');

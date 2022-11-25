@@ -172,7 +172,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 suggestion_models.SCORE_CATEGORY_DELIMITER not in score_type)
 
     def test_get_translation_suggestions_submitted_for_given_date_range(
-        self) -> None:
+        self
+    ) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,

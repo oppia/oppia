@@ -6014,8 +6014,8 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
 
     def test_create_translation_contributor_certificate(self) -> None:     
         score_category: str = (
-                suggestion_models.SCORE_TYPE_TRANSLATION +
-                suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+            suggestion_models.SCORE_TYPE_TRANSLATION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
         change_cmd = {
             'cmd': 'add_translation',
             'content_id': 'content',
@@ -6161,14 +6161,16 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             from_date, to_date)
 
     def test_create_contributor_certificate_raises_exception_for_wrong_language(
-        self) -> None:
+        self
+    ) -> None:
         username = user_services.get_username(self.author_id)
         from_date = datetime.datetime.today() - datetime.timedelta(days=1)
         to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
         with self.assertRaisesRegex(
             Exception,
-            'The language that is provided is invalid.'):
+            'The language that is provided is invalid.'
+        ):
             suggestion_services.generate_contributor_certificate(
             username, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT, 'test',
             from_date, to_date)

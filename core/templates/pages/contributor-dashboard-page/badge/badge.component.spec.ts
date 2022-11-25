@@ -16,11 +16,7 @@
  * @fileoverview Unit tests for BadgeComponent.
  */
 
-<<<<<<< HEAD
-import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
-=======
 import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
->>>>>>> 8bb2b53bb8de3b8add17b045a17c343dbd6a7253
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { BadgeComponent } from './badge.component';
@@ -125,19 +121,4 @@ describe('Badge component', () => {
       expect(component.lineHeight).toEqual('90%');
     }));
   });
-<<<<<<< HEAD
-
-  describe('when an invalid type is passed ', () => {
-    it('should throw an error', fakeAsync(() => {
-      component.contributionSubType = 'invalid';
-
-      expect(() => {
-        fixture.detectChanges();
-        tick();
-      }).toThrowError();
-      flush();
-    }));
-  });
-=======
->>>>>>> 8bb2b53bb8de3b8add17b045a17c343dbd6a7253
 });

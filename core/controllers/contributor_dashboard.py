@@ -939,7 +939,8 @@ class ContributorCertificateHandler(base.BaseHandler):
         },
         'suggestion_type': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'choices': feconf.SUGGESTION_TYPE_CHOICES
             }
         },
         'language': {

@@ -423,8 +423,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_translation_suggestions_submitted_within_given_dates(
-        cls, from_date: datetime.datetime, to_date: datetime.datetime,
-        user_id: str, language_code: str
+        cls,
+        from_date: datetime.datetime,
+        to_date: datetime.datetime,
+        user_id: str,
+        language_code: str
     ) -> Sequence[GeneralSuggestionModel]:
         """Gets all suggestions which are are submitted within the given
         date range.
@@ -452,7 +455,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_question_suggestions_submitted_within_given_dates(
-        cls, from_date: datetime.datetime, to_date: datetime.datetime,
+        cls,
+        from_date: datetime.datetime,
+        to_date: datetime.datetime,
         user_id: str
     ) -> Sequence[GeneralSuggestionModel]:
         """Gets all suggestions which are are submitted within the given

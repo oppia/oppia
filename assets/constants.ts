@@ -6923,5 +6923,7 @@ export default {
     "param_changes", "auto_tts_enabled", "correctness_feedback_enabled",
     "edits_allowed"
   ],
-  "NON_METADATA_PROPERTIES": ["id", "states"]
+  "NON_METADATA_PROPERTIES": ["id", "states"],
+  "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
+  "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313
 } as const;

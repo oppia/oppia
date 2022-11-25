@@ -21,6 +21,7 @@ google-cloud-secret-manager==2.12.4
 google-cloud-tasks==2.7.2
 google-cloud-translate==3.6.1
 gunicorn==20.1.0
+html2image==2.0.1
 html5lib==1.1
 mailchimp3==3.0.15
 mutagen==1.45.1
@@ -48,4 +49,3 @@ webencodings==0.5.1
 # them earlier than we are able to install the libraries from this file.
 PyYAML==6.0
 certifi==2021.5.30
-html2image==2.0.1
