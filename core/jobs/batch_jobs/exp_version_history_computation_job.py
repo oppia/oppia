@@ -42,8 +42,9 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class UnformattedModelGroupForVerificationJobDict(TypedDict):
-    """Dictionary representing an unformatted model group for the verification
-    job.
+    """Dictionary representing an unformatted model group for the
+    VerifyVersionHistoryModelsJob which verifies whether the version history
+    models were created correctly.
     """
 
     all_exp_models: List[exp_domain.Exploration]
@@ -56,8 +57,9 @@ class UnformattedModelGroupForVerificationJobDict(TypedDict):
 
 
 class FormattedModelGroupForVerificationJobDict(TypedDict):
-    """Dictionary representing a formatted model group for the verification
-    job.
+    """Dictionary representing a formatted model group for the
+    VerifyVersionHistoryModelsJob which verifies whether the version history
+    models were created correctly.
     """
 
     exp_vlatest: exp_domain.Exploration
@@ -70,8 +72,9 @@ class FormattedModelGroupForVerificationJobDict(TypedDict):
 
 
 class UnformattedModelGroupForComputationJobDict(TypedDict):
-    """Dictionary representing an unformatted model group for the computation
-    job.
+    """Dictionary representing an unformatted model group for the
+    ComputeExplorationVersionHistoryJob which verifies whether the version
+    history models were created correctly.
     """
 
     all_exp_models: List[exp_models.ExplorationModel]
@@ -84,8 +87,9 @@ class UnformattedModelGroupForComputationJobDict(TypedDict):
 
 
 class FormattedModelGroupForComputationJobDict(TypedDict):
-    """Dictionary representing a formatted model group for the computation
-    job.
+    """Dictionary representing a formatted model group for the
+    ComputeExplorationVersionHistoryJob which verifies whether the version
+    history models were created correctly.
     """
 
     exp_vlatest: exp_models.ExplorationModel
@@ -238,7 +242,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
 
         Returns:
             Tuple[str, bool]. The pair of exploration id and whether the
-            version history models were created correctly or not.
+            version history models were created correctly.
         """
         exp_vlatest = model_group['exp_vlatest']
         snapshot_metadata_models = model_group['snapshot_metadata_models']
