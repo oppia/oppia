@@ -750,9 +750,9 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     Union[Exception, str],
                     int
                 ]
-            ]. The exploration id along with the created version history or
-            the exploration id along with error message and version number of
-            the exploration in case of any error.
+            ]. The tuple of exploration id along with the created version
+            history or the tuple of exploration id along with error message
+            and version number of the exploration in case of any error.
         """
         with datastore_services.get_ndb_context():
             exp_vlatest = model_group['exp_vlatest']
