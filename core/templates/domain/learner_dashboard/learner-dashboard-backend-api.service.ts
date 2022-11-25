@@ -88,7 +88,7 @@ interface LearnerDashboardCollectionsDataBackendDict {
 }
 
 
-interface LearnerDashboardExplorationsDataBackendDict {
+export interface LearnerDashboardExplorationsDataBackendDict {
   'completed_explorations_list': LearnerExplorationSummaryBackendDict[];
   'incomplete_explorations_list': LearnerExplorationSummaryBackendDict[];
   'exploration_playlist': LearnerExplorationSummaryBackendDict[];
@@ -159,7 +159,11 @@ interface LearnerDashboardLearnerGroups {
 
 export interface AddMessagePayload {
   'updated_status': boolean;
-  'updated_subject': string;
+  // Subject for frontend instances of thread message domain objects
+  // are null and are only required to be supplied if the message is first
+  // message of the thread. Otherwise, these properties are only non-null
+  // when the subject changes.
+  'updated_subject': string | null;
   'text': string;
 }
 
@@ -360,7 +364,7 @@ export class LearnerDashboardBackendApiService {
   }
 
   async fetchLearnerDashboardFeedbackUpdatesDataAsync(
-      paginatedThreadsList = []
+      paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = []
   ):
   Promise<LearnerDashboardFeedbackUpdatesData> {
     return this._fetchLearnerDashboardFeedbackUpdatesDataAsync(

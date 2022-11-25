@@ -87,22 +87,24 @@ export interface QuestionPlayerConfig {
   templateUrl: './question-player.component.html'
 })
 export class QuestionPlayerComponent implements OnInit, OnDestroy {
-  @Input() questionPlayerConfig: QuestionPlayerConfig;
-
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() questionPlayerConfig!: QuestionPlayerConfig;
+  resultsLoaded!: boolean;
+  currentQuestion!: number;
+  totalQuestions!: number;
+  currentProgress!: number;
+  totalScore!: number;
+  allQuestions!: number;
+  finalCorrect!: number;
+  scorePerSkillMapping!: ScorePerSkillMapping;
+  testIsPassed!: boolean;
+  masteryPerSkillMapping!: MasteryPerSkillMapping;
+  failedSkillIds!: string[];
+  userIsLoggedIn!: boolean;
+  canCreateCollections!: boolean;
   componentSubscription = new Subscription();
-  resultsLoaded: boolean;
-  currentQuestion: number;
-  totalQuestions: number;
-  currentProgress: number;
-  totalScore: number;
-  allQuestions: number;
-  finalCorrect: number;
-  scorePerSkillMapping: ScorePerSkillMapping;
-  testIsPassed: boolean;
-  masteryPerSkillMapping: MasteryPerSkillMapping;
-  failedSkillIds: string[];
-  userIsLoggedIn: boolean;
-  canCreateCollections: boolean;
 
   constructor(
     private contextService: ContextService,
@@ -154,16 +156,15 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
       this.allQuestions += 1;
 
       // Calculate scores per skill.
-      if (!(questionData.linkedSkillIds)) {
-        continue;
-      }
-      for (let i = 0; i < questionData.linkedSkillIds.length; i++) {
-        let skillId = questionData.linkedSkillIds[i];
-        if (!(skillId in this.scorePerSkillMapping)) {
-          continue;
+      if (questionData.linkedSkillIds) {
+        for (let i = 0; i < questionData.linkedSkillIds.length; i++) {
+          let skillId = questionData.linkedSkillIds[i];
+          if (!(skillId in this.scorePerSkillMapping)) {
+            continue;
+          }
+          this.scorePerSkillMapping[skillId].score += questionScore;
+          this.scorePerSkillMapping[skillId].total += 1.0;
         }
-        this.scorePerSkillMapping[skillId].score += questionScore;
-        this.scorePerSkillMapping[skillId].total += 1.0;
       }
     }
     this.finalCorrect = this.totalScore;
@@ -225,31 +226,30 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
 
     for (let question in questionStateData) {
       let questionData = questionStateData[question];
-      if (!(questionData.linkedSkillIds)) {
-        continue;
-      }
-      let masteryChangePerQuestion =
-      this.createMasteryChangePerQuestion(questionData);
+      if (questionData.linkedSkillIds) {
+        let masteryChangePerQuestion =
+        this.createMasteryChangePerQuestion(questionData);
 
-      if (questionData.viewedSolution) {
-        for (let skillId in masteryChangePerQuestion) {
-          masteryChangePerQuestion[skillId] =
-          QuestionPlayerConstants.MAX_MASTERY_LOSS_PER_QUESTION;
-        }
-      } else {
-        if (questionData.usedHints) {
+        if (questionData.viewedSolution) {
           for (let skillId in masteryChangePerQuestion) {
-            masteryChangePerQuestion[skillId] -= (
-              questionData.usedHints.length *
-              QuestionPlayerConstants.VIEW_HINT_PENALTY_FOR_MASTERY);
+            masteryChangePerQuestion[skillId] =
+            QuestionPlayerConstants.MAX_MASTERY_LOSS_PER_QUESTION;
+          }
+        } else {
+          if (questionData.usedHints) {
+            for (let skillId in masteryChangePerQuestion) {
+              masteryChangePerQuestion[skillId] -= (
+                questionData.usedHints.length *
+                QuestionPlayerConstants.VIEW_HINT_PENALTY_FOR_MASTERY);
+            }
+          }
+          if (questionData.answers) {
+            masteryChangePerQuestion = this.getMasteryChangeForWrongAnswers(
+              questionData.answers, masteryChangePerQuestion);
           }
         }
-        if (questionData.answers) {
-          masteryChangePerQuestion = this.getMasteryChangeForWrongAnswers(
-            questionData.answers, masteryChangePerQuestion);
-        }
+        this.updateMasteryPerSkillMapping(masteryChangePerQuestion);
       }
-      this.updateMasteryPerSkillMapping(masteryChangePerQuestion);
     }
 
     this.skillMasteryBackendApiService.updateSkillMasteryDegreesAsync(
@@ -257,8 +257,8 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   }
 
   hasUserPassedTest(): boolean {
-    let testIsPassed = true;
-    let failedSkillIds = [];
+    let testIsPassed: boolean = true;
+    let failedSkillIds: string[] = [];
     if (this.isInPassOrFailMode()) {
       Object.keys(this.scorePerSkillMapping).forEach((skillId) => {
         let correctionRate = this.scorePerSkillMapping[skillId].score /
@@ -328,7 +328,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     modelRef.componentInstance.skillId = skillId;
     modelRef.componentInstance.userIsLoggedIn = this.userIsLoggedIn;
     modelRef.componentInstance.openConceptCardModal.subscribe(
-      (value) => {
+      (value: string[]) => {
         this.openConceptCardModal(value);
       }
     );
@@ -395,7 +395,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   }
 
   createScorePerSkillMapping(): void {
-    let scorePerSkillMapping = {};
+    let scorePerSkillMapping: Record<string, ScorePerSkill> = {};
 
     if (this.questionPlayerConfig.skillList) {
       for (let i = 0;
@@ -415,7 +415,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   }
 
   createMasteryPerSkillMapping(): void {
-    let masteryPerSkillMapping = {};
+    let masteryPerSkillMapping: Record<string, number> = {};
     if (this.questionPlayerConfig.skillList) {
       for (let i = 0;
         i < this.questionPlayerConfig.skillList.length; i++) {
@@ -428,7 +428,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
 
   createMasteryChangePerQuestion(
       questionData: QuestionData): MasteryChangePerQuestion {
-    let masteryChangePerQuestion = {};
+    let masteryChangePerQuestion: Record<string, number> = {};
     for (let i = 0; i < questionData.linkedSkillIds.length; i++) {
       let skillId = questionData.linkedSkillIds[i];
       masteryChangePerQuestion[skillId] =
@@ -460,7 +460,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
       'action-button-icon">&#xE88A</i>';
     }
     return this._sanitizer.sanitize(
-      SecurityContext.HTML, iconHtml);
+      SecurityContext.HTML, iconHtml) as string;
   }
 
   performAction(actionButton: ActionButton): void {
@@ -478,8 +478,8 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   }
 
   getWorstSkillIds(): string[] {
-    let minScore = 0.95;
-    let worstSkillIds = [];
+    let minScore: number = 0.95;
+    let worstSkillIds: [number, string][] = [];
     Object.keys(this.scorePerSkillMapping).forEach((skillId) => {
       let skillScoreData = this.scorePerSkillMapping[skillId];
       let scorePercentage = skillScoreData.score / skillScoreData.total;
@@ -492,7 +492,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   }
 
   openConceptCardModal(skillIds: string[]): void {
-    let skills = [];
+    let skills: string[] = [];
     skillIds.forEach((skillId) => {
       skills.push(
         this.scorePerSkillMapping[skillId].description);
@@ -574,7 +574,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
         }
       });
 
-      this.userIsLoggedIn = null;
+      this.userIsLoggedIn = false;
       this.userService.getUserInfoAsync().then((userInfo) => {
         this.canCreateCollections = userInfo.canCreateCollections();
         this.userIsLoggedIn = userInfo.isLoggedIn();

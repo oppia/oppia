@@ -41,19 +41,22 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 })
 export class QuestionSuggestionEditorModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() question: Question;
-  @Input() questionStateData: State;
-  @Input() questionId: string;
-  @Input() skill: Skill;
-  @Input() skillDifficulty: number;
-  @Input() suggestionId: string;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() question!: Question;
+  @Input() questionStateData!: State;
+  @Input() questionId!: string;
+  @Input() skill!: Skill;
+  @Input() skillDifficulty!: number;
+  @Input() suggestionId!: string;
 
-  canEditQuestion: boolean;
-  newQuestionIsBeingCreated: boolean;
-  isEditing: boolean;
-  misconceptionsBySkill: MisconceptionSkillMap;
-  skillId: string;
-  skillDifficultyString: string;
+  canEditQuestion!: boolean;
+  newQuestionIsBeingCreated!: boolean;
+  isEditing!: boolean;
+  misconceptionsBySkill!: MisconceptionSkillMap;
+  skillId!: string;
+  skillDifficultyString!: string;
 
   constructor(
     private questionUndoRedoService: QuestionUndoRedoService,
@@ -155,6 +158,10 @@ export class QuestionSuggestionEditorModalComponent
   }
 
   setDifficultyString(skillDifficulty: number): void {
+    // This throws "Object is possibly undefined." The type undefined
+    // comes here from Object dependency. We need to suppress this
+    // error because of strict type checking.
+    // @ts-ignore
     this.skillDifficultyString = Object.entries(
       AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT).find(
       entry => entry[1] === skillDifficulty)[0];

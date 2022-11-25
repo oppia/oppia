@@ -19,6 +19,12 @@
 import { Component, Input } from '@angular/core';
 import { AppConstants } from 'app.constants';
 
+interface ContributionSubTypeTexts {
+  submission: string;
+  review: string;
+  correction: string;
+}
+
 @Component({
   selector: 'badge',
   templateUrl: './badge.component.html',
@@ -26,7 +32,7 @@ import { AppConstants } from 'app.constants';
 })
 export class BadgeComponent {
   @Input() contributionType!: string;
-  @Input() contributionSubType!: string;
+  @Input() contributionSubType!: keyof ContributionSubTypeTexts;
   @Input() contributionCount!: number;
   @Input() language!: string | null;
   @Input() isUnlocked!: boolean;
@@ -34,7 +40,7 @@ export class BadgeComponent {
 
   fontSize: string = '13px';
   lineHeight: string = '20px';
-  CONTRIBUTION_SUB_TYPE_TEXTS = {
+  CONTRIBUTION_SUB_TYPE_TEXTS: ContributionSubTypeTexts = {
     [AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION]: 'Submission',
     [AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW]: 'Review',
     [AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION]: 'Correction'
