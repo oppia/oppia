@@ -41,6 +41,8 @@ import { AudioTranslationLanguageService} from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
+import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
+import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
 
 class MockContentTranslationLanguageService {
   currentLanguageCode!: string;
@@ -68,7 +70,7 @@ class MockI18nLanguageCodeService {
   }
 }
 
-describe('Content language selector component', () => {
+fdescribe('Content language selector component', () => {
   let component: ContentLanguageSelectorComponent;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
@@ -87,7 +89,9 @@ describe('Content language selector component', () => {
       declarations: [
         ContentLanguageSelectorComponent,
         MockTranslatePipe,
-        SwitchContentLanguageRefreshRequiredModalComponent
+        SwitchContentLanguageRefreshRequiredModalComponent,
+        LoadingDotsComponent,
+        TranslationsFetchingMessageModalComponent
       ],
       providers: [{
         provide: ContentTranslationLanguageService,
@@ -98,7 +102,10 @@ describe('Content language selector component', () => {
       }]
     }).overrideModule(BrowserDynamicTestingModule, {
       set: {
-        entryComponents: [SwitchContentLanguageRefreshRequiredModalComponent],
+        entryComponents: [
+          SwitchContentLanguageRefreshRequiredModalComponent,
+          TranslationsFetchingMessageModalComponent
+        ],
       }
     }).compileComponents();
     contentTranslationLanguageService = TestBed.get(
