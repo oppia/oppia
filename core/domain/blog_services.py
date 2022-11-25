@@ -420,7 +420,7 @@ def get_published_blog_post_summaries_by_user_id(
         blog_models.BlogPostSummaryModel.query(
             blog_models.BlogPostSummaryModel.author_id == user_id
         ).filter(
-            blog_models.BlogPostSummaryModel.published_on is not None
+            blog_models.BlogPostSummaryModel.published_on != None  # pylint: disable=inequality-with-none
         ).order(
             -blog_models.BlogPostSummaryModel.published_on
         ).fetch(
@@ -827,7 +827,7 @@ def get_published_blog_post_summaries(
         max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
     blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
         blog_models.BlogPostSummaryModel.query(
-            blog_models.BlogPostSummaryModel.published_on is not None
+            blog_models.BlogPostSummaryModel.published_on != None # pylint: disable=inequality-with-none
         ).order(
             -blog_models.BlogPostSummaryModel.published_on
         ).fetch(

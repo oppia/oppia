@@ -49,6 +49,10 @@ interface AuthorStatsDict {
   readingTime?: ReadingTimeStats;
 }
 
+interface StatsDict {
+  [statsKey: string]: number;
+}
+
 @Component({
   selector: 'oppia-blog-statistics-tab',
   templateUrl: './statistics-tab.component.html'
@@ -66,12 +70,12 @@ export class BlogStatisticsTabComponent implements OnInit {
   private _y!: d3.ScaleLinear<number, number>;
   private _xAxis!: d3.Selection<SVGGElement, unknown, null, undefined>;
   private _yAxis!: d3.Selection<SVGGElement, unknown, null, undefined>;
-  private _currentPlotData!: {[statsKey: string]: number} | ReadingTimeStats;
+  private _currentPlotData!: StatsDict | ReadingTimeStats;
 
   margin = { top: 20, right: 20, bottom: 50, left: 60 };
   authorAggregatedStatsShown!: boolean;
   selectedChartType!: string;
-  selectedTimePeriod!: string;
+  selectedTimePeriod!: 'hourly' | 'weekly' | 'monthly' | 'yearly' | 'all';
   viewsChartShown: boolean = true;
   readsChartShown: boolean = false;
   readingTimeChartShown: boolean = false;
@@ -95,12 +99,12 @@ export class BlogStatisticsTabComponent implements OnInit {
     this.showViewsChartStats();
     if (this.isSmallScreenViewActive()) {
       this.smallScreenViewIsActive = true;
-      this.margin = { top: 10, right: 10, bottom: 30, left: 40 };
+      this.margin = { top: 10, right: 10, bottom: 40, left: 40 };
     }
     this.windowDimensionsService.getResizeEvent().subscribe(() => {
       if (this.isSmallScreenViewActive()) {
         this.smallScreenViewIsActive = true;
-        this.margin = { top: 10, right: 10, bottom: 30, left: 40 };
+        this.margin = { top: 10, right: 10, bottom: 45, left: 40 };
       } else {
         this.smallScreenViewIsActive = false;
         this.margin = { top: 20, right: 20, bottom: 50, left: 60 };
@@ -329,6 +333,7 @@ export class BlogStatisticsTabComponent implements OnInit {
       );
       hourOffset -= 1;
     });
+    this.selectedTimePeriod = 'hourly';
     this.plotStatsGraph(data);
   }
 
@@ -343,6 +348,7 @@ export class BlogStatisticsTabComponent implements OnInit {
       );
       dayOffset += 1;
     });
+    this.selectedTimePeriod = 'monthly';
     this.plotStatsGraph(data);
   }
 
@@ -357,6 +363,7 @@ export class BlogStatisticsTabComponent implements OnInit {
       );
       dayOffset -= 1;
     });
+    this.selectedTimePeriod = 'weekly';
     this.plotStatsGraph(data);
   }
 
@@ -371,11 +378,8 @@ export class BlogStatisticsTabComponent implements OnInit {
       );
       monthOffset += 1;
     });
+    this.selectedTimePeriod = 'yearly';
     this.plotStatsGraph(data);
-  }
-
-  showAllStats(): void {
-    this.selectedTimePeriod = 'all';
   }
 
   plotReadingTimeStatsChart(): void {
@@ -413,7 +417,7 @@ export class BlogStatisticsTabComponent implements OnInit {
     this.showViewsChartStats();
   }
 
-  plotStatsGraph(data: {[statsKey: string]: number} | ReadingTimeStats): void {
+  plotStatsGraph(data: StatsDict | ReadingTimeStats): void {
     const element = this.chartContainer.nativeElement;
     setTimeout(() => {
       this.loadingChartSpinnerShown = false;
@@ -458,9 +462,8 @@ export class BlogStatisticsTabComponent implements OnInit {
     this._yAxis = this._svg.append('g');
   }
 
-  private _drawBars(
-      data: {[statsKey: string]: number} | ReadingTimeStats
-  ): void {
+
+  private _drawBars(data: StatsDict | ReadingTimeStats): void {
     this._currentPlotData = data;
     let plotData = d3.entries(data);
     // Create the X-axis band scale.
@@ -483,6 +486,12 @@ export class BlogStatisticsTabComponent implements OnInit {
       .attr('stroke', '#4682B4')
       .attr('stroke-width', 2.5)
       .attr('opacity', 0.5);
+    if (this.readingTimeChartShown) {
+      this._xAxis.selectAll('.tick line')
+        .attr('stroke', '#4682B4')
+        .attr('stroke-width', 2.5)
+        .attr('opacity', 0.5);
+    }
     if (this.isSmallScreenViewActive()) {
       this._xAxis.selectAll('text')
         .style('text-anchor', 'middle')
@@ -508,7 +517,7 @@ export class BlogStatisticsTabComponent implements OnInit {
     this._yAxis.select('.domain')
       .attr('stroke-width', 1)
       .attr('stroke', '#000');
-    this._yAxis.selectAll('.tick:not(:first-of-type) line')
+    this._yAxis.selectAll('.tick:not(:first-of-type):not(:last-of-type) line')
       .attr('stroke', '#4682B4')
       .attr('stroke-width', 2.5)
       .attr('opacity', 0.5);
@@ -541,6 +550,26 @@ export class BlogStatisticsTabComponent implements OnInit {
       .attr('x', 0 - this._height / 2)
       .text(this.getYaxisLabel())
       .style('fill', '#00645c');
+
+    // X axis label for reading time chart.
+    if (this.readingTimeChartShown) {
+      let xAxisLabel = this._svg.append('text')
+        .style('text-anchor', 'middle')
+        .text('MINUTES')
+        .style('fill', '#00645c');
+
+      if (this.isSmallScreenViewActive()) {
+        xAxisLabel.attr(
+          'transform',
+          'translate(' + (this._width / 2) + ' ,' + (this._height + this.margin.bottom) + ')') // eslint-disable-line max-len
+          .style('font-size', '12px');
+      } else {
+        xAxisLabel.attr(
+          'transform',
+          'translate(' + (this._width / 2) + ' ,' + (this._height + this.margin.bottom - 10) + ')') // eslint-disable-line max-len
+          .style('font-size', '14px');
+      }
+    }
 
     if (this.isSmallScreenViewActive()) {
       yAxisLabel.style('font-size', '12px');

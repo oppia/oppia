@@ -1,4 +1,4 @@
-<div class="blog-dashboard-statistics-container mt-3 mb-5" [ngClass]="{'row mx-auto': !smallScreenViewIsActive, 'px-4': smallScreenViewIsActive}">
+<div class="blog-dashboard-statistics-container mb-5" [ngClass]="{'row mx-auto mt-5': !smallScreenViewIsActive, 'px-4 mt-3': smallScreenViewIsActive}">
   <div class="blog-post-list col-3 px-0" [ngClass]="{'d-none': smallScreenViewIsActive}">
     <mat-selection-list #blogPostSelection [multiple]="false" class="pt-0">
       <mat-list-option class="blog-post-list-option blog-post-title"
@@ -96,11 +96,31 @@
       <mat-divider class="mt-3 position-relative" *ngIf="!readingTimeChartShown"></mat-divider>
       <div class="py-2 blog-stats-time-period">
         <div class="time-period-button-row" *ngIf="!readingTimeChartShown">
-          <button mat-button class="time-period-button" (click)="showHourlyStats()">{{ 'I18N_BLOG_DASHBOARD_STATISTICS_HOURLY_STATS_BUTTON' | translate }}</button>
-          <button mat-button class="time-period-button" (click)="showWeeklyStats()">{{ 'I18N_BLOG_DASHBOARD_STATISTICS_WEEKLY_STATS_BUTTON' | translate }}</button>
-          <button mat-button class="time-period-button" (click)="showMonthlyStats()">{{ 'I18N_BLOG_DASHBOARD_STATISTICS_MONTHLY_STATS_BUTTON' | translate }}</button>
-          <button mat-button class="time-period-button" (click)="showYearlyStats()">{{ 'I18N_BLOG_DASHBOARD_STATISTICS_YEARLY_STATS_BUTTON' | translate }}</button>
-          <button mat-button class="time-period-button" (click)="showAllStats()">{{ 'I18N_BLOG_DASHBOARD_STATISTICS_ALL_STATS_BUTTON' | translate }}</button>
+          <button mat-button
+                  class="time-period-button"
+                  (click)="showHourlyStats()"
+                  autofocus>
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_HOURLY_STATS_BUTTON' | translate }}
+          </button>
+          <button mat-button
+                  class="time-period-button"
+                  (click)="showWeeklyStats()">
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_WEEKLY_STATS_BUTTON' | translate }}
+          </button>
+          <button mat-button
+                  class="time-period-button"
+                  (click)="showMonthlyStats()">
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_MONTHLY_STATS_BUTTON' | translate }}
+          </button>
+          <button mat-button
+                  class="time-period-button"
+                  (click)="showYearlyStats()">
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_YEARLY_STATS_BUTTON' | translate }}
+          </button>
+          <button mat-button
+                  class="time-period-button">
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_ALL_STATS_BUTTON' | translate }}
+          </button>
         </div>
       </div>
     </div>
@@ -129,6 +149,10 @@
     width: 550px;
   }
 
+  .mat-list-base .mat-list-item, .mat-list-base .mat-list-option {
+    height: 56px;
+  }
+
   @media(max-width: 650px) {
     .time-period-button {
       font-size: 14px;
@@ -136,7 +160,7 @@
       text-align: center;
     }
     .blog-stats {
-      height: 250px;
+      height: 300px;
       width: 100%;
     }
 

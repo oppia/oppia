@@ -179,7 +179,7 @@ export class BlogDashboardPageService {
         now.getDate()
       )
     );
-    return dayjs(day).format('MMM-YY');
+    return dayjs(day).format('MMM YY');
   }
 
   getCurrentMonthDayString(dayOffset: number): string {
@@ -203,7 +203,7 @@ export class BlogDashboardPageService {
         now.getDate() - dayOffset
       )
     );
-    return dayjs(day).format('D-MMM');
+    return dayjs(day).format('D MMM');
   }
 
   getPastHourString(hourOffset: number): string {
