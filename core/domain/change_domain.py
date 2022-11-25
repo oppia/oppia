@@ -23,10 +23,10 @@ import copy
 from core import feconf
 from core import utils
 
-from typing import Any, Dict, List, Mapping, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Union, cast
 
 MYPY = False
-if MYPY: # pragma: no cover
+if TYPE_CHECKING: # pragma: no cover
     # Modules imported under the `if MYPY` clause is imported only for
     # type checking purposes and they are not expected to be executed
     # at runtime.

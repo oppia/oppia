@@ -25,10 +25,13 @@ import re
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import change_domain
 
 from typing import Callable, Dict, List, Optional, Pattern, Union
 from typing_extensions import Final, TypedDict
+
+MYPY = False
+if MYPY:
+    from core.domain import change_domain
 
 
 class ServerMode(enum.Enum):
