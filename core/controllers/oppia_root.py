@@ -53,6 +53,14 @@ class OppiaLightweightRootPage(
     @acl_decorators.open_access
     def get(self, **kwargs: Dict[str, str]) -> None:
         """Handles GET requests."""
+        # The following logic determines which bundle to return. Currently the
+        # AoT bundle doesn't support rtl languages yet. So we switch between
+        # AoT and webpack bundle based on language direction.
+        # The order of preference to determine the language direction is:
+        # 1. Cookies
+        # 2. Url params
+        # Incase we don't find a language direction from the above two, we
+        # default to AoT bundle.
         if self.request.cookies.get('dir') == 'rtl':
             self.render_template('lightweight-oppia-root.mainpage.html')
             return

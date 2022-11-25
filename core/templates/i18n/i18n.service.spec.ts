@@ -270,7 +270,7 @@ describe('I18n service', () => {
 
   it(
     'should reload the website if language direction changes with lang param' +
-    'when cookies are not acknowledged',
+    ' when cookies are not acknowledged',
     fakeAsync(() => {
       let mockI18nLanguageCodeServiceSubject = new EventEmitter<string>();
       spyOn(windowRef.nativeWindow.location, 'toString')
@@ -296,7 +296,7 @@ describe('I18n service', () => {
   );
 
   it(
-    'should reload the website if language direction changes when cookies' +
+    'should reload the website if language direction changes when cookies ' +
     'acknowledged',
     fakeAsync(() => {
       let currentDateInUnixTimeMsecs = new Date().valueOf();
@@ -320,9 +320,11 @@ describe('I18n service', () => {
       I18nLanguageCodeService.prevLangCode = 'en';
       spyOn(windowRef.nativeWindow.location, 'reload');
       i18nService.initialize();
+      expect(windowRef.nativeWindow.location.href).toBe('http://localhost:8181');
       mockI18nLanguageCodeServiceSubject.emit('ar');
       I18nLanguageCodeService.prevLangCode = prevLangCode;
       expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
+      expect(windowRef.nativeWindow.location.href).toBe('http://localhost:8181');
       cookieService.removeAll();
       flushMicrotasks();
     })

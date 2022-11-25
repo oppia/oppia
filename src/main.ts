@@ -29,7 +29,7 @@ platformBrowserDynamic().bootstrapModule(LighweightAppModule).catch(
   (err) => console.error(err)
 );
 
-// This prevents angular pages to cause side effects to hybrid pages.
+// This prevents angular pages causing side effects to hybrid pages.
 // TODO(#13080): Remove window.name statement from import.ts files
 // after migration is complete.
 window.name = '';

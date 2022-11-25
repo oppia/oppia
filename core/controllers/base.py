@@ -91,9 +91,10 @@ def load_template(
     Returns:
         str. The HTML file content.
     """
-    filepath = os.path.join(feconf.FRONTEND_TEMPLATES_DIR, filename)
-    if template_is_aot_compiled:
-        filepath = os.path.join(feconf.FRONTEND_AOT_DIR, filename)
+    filepath = os.path.join(
+        (feconf.FRONTEND_AOT_DIR if template_is_aot_compiled else feconf.FRONTEND_TEMPLATES_DIR),
+        filename
+    )
     with utils.open_file(filepath, 'r') as f:
         html_text = f.read()
     return html_text
