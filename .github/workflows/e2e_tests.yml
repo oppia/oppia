@@ -171,7 +171,7 @@ jobs:
       - name: Install ffmpeg
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: sudo apt install ffmpeg
-      - name: Run E2E Test: ${{ matrix.suite }}
+      - name: Run E2E Test ${{ matrix.suite }}
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite=${{ matrix.suite }} --prod_env
         env: 
