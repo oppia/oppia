@@ -979,4 +979,10 @@ describe('Exploration editor tab component', () => {
     expect(editabilityService.onEndTutorial).toHaveBeenCalled();
     expect(component.tutorialInProgress).toBe(false);
   });
+
+  it('should get the last edited version number in case of error', () => {
+    versionHistoryService.insertStateVersionHistoryData(4, null, '');
+
+    expect(component.getLastEditedVersionNumberInCaseOfError()).toEqual(4);
+  });
 });

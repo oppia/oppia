@@ -25,7 +25,6 @@ import { ContextService } from 'services/context.service';
 import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
 import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 import { VersionHistoryService } from '../services/version-history.service';
-import { AlertsService } from 'services/alerts.service';
 
 interface HeadersAndYamlStrs {
   previousVersionStateYaml: string;
@@ -66,7 +65,6 @@ export class StateVersionHistoryModalComponent
 
   constructor(
       private ngbActiveModal: NgbActiveModal,
-      private alertsService: AlertsService,
       private contextService: ContextService,
       private versionHistoryService: VersionHistoryService,
       private versionHistoryBackendApiService: VersionHistoryBackendApiService,
@@ -101,7 +99,7 @@ export class StateVersionHistoryModalComponent
     return (
       this.versionHistoryService.fetchedStateVersionNumbers[
         this.versionHistoryService
-          .getCurrentPositionInStateVersionHistoryList()]);
+          .getCurrentPositionInStateVersionHistoryList()] as number);
   }
 
   getLastEditedCommitterUsername(): string {
