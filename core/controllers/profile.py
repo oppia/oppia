@@ -206,6 +206,7 @@ class MailingListSubscriptionHandlerNormalizedPayloadDict(TypedDict):
 
     email: str
     name: str
+    tag: str
 
 
 class MailingListSubscriptionHandler(
