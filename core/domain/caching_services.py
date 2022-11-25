@@ -22,7 +22,6 @@ import json
 
 from core.domain import caching_domain
 from core.domain import collection_domain
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import platform_parameter_domain
 from core.domain import skill_domain
@@ -30,10 +29,15 @@ from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
 
-from typing import Callable, Dict, List, Mapping, Optional, Union, overload
+from typing import (
+    TYPE_CHECKING, Callable, Dict, List, Mapping, Optional, Union,
+ overload)
 from typing_extensions import Final, Literal, TypedDict
 
 MYPY = False
+if TYPE_CHECKING:
+    from core.domain import config_domain
+
 if MYPY: # pragma: no cover
     from mypy_imports import memory_cache_services
 
@@ -43,7 +47,6 @@ if MYPY: # pragma: no cover
 
     AllowedCacheableObjectTypes = Union[
         AllowedDefaultTypes,
-        config_domain.AllowedDefaultValueTypes,
         collection_domain.Collection,
         exp_domain.Exploration,
         skill_domain.Skill,

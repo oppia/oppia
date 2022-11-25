@@ -26,7 +26,6 @@ from core.domain import change_domain
 from typing import Any, Dict, List, Optional, Sequence, Union
 from typing_extensions import TypedDict
 
-from core.domain import caching_services  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
@@ -37,6 +36,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import config_models
     from mypy_imports import suggestion_models
+    from core.domain import caching_services # pylint: disable=invalid-import-from # isort:skip
 
 (config_models, suggestion_models,) = models.Registry.import_models(
     [models.Names.CONFIG, models.Names.SUGGESTION])
