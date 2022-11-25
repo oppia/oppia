@@ -45,7 +45,7 @@
   <div *ngIf="type == 'translationContribution' || type == 'translationReview'" class="stats-cards-container">
     <mat-card *ngFor="let translationStatByLanguageAndTopic of statsData[type] | keyvalue" layout="row" class="list-view-item">
       <div>
-        {{selectedContributionType}} - {{translationStatByLanguageAndTopic.key}}
+        {{selectedContributionType}} - {{languageUtilService.getAudioLanguageDescription(translationStatByLanguageAndTopic.key)}}
       </div>
       <table class="dashboard-table e2e-test-topics-table">
         <tr>

@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import heapq
 import logging
+import os
 import re
 import uuid
 
@@ -3077,6 +3078,7 @@ def _generate_translation_contributor_certificate(
     if words_count == 0:
         raise Exception(
             'There are no contributions for the given time range.')
+    logo_path = os.getcwd() + '/assets/images/contributor_dashboard/oppia-logo.jpg'
 
     translation_submitter_certificate_template = """
       <!DOCTYPE html>
@@ -3113,7 +3115,7 @@ def _generate_translation_contributor_certificate(
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);">
-                <img src="/assets/images/contributor_dashboard/oppia-logo.jpg"
+                <img src=" """ + logo_path + """ "
                       style="padding-top: 50px;
                       padding-bottom: 30px;
                       height: 100px;
@@ -3302,6 +3304,7 @@ def _generate_question_contributor_certificate(
     if minutes_contributed == 0:
         raise Exception(
             'There are no contributions for the given time range.')
+    logo_path = os.getcwd() + '/assets/images/contributor_dashboard/oppia-logo.jpg'
 
     question_submitter_certificate_template = """
       <!DOCTYPE html>
@@ -3338,7 +3341,7 @@ def _generate_question_contributor_certificate(
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);">
-                <img src="/assets/images/contributor_dashboard/oppia-logo.jpg"
+                <img src=" """ + logo_path + """ "
                       style="padding-top: 50px;
                       padding-bottom: 30px;
                       height: 100px;

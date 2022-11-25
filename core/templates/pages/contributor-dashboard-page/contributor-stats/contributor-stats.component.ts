@@ -168,7 +168,7 @@ export class ContributorStatsComponent {
     };
 
   constructor(
-    private readonly languageUtilService: LanguageUtilService,
+    public readonly languageUtilService: LanguageUtilService,
     private readonly contributionAndReviewStatsService:
         ContributionAndReviewStatsService,
     private readonly userService: UserService,
@@ -239,19 +239,17 @@ export class ContributorStatsComponent {
 
     if (response.translation_contribution_stats.length > 0) {
       response.translation_contribution_stats.map((stat) => {
-        const language = this.languageUtilService.getAudioLanguageDescription(
-          stat.language_code);
         const translationContributionStatsData = this
-          .statsData?.translationContribution.get(language);
+          .statsData?.translationContribution.get(stat.language_code);
         if (translationContributionStatsData === undefined) {
           this.statsData?.translationContribution.set(
-            language,
+            stat.language_code,
             new PageableStats([this.createTranslationContributionStat(stat)]));
         } else {
           translationContributionStatsData.data?.push(
             this.createTranslationContributionStat(stat));
           this.statsData?.translationContribution.set(
-            language,
+            stat.language_code,
             translationContributionStatsData
           );
         }
@@ -260,19 +258,17 @@ export class ContributorStatsComponent {
 
     if (response.translation_review_stats.length > 0) {
       response.translation_review_stats.map((stat) => {
-        const language = this.languageUtilService.getAudioLanguageDescription(
-          stat.language_code);
         const translationReviewStatsData = this
-          .statsData?.translationReview.get(language);
+          .statsData?.translationReview.get(stat.language_code);
         if (translationReviewStatsData === undefined) {
           this.statsData.translationReview.set(
-            language,
+            stat.language_code,
             new PageableStats([this.createTranslationReviewStat(stat)]));
         } else {
           translationReviewStatsData.data?.push(
             this.createTranslationReviewStat(stat));
           this.statsData?.translationReview.set(
-            language,
+            stat.language_code,
             translationReviewStatsData
           );
         }
