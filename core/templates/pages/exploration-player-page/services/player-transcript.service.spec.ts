@@ -159,7 +159,10 @@ describe('Player transcript service', () => {
       'input has been received.');
 
     pts.addNewResponse('feedback');
-    pts.addNewInput('second answer', true);
+    pts.addNewInput('second answer', false);
+    pts.addNewResponse('feedback');
+    pts.addNewResponseToExistingFeedback('feedback_2');
+    pts.addNewInput('third answer', true);
 
     let firstCard = pts.getCard(0);
     expect(firstCard.getInputResponsePairs()).toEqual([{
@@ -168,10 +171,14 @@ describe('Player transcript service', () => {
       isHint: false
     }, {
       learnerInput: 'second answer',
+      oppiaResponse: 'feedback\nfeedback_2',
+      isHint: false
+    }, {
+      learnerInput: 'third answer',
       oppiaResponse: null,
       isHint: true
     }]);
-    expect(pts.getNumSubmitsForLastCard()).toBe(1);
+    expect(pts.getNumSubmitsForLastCard()).toBe(2);
   });
 
   it('should retrieve the last card of the transcript correctly', () => {
