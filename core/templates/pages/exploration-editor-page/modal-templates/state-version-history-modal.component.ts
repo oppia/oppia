@@ -51,7 +51,7 @@ export class StateVersionHistoryModalComponent
   @Input() oldState!: State;
   @Input() newStateName!: string;
   @Input() oldStateName!: string;
-  validationError: boolean = false;
+  validationErrorIsShown: boolean = false;
   yamlStrs: HeadersAndYamlStrs = {
     previousVersionStateYaml: '',
     currentVersionStateYaml: '',
@@ -165,7 +165,7 @@ export class StateVersionHistoryModalComponent
     this.updateLeftPane();
     this.updateRightPane();
 
-    this.validationError = false;
+    this.validationErrorIsShown = false;
 
     this
       .versionHistoryService
@@ -213,7 +213,7 @@ export class StateVersionHistoryModalComponent
     this.updateLeftPane();
     this.updateRightPane();
 
-    this.validationError = false;
+    this.validationErrorIsShown = false;
 
     this.fetchPreviousVersionHistory();
   }
@@ -259,7 +259,7 @@ export class StateVersionHistoryModalComponent
           this.versionHistoryService
             .incrementCurrentPositionInStateVersionHistoryList();
         } else {
-          this.validationError = true;
+          this.validationErrorIsShown = true;
           this.versionHistoryService
             .incrementCurrentPositionInStateVersionHistoryList();
         }
