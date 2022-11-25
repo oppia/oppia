@@ -41,15 +41,21 @@ describe('RandomSelector component', function() {
     component.initArgs = 'generatorId';
     component.objType = 'objType';
     component.customizationArgs = {
-      list_of_values: null,
-      value: null,
+      // This throws "Argument of type 'null' is not assignable to
+      // parameter of type 'AnswerGroup[]'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+      list_of_values: null, value: null,
     };
   });
 
   it('should initialise component', () => {
     component.customizationArgs = {
-      list_of_values: ['test'],
-      value: null,
+      // This throws "Argument of type 'null' is not assignable to
+      // parameter of type 'AnswerGroup[]'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+      list_of_values: ['test'], value: null,
     };
 
     component.ngOnInit();

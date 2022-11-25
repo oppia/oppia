@@ -18,17 +18,17 @@
 
 import { TestBed } from '@angular/core/testing';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
+import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { MisconceptionObjectFactory, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { QuestionValidationService } from './question-validation.service';
 
 describe('Question Validation Service', () => {
   let misconceptionObjectFactory: MisconceptionObjectFactory;
-  let mockMisconceptionObject;
-  let mockQuestionDict;
+  let mockMisconceptionObject: MisconceptionSkillMap;
+  let mockQuestionDict: QuestionBackendDict;
   let questionObjectFactory: QuestionObjectFactory;
   let qvs: QuestionValidationService;
-  let ses;
+  let ses: StateEditorService;
 
   beforeEach(() => {
     misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
@@ -145,7 +145,7 @@ describe('Question Validation Service', () => {
       version: 1,
       linked_skill_ids: ['abc'],
       inapplicable_skill_misconception_ids: ['abc-2']
-    };
+    } as unknown as QuestionBackendDict;
     mockMisconceptionObject = {
       abc: [
         misconceptionObjectFactory.create(
@@ -175,7 +175,7 @@ describe('Question Validation Service', () => {
   });
 
   it('should return false if solution is invalid', () => {
-    ses.isCurrentSolutionValid.and.returnValue(false);
+    ses.isCurrentSolutionValid = () => false;
     expect(
       qvs.isQuestionValid(
         questionObjectFactory.createFromBackendDict(mockQuestionDict),

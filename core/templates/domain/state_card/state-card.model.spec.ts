@@ -238,6 +238,9 @@ describe('State card object factory', () => {
 
     _sampleCard1.setLastOppiaResponse('response_3');
     expect(_sampleCard1.getLastOppiaResponse()).toEqual('response_3');
+    _sampleCard1.addToExistingFeedback('response_4');
+    expect(_sampleCard1.getLastOppiaResponse()).
+      toEqual('response_3\nresponse_4');
   });
 
   it('should get the last answer or null if there is no last answer', () => {
