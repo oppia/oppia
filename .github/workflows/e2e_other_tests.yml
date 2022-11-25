@@ -65,14 +65,56 @@ jobs:
           name: build_files
           path: /home/runner/work/oppia/build_files.zip
           retention-days: 1
-  e2e_collections:
+  e2e_test:
     needs: build
-    # TODO: Use a strategy matrix to auto-generate the jobs for all the e2e
-    # tests without copy-pasting code.
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-22.04]
+        suite:
+          - collections
+          - accessibility
+          - additionalEditorFeatures
+          - additionalEditorFeaturesModals
+          - additionalPlayerFeatures
+          - adminPage
+          - blogDashboard
+          - blog
+          - checkpointFeatures
+          - classroomPage
+          - classroomPageFileUploadFeatures
+          - collections
+          - contributorDashboard
+          - coreEditorAndPlayerFeatures
+          - creatorDashboard
+          - diagnosticTestPage
+          - embedding
+          - explorationFeedbackTab
+          - explorationImprovementsTab
+          - explorationHistoryTab
+          - explorationStatisticsTab
+          - explorationTranslationTab
+          - extensions
+          - featureGating
+          - fileUploadExtensions
+          - fileUploadFeatures
+          - learner
+          - learnerDashboard
+          - library
+          - navigation
+          - playVoiceovers
+          - preferences
+          - profileFeatures
+          - profileMenu
+          - publication
+          - skillEditor
+          - subscriptions
+          - topicsAndSkillsDashboard
+          - topicAndStoryEditor
+          - topicAndStoryEditorFileUploadFeatures
+          - topicAndStoryViewer
+          - users
+          - wipeout
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
@@ -104,8 +146,6 @@ jobs:
           path: /home/runner/work/oppia/
       - name: Unzip build files
         run: |
-          pwd
-          whoami
           ls -la
           unzip build_files.zip
           rm build_files.zip
@@ -131,44 +171,19 @@ jobs:
       - name: Install ffmpeg
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: sudo apt install ffmpeg
-      - name: Run e2e Collections Test
+      - name: Run E2E Test: ${{ matrix.suite }}
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite=${{ matrix.suite }} --prod_env
         env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e Accessibility Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
-        env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e Classroom Page Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env
-        env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e Navigation Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --prod_env --skip-install --skip-build --suite="navigation"
-        env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e Admin Page Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --prod_env --skip-install --skip-build --suite="adminPage"
-        env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e Checkpoint Features Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="checkpointFeatures" --prod_env
-        env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
           name: webdriverio-video
           path: /home/runner/work/oppia/webdriverio-video
       - name: Uploading webdriverio screenshots as Artifacts
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
           name: webdriverio-screenshots
