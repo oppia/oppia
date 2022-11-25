@@ -23,43 +23,43 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ThanksForSubscribingModalComponent } from './thanks-for-subscribing-modal.component';
 
 class MockActiveModal {
- dismiss(): void {
-   return;
- }
+  dismiss(): void {
+    return;
+  }
 
- close(): void {
-   return;
- }
+  close(): void {
+    return;
+  }
 }
 
 describe('ThanksForSubscribingModalComponent', function() {
- let component: ThanksForSubscribingModalComponent;
- let fixture: ComponentFixture<ThanksForSubscribingModalComponent>;
- let ngbActiveModal: NgbActiveModal;
+  let component: ThanksForSubscribingModalComponent;
+  let fixture: ComponentFixture<ThanksForSubscribingModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
 
- beforeEach(async(() => {
-   TestBed.configureTestingModule({
-     declarations: [MockTranslatePipe, ThanksForSubscribingModalComponent],
-     providers: [
-       {
-         provide: NgbActiveModal,
-         useClass: MockActiveModal
-       }
-     ]
-   }).compileComponents();
- }));
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [MockTranslatePipe, ThanksForSubscribingModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        }
+      ]
+    }).compileComponents();
+  }));
 
- beforeEach(() => {
-   fixture = TestBed.createComponent(ThanksForSubscribingModalComponent);
-   component = fixture.componentInstance;
-   ngbActiveModal = TestBed.inject(NgbActiveModal);
- });
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ThanksForSubscribingModalComponent);
+    component = fixture.componentInstance;
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+  });
 
- it('should close modal', () => {
-   const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+  it('should close modal', () => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
 
-   component.dismiss();
+    component.dismiss();
 
-   expect(dismissSpy).toHaveBeenCalled();
- });
+    expect(dismissSpy).toHaveBeenCalled();
+  });
 });

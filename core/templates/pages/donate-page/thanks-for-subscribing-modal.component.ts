@@ -28,7 +28,8 @@ export class ThanksForSubscribingModalComponent {
   constructor(
     private activeModal: NgbActiveModal
   ) {}
-  dismiss() {
+
+  dismiss(): void {
     this.activeModal.dismiss();
   }
 }

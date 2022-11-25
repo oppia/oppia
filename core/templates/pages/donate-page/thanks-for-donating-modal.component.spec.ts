@@ -16,51 +16,50 @@
  * @fileoverview Unit tests for ThanksForDonatingModalComponent.
  */
 
- import { async, ComponentFixture, TestBed } from
- '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
 
 class MockActiveModal {
- dismiss(): void {
-   return;
- }
+  dismiss(): void {
+    return;
+  }
 
- close(): void {
-   return;
- }
+  close(): void {
+    return;
+  }
 }
 
 describe('ThanksForDonatingModalComponent', function() {
- let component: ThanksForDonatingModalComponent;
- let fixture: ComponentFixture<ThanksForDonatingModalComponent>;
- let ngbActiveModal: NgbActiveModal;
+  let component: ThanksForDonatingModalComponent;
+  let fixture: ComponentFixture<ThanksForDonatingModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
 
- beforeEach(async(() => {
-   TestBed.configureTestingModule({
-     declarations: [MockTranslatePipe, ThanksForDonatingModalComponent],
-     providers: [
-       {
-         provide: NgbActiveModal,
-         useClass: MockActiveModal
-       }
-     ]
-   }).compileComponents();
- }));
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [MockTranslatePipe, ThanksForDonatingModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        }
+      ]
+    }).compileComponents();
+  }));
 
- beforeEach(() => {
-   fixture = TestBed.createComponent(ThanksForDonatingModalComponent);
-   component = fixture.componentInstance;
-   ngbActiveModal = TestBed.inject(NgbActiveModal);
- });
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ThanksForDonatingModalComponent);
+    component = fixture.componentInstance;
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+  });
 
- it('should close modal', () => {
-   const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+  it('should close modal', () => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
 
-   component.dismiss();
+    component.dismiss();
 
-   expect(dismissSpy).toHaveBeenCalled();
- });
+    expect(dismissSpy).toHaveBeenCalled();
+  });
 });
