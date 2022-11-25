@@ -521,7 +521,9 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
                     all_event_handlers.append(name)
 
         expected_event_handlers = [
-            'StatsEventsHandler', 'AnswerSubmissionEventHandler',
+            'BlogPostExitedEventHandler', 'BlogPostReadEventHandler',
+            'BlogPostViewedEventHandler', 'StatsEventsHandler',
+            'AnswerSubmissionEventHandler',
             'ExplorationActualStartEventHandler', 'SolutionHitEventHandler',
             'StartExplorationEventHandler', 'MaybeLeaveExplorationEventHandler',
             'CompleteExplorationEventHandler', 'RateExplorationEventHandler',

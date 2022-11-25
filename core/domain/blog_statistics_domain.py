@@ -469,6 +469,88 @@ def _generate_yearly_reads_from_reads_by_month(
     return stats_dict
 
 
+@overload
+def _generate_all_reads_from_reads_by_month(
+    stats: BlogPostReadsAggregatedStats,
+) -> Dict[str, Dict[str, int]]: ...
+
+
+@overload
+def _generate_all_reads_from_reads_by_month(
+    stats: AuthorBlogPostReadsAggregatedStats,
+) -> Dict[str, Dict[str, int]]: ...
+
+
+def _generate_all_reads_from_reads_by_month(
+    stats: Union[
+        BlogPostReadsAggregatedStats,
+        AuthorBlogPostReadsAggregatedStats
+    ]
+) -> Dict[str, Dict[str, int]]:
+    """Returns a dict with number of reads month wise for all the past years.
+
+    Args:
+        stats: BlogPostReadsAggregatedStats|AuthorBlogPostReadsAggregatedStats.
+            The stats domain object for which all reads are to be generated.
+
+    Returns:
+        dict. A dict with number of reads keyed to months in UTC fromat keyed to
+        their respective years.
+    """
+    # We add '_' infront of month keys to avoid auto ordering of keys
+    # in frontend, otherwise the keys get treated like numeric keys instead of
+    # strings by typescript.
+    stats_dict = {
+        '_' + k: {
+            '_' + m: stats.reads_by_month[k][m] for m in list(
+                stats.reads_by_month[k]
+            )
+        } for k in list(stats.reads_by_month)
+    }
+    return stats_dict
+
+
+@overload
+def _generate_all_views_from_views_by_month(
+    stats: BlogPostViewsAggregatedStats,
+) -> Dict[str, Dict[str, int]]: ...
+
+
+@overload
+def _generate_all_views_from_views_by_month(
+    stats: AuthorBlogPostViewsAggregatedStats,
+) -> Dict[str, Dict[str, int]]: ...
+
+
+def _generate_all_views_from_views_by_month(
+    stats: Union[
+        BlogPostViewsAggregatedStats,
+        AuthorBlogPostViewsAggregatedStats
+    ]
+) -> Dict[str, Dict[str, int]]:
+    """Returns a dict with number of views month wise for all the past years.
+
+    Args:
+        stats: BlogPostViewsAggregatedStats|AuthorBlogPostViewsAggregatedStats.
+            The stats domain object for which all views are to be generated.
+
+    Returns:
+        dict. A dict with number of views keyed to months in UTC fromat keyed to
+        their respective years.
+    """
+    # We add '_' infront of month keys to avoid auto ordering of keys
+    # in frontend, otherwise the keys get treated like numeric keys instead of
+    # strings by typescript.
+    stats_dict = {
+        '_' + k: {
+            '_' + m: stats.views_by_month[k][m] for m in list(
+                stats.views_by_month[k]
+            )
+        } for k in list(stats.views_by_month)
+    }
+    return stats_dict
+
+
 class BlogPostViewsAggregatedStatsFrontendDict(TypedDict):
     """Frontend Dict type for BlogPostViewsAggregatedStats object."""
 
@@ -604,7 +686,7 @@ class BlogPostViewsAggregatedStats:
             ),
             'monthly_views': _generate_monthly_views_from_views_by_date(self),
             'yearly_views': _generate_yearly_views_from_views_by_month(self),
-            'all_views': self.views_by_month,
+            'all_views': _generate_all_views_from_views_by_month(self),
         }
         return stats_dict
 
@@ -687,7 +769,7 @@ class BlogPostReadsAggregatedStats:
                 ),
             'monthly_reads': _generate_monthly_reads_from_reads_by_date(self),
             'yearly_reads': _generate_yearly_reads_from_reads_by_month(self),
-            'all_reads': self.reads_by_month,
+            'all_reads': _generate_all_reads_from_reads_by_month(self),
         }
         return stats_dict
 
@@ -873,7 +955,7 @@ class AuthorBlogPostViewsAggregatedStats:
                 ),
             'monthly_views': _generate_monthly_views_from_views_by_date(self),
             'yearly_views': _generate_yearly_views_from_views_by_month(self),
-            'all_views': self.views_by_month,
+            'all_views': _generate_all_views_from_views_by_month(self),
         }
         return stats_dict
 
@@ -958,7 +1040,7 @@ class AuthorBlogPostReadsAggregatedStats:
                 ),
             'monthly_reads': _generate_monthly_reads_from_reads_by_date(self),
             'yearly_reads': _generate_yearly_reads_from_reads_by_month(self),
-            'all_reads': self.reads_by_month,
+            'all_reads': _generate_all_reads_from_reads_by_month(self),
         }
         return stats_dict
 

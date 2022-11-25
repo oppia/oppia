@@ -5,9 +5,9 @@
                        (click)="authorAggregatedStatsShown = true; showViewsChartStats()"
                        [selected]="authorAggregatedStatsShown"
                        [value]="'all'">
-      <span class="blog-post-title">
-        {{ 'I18N_BLOG_DASHBOARD_STATISTICS_ALL_BLOG_POSTS_STATS_BUTTON' | translate }}
-      </span>
+        <span class="blog-post-title">
+          {{ 'I18N_BLOG_DASHBOARD_STATISTICS_ALL_BLOG_POSTS_STATS_BUTTON' | translate }}
+        </span>
       </mat-list-option>
       <mat-list-option *ngFor="let blogPostSummary of publishedBlogPostList"
                        [value]="blogPostSummary"
@@ -124,7 +124,6 @@
   </div>
 </div>
 <style>
-
   .blog-stats {
     height: 320px;
     width: 550px;
@@ -132,8 +131,8 @@
 
   @media(max-width: 650px) {
     .time-period-button {
-      padding: 0;
       font-size: 14px;
+      padding: 0;
       text-align: center;
     }
     .blog-stats {
@@ -167,7 +166,7 @@
 
   @media(max-width: 550px) {
     .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
-    padding: 0 4px;
+      padding: 0 4px;
     }
   }
 
@@ -176,8 +175,8 @@
     display: block;
     font-size: 22px;
     font-weight: 400;
-    text-overflow: ellipsis;
     overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 

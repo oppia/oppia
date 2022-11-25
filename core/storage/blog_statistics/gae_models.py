@@ -88,8 +88,10 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """Model contains user ID of the author of the blog post."""
-        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+        """Model does not contain neccessary information for user for
+        takeout.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
@@ -207,8 +209,10 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
     def get_model_association_to_user() -> (
         base_models.MODEL_ASSOCIATION_TO_USER
     ):
-        """Model contains user ID of the author of the blog post."""
-        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+        """Model does not contain neccessary information for user for
+        takeout.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
@@ -330,8 +334,10 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """Model contains user ID of the author of the blog post."""
-        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+        """Model does not contain neccessary information for user for
+        takeout.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:

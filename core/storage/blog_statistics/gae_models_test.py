@@ -112,7 +112,7 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             blog_stats_models.BlogPostViewedEventLogEntryModel
                 .get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
     def test_get_export_policy(self) -> None:
@@ -246,7 +246,7 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             blog_stats_models.BlogPostReadEventLogEntryModel
                 .get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
     def test_get_export_policy(self) -> None:
@@ -387,7 +387,7 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             blog_stats_models.BlogPostExitedEventLogEntryModel
                 .get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
     def test_get_export_policy(self) -> None:

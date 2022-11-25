@@ -24,14 +24,13 @@ from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import blog_domain
 from core.domain import blog_services
-from core.domain import blog_statistics_domain
 from core.domain import blog_statistics_services
 from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import user_services
 
-from typing import Dict, List, Optional, TypedDict, Union
+from typing import Dict, List, Optional, TypedDict
 
 
 class BlogCardSummaryDict(TypedDict):

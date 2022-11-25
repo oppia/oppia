@@ -330,9 +330,11 @@ class AuthorBlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(frontend_dict['yearly_reads'].keys()), 12)
             self.assertEqual(len(frontend_dict['all_reads'].keys()), 1)
             for i in range(current_day - 6, current_day + 1):
-                self.assertTrue(str(i) in frontend_dict['weekly_reads'].keys())
+                self.assertTrue(
+                    ('_' + str(i)) in frontend_dict['weekly_reads'].keys()
+                )
 
-            current_year = str(current_datetime.year)
+            current_year = '_' + str(current_datetime.year)
             self.assertTrue(current_year in frontend_dict['all_reads'])
 
         # Checking to_front_end_dict() when current date is less than 7.
@@ -353,9 +355,10 @@ class AuthorBlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
             for i in range(
                 (datetime_now - datetime.timedelta(days=6)).day, current_day + 1
             ):
-                self.assertTrue(str(i) in frontend_dict['weekly_reads'].keys())
+                self.assertTrue(
+                    ('_' + str(i)) in frontend_dict['weekly_reads'].keys())
 
-            current_year = str(datetime_now.year)
+            current_year = '_' + str(datetime_now.year)
             self.assertTrue(current_year in frontend_dict['all_reads'])
 
 
@@ -503,9 +506,11 @@ class AuthorBlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(frontend_dict['yearly_views'].keys()), 12)
             self.assertEqual(len(frontend_dict['all_views'].keys()), 1)
             for i in range(current_day - 6, current_day + 1):
-                self.assertTrue(str(i) in frontend_dict['weekly_views'].keys())
+                self.assertTrue(
+                    ('_' + str(i)) in frontend_dict['weekly_views'].keys()
+                )
 
-            current_year = str(current_datetime.year)
+            current_year = '_' + str(current_datetime.year)
             self.assertTrue(current_year in frontend_dict['all_views'])
 
         # Checking to_front_end_dict() when current date is less than 7.
@@ -526,9 +531,11 @@ class AuthorBlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
             for i in range(
                 (datetime_now - datetime.timedelta(days=6)).day, current_day + 1
             ):
-                self.assertTrue(str(i) in frontend_dict['weekly_views'].keys())
+                self.assertTrue(
+                    ('_' + str(i)) in frontend_dict['weekly_views'].keys()
+                )
 
-            current_year = str(datetime_now.year)
+            current_year = '_' + str(datetime_now.year)
             self.assertTrue(current_year in frontend_dict['all_views'])
 
 
@@ -674,9 +681,11 @@ class BlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(frontend_dict['yearly_reads'].keys()), 12)
             self.assertEqual(len(frontend_dict['all_reads'].keys()), 1)
             for i in range(current_day - 6, current_day + 1):
-                self.assertTrue(str(i) in frontend_dict['weekly_reads'].keys())
+                self.assertTrue(
+                    ('_' + str(i)) in frontend_dict['weekly_reads'].keys()
+                )
 
-            current_year = str(current_datetime.year)
+            current_year = '_' + str(current_datetime.year)
             self.assertTrue(current_year in frontend_dict['all_reads'])
 
         # Checking to_front_end_dict() when current date is less than 7.
@@ -699,7 +708,7 @@ class BlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
             ):
                 self.assertTrue(str(i) in frontend_dict['weekly_reads'].keys())
 
-            current_year = str(datetime_now.year)
+            current_year = '_' + str(datetime_now.year)
             self.assertTrue(current_year in frontend_dict['all_reads'])
 
 
@@ -847,9 +856,10 @@ class BlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(frontend_dict['yearly_views'].keys()), 12)
             self.assertEqual(len(frontend_dict['all_views'].keys()), 1)
             for i in range(current_day - 6, current_day + 1):
-                self.assertTrue(str(i) in frontend_dict['weekly_views'].keys())
+                self.assertTrue(
+                    ('_' + str(i)) in frontend_dict['weekly_views'].keys())
 
-            current_year = str(current_datetime.year)
+            current_year = '_' + str(current_datetime.year)
             self.assertTrue(current_year in frontend_dict['all_views'])
 
         # Checking to_front_end_dict() when current date is less than 7.
@@ -872,5 +882,5 @@ class BlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
             ):
                 self.assertTrue(str(i) in frontend_dict['weekly_views'].keys())
 
-            current_year = str(datetime_now.year)
+            current_year = '_' + str(datetime_now.year)
             self.assertTrue(current_year in frontend_dict['all_views'])

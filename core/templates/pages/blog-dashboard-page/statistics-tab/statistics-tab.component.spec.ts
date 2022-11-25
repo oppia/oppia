@@ -762,4 +762,3 @@ describe('Blog Dashboard Statistics Component', () => {
     expect(component.plotStatsGraph).toHaveBeenCalled();
   });
 });
-

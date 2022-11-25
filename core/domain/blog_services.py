@@ -420,7 +420,7 @@ def get_published_blog_post_summaries_by_user_id(
         blog_models.BlogPostSummaryModel.query(
             blog_models.BlogPostSummaryModel.author_id == user_id
         ).filter(
-            blog_models.BlogPostSummaryModel.published_on != None
+            blog_models.BlogPostSummaryModel.published_on is not None
         ).order(
             -blog_models.BlogPostSummaryModel.published_on
         ).fetch(
@@ -652,7 +652,7 @@ def generate_url_fragment(title: str, blog_post_id: str) -> str:
     """
     lower_title = title.lower()
     # Removing special characters from url fragment.
-    simple_title = re.sub(r'[^a-zA-Z0-9 ]','', lower_title)
+    simple_title = re.sub(r'[^a-zA-Z0-9 ]', '', lower_title)
     hyphenated_title = (
         simple_title.replace('-', ' ').replace('  ', ' ').replace(' ', '-'))
     lower_id = blog_post_id.lower()
@@ -827,7 +827,7 @@ def get_published_blog_post_summaries(
         max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
     blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
         blog_models.BlogPostSummaryModel.query(
-            blog_models.BlogPostSummaryModel.published_on != None
+            blog_models.BlogPostSummaryModel.published_on is not None
         ).order(
             -blog_models.BlogPostSummaryModel.published_on
         ).fetch(
