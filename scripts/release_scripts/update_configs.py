@@ -20,6 +20,7 @@ Usage: Run this script from your oppia root folder:
 
     python -m scripts.release_scripts.update_configs
 """
+
 from __future__ import annotations
 
 import argparse
@@ -27,9 +28,9 @@ import getpass
 import os
 import re
 
-from cryptography.fernet import Fernet
 import github
 from typing import Final, List, Optional
+
 
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
@@ -279,13 +280,10 @@ def add_mailgun_api_key(release_feconf_path: str) -> None:
 
     assert 'MAILGUN_API_KEY = None\n' in feconf_lines, 'Missing mailgun API key'
 
-    key = Fernet.generate_key()
-    f = Fernet(key)
-    mailgun_api_key_encrypted = f.encrypt(mailgun_api_key)
     with utils.open_file(release_feconf_path, 'w') as f:
         for line in feconf_lines:
             if line == 'MAILGUN_API_KEY = None\n':
-                line = line.replace('None', '\'%s\'' % f.decrypt(mailgun_api_key_encrypted).decode())
+                line = line.replace('None', '\'%s\'' % mailgun_api_key)
             f.write(line)
 
 
