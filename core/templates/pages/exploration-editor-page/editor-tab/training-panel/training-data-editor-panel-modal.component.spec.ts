@@ -46,7 +46,7 @@ import { TrainingModalService } from './training-modal.service';
  }
 
  class MockExplorationStatesService {
-   getState(item1) {
+   getState(item1: string) {
      return {
        content: {
          html: 'This is Hola State'
@@ -62,9 +62,17 @@ import { TrainingModalService } from './training-modal.service';
 
    getAnswerGroup() {
      return new AnswerGroup([
-       new Rule('TextInput', null, null),
-       new Rule('TextInput', null, null)
-     ], null, ['Answer1', 'Answer2'], null);
+       new Rule('TextInput', {
+         x: [],
+       }, {
+         x: 'ListOfSetsOfTranslatableHtmlContentIds'
+       }),
+       new Rule('TextInput', {
+         x: [],
+       }, {
+         x: 'ListOfSetsOfTranslatableHtmlContentIds'
+       }),
+     ], {} as Outcome, ['Answer1', 'Answer2'], null);
    }
  }
 
@@ -114,6 +122,7 @@ describe('Training Data Editor Panel Component', () => {
   let truncateInputBasedOnInteractionAnswerTypePipe:
      TruncateInputBasedOnInteractionAnswerTypePipe;
   let answerClassificationService: AnswerClassificationService;
+  let stateEditorService: StateEditorService;
   let trainingModalServiceeventEmitter = new EventEmitter();
 
    class MockTrainingModalService {
@@ -121,11 +130,12 @@ describe('Training Data Editor Panel Component', () => {
        return trainingModalServiceeventEmitter;
      }
 
-     getTrainingDataOfAnswerGroup(index1) {
+     getTrainingDataOfAnswerGroup(index1: string) {
        return ['name', 'class'];
      }
 
-     openTrainUnresolvedAnswerModal(item1, item2, item3) {
+     openTrainUnresolvedAnswerModal(
+         item1: string, item2: string, item3: string) {
      }
    }
 
@@ -196,6 +206,7 @@ describe('Training Data Editor Panel Component', () => {
      trainingModalService = TestBed.inject(TrainingModalService);
      answerClassificationService = TestBed.inject(AnswerClassificationService);
      focusManagerService = TestBed.inject(FocusManagerService);
+     stateEditorService = TestBed.inject(StateEditorService);
      ngbActiveModal = TestBed.inject(NgbActiveModal);
      truncateInputBasedOnInteractionAnswerTypePipe =
        TestBed.inject(TruncateInputBasedOnInteractionAnswerTypePipe);
@@ -269,14 +280,14 @@ describe('Training Data Editor Panel Component', () => {
        .and.returnValue({
          outcome: new Outcome(
            'Hola',
-           null,
+           '',
            new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
            false,
            [],
-           null,
-           null,
+           '',
+           '',
          ),
-         answerGroupIndex: null,
+         answerGroupIndex: 0,
          ruleIndex: null,
          classificationCategorization: 'explicit',
        });
@@ -317,4 +328,18 @@ describe('Training Data Editor Panel Component', () => {
 
      expect(ngbActiveModal.dismiss).toHaveBeenCalled();
    });
+
+   it('should throw error if state name is null', fakeAsync(() => {
+     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+     expect(() => {
+       component.ngOnInit();
+     }).toThrowError('State name cannot be empty.');
+   }));
+
+   it('should throw error if state name is null', fakeAsync(() => {
+     component._stateName = null;
+     expect(() => {
+       component.submitAnswer('answer');
+     }).toThrowError('State name cannot be empty.');
+   }));
 });
