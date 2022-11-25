@@ -241,7 +241,7 @@
                 <span class="link">
                   {{'I18N_TOPNAV_BLOG' | translate}}
                 </span>
-                <span class="fas fa-external-link-alt launch"></span>
+                <span class="fas fa-external-link-alt launch" *ngIf="!platformFeatureService.status.BlogPages.isEnabled"></span>
               </a>
             </li>
           </ul>
