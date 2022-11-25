@@ -525,12 +525,6 @@ def verify_user_deleted(
     if not auth_services.verify_external_auth_associations_are_deleted(user_id):
         return False
 
-    # Verify if user is deleted.
-    user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-    if user_settings_model:
-        username = user_settings_model.username
-        _verify_profile_picture_is_deleted(username)
-
     policies_not_to_verify = [
         base_models.DELETION_POLICY.KEEP,
         base_models.DELETION_POLICY.NOT_APPLICABLE
@@ -538,6 +532,12 @@ def verify_user_deleted(
     if not include_delete_at_end_models:
         policies_not_to_verify.append(
             base_models.DELETION_POLICY.DELETE_AT_END)
+
+        # Verify if user profile picture is deleted.
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        if user_settings_model:
+            username = user_settings_model.username
+            _verify_profile_picture_is_deleted(username)
 
     user_is_verified = True
     for model_class in models.Registry.get_all_storage_model_classes():
