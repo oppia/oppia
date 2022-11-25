@@ -25,16 +25,18 @@ from core import utils
 from core.domain import caching_services
 from core.domain import classroom_services
 from core.domain import story_domain
-from core.domain import story_fetchers
 from core.domain import topic_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Set, overload
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Set, overload
 from typing_extensions import Literal, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import topic_models
+
+if TYPE_CHECKING:
+    from core.domain import story_fetchers
 
 (topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 

@@ -29,7 +29,6 @@ from core import feconf
 from core.domain import caching_services
 from core.domain import exp_fetchers
 from core.domain import story_domain
-from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 
@@ -40,6 +39,9 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import story_models
     from mypy_imports import user_models
+
+if MYPY:
+    from core.domain import topic_fetchers
 
 (story_models, user_models) = models.Registry.import_models(
     [models.Names.STORY, models.Names.USER])
