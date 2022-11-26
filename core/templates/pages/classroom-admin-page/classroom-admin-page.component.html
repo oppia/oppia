@@ -15,7 +15,7 @@
       </em>
 
       <div *ngFor="let classroom of classroomIdToClassroomName | keyvalue">
-        <div class="oppia-classroom-tile"
+        <div class="oppia-classroom-tile e2e-test-classroom-tile"
              (click)="getClassroomData(classroom.key)">
           <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())">
             {{ classroom.value }}
@@ -36,9 +36,10 @@
 
         <div class="classroom-details"
              *ngIf="classroomDetailsIsShown && tempClassroomData.getClassroomId() === classroom.key">
-          <div *ngIf="classroomViewerMode"
+          <div *ngIf="classroomViewerMode">
+            <i class="material-icons oppia-edit-icon e2e-test-edit-classroom-config-button"
+               title="Edit Classroom"
                (click)="openClassroomInEditorMode()">
-            <i class="material-icons oppia-edit-icon" title="Edit Classroom">
               &#xE254;
             </i>
           </div>
@@ -190,6 +191,14 @@
                           </mat-autocomplete>
                         </mat-form-field>
                       </div>
+
+                      <div *ngIf="classroomEditorMode">
+                        <button (click)="deleteTopic(topicName)"
+                                mat-button matSuffix mat-icon-button
+                                aria-label="Clear">
+                          <mat-icon matListIcon>close</mat-icon>
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -198,28 +207,20 @@
                     {{ classroomAdminDataService.topicsGraphValidationError }}
                   </p>
                 </div>
-
-                <div *ngIf="classroomEditorMode">
-                  <button (click)="deleteTopic(topicName)"
-                          mat-button matSuffix mat-icon-button
-                          aria-label="Clear">
-                    <mat-icon matListIcon>close</mat-icon>
-                  </button>
-                </div>
               </div>
             </div>
 
             <div *ngIf="classroomEditorMode">
               <div class="new-topic-input-container" *ngIf="newTopicCanBeAdded">
                 <input [(ngModel)]="newTopicId"
-                       class="form-control new-topic-input"
+                       class="form-control new-topic-input e2e-test-add-topic-to-classroom-input"
                        (ngModelChange)="onNewTopicInputModelChange()">
                 <button (click)="removeNewTopicInputField()"
                         class="btn btn-secondary">
                   Cancel
                 </button>
                 <button (click)="addTopicId(newTopicId)"
-                        class="btn btn-success"
+                        class="btn btn-success e2e-test-submit-topic-id-to-classroom-button"
                         [disabled]="newTopicId.length === 0">
                   Submit
                 </button>
@@ -227,7 +228,7 @@
 
               <button (click)="showNewTopicInputField()"
                       *ngIf="!newTopicCanBeAdded"
-                      class="btn btn-secondary add-new-topic">
+                      class="btn btn-secondary add-new-topic e2e-test-add-topic-to-classroom-button">
                 Add Topic
               </button>
               <p *ngIf="!topicWithGivenIdExists" class="oppia-warning-text" >
@@ -247,7 +248,7 @@
                     [disabled]="classroomDataSaveInProgress">
               Cancel
             </button>
-            <button class="btn btn-success save-classroom-changes"
+            <button class="btn btn-success save-classroom-changes e2e-test-save-classroom-config-button"
                     [disabled]="!(classroomDataIsChanged && tempClassroomData.isClassroomDataValid())"
                     (click)="saveClassroomData(classroom.key)">
               <span *ngIf="!classroomDataSaveInProgress">Save</span>
@@ -266,7 +267,7 @@
          matTooltipPosition="right"
          aria-tooltip="Button that creates a new classroom"
          class="create-new-classroom-button-wrapper">
-      <button class="btn add-new-classroom"
+      <button class="btn add-new-classroom e2e-test-add-new-classroom-config"
               (click)="createNewClassroom()"
               [disabled]="classroomEditorMode">
         + ADD NEW CLASSROOM
@@ -339,8 +340,9 @@
     width: 200px;
   }
   .topics-name {
+    overflow: auto;
     padding: 10px;
-    width: 33%;
+    width: 100px;
   }
   .topic-dependency-description {
     margin: 10px 0;
