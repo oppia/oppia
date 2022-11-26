@@ -65,6 +65,8 @@ describe('Interaction display', () => {
     } as ViewContainerRef;
     spyOn(componentFactoryResolver, 'resolveComponentFactory');
     spyOn(componentInstance.viewContainerRef, 'createComponent')
+      // Unknown type is used here because the type of the component
+      // is not known.
       .and.returnValue(mockComponentRef as ComponentRef<unknown>);
 
     componentInstance.buildInteraction();
@@ -106,6 +108,8 @@ describe('Interaction display', () => {
 
     spyOn(componentFactoryResolver, 'resolveComponentFactory');
     spyOn(componentInstance.viewContainerRef, 'createComponent')
+      // Unknown type is used here because the type of the component
+      // is not known.
       .and.returnValue(mockComponentRef as ComponentRef<unknown>);
 
     componentInstance.buildInteraction();

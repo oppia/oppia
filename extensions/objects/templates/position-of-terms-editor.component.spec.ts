@@ -18,7 +18,7 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { PositionOfTerm, PositionOfTermsEditorComponent } from './position-of-terms-editor.component';
+import { PositionOfTermsEditorComponent } from './position-of-terms-editor.component';
 
 describe('PositionOfTerms', () => {
   let fixture: ComponentFixture<PositionOfTermsEditorComponent>;
@@ -53,7 +53,7 @@ describe('PositionOfTerms', () => {
       // 'PositionOfTerm'." We need to suppress this error
       // because of the need to test validations.
       // @ts-ignore
-      component.positionOfTerms[0] as PositionOfTerm);
+      component.positionOfTerms[0]);
     component.onChangePosition('lhs');
     expect(component.value).toBe('lhs');
   });

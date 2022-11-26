@@ -26,6 +26,7 @@ import 'components/code-mirror/codemirror.component';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { Subscription } from 'rxjs';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { SchemaDefaultValue } from 'services/schema-default-value.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
@@ -117,7 +118,7 @@ implements ControlValueAccessor, OnInit, Validator {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: unknown): void {
+  registerOnTouched(fn: SchemaDefaultValue): void {
   }
 
   validate(control: AbstractControl): ValidationErrors {
@@ -193,7 +194,7 @@ implements ControlValueAccessor, OnInit, Validator {
     }
   }
 
-  getCodingMode(): unknown {
+  getCodingMode(): string | null {
     if (!this.uiConfig) {
       return null;
     } else {

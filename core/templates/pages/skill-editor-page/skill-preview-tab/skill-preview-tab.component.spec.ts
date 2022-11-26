@@ -152,7 +152,7 @@ describe('Skill Preview Tab Component', () => {
         id: 'TextInput'
       }
     }
-  } as unknown as QuestionBackendDict;
+  } as QuestionBackendDict;
   let questionDict2 = {
     question_state_data: {
       content: {
@@ -161,7 +161,7 @@ describe('Skill Preview Tab Component', () => {
         id: 'ItemSelectionInput'
       }
     }
-  } as unknown as QuestionBackendDict;
+  } as QuestionBackendDict;
   let questionDict3 = {
     question_state_data: {
       content: {
@@ -170,7 +170,7 @@ describe('Skill Preview Tab Component', () => {
         id: 'NumericInput'
       }
     }
-  } as unknown as QuestionBackendDict;
+  } as QuestionBackendDict;
   let questionDict4 = {
     question_state_data: {
       content: {
@@ -179,7 +179,7 @@ describe('Skill Preview Tab Component', () => {
         id: 'MultipleChoiceInput'
       }
     }
-  } as unknown as QuestionBackendDict;
+  } as QuestionBackendDict;
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SkillPreviewTabComponent);

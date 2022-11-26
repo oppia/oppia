@@ -75,6 +75,7 @@ describe('Topic editor state service', () => {
         skillIdToDescriptionDict: {},
         skillIdToRubricsDict: {},
         classroomUrlFragment: 'url_fragment'
+      // Use unknown for test validation.
       } as unknown as FetchTopicResponse);
     }
 

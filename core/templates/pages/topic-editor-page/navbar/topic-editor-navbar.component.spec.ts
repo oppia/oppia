@@ -574,6 +574,7 @@ describe('Topic Editor Navbar', () => {
       componentInstance.showTopicEditOptions = true;
       spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and
         .returnValue(
+          // Use unknown for test validation.
           Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>);
       spyOn(topicEditorStateService, 'setTopicRights');
 
@@ -600,6 +601,7 @@ describe('Topic Editor Navbar', () => {
       });
       spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and
         .returnValue(
+          // Use unknown for test validation.
           Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>);
 
       componentInstance.unpublishTopic();
@@ -611,6 +613,7 @@ describe('Topic Editor Navbar', () => {
   it('should publish topic when user clicks the \'publish\' button',
     fakeAsync(() => {
       spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
+        // Use unknown for test validation.
         Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>);
       spyOn(alertsService, 'addSuccessMessage');
       componentInstance.topicRights = TopicRights.createFromBackendDict({
