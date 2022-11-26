@@ -43,11 +43,11 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 
+from html2image import Html2Image
 from typing import (
     Callable, Dict, Final, List, Literal, Mapping, Match, Optional, Sequence,
     Set, Tuple, Union, cast, overload
 )
-from html2image import Html2Image
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -3022,8 +3022,6 @@ def _generate_translation_contributor_certificate(
     Args:
         language_code: str|None. The language for which the contributions should
             be considered.
-        suggestion_type: str. The type of suggestion that the certificate
-            needs to generate.
         from_date: datetime.datetime. The start of the date range for which
             the contributions were created.
         to_date: datetime.datetime. The end of the date range for which
@@ -3051,9 +3049,9 @@ def _generate_translation_contributor_certificate(
     if language is None:
         raise Exception('The provided language is invalid.')
     language_description = language['description']
-    if (language_description.find(' (') != -1):
+    if language_description.find(' (') != -1:
         language_description = language_description[
-            language_description.find('(')+1:language_description.find(')')]
+            language_description.find('(') + 1:language_description.find(')')]
 
     suggestions = (
         suggestion_models.GeneralSuggestionModel
