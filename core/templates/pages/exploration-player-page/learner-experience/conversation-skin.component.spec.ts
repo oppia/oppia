@@ -1124,7 +1124,8 @@ describe('Conversation skin component', () => {
     spyOn(componentInstance, 'showPendingCard');
     spyOn(translateService, 'instant').and.callThrough();
     spyOn(playerTranscriptService, 'addNewResponseToExistingFeedback');
-
+    expect(componentInstance.continueToReviseStateButtonIsVisible).
+      toEqual(false);
     componentInstance.nextCardIfStuck = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
@@ -1134,6 +1135,8 @@ describe('Conversation skin component', () => {
       ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE');
+    expect(componentInstance.continueToReviseStateButtonIsVisible).
+      toEqual(true);
     flush();
   }));
 
@@ -1156,14 +1159,19 @@ describe('Conversation skin component', () => {
     spyOn(translateService, 'instant').and.callThrough();
     spyOn(componentInstance, 'showPendingCard');
     spyOn(playerTranscriptService, 'addNewResponseToExistingFeedback');
-
+    expect(componentInstance.continueToReviseStateButtonIsVisible).
+      toEqual(false);
     componentInstance.nextCardIfStuck = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
       [], null, null, '', null);
+
     componentInstance.triggerIfLearnerStuckActionDirectly();
+
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE');
+    expect(componentInstance.continueToReviseStateButtonIsVisible).
+      toEqual(true);
   }));
 
   it('should redirect the learner to stuck state', fakeAsync(() => {
