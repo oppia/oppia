@@ -527,19 +527,25 @@ export class BlogStatisticsTabComponent implements OnInit {
     // Remove already existing bars.
     this._svg.selectAll('rect').remove().transition().attr('opacity', 0);
     // Create and fill the bars.
+
+    // This throws argument of 'Type 'number | undefined' is not assignable to
+    // type string | number | boolean'. This comes when data  is entered in d3
+    // Selection as '.data' dependancy of d3 return 'number | undefined'. We
+    // need to suppress this error because of strict type checking.
+    // @ts-ignore
     this._svg.selectAll('bars')
       .data(plotData)
       .enter()
       .append('rect') // Add a new rect for each new elements.
       .attr('class', 'bar')
       .attr('x', d => this._x(d.key))
-      .attr('y', d => this._y(d.value as NumberValue))
+      .attr('y', d => this._y(d.value as NumberValue) || 0)
       .transition()
       .attr('opacity', 1)
-      .attr('width', this._x.bandwidth())
+      .attr('width', this._x.bandwidth() || 0)
       .attr(
         'height',
-        d => this._height - (this._y(d.value as NumberValue) as number))
+        d => this._height - (this._y(d.value as NumberValue) as number || 0))
       .attr('fill', '#1F78B4');
 
     // Y axis label.

@@ -58,7 +58,6 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
   activeTimeUserStayedOnPostInMinutes: number = 0;
   blogPostExitedEventFired: boolean = false;
   blogPostReadEventFired: boolean = false;
-  self;
 
   constructor(
     private windowDimensionsService: WindowDimensionsService,
@@ -77,6 +76,7 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
   }
 
   private stopListening(): void {
+    console.error('me');
     window.removeEventListener('beforeunload', this.ngOnDestroy.bind(this));
   }
 

@@ -191,7 +191,7 @@ class BlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
 class AuthorBlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
     """Tests for author blog post reads stats domain object."""
 
-    MOCK_DATE: Final = datetime.datetime(2021, 9, 20)
+    MOCK_DATE: Final = datetime.datetime(2021, 9, 20).replace(hour=6)
 
     def setUp(self) -> None:
         """Set up for testing blog post reading domain object."""
@@ -666,13 +666,14 @@ class BlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
         )
 
     def test_blog_post_reads_to_frontend_dict(self) -> None:
-        current_datetime = self.MOCK_DATE + datetime.timedelta(days=5)
+        current_datetime = (
+            self.MOCK_DATE.replace(hour=6) + datetime.timedelta(days=5)
+        )
         with self.mock_datetime_utcnow(current_datetime):
-            frontend_dict = (
-                stats_services.get_blog_post_reads_stats_by_id(
+            domain_obj = stats_services.get_blog_post_reads_stats_by_id(
                     self.blog_id_a
-                ).to_frontend_dict()
-            )
+                )
+            frontend_dict = domain_obj.to_frontend_dict()
 
             current_day = current_datetime.day
             self.assertEqual(len(frontend_dict['hourly_reads'].keys()), 24)
@@ -680,6 +681,15 @@ class BlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(frontend_dict['monthly_reads'].keys()), 30)
             self.assertEqual(len(frontend_dict['yearly_reads'].keys()), 12)
             self.assertEqual(len(frontend_dict['all_reads'].keys()), 1)
+
+            for i in range(0, 9):
+                self.assertTrue(
+                    ('_0' + str(i)) in frontend_dict['hourly_reads'].keys()
+                )
+            for i in range(10, 24):
+                self.assertTrue(
+                    ('_' + str(i)) in frontend_dict['hourly_reads'].keys()
+                )
             for i in range(current_day - 6, current_day + 1):
                 self.assertTrue(
                     ('_' + str(i)) in frontend_dict['weekly_reads'].keys()

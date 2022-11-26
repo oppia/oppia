@@ -223,7 +223,7 @@ def save_blog_post_views_stats_model(
     """
     blog_post_views_aggregated_stats = (
         blog_stats_models.BlogPostViewsAggregatedStatsModel.get(
-            views_stats.blog_post_id
+            views_stats.blog_post_id, strict=False
         )
     )
     if blog_post_views_aggregated_stats is None:
@@ -255,7 +255,7 @@ def save_blog_post_reads_stats_model(
     """
     blog_post_reads_aggregated_stats = (
         blog_stats_models.BlogPostReadsAggregatedStatsModel.get(
-            reads_stats.blog_post_id
+            reads_stats.blog_post_id, strict=False
         )
     )
     if blog_post_reads_aggregated_stats is None:
@@ -287,7 +287,7 @@ def save_blog_post_reading_time_model(
     """
     reading_time_model = (
         blog_stats_models.BlogPostReadingTimeModel.get(
-            reading_time_stats.blog_post_id
+            reading_time_stats.blog_post_id, strict=False
         )
     )
     if reading_time_model is None:
@@ -329,7 +329,7 @@ def save_author_blog_post_views_stats_model(
     """
     author_views_aggregated_stats = (
         blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
-            views_stats.author_id
+            views_stats.author_id, strict=False
         )
     )
     if author_views_aggregated_stats is None:
@@ -362,12 +362,12 @@ def save_author_blog_post_reads_stats_model(
     """
     author_reads_aggregated_stats = (
         blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
-            reads_stats.author_id
+            reads_stats.author_id, strict=False
         )
     )
     if author_reads_aggregated_stats is None:
         raise Exception(
-            'No author blog post reads stats model exists for the given' +
+            'No author blog post reads stats model exists for the given ' +
             'author_id.'
         )
 
@@ -395,12 +395,12 @@ def save_author_blog_posts_aggregated_reading_time_model(
     """
     reading_time_model = (
         blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
-            reading_time_stats.author_id
+            reading_time_stats.author_id, strict=False
         )
     )
     if reading_time_model is None:
         raise Exception(
-            'No author blog post reading time model exists for the given' +
+            'No author blog post reading time model exists for the given ' +
             'author_id.'
         )
 
@@ -540,18 +540,9 @@ def _update_views_stats_transactional(
             exist.
     """
     blog_post_views_stats = get_blog_post_views_stats_by_id(blog_post_id)
-    if blog_post_views_stats is None:
-        raise Exception(
-            'BlogPostViewsStatsModel id="%s" does not exist' % (blog_post_id)
-        )
-
     author_blog_post_views_stats = (
         get_author_blog_post_views_stats_by_id(author_id)
     )
-    if author_blog_post_views_stats is None:
-        raise Exception(
-            'AuthorBlogPostViewsStatsModel id="%s" does not exist' % (author_id)
-        )
     current_datetime = datetime.datetime.utcnow()
     current_date = parse_date_as_string(current_datetime)
     current_day = current_datetime.strftime('%d')
@@ -595,18 +586,9 @@ def _update_reads_stats_transactional(
             exist.
     """
     blog_post_reads_stats = get_blog_post_reads_stats_by_id(blog_post_id)
-    if blog_post_reads_stats is None:
-        raise Exception(
-            'BlogPostReadsStatsModel id="%s" does not exist' % (blog_post_id)
-        )
-
     author_blog_post_reads_stats = (
         get_author_blog_post_reads_stats_by_id(author_id)
     )
-    if author_blog_post_reads_stats is None:
-        raise Exception(
-            'AuthorBlogPostReadsStatsModel id="%s" does not exist' % (author_id)
-        )
     current_datetime = datetime.datetime.utcnow()
     current_date = parse_date_as_string(current_datetime)
     current_day = current_datetime.strftime('%d')
@@ -654,20 +636,9 @@ def _update_reading_time_stats_transactional(
     blog_post_reading_time_stats = (
         get_blog_post_reading_time_stats_by_id(blog_post_id)
     )
-    if blog_post_reading_time_stats is None:
-        raise Exception(
-            'BlogPostReadingTimeModel id="%s" does not exist' % (blog_post_id)
-        )
-
     author_blog_post_reading_time_stats = (
         get_author_blog_posts_reading_time_stats_by_id(author_id)
     )
-    if author_blog_post_reading_time_stats is None:
-        raise Exception(
-            'AuthorBlogPostsAggregatedReadingTimeModel for the given id does'
-            'not exist.'
-        )
-
     _increment_reading_time_bucket_count(
         blog_post_reading_time_stats, time_taken_to_read_post)
     _increment_reading_time_bucket_count(

@@ -84,7 +84,9 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
         self.blog_post_url = (
             blog_services.get_blog_post_by_id(self.blog_post.id)).url_fragment
 
-        self.current_datetime = self.MOCK_DATE + datetime.timedelta(days=1)
+        self.current_datetime = self.MOCK_DATE + datetime.timedelta(
+            days=3, weeks=16
+        )
         with self.mock_datetime_utcnow(self.current_datetime):
             # Hitting Blog Post Stats Event Handler to create event log entry
             # model.
@@ -124,8 +126,8 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             expected_stats.to_frontend_dict(),
-            blog_statistics_services.get_blog_post_views_stats_by_id(
-                self.blog_post.id
+            blog_statistics_services.get_blog_post_stats_by_blog_post_id(
+                self.blog_post.id, 'views'
             ).to_frontend_dict()
         )
 
@@ -150,8 +152,8 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             expected_stats.to_frontend_dict(),
-            blog_statistics_services.get_blog_post_reads_stats_by_id(
-                self.blog_post.id
+            blog_statistics_services.get_blog_post_stats_by_blog_post_id(
+                self.blog_post.id, 'reads'
             ).to_frontend_dict()
         )
 
@@ -177,8 +179,8 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             expected_stats.to_frontend_dict(),
-            blog_statistics_services.get_blog_post_reading_time_stats_by_id(
-                self.blog_post.id
+            blog_statistics_services.get_blog_post_stats_by_blog_post_id(
+                self.blog_post.id, 'reading_time'
             ).to_frontend_dict()
         )
 
@@ -205,8 +207,8 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             expected_stats.to_frontend_dict(),
-            blog_statistics_services.get_author_blog_post_views_stats_by_id(
-                self.blog_admin_id
+            blog_statistics_services.get_author_aggregated_stats_by_author_id(
+                self.blog_admin_id, 'views'
             ).to_frontend_dict()
         )
 
@@ -233,8 +235,8 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             expected_stats.to_frontend_dict(),
-            blog_statistics_services.get_author_blog_post_reads_stats_by_id(
-                self.blog_admin_id
+            blog_statistics_services.get_author_aggregated_stats_by_author_id(
+                self.blog_admin_id, 'reads'
             ).to_frontend_dict()
         )
 
@@ -262,12 +264,9 @@ class BlogStatisticsServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             expected_stats.to_frontend_dict(),
-            (
-                blog_statistics_services
-                .get_author_blog_posts_reading_time_stats_by_id(
-                    self.blog_admin_id
-                ).to_frontend_dict()
-            )
+            blog_statistics_services.get_author_aggregated_stats_by_author_id(
+                self.blog_admin_id, 'reading_time'
+            ).to_frontend_dict()
         )
 
     def test_generate_stats_by_hour_dict(self) -> None:
@@ -978,3 +977,142 @@ class BlogPostEventHandlersTests(test_utils.GenericTestBase):
             aggregated_blog_stats_model.three_to_four_min, 2)
         self.assertEqual(
             aggregated_author_stats_model.three_to_four_min, 2)
+
+    def test_save_blog_post_views_stats_model_raises_exception_for_invalid_id(
+        self
+    ) -> None:
+        stats_model = blog_stats_models.BlogPostViewsAggregatedStatsModel.get(
+            self.blog_post.id
+        )
+        views_domain_obj = (
+            blog_statistics_services.get_blog_post_views_stats_by_id(
+                self.blog_post.id
+            )
+        )
+        # Delete the model to check that the exception is raised.
+        stats_model.delete()
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No blog post views stats model exists for the given blog_post_id.'
+        ):
+            blog_statistics_services.save_blog_post_views_stats_model(
+                views_domain_obj)
+
+    def test_save_blog_post_reads_stats_model_raises_exception_for_invalid_id(
+        self
+    ) -> None:
+        stats_model = blog_stats_models.BlogPostReadsAggregatedStatsModel.get(
+            self.blog_post.id
+        )
+        reads_domain_obj = (
+            blog_statistics_services.get_blog_post_reads_stats_by_id(
+                self.blog_post.id
+            )
+        )
+        # Delete the model to check that the exception is raised.
+        stats_model.delete()
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No blog post reads stats model exists for the given blog_post_id.'
+        ):
+            blog_statistics_services.save_blog_post_reads_stats_model(
+                reads_domain_obj)
+
+    def test_save_blog_post_reading_time_model_raises_exception_for_invalid_id(
+        self
+    ) -> None:
+        stats_model = blog_stats_models.BlogPostReadingTimeModel.get(
+            self.blog_post.id
+        )
+        reading_time_domain_obj = (
+            blog_statistics_services.get_blog_post_reading_time_stats_by_id(
+                self.blog_post.id
+            )
+        )
+        # Delete the model to check that the exception is raised.
+        stats_model.delete()
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No blog post reading time model exists for the given blog_post_id.'
+        ):
+            blog_statistics_services.save_blog_post_reading_time_model(
+                reading_time_domain_obj)
+
+    def test_save_author_blog_post_views_stats_model_raises_exception(
+        self
+    ) -> None:
+        stats_model = (
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
+                self.blog_admin_id
+            )
+        )
+        views_domain_obj = (
+            blog_statistics_services.get_author_blog_post_views_stats_by_id(
+                self.blog_admin_id
+            )
+        )
+        # Delete the model to check that the exception is raised.
+        stats_model.delete()
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No author blog post views stats model exists for the given' +
+            ' author_id.'
+        ):
+            blog_statistics_services.save_author_blog_post_views_stats_model(
+                views_domain_obj)
+
+    def test_save_author_blog_post_reads_stats_model_raises_exception(
+        self
+        ) -> None:
+        stats_model = (
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
+                self.blog_admin_id
+            )
+        )
+        reads_domain_obj = (
+            blog_statistics_services.get_author_blog_post_reads_stats_by_id(
+                self.blog_admin_id
+            )
+        )
+        # Delete the model to check that the exception is raised.
+        stats_model.delete()
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No author blog post reads stats model exists for the given ' +
+            'author_id.'
+        ):
+            blog_statistics_services.save_author_blog_post_reads_stats_model(
+                reads_domain_obj)
+
+    def test_save_author_blog_posts_aggregated_reading_time_model_raises_exception(  # pylint: disable=line-too-long
+        self
+        ) -> None:
+        stats_model = (
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
+                self.blog_admin_id
+            )
+        )
+        reading_time_domain_obj = (
+            blog_statistics_services.get_author_blog_posts_reading_time_stats_by_id(  # pylint: disable=line-too-long
+                self.blog_admin_id
+            )
+        )
+        # Delete the model to check that the exception is raised.
+        stats_model.delete()
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No author blog post reading time model exists for the given ' +
+            'author_id.'
+        ):
+            (
+                blog_statistics_services
+                .save_author_blog_posts_aggregated_reading_time_model(
+                    reading_time_domain_obj
+                )
+            )

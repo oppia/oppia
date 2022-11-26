@@ -285,13 +285,13 @@ describe('Blog home page component', () => {
     // When blog post is not read by the user and user switches tab.
     component.blogPostReadEventFired = false;
 
-    component.handleVisibilityChange();
+    component.handleVisibilityChange(component);
     expect(component.activeTimeUserStayedOnPostInMinutes).toBe(30);
     expect(blogHomePageBackendApiService.recordBlogPostReadEventAsync)
       .not.toHaveBeenCalled();
 
     // When user comes back to the blog post page tab.
-    component.handleVisibilityChange();
+    component.handleVisibilityChange(component);
     component.activeTimeUserStayedOnPostInMinutes = 0;
 
     expect(component.timeUserStartedViewingPost).toEqual(baseTime.getTime());
@@ -302,7 +302,7 @@ describe('Blog home page component', () => {
     component.blogPostReadEventFired = true;
     component.activeTimeUserStayedOnPostInMinutes = 0;
 
-    component.handleVisibilityChange();
+    component.handleVisibilityChange(component);
     expect(component.activeTimeUserStayedOnPostInMinutes).toBe(30);
     expect(blogHomePageBackendApiService.recordBlogPostReadEventAsync)
       .not.toHaveBeenCalled();
@@ -313,7 +313,7 @@ describe('Blog home page component', () => {
     component.blogPostReadEventFired = false;
     component.activeTimeUserStayedOnPostInMinutes = 0;
 
-    component.handleVisibilityChange();
+    component.handleVisibilityChange(component);
     expect(component.activeTimeUserStayedOnPostInMinutes).toBe(30);
     expect(blogHomePageBackendApiService.recordBlogPostReadEventAsync)
       .toHaveBeenCalled();
@@ -364,11 +364,12 @@ describe('Blog home page component', () => {
     jasmine.clock().mockDate(baseTime);
     spyOn(component, 'recordBlogPostExitedEvent');
     spyOn(component, 'isBlogPostRead').and.returnValues(false);
+    spyOn(window, 'removeEventListener');
 
     component.ngOnDestroy();
 
     expect(component.recordBlogPostExitedEvent).toHaveBeenCalled();
-    expect(component.activeTimeUserStayedOnPostInMinutes).toBe(35);
+    expect(window.removeEventListener).toHaveBeenCalled();
   });
 
   it('should not fire blog post exited event when blog post is exited but' +
@@ -382,18 +383,18 @@ describe('Blog home page component', () => {
     spyOn(component, 'recordBlogPostExitedEvent');
     spyOn(component, 'recordBlogPostReadEvent');
     spyOn(component, 'isBlogPostRead').and.returnValues(false, true);
+    spyOn(window, 'removeEventListener');
 
     component.ngOnDestroy();
 
     expect(component.recordBlogPostExitedEvent).not.toHaveBeenCalled();
-    expect(component.activeTimeUserStayedOnPostInMinutes).toBe(35);
     expect(component.recordBlogPostReadEvent).not.toHaveBeenCalled();
 
-    component.activeTimeUserStayedOnPostInMinutes = 0;
+    component.blogPostReadEventFired = false;
     component.ngOnDestroy();
 
     expect(component.recordBlogPostExitedEvent).not.toHaveBeenCalled();
-    expect(component.activeTimeUserStayedOnPostInMinutes).toBe(35);
     expect(component.recordBlogPostReadEvent).toHaveBeenCalled();
+    expect(window.removeEventListener).toHaveBeenCalled();
   });
 });
