@@ -61,11 +61,15 @@ describe('ShortResponseCodeRepl', () => {
 
     component.ngOnInit();
 
+    // This throws "Type object is not assignable to type
+    // 'string'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     expect(component.escapedAnswer).toEqual({
       code: "# Type your code here.\nprint('hello')",
       error: '',
       evaluation: '',
       output: 'hello\n'
-    } as unknown as string);
+    } as string);
   });
 });

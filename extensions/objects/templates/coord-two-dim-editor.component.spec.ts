@@ -113,7 +113,7 @@ describe('CoordTwoDimEditorComponent', () => {
         lat: 45,
         lng: 50
       }
-    } as unknown as LeafletMouseEvent;
+    } as LeafletMouseEvent;
 
     component.leafletClick(e);
 

@@ -240,7 +240,7 @@ describe('NumberWithUnitsValidationService', () => {
         }
       },
       toMathjsCompatibleString: () => {
-        return null as unknown as string;
+        return null as string;
       },
       toDict: () => {
         let uof = new UnitsObjectFactory();

@@ -251,7 +251,11 @@ describe('GraphInputValidationService', () => {
   it('should throw error when rule is invalid', () => {
     var answerGroup = agof.createNew(
       [{
-        type: new Error('Error') as unknown as string,
+        // This throws "Type object is not assignable to type
+        // 'string'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        type: new Error('Error') as string,
         inputs: {},
         inputTypes: {},
         toBackendDict: () => {

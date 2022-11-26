@@ -131,7 +131,7 @@ describe('MathExpressionContentEditorComponent', () => {
         'AyMSAyODdaIi8+PC9nPjwvZz48L2c+PC9zdmc+',
       mathExpressionSvgIsBeingProcessed: false
     };
-    window.MathJax = mockMathJs as unknown as typeof MathJax;
+    window.MathJax = mockMathJs as typeof MathJax;
     svgElement = {
       setAttribute: (txt: string, temp: string) => {
         return;

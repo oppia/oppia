@@ -49,7 +49,11 @@ describe('PositionOfTerms', () => {
 
     // Changing localValue should change ctrl.value.
     component.localValue = (
-      component.positionOfTerms[0] as unknown as PositionOfTerm);
+      // This throws "Type object is not assignable to type
+      // 'PositionOfTerm'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+      component.positionOfTerms[0] as PositionOfTerm);
     component.onChangePosition('lhs');
     expect(component.value).toBe('lhs');
   });

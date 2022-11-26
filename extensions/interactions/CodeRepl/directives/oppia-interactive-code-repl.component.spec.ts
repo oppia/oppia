@@ -204,6 +204,11 @@ describe('InteractiveCodeReplComponent', () => {
     // The values cannot be tested since all the variables are private in the
     // editorOptions Object. Therefore, the arguments passed to various
     // functions tested instead.
+
+    // This throws "Type object is not assignable to type
+    // 'QuestionBackendDict'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     let cm = {
       replaceSelection: (spaces) => {
         expect(spaces).toBe('  ');
@@ -226,7 +231,7 @@ describe('InteractiveCodeReplComponent', () => {
           return 2;
         }
       }
-    } as unknown as CodeMirror.Editor;
+    } as CodeMirror.Editor;
 
     component.editorOptions.extraKeys.Tab(cm);
   });
@@ -290,7 +295,7 @@ describe('InteractiveCodeReplComponent', () => {
         },
         addLineClass: (num, txt1, txt2) => {}
       }
-    } as unknown as CodemirrorComponent;
+    } as CodemirrorComponent;
 
     component.ngAfterViewInit();
     tick();

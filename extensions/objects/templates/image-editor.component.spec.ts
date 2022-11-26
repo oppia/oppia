@@ -1796,7 +1796,7 @@ describe('ImageEditor', () => {
       frameInfo: {
         disposal: 1
       },
-    }] as unknown as never);
+    }] as never);
     // This throws an error "Type '{ lastModified: number; name:
     // string; size: number; type: string; }' is missing the following
     // properties from type 'File': arrayBuffer, slice, stream, text"
