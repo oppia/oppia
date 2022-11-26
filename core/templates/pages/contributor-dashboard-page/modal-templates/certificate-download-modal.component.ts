@@ -60,6 +60,11 @@ export class CertificateDownloadModalComponent {
       this.errorMessage = 'Invalid date range.';
       return;
     }
+    if (new Date() < new Date(this.toDate)) {
+      this.errorsFound = true;
+      this.errorMessage = 'To date should not be a future date';
+      return;
+    }
     this.certificateDownloading = true;
     this.contributionAndReviewService.downloadContributorCertificateAsync(
       this.username,
@@ -69,12 +74,11 @@ export class CertificateDownloadModalComponent {
       this.toDate
     ).then((response: Blob) => {
       const dataType = response.type;
-
       const downloadLink = document.createElement('a');
+
       downloadLink.href = window.URL.createObjectURL(
         new Blob([response], {type: dataType}));
       downloadLink.setAttribute('download', 'certificate');
-
       document.body.appendChild(downloadLink);
       downloadLink.click();
       this.certificateDownloading = false;

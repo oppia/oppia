@@ -3225,7 +3225,7 @@ def _generate_translation_contributor_certificate(
                           text-align: center;">
                       <div style="font-family: 'Roboto';
                             font-size: 24px; color: #000000; line-height: 10px;">
-                        """ + date + """
+                        """ + date.strftime('%d %b %Y') + """
                       </div>
                       <center>
                         <p style="width: 186px;
@@ -3446,7 +3446,7 @@ def _generate_question_contributor_certificate(
                           text-align: center;">
                       <div style="font-family: 'Roboto';
                             font-size: 24px; color: #000000; line-height: 10px;">
-                        """ + date + """
+                        """ + date.strftime('%d %b %Y') + """
                       </div>
                       <center>
                         <p style="width: 186px;
