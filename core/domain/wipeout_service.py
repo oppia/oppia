@@ -28,6 +28,7 @@ from core.domain import collection_services
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import taskqueue_services
@@ -376,6 +377,22 @@ def _delete_models_with_delete_at_end_policy(user_id: str) -> None:
             model_class.apply_deletion_policy(user_id)
 
 
+def _delete_profile_picture(username: str) -> None:
+    """Verify that the profile picture is deleted.
+
+    Args:
+        username: str. The username of the user.
+    """
+    fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
+    filename_png = 'profile_picture.png'
+    filename_webp = 'profile_picture.webp'
+    if fs.isfile(filename_png):
+        fs.delete(filename_png)
+
+    if fs.isfile(filename_webp):
+        fs.delete(filename_webp)
+
+
 def delete_user(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest
 ) -> None:
@@ -390,6 +407,12 @@ def delete_user(
     user_roles = user_models.UserSettingsModel.get_by_id(user_id).roles
 
     auth_services.delete_external_auth_associations(user_id)
+
+    # Remove profile picture.
+    user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+    username = user_settings_model.username
+    if username is not None:
+        _delete_profile_picture(username)
 
     _delete_models(user_id, models.Names.AUTH)
     _delete_models(user_id, models.Names.USER)
@@ -466,6 +489,29 @@ def delete_user(
     _delete_models(user_id, models.Names.LEARNER_GROUP)
 
 
+def _verify_profile_picture_is_deleted(username: str) -> bool:
+    """Verify that the profile picture is deleted.
+
+    Args:
+        username: str. The username of the user.
+
+    Returns:
+        bool. True when the profile picture is deleted else False.
+    """
+    if username is None:
+        return True
+    fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
+    filename_png = 'profile_picture.png'
+    filename_webp = 'profile_picture.webp'
+    if fs.isfile(filename_png) or fs.isfile(filename_webp):
+        logging.error(
+            'Profile picture is not deleted of user having '
+            'username %s.' % (username)
+        )
+        return False
+    return True
+
+
 def verify_user_deleted(
     user_id: str, include_delete_at_end_models: bool = False
 ) -> bool:
@@ -490,6 +536,13 @@ def verify_user_deleted(
     if not include_delete_at_end_models:
         policies_not_to_verify.append(
             base_models.DELETION_POLICY.DELETE_AT_END)
+
+        # Verify if user profile picture is deleted.
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        if user_settings_model:
+            username = user_settings_model.username
+            if not _verify_profile_picture_is_deleted(username):
+                return False
 
     user_is_verified = True
     for model_class in models.Registry.get_all_storage_model_classes():

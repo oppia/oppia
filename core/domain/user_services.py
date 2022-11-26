@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import hashlib
 import imghdr
+import io
 import itertools
 import logging
 import re
@@ -32,11 +33,13 @@ from core.constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import exp_fetchers
+from core.domain import fs_services
 from core.domain import role_services
 from core.domain import state_domain
 from core.domain import user_domain
 from core.platform import models
 
+from PIL import Image
 import requests
 
 from typing import (
@@ -881,8 +884,6 @@ def _get_user_settings_from_model(
             user_settings_model.last_edited_an_exploration),
         last_created_an_exploration=(
             user_settings_model.last_created_an_exploration),
-        profile_picture_data_url=(
-            user_settings_model.profile_picture_data_url),
         default_dashboard=user_settings_model.default_dashboard,
         creator_dashboard_display_pref=(
             user_settings_model.creator_dashboard_display_pref),
@@ -1412,8 +1413,26 @@ def update_profile_picture_data_url(
         profile_picture_data_url: str. New profile picture url to be set.
     """
     user_settings = get_user_settings(user_id, strict=True)
-    user_settings.profile_picture_data_url = profile_picture_data_url
-    save_user_settings(user_settings)
+    username = user_settings.username
+    if username is None:
+        raise utils.ValidationError(
+            'User does not have a valid username, having value None.')
+    # Ruling out the possibility of different types for mypy type checking.
+    assert isinstance(username, str)
+    fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
+    filename_png = 'profile_picture.png'
+    png_binary = utils.convert_png_data_url_to_binary(
+        profile_picture_data_url)
+    fs.commit(filename_png, png_binary, mimetype='image/png')
+
+    profile_picture_binary = utils.convert_png_data_url_to_binary(
+        profile_picture_data_url)
+    output = io.BytesIO()
+    image = Image.open(io.BytesIO(profile_picture_binary)).convert('RGB')
+    image.save(output, 'webp')
+    webp_binary = output.getvalue()
+    filename_webp = 'profile_picture.webp'
+    fs.commit(filename_webp, webp_binary, mimetype='image/webp')
 
 
 def update_user_bio(user_id: str, user_bio: str) -> None:

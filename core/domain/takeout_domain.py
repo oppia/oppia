@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 
 class TakeoutData:
@@ -59,29 +59,3 @@ class TakeoutImage:
         """
         self.b64_image_data = b64_image_data
         self.image_export_path = image_export_path
-
-
-class TakeoutImageReplacementInstruction:
-    """Domain object for storing the instructions for replacing a user image
-    with a path corresponding to a file in the final zip.
-    """
-
-    def __init__(
-        self,
-        dictionary_path: Tuple[str, ...],
-        export_filename: str,
-        new_key: str
-    ) -> None:
-        """Constructs a TakeoutImageReplacementInstruction object.
-
-        Args:
-            dictionary_path: tuple(str). A sequence of keys indicating the
-                position of the user image data within the user data dictionary.
-            export_filename: str. The filename of the new file created.
-            new_key: str. The new key name in the user data dictionary after the
-                image data is replaced with the filename within the final
-                Takeout zip.
-        """
-        self.dictionary_path = dictionary_path
-        self.export_filename = export_filename
-        self.new_key = new_key

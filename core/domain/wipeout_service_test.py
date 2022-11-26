@@ -20,11 +20,13 @@ import datetime
 import logging
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import email_manager
 from core.domain import exp_services
+from core.domain import fs_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
@@ -5692,3 +5694,37 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
                 self.user_1_id, model.committer_ids)
             self.assertIn(
                 pseudonymized_id, model.committer_ids)
+
+
+class WipeoutServiceVerifyProfilePictureIsDeletedTests(
+    test_utils.GenericTestBase
+):
+    """Test that profile picture is removed when we delete the user."""
+
+    USER_1_EMAIL: Final = 'some@email.com'
+    USER_1_USERNAME: Final = 'username1'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+
+        self.fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.USER_1_USERNAME)
+        self.filename_png = 'profile_picture.png'
+        self.filename_webp = 'profile_picture.webp'
+        png_binary = utils.convert_png_data_url_to_binary(
+            user_services.DEFAULT_IDENTICON_DATA_URL)
+        self.fs.commit(self.filename_png, png_binary)
+        self.fs.commit(self.filename_webp, png_binary)
+
+    def test_profile_picture_is_removed(self) -> None:
+        self.assertTrue(self.fs.isfile(self.filename_png))
+        self.assertTrue(self.fs.isfile(self.filename_webp))
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
+        self.assertFalse(self.fs.isfile(self.filename_png))
+        self.assertFalse(self.fs.isfile(self.filename_webp))

@@ -48,6 +48,7 @@ from typing import ( # isort:skip
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
 PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
+WEBP_DATA_URL_PREFIX = 'data:image/webp;base64,'
 SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 

@@ -43,7 +43,6 @@ class BlogCardSummaryDict(TypedDict):
     title: str
     summary: str
     author_username: Optional[str]
-    profile_pic_url: Optional[str]
     url_fragment: str
     tags: List[str]
     thumbnail_filename: Optional[str]
@@ -91,7 +90,6 @@ def _get_blog_card_summary_dicts_for_homepage(
                 'title': summary_dict['title'],
                 'summary': summary_dict['summary'],
                 'author_username': user_settings.username,
-                'profile_pic_url': user_settings.profile_picture_data_url,
                 'tags': summary_dict['tags'],
                 'thumbnail_filename': summary_dict['thumbnail_filename'],
                 'url_fragment': summary_dict['url_fragment'],
@@ -105,7 +103,6 @@ def _get_blog_card_summary_dicts_for_homepage(
                 'title': summary_dict['title'],
                 'summary': summary_dict['summary'],
                 'author_username': 'author account deleted',
-                'profile_pic_url': None,
                 'tags': summary_dict['tags'],
                 'thumbnail_filename': summary_dict['thumbnail_filename'],
                 'url_fragment': summary_dict['url_fragment'],
@@ -251,11 +248,8 @@ class BlogPostDataHandler(
         user_settings = user_services.get_user_settings(
             blog_post.author_id, strict=False)
         if user_settings:
-            profile_picture_data_url = (
-                user_settings.profile_picture_data_url)
             author_username = user_settings.username
         else:
-            profile_picture_data_url = None
             author_username = 'author account deleted'
         author_details = blog_services.get_blog_author_details(
             blog_post.author_id)
@@ -317,7 +311,6 @@ class BlogPostDataHandler(
 
         self.values.update({
             'author_username': author_username,
-            'profile_picture_data_url': profile_picture_data_url,
             'blog_post_dict': authors_blog_post_dict,
             'summary_dicts': _get_blog_card_summary_dicts_for_homepage(
                 summaries[:MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST])
@@ -386,8 +379,6 @@ class AuthorsPageHandler(
 
         self.values.update({
             'author_details': author_details,
-            'profile_picture_data_url': (
-                user_settings.profile_picture_data_url),
             'no_of_blog_post_summaries': num_of_published_blog_post_summaries,
             'summary_dicts': blog_post_summary_dicts
         })
