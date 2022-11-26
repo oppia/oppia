@@ -972,10 +972,6 @@ class ContributorCertificateHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'To date should not be a future date.')
 
-        # Adds one date to the to_date to make sure the contributions within
-        # the to_date are also counted for the certificate.
-        to_datetime = to_datetime + datetime.timedelta(days=1)
-
         file = suggestion_services.generate_contributor_certificate(
             username, suggestion_type, language, from_datetime,
             to_datetime)

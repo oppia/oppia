@@ -2992,7 +2992,7 @@ def generate_contributor_certificate(
         Exception: The suggestion type is invalid.
     """
     user_id = user_services.get_user_id_from_username(username)
-    date = datetime.datetime.now().strftime('%Y-%m-%d')
+    date = datetime.datetime.now().strftime('%d %b %Y')
     template = ''
 
     if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
@@ -3041,6 +3041,10 @@ def _generate_translation_contributor_certificate(
     """
     signature = feconf.TRANSLATION_TEAM_LEAD
 
+    # Adds one date to the to_date to make sure the contributions within
+    # the to_date are also counted for the certificate.
+    to_date_to_fetch_contributions = to_date + datetime.timedelta(days=1)
+
     language = next(filter(
         lambda lang: lang['id'] == language_code,
         constants.SUPPORTED_AUDIO_LANGUAGES), None)
@@ -3054,7 +3058,11 @@ def _generate_translation_contributor_certificate(
     suggestions = (
         suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_submitted_within_given_dates(
-                from_date, to_date, user_id, language_code))
+              from_date,
+              to_date_to_fetch_contributions,
+              user_id,
+              language_code
+            ))
 
     words_count = 0
     for model in suggestions:
@@ -3225,7 +3233,7 @@ def _generate_translation_contributor_certificate(
                           text-align: center;">
                       <div style="font-family: 'Roboto';
                             font-size: 24px; color: #000000; line-height: 10px;">
-                        """ + date.strftime('%d %b %Y') + """
+                        """ + date + """
                       </div>
                       <center>
                         <p style="width: 186px;
@@ -3285,10 +3293,14 @@ def _generate_question_contributor_certificate(
     """
     signature = feconf.QUESTION_TEAM_LEAD
 
+    # Adds one date to the to_date to make sure the contributions within
+    # the to_date are also counted for the certificate.
+    to_date_to_fetch_contributions = to_date + datetime.timedelta(days=1)
+
     suggestions = (
         suggestion_models.GeneralSuggestionModel
             .get_question_suggestions_submitted_within_given_dates(
-                from_date, to_date, user_id))
+                from_date, to_date_to_fetch_contributions, user_id))
 
     minutes_contributed = 0
     for model in suggestions:
@@ -3400,10 +3412,10 @@ def _generate_question_contributor_certificate(
                       access to quality education.
                       <br><br> 
                       We confirm that  """ + username + """ has contributed 
-                      """ + str(hours_contributed) + """ 
-                      to Oppia from 
-                      """ + from_date.strftime('%d %b %Y') + """ 
-                      to 
+                      """ + str(hours_contributed) + """ hours 
+                      to Oppia from <br>
+                      """ + from_date.strftime('%d %b %Y') + """  <br>
+                      to  <br>
                       """ + to_date.strftime('%d %b %Y') + """
                     </p>
                   </div> 
@@ -3446,7 +3458,7 @@ def _generate_question_contributor_certificate(
                           text-align: center;">
                       <div style="font-family: 'Roboto';
                             font-size: 24px; color: #000000; line-height: 10px;">
-                        """ + date.strftime('%d %b %Y') + """
+                        """ + date + """
                       </div>
                       <center>
                         <p style="width: 186px;
