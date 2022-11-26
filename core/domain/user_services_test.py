@@ -4169,7 +4169,9 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.get_user_contribution_rights(user_id))
         self.assertFalse(user_contribution_rights.can_submit_questions)
 
-    def test_create_aggregated_author_blog_post_stats_models(self) -> None:
+    def test_create_author_blog_post_stats_models_if_it_does_not_exist(
+        self
+    ) -> None:
         author_id = 'sample_id'
         self.assertIsNone(
             blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
@@ -4187,7 +4189,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             )
         )
 
-        user_services.create_aggregated_author_blog_post_stats_models(
+        user_services.create_aggregated_author_blog_post_stats_models_if_it_does_not_exist(  # pylint: disable=line-too-long
             author_id
         )
 

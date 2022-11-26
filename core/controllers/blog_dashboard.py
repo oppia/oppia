@@ -424,8 +424,8 @@ class BlogDashboardAuthorBlogPostsStatisticsHandler(
     @acl_decorators.can_access_blog_dashboard
     def get(self, chart_type: str) -> None:
         """Populates the data for generating author statistics plot."""
+        assert self.user_id is not None
         author_id = self.user_id
-        assert author_id is not None
         stats_dict = (
             blog_statistics_services.get_author_aggregated_stats_by_author_id(
                 author_id, chart_type

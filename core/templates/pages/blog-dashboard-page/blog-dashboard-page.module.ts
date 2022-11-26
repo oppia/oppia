@@ -40,7 +40,7 @@ import { BlogDashboardNavbarBreadcrumbComponent } from 'pages/blog-dashboard-pag
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { ToastrModule } from 'ngx-toastr';
 import { BlogPostEditorComponent } from 'pages/blog-dashboard-page/blog-post-editor/blog-post-editor.component';
-import { BlogStatisticsTabComponent } from './statistics-tab/statistics-tab.component';
+import { BlogStatisticsTabComponent } from './statistics-tab/blog-statistics-tab.component';
 import { UploadBlogPostThumbnailModalComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
 import { BlogCardPreviewModalComponent } from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
 import { UploadBlogPostThumbnailComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail.component';

@@ -58,6 +58,7 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
   activeTimeUserStayedOnPostInMinutes: number = 0;
   blogPostExitedEventFired: boolean = false;
   blogPostReadEventFired: boolean = false;
+  self;
 
   constructor(
     private windowDimensionsService: WindowDimensionsService,
@@ -97,8 +98,9 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
     this.blogHomePageBackendApiService.recordBlogPostViewedEventAsync(
       this.blogPostUrlFragment
     );
+    const self = this;
     document.addEventListener(
-      'visibilitychange', this.handleVisibilityChange, false
+      'visibilitychange', () => this.handleVisibilityChange(self), false
     );
     this.timeUserStartedViewingPost = new Date().getTime();
     // If user stays on the blog post for more than 45 minutes or
@@ -186,12 +188,12 @@ export class BlogPostPageComponent implements OnInit, OnDestroy {
     );
   }
 
-  handleVisibilityChange(): void {
+  handleVisibilityChange(self: this): void {
     if (document.hidden) {
       let timeUserMovedAwayFromPost: number = new Date().getTime();
       this.activeTimeUserStayedOnPostInMinutes += (
         (timeUserMovedAwayFromPost - this.timeUserStartedViewingPost) / 60000);
-      let blogPostIsRead = this.isBlogPostRead();
+      let blogPostIsRead = self.isBlogPostRead();
       if (blogPostIsRead && !this.blogPostReadEventFired) {
         this.recordBlogPostReadEvent();
       }

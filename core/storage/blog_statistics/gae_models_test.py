@@ -129,38 +129,6 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             expected_export_policy_dict
         )
 
-    def test_get_all_by_author(self) -> None:
-        self.assertEqual(
-            blog_stats_models.BlogPostViewedEventLogEntryModel
-                .get_all_by_author(self.USER_ONE_ID),
-            [
-                self.event_model_one,
-                self.event_model_two,
-                self.event_model_three
-            ]
-        )
-        self.assertEqual(
-            blog_stats_models.BlogPostViewedEventLogEntryModel
-                .get_all_by_author(self.USER_TWO_ID),
-            [self.event_model_four]
-        )
-
-    def test_get_all_by_blog_post_id(self) -> None:
-        self.assertEqual(
-            blog_stats_models.BlogPostViewedEventLogEntryModel
-                .get_all_by_blog_post_id(self.BLOG_POST_ONE_ID),
-            [
-                self.event_model_one,
-                self.event_model_two,
-                self.event_model_three
-            ]
-        )
-        self.assertEqual(
-            blog_stats_models.BlogPostViewedEventLogEntryModel
-                .get_all_by_blog_post_id(self.BLOG_POST_TWO_ID),
-            [self.event_model_four]
-        )
-
     def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
             blog_stats_models.BlogPostViewedEventLogEntryModel
@@ -261,38 +229,6 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             blog_stats_models.BlogPostReadEventLogEntryModel
                 .get_export_policy(),
             expected_export_policy_dict
-        )
-
-    def test_get_all_by_author(self) -> None:
-        self.assertEqual(
-            blog_stats_models.BlogPostReadEventLogEntryModel
-                .get_all_by_author(self.USER_ONE_ID),
-            [
-                self.event_model_one,
-                self.event_model_two,
-                self.event_model_three
-            ]
-        )
-        self.assertEqual(
-            blog_stats_models.BlogPostReadEventLogEntryModel
-                .get_all_by_author(self.USER_TWO_ID),
-            [self.event_model_four]
-        )
-
-    def test_get_all_by_blog_post_id(self) -> None:
-        self.assertEqual(
-            blog_stats_models.BlogPostReadEventLogEntryModel
-                .get_all_by_blog_post_id(self.BLOG_POST_ONE_ID),
-            [
-                self.event_model_one,
-                self.event_model_two,
-                self.event_model_three
-            ]
-        )
-        self.assertEqual(
-            blog_stats_models.BlogPostReadEventLogEntryModel
-                .get_all_by_blog_post_id(self.BLOG_POST_TWO_ID),
-            [self.event_model_four]
         )
 
     def test_has_reference_to_user_id(self) -> None:
@@ -404,38 +340,6 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             blog_stats_models.BlogPostExitedEventLogEntryModel
                 .get_export_policy(),
             expected_export_policy_dict
-        )
-
-    def test_get_all_by_author(self) -> None:
-        self.assertEqual(
-            blog_stats_models.BlogPostExitedEventLogEntryModel
-                .get_all_by_author(self.USER_ONE_ID),
-            [
-                self.event_model_one,
-                self.event_model_two,
-                self.event_model_three
-            ]
-        )
-        self.assertEqual(
-            blog_stats_models.BlogPostExitedEventLogEntryModel
-                .get_all_by_author(self.USER_TWO_ID),
-            [self.event_model_four]
-        )
-
-    def test_get_all_by_blog_post_id(self) -> None:
-        self.assertEqual(
-            blog_stats_models.BlogPostExitedEventLogEntryModel
-                .get_all_by_blog_post_id(self.BLOG_POST_ONE_ID),
-            [
-                self.event_model_one,
-                self.event_model_two,
-                self.event_model_three
-            ]
-        )
-        self.assertEqual(
-            blog_stats_models.BlogPostExitedEventLogEntryModel
-                .get_all_by_blog_post_id(self.BLOG_POST_TWO_ID),
-            [self.event_model_four]
         )
 
     def test_has_reference_to_user_id(self) -> None:

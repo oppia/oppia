@@ -5978,7 +5978,7 @@ export default {
   // This represents the maximum number of characters in the URL fragment for
   // the blog post. It is generated using blog post title which can be 65
   // characters long and the blog post id which is 12 characters long.
-  "MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT": 77,
+  "MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT": 78,
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,

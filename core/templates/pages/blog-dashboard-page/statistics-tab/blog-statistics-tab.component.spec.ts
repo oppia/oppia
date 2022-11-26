@@ -28,7 +28,7 @@ import { BlogPostViewsStats,
 import { MaterialModule } from 'modules/material.module';
 import { BlogDashboardPageConstants } from '../blog-dashboard-page.constants';
 import { BlogDashboardPageService } from '../services/blog-dashboard-page.service';
-import { BlogStatisticsTabComponent } from './statistics-tab.component';
+import { BlogStatisticsTabComponent } from './blog-statistics-tab.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';

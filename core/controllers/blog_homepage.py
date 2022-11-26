@@ -512,7 +512,7 @@ class BlogPostViewedEventHandler(
     @acl_decorators.open_access
     def post(self, blog_post_url: str) -> None:
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
-        if not blog_post:
+        if blog_post is None:
             raise self.PageNotFoundException(
                 Exception(
                     'The blog post page with the given url doesn\'t exist.'
@@ -551,7 +551,7 @@ class BlogPostReadEventHandler(
     @acl_decorators.open_access
     def post(self, blog_post_url: str) -> None:
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
-        if not blog_post:
+        if blog_post is None:
             raise self.PageNotFoundException(
                 Exception(
                     'The blog post page with the given url doesn\'t exist.'
@@ -576,10 +576,10 @@ class BlogPostExitedEventHandler(
             'schema': {
                 'type': 'basestring',
                 'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': (
-                            constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT)
-                    }]
+                    'id': 'has_length_at_most',
+                    'max_value': (
+                        constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT)
+                }]
             }
         }
     }

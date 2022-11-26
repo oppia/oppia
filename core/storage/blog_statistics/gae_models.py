@@ -23,7 +23,7 @@ import datetime
 from core import utils
 from core.platform import models
 
-from typing import Dict, List
+from typing import Dict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -36,7 +36,10 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
-    """An event triggered when a blog post is viewed by any user."""
+    """An event triggered when a blog post is viewed by any user.
+    The model will be keyed to unique ID which will be of the form -
+    '[timestamp]:[blog_post_id]:[random_hash]'.
+    """
 
     # ID of blog post currently being viewed.
     blog_post_id = datastore_services.StringProperty(
@@ -117,47 +120,14 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
             cls.author_id == user_id
         ).get(keys_only=True) is not None
 
-    @classmethod
-    def get_all_by_author(
-        cls, author_id: str
-    ) -> List[BlogPostViewedEventLogEntryModel]:
-        """Retrieves the blog post viewed event log entry model objects for
-        blog posts with the given user as author.
-
-        Args:
-            author_id: str. ID of the author of the blog posts for which the
-                event models are to be fetched.
-
-        Returns:
-            list(BlogPostViewedEventLogEntryModel). The list of
-            BlogPostViewedEventLogEntryModel objects in which the given user is
-            an author.
-        """
-        return list(cls.query(cls.author_id == author_id).fetch())
-
-    @classmethod
-    def get_all_by_blog_post_id(
-        cls, blog_post_id: str
-    ) -> List[BlogPostViewedEventLogEntryModel]:
-        """Retrieves the blog post viewed event log entry model objects for
-        the given blog post ID.
-
-        Args:
-            blog_post_id: str. ID of the blog post for which the event models
-                are to be fetched.
-
-        Returns:
-            list(BlogPostViewedEventLogEntryModel). The list of
-            BlogPostViewedEventLogEntryModel objects for the given blog post.
-        """
-        return list(cls.query(cls.blog_post_id == blog_post_id).fetch())
-
 
 class BlogPostReadEventLogEntryModel(base_models.BaseModel):
     """An event triggered when a blog post is read by any user, that is,
     if the user stays on the blog post longer than 50% of the time calculated
     using the number of words in the blog post,the blog post will be marked as
     read.
+    The model will be keyed to unique ID which will be of the form -
+    [timestamp]:[blog_post_id]:[random_hash].
     """
 
     # ID of blog post currently being read.
@@ -238,47 +208,14 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
             cls.author_id == user_id
         ).get(keys_only=True) is not None
 
-    @classmethod
-    def get_all_by_author(
-        cls, author_id: str
-    ) -> List[BlogPostReadEventLogEntryModel]:
-        """Retrieves the blog post read event log entry model objects for blog
-        posts with the given user as author.
-
-        Args:
-            author_id: str. ID of the author of the blog posts for which the
-                event models are to be fetched.
-
-        Returns:
-            list(BlogPostReadEventLogEntryModel). The list of
-            BlogPostReadEventLogEntryModel objects in which the given user is
-            an author.
-        """
-        return list(cls.query(cls.author_id == author_id).fetch())
-
-    @classmethod
-    def get_all_by_blog_post_id(
-        cls, blog_post_id: str
-    ) -> List[BlogPostReadEventLogEntryModel]:
-        """Retrieves the blog post read event log entry model objects for the
-        given blog post ID.
-
-        Args:
-            blog_post_id: str. ID of the blog post for which the event models
-                are to be fetched.
-
-        Returns:
-            list(BlogPostReadEventLogEntryModel). The list of
-            BlogPostReadEventLogEntryModel objects for the given blog post.
-        """
-        return list(cls.query(cls.blog_post_id == blog_post_id).fetch())
-
 
 class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
     """An event triggered when a blog post is read by any user, that is,
     if the user stays on the blog post longer than 50% of the time calculated
     using the number of words in the blog post,the blog post will be marked as
     read.
+    The model will be keyed to unique ID which will be of the form -
+    [timestamp]:[blog_post_id]:[random_hash].
     """
 
     # ID of blog post being exited.
@@ -364,41 +301,6 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
         return cls.query(
             cls.author_id == user_id
         ).get(keys_only=True) is not None
-
-    @classmethod
-    def get_all_by_author(
-        cls, author_id: str
-    ) -> List[BlogPostExitedEventLogEntryModel]:
-        """Retrieves the blog post exited event log entry model objects for blog
-        posts with the given user as author.
-
-        Args:
-            author_id: str. ID of the author of the blog posts for which the
-                event models are to be fetched.
-
-        Returns:
-            list(BlogPostExitedEventLogEntryModel). The list of
-            BlogPostExitedEventLogEntryModel objects in which the given user is
-            an author.
-        """
-        return list(cls.query(cls.author_id == author_id).fetch())
-
-    @classmethod
-    def get_all_by_blog_post_id(
-        cls, blog_post_id: str
-    ) -> List[BlogPostExitedEventLogEntryModel]:
-        """Retrieves the blog post exited event log entry model objects for the
-        given blog post ID.
-
-        Args:
-            blog_post_id: str. ID of the blog post for which the event models
-                are to be fetched.
-
-        Returns:
-            list(BlogPostExitedEventLogEntryModel). The list of
-            BlogPostExitedEventLogEntryModel objects for the given blog post.
-        """
-        return list(cls.query(cls.blog_post_id == blog_post_id).fetch())
 
 
 class BlogPostViewsAggregatedStatsModel(base_models.BaseModel):

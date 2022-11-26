@@ -1584,12 +1584,14 @@ def add_user_role(user_id: str, role: str) -> None:
         username=user_settings.username)
 
     if role in [feconf.ROLE_ID_BLOG_ADMIN, feconf.ROLE_ID_BLOG_POST_EDITOR]:
-        create_aggregated_author_blog_post_stats_models(user_id)
+        create_aggregated_author_blog_post_stats_models_if_it_does_not_exist(
+            user_id
+        )
 
     save_user_settings(user_settings)
 
 
-def create_aggregated_author_blog_post_stats_models(
+def create_aggregated_author_blog_post_stats_models_if_it_does_not_exist(
     author_id: str
 ) -> None:
     """Creates Author Blog Post Aggreagted Stats Models for a new blog post

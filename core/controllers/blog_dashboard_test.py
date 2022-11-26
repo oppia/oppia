@@ -581,21 +581,22 @@ class BlogDashboardBlogPostStatisticsHandlerTests(test_utils.GenericTestBase):
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
         self.add_user_role(
             self.BLOG_EDITOR_USERNAME,
-            feconf.ROLE_ID_BLOG_POST_EDITOR)
+            feconf.ROLE_ID_BLOG_POST_EDITOR
+        )
         self.blog_admin_id = (
             self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
         self.blog_editor_id = (
             self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
 
         self.blog_post_id = 'sample_id'
-        stats_service.create_aggregated_stats_models_for_newly_published_blog_post( # pylint: disable=line-too-long
+        stats_service.create_aggregated_stats_models_for_newly_published_blog_post(  # pylint: disable=line-too-long
         self.blog_post_id)
         self.views_stats = stats_service.get_blog_post_views_stats_by_id(
-                self.blog_post_id
-            )
+            self.blog_post_id
+        )
         self.reads_stats = stats_service.get_blog_post_reads_stats_by_id(
-                self.blog_post_id
-            )
+            self.blog_post_id
+        )
 
     def test_get_blog_post_views_stats_data(self) -> None:
         # Checks blog editor can load blog post stats data.
@@ -736,11 +737,11 @@ class BlogDashboardAuthorBlogPostStatisticsHandlerTests(
         self.blog_editor_id = (
             self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
         self.views_stats = stats_service.get_author_blog_post_views_stats_by_id(
-                self.blog_admin_id
-            )
+            self.blog_admin_id
+        )
         self.reads_stats = stats_service.get_author_blog_post_reads_stats_by_id(
-                self.blog_editor_id
-            )
+            self.blog_editor_id
+        )
 
     def test_get_author_blog_post_views_stats_data(self) -> None:
         # Checks blog admin can load blog post stats data.

@@ -28,7 +28,7 @@ from core.domain import blog_statistics_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Final
+from typing import Final, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -787,9 +787,11 @@ class BlogPostEventHandlersTests(test_utils.GenericTestBase):
 
         # Check that the event model is created and aggregated stats models are
         # updated.
-        event_models = (
-            blog_stats_models.BlogPostViewedEventLogEntryModel
-                .get_all_by_blog_post_id(self.blog_post.id))
+        cls = blog_stats_models.BlogPostViewedEventLogEntryModel
+        event_models: List[blog_stats_models.BlogPostViewedEventLogEntryModel]
+        event_models = list(cls.query(
+            cls.blog_post_id == self.blog_post.id
+        ).fetch())
         self.assertEqual(len(event_models), 1)
         aggregated_blog_stats_model = (
             blog_stats_models.BlogPostViewsAggregatedStatsModel.get(
@@ -822,9 +824,10 @@ class BlogPostEventHandlersTests(test_utils.GenericTestBase):
 
         # Check that the event model is created and aggregated stats models are
         # updated.
-        event_models = (
-            blog_stats_models.BlogPostViewedEventLogEntryModel
-                .get_all_by_blog_post_id(self.blog_post.id))
+        cls = blog_stats_models.BlogPostViewedEventLogEntryModel
+        event_models = list(cls.query(
+            cls.blog_post_id == self.blog_post.id
+        ).fetch())
         self.assertEqual(len(event_models), 2)
         aggregated_blog_stats_model = (
             blog_stats_models.BlogPostViewsAggregatedStatsModel.get(
@@ -854,9 +857,11 @@ class BlogPostEventHandlersTests(test_utils.GenericTestBase):
 
         # Check that the event model is created and aggregated stats models are
         # updated.
-        event_models = (
-            blog_stats_models.BlogPostReadEventLogEntryModel
-                .get_all_by_blog_post_id(self.blog_post.id))
+        cls = blog_stats_models.BlogPostReadEventLogEntryModel
+        event_models: List[blog_stats_models.BlogPostReadEventLogEntryModel]
+        event_models = list(cls.query(
+            cls.blog_post_id == self.blog_post.id
+        ).fetch())
         self.assertEqual(len(event_models), 1)
         aggregated_blog_stats_model = (
             blog_stats_models.BlogPostReadsAggregatedStatsModel.get(
@@ -890,9 +895,9 @@ class BlogPostEventHandlersTests(test_utils.GenericTestBase):
 
         # Check that the event model is created and aggregated stats models are
         # updated.
-        event_models = (
-            blog_stats_models.BlogPostReadEventLogEntryModel
-                .get_all_by_blog_post_id(self.blog_post.id))
+        event_models = list(cls.query(
+            cls.blog_post_id == self.blog_post.id
+        ).fetch())
         self.assertEqual(len(event_models), 2)
         aggregated_blog_stats_model = (
             blog_stats_models.BlogPostReadsAggregatedStatsModel.get(
@@ -924,9 +929,11 @@ class BlogPostEventHandlersTests(test_utils.GenericTestBase):
 
         # Check that the event model is created and aggregated stats models are
         # updated.
-        event_models = (
-            blog_stats_models.BlogPostExitedEventLogEntryModel
-                .get_all_by_blog_post_id(self.blog_post.id))
+        cls = blog_stats_models.BlogPostExitedEventLogEntryModel
+        event_models: List[blog_stats_models.BlogPostExitedEventLogEntryModel]
+        event_models = list(cls.query(
+            cls.blog_post_id == self.blog_post.id
+        ).fetch())
         self.assertEqual(len(event_models), 1)
         aggregated_blog_stats_model = (
             blog_stats_models.BlogPostReadingTimeModel.get(
@@ -953,9 +960,10 @@ class BlogPostEventHandlersTests(test_utils.GenericTestBase):
 
         # Check that the event model is created and aggregated stats models are
         # updated.
-        event_models = (
-            blog_stats_models.BlogPostExitedEventLogEntryModel
-                .get_all_by_blog_post_id(self.blog_post.id))
+        cls = blog_stats_models.BlogPostExitedEventLogEntryModel
+        event_models = list(cls.query(
+            cls.blog_post_id == self.blog_post.id
+        ).fetch())
         self.assertEqual(len(event_models), 2)
         aggregated_blog_stats_model = (
             blog_stats_models.BlogPostReadingTimeModel.get(

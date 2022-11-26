@@ -55,7 +55,7 @@ interface StatsDict {
 
 @Component({
   selector: 'oppia-blog-statistics-tab',
-  templateUrl: './statistics-tab.component.html'
+  templateUrl: './blog-statistics-tab.component.html'
 })
 
 export class BlogStatisticsTabComponent implements OnInit {

@@ -43,8 +43,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import blog_models
     from mypy_imports import blog_stats_models
 
-(blog_models, blog_stats_models, ) = models.Registry.import_models(
-    [models.Names.BLOG, models.Names.BLOG_STATISTICS])
+(blog_models, blog_stats_models, ) = models.Registry.import_models([
+    models.Names.BLOG, models.Names.BLOG_STATISTICS
+])
 
 # The maximum number of iterations allowed for populating the results of a
 # search query.
@@ -420,14 +421,14 @@ def get_published_blog_post_summaries_by_user_id(
         blog_models.BlogPostSummaryModel.query(
             blog_models.BlogPostSummaryModel.author_id == user_id
         ).filter(
-            blog_models.BlogPostSummaryModel.published_on != None # pylint: disable=singleton-comparison, inequality-with-none, line-too-long
+            blog_models.BlogPostSummaryModel.published_on != None  # pylint: disable=singleton-comparison, inequality-with-none, line-too-long
         ).order(
             -blog_models.BlogPostSummaryModel.published_on
         ).fetch(
             max_limit, offset=offset
         )
     )
-    if not blog_post_summary_models:
+    if blog_post_summary_models is None:
         return []
     blog_post_summaries = [
         get_blog_post_summary_from_model(model)
@@ -827,7 +828,7 @@ def get_published_blog_post_summaries(
         max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
     blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
         blog_models.BlogPostSummaryModel.query(
-            blog_models.BlogPostSummaryModel.published_on != None # pylint: disable=singleton-comparison, inequality-with-none, line-too-long
+            blog_models.BlogPostSummaryModel.published_on != None  # pylint: disable=singleton-comparison, inequality-with-none, line-too-long
         ).order(
             -blog_models.BlogPostSummaryModel.published_on
         ).fetch(
