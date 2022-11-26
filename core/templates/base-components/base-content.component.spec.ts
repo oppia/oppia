@@ -28,6 +28,7 @@ import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
+import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
@@ -49,6 +50,7 @@ describe('Base Content Component', () => {
   let backgroundMaskService: BackgroundMaskService;
   let bottomNavbarStatusService: BottomNavbarStatusService;
   let windowRef: WindowRef;
+  let loaderService: LoaderService;
   let keyboardShortcutService: KeyboardShortcutService;
   let sidebarStatusService: SidebarStatusService;
   let cookieService: CookieService;
@@ -58,6 +60,10 @@ describe('Base Content Component', () => {
     isIframed(): boolean {
       return isIframed;
     }
+  }
+
+  class MockLoaderService {
+    onLoadingMessageChange: Observable<string> = of('Test Message');
   }
 
   // We are mocking Router service to return the NavigationEnd object,
@@ -123,6 +129,10 @@ describe('Base Content Component', () => {
         BottomNavbarStatusService,
         KeyboardShortcutService,
         {
+          provide: LoaderService,
+          useClass: MockLoaderService
+        },
+        {
           provide: PageTitleService,
           useClass: MockPageTitleService
         },
@@ -135,11 +145,22 @@ describe('Base Content Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(BaseContentComponent);
     componentInstance = fixture.componentInstance;
+    loaderService = TestBed.inject(LoaderService);
+    loaderService = (loaderService) as jasmine.SpyObj<LoaderService>;
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
+    keyboardShortcutService = (keyboardShortcutService) as
+     jasmine.SpyObj<KeyboardShortcutService>;
     windowRef = TestBed.inject(WindowRef);
+    windowRef = (windowRef) as jasmine.SpyObj<WindowRef>;
     sidebarStatusService = TestBed.inject(SidebarStatusService);
+    sidebarStatusService = (sidebarStatusService) as
+     jasmine.SpyObj<SidebarStatusService>;
     bottomNavbarStatusService = TestBed.inject(BottomNavbarStatusService);
+    bottomNavbarStatusService = (bottomNavbarStatusService) as
+     jasmine.SpyObj<BottomNavbarStatusService>;
     backgroundMaskService = TestBed.inject(BackgroundMaskService);
+    backgroundMaskService = (backgroundMaskService) as
+     jasmine.SpyObj<BackgroundMaskService>;
     cookieService = TestBed.inject(CookieService);
   });
 
