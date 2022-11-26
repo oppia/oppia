@@ -968,7 +968,7 @@ class ContributorCertificateHandler(base.BaseHandler):
         """Handles GET requests."""
         from_datetime = datetime.datetime.strptime(from_date, '%Y-%m-%d')
         to_datetime = datetime.datetime.strptime(to_date, '%Y-%m-%d')
-        if (to_datetime.date() > datetime.datetime.now().date()):
+        if to_datetime.date() > datetime.datetime.now().date():
             raise self.InvalidInputException(
                 'To date should not be a future date.')
 
@@ -976,7 +976,7 @@ class ContributorCertificateHandler(base.BaseHandler):
             username, suggestion_type, language, from_datetime,
             to_datetime)
 
-        with open(file, "rb") as fh:
+        with open(file, 'rb') as fh:
             buf = io.BytesIO(fh.read())
 
             # Removes the generated file.

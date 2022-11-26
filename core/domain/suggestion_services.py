@@ -3005,7 +3005,7 @@ def generate_contributor_certificate(
 
     else:
         raise Exception('The suggestion type is invalid.')
-        
+
     return _generate_contributor_certificate_image(template)
 
 
@@ -3052,8 +3052,8 @@ def _generate_translation_contributor_certificate(
         raise Exception('The provided language is invalid.')
     language_description = language['description']
     if (language_description.find(' (') != -1):
-      language_description = language_description[
-        language_description.find("(")+1:language_description.find(")")]
+        language_description = language_description[
+            language_description.find('(')+1:language_description.find(')')]
 
     suggestions = (
         suggestion_models.GeneralSuggestionModel
@@ -3068,7 +3068,7 @@ def _generate_translation_contributor_certificate(
     for model in suggestions:
         suggestion = get_suggestion_from_model(model)
 
-        # Retrieve the html content that is emphasized on the 
+        # Retrieve the html content that is emphasized on the
         # Contributor Dashboard pages. This content is what stands
         # out for each suggestion when a user views a list of
         # suggestions.
@@ -3089,7 +3089,8 @@ def _generate_translation_contributor_certificate(
     if words_count == 0:
         raise Exception(
             'There are no contributions for the given time range.')
-    logo_path = os.getcwd() + '/assets/images/contributor_dashboard/oppia-logo.jpg'
+    logo_path = os.getcwd() + (
+        '/assets/images/contributor_dashboard/oppia-logo.jpg')
 
     certificate_template = feconf.TRANSLATION_SUBMITTER_CERTIFICATE.format(
       logo_path,
@@ -3117,8 +3118,6 @@ def _generate_question_contributor_certificate(
     """Generates a certificate for a user's question contributions.
 
     Args:
-        suggestion_type: str. The type of suggestion that the certificate
-            needs to generate.
         from_date: datetime.datetime. The start of the date range for which
             the contributions were created.
         to_date: datetime.datetime. The end of the date range for which
@@ -3163,7 +3162,8 @@ def _generate_question_contributor_certificate(
     if minutes_contributed == 0:
         raise Exception(
             'There are no contributions for the given time range.')
-    logo_path = os.getcwd() + '/assets/images/contributor_dashboard/oppia-logo.jpg'
+    logo_path = os.getcwd() + (
+        '/assets/images/contributor_dashboard/oppia-logo.jpg')
 
     certificate_template = feconf.QUESTION_SUBMITTER_CERTIFICATE.format(
       logo_path,
@@ -3184,6 +3184,9 @@ def _generate_contributor_certificate_image(template: str) -> str:
 
     Args:
         template: str. The html template to create the image.
+
+    Returns:
+        str. The path of the generated image.
 
     Raises:
         Exception. Image generation failed.

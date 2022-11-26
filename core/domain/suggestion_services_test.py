@@ -6012,7 +6012,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
 
-    def test_create_translation_contributor_certificate(self) -> None:     
+    def test_create_translation_contributor_certificate(self) -> None:
         score_category: str = (
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
@@ -6046,7 +6046,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         # Generated image file of the certificate is deleted.
         os.remove(response)
 
-    def test_create_question_contributor_certificate(self) -> None:     
+    def test_create_question_contributor_certificate(self) -> None:
         suggestion_change: Dict[
             str, Union[str, float, question_domain.QuestionDict]
         ] = {
@@ -6096,7 +6096,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
 
     def test_create_question_contributor_certificate_with_image_content(
         self
-    ) -> None:     
+    ) -> None:
         suggestion_change: Dict[
             str, Union[str, float, question_domain.QuestionDict]
         ] = {
@@ -6163,7 +6163,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
                 to_date
             )
 
-    def test_create_contributor_certificate_raises_exception_for_no_question_suggestions(
+    def test_create_certificate_raises_exception_for_no_question_suggestions(
         self
     ) -> None:
         username = user_services.get_username(self.author_id)
@@ -6218,4 +6218,3 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
                 from_date,
                 to_date
             )
-

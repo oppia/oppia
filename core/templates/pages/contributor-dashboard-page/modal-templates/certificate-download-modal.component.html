@@ -55,8 +55,8 @@
   }
   .datepicker-container {
     margin: auto;
-    margin-top: 10px;
     margin-bottom: 10px;
+    margin-top: 10px;
     width: 60%
   }
   .date-label {
@@ -196,15 +196,15 @@
     color: red;
   }
   .loader {
-    margin: auto;
+    animation: spinner 4s linear infinite;
     border: 10px solid #e0e0e0;
     border-radius: 50%;
     border-top: 10px solid #00645c;
-    width: 100px;
     height: 100px;
-    animation: spinner 4s linear infinite;
+    margin: auto;
+    width: 100px;
   }
-  
+
   @keyframes spinner {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
