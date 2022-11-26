@@ -388,7 +388,7 @@ describe('State version history modal', () => {
     );
   });
 
-  it('should be show alert message if the backend api fails', fakeAsync(() => {
+  it('should be show error message if the backend api fails', fakeAsync(() => {
     spyOn(
       versionHistoryService, 'shouldFetchNewStateVersionHistory'
     ).and.returnValue(true);

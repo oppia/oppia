@@ -21,7 +21,6 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { ExplorationMetadata } from 'domain/exploration/ExplorationMetadataObjectFactory';
-import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
 import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
@@ -64,7 +63,6 @@ export class MetadataVersionHistoryModalComponent
 
   constructor(
       private ngbActiveModal: NgbActiveModal,
-      private alertsService: AlertsService,
       private contextService: ContextService,
       private versionHistoryService: VersionHistoryService,
       private versionHistoryBackendApiService: VersionHistoryBackendApiService,
