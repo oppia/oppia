@@ -102,6 +102,7 @@ FILES_CONTAIN_UNKNOWN_TYPE: Final = [
     'core/templates/pages/exploration-editor-page/services/exploration-data.service.spec.ts',
     'core/templates/pages/exploration-editor-page/services/exploration-diff.service.spec.ts',
     'core/templates/pages/exploration-editor-page/services/exploration-property.service.ts',
+    'core/templates/pages/exploration-editor-page/statistics-tab/charts/pie-chart.component.spec.ts',
     'core/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.spec.ts',
     'core/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.spec.ts',
     'core/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.ts',
@@ -111,6 +112,7 @@ FILES_CONTAIN_UNKNOWN_TYPE: Final = [
     'core/templates/pages/exploration-player-page/modals/flag-exploration-modal.component.spec.ts',
     'core/templates/pages/exploration-player-page/modals/refresher-exploration-confirmation-modal.component.spec.ts',
     'core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts',
+    'core/templates/pages/exploration-player-page/services/image-preloader.service.spec.ts',
     'core/templates/pages/learner-dashboard-page/learner-dashboard-page.component.spec.ts',
     'core/templates/pages/login-page/login-page.component.ts',
     'core/templates/pages/moderator-page/moderator-page.component.spec.ts',
@@ -133,6 +135,7 @@ FILES_CONTAIN_UNKNOWN_TYPE: Final = [
     'core/templates/services/messenger.service.spec.ts',
     'core/templates/services/navigation.service.spec.ts',
     'core/templates/services/platform-feature.service.ts',
+    'core/templates/services/question-validation.service.spec.ts',
     'core/templates/services/request-interceptor.service.ts',
     'core/templates/services/speech-synthesis-chunker.service.ts',
     'core/templates/services/yaml.service.ts',
@@ -174,6 +177,7 @@ FILES_CONTAIN_UNKNOWN_TYPE: Final = [
     'extensions/objects/templates/subtitled-html-editor.component.ts',
     'extensions/objects/templates/svg-editor.component.spec.ts',
     'extensions/objects/templates/svg-editor.component.ts',
+    'extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component.ts',
     'extensions/rich_text_components/Math/directives/oppia-noninteractive-math.component.spec.ts',
     'extensions/rich_text_components/Math/directives/oppia-noninteractive-math.component.ts',
     'extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component.spec.ts',
@@ -603,7 +607,7 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                         for x in range(len(unknown_type_conversion)):
                             error_message = (
                                 '%s:%s:%s: unknown type conversion used. Add proper'
-                                'comment if unknown is needed.' % (
+                                ' comment if unknown is needed.' % (
                                 file_path, line_num + 1, unknown_type_conversion[x]))
                             error_messages.append(error_message)
 
