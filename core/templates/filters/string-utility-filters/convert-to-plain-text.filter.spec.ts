@@ -25,12 +25,14 @@ require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 
 describe('Testing filters', function() {
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  beforeEach(angular.mock.module(
+    'oppia',
+    function($provide: { value: (arg0: string, arg1: string) => void }) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value as string);
+      }
+    }));
 
   it('should correctly convertToPlainText strings', angular.mock.inject(
     function($filter) {

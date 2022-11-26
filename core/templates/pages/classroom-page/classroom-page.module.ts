@@ -22,11 +22,11 @@ import { NgModule } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { BackgroundBannerModule } from 'components/common-layout-directives/common-elements/background-banner.module';
-import { BaseModule } from 'base-components/base.module';
+import { BaseModule } from 'core/templates/base-components/base.module';
 import { ClassroomPageComponent } from './classroom-page.component';
 import { ClassroomPageRootComponent } from './classroom-page-root.component';
 import { ClassroomPageRoutingModule } from './classroom-page-routing.module';
-import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
+import { RichTextComponentsModule } from 'extensions/rich_text_components/rich-text-components.module';
 import { SearchBarModule } from 'pages/library-page/search-bar/search-bar.module';
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
 import { TopicSummaryTileComponent } from 'components/summary-tile/topic-summary-tile.component';
