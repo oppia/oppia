@@ -3047,6 +3047,9 @@ def _generate_translation_contributor_certificate(
     if language is None:
         raise Exception('The provided language is invalid.')
     language_description = language['description']
+    if (language_description.find(' (') != -1):
+      language_description = language_description[
+        language_description.find("(")+1:language_description.find(")")]
 
     suggestions = (
         suggestion_models.GeneralSuggestionModel
@@ -3394,7 +3397,7 @@ def _generate_question_contributor_certificate(
                         color: #8F9899;">
                       has contributed practice questions to Oppia's
                       Math Classroom, which supports our mission of improving 
-                      education access.
+                      access to quality education.
                       <br><br> 
                       We confirm that  """ + username + """ has contributed 
                       """ + str(hours_contributed) + """ 

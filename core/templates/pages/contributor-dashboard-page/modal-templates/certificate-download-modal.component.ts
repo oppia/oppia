@@ -19,7 +19,6 @@
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AlertsService } from 'services/alerts.service';
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
 
 @Component({
@@ -35,9 +34,9 @@ export class CertificateDownloadModalComponent {
   errorMessage: string;
   errorsFound = false;
   certificateDownloading = false;
+  datesSelected = false;
 
   constructor(
-    private alertsService: AlertsService,
     private readonly activeModal: NgbActiveModal,
     private contributionAndReviewService: ContributionAndReviewService) {
   }
@@ -62,8 +61,6 @@ export class CertificateDownloadModalComponent {
       return;
     }
     this.certificateDownloading = true;
-    this.alertsService.addInfoMessage(
-      'Generating certificate...', 5000);
     this.contributionAndReviewService.downloadContributorCertificateAsync(
       this.username,
       this.suggestionType,
@@ -87,6 +84,10 @@ export class CertificateDownloadModalComponent {
       this.errorMessage = (
         'Not able to download contributor certificate');
     });
+  }
+
+  disableDownloadButton(): boolean {
+    return this.fromDate === undefined || this.toDate === undefined;
   }
 }
 

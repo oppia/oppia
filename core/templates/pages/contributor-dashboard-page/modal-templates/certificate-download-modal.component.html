@@ -27,6 +27,7 @@
       <span class="date-range-error">{{errorMessage}}</span>
     </div>
   </div>
+  <div *ngIf="certificateDownloading" class="loader"></div>
   <div *ngIf="certificateDownloading" class="certficate-generation-await">
     Generating certificate for time range {{fromDate}} to {{toDate}}. Please wait.
   </div>
@@ -35,7 +36,7 @@
   <button class="btn btn-default" (click)="close()">
     Cancel
   </button>
-  <button [disabled]="certificateDownloading"
+  <button [disabled]="certificateDownloading || disableDownloadButton()"
           class="btn btn-success oppia-upload-translated-text-button"
           (click)="downloadCertificate()">
     <i [hidden]="!certificateDownloading" class="fa fa-spinner"></i>
@@ -193,6 +194,20 @@
   }
   .oppia-translation-error-section {
     color: red;
+  }
+  .loader {
+    margin: auto;
+    border: 10px solid #e0e0e0;
+    border-radius: 50%;
+    border-top: 10px solid #00645c;
+    width: 100px;
+    height: 100px;
+    animation: spinner 4s linear infinite;
+  }
+  
+  @keyframes spinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 
   @media screen and (max-width: 700px) {
