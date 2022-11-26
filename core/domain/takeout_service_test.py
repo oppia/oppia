@@ -1226,7 +1226,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             user_bio='I want to leak uid_abcdefghijabcdefghijabcdefghijab'
         ).put()
 
-        def _mock_get_user_settings(_, strict) -> None:
+        def _mock_get_user_settings(_, strict: bool) -> None: # pylint: disable=unused-argument
             """Mock get_user_settings function to return None."""
 
         with self.swap(
