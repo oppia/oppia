@@ -22,7 +22,7 @@ import { OperatorFunction, Subject, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { BaseEvent } from './app-events';
 
-export type Newable<T> = new(message: unknown) => T;
+export type Newable<T> = new(message: string) => T;
 
 @Injectable({
   providedIn: 'root'
@@ -58,6 +58,7 @@ export class EventBusService {
       (event: T): void => {
         try {
           action.call(callbackContext, event);
+        // Type unknown is used because we don't know actual type of unknown.
         } catch (error: unknown) {
           if (error instanceof Error) {
             this._errorHandler(error);

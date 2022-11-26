@@ -62,6 +62,7 @@ export class RatioExpressionEditorComponent implements OnInit {
         value: false
       }));
       return true;
+    // Type unknown is used because we don't know which kind of error thrown.
     } catch (parsingError: unknown) {
       if (parsingError instanceof Error) {
         this.warningTextI18nKey = parsingError.message;

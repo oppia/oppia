@@ -2337,9 +2337,11 @@ describe('Conversation skin component', () => {
   it('should be able to skip the current question', fakeAsync(() => {
     let sampleCard = StateCard.createNewCard(
       'State 2', '<p>Content</p>', '',
-      // Use unknown type conversion to test that the interaction is not
-      // required to be a string.
-      null as unknown as Interaction, null as unknown as RecordedVoiceovers,
+      // This throws "Type null is not assignable to type
+      // 'string'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+      null as Interaction, null as RecordedVoiceovers,
       writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
 

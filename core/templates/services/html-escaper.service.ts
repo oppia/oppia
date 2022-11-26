@@ -20,6 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { LoggerService } from 'services/contextual/logger.service';
+import { Answer } from 'interactions/PencilCodeEditor/directives/oppia-response-pencil-code-editor.component';
 
 @Injectable({
   providedIn: 'root'
@@ -44,12 +45,12 @@ export class HtmlEscaperService {
    * @return {object} an unescaped non-JSON version of the original string.
    * @throws Will throw error if empty string is passed to JSON decoder.
    */
-  escapedJsonToObj(json: string): Object {
+  escapedJsonToObj(json: string | Answer): Object {
     if (!json) {
       this.loggerService.error('Empty string was passed to JSON decoder.');
       return '';
     }
-    return JSON.parse(this.escapedStrToUnescapedStr(json));
+    return JSON.parse(this.escapedStrToUnescapedStr(json as string));
   }
 
   /**

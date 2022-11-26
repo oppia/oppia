@@ -403,7 +403,7 @@ export interface NumericExpressionInputCustomizationArgsBackendDict {
   };
 }
 export interface NumericExpressionInputCustomizationArgs {
-  useFractionForDivision: boolean;
+  useFractionForDivision: boolean | {value: boolean};
   placeholder: {
     value: SubtitledUnicode;
   };

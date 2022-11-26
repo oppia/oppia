@@ -107,6 +107,7 @@ export class AssetsBackendApiService {
     try {
       return await this.http.post<SaveAudioResponse>(
         this.getAudioUploadUrl(explorationId), form).toPromise();
+    // Unknown type is used because we don't know which type pf error thrown.
     } catch (error: unknown) {
       if (error instanceof HttpErrorResponse) {
         return Promise.reject(error.error);
@@ -126,6 +127,7 @@ export class AssetsBackendApiService {
     try {
       return await this.http.post<SaveImageResponse>(
         this.getImageUploadUrl(entityType, entityId), form).toPromise();
+    // Unknown type is used because we don't know which type pf error thrown.
     } catch (error: unknown) {
       if (error instanceof HttpErrorResponse) {
         return Promise.reject(error.error);

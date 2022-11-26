@@ -59,6 +59,19 @@ import { Warning } from 'interactions/base-interaction-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { ImageWithRegions } from 'interactions/customization-args-defs';
 
+type DefaultCustomizationArg = (
+  DefaultValueHtml[] |
+  DefaultValueHtml |
+  DefaultValueUnicode[] |
+  DefaultValueUnicode |
+  DefaultValueGraph |
+  ImageWithRegions |
+  [] |
+  number |
+  string |
+  boolean
+);
+
 interface DefaultValueHtml {
   content_id: string;
   html: string;
@@ -91,16 +104,7 @@ interface DefaultValueGraph {
 
 interface CustomizationArgSpecsInterface {
   name: string;
-  default_value: DefaultValueHtml[] |
-                 DefaultValueHtml |
-                 DefaultValueUnicode[] |
-                 DefaultValueUnicode |
-                 DefaultValueGraph |
-                 ImageWithRegions |
-                 [] |
-                 number |
-                 string |
-                 boolean;
+  default_value: DefaultCustomizationArg;
 }
 
 interface AllowedInteractionCategories {
@@ -224,7 +228,10 @@ export class CustomizeInteractionModalComponent
     } else {
       const customizationArgsBackendDict = {};
       this.customizationArgSpecs.forEach((
-          caSpec: { name: string | number; default_value: unknown }) => {
+          caSpec: {
+             name: string | number;
+            default_value: DefaultCustomizationArg;
+          }) => {
         customizationArgsBackendDict[caSpec.name] = {
           value: caSpec.default_value
         };

@@ -164,6 +164,7 @@ export class AuthService {
         this.creds = await this.angularFireAuth.signInWithEmailAndPassword(
           email, password);
       }
+    // Unknown type is used because we don't know which type pf error thrown.
     } catch (err: unknown) {
       if ((err as firebase.auth.Error).code === 'auth/user-not-found') {
         if (this.angularFireAuth !== null) {

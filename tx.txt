@@ -1,0 +1,268 @@
+Compiling and testing typescript...
+
+core/templates/components/forms/schema-based-editors/schema-based-list-editor.component.spec.ts(60,9): error TS2322: Type 'boolean' is not assignable to type 'string'.
+
+core/templates/components/forms/schema-based-editors/schema-based-list-editor.component.spec.ts(157,9): error TS2322: Type 'boolean' is not assignable to type 'string'.
+
+core/templates/components/forms/schema-based-editors/schema-based-list-editor.component.spec.ts(172,9): error TS2322: Type 'boolean' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/learner-experience/input-response-pair.component.spec.ts(221,7): error TS2578: Unused '@ts-expect-error' directive.
+
+core/templates/pages/exploration-player-page/learner-experience/supplemental-card.component.ts(129,7): error TS2322: Type 'string | { answerDetails: string; } | null' is not assignable to type 'string | null'.
+
+  Type '{ answerDetails: string; }' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/learner-experience/tutor-card.component.ts(359,7): error TS2322: Type 'string | { answerDetails: string; } | null' is not assignable to type 'string | null'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(50,11): error TS2564: Property '_explorationId' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(51,11): error TS2564: Property '_editorPreviewMode' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(52,11): error TS2564: Property '_questionPlayerMode' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(59,3): error TS2564: Property 'exploration' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(64,3): error TS2564: Property 'currentStateName' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(65,3): error TS2564: Property 'nextStateName' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(66,3): error TS2564: Property 'nextStateIfStuckName' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(69,3): error TS2564: Property 'manualParamChanges' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(70,3): error TS2564: Property 'initStateName' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(71,3): error TS2564: Property 'version' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(116,7): error TS2322: Type 'number | null' is not assignable to type 'number'.
+
+  Type 'null' is not assignable to type 'number'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(176,11): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+
+  Type 'undefined' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(178,15): error TS2322: Type 'string | null' is not assignable to type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(180,15): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+
+  Type 'undefined' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(189,11): error TS2345: Argument of type 'string[] | undefined' is not assignable to parameter of type 'string[]'.
+
+  Type 'undefined' is not assignable to type 'string[]'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(197,5): error TS2322: Type 'null' is not assignable to type 'ExplorationParams'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(224,9): error TS2322: Type 'Interaction | null' is not assignable to type 'Interaction'.
+
+  Type 'null' is not assignable to type 'Interaction'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(234,9): error TS2345: Argument of type 'InteractionCustomizationArgs | null' is not assignable to parameter of type 'InteractionCustomizationArgs'.
+
+  Type 'null' is not assignable to type 'InteractionCustomizationArgs'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(253,44): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(265,42): error TS7006: Parameter 'paramName' implicitly has an 'any' type.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(265,53): error TS7006: Parameter 'paramSpec' implicitly has an 'any' type.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(266,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(280,9): error TS2322: Type 'string | null' is not assignable to type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(285,7): error TS2345: Argument of type 'InteractionCustomizationArgs | null' is not assignable to parameter of type 'InteractionCustomizationArgs'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(341,33): error TS2322: Type 'string | null' is not assignable to type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(352,35): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(362,9): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(365,9): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(376,39): error TS7051: Parameter has a name but no type. Did you mean 'arg0: StateCard'?
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(376,50): error TS7051: Parameter has a name but no type. Did you mean 'arg1: string'?
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(410,5): error TS2322: Type 'string[] | null' is not assignable to type 'string[]'.
+
+  Type 'null' is not assignable to type 'string[]'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(440,7): error TS2322: Type 'undefined' is not assignable to type 'boolean'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(471,9): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
+
+  Type 'null' is not assignable to type 'number'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(476,37): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(493,9): error TS2322: Type 'string | null' is not assignable to type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(499,7): error TS2322: Type 'undefined' is not assignable to type 'boolean'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(507,7): error TS2322: Type 'undefined' is not assignable to type 'boolean'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(517,7): error TS2322: Type 'undefined' is not assignable to type 'boolean'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(536,9): error TS2531: Object is possibly 'null'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(551,7): error TS2345: Argument of type 'Interaction | null' is not assignable to parameter of type 'Interaction'.
+
+  Type 'null' is not assignable to type 'Interaction'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(573,11): error TS2531: Object is possibly 'null'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(587,9): error TS2345: Argument of type 'Interaction | null' is not assignable to parameter of type 'Interaction'.
+
+  Type 'null' is not assignable to type 'Interaction'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(597,34): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(619,9): error TS2531: Object is possibly 'null'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(634,7): error TS2345: Argument of type 'Interaction | null' is not assignable to parameter of type 'Interaction'.
+
+  Type 'null' is not assignable to type 'Interaction'.
+
+core/templates/pages/exploration-player-page/services/exploration-engine.service.ts(675,5): error TS2322: Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts(59,3): error TS2564: Property 'currentEngineService' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts(66,3): error TS2564: Property 'editorPreviewMode' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts(67,3): error TS2564: Property 'questionPlayerMode' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts(68,3): error TS2564: Property 'diagnosticTestPlayerMode' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts(69,3): error TS2564: Property 'explorationId' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts(70,3): error TS2564: Property 'version' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts(71,3): error TS2564: Property 'storyUrlFragment' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts(72,3): error TS2564: Property 'lastCompletedCheckpoint' has no initializer and is not definitely assigned in the constructor.
+
+core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts(131,31): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
+
+  Type 'null' is not assignable to type 'number'.
+
+core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts(142,5): error TS2322: Type 'string | null' is not assignable to type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts(156,7): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts(201,16): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.
+
+core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts(254,26): error TS2345: Argument of type 'null' is not assignable to parameter of type 'number'.
+
+core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts(448,9): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
+
+  Type 'null' is not assignable to type 'number'.
+
+core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts(459,5): error TS2322: Type 'string | null' is not assignable to type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/player-transcript.service.ts(139,7): error TS2322: Type 'string | { answerDetails: string; }' is not assignable to type 'string | null'.
+
+  Type '{ answerDetails: string; }' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(44,11): error TS2322: Type 'null' is not assignable to type 'number'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(45,11): error TS2322: Type 'null' is not assignable to type 'number'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(91,42): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(117,9): error TS2345: Argument of type 'null' is not assignable to parameter of type 'string'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(135,7): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(163,7): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(166,47): error TS2345: Argument of type '(() => void) | undefined' is not assignable to parameter of type '() => void'.
+
+  Type 'undefined' is not assignable to type '() => void'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(188,5): error TS2322: Type 'string | null' is not assignable to type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(227,11): error TS7006: Parameter 'refresherExplorationId' implicitly has an 'any' type.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(228,11): error TS7006: Parameter 'missingPrerequisiteSkillId' implicitly has an 'any' type.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(231,11): error TS7006: Parameter 'wasOldStateInitial' implicitly has an 'any' type.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(232,11): error TS7006: Parameter 'isFirstHit' implicitly has an 'any' type.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(237,7): error TS2322: Type 'undefined' is not assignable to type 'boolean'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(246,9): error TS2345: Argument of type 'null' is not assignable to parameter of type 'string'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(269,48): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(273,7): error TS2322: Type 'undefined' is not assignable to type 'boolean'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(289,7): error TS2322: Type 'undefined' is not assignable to type 'boolean'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(296,7): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ ImageClickInput: { can_have_solution: boolean; show_generic_submit_button: boolean; instructions: string; is_trainable: boolean; narrow_instructions: string; description: string; needs_summary: boolean; ... 8 more ...; rule_descriptions: { ...; }; }; ... 18 more ...; RatioExpressionInput: { ...; }; }'.
+
+  No index signature with a parameter of type 'string' was found on type '{ ImageClickInput: { can_have_solution: boolean; show_generic_submit_button: boolean; instructions: string; is_trainable: boolean; narrow_instructions: string; description: string; needs_summary: boolean; ... 8 more ...; rule_descriptions: { ...; }; }; ... 18 more ...; RatioExpressionInput: { ...; }; }'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(319,9): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+core/templates/pages/exploration-player-page/services/question-player-engine.service.ts(324,7): error TS2345: Argument of type 'StateCard | null' is not assignable to parameter of type 'StateCard'.
+
+  Type 'null' is not assignable to type 'StateCard'.
+
+extensions/interactions/NumberWithUnits/directives/number-with-units-validation.service.spec.ts(242,7): error TS2322: Type '() => null' is not assignable to type '() => string'.
+
+  Type 'null' is not assignable to type 'string'.
+
+extensions/interactions/PencilCodeEditor/directives/oppia-response-pencil-code-editor.component.ts(36,12): error TS2564: Property 'answer' has no initializer and is not definitely assigned in the constructor.
+
+extensions/interactions/PencilCodeEditor/directives/oppia-response-pencil-code-editor.component.ts(37,3): error TS2564: Property 'answerCode' has no initializer and is not definitely assigned in the constructor.
+
+extensions/objects/templates/list-of-tabs-editor.component.ts(40,12): error TS2564: Property 'value' has no initializer and is not definitely assigned in the constructor.
+
+extensions/objects/templates/list-of-unicode-string-editor.component.ts(41,12): error TS2564: Property 'value' has no initializer and is not definitely assigned in the constructor.
+
+extensions/objects/templates/sanitized-url-editor.component.ts(52,12): error TS2564: Property 'value' has no initializer and is not definitely assigned in the constructor.
+
+typings/tests/customization-args-defs-test.ts(202,3): error TS2344: Type 'false' does not satisfy the constraint 'true'.
+
+95 Errors found during compilation.
+

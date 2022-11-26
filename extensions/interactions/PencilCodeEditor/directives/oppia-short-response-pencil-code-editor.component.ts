@@ -44,7 +44,7 @@ export class ShortResponePencilCodeEditor implements OnInit {
   ngOnInit(): void {
     this.answerCode = (
       (this.htmlEscaperService.escapedJsonToObj(
-        (this.answer) as unknown as string) as Answer).code);
+        (this.answer)) as Answer).code);
   }
 }
 

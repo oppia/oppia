@@ -451,6 +451,10 @@ describe('Creator Dashboard Page Component', () => {
 
     beforeEach(waitForAsync(() => {
       spyOn(creatorDashboardBackendApiService, 'fetchDashboardDataAsync')
+        // This throws "Type object is not assignable to type
+        // 'CreatorDashboardData'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
         .and.returnValue(Promise.resolve({
           dashboardStats: CreatorDashboardStats
             .createFromBackendDict(dashboardData.dashboard_stats),
@@ -466,10 +470,18 @@ describe('Creator Dashboard Page Component', () => {
             expSummary => CreatorExplorationSummary
               .createFromBackendDict(expSummary)),
           collectionsList: dashboardData.collections_list.map(
-            (collectionSummary: unknown) => CollectionSummary
+            // This throws "Type object is not assignable to type
+            // 'CreatorDashboardData'." We need to suppress this error
+            // because of the need to test validations.
+            // @ts-ignore
+            (collectionSummary: CollectionSummary) => CollectionSummary
               .createFromBackendDict(
+                // This throws "Type object is not assignable to type
+                // 'CreatorDashboardData'." We need to suppress this error
+                // because of the need to test validations.
+                // @ts-ignore
                 collectionSummary as CollectionSummaryBackendDict))
-        } as unknown as CreatorDashboardData));
+        } as CreatorDashboardData));
 
       component.ngOnInit();
     }));

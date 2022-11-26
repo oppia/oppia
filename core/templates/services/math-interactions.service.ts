@@ -199,6 +199,7 @@ export class MathInteractionsService {
     try {
       expressionString = this.insertMultiplicationSigns(expressionString);
       nerdamer(expressionString);
+    // Unknown type is used because we don't know which type pf error thrown.
     } catch (err: unknown) {
       if (err instanceof Error) {
         this.warningText = (

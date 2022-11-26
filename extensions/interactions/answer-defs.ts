@@ -125,4 +125,5 @@ export type InteractionAnswer = (
   RatioInputAnswer |
   SetInputAnswer |
   TextInputAnswer |
+  MusicNotesAnswer[] |
   MathEquationAnswer);

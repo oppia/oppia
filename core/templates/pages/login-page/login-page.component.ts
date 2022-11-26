@@ -62,6 +62,7 @@ export class LoginPageComponent implements OnInit {
       let authSucceeded = false;
       try {
         authSucceeded = await this.authService.handleRedirectResultAsync();
+      // Unknown type is used because we don't know which type pf error thrown.
       } catch (error: unknown) {
         this.onSignInError(error as firebase.auth.Error);
         return;
@@ -74,6 +75,7 @@ export class LoginPageComponent implements OnInit {
 
       try {
         await this.authService.signInWithRedirectAsync();
+      // Unknown type is used because we don't know which type pf error thrown.
       } catch (error: unknown) {
         this.onSignInError(error as firebase.auth.Error);
       }

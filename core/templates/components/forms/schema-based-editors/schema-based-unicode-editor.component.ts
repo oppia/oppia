@@ -61,7 +61,7 @@ implements ControlValueAccessor, OnInit, Validator {
   @Input() disabled!: boolean;
   // UI configuration. May be undefined if the schema does not specify it.
   @Input() uiConfig!: {
-    rows: string[]; placeholder: string; 'coding_mode': unknown;
+    rows: string[]; placeholder: string; 'coding_mode': string;
   } | undefined;
 
   @Input() validators!: OppiaValidator[];
@@ -74,7 +74,7 @@ implements ControlValueAccessor, OnInit, Validator {
     extraKeys: { Tab: (cm: CodeMirror.Editor) => void };
     indentWithTabs: boolean;
     lineNumbers: boolean;
-    readOnly?: string; mode?: unknown;
+    readOnly?: string; mode?: string;
   } = {
     // Convert tabs to spaces.
       extraKeys: {

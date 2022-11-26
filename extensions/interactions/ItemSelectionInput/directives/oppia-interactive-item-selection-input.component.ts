@@ -26,7 +26,6 @@ import { ItemSelectionInputCustomizationArgs } from 'interactions/customization-
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { ItemSelectionInputRulesService } from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { AudioTranslationManagerService } from 'pages/exploration-player-page/services/audio-translation-manager.service';
@@ -180,9 +179,9 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
       html => this.choicesValue[this.choices.indexOf(html)].contentId);
 
     this.currentInteractionService.onSubmit(
-      answers as unknown as string,
-      this.itemSelectionInputRulesService as unknown as
-      InteractionRulesService);
+      answers as string | string[],
+      this.itemSelectionInputRulesService as
+      ItemSelectionInputRulesService);
   }
 
   validityCheckFn(): boolean {

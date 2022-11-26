@@ -66,6 +66,7 @@ export class FractionEditorComponent implements OnInit {
       }
       this.errorMessageI18nKey = '';
       this.currentFractionValueIsValid = true;
+    // Type unknown is used because we don't know actual type of error throw.
     } catch (parsingError: unknown) {
       if (parsingError instanceof Error) {
         this.errorMessageI18nKey = parsingError.message;

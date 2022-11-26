@@ -18,6 +18,7 @@
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { SchemaDefaultValue } from 'services/schema-default-value.service';
 
 interface SanitizedUrlSchema {
   type: string;
@@ -48,7 +49,7 @@ export class SanitizedUrlEditorComponent {
   // The property 'value' is dependent on another property, 'localValue', from
   // 'schema-based-editor'. Most components using 'localValue' are currently in
   // AngularJS, so its type cannot be determined for now.
-  @Input() value: unknown;
+  @Input() value: SchemaDefaultValue;
   @Output() valueChanged = new EventEmitter();
   schema: SanitizedUrlSchema = {
     type: 'unicode',
@@ -72,7 +73,7 @@ export class SanitizedUrlEditorComponent {
     return this.schema;
   }
 
-  updateValue(newValue: unknown): void {
+  updateValue(newValue: SchemaDefaultValue): void {
     if (this.value === newValue) {
       return;
     }

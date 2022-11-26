@@ -47,6 +47,7 @@ export class PlatformFeatureDummyBackendApiService {
       await this.http.get(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
         .toPromise();
       return true;
+    // Type unknown is used because we don't know actual type of error throw.
     } catch (err: unknown) {
       if (err instanceof HttpErrorResponse && err.status === 404) {
         return false;

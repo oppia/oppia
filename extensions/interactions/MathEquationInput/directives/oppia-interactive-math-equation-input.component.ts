@@ -104,7 +104,7 @@ export class InteractiveMathEquationInput implements OnInit {
     );
     this.guppyInitializationService.setAllowedVariables(
       this.htmlEscaperService.escapedJsonToObj(
-        this.allowedVariablesWithValue) as unknown as string[]);
+        this.allowedVariablesWithValue) as string[]);
     let eventType = (
       this.deviceInfoService.isMobileUserAgent() &&
       this.deviceInfoService.hasTouchEvents()) ? 'focus' : 'change';

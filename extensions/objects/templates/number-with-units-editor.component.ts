@@ -69,6 +69,7 @@ export class NumberWithUnitsEditorComponent implements OnInit {
         modalId: this.modalId
       }));
       this.errorMessageI18nKey = '';
+    // Type unknown is used because we don't know which kind of error thrown.
     } catch (parsingError: unknown) {
       this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
         value: true,

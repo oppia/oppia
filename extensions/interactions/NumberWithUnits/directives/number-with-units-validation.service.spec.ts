@@ -240,7 +240,11 @@ describe('NumberWithUnitsValidationService', () => {
         }
       },
       toMathjsCompatibleString: () => {
-        return null as string;
+        // This throws "Type null is not assignable to type
+        // 'string'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        return null;
       },
       toDict: () => {
         let uof = new UnitsObjectFactory();

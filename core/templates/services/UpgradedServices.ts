@@ -497,7 +497,7 @@ import { QuestionValidationService } from './question-validation.service';
 import { MathInteractionsService } from './math-interactions.service';
 
 interface UpgradedServicesDict {
-  [service: string]: unknown;
+  [service: string]: string;
 }
 
 @Injectable({
