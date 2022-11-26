@@ -1735,7 +1735,7 @@ TRANSLATION_SUBMITTER_CERTIFICATE = """
                       <span style="color: #00645C;">
                         {}
                       </span>
-                      which will help our {}-speaking 
+                      which will help our {}-speaking
                       learners better understand the lessons.
                       <br><br> 
                       This certificate confirms that {}
