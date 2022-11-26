@@ -62,6 +62,7 @@ oppia-blog-home-page .oppia-blog-home-page-card {
   max-width: 1400px;
   padding-left: 3rem;
   padding-right: 3rem;
+  width: 100%
 }
 
 oppia-blog-home-page .oppia-blog-home-page-card-avatar {
@@ -142,8 +143,18 @@ ngb-pagination .page-link {
 }
 
 ngb-pagination .page-link:hover {
-  background-color: none;
-  border-color: none;
+  background-color: unset;
+  border-color: unset;
+}
+
+ngb-pagination .page-item:last-child .page-link {
+  border-bottom-right-radius: 100%;
+  border-top-right-radius: 100%;
+}
+
+ngb-pagination .page-item:first-child .page-link {
+  border-bottom-left-radius: 100%;
+  border-top-left-radius: 100%;
 }
 
 ngb-pagination .page-item.active .page-link {

@@ -111,6 +111,7 @@
 	"I18N_BLOG_CARD_PREVIEW_HEADING": "Heading of the blog card preview modal in the blog post editor page.",
 		"I18N_BLOG_DASHBOARD_AUTHOR_BIO_EXPLAIN_TEXT": "Text displayed in the blog dashboard page's author detail model editor. - Text shown below the text entry for the author biography.",
         "I18N_BLOG_DASHBOARD_AUTHOR_BIO_HEADING": "Heading beside the author's bio in author details editor in blog dashboard page.",
+		"I18N_BLOG_DASHBOARD_AUTHOR_DETAILS_EDITOR_DESCRIPTION": "Description about the author name and bio on author details editor in the blog dashboard.",
 		"I18N_BLOG_DASHBOARD_AUTHOR_DETAILS_EDITOR_HEADING": "Heading of the blog author details editor modal in the blog dashboard page whichc allows to enter author's publicly viewable name and bio.",
         "I18N_BLOG_DASHBOARD_AUTHOR_NAME_HEADING": "Heading beside the author's name in author details editor in blog dashboard page.",
 	"I18N_BLOG_DASHBOARD_CREATE_NEW_BLOG_POST_BUTTON": "Button text on Oppia's Blog Dashboard Page - Button displayed when user has not created any blog post yet. Clicking on button takes user to new blog post editor.",

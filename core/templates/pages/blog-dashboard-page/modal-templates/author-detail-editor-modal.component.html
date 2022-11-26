@@ -1,19 +1,21 @@
 <div class="mt-5 mb-1 mx-3 e2e-test-blog-author-details-modal">
   <h3>{{ 'I18N_BLOG_DASHBOARD_AUTHOR_DETAILS_EDITOR_HEADING' | translate }}: </h3>
 </div>
-<span class="my-2 ml-2 d-flex">
-  <h4 class="my-auto mr-1">{{ 'I18N_BLOG_DASHBOARD_AUTHOR_NAME_HEADING' | translate }} :</h4>
-  <input class="w-auto form-control required general-text-format oppia-autofocus blog-author-editor e2e-test-blog-author-name-field"
+<mat-divider></mat-divider>
+<h4 class="my-4 ml-4">{{ 'I18N_BLOG_DASHBOARD_AUTHOR_DETAILS_EDITOR_DESCRIPTION' | translate }}</h4>
+<span class="my-2 ml-2 d-flex row">
+  <h4 class="my-auto col-2 px-0 ml-2">{{ 'I18N_BLOG_DASHBOARD_AUTHOR_NAME_HEADING' | translate }} :</h4>
+  <input class="col-8 form-control required general-text-format oppia-autofocus blog-author-editor e2e-test-blog-author-name-field col"
          [(ngModel)]="authorName"
          maxlength="MAX_AUTHOR_NAME_LENGTH"
          aria-label="Author Name of the user">
 </span>
 <div class="my-4 ml-2">
-  <span class="d-flex blog-author-editor">
-    <span class="blog-author-bio">
-      <h4 class="mr-1">{{ 'I18N_BLOG_DASHBOARD_AUTHOR_BIO_HEADING' | translate }}: </h4>
+  <span class="my-2 ml-2 d-flex row d-flex blog-author-editor">
+    <span class="mb-auto col-2 px-0 blog-author-bio">
+      <h4>{{ 'I18N_BLOG_DASHBOARD_AUTHOR_BIO_HEADING' | translate }}: </h4>
     </span>
-    <textarea class="oppia-bio-border oppia-autofocus w-100 mr-1 e2e-test-blog-author-bio-field"
+    <textarea class="oppia-bio-border oppia-autofocus col-8 mr-1 e2e-test-blog-author-bio-field"
               [(ngModel)]="authorBio"
               [attr.value]="authorBio"
               rows="5"
@@ -54,5 +56,9 @@
     font-size: 18px;
     line-height: 20px;
     text-align: left;
+  }
+
+  .oppia-bio-border {
+    border-color: #ced4da;
   }
 </style>

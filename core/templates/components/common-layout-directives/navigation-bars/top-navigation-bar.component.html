@@ -235,13 +235,13 @@
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-blog-link"
                  [href]="getOppiaBlogUrl()"
-                 target="_blank"
+                 [target]="getOppiaBlogUrl() === '/blog' ? '_self' : '_blank'"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">
                   {{'I18N_TOPNAV_BLOG' | translate}}
                 </span>
-                <span class="fas fa-external-link-alt launch"></span>
+                <span class="fas fa-external-link-alt launch" *ngIf="!platformFeatureService.status.BlogPages.isEnabled"></span>
               </a>
             </li>
           </ul>
