@@ -41,7 +41,6 @@ class MessageSummaryDict(TypedDict):
     text: str
     updated_status: str
     author_username: Optional[str]
-    author_picture_data_url: Optional[str]
     created_on_msecs: float
 
 

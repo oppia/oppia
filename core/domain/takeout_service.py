@@ -106,13 +106,15 @@ def export_data_for_user(user_id: str) -> takeout_domain.TakeoutData:
     # Separate out images. We store the images that need to be separated here,
     # as the images are now stored in GCS we will fetch them and return them.
     takeout_image_files: List[takeout_domain.TakeoutImage] = []
-    if user_settings.username is not None:
-        fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_USER, user_settings.username)
-        filename_png = 'profile_picture.png'
-        image_data = utils.convert_png_binary_to_data_url(fs.get(filename_png))
-        takeout_image_files.append(
-            takeout_domain.TakeoutImage(
-                image_data, 'user_settings_profile_picture.png'))
+    if user_settings is not None:
+        if user_settings.username is not None:
+            fs = fs_services.GcsFileSystem(
+                feconf.ENTITY_TYPE_USER, user_settings.username)
+            filename_png = 'profile_picture.png'
+            image_data = utils.convert_png_binary_to_data_url(
+                fs.get(filename_png))
+            takeout_image_files.append(
+                takeout_domain.TakeoutImage(
+                    image_data, 'user_settings_profile_picture.png'))
 
     return takeout_domain.TakeoutData(exported_data, takeout_image_files)

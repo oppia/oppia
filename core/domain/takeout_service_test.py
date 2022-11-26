@@ -1922,8 +1922,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
 
         with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'), 'rb',
-            encoding=None) as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
+            'rb',
+            encoding=None
+        ) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_USER, self.GENERIC_USERNAME)
@@ -2015,8 +2017,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
 
         with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'), 'rb',
-            encoding=None) as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
+            'rb',
+            encoding=None
+        ) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_USER, self.GENERIC_USERNAME)

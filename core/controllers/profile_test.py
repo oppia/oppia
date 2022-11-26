@@ -384,9 +384,13 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         user_settings = user_services.get_user_settings(self.owner_id)
+        # Ruling out the possibility of different types for mypy type checking.
+        assert isinstance(user_settings.username, str)
         with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'), 'rb',
-            encoding=None) as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
+            'rb',
+            encoding=None
+        ) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_USER, user_settings.username)
@@ -1273,8 +1277,10 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         ).put()
 
         with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'), 'rb',
-            encoding=None) as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
+            'rb',
+            encoding=None
+        ) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_USER, user_settings.username)

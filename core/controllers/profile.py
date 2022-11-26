@@ -35,7 +35,7 @@ from core.domain import takeout_service
 from core.domain import user_services
 from core.domain import wipeout_service
 
-from typing import Callable, Dict, TypedDict
+from typing import Callable, Dict, Optional, TypedDict
 
 
 class ProfileHandler(
@@ -348,7 +348,17 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         })
 
 
-class SignupPage(base.BaseHandler):
+class SignupPageNormalizedRequestDict(TypedDict):
+    """Dict representation of SignupPage's
+    normalized_request dictionary.
+    """
+
+    return_url: Optional[str]
+
+
+class SignupPage(
+    base.BaseHandler[Dict[str, str], SignupPageNormalizedRequestDict]
+):
     """The page which prompts for username and acceptance of terms."""
 
     REDIRECT_UNFINISHED_SIGNUPS = False

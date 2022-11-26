@@ -383,8 +383,6 @@ def _delete_profile_picture(username: str) -> None:
     Args:
         username: str. The username of the user.
     """
-    if username is None:
-        return
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
     filename_png = 'profile_picture.png'
     filename_webp = 'profile_picture.webp'
@@ -413,7 +411,8 @@ def delete_user(
     # Remove profile picture.
     user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
     username = user_settings_model.username
-    _delete_profile_picture(username)
+    if username is not None:
+        _delete_profile_picture(username)
 
     _delete_models(user_id, models.Names.AUTH)
     _delete_models(user_id, models.Names.USER)
@@ -490,14 +489,17 @@ def delete_user(
     _delete_models(user_id, models.Names.LEARNER_GROUP)
 
 
-def _verify_profile_picture_is_deleted(username: str) -> None:
+def _verify_profile_picture_is_deleted(username: str) -> bool:
     """Verify that the profile picture is deleted.
 
     Args:
         username: str. The username of the user.
+
+    Returns:
+        bool. True when the profile picture is deleted else False.
     """
     if username is None:
-        return
+        return True
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
     filename_png = 'profile_picture.png'
     filename_webp = 'profile_picture.webp'
@@ -506,6 +508,8 @@ def _verify_profile_picture_is_deleted(username: str) -> None:
             'Profile picture is not deleted of user having '
             'username %s.' % (username)
         )
+        return False
+    return True
 
 
 def verify_user_deleted(
@@ -537,7 +541,8 @@ def verify_user_deleted(
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
         if user_settings_model:
             username = user_settings_model.username
-            _verify_profile_picture_is_deleted(username)
+            if not _verify_profile_picture_is_deleted(username):
+                return False
 
     user_is_verified = True
     for model_class in models.Registry.get_all_storage_model_classes():

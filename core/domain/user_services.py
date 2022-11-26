@@ -40,7 +40,6 @@ from core.domain import user_domain
 from core.platform import models
 
 from PIL import Image
-
 import requests
 
 from typing import (
@@ -1415,6 +1414,11 @@ def update_profile_picture_data_url(
     """
     user_settings = get_user_settings(user_id, strict=True)
     username = user_settings.username
+    if username is None:
+        raise utils.ValidationError(
+            'User does not have a valid username, having value None.')
+    # Ruling out the possibility of different types for mypy type checking.
+    assert isinstance(username, str)
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
     filename_png = 'profile_picture.png'
     png_binary = utils.convert_png_data_url_to_binary(
