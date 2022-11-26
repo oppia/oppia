@@ -233,7 +233,6 @@ describe('ConceptCardManager service', () => {
         }
       }),
       RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
 
     pps.onNewCardOpened.emit(newCard);

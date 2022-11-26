@@ -39,7 +39,7 @@ import {
 import { Rule } from 'domain/exploration/RuleObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
-fdescribe('Responses Service', () => {
+describe('Responses Service', () => {
   let alertsService: AlertsService;
   let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;

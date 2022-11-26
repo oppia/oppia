@@ -31,6 +31,7 @@ import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 
 export type ExplorationPropertyValues = (
   null |
+  number |
   string |
   string[] |
   boolean |

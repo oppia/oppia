@@ -21,6 +21,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ExplorationChangeAddState } from 'domain/exploration/exploration-draft.model';
 import { StateObjectsBackendDict, StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -96,7 +97,7 @@ describe('Exploration save service ' +
                   state_name: 'StateName',
                   content_id_for_state_content: 'content_0',
                   content_id_for_default_outcome: 'default_outcome_1'
-                }]);
+                } as ExplorationChangeAddState]);
             }
           }
         },

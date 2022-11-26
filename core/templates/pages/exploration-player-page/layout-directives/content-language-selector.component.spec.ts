@@ -70,7 +70,7 @@ class MockI18nLanguageCodeService {
   }
 }
 
-fdescribe('Content language selector component', () => {
+describe('Content language selector component', () => {
   let component: ContentLanguageSelectorComponent;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let fixture: ComponentFixture<ContentLanguageSelectorComponent>;

@@ -107,7 +107,8 @@ describe('Preview Tab Component', () => {
       auto_tts_enabled: false,
       correctness_feedback_enabled: true,
       edits_allowed: true
-    }
+    },
+    next_content_id_index: 5,
   };
   let parameters = [{
     paramName: 'paramName1',
