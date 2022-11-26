@@ -102,6 +102,7 @@ export class TutorCardComponent {
   @Input() displayedCardWasCompletedInPrevSession!: boolean;
   @Input() startCardChangeAnimation!: boolean;
   @Input() avatarImageIsShown!: boolean;
+  @Input() shouldHideInteraction!: boolean;
   @Input() userIsLoggedIn!: boolean;
   @Input() explorationIsInPreviewMode!: boolean;
   @Input() questionPlayerConfig!: QuestionPlayerConfig;

@@ -167,6 +167,7 @@ export class ConversationSkinComponent {
   submitButtonIsDisabled = true;
   solutionForState: Solution | null = null;
   isLearnerReallyStuck: boolean = false;
+  continueToStuckStateButtonIsVisible: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
@@ -292,6 +293,7 @@ export class ConversationSkinComponent {
           this.solutionForState = newCard.getSolution();
           this.numberOfIncorrectSubmissions = 0;
           this.nextCardIfStuck = null;
+          this.continueToStuckStateButtonIsVisible = false;
           this.triggerIfLearnerStuckAction();
         }
       )
@@ -1050,13 +1052,18 @@ export class ConversationSkinComponent {
       this.responseTimeout = null;
     }
     this.responseTimeout = setTimeout(() => {
-      if (this.nextCardIfStuck) {
+      if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
         // Let the learner know about the redirection to a state
         // for clearing concepts.
+        console.log("Kya hua");
         this.playerTranscriptService.addNewResponseToExistingFeedback(
           this.translateService.instant(
             'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE')
         );
+        //Enable visibility of ContinueStuck button
+
+        this.continueToStuckStateButtonIsVisible = true;
+
       } else if (this.solutionForState !== null &&
         this.numberOfIncorrectSubmissions >=
         ExplorationPlayerConstants.
@@ -1066,13 +1073,6 @@ export class ConversationSkinComponent {
         this.hintsAndSolutionManagerService.releaseSolution();
       }
     }, ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
-    this.timeout = setTimeout(() => {
-      if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
-        // Redirect the learner.
-        this.nextCard = this.nextCardIfStuck;
-        this.showPendingCard();
-      }
-    }, ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
   }
 
   triggerIfLearnerStuckActionDirectly(): void {
@@ -1089,10 +1089,7 @@ export class ConversationSkinComponent {
       this.playerTranscriptService.addNewResponseToExistingFeedback(
         this.translateService.instant(
           'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE'));
-      setTimeout(() => {
-        this.nextCard = this.nextCardIfStuck;
-        this.showPendingCard();
-      }, 10000);
+          this.continueToStuckStateButtonIsVisible = true;
     } else if (this.solutionForState !== null &&
       this.numberOfIncorrectSubmissions >=
       ExplorationPlayerConstants.
@@ -1100,6 +1097,12 @@ export class ConversationSkinComponent {
       // Release solution if it exists.
       this.hintsAndSolutionManagerService.releaseSolution();
     }
+  }
+
+  triggerRedirectionToStuckState(): void {
+    // Redirect the learner.
+    this.nextCard = this.nextCardIfStuck;
+    this.showPendingCard();
   }
 
   showQuestionAreNotAvailable(): void {

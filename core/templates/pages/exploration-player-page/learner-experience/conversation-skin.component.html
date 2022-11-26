@@ -10,6 +10,7 @@
       <oppia-tutor-card [displayedCard]="displayedCard"
                         [displayedCardWasCompletedInPrevSession]="isDisplayedCardCompletedInPrevSession()"
                         [avatarImageIsShown]="true"
+                        [shouldHideInteraction]="continueToStuckStateButtonIsVisible"
                         [startCardChangeAnimation]="startCardChangeAnimation"
                         [userIsLoggedIn]="isLoggedIn"
                         [collectionSummary]="collectionSummary"
@@ -37,8 +38,10 @@
         <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
                             [isLearnAgainButton]="isLearnAgainButton()"
                             [displayedCard]="displayedCard"
-                            [submitButtonIsShown]="!answerIsBeingProcessed"
+                            [submitButtonIsShown]="!answerIsBeingProcessed && !continueToStuckStateButtonIsVisible"
+                            [showStuckContinueButton]="continueToStuckStateButtonIsVisible"
                             (clickContinueButton)="showUpcomingCard()"
+                            (clickStuckContinueButton)="triggerRedirectionToStuckState()"
                             (changeCard)="changeCard($event)">
         </oppia-progress-nav>
       </div>
