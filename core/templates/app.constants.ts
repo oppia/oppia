@@ -193,6 +193,8 @@ export const AppConstants = {
   AUDIO_UPLOAD_URL_TEMPLATE: '/createhandler/audioupload/<exploration_id>',
   IMAGE_UPLOAD_URL_TEMPLATE: (
     '/createhandler/imageupload/<entity_type>/<entity_id>'),
+  PROFILE_PHOTO_UPLOAD_URL_TEMPLATE: (
+    '/profile_photo_upload/<username>'),
 
   MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY: 3,
   MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY: 3,

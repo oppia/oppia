@@ -63,20 +63,13 @@ export class UserService {
     return this.getUserInfoAsync().then(
       async(userInfo) => {
         if (userInfo.isLoggedIn()) {
-          return this.userBackendApiService.getProfileImageDataUrlAsync(
-            defaultUrl);
+          return this.userBackendApiService.getProfileImageDataUrlAsync();
         } else {
           return new Promise((resolve, reject) => {
             resolve(defaultUrl);
           });
         }
       });
-  }
-
-  async setProfileImageDataUrlAsync(
-      newProfileImageDataUrl: string): Promise<UpdatePreferencesResponse> {
-    return this.userBackendApiService.setProfileImageDataUrlAsync(
-      newProfileImageDataUrl);
   }
 
   async getLoginUrlAsync(): Promise<string> {
