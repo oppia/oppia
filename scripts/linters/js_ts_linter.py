@@ -54,12 +54,11 @@ INJECTABLES_TO_IGNORE: Final = [
     # Route guards cannot be made injectables until migration is complete.
     'CanAccessSplashPageGuard',
 ]
-# pylint: disable=line-too-long, single-line-pragma
-FILES_CONTAIN_UNKNOWN_TYPE: List[str] = [
+
+FILES_CONTAINING_UNKNOWN_TYPE: List[str] = [
     # Do this file after removal Jquery from this file.
     'extensions/objects/templates/svg-editor.component.ts',
 ]
-# pylint: enable=line-too-long, single-line-pragma
 
 def _parse_js_or_ts_file(
     filepath: str, file_content: str, comment: bool = False
@@ -436,10 +435,11 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
 
     def _check_unknown_type(self) -> concurrent_task_utils.TaskResult:
         """Prints a list of lint errors if an unknown type is used. This lint
-        check is not enabled by default. Add proper comment if unknown is needed.
+            check is not enabled by default. Add proper comment if unknown is needed.
+
         Returns:
-        TaskResult. A TaskResult object representing the result of the
-        lint check.
+            TaskResult. A TaskResult object representing the result of the
+            lint check.
         """
         name = 'Unknown type'
         error_messages = []
@@ -448,7 +448,7 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         ts_files_to_check = self.ts_filepaths
         for file_path in ts_files_to_check:
             # Not showing lint errors for files present in FILES_CONTAIN_UNKNOWN_TYPE
-            if file_path in FILES_CONTAIN_UNKNOWN_TYPE:
+            if file_path in FILES_CONTAINING_UNKNOWN_TYPE:
                 continue
 
             file_content = self.file_cache.read(file_path)
