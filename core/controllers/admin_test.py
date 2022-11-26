@@ -30,7 +30,6 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain
@@ -2441,8 +2440,12 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
     def test_profile_picture_is_missing_raises_error(self) -> None:
         def _mock_generation(_) -> None:
-            """"""
-        with self.swap(user_services, 'generate_initial_profile_picture', _mock_generation):
+            """Mock generate_initial_profile_picture to return None."""
+        with self.swap(
+            user_services,
+            'generate_initial_profile_picture',
+            _mock_generation
+        ):
             self.signup(self.BLOG_ADMIN_EMAIL, self.EDITOR_USERNAME)
             csrf_token = self.get_new_csrf_token()
 
