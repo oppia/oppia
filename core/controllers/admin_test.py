@@ -2439,7 +2439,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             username_change_audit_model.new_username, self.NEW_USERNAME)
 
     def test_profile_picture_is_missing_raises_error(self) -> None:
-        def _mock_generation(_) -> None:
+        def _mock_generation(_: str) -> None:
             """Mock generate_initial_profile_picture to return None."""
         with self.swap(
             user_services,
