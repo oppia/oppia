@@ -17,7 +17,7 @@
  */
 
 import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
@@ -225,18 +225,6 @@ describe('Settings Tab Component', () => {
     paramSpecObjectFactory = TestBed.inject(ParamSpecObjectFactory);
     versionHistoryBackendApiService = TestBed.inject(
       VersionHistoryBackendApiService);
-    const explorationMetadata = new ExplorationMetadata(
-      'title', 'category', 'objective', 'en',
-      [], '', '', 55, 'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory), [], false, true, true
-    );
-    spyOn(
-      versionHistoryBackendApiService, 'fetchMetadataVersionHistoryAsync'
-    ).and.resolveTo({
-      lastEditedVersionNumber: 3,
-      lastEditedCommitterUsername: '',
-      metadataInPreviousVersion: explorationMetadata
-    });
 
     spyOn(explorationTagsService, 'onExplorationPropertyChanged')
       .and.returnValue(mockExplorationTagsServiceonPropertyChanged);
@@ -1195,6 +1183,45 @@ describe('Settings Tab Component', () => {
 
       expect(component.getLastEditedCommitterUsername()).toEqual('some');
     });
+
+  it('should fetch the version history data from the backend',
+    fakeAsync(() => {
+      const explorationMetadata = new ExplorationMetadata(
+        'title', 'category', 'objective', 'en',
+        [], '', '', 55, 'Introduction',
+        new ParamSpecs({}, paramSpecObjectFactory), [], false, true, true
+      );
+      spyOn(
+        versionHistoryBackendApiService, 'fetchMetadataVersionHistoryAsync'
+      ).and.resolveTo({
+        lastEditedVersionNumber: 3,
+        lastEditedCommitterUsername: '',
+        metadataInPreviousVersion: explorationMetadata
+      });
+
+      component.updateMetadataVersionHistory();
+      tick();
+      flushMicrotasks();
+
+      expect(
+        versionHistoryBackendApiService.fetchMetadataVersionHistoryAsync
+      ).toHaveBeenCalled();
+    }));
+
+  it('should fetch show validation error if the backend api fails',
+    fakeAsync(() => {
+      spyOn(
+        versionHistoryBackendApiService, 'fetchMetadataVersionHistoryAsync'
+      ).and.resolveTo(null);
+
+      expect(component.validationErrorIsShown).toBeFalse();
+
+      component.updateMetadataVersionHistory();
+      tick();
+      flushMicrotasks();
+
+      expect(component.validationErrorIsShown).toBeTrue();
+    }));
 
   it('should open the metadata version history modal on clicking the explore ' +
     'version history button', () => {

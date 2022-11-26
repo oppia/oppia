@@ -26,7 +26,6 @@ import { VersionHistoryBackendApiService } from '../services/version-history-bac
 import { StateDiffData, VersionHistoryService } from '../services/version-history.service';
 import { StateVersionHistoryModalComponent } from './state-version-history-modal.component';
 import { StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { AlertsService } from 'services/alerts.service';
 
 describe('State version history modal', () => {
   let component: StateVersionHistoryModalComponent;
@@ -37,7 +36,6 @@ describe('State version history modal', () => {
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
   let contextService: ContextService;
   let stateObject: StateBackendDict;
-  let alertsService: AlertsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -65,7 +63,6 @@ describe('State version history modal', () => {
       VersionHistoryBackendApiService
     );
     contextService = TestBed.inject(ContextService);
-    alertsService = TestBed.inject(AlertsService);
 
     stateObject = {
       classifier_model_id: null,
@@ -391,7 +388,7 @@ describe('State version history modal', () => {
     );
   });
 
-  it('should be show alert message if the backend api fails', fakeAsync(() => {
+  it('should be show error message if the backend api fails', fakeAsync(() => {
     spyOn(
       versionHistoryService, 'shouldFetchNewStateVersionHistory'
     ).and.returnValue(true);
@@ -408,15 +405,13 @@ describe('State version history modal', () => {
     spyOn(
       versionHistoryBackendApiService, 'fetchStateVersionHistoryAsync'
     ).and.resolveTo(null);
-    spyOn(alertsService, 'addWarning').and.callFake(() => {});
+
+    expect(component.validationErrorIsShown).toBeFalse();
 
     component.fetchPreviousVersionHistory();
     tick();
 
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Could not fetch the version history data. ' +
-      'Please reload the page and try again.'
-    );
+    expect(component.validationErrorIsShown).toBeTrue();
   }));
 
   it('should update the left and right side yaml strings on initialization',
@@ -435,4 +430,10 @@ describe('State version history modal', () => {
       expect(component.yamlStrs.currentVersionStateYaml).toEqual('YAML STRING');
       expect(component.fetchPreviousVersionHistory).toHaveBeenCalled();
     }));
+
+  it('should get the last edited version number in case of error', () => {
+    versionHistoryService.insertStateVersionHistoryData(4, null, '');
+
+    expect(component.getLastEditedVersionNumberInCaseOfError()).toEqual(4);
+  });
 });

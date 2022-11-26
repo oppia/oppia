@@ -303,16 +303,6 @@ describe('Exploration editor tab component', () => {
         }
       }
     };
-    let stateData = stateObjectFactory.createFromBackendDict(
-      'State', stateObject);
-    spyOn(
-      versionHistoryBackendApiService, 'fetchStateVersionHistoryAsync'
-    ).and.resolveTo({
-      lastEditedVersionNumber: 2,
-      stateNameInPreviousVersion: 'State',
-      stateInPreviousVersion: stateData,
-      lastEditedCommitterUsername: 'some'
-    });
 
     explorationStatesService.init({
       'First State': {
@@ -979,4 +969,48 @@ describe('Exploration editor tab component', () => {
     expect(editabilityService.onEndTutorial).toHaveBeenCalled();
     expect(component.tutorialInProgress).toBe(false);
   });
+
+  it('should get the last edited version number in case of error', () => {
+    versionHistoryService.insertStateVersionHistoryData(4, null, '');
+
+    expect(component.getLastEditedVersionNumberInCaseOfError()).toEqual(4);
+  });
+
+  it('should fetch the version history data on initialization of state editor',
+    fakeAsync(() => {
+      stateEditorService.setActiveStateName('First State');
+      let stateData = stateObjectFactory.createFromBackendDict(
+        'State', stateObject);
+      spyOn(
+        versionHistoryBackendApiService, 'fetchStateVersionHistoryAsync'
+      ).and.resolveTo({
+        lastEditedVersionNumber: 2,
+        stateNameInPreviousVersion: 'State',
+        stateInPreviousVersion: stateData,
+        lastEditedCommitterUsername: 'some'
+      });
+
+      component.initStateEditor();
+      tick();
+      flush();
+
+      expect(
+        versionHistoryBackendApiService.fetchStateVersionHistoryAsync
+      ).toHaveBeenCalled();
+    }));
+
+  it('should show error message if the backend api fails', fakeAsync(() => {
+    stateEditorService.setActiveStateName('First State');
+    spyOn(
+      versionHistoryBackendApiService, 'fetchStateVersionHistoryAsync'
+    ).and.resolveTo(null);
+
+    expect(component.validationErrorIsShown).toBeFalse();
+
+    component.initStateEditor();
+    tick();
+    flush();
+
+    expect(component.validationErrorIsShown).toBeTrue();
+  }));
 });

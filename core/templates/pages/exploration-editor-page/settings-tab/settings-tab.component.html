@@ -696,7 +696,10 @@
       <a class="text-primary explore-version-history-button" (click)="onClickExploreVersionHistoryButton()"> More details</a>.
     </div>
     <div *ngIf="!canShowExploreVersionHistoryButton();">
-      No changes have been made to the exploration metadata after the initial creation of the exploration.
+      <span *ngIf="!validationErrorIsShown">No changes have been made to the exploration metadata after the initial creation of the exploration.</span>
+      <span *ngIf="validationErrorIsShown" class="error-message">
+        Unable to display the metadata version history due to an error loading the exploration data.
+      </span>
     </div>
   </mat-card>
 </div>
@@ -846,5 +849,9 @@
 
   .oppia-no-voice-artist-message {
     float: left;
+  }
+
+  .error-message {
+    color: #f00;
   }
 </style>
