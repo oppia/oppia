@@ -44,10 +44,8 @@ from core.domain import user_services
 from core.platform import models
 
 from html2image import Html2Image
-from typing import (
-    Callable, Dict, Final, List, Literal, Mapping, Match, Optional, Sequence,
-    Set, Tuple, Union, cast, overload
-)
+from typing import (Callable, Dict, Final, List, Literal, Mapping, Match,
+                    Optional, Sequence, Set, Tuple, Union, cast, overload)
 
 MYPY = False
 if MYPY:  # pragma: no cover
