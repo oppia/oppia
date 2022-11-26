@@ -212,7 +212,7 @@ describe('Contributor stats component', () => {
     it('should open date range selecting model to generate certificate for' +
       ' contributors',
     fakeAsync(() => {
-      component.openCertificateDownloadModal('add_question');
+      component.openCertificateDownloadModal('add_question', '');
       tick();
       expect(modalService.open).toHaveBeenCalled();
     }));
