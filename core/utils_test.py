@@ -32,7 +32,7 @@ from core.constants import constants
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
 
-from typing import Dict, List, Union
+from typing import Dict, List, Tuple, Union
 
 
 class UtilsTests(test_utils.GenericTestBase):
@@ -948,7 +948,7 @@ class UtilsTests(test_utils.GenericTestBase):
                 ['-1', '-2', '-3', '-4', '-5']),
                 [])
 
-    def _get_png_and_webp_image(self) -> bytes:
+    def _get_png_and_webp_image(self) -> Tuple[bytes, bytes]:
         """Returns png image."""
         filepath_png = os.path.join('core', 'tests', 'data', 'test_png_img.png')
         filepath_webp = os.path.join(
