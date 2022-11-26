@@ -2987,7 +2987,7 @@ def generate_contributor_certificate(
         str. The path of the generated image of the certificate.
 
     Raises:
-        Exception: The suggestion type is invalid.
+        Exception. The suggestion type is invalid.
     """
     user_id = user_services.get_user_id_from_username(username)
     date = datetime.datetime.now().strftime('%d %b %Y')
@@ -3127,7 +3127,7 @@ def _generate_question_contributor_certificate(
         str. The HTML template to generate the certificate.
 
     Raises:
-        Exception: The suggestion type given to generate the certificate is
+        Exception. The suggestion type given to generate the certificate is
             invalid.
     """
     signature = feconf.QUESTION_TEAM_LEAD
