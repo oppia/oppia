@@ -22,7 +22,9 @@ import { OperatorFunction, Subject, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { BaseEvent } from './app-events';
 
-export type Newable<T> = new(message: string) => T;
+// Type unknown is used here because we don't know the type of the data
+// that will be passed with the event.
+export type Newable<T> = new(message: unknown) => T;
 
 @Injectable({
   providedIn: 'root'
