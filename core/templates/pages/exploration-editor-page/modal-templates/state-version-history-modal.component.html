@@ -42,9 +42,12 @@
 
 <div class="modal-footer">
   <ng-template [ngIf]="yamlStrs.previousVersionStateYaml && yamlStrs.currentVersionStateYaml">
-    <button class="btn btn-outline-primary previous-commit" *ngIf="canExploreBackwardVersionHistory()" (click)="onClickExploreBackwardVersionHistory()">
-      View previous commit by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 }}</strong>
+    <button [disabled]="validationErrorIsShown" class="btn btn-outline-primary" *ngIf="canExploreBackwardVersionHistory() || validationErrorIsShown" (click)="onClickExploreBackwardVersionHistory()">
+      View previous commit by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 || (validationErrorIsShown && getLastEditedVersionNumberInCaseOfError()) }}</strong>
     </button>
+    <span *ngIf="validationErrorIsShown" class="error-message">
+      Unable to display version history for version {{ getLastEditedVersionNumberInCaseOfError() }}, due to an error loading that version of the exploration.
+    </span>
     <button class="btn btn-outline-primary next-commit" *ngIf="canExploreForwardVersionHistory()" (click)="onClickExploreForwardVersionHistory()">
       View next commit by <strong>{{ getNextEditedCommitterUsername() }}</strong> at <strong>version {{ getNextEditedVersionNumber() + 1 }}</strong>
     </button>
@@ -60,7 +63,7 @@
     text-decoration-skip-ink: none;
   }
   .CodeMirror-merge-r-inserted {
-    text-decoration: underline red 2px;
+    text-decoration: underline #f00 2px;
     text-decoration-skip-ink: none;
   }
   .CodeMirror-merge, .CodeMirror-merge .CodeMirror {
@@ -70,9 +73,6 @@
     height: 405px;
     margin-top: -30px;
     overflow: auto;
-  }
-  .previous-commit {
-    margin-right: auto;
   }
   .colgroup-1 {
     padding: 15px;
@@ -90,5 +90,19 @@
   .spinner-border {
     height: 4rem;
     width: 4rem;
+  }
+  .error-message {
+    color: #f00;
+    display: inline-block;
+    font-size: 1.3rem;
+    max-width: 250px;
+    padding: 10px;
+  }
+  .modal-footer {
+    display: flex;
+    justify-content: flex-start;
+  }
+  .next-commit {
+    margin-left: auto;
   }
 </style>
