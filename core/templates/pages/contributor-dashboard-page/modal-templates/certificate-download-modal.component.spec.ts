@@ -89,7 +89,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
   it('should download the certificate when available', () => {
     component.fromDate = '2022/01/01';
-    component.toDate = '2022/12/31';
+    component.toDate = '2022/10/31';
     spyOn(
       contributionAndReviewService,
       'downloadContributorCertificateAsync')
@@ -102,13 +102,11 @@ describe('Contributor Certificate Download Modal Component', () => {
     expect(
       contributionAndReviewService.downloadContributorCertificateAsync
     ).toHaveBeenCalled();
-    expect(alertsService.addSuccessMessage)
-      .toHaveBeenCalledWith('Generating certificate...', 5000);
   });
 
   it('should show error when contributions not found', fakeAsync(() => {
     component.fromDate = '2022/01/01';
-    component.toDate = '2022/12/31';
+    component.toDate = '2022/10/31';
     spyOn(
       contributionAndReviewService,
       'downloadContributorCertificateAsync')
@@ -122,12 +120,31 @@ describe('Contributor Certificate Download Modal Component', () => {
     ).toHaveBeenCalled();
     expect(component.errorsFound).toBeTrue();
     expect(component.errorMessage).toEqual(
-      'Contributions not found for the given inputs.');
+      'Not able to download contributor certificate');
   }));
 
-  it('should show error for invalid time ranges', () => {
-    component.fromDate = '2023/01/01';
-    component.toDate = '2022/12/31';
+  it('should show error for invalid to date', () => {
+    const today = new Date();
+    let tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    component.fromDate = today.toDateString();
+    component.toDate = tomorrow.toDateString();
+
+    component.downloadCertificate();
+
+    expect(component.errorsFound).toBeTrue();
+    expect(component.errorMessage).toEqual(
+      `Please select a 'To' date that is earlier than today's 
+      date`
+    );
+  });
+
+  it('should show error for invalid date ranges', () => {
+    const today = new Date();
+    let tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    component.fromDate = tomorrow.toDateString();
+    component.toDate = today.toDateString();
 
     component.downloadCertificate();
 
