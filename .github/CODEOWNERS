@@ -233,6 +233,7 @@
 /core/templates/services/exploration-features*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/exploration-html-formatter.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/favicon.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/fix-commit-command-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/image-upload-helper.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/staleness-detection.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/validators.service*.ts @oppia/lace-frontend-reviewers

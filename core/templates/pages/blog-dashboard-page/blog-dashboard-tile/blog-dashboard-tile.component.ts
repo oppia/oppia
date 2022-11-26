@@ -51,6 +51,9 @@ export class BlogDashboardTileComponent implements OnInit {
 
   ngOnInit(): void {
     const lastUpdated = this.blogPostSummary.lastUpdated;
+    if (lastUpdated === undefined) {
+      throw new Error('Last updated date is undefined');
+    }
     this.lastUpdatedDateString = this.getDateStringInWords(lastUpdated);
     // Truncating the summary to 220 characters to avoid display in blog
     // dashboard tile to avoid overflow of text outside the tile.

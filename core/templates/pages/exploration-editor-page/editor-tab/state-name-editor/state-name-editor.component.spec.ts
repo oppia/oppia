@@ -31,7 +31,7 @@ import { StateNameEditorComponent } from './state-name-editor.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 class MockExplorationDataService {
-  explorationId: 0;
+  explorationId!: 0;
   autosaveChangeListAsync() {
     return;
   }
@@ -50,9 +50,9 @@ describe('State Name Editor component', () => {
   let routerService: RouterService;
   let stateEditorService: StateEditorService;
   let stateNameService: StateNameService;
-  let mockExternalSaveEventEmitter = null;
+  let mockExternalSaveEventEmitter: EventEmitter<void>;
   let explorationDataService: MockExplorationDataService;
-  let autosaveChangeListSpy;
+  let autosaveChangeListSpy: jasmine.Spy;
 
   class MockNgbModal {
     open() {
@@ -132,8 +132,8 @@ describe('State Name Editor component', () => {
           }
         },
         interaction: {
-          confirmed_unclassified_answers: null,
-          customization_args: null,
+          confirmed_unclassified_answers: [],
+          customization_args: {},
           solution: null,
           id: null,
           answer_groups: [],
@@ -176,8 +176,8 @@ describe('State Name Editor component', () => {
           }
         },
         interaction: {
-          confirmed_unclassified_answers: null,
-          customization_args: null,
+          confirmed_unclassified_answers: [],
+          customization_args: {},
           solution: null,
           id: null,
           answer_groups: [],
@@ -220,8 +220,8 @@ describe('State Name Editor component', () => {
           }
         },
         interaction: {
-          confirmed_unclassified_answers: null,
-          customization_args: null,
+          confirmed_unclassified_answers: [],
+          customization_args: {},
           solution: null,
           id: null,
           answer_groups: [],
@@ -354,4 +354,12 @@ describe('State Name Editor component', () => {
     mockExternalSaveEventEmitter.emit();
     expect(component.saveStateName).toHaveBeenCalledWith('SampleState');
   });
+
+  it('should throw error if state name is null', fakeAsync(() => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    expect(() => {
+      component.openStateNameEditor();
+      tick();
+    }).toThrowError();
+  }));
 });
