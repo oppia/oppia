@@ -3091,176 +3091,20 @@ def _generate_translation_contributor_certificate(
             'There are no contributions for the given time range.')
     logo_path = os.getcwd() + '/assets/images/contributor_dashboard/oppia-logo.jpg'
 
-    translation_submitter_certificate_template = """
-      <!DOCTYPE html>
-      <html lang="en">
-        <head>
-          <link href=
-            "https://fonts.googleapis.com/css?family=Roboto&display=swap"
-            rel="stylesheet" />
-          <link
-            href="https://fonts.googleapis.com/css?family=Capriola&display=swap"
-            rel="stylesheet" />
-          <meta charset="UTF-8"> 
-          <meta http-equiv="X-UA-Compatible"
-                content="IE=edge">
-          <meta name="viewport"
-                content="width=device-width,
-                  initial-scale=1.0">
-          <title>Document</title>
-        </head>
-        <body style="margin-top:0px;margin-left:0px;">
-          <div>
-            <div style="width: 1493px;
-                  height: 1313px;
-                  background: #D0E1F0;
-                  margin: auto;
-                  display: block;
-                  margin-left: auto;
-                  margin-right: auto;
-                  position: relative;">
-              <div style="width: 1235px;
-                    height: 1086px;
-                    background: #F7FDFF;
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);">
-                <img src=" """ + logo_path + """ "
-                      style="padding-top: 50px;
-                      padding-bottom: 30px;
-                      height: 100px;
-                      display: block;
-                      margin-left: auto;
-                      margin-right: auto;">
-                <div>
-                  <h3 style="font-family: 'Capriola';
-                        font-style: normal;
-                        font-weight: 400;
-                        font-size: 37px;
-                        line-height: 46px;
-                        text-align: center;
-                        color: #00645C;">
-                    CERTIFICATE OF APPRECIATION
-                  </h3>
-                </div>
-                <br><br> 
-                <div>
-                  <div style="width: 90%;
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);">
-                    <p style="font-family: 'Capriola';
-                        font-style: normal;
-                        font-weight: 400;
-                        font-size: 30px;
-                        line-height: 38px;
-                        text-align: center;
-                        color: #8F9899;">
-                      WE GRATEFULLY ACKNOWLEDGE
-                    </p>
-                    <p style="font-family: 'Capriola';
-                        font-style: normal;
-                        font-weight: 400; 
-                        font-size: 40px;
-                        line-height: 50px;
-                        text-align: center; 
-                        color: #00645C;
-                        margin: 0; ">
-                      """ + username + """
-                    </p>
-                    <p style="font-family: 'Capriola';
-                        font-style: normal;
-                        font-weight: 400; 
-                        font-size: 26px;
-                        line-height: 32px;
-                        text-align: center; 
-                        color: #8F9899;">
-                      for your dedication and time in translating 
-                      <span style="color: #00645C;">Oppia’s</span>
-                      basic maths lessons to 
-                      <span style="color: #00645C;">
-                        """ + language_description + """
-                      </span>
-                      which will help our """ + language_description + """
-                      - speaking learners better understand the lessons.
-                      <br><br> 
-                      This certificate confirms that """ + username + """
-                      has contributed """ + str(hours_contributed) + """ 
-                      hours worth of translations from 
-                      """ + from_date.strftime('%d %b %Y') + """ 
-                      to 
-                      """ + to_date.strftime('%d %b %Y') + """
-                    </p>
-                  </div> 
-                  <div style="display:block;
-                        position: absolute;
-                        top: 80%; 
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        width: 100%;">
-                    <div style="width: 50%;
-                          float:left; 
-                          text-align: center;">
-                      <div style="font-family: Brush Script MT,
-                              Brush Script Std,
-                              cursiv;
-                            font-size: 36px;
-                            line-height: 10px;
-                            margin-top: 0px;
-                            color: #000000;">
-                        """+ signature +"""
-                      </div>
-                      <center> 
-                        <p style="width: 186px;
-                            height: 0px;
-                            border: 1px solid #00645C;">
-                        </p>
-                      </center>
-                      <p style="font-family: 'Roboto'; 
-                          font-style: normal;
-                          font-weight: 400;
-                          font-size: 24px; 
-                          line-height: 28px;
-                          margin-top: 0px;
-                          color: #8F9899;">
-                        SIGNATURE
-                      </p> 
-                    </div>
-                    <div style="width: 50%;
-                          float:left;
-                          text-align: center;">
-                      <div style="font-family: 'Roboto';
-                            font-size: 24px; color: #000000; line-height: 10px;">
-                        """ + date + """
-                      </div>
-                      <center>
-                        <p style="width: 186px;
-                            height: 0px;
-                            border: 1px solid #00645C;">
-                        </p> 
-                      </center>
-                      <p style="font-family: 'Roboto';
-                          font-style: normal; 
-                          font-weight: 400;
-                          font-size: 24px;
-                          line-height: 28px; 
-                          margin-top: 0px;
-                          color: #8F9899;">
-                        DATE
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </body>
-      </html>
-    """
+    certificate_template = feconf.TRANSLATION_SUBMITTER_CERTIFICATE.format(
+      logo_path,
+      username,
+      language_description,
+      language_description,
+      username,
+      str(hours_contributed),
+      from_date.strftime('%d %b %Y'),
+      to_date.strftime('%d %b %Y'),
+      signature,
+      date
+    )
 
-    return translation_submitter_certificate_template
+    return certificate_template
 
 
 def _generate_question_contributor_certificate(
@@ -3321,171 +3165,18 @@ def _generate_question_contributor_certificate(
             'There are no contributions for the given time range.')
     logo_path = os.getcwd() + '/assets/images/contributor_dashboard/oppia-logo.jpg'
 
-    question_submitter_certificate_template = """
-      <!DOCTYPE html>
-      <html lang="en">
-        <head>
-          <link href=
-            "https://fonts.googleapis.com/css?family=Roboto&display=swap"
-            rel="stylesheet" />
-          <link
-            href="https://fonts.googleapis.com/css?family=Capriola&display=swap"
-            rel="stylesheet" />
-          <meta charset="UTF-8"> 
-          <meta http-equiv="X-UA-Compatible"
-                content="IE=edge">
-          <meta name="viewport"
-                content="width=device-width,
-                  initial-scale=1.0">
-          <title>Document</title>
-        </head>
-        <body style="margin-top:0px;margin-left:0px;">
-          <div>
-            <div style="width: 1493px;
-                  height: 1313px;
-                  background: #D0E1F0;
-                  margin: auto;
-                  display: block;
-                  margin-left: auto;
-                  margin-right: auto;
-                  position: relative;">
-              <div style="width: 1235px;
-                    height: 1086px;
-                    background: #F7FDFF;
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);">
-                <img src=" """ + logo_path + """ "
-                      style="padding-top: 50px;
-                      padding-bottom: 30px;
-                      height: 100px;
-                      display: block;
-                      margin-left: auto;
-                      margin-right: auto;">
-                <div>
-                  <h3 style="font-family: 'Capriola';
-                        font-style: normal;
-                        font-weight: 400;
-                        font-size: 37px;
-                        line-height: 46px;
-                        text-align: center;
-                        color: #00645C;">
-                    CERTIFICATE OF APPRECIATION
-                  </h3>
-                </div>
-                <br><br> 
-                <div>
-                  <div style="width: 90%;
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);">
-                    <p style="font-family: 'Capriola';
-                        font-style: normal;
-                        font-weight: 400;
-                        font-size: 30px;
-                        line-height: 38px;
-                        text-align: center;
-                        color: #8F9899;">
-                      WE GRATEFULLY ACKNOWLEDGE
-                    </p>
-                    <p style="font-family: 'Capriola';
-                        font-style: normal;
-                        font-weight: 400; 
-                        font-size: 40px;
-                        line-height: 50px;
-                        text-align: center; 
-                        color: #00645C;
-                        margin: 0; ">
-                      """ + username + """
-                    </p>
-                    <p style="font-family: 'Capriola';
-                        font-style: normal;
-                        font-weight: 400; 
-                        font-size: 26px;
-                        line-height: 32px;
-                        text-align: center; 
-                        color: #8F9899;">
-                      has contributed practice questions to Oppia's
-                      Math Classroom, which supports our mission of improving 
-                      access to quality education.
-                      <br><br> 
-                      We confirm that  """ + username + """ has contributed 
-                      """ + str(hours_contributed) + """ hours 
-                      to Oppia from <br>
-                      """ + from_date.strftime('%d %b %Y') + """  <br>
-                      to  <br>
-                      """ + to_date.strftime('%d %b %Y') + """
-                    </p>
-                  </div> 
-                  <div style="display:block;
-                        position: absolute;
-                        top: 80%; 
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        width: 100%;">
-                    <div style="width: 50%;
-                          float:left; 
-                          text-align: center;">
-                      <div style="font-family: Brush Script MT,
-                              Brush Script Std,
-                              cursiv;
-                            font-size: 36px;
-                            line-height: 10px;
-                            margin-top: 0px;
-                            color: #000000;">
-                        """+ signature +"""
-                      </div>
-                      <center> 
-                        <p style="width: 186px;
-                            height: 0px;
-                            border: 1px solid #00645C;">
-                        </p>
-                      </center>
-                      <p style="font-family: 'Roboto'; 
-                          font-style: normal;
-                          font-weight: 400;
-                          font-size: 24px; 
-                          line-height: 28px;
-                          margin-top: 0px;
-                          color: #8F9899;">
-                        SIGNATURE
-                      </p> 
-                    </div>
-                    <div style="width: 50%;
-                          float:left;
-                          text-align: center;">
-                      <div style="font-family: 'Roboto';
-                            font-size: 24px; color: #000000; line-height: 10px;">
-                        """ + date + """
-                      </div>
-                      <center>
-                        <p style="width: 186px;
-                            height: 0px;
-                            border: 1px solid #00645C;">
-                        </p> 
-                      </center>
-                      <p style="font-family: 'Roboto';
-                          font-style: normal; 
-                          font-weight: 400;
-                          font-size: 24px;
-                          line-height: 28px; 
-                          margin-top: 0px;
-                          color: #8F9899;">
-                        DATE
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </body>
-      </html>
-    """
+    certificate_template = feconf.QUESTION_SUBMITTER_CERTIFICATE.format(
+      logo_path,
+      username,
+      username,
+      str(hours_contributed),
+      from_date.strftime('%d %b %Y'),
+      to_date.strftime('%d %b %Y'),
+      signature,
+      date
+    )
 
-    return question_submitter_certificate_template
+    return certificate_template
 
 
 def _generate_contributor_certificate_image(template: str) -> str:

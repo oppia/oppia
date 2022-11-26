@@ -6035,8 +6035,12 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
         response = suggestion_services.generate_contributor_certificate(
-            username, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT, 'hi',
-            from_date, to_date)
+            username,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            'hi',
+            from_date,
+            to_date
+        )
 
         self.assertIsNotNone(response)
         # Generated image file of the certificate is deleted.
@@ -6079,8 +6083,12 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
         response = suggestion_services.generate_contributor_certificate(
-            username, feconf.SUGGESTION_TYPE_ADD_QUESTION, None,
-            from_date, to_date)
+            username,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            None,
+            from_date,
+            to_date
+        )
 
         self.assertIsNotNone(response)
         # Generated image file of the certificate is deleted.
@@ -6125,8 +6133,12 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
         response = suggestion_services.generate_contributor_certificate(
-            username, feconf.SUGGESTION_TYPE_ADD_QUESTION, None,
-            from_date, to_date)
+            username,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            None,
+            from_date,
+            to_date
+        )
 
         self.assertIsNotNone(response)
         # Generated image file of the certificate is deleted.
@@ -6141,10 +6153,15 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'There are no contributions for the given time range.'):
+            'There are no contributions for the given time range.'
+        ):
             suggestion_services.generate_contributor_certificate(
-            username, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT, 'hi',
-            from_date, to_date)
+                username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi',
+                from_date,
+                to_date
+            )
 
     def test_create_contributor_certificate_raises_exception_for_no_question_suggestions(
         self
@@ -6155,10 +6172,15 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'There are no contributions for the given time range.'):
+            'There are no contributions for the given time range.'
+        ):
             suggestion_services.generate_contributor_certificate(
-            username, feconf.SUGGESTION_TYPE_ADD_QUESTION, None,
-            from_date, to_date)
+                username,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                None,
+                from_date,
+                to_date
+            )
 
     def test_create_contributor_certificate_raises_exception_for_wrong_language(
         self
@@ -6172,8 +6194,12 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'The language that is provided is invalid.'
         ):
             suggestion_services.generate_contributor_certificate(
-            username, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT, 'test',
-            from_date, to_date)
+                username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'test',
+                from_date,
+                to_date
+            )
 
     def test_create_contributor_certificate_raises_exception_for_wrong_type(
         self) -> None:
@@ -6183,8 +6209,13 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'Invalid contribution type to generate the certificate.'):
+            'Invalid contribution type to generate the certificate.'
+        ):
             suggestion_services.generate_contributor_certificate(
-            username, feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT, 'test',
-            from_date, to_date)
+                username,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                'test',
+                from_date,
+                to_date
+            )
 

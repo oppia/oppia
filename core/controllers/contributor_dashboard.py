@@ -982,9 +982,7 @@ class ContributorCertificateHandler(base.BaseHandler):
             # Removes the generated file.
             os.remove(file)
             self.render_downloadable_file(
-                buf,
-                'certificate.png',
-                'image/png')
+                buf, 'certificate.png', 'image/png')
 
 
 class ContributorAllStatsSummariesHandler(

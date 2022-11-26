@@ -62,7 +62,8 @@ export class CertificateDownloadModalComponent {
     }
     if (new Date() < new Date(this.toDate)) {
       this.errorsFound = true;
-      this.errorMessage = 'To date should not be a future date';
+      this.errorMessage = `Please select a 'To' date that is earlier than
+        today's date`;
       return;
     }
     this.certificateDownloading = true;

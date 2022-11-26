@@ -369,18 +369,12 @@ export class ContributorStatsComponent {
   }
 
   openCertificateDownloadModal(
-      suggestionType: string, languageCode?: string): void {
+      suggestionType: string, languageCode: string | null): void {
     const modalRef = this.modalService.open(
       CertificateDownloadModalComponent, {
         size: 'lg',
         backdrop: 'static',
-        injector: this.injector,
-        // TODO(#12768): Remove the backdropClass & windowClass once the
-        // rte-component-modal is migrated to Angular. Currently, the custom
-        // class is used for correctly stacking AngularJS modal on top of
-        // Angular modal.
-        backdropClass: 'forced-modal-stack',
-        windowClass: 'forced-modal-stack'
+        injector: this.injector
       });
     modalRef.componentInstance.suggestionType = suggestionType;
     modalRef.componentInstance.username = this.username;

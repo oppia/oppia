@@ -192,7 +192,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 1)
 
     def test_get_question_suggestions_submitted_for_given_date_range(
-        self) -> None:
+        self
+    ) -> None:
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_EXPLORATION,
