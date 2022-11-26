@@ -55,7 +55,7 @@ INJECTABLES_TO_IGNORE: Final = [
     'CanAccessSplashPageGuard',
 ]
 # pylint: disable=line-too-long, single-line-pragma
-FILES_CONTAIN_UNKNOWN_TYPE: Final = [
+FILES_CONTAIN_UNKNOWN_TYPE: List[str] = [
     # Add file path when you force to use unknown.
 ]
 # pylint: enable=line-too-long, single-line-pragma
@@ -433,7 +433,7 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def _check_unknown_type(self):
+    def _check_unknown_type(self) -> concurrent_task_utils.TaskResult:
         """Prints a list of lint errors if an unknown type is used. This lint
         check is not enabled by default. Add proper comment if unknown is needed.
         Returns:
