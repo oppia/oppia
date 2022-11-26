@@ -27,15 +27,15 @@ import { FocusOnDirective } from './focus-on.directive';
   template: '<div [oppiaFocusOn]="label" class="focus-label"></div>'
 })
 class MockCompA {
-  label: 'label';
+  label!: 'label';
 }
 
 describe('Focus on component', () => {
   let fixture: ComponentFixture<MockCompA>;
   let directiveInstance: FocusOnDirective;
   let mockEventEmitter = new EventEmitter();
-  let focusManagerService: FocusManagerService = null;
-  let focusSpy = null;
+  let focusManagerService: FocusManagerService;
+  let focusSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
