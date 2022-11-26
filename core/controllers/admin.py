@@ -1695,31 +1695,28 @@ class UpdateUsernameHandler(
             feconf.ENTITY_TYPE_USER, old_username)
         new_fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_USER, new_username)
-        if old_fs.isfile('profile_picture.png'):
-            print("****************************************")
-            print("png")
-            image_png = old_fs.get('profile_picture.png')
-            old_fs.delete('profile_picture.png')
-            new_fs.commit(
-                'profile_picture.png', image_png, mimetype='image/png')
-        else:
+
+        if not old_fs.isfile('profile_picture.png'):
             self.InvalidInputException(
                 'The user with username %s does not have a '
                 'profile picture with png extension.' % (old_username)
             )
 
-        if old_fs.isfile('profile_picture.webp'):
-            print("****************************************")
-            print("webp")
-            image_webp = old_fs.get('profile_picture.webp')
-            old_fs.delete('profile_picture.webp')
-            new_fs.commit(
-                'profile_picture.webp', image_webp, mimetype='image/webp')
-        else:
+        if not old_fs.isfile('profile_picture.webp'):
             self.InvalidInputException(
                 'The user with username %s does not have a '
                 'profile picture with webp extension.' % (old_username)
             )
+
+        image_png = old_fs.get('profile_picture.png')
+        old_fs.delete('profile_picture.png')
+        new_fs.commit(
+            'profile_picture.png', image_png, mimetype='image/png')
+
+        image_webp = old_fs.get('profile_picture.webp')
+        old_fs.delete('profile_picture.webp')
+        new_fs.commit(
+            'profile_picture.webp', image_webp, mimetype='image/webp')
 
         user_services.set_username(user_id, new_username)
         user_services.log_username_change(

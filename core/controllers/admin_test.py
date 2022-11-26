@@ -2453,7 +2453,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token)
 
-        self.assertEqual(response['error'], '')
+        self.assertEqual(response, '')
 
 
 class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
