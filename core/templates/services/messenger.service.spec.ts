@@ -67,7 +67,11 @@ describe('BannerComponent', () => {
         },
       ]
     });
-    mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
+    // This throws "Type object is not assignable to type
+    // 'WindowRef'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
+    mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
   });
 
   beforeEach(() => {

@@ -120,19 +120,27 @@ describe('Topics List Component', () => {
     componentInstance = fixture.componentInstance;
     fixture.detectChanges();
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    urlInterpolationService = (urlInterpolationService as unknown) as
+    urlInterpolationService = (urlInterpolationService) as
       jasmine.SpyObj<UrlInterpolationService>;
     alertsService = TestBed.inject(AlertsService);
-    alertsService = (alertsService as unknown) as
+    alertsService = (alertsService) as
       jasmine.SpyObj<AlertsService>;
+    // This throws "Type object is not assignable to type
+    // 'EditableTopicBackendApiService'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     editableTopicBackendApiService = (
-      TestBed.inject(EditableTopicBackendApiService) as unknown) as
+      TestBed.inject(EditableTopicBackendApiService)) as
       MockEditableBackendApiService;
-    mockNgbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
+    // This throws "Type object is not assignable to type
+    // 'NgbModal'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
+    mockNgbModal = (TestBed.inject(NgbModal)) as MockNgbModal;
     topicsAndSkillsDashboardBackendApiService = TestBed.inject(
       TopicsAndSkillsDashboardBackendApiService);
     topicsAndSkillsDashboardBackendApiService = (
-      topicsAndSkillsDashboardBackendApiService as unknown) as
+      topicsAndSkillsDashboardBackendApiService) as
       jasmine.SpyObj<TopicsAndSkillsDashboardBackendApiService>;
   });
 

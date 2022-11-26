@@ -167,12 +167,36 @@ import { ReviewTestPageComponent } from 'pages/review-test-page/review-test-page
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 import { AnswerContentModalComponent } from './common-layout-directives/common-elements/answer-content-modal.component';
-import { VisualizationSortedTilesComponent } from 'extensions/visualizations/oppia-visualization-sorted-tiles.component';
-import { OppiaVisualizationClickHexbinsComponent } from 'extensions/visualizations/oppia-visualization-click-hexbins.directive';
-import { OppiaVisualizationFrequencyTableComponent } from 'extensions/visualizations/oppia-visualization-frequency-table.directive';
-import { OppiaVisualizationEnumeratedFrequencyTableComponent } from 'extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive';
-import { RandomSelectorComponent } from 'extensions/value_generators/templates/random-selector.component';
-import { CopierComponent } from 'extensions/value_generators/templates/copier.component';
+// This throws "TS2307". We need to
+// suppress this error because DynamicComponentModule are not strictly typed
+// yet.
+// @ts-ignore
+import { VisualizationSortedTilesComponent } from 'visualizations/oppia-visualization-sorted-tiles.component';
+// This throws "TS2307". We need to
+// suppress this error because DynamicComponentModule are not strictly typed
+// yet.
+// @ts-ignore
+import { OppiaVisualizationClickHexbinsComponent } from 'visualizations/oppia-visualization-click-hexbins.directive';
+// This throws "TS2307". We need to
+// suppress this error because DynamicComponentModule are not strictly typed
+// yet.
+// @ts-ignore
+import { OppiaVisualizationFrequencyTableComponent } from 'visualizations/oppia-visualization-frequency-table.directive';
+// This throws "TS2307". We need to
+// suppress this error because DynamicComponentModule are not strictly typed
+// yet.
+// @ts-ignore
+import { OppiaVisualizationEnumeratedFrequencyTableComponent } from 'visualizations/oppia-visualization-enumerated-frequency-table.directive';
+// This throws "TS2307". We need to
+// suppress this error because DynamicComponentModule are not strictly typed
+// yet.
+// @ts-ignore
+import { RandomSelectorComponent } from 'value_generators/templates/random-selector.component';
+// This throws "TS2307". We need to
+// suppress this error because DynamicComponentModule are not strictly typed
+// yet.
+// @ts-ignore
+import { CopierComponent } from 'value_generators/templates/copier.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -191,7 +215,11 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { ComponentOverviewComponent } from './copy-url/copy-url.component';
 import { MatMenuModule} from '@angular/material/menu';
-import { DynamicComponentModule } from 'extensions/value_generators/templates/dynamic-component.module';
+// This throws "TS2307". We need to
+// suppress this error because DynamicComponentModule are not strictly typed
+// yet.
+// @ts-ignore
+import { DynamicComponentModule } from 'value_generators/templates/dynamic-component.module';
 
 @NgModule({
   imports: [
