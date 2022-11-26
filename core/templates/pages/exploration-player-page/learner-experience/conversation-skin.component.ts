@@ -167,7 +167,7 @@ export class ConversationSkinComponent {
   submitButtonIsDisabled = true;
   solutionForState: Solution | null = null;
   isLearnerReallyStuck: boolean = false;
-  continueToStuckStateButtonIsVisible: boolean = false;
+  continueToReviseStateButtonIsVisible: boolean = false;
 
   // The fields are used to customize the component for the diagnostic player,
   // question player, and exploration player page.
@@ -311,7 +311,7 @@ export class ConversationSkinComponent {
           this.solutionForState = newCard.getSolution();
           this.numberOfIncorrectSubmissions = 0;
           this.nextCardIfStuck = null;
-          this.continueToStuckStateButtonIsVisible = false;
+          this.continueToReviseStateButtonIsVisible = false;
           this.triggerIfLearnerStuckAction();
         }
       )
@@ -1073,8 +1073,8 @@ export class ConversationSkinComponent {
           this.translateService.instant(
             'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE')
         );
-        // Enable visibility of ContinueStuck button.
-        this.continueToStuckStateButtonIsVisible = true;
+        // Enable visibility of ContinueToRevise button.
+        this.continueToReviseStateButtonIsVisible = true;
       } else if (this.solutionForState !== null &&
         this.numberOfIncorrectSubmissions >=
         ExplorationPlayerConstants.
@@ -1096,8 +1096,8 @@ export class ConversationSkinComponent {
       this.playerTranscriptService.addNewResponseToExistingFeedback(
         this.translateService.instant(
           'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE'));
-      // Enable visibility of ContinueStuck button.
-      this.continueToStuckStateButtonIsVisible = true;
+      // Enable visibility of ContinueToRevise button.
+      this.continueToReviseStateButtonIsVisible = true;
     } else if (this.solutionForState !== null &&
       this.numberOfIncorrectSubmissions >=
       ExplorationPlayerConstants.

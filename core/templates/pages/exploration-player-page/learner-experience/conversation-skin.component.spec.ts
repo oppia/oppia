@@ -1176,7 +1176,7 @@ describe('Conversation skin component', () => {
     expect(componentInstance.nextCard).toEqual(
       componentInstance.nextCardIfStuck);
     expect(componentInstance.showPendingCard).toHaveBeenCalled();
-  }))
+  }));
 
   it('should fetch completed chapters count if user is logged in',
     fakeAsync(() => {

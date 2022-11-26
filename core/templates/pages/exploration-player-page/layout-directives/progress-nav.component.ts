@@ -61,7 +61,7 @@ export class ProgressNavComponent {
   @Input() isLearnAgainButton!: boolean;
   @Input() displayedCard!: StateCard;
   @Input() submitButtonIsShown!: boolean;
-  @Input() showStuckContinueButton!: boolean;
+  @Input() showContinueToReviseButton!: boolean;
   @Input() navigationThroughCardHistoryIsEnabled!: boolean;
   @Input() skipButtonIsShown!: boolean;
   displayedCardIndex!: number;
@@ -82,7 +82,7 @@ export class ProgressNavComponent {
   @Output() clickContinueButton: EventEmitter<void> = (
     new EventEmitter());
 
-  @Output() clickStuckContinueButton: EventEmitter<void> = (
+  @Output() clickContinueToReviseButton: EventEmitter<void> = (
     new EventEmitter());
 
   @Output() changeCard: EventEmitter<number> = new EventEmitter();
