@@ -50,6 +50,10 @@ describe('Image preloader service', () => {
 
 
   const initStateName = 'Introduction';
+  // This throws "Type object is not assignable to type
+  // 'ExplorationBackendDict'." We need to suppress this error
+  // because of the need to test validations.
+  // @ts-ignore
   const explorationDict: ExplorationBackendDict = {
     correctness_feedback_enabled: false,
     draft_changes: [],
@@ -387,7 +391,7 @@ describe('Image preloader service', () => {
       correctness_feedback_enabled: true,
       edits_allowed: true
     }
-  } as unknown as ExplorationBackendDict;
+  } as ExplorationBackendDict;
   class mockReaderObject {
     result = null;
     onloadend: () => string;

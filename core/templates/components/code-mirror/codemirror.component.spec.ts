@@ -49,9 +49,13 @@ describe('Oppia CodeMirror Component', () => {
   it('should notify that it has loaded', fakeAsync(() => {
     const onLoadSpy = jasmine.createSpy('onLoadSpy');
     let subscription = component.onLoad.subscribe(onLoadSpy);
+    // This throws "Type object is not assignable to type
+    // 'CodemirrorComponent'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     component.codemirrorComponent = {
       codemirror: {}
-    } as unknown as CodemirrorComponent;
+    } as CodemirrorComponent;
     component.ngAfterViewInit();
     tick(1);
     expect(onLoadSpy).toHaveBeenCalled();
@@ -67,11 +71,15 @@ describe('Oppia CodeMirror Component', () => {
   }));
 
   it ('should refresh codemirror', waitForAsync(() => {
+    // This throws "Type object is not assignable to type
+    // 'CodeMirror.Editor'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     component.codemirror = {
       refresh: () => {
         return;
       }
-    } as unknown as CodeMirror.Editor;
+    } as CodeMirror.Editor;
     const refreshSpy = spyOn(component.codemirror, 'refresh');
     const changes: SimpleChanges = {
       refresh: {

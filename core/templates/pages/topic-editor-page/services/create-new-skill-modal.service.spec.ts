@@ -122,19 +122,23 @@ describe('Create New Skill Modal Service', () => {
   beforeEach(() => {
     createNewSkillModalService = TestBed.inject(CreateNewSkillModalService);
     alertsService = TestBed.inject(AlertsService);
-    alertsService = (alertsService as unknown) as
+    alertsService = (alertsService) as
       jasmine.SpyObj<AlertsService>;
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
-    imageLocalStorageService = (imageLocalStorageService as unknown) as
+    imageLocalStorageService = (imageLocalStorageService) as
       jasmine.SpyObj<ImageLocalStorageService>;
     topicsAndSkillsDashboardBackendApiService =
     TestBed.inject(TopicsAndSkillsDashboardBackendApiService);
     topicsAndSkillsDashboardBackendApiService =
-    (topicsAndSkillsDashboardBackendApiService as unknown) as jasmine
+    (topicsAndSkillsDashboardBackendApiService) as jasmine
     .SpyObj<TopicsAndSkillsDashboardBackendApiService>;
-    mockSkillCreationBackendApiService =
-    (TestBed.inject(SkillCreationBackendApiService) as unknown) as
-    MockSkillCreationBackendApiService;
+    mockSkillCreationBackendApiService = (
+      // This throws "Type 'MockSkillCreationBackendApiService' is not
+      // assignable to type desire". We need to suppress this error because of
+      // the need to test validations.
+      // @ts-ignore
+      TestBed.inject(SkillCreationBackendApiService) as
+    MockSkillCreationBackendApiService);
   });
 
   it('should not create new skill when skill creation is in progress', () => {

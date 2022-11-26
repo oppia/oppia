@@ -77,8 +77,12 @@ describe('Translation opportunities component', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
+    // This throws "Type windowref is not assignable to type
+    // desire." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     translationModal = TestBed.createComponent(
-      TranslationModalComponent) as unknown as NgbModalRef;
+      TranslationModalComponent) as NgbModalRef;
     httpTestingController = TestBed.inject(HttpTestingController);
     contributionOpportunitiesService = TestBed.inject(
       ContributionOpportunitiesService);

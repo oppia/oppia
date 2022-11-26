@@ -65,7 +65,11 @@ describe('Blog Dashboard Page Component', () => {
     fixture = TestBed.createComponent(
       BlogPostEditorNavbarPreLogoActionComponent);
     component = fixture.componentInstance;
-    mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
+    // This throws "Type windowref is not assignable to type
+    // desire." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
+    mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
     blogDashboardPageService = TestBed.inject(BlogDashboardPageService);
   });
 

@@ -81,6 +81,10 @@ describe('Schema Based Unicode Editor', () => {
   });
 
   it('should instantiate codemirror on initialization', fakeAsync(() => {
+    // This throws "Type object is not assignable to type
+    // 'CodeMirror.Editor'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     let cm = {
       getOption: () => 2,
       replaceSelection: () => {},
@@ -90,7 +94,7 @@ describe('Schema Based Unicode Editor', () => {
           setCursor: () => {}
         };
       }
-    } as unknown as CodeMirror.Editor;
+    } as CodeMirror.Editor;
     spyOn(cm, 'replaceSelection');
     component.ngOnInit();
 

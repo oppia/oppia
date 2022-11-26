@@ -42,10 +42,13 @@ describe('Testing RemoveDuplicatesInArrayPipe', () => {
 
   it('should throw error when the input is invalid', () => {
     expect(() => {
-      // Using unknown type conversion to check if the input is invalid.
+      // This throws "Type object is not assignable to type
+      // 'string[]'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
       pipe.transform({
         filter: undefined
-      } as unknown as string[]);
+      } as string[]);
     }).toThrowError('Bad input for removeDuplicatesInArray: {}');
   });
 });

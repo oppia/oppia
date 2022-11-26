@@ -1821,6 +1821,10 @@ describe('Conversation skin component', () => {
     componentInstance.scrollToBottom();
     tick(200);
 
+    // This throws "Type object is not assignable to type
+    // 'JQLite'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     spyOn(window, '$').and.returnValue({
       offset: () => {
         return {top: 10};
@@ -1829,7 +1833,7 @@ describe('Conversation skin component', () => {
       scrollTop: () => 0,
       height: () => 0,
       animate: () => {}
-    } as unknown as JQLite);
+    } as JQLite);
 
     componentInstance.scrollToBottom();
     tick(200);
@@ -1838,9 +1842,13 @@ describe('Conversation skin component', () => {
 
   it('should scroll to top', fakeAsync(() => {
     let animateSpy = jasmine.createSpy('jquery spy');
+    // This throws "Type object is not assignable to type
+    // 'JQLite'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     spyOn(window, '$').and.returnValue({
       animate: animateSpy
-    } as unknown as JQLite);
+    } as JQLite);
     componentInstance.scrollToTop();
     tick(1000);
     expect(animateSpy).toHaveBeenCalled();

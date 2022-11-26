@@ -231,6 +231,10 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       questionBackendApiService.fetchQuestionsAsync(
+        // This throws "Type string is not assignable to type
+        // 'number'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
         ['1'], 'abc' as unknown as number, true
       ).then(successHandler, failHandler);
       flushMicrotasks();

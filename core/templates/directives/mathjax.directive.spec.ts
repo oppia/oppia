@@ -49,6 +49,10 @@ describe('MathJax directive', () => {
   beforeEach(waitForAsync(() => {
     fixture = TestBed.createComponent(MockCompA);
     component = fixture.componentInstance;
+    // This throws "Type object is not assignable to type
+    // 'MathJax'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     window.MathJax = mockMathJs as unknown as typeof MathJax;
   }));
 

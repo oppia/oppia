@@ -41,7 +41,6 @@ describe('Warnings and Alert Component', () => {
     fixture = TestBed.createComponent(WarningsAndAlertsComponent);
     componentInstance = fixture.componentInstance;
     alertsService = TestBed.inject(AlertsService);
-    alertsService = (alertsService as unknown) as jasmine.SpyObj<AlertsService>;
   });
 
   it('should create', () => {

@@ -83,10 +83,14 @@ class MockExplorationDataService {
 }
 
 describe('Save Version Mismatch Modal Component', () => {
+  // This throws "Type object is not assignable to type
+  // LostChange." We need to suppress this error
+  // because of the need to test validations.
+  // @ts-ignore
   const lostChanges = [{
     cmd: 'add_state',
     state_name: 'State name',
-  } as unknown as LostChange];
+  } as LostChange];
 
   let component: SaveVersionMismatchModalComponent;
   let fixture: ComponentFixture<SaveVersionMismatchModalComponent>;

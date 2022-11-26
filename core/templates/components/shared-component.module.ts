@@ -27,14 +27,26 @@ import { CustomFormsComponentsModule } from './forms/custom-forms-directives/cus
 import { DynamicContentModule } from './interaction-display/dynamic-content.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from 'modules/material.module';
-import { ObjectComponentsModule } from 'extensions/objects/object-components.module';
+// This throws "TS2307". We need to
+// suppress this error because ObjectComponentsModule are not strictly typed
+// yet.
+// @ts-ignore
+import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { RecommendationsModule } from './recommendations/recommendations.module';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
-import { RichTextComponentsModule } from 'extensions/rich_text_components/rich-text-components.module';
+// This throws "TS2307". We need to
+// suppress this error because RichTextComponentsModule are not strictly typed
+// yet.
+// @ts-ignore
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { OppiaCkEditor4Module } from './ck-editor-helpers/ckeditor4.module';
-import { BaseModule } from 'core/templates/base-components/base.module';
+// This throws "TS2307". We need to
+// suppress this error because BaseModule are not strictly typed
+// yet.
+// @ts-ignore
+import { BaseModule } from 'base-components/base.module';
 import { NgBootstrapModule } from 'modules/ng-boostrap.module';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 

@@ -216,10 +216,14 @@ describe('Schema Based List Editor Component', () => {
     'the validators include "is_uniquified"',
     () => {
       component.showDuplicatesWarning = false;
+      // This throws "Type object is not assignable to type
+      // 'OppiaValidator[]'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
       component.validators = [
         {
           id: 'is_uniquified',
-        } as unknown as OppiaValidator
+        } as OppiaValidator
       ];
 
       component.ngOnInit();

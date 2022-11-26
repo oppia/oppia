@@ -66,6 +66,10 @@ describe('Exploration data service', function() {
       edits_allowed: true
     }
   };
+  // This throws "Type object is not assignable to type
+  // FetchExplorationBackendResponse." We need to suppress this error
+  // because of the need to test validations.
+  // @ts-ignore
   let sampleExploration: FetchExplorationBackendResponse = {
     can_edit: true,
     exploration: {
@@ -96,7 +100,7 @@ describe('Exploration data service', function() {
     auto_tts_enabled: true,
     correctness_feedback_enabled: false,
     record_playthrough_probability: 1,
-  } as unknown as FetchExplorationBackendResponse;
+  } as FetchExplorationBackendResponse;
   class MockEditableExplorationBackendApiService {
     resolve: boolean = true;
     async fetchApplyDraftExplorationAsync() {

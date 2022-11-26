@@ -175,13 +175,18 @@ describe('Topic editor state service', () => {
   beforeEach(() => {
     undoRedoService = TestBed.inject(UndoRedoService);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
+    // This throws "Type 'EditableTopicBackendApiService' is not
+    // assignable to type desire". We need to suppress this error because of
+    // the need to test validations.
+    // @ts-ignore
     mockEditableTopicBackendApiService = (TestBed.inject(
-      EditableTopicBackendApiService) as unknown) as
+      EditableTopicBackendApiService)) as
       jasmine.SpyObj<MockEditableTopicBackendApiService>;
     editableStoryBackendApiService =
       TestBed.inject(EditableStoryBackendApiService);
-    alertsService = (TestBed.inject(AlertsService) as unknown) as
-      jasmine.SpyObj<AlertsService>;
+    alertsService = (
+      TestBed.inject(AlertsService) as
+      jasmine.SpyObj<AlertsService>);
     topicObjectFactory = TestBed.inject(TopicObjectFactory);
 
     topicDict = {

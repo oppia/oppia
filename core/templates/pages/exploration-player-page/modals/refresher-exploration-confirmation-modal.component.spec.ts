@@ -74,12 +74,13 @@ describe('Refresher Exploration Confirmation Modal', () => {
     fixture = TestBed.createComponent(RefresherExplorationConfirmationModal);
     componentInstance = fixture.componentInstance;
     componentInstance.refresherExplorationId = 'test_id';
-    mockUrlService = (TestBed.inject(UrlService) as unknown) as
-      jasmine.SpyObj<MockUrlService>;
-    windowRef = (TestBed.inject(WindowRef) as unknown) as
-      jasmine.SpyObj<WindowRef>;
-    ngbActiveModal = (TestBed.inject(NgbActiveModal) as unknown) as
-      jasmine.SpyObj<NgbActiveModal>;
+    // This throws "Type object is not assignable to type
+    // 'UrlService'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
+    mockUrlService = (TestBed.inject(UrlService));
+    windowRef = (TestBed.inject(WindowRef));
+    ngbActiveModal = (TestBed.inject(NgbActiveModal));
   });
 
   it('should create', () => {

@@ -197,6 +197,10 @@ describe('State Skill Editor Component', () => {
     fixture.detectChanges();
     componentInstance.untriagedSkillSummaries = [];
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    // This throws "Type NgbModel is not assignable to type
+    // 'Model'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     mockNgbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
     stateLinkedSkillIdService = TestBed.inject(StateLinkedSkillIdService);
     userService = TestBed.inject(UserService);

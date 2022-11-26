@@ -60,7 +60,11 @@ describe('Blog Post Page service', () => {
     blogPostEditorBackendApiService = TestBed.inject(
       BlogPostEditorBackendApiService);
     blogDashboardPageService = TestBed.inject(BlogDashboardPageService);
-    mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
+    // This throws "Type windowref is not assignable to type
+    // desire." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
+    mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
     alertsService = TestBed.inject(AlertsService);
   });
 

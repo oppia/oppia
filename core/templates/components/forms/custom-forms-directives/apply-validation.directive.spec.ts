@@ -56,8 +56,12 @@ describe('Apply validation directive', () => {
   it('should validate value', () => {
     directiveInstance.validators = [{
       id: 'isAtLeast',
+      // This throws "Type object is not assignable to type
+      // 'Validator[]'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
       minValue: -2.5
-    }] as unknown as Validator[];
+    }] as Validator[];
 
     expect(directiveInstance.validate(new FormControl(2))).toBeNull();
 

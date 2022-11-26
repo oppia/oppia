@@ -62,6 +62,9 @@ describe('Pie Chart component', () => {
     mockedChart = {
       draw: () => { },
       data: 1
+    // Here 'as unknown as' is used to test invalid Command,
+    // But if we try to enter 'invalidCommand' directly in cmd
+    // it will throw type script error ts(2322).
     } as unknown as google.visualization.PieChart;
 
     // This approach was choosen because spyOnProperty() doesn't work on

@@ -39,10 +39,10 @@ describe('Exploration Diff Service', () => {
       changeList: [{
         cmd: 'invalidCommand',
         state_name: 'newState'
-      } as unknown as ExplorationChange],
       // Here 'as unknown as' is used to test invalid Command,
       // But if we try to enter 'invalidCommand' directly in cmd
       // it will throw type script error ts(2322).
+      } as unknown as ExplorationChange],
       directionForwards: true
     }];
 
