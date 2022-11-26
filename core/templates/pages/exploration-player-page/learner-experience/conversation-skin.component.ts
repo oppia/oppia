@@ -132,7 +132,6 @@ export class ConversationSkinComponent {
   OPPIA_AVATAR_IMAGE_URL: string;
   displayedCard: StateCard;
   upcomingInlineInteractionHtml;
-  timeout: NodeJS.Timeout | null = null;
   responseTimeout: NodeJS.Timeout | null = null;
   DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
@@ -1062,10 +1061,6 @@ export class ConversationSkinComponent {
   }
 
   triggerIfLearnerStuckAction(): void {
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
-    }
     if (this.responseTimeout) {
       clearTimeout(this.responseTimeout);
       this.responseTimeout = null;
@@ -1078,10 +1073,8 @@ export class ConversationSkinComponent {
           this.translateService.instant(
             'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE')
         );
-        //Enable visibility of ContinueStuck button
-
+        // Enable visibility of ContinueStuck button.
         this.continueToStuckStateButtonIsVisible = true;
-
       } else if (this.solutionForState !== null &&
         this.numberOfIncorrectSubmissions >=
         ExplorationPlayerConstants.
@@ -1094,10 +1087,6 @@ export class ConversationSkinComponent {
   }
 
   triggerIfLearnerStuckActionDirectly(): void {
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
-    }
     if (this.responseTimeout) {
       clearTimeout(this.responseTimeout);
       this.responseTimeout = null;
@@ -1107,7 +1096,8 @@ export class ConversationSkinComponent {
       this.playerTranscriptService.addNewResponseToExistingFeedback(
         this.translateService.instant(
           'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE'));
-          this.continueToStuckStateButtonIsVisible = true;
+      // Enable visibility of ContinueStuck button.
+      this.continueToStuckStateButtonIsVisible = true;
     } else if (this.solutionForState !== null &&
       this.numberOfIncorrectSubmissions >=
       ExplorationPlayerConstants.

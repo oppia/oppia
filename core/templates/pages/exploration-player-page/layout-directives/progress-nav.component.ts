@@ -67,7 +67,6 @@ export class ProgressNavComponent {
   displayedCardIndex!: number;
   hasPrevious!: boolean;
   hasNext!: boolean;
-  // isStuckContinueButtonVisible: boolean = true;
   conceptCardIsBeingShown!: boolean;
   interactionCustomizationArgs!: InteractionCustomizationArgs | null;
   interactionId!: string | null;
@@ -82,7 +81,7 @@ export class ProgressNavComponent {
 
   @Output() clickContinueButton: EventEmitter<void> = (
     new EventEmitter());
-  
+
   @Output() clickStuckContinueButton: EventEmitter<void> = (
     new EventEmitter());
 
