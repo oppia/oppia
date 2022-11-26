@@ -25,7 +25,6 @@ import { ContextService } from 'services/context.service';
 import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
 import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 import { VersionHistoryService } from '../services/version-history.service';
-import { AlertsService } from 'services/alerts.service';
 
 interface HeadersAndYamlStrs {
   previousVersionStateYaml: string;
@@ -51,6 +50,7 @@ export class StateVersionHistoryModalComponent
   @Input() oldState!: State;
   @Input() newStateName!: string;
   @Input() oldStateName!: string;
+  validationErrorIsShown: boolean = false;
   yamlStrs: HeadersAndYamlStrs = {
     previousVersionStateYaml: '',
     currentVersionStateYaml: '',
@@ -65,7 +65,6 @@ export class StateVersionHistoryModalComponent
 
   constructor(
       private ngbActiveModal: NgbActiveModal,
-      private alertsService: AlertsService,
       private contextService: ContextService,
       private versionHistoryService: VersionHistoryService,
       private versionHistoryBackendApiService: VersionHistoryBackendApiService,
@@ -94,6 +93,13 @@ export class StateVersionHistoryModalComponent
       throw new Error('Last edited version number cannot be null');
     }
     return lastEditedVersionNumber;
+  }
+
+  getLastEditedVersionNumberInCaseOfError(): number {
+    return (
+      this.versionHistoryService.fetchedStateVersionNumbers[
+        this.versionHistoryService
+          .getCurrentPositionInStateVersionHistoryList()] as number);
   }
 
   getLastEditedCommitterUsername(): string {
@@ -157,6 +163,8 @@ export class StateVersionHistoryModalComponent
     this.updateLeftPane();
     this.updateRightPane();
 
+    this.validationErrorIsShown = false;
+
     this
       .versionHistoryService
       .decrementCurrentPositionInStateVersionHistoryList();
@@ -203,6 +211,8 @@ export class StateVersionHistoryModalComponent
     this.updateLeftPane();
     this.updateRightPane();
 
+    this.validationErrorIsShown = false;
+
     this.fetchPreviousVersionHistory();
   }
 
@@ -247,9 +257,9 @@ export class StateVersionHistoryModalComponent
           this.versionHistoryService
             .incrementCurrentPositionInStateVersionHistoryList();
         } else {
-          this.alertsService.addWarning(
-            'Could not fetch the version history data. ' +
-            'Please reload the page and try again.');
+          this.validationErrorIsShown = true;
+          this.versionHistoryService
+            .incrementCurrentPositionInStateVersionHistoryList();
         }
       });
     }
