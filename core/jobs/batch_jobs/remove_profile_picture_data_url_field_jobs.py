@@ -66,7 +66,7 @@ class RemoveProfilePictureFieldJob(base_jobs.JobBase):
             users_with_updated_fields
             | 'Total count for user models' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'USER MODELS UPDATED'))
+                    'USER MODELS ITERATED OR UPDATED'))
         )
 
         unused_put_results = (

@@ -52,6 +52,25 @@ class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
     JOB_CLASS = (
         remove_profile_picture_data_url_field_jobs.RemoveProfilePictureFieldJob)
 
+    def test_run_with_no_models(self) -> None:
+        self.assert_job_output_is([])
+
+    def test_model_without_profile_picture_field_works(self) -> None:
+        user_1 = self.create_model(
+            user_models.UserSettingsModel,
+            id='test_id_1',
+            email='test_1@example.com',
+            username='test_1',
+            roles=[
+                feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN]
+        )
+        self.put_multi([user_1])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='USER MODELS ITERATED OR UPDATED SUCCESS: 1'
+            )
+        ])
+
     def test_removal_of_profile_field(self) -> None:
         with self.swap(
             user_models, 'UserSettingsModel',
@@ -80,39 +99,8 @@ class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
 
             self.assert_job_output_is([
                 job_run_result.JobRunResult(
-                    stdout='USER MODELS UPDATED SUCCESS: 2'
+                    stdout='USER MODELS ITERATED OR UPDATED SUCCESS: 2'
                 )
             ])
 
-            expected_user_1_settings_model_dict = {
-                'banned': False,
-                'created_on': user_1.created_on,
-                'creator_dashboard_display_pref': 'card',
-                'default_dashboard': 'learner',
-                'deleted': False,
-                'display_alias': None,
-                'email': 'test_1@example.com',
-                'first_contribution_msec': None,
-                'has_viewed_lesson_info_modal_once': False,
-                'last_agreed_to_terms': None,
-                'last_created_an_exploration': None,
-                'last_edited_an_exploration': None,
-                'last_logged_in': None,
-                'last_started_state_editor_tutorial': None,
-                'last_started_state_translation_tutorial': None,
-                'last_updated': user_1.last_updated,
-                'normalized_username': None,
-                'pin': None,
-                'preferred_audio_language_code': None,
-                'preferred_language_codes': [],
-                'preferred_site_language_code': None,
-                'preferred_translation_language_code': None,
-                'role': 'EXPLORATION_EDITOR',
-                'roles': ['EXPLORATION_EDITOR', 'ADMIN'],
-                'subject_interests': [],
-                'user_bio': None,
-                'username': 'test_1'
-            }
-
-            self.assertEqual(
-                user_1.to_dict(), expected_user_1_settings_model_dict)
+            self.assertNotIn('profile_picture_data_url', user_1.to_dict())
