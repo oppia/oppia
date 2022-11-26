@@ -97,6 +97,7 @@ const TIME_NUM_CARDS_CHANGE_MSEC = 500;
 })
 export class ConversationSkinComponent {
   @Input() questionPlayerConfig;
+  @Input() diagnosticTestTopicTrackerModel;
   directiveSubscriptions = new Subscription();
   // The minimum width, in pixels, needed to be able to show two cards
   // side-by-side.
@@ -168,6 +169,15 @@ export class ConversationSkinComponent {
   solutionForState: Solution | null = null;
   isLearnerReallyStuck: boolean = false;
   continueToStuckStateButtonIsVisible: boolean = false;
+
+  // The fields are used to customize the component for the diagnostic player,
+  // question player, and exploration player page.
+  feedbackIsEnabled: boolean = true;
+  learnerCanOnlyAttemptQuestionOnce: boolean = false;
+  inputOutputHistoryIsShown: boolean = true;
+  navigationThroughCardHistoryIsEnabled: boolean = true;
+  checkpointCelebrationModalIsEnabled: boolean = true;
+  skipButtonIsShown: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
@@ -256,6 +266,15 @@ export class ConversationSkinComponent {
       });
     } else {
       this.collectionTitle = null;
+    }
+
+    if (this.diagnosticTestTopicTrackerModel) {
+      this.feedbackIsEnabled = false;
+      this.learnerCanOnlyAttemptQuestionOnce = true;
+      this.inputOutputHistoryIsShown = false;
+      this.navigationThroughCardHistoryIsEnabled = false;
+      this.checkpointCelebrationModalIsEnabled = false;
+      this.skipButtonIsShown = true;
     }
 
     this.explorationId = this.explorationEngineService.getExplorationId();
@@ -1055,7 +1074,6 @@ export class ConversationSkinComponent {
       if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
         // Let the learner know about the redirection to a state
         // for clearing concepts.
-        console.log("Kya hua");
         this.playerTranscriptService.addNewResponseToExistingFeedback(
           this.translateService.instant(
             'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE')
@@ -1112,8 +1130,10 @@ export class ConversationSkinComponent {
   private _initializeDirectiveComponents(initialCard, focusLabel): void {
     this._addNewCard(initialCard);
     this.nextCard = initialCard;
-    this.explorationPlayerStateService.onPlayerStateChange.emit(
-      this.nextCard.getStateName());
+    if (!this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()) {
+      this.explorationPlayerStateService.onPlayerStateChange.emit(
+        this.nextCard.getStateName());
+    }
 
     if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
       // We do not store checkpoints progress for iframes hence we do not
@@ -1156,6 +1176,15 @@ export class ConversationSkinComponent {
     });
   }
 
+  skipCurrentQuestion(): void {
+    this.explorationPlayerStateService.skipCurrentQuestion(
+      (nextCard) => {
+        this.nextCard = nextCard;
+        this.showPendingCard();
+      }
+    );
+  }
+
   initializePage(): void {
     this.hasInteractedAtLeastOnce = false;
     this.recommendedExplorationSummaries = [];
@@ -1165,6 +1194,11 @@ export class ConversationSkinComponent {
         this.questionPlayerConfig,
         this._initializeDirectiveComponents.bind(this),
         this.showQuestionAreNotAvailable);
+    } else if (this.diagnosticTestTopicTrackerModel) {
+      this.explorationPlayerStateService.initializeDiagnosticPlayer(
+        this.diagnosticTestTopicTrackerModel,
+        this._initializeDirectiveComponents.bind(this)
+      );
     } else {
       this.explorationPlayerStateService.initializePlayer(
         this._initializeDirectiveComponents.bind(this));
@@ -1189,9 +1223,10 @@ export class ConversationSkinComponent {
       }
     }
 
-    if (!this.explorationPlayerStateService.isInQuestionMode() &&
-      !this.isInPreviewMode &&
-      AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
+    if (!this.isInPreviewMode &&
+        !this.explorationPlayerStateService.isPresentingIsolatedQuestions() &&
+        AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE
+    ) {
       this.initLearnerAnswerInfoService(
         this.explorationId, this.explorationEngineService.getState(),
         answer, interactionRulesService,
@@ -1233,7 +1268,8 @@ export class ConversationSkinComponent {
         this.nextCard = nextCard;
         this.nextCardIfStuck = nextCardIfReallyStuck;
         if (!this._editorPreviewMode &&
-            !this.explorationPlayerStateService.isInQuestionMode()) {
+            !this.explorationPlayerStateService.isPresentingIsolatedQuestions()
+        ) {
           let oldStateName =
             this.playerPositionService.getCurrentStateName();
           if (!remainOnCurrentCard) {
@@ -1260,22 +1296,37 @@ export class ConversationSkinComponent {
             this.explorationActuallyStarted = true;
           }
         }
-        if (!this.explorationPlayerStateService.isInQuestionMode()) {
+
+        if (
+          !this.explorationPlayerStateService.isPresentingIsolatedQuestions()
+        ) {
           this.explorationPlayerStateService.onPlayerStateChange.emit(
             nextCard.getStateName());
-        } else {
+        } else if (
+          this.explorationPlayerStateService.isInQuestionPlayerMode()
+        ) {
           this.questionPlayerStateService.answerSubmitted(
             this.questionPlayerEngineService.getCurrentQuestion(),
             !remainOnCurrentCard,
             taggedSkillMisconceptionId);
         }
-        // Do not wait if the interaction is supplemental -- there's
-        // already a delay bringing in the help card.
-        let millisecsLeftToWait = (
-          !this.displayedCard.isInteractionInline() ? 1.0 :
-          Math.max(this.MIN_CARD_LOADING_DELAY_MSEC - (
-            new Date().getTime() - timeAtServerCall),
-          1.0));
+
+        let millisecsLeftToWait: number;
+        if (!this.displayedCard.isInteractionInline()) {
+          // Do not wait if the interaction is supplemental -- there's
+          // already a delay bringing in the help card.
+          millisecsLeftToWait = 1.0;
+        } else if (
+          this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
+        ) {
+          // Do not wait if the player mode is the diagnostic test. Since no
+          // feedback will be presented after attempting a question so delaying
+          // is not required.
+          millisecsLeftToWait = 1.0;
+        } else {
+          millisecsLeftToWait = Math.max(this.MIN_CARD_LOADING_DELAY_MSEC - (
+            new Date().getTime() - timeAtServerCall), 1.0);
+        }
 
         setTimeout(() => {
           this.explorationPlayerStateService.onOppiaFeedbackAvailable.emit();

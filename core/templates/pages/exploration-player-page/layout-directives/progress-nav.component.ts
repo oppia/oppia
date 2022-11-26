@@ -62,6 +62,8 @@ export class ProgressNavComponent {
   @Input() displayedCard!: StateCard;
   @Input() submitButtonIsShown!: boolean;
   @Input() showStuckContinueButton!: boolean;
+  @Input() navigationThroughCardHistoryIsEnabled!: boolean;
+  @Input() skipButtonIsShown!: boolean;
   displayedCardIndex!: number;
   hasPrevious!: boolean;
   hasNext!: boolean;
@@ -86,6 +88,8 @@ export class ProgressNavComponent {
 
   @Output() changeCard: EventEmitter<number> = new EventEmitter();
 
+  @Output() skipQuestion: EventEmitter<void> = new EventEmitter();
+
   directiveSubscriptions = new Subscription();
   transcriptLength: number = 0;
   interactionIsInline: boolean = true;
@@ -105,7 +109,7 @@ export class ProgressNavComponent {
     private urlService: UrlService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private windowDimensionsService: WindowDimensionsService,
-    private contentTranslationManagerService: ContentTranslationManagerService
+    private contentTranslationManagerService: ContentTranslationManagerService,
   ) {}
 
   ngOnChanges(): void {
@@ -141,6 +145,10 @@ export class ProgressNavComponent {
     );
   }
 
+  skipCurrentQuestion(): void {
+    this.skipQuestion.emit();
+  }
+
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
@@ -153,9 +161,12 @@ export class ProgressNavComponent {
     this.hasNext = !this.playerTranscriptService.isLastCard(
       this.displayedCardIndex);
     this.explorationPlayerStateService.isInQuestionMode();
+
     this.conceptCardIsBeingShown = (
       this.displayedCard.getStateName() === null &&
-      !this.explorationPlayerStateService.isInQuestionMode());
+        !this.explorationPlayerStateService.isPresentingIsolatedQuestions()
+    );
+
     if (!this.conceptCardIsBeingShown) {
       this.interactionIsInline = this.displayedCard.isInteractionInline();
       this.interactionCustomizationArgs = this.displayedCard
