@@ -1883,7 +1883,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_contributor_certificate(self):
+    def test_get_contributor_certificate(self) -> None:
         score_category: str = (
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')

@@ -134,8 +134,8 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     expect(component.errorsFound).toBeTrue();
     expect(component.errorMessage).toEqual(
-      `Please select a 'To' date that is earlier than today's 
-      date`
+      'Please select a \'To\' date that is earlier than ' +
+      'today\'s date'
     );
   });
 

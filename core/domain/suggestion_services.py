@@ -45,8 +45,8 @@ from core.platform import models
 
 from html2image import Html2Image
 from typing import (
-    Callable, Dict, Final, List, Literal, Mapping, Match, Optional, Sequence,
-    Set, Tuple, Union, cast, overload
+    Any, Callable, Dict, Final, List, Literal, Mapping, Match, Optional,
+    Sequence, Set, Tuple, Union, cast, overload
 )
 
 MYPY = False
@@ -3010,11 +3010,11 @@ def generate_contributor_certificate(
 
 
 def _generate_translation_contributor_certificate(
-    language_code: str,
+    language_code: Optional[str],
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     username: str,
-    user_id: str,
+    user_id: Optional[str],
     date: str
 ) -> str:
     """Generates a certificate for a user's translation contributions.
@@ -3110,7 +3110,7 @@ def _generate_question_contributor_certificate(
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     username: str,
-    user_id: str,
+    user_id: Optional[str],
     date: str
 ) -> str:
     """Generates a certificate for a user's question contributions.
@@ -3177,14 +3177,14 @@ def _generate_question_contributor_certificate(
     return certificate_template
 
 
-def _generate_contributor_certificate_image(template: str) -> str:
+def _generate_contributor_certificate_image(template: str) -> Any:
     """Generates an image from the html string.
 
     Args:
         template: str. The html template to create the image.
 
     Returns:
-        str. The path of the generated image.
+        Any. The path of the generated image.
 
     Raises:
         Exception. Image generation failed.

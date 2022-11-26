@@ -964,7 +964,14 @@ class ContributorCertificateHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
-    def get(self, username, suggestion_type, language, from_date, to_date):
+    def get(
+        self,
+        username,
+        suggestion_type,
+        language,
+        from_date,
+        to_date
+    ) -> None:
         """Handles GET requests."""
         from_datetime = datetime.datetime.strptime(from_date, '%Y-%m-%d')
         to_datetime = datetime.datetime.strptime(to_date, '%Y-%m-%d')
@@ -976,6 +983,9 @@ class ContributorCertificateHandler(base.BaseHandler):
             username, suggestion_type, language, from_datetime,
             to_datetime)
 
+
+        # TODO(#16632): Certificate file should not be saved into the file
+        # system.
         with open(file, 'rb') as fh:
             buf = io.BytesIO(fh.read())
 

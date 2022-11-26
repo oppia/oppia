@@ -6067,10 +6067,16 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'skill_id': 1,
             'skill_difficulty': 0.3
         }
-        suggestion_change[
-            'question_dict'][
-                'question_state_data']['content']['html'] = (
-                    '<p>No image content</p>')
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(suggestion_change['question_dict'], dict)
+        test_question_dict: question_domain.QuestionDict = (
+            suggestion_change['question_dict']
+        )
+
+        question_state_data = test_question_dict[
+            'question_state_data']
+        question_state_data['content'][
+            'html'] = '<p>No image content</p>'
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
@@ -6117,10 +6123,16 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'skill_id': 1,
             'skill_difficulty': 0.3
         }
-        suggestion_change[
-            'question_dict'][
-                'question_state_data']['content']['html'] = (
-                    '<img src=abc>No image content</img>')
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(suggestion_change['question_dict'], dict)
+        test_question_dict: question_domain.QuestionDict = (
+            suggestion_change['question_dict']
+        )
+
+        question_state_data = test_question_dict[
+            'question_state_data']
+        question_state_data['content'][
+            'html'] = '<img src=abc>No image content</img>'
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
