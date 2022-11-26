@@ -505,8 +505,8 @@ def _verify_profile_picture_is_deleted(username: str) -> bool:
     filename_webp = 'profile_picture.webp'
     if fs.isfile(filename_png) or fs.isfile(filename_webp):
         logging.error(
-            'Profile picture is not deleted of user having '
-            'username %s.' % (username)
+            '%s Profile picture is not deleted of user having '
+            'username %s.' % (WIPEOUT_LOGS_PREFIX, username)
         )
         return False
     return True

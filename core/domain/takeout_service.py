@@ -103,8 +103,6 @@ def export_data_for_user(user_id: str) -> takeout_domain.TakeoutData:
         final_name = ('_').join([x.lower() for x in split_name])
         exported_data[final_name] = exported_model_data
 
-    # Separate out images. We store the images that need to be separated here,
-    # as the images are now stored in GCS we will fetch them and return them.
     takeout_image_files: List[takeout_domain.TakeoutImage] = []
     if user_settings is not None:
         if user_settings.username is not None:

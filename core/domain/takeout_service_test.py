@@ -33,6 +33,7 @@ from core.domain import stats_domain
 from core.domain import takeout_domain
 from core.domain import takeout_service
 from core.domain import topic_domain
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -1216,6 +1217,26 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 ],
                 log_messages
             )
+
+    def test_export_data_when_user_settings_is_none(self) -> None:
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            email=self.USER_1_EMAIL,
+            roles=[self.USER_1_ROLE],
+            user_bio='I want to leak uid_abcdefghijabcdefghijabcdefghijab'
+        ).put()
+
+        def _mock_get_user_settings(_, strict) -> None:
+            """Mock get_user_settings function to return None."""
+
+        with self.swap(
+            user_services, 'get_user_settings', _mock_get_user_settings
+        ):
+            user_takeout_object = takeout_service.export_data_for_user(
+                self.USER_ID_1)
+            observed_images = user_takeout_object.user_images
+            expected_images: List[takeout_domain.TakeoutImage] = []
+            self.assertEqual(expected_images, observed_images)
 
     def test_exports_have_single_takeout_dict_key(self) -> None:
         """Test to ensure that all export policies that specify a key for the

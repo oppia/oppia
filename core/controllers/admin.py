@@ -1690,10 +1690,6 @@ class UpdateUsernameHandler(
         if user_services.is_username_taken(new_username):
             raise self.InvalidInputException('Username already taken.')
 
-        user_services.set_username(user_id, new_username)
-        user_services.log_username_change(
-            self.user_id, old_username, new_username)
-
         # Update profile picture.
         old_fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_USER, old_username)
@@ -1724,6 +1720,10 @@ class UpdateUsernameHandler(
                 'The user with username %s does not have a '
                 'profile picture with webp extension.' % (old_username)
             )
+
+        user_services.set_username(user_id, new_username)
+        user_services.log_username_change(
+            self.user_id, old_username, new_username)
 
         self.render_json({})
 
