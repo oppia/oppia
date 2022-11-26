@@ -113,7 +113,6 @@ FILES_CONTAIN_UNKNOWN_TYPE: Final = [
     'extensions/objects/templates/svg-editor.component.ts',
     'extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component.ts',
     'extensions/rich_text_components/Math/directives/oppia-noninteractive-math.component.ts',
-    'extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component.spec.ts',
     'extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component.spec.ts',
 ]
 # pylint: enable=line-too-long, single-line-pragma

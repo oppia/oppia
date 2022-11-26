@@ -95,6 +95,10 @@ describe('NoninteractiveSkillreview', () => {
 
   it('should open concept card when user clicks the link', () => {
     spyOn(contextService, 'removeCustomEntityContext');
+    // This throws "Type object is not assignable to type
+    // 'MouseEvent'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     let e = {
       currentTarget: {
         offsetParent: {
@@ -103,7 +107,7 @@ describe('NoninteractiveSkillreview', () => {
           }
         }
       }
-    } as unknown as MouseEvent;
+    } as MouseEvent;
 
     ckEditorCopyContentService.copyModeActive = false;
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
@@ -121,6 +125,10 @@ describe('NoninteractiveSkillreview', () => {
 
   it('should close concept card when user clicks the link', fakeAsync(() => {
     spyOn(contextService, 'removeCustomEntityContext');
+    // This throws "Type object is not assignable to type
+    // 'MouseEvent'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     let e = {
       currentTarget: {
         offsetParent: {
@@ -129,7 +137,7 @@ describe('NoninteractiveSkillreview', () => {
           }
         }
       }
-    } as unknown as MouseEvent;
+    } as MouseEvent;
 
     ckEditorCopyContentService.copyModeActive = false;
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
@@ -148,6 +156,10 @@ describe('NoninteractiveSkillreview', () => {
 
   it('should throw error when modal is closed in a method other than' +
   '\'cancel\', \'escape key press\' or \'backdrop click\'', fakeAsync(() => {
+    // This throws "Type object is not assignable to type
+    // 'MouseEvent'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     let e = {
       currentTarget: {
         offsetParent: {
@@ -156,7 +168,7 @@ describe('NoninteractiveSkillreview', () => {
           }
         }
       }
-    } as unknown as MouseEvent;
+    } as MouseEvent;
 
     ckEditorCopyContentService.copyModeActive = false;
     spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
@@ -170,6 +182,7 @@ describe('NoninteractiveSkillreview', () => {
     try {
       component.openConceptCard(e);
       flush();
+    // Unknown type is used because we don't know actual type of unknown.
     } catch (e: unknown) {
       error = e as Error;
       expect(error.message.indexOf('Error: close') !== -1).toBeTrue();
@@ -179,6 +192,10 @@ describe('NoninteractiveSkillreview', () => {
 
   it('should not open modal when ck Editor copy mode is active',
     fakeAsync(() => {
+      // This throws "Type object is not assignable to type
+      // 'MouseEvent'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
       let e = {
         currentTarget: {
           offsetParent: {
@@ -187,7 +204,7 @@ describe('NoninteractiveSkillreview', () => {
             }
           }
         }
-      } as unknown as MouseEvent;
+      } as MouseEvent;
       const modalSpy = spyOn(ngbModal, 'open');
       ckEditorCopyContentService.copyModeActive = true;
 
