@@ -49,7 +49,7 @@ class TopologicalSortTests(test_utils.GenericTestBase):
         with self.swap(
             create_topological_sort_of_all_services, 'DIRECTORY_NAMES',
             MOCK_DIRECTORY_NAMES):
-            adj_list, node_set = (
+            adj_list, node_list = (
                 create_topological_sort_of_all_services.make_graph())
 
             expected_adj_list = {
@@ -71,7 +71,7 @@ class TopologicalSortTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     sorted(adj_list[key]), sorted(expected_adj_list[key]))
 
-            self.assertEqual(node_set, expected_node_set)
+            self.assertEqual(set(node_list), expected_node_set)
 
     def test_complete_process(self) -> None:
         actual_output = []
