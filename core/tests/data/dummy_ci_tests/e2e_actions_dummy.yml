@@ -9,4 +9,4 @@ jobs:
     steps:
       - name: Run E2E test ${{ matrix.suite }}
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_e2e_tests --suite=${{ matrix.suite }} --prod_env
+        run: python -m scripts.run_e2e_tests --suite=${{ matrix.suite }}
