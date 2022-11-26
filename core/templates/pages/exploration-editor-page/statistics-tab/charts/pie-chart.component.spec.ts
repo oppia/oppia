@@ -59,13 +59,14 @@ describe('Pie Chart component', () => {
       PieChartComponent);
     component = fixture.componentInstance;
 
+    // This throws "Type object is not assignable to type
+    // 'google.visualization.PieChart'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     mockedChart = {
       draw: () => { },
       data: 1
-    // Here 'as unknown as' is used to test invalid Command,
-    // But if we try to enter 'invalidCommand' directly in cmd
-    // it will throw type script error ts(2322).
-    } as unknown as google.visualization.PieChart;
+    } as google.visualization.PieChart;
 
     // This approach was choosen because spyOnProperty() doesn't work on
     // properties that doesn't have a get access type.

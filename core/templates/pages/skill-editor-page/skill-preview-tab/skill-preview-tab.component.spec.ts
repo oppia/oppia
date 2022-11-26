@@ -110,6 +110,10 @@ const questionDict = {
 
 class MockQuestionBackendApiService {
   async fetchQuestionsAsync() {
+    // This throws "Type object is not assignable to type
+    // 'QuestionBackendDict'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     return Promise.resolve([questionDict as unknown as QuestionBackendDict]);
   }
 }
@@ -190,7 +194,7 @@ describe('Skill Preview Tab Component', () => {
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
-    questionPlayerEngineService = (questionPlayerEngineService as unknown) as
+    questionPlayerEngineService = (questionPlayerEngineService) as
       jasmine.SpyObj<QuestionPlayerEngineService>;
     let skillId = 'df432fe';
     spyOn(questionPlayerEngineService, 'init').and.callFake((

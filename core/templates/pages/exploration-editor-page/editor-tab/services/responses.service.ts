@@ -64,7 +64,7 @@ interface UpdateRule {
   rules: Rule[];
 }
 
-type UpdateActiveAnswerGroup = (
+export type UpdateActiveAnswerGroup = (
   AnswerGroup |
   UpdateAnswerGroupFeedback |
   UpdateAnswerGroupCorrectnessLabel |

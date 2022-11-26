@@ -36,13 +36,14 @@ describe('Exploration Diff Service', () => {
     let newState = stateObjectFactory.createDefaultState('newState');
     let oldState = stateObjectFactory.createDefaultState('oldState');
     explorationGraphChangeList = [{
+      // This throws "Type object is not assignable to type
+      // 'ExplorationChange'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
       changeList: [{
         cmd: 'invalidCommand',
         state_name: 'newState'
-      // Here 'as unknown as' is used to test invalid Command,
-      // But if we try to enter 'invalidCommand' directly in cmd
-      // it will throw type script error ts(2322).
-      } as unknown as ExplorationChange],
+      } as ExplorationChange],
       directionForwards: true
     }];
 

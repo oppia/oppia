@@ -90,6 +90,7 @@ export class LoginPageComponent implements OnInit {
 
     try {
       await this.authService.signInWithEmail(email);
+    // Unknown type is used because we don't know which type pf error thrown.
     } catch (error: unknown) {
       this.onSignInError(error as firebase.auth.Error);
       return;

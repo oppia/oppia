@@ -56,7 +56,8 @@ INJECTABLES_TO_IGNORE: Final = [
 ]
 # pylint: disable=line-too-long, single-line-pragma
 FILES_CONTAIN_UNKNOWN_TYPE: List[str] = [
-    # Add file path when you force to use unknown.
+    # Do this file after removal Jquery from this file.
+    'extensions/objects/templates/svg-editor.component.ts',
 ]
 # pylint: enable=line-too-long, single-line-pragma
 
