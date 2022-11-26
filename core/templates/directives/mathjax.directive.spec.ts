@@ -53,7 +53,7 @@ describe('MathJax directive', () => {
     // 'MathJax'." We need to suppress this error
     // because of the need to test validations.
     // @ts-ignore
-    window.MathJax = mockMathJs as unknown as typeof MathJax;
+    window.MathJax = mockMathJs as typeof MathJax;
   }));
 
   afterEach(() => {

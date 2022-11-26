@@ -37,7 +37,7 @@ export class ListOfTabsEditorComponent implements OnInit {
   // The property 'value' is dependent on another property, 'localValue', from
   // 'schema-based-editor'. Most components using 'localValue' are currently in
   // AngularJS, so its type cannot be determined for now.
-  @Input() value: SchemaDefaultValue;
+  @Input() value!: SchemaDefaultValue;
   @Output() valueChanged = new EventEmitter();
   SCHEMA = {
     type: 'list',

@@ -33,8 +33,8 @@ export interface Answer {
   templateUrl: './pencil-code-editor-response.component.html'
 })
 export class ResponePencilCodeEditor implements OnInit {
-  @Input() answer: Answer;
-  answerCode: string;
+  @Input() answer!: Answer;
+  answerCode!: string;
 
   constructor(
     private htmlEscaperService: HtmlEscaperService

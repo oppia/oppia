@@ -125,7 +125,8 @@ export class InteractiveNumericExpressionInput implements OnInit {
       }
     }
     this.guppyConfigurationService.changeDivSymbol(
-      (useFractionForDivision as {value: boolean}).value);
+      // TODO(#13015): Remove use of unknown as a type.
+      (useFractionForDivision as unknown as {value: boolean}).value);
     this.guppyInitializationService.init(
       'guppy-div-learner',
       placeholder.value.unicode,

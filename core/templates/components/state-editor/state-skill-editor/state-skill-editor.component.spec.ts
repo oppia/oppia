@@ -201,7 +201,7 @@ describe('State Skill Editor Component', () => {
     // 'Model'." We need to suppress this error
     // because of the need to test validations.
     // @ts-ignore
-    mockNgbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
+    mockNgbModal = (TestBed.inject(NgbModal)) as MockNgbModal;
     stateLinkedSkillIdService = TestBed.inject(StateLinkedSkillIdService);
     userService = TestBed.inject(UserService);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);

@@ -128,7 +128,9 @@ export class PlayerTranscriptService {
     return this.transcript[index];
   }
 
-  getLastAnswerOnDisplayedCard(displayedCardIndex: number): string | null {
+  getLastAnswerOnDisplayedCard(
+      displayedCardIndex: number
+  ): { answerDetails: string } | string | null {
     if (
       this.isLastCard(displayedCardIndex) ||
         this.transcript[displayedCardIndex].getStateName() === null ||

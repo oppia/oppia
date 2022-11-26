@@ -244,7 +244,7 @@ describe('NumberWithUnitsValidationService', () => {
         // 'string'." We need to suppress this error
         // because of the need to test validations.
         // @ts-ignore
-        return null;
+        return null as string;
       },
       toDict: () => {
         let uof = new UnitsObjectFactory();

@@ -147,7 +147,7 @@ describe('State Interaction component', () => {
     // 'MockNgbModal'." We need to suppress this error
     // because of the need to test validations.
     // @ts-ignore
-    mockNgbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
+    mockNgbModal = (TestBed.inject(NgbModal)) as MockNgbModal;
     responsesService = TestBed.inject(ResponsesService);
     stateContentService = TestBed.inject(StateContentService);
     stateCustomizationArgsService =
