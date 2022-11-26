@@ -49,6 +49,7 @@ export class MetadataVersionHistoryModalComponent
   @Input() oldVersion: number | null = null;
   @Input() newMetadata!: ExplorationMetadata;
   @Input() oldMetadata!: ExplorationMetadata;
+  validationErrorIsShown: boolean = false;
   yamlStrs: HeadersAndYamlStrs = {
     previousVersionMetadataYaml: '',
     currentVersionMetadataYaml: '',
@@ -105,6 +106,13 @@ export class MetadataVersionHistoryModalComponent
     );
   }
 
+  getLastEditedVersionNumberInCaseOfError(): number {
+    return (
+      this.versionHistoryService.fetchedMetadataVersionNumbers[
+        this.versionHistoryService
+          .getCurrentPositionInMetadataVersionHistoryList()] as number);
+  }
+
   getNextEditedVersionNumber(): number {
     const nextEditedVersionNumber = this
       .versionHistoryService
@@ -149,6 +157,8 @@ export class MetadataVersionHistoryModalComponent
     this.updateLeftPane();
     this.updateRightPane();
 
+    this.validationErrorIsShown = false;
+
     this.versionHistoryService
       .decrementCurrentPositionInMetadataVersionHistoryList();
   }
@@ -176,6 +186,8 @@ export class MetadataVersionHistoryModalComponent
     this.updateLeftPane();
     this.updateRightPane();
 
+    this.validationErrorIsShown = false;
+
     this.fetchPreviousVersionHistory();
   }
 
@@ -199,12 +211,9 @@ export class MetadataVersionHistoryModalComponent
           this.versionHistoryService
             .incrementCurrentPositionInMetadataVersionHistoryList();
         } else {
-          this.ngbActiveModal.close(
-            'Version history cannot be explored further.');
-          this.alertsService.addWarning(
-            'Version history of cannot be explored further ' +
-            'due to some internal validation error.'
-          );
+          this.validationErrorIsShown = true;
+          this.versionHistoryService
+            .incrementCurrentPositionInMetadataVersionHistoryList();
         }
       });
     }
