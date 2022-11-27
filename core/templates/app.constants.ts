@@ -212,10 +212,6 @@ export const AppConstants = {
   CONTRIBUTION_STATS_SUBTYPE_SUBMISSION: 'submission',
   CONTRIBUTION_STATS_SUBTYPE_REVIEW: 'review',
 
-  INTERACTION_NAME: {
-    END_EXPLORATION: 'End Exploration'
-  },
-
   CONTRIBUTION_STATS_SUBTYPE_CORRECTION: 'correction',
   CONTRIBUTION_STATS_TYPES: {
     TRANSLATION_CONTRIBUTION: {
@@ -235,5 +231,9 @@ export const AppConstants = {
       DISPLAY_NAME: 'Question Reviews'
     }
   },
-  CONTRIBUTOR_BADGE_INITIAL_LEVELS: [1, 10, 20, 50, 100, 200, 300, 400, 500]
+  CONTRIBUTOR_BADGE_INITIAL_LEVELS: [1, 10, 20, 50, 100, 200, 300, 400, 500],
+
+  INTERACTION_NAME: {
+    END_EXPLORATION: 'End Exploration'
+  },
 } as const;
