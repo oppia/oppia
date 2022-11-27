@@ -4,11 +4,11 @@ module.exports = class acceptanceTests {
   browser;
   
   async init(){
-    // currently, headless is set to false and the page viewport
-    // is maximized so that it would be easy for the developers
-    // to debug easily while testing.
-    // We can remove these settings before merging as we have
-    // to run the tests in headless mode.
+    /* currently, headless is set to false and the page viewport
+       is maximized so that it would be easy for the developers
+       to debug easily while testing.
+       We can remove these settings before merging as we have
+       to run the tests in headless mode. */
     await puppeteer
       .launch({
         headless: false,
@@ -22,19 +22,6 @@ module.exports = class acceptanceTests {
 
       return await this.page;
   }
-
-  // async clickOn(selector, time = 0) {
-  //   await (this.page).waitForSelector(selector);
-  //   await (this.page).waitForTimeout(time);
-  //   await (this.page).click(selector);
-  // }
-  
-  // async clickText(tag, text, time = 0) {
-  //   await (this.page).waitForXPath('//' + tag);
-  //   await (this.page).waitForTimeout(time);
-  //   const [button] = await (this.page).$x('//' + tag + '[contains(text(), "' + text + '")]');
-  //   await button.click();
-  // }
   
   async clickOn(tag, selector, time = 0) {
     try {
@@ -54,7 +41,10 @@ module.exports = class acceptanceTests {
     await (this.page).type(selector, text);
   }
 
-  async goto(url) {
+  async goto(url, selector = null) {
+    if (selector !== null) {
+      await (this.page).waitForSelector(selector);
+    }
     await (this.page).goto(url, {waitUntil: "networkidle0"});
   }
 };

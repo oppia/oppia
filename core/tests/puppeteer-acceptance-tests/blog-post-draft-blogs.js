@@ -4,30 +4,29 @@ const testConstants = require("./utility-functions/testConstants.js");
 
 const blogEditOptions = "e2e-test-blog-post-edit-box";
 
-async function blogDrafts_journey() {
-  const obj = await new acceptanceTests();
-  const page = await obj.init();
+async function deleteDraftAsBlogAdmin() {
+  const user = await new acceptanceTests();
+  const page = await user.init();
 
-  await page.goto(testConstants.URLs.home);
-  await obj.clickOn("button", "OK");
-  await obj.clickOn("span", "Sign in");
-  await obj.type(testConstants.SignInDetails.inputField, "testadmin@example.com");
-  await obj.clickOn("span", "Sign In");
+  await user.goto(testConstants.URLs.home);
+  await user.clickOn("button", "OK");
+  await user.clickOn("span", "Sign in");
+  await user.type(testConstants.SignInDetails.inputField, "testadmin@example.com");
+  await user.clickOn("span", "Sign In");
   
-  await page.waitForSelector(testConstants.Dashboard.MainDashboard);
-  await page.goto(testConstants.URLs.BlogDashboard);
+  await user.goto(testConstants.URLs.BlogDashboard, testConstants.Dashboard.MainDashboard);
 
   try{
-    await obj.clickOn("button", blogEditOptions); // an icon
-    await obj.clickOn("span", "Delete", 100);
-    await obj.clickOn("button", " Confirm ");
+    await user.clickOn("button", blogEditOptions); // an icon
+    await user.clickOn("span", "Delete", 100);
+    await user.clickOn("button", " Confirm ");
   } catch {
     console.log("no blog post in drafts");
   }
 
   console.log("Successfully tested deleting blog drafts");
-  await obj.browser.close();
+  await user.browser.close();
 
 }
 
-blogDrafts_journey();
+deleteDraftAsBlogAdmin();

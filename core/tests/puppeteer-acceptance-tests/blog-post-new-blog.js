@@ -8,47 +8,46 @@ const thumbnailPhotoBox = "e2e-test-photo-clickable";
 
 
 
-async function publishBlog_journey() {
-  const obj = await new acceptanceTests();
-  const page = await obj.init();
+async function publishBlogAsBlogAdmin() {
+  const user = await new acceptanceTests();
+  const page = await user.init();
 
-  await page.goto(testConstants.URLs.home);
-  await obj.clickOn("button", "OK");
-  await obj.clickOn("span", "Sign in");
-  await obj.type(testConstants.SignInDetails.inputField, "testadmin@example.com");
-  await obj.clickOn("span", "Sign In");
+  await user.goto(testConstants.URLs.home);
+  await user.clickOn("button", "OK");
+  await user.clickOn("span", "Sign in");
+  await user.type(testConstants.SignInDetails.inputField, "testadmin@example.com");
+  await user.clickOn("span", "Sign In");
   
-  await page.waitForSelector(testConstants.Dashboard.MainDashboard);
-  await page.goto(testConstants.URLs.BlogDashboard);
+  await user.goto(testConstants.URLs.BlogDashboard, testConstants.Dashboard.MainDashboard);
 
   // creating new blog
   try{
-    await obj.clickOn("span", "NEW POST");
+    await user.clickOn("span", "NEW POST");
   } catch {
     // condition when there is no blog in draft/published section.
-    await obj.clickOn("span", " CREATE NEW BLOG POST ");
+    await user.clickOn("span", " CREATE NEW BLOG POST ");
   }
-  await obj.type(blogTitleInput, "random title");
-  await obj.type(blogBodyInput, "my blog body content");
+  await user.type(blogTitleInput, "random title");
+  await user.type(blogBodyInput, "my blog body content");
 
   // uploading thumbnail image
-  await obj.clickOn("div", thumbnailPhotoBox);
+  await user.clickOn("div", thumbnailPhotoBox);
   const inputUploadHandle = await page.$('input[type=file]');
   let fileToUpload = 'collection.svg';
   inputUploadHandle.uploadFile(fileToUpload);
-  await obj.clickOn("button", " Add Thumbnail Image ");
+  await user.clickOn("button", " Add Thumbnail Image ");
   await page.waitForTimeout(500);
 
   // adding tags
-  await obj.clickOn("span", " International ");
-  await obj.clickOn("span", " DONE ");
+  await user.clickOn("span", " International ");
+  await user.clickOn("span", " DONE ");
   
   // publishing blog
-  await obj.clickOn("span", "PUBLISH");
-  await obj.clickOn("button", " Confirm ");
+  await user.clickOn("span", "PUBLISH");
+  await user.clickOn("button", " Confirm ");
   
   console.log("Successfully published a blog!");
-  await obj.browser.close();
+  await user.browser.close();
 }
 
-publishBlog_journey();
+publishBlogAsBlogAdmin();
