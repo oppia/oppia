@@ -34,7 +34,7 @@
       </div>
     </div>
 
-    <div *ngIf="(displayedCard.getInputResponsePairs().length > 1 && isInteractionInline()) || (displayedCard.getInputResponsePairs().length > 0 && !isInteractionInline())">
+    <div *ngIf="inputOutputHistoryIsShown && (displayedCard.getInputResponsePairs().length > 1 && isInteractionInline()) || (displayedCard.getInputResponsePairs().length > 0 && !isInteractionInline())">
       <h4 class="conversation-skin-responses-dropdown-container"
           (click)="toggleShowPreviousResponses()">
         <span class="conversation-skin-responses-dropdown-text">
@@ -56,7 +56,8 @@
                                      [profilePicture]="profilePicture"
                                      [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
                                      [inputResponsePairId]="getInputResponsePairId($index)"
-                                     [isLastPair]="false">
+                                     [isLastPair]="false"
+                                     [feedbackIsEnabled]="feedbackIsEnabled">
           </oppia-input-response-pair>
         </div>
       </div>
@@ -69,7 +70,8 @@
                                  [profilePicture]="profilePicture"
                                  [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
                                  [inputResponsePairId]="getInputResponsePairId(displayedCard.getInputResponsePairs().length - 1)"
-                                 [isLastPair]="true">
+                                 [isLastPair]="true"
+                                 [feedbackIsEnabled]="feedbackIsEnabled">
       </oppia-input-response-pair>
     </div>
 
@@ -80,7 +82,7 @@
       In addition, if the exploration is iframed, the terminal card will
       have no learner input section, so we do not show it.
     -->
-    <div *ngIf="!displayedCardWasCompletedInPrevSession && isInteractionInline() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
+    <div *ngIf="!displayedCardWasCompletedInPrevSession && isInteractionInline() && !shouldHideInteraction && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
     ((displayedCard.getInteractionHtml() && !displayedCard.isCompleted()) || displayedCard.isCompleted()) &&
     (!isOnTerminalCard() || !isIframed || displayedCard.isCompleted())">
       <div class="conversation-skin-inline-interaction">
@@ -94,6 +96,16 @@
           </oppia-interaction-display>
         </div>
       </div>
+    </div>
+
+    <div *ngIf="displayedCard.getInteractionId() === 'MultipleChoiceInput'"
+         class="oppia-mcq-question-description-text">
+      <span>
+        <i>
+          Note: When you select an option, the quiz will automatically
+          move to the next question.
+        </i>
+      </span>
     </div>
 
     <div *ngIf="!isInteractionInline() && !conceptCardIsBeingShown"
@@ -171,5 +183,5 @@
     </div>
   </div>
 </div>
-<oppia-checkpoint-celebration-modal class="checkpoint-celebration-modal-container">
+<oppia-checkpoint-celebration-modal class="checkpoint-celebration-modal-container" *ngIf="checkpointCelebrationModalIsEnabled">
 </oppia-checkpoint-celebration-modal>

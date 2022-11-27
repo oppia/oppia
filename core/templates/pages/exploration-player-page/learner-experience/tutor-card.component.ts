@@ -102,6 +102,7 @@ export class TutorCardComponent {
   @Input() displayedCardWasCompletedInPrevSession!: boolean;
   @Input() startCardChangeAnimation!: boolean;
   @Input() avatarImageIsShown!: boolean;
+  @Input() shouldHideInteraction!: boolean;
   @Input() userIsLoggedIn!: boolean;
   @Input() explorationIsInPreviewMode!: boolean;
   @Input() questionPlayerConfig!: QuestionPlayerConfig;
@@ -113,6 +114,10 @@ export class TutorCardComponent {
   @Input() nextLessonLink!: string;
   @Input() completedChaptersCount!: number;
   @Input() milestoneMessageIsToBeDisplayed!: boolean;
+  @Input() feedbackIsEnabled!: boolean;
+  @Input() learnerCanOnlyAttemptQuestionOnce!: boolean;
+  @Input() inputOutputHistoryIsShown!: boolean;
+  @Input() checkpointCelebrationModalIsEnabled!: boolean;
   private _editorPreviewMode!: boolean;
   lastAnswer!: string | null;
   conceptCardIsBeingShown!: boolean;

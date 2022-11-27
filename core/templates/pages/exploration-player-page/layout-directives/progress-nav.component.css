@@ -36,7 +36,7 @@
 
 .progress-nav-bar .oppia-nav-button {
   height: 36px;
-  margin: 0 12px 12px 12px;
+  margin: 0 12px 20px 12px;
   min-width: 36px;
   padding: 6px;
 }
@@ -91,4 +91,12 @@
   -o-transform: scaleX(1) /*rtl:scaleX(-1)*/;
   -webkit-transform: scaleX(1) /*rtl:scaleX(-1)*/;
   transform: scaleX(1) /*rtl:scaleX(-1)*/;
+}
+
+.progress-nav-bar .oppia-skip-button {
+  border: 1px solid #0d48a1;
+  color: #0d48a1;
+  font-weight: bold;
+  margin-right: 10px;
+  text-transform: uppercase;
 }
