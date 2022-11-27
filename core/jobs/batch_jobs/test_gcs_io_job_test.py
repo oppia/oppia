@@ -22,28 +22,22 @@ from core.jobs import job_test_utils
 from core.jobs.batch_jobs import test_gcs_io_job
 from core.jobs.types import job_run_result
 from core.platform import models
+from core.platform.storage import cloud_storage_emulator
 
-from apache_beam.io.gcp import gcsio
-from apache_beam.io.gcp import gcsio_test
+from typing import List
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import app_identity_services
+    from mypy_imports import storage_services
 
+storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()
-
-CLIENT = gcsio_test.FakeGcsClient()
 
 
 class TestGCSIoWriteJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = test_gcs_io_job.TestGCSIoWriteJob
-
-    def setUp(self) -> None:
-        super().setUp()
-
-        self.client = CLIENT
-        self.job = self.JOB_CLASS(self.pipeline, self.client)
 
     def test_to_fetch_exp_filename(self) -> None:
         self.assert_job_output_is([
@@ -51,13 +45,8 @@ class TestGCSIoWriteJobTests(job_test_utils.JobTestBase):
         ])
 
 
-def write_files_to_gcs(client: gcsio_test.FakeGcsClient) -> None:
-    """Write dummy files to GCS.
-
-    Args:
-        client: gcsio_test.FakeGcsClient. The fake GCS client.
-    """
-    gcs = gcsio.GcsIO(client)
+def write_files_to_gcs() -> List[cloud_storage_emulator.EmulatorBlob]:
+    """Write dummy files to GCS."""
     bucket = app_identity_services.get_gcs_resource_bucket_name()
     fileobjects = [
         {
@@ -70,29 +59,34 @@ def write_files_to_gcs(client: gcsio_test.FakeGcsClient) -> None:
         }
     ]
 
-    for file_obj in fileobjects:
-        filepath = file_obj['filepath']
-        gcs_url = 'gs://%s/%s' % (bucket, filepath)
-        file = gcs.open(
-            filename=gcs_url,
-            mode='w',
-            mime_type='application/octet-stream')
-        file.write(file_obj['data'])
-        file.close()
+    filepath_0 = fileobjects[0]['filepath']
+    assert isinstance(filepath_0, str)
+    data_0 = fileobjects[0]['data']
+    assert isinstance(data_0, bytes)
+    filepath_1 = fileobjects[1]['filepath']
+    assert isinstance(filepath_1, str)
+    data_1 = fileobjects[1]['data']
+    assert isinstance(data_1, bytes)
+
+    storage_services.commit(
+        bucket, filepath_0, data_0, 'application/octet-stream')
+    storage_services.commit(
+        bucket, filepath_1, data_1, 'application/octet-stream')
+
+    emulator_blob_1 = cloud_storage_emulator.EmulatorBlob(
+        filepath_0, data_0, 'application/octet-stream')
+    emulator_blob_2 = cloud_storage_emulator.EmulatorBlob(
+        filepath_1, data_1, 'application/octet-stream')
+
+    return [emulator_blob_1, emulator_blob_2]
 
 
 class TestGCSIoReadJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = test_gcs_io_job.TestGCSIoReadJob
 
-    def setUp(self) -> None:
-        super().setUp()
-
-        self.client = CLIENT
-        self.job = self.JOB_CLASS(self.pipeline, self.client)
-
     def test_to_fetch_filename(self) -> None:
-        write_files_to_gcs(self.client)
+        write_files_to_gcs()
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout='TOTAL FILES FETCHED SUCCESS: 2'),
@@ -109,22 +103,13 @@ class TestGCSIoGetFilesJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = test_gcs_io_job.TestGcsIoGetFilesJob
 
-    def setUp(self) -> None:
-        super().setUp()
-
-        self.client = CLIENT
-        self.job = self.JOB_CLASS(self.pipeline, self.client)
-
     def test_to_fetch_filename(self) -> None:
-        write_files_to_gcs(self.client)
+        blobs = write_files_to_gcs()
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout='TOTAL PREFIXES FETCHED SUCCESS: 1'),
             job_run_result.JobRunResult(
-                stdout='The data is {\'gs://dev-project-id-resources/'
-                'dummy_folder/dummy_subfolder/dummy_file_1\': 9, \'gs://'
-                'dev-project-id-resources/dummy_folder/dummy_subfolder/'
-                'dummy_file_2\': 9}')
+                stdout='The data is %s' % (blobs))
         ])
 
 
@@ -132,14 +117,8 @@ class TestGCSIoDeleteJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = test_gcs_io_job.TestGcsIoDeleteJob
 
-    def setUp(self) -> None:
-        super().setUp()
-
-        self.client = CLIENT
-        self.job = self.JOB_CLASS(self.pipeline, self.client)
-
     def test_to_delete_filenames(self) -> None:
-        write_files_to_gcs(self.client)
+        write_files_to_gcs()
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='TOTAL FILES DELETED SUCCESS: 2')
         ])
