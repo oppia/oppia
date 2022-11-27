@@ -40,14 +40,7 @@ describe('Contributor Certificate Download Modal Component', () => {
   let changeDetectorRef: MockChangeDetectorRef = new MockChangeDetectorRef();
   let contributionAndReviewService: ContributionAndReviewService;
   let alertsService: AlertsService;
-  const fileResponse: Blob = {
-    size: 100,
-    type: 'image/png',
-    arrayBuffer: null,
-    stream: null,
-    slice: null,
-    text: null
-  };
+  const fileResponse: Blob = new Blob(['Hello, world!'], {type: 'image/png'});
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
