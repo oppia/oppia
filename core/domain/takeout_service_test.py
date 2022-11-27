@@ -33,6 +33,7 @@ from core.domain import stats_domain
 from core.domain import takeout_domain
 from core.domain import takeout_service
 from core.domain import topic_domain
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -438,7 +439,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ]
     FIRST_CONTRIBUTION_DATE: Final = datetime.datetime(2021, 5, 20)
     LAST_CONTRIBUTION_DATE: Final = datetime.datetime(2022, 5, 20)
-    PROFILE_PICTURE_DATA: Final = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAIAAACAbBMhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAySURBVBhXY/iPDYBEV6xY0draCuFDAEgUKMTAANUEUYFuAkQFihIIGwigosiG/P//HwD5HmjphyAmJQAAAABJRU5ErkJggg%3D%3D' # pylint: disable=line-too-long
+    PROFILE_PICTURE_DATA_PNG: Final = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAIAAACAbBMhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAySURBVBhXY/iPDYBEV6xY0draCuFDAEgUKMTAANUEUYFuAkQFihIIGwigosiG/P//HwD5HmjphyAmJQAAAABJRU5ErkJggg%3D%3D' # pylint: disable=line-too-long
+    PROFILE_PICTURE_DATA_WEBP: Final = 'data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAADQAQCdASoHAAYAAgA0JaQAAv%2B5x9YuAAD%2B%2B0nD9oP5zmavp/Nyl8%2Bf/REL9weER482Ugrc/6dmq28Kx1pj/se/CsMAAAAA' # pylint: disable=line-too-long
 
     def set_up_non_trivial(self) -> None:
         """Set up all models for use in testing.
@@ -1217,6 +1219,26 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 log_messages
             )
 
+    def test_export_data_when_user_settings_is_none(self) -> None:
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            email=self.USER_1_EMAIL,
+            roles=[self.USER_1_ROLE],
+            user_bio='I want to leak uid_abcdefghijabcdefghijabcdefghijab'
+        ).put()
+
+        def _mock_get_user_settings(_: str, strict: bool) -> None: # pylint: disable=unused-argument
+            """Mock get_user_settings function to return None."""
+
+        with self.swap(
+            user_services, 'get_user_settings', _mock_get_user_settings
+        ):
+            user_takeout_object = takeout_service.export_data_for_user(
+                self.USER_ID_1)
+            observed_images = user_takeout_object.user_images
+            expected_images: List[takeout_domain.TakeoutImage] = []
+            self.assertEqual(expected_images, observed_images)
+
     def test_exports_have_single_takeout_dict_key(self) -> None:
         """Test to ensure that all export policies that specify a key for the
         Takeout dict are also models that specify this policy are type
@@ -1926,10 +1948,17 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'rb',
             encoding=None
         ) as f:
-            raw_image = f.read()
+            raw_image_png = f.read()
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.webp'),
+            'rb',
+            encoding=None
+        ) as f:
+            raw_image_webp = f.read()
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_USER, self.GENERIC_USERNAME)
-        fs.commit('profile_picture.png', raw_image, mimetype='image/png')
+        fs.commit('profile_picture.png', raw_image_png, mimetype='image/png')
+        fs.commit('profile_picture.webp', raw_image_webp, mimetype='image/webp')
 
         user_takeout_object = takeout_service.export_data_for_user(
             self.USER_ID_1)
@@ -1942,7 +1971,11 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             json.loads(observed_json), json.loads(expected_json))
         expected_images = [
             takeout_domain.TakeoutImage(
-                self.PROFILE_PICTURE_DATA, 'user_settings_profile_picture.png')
+                self.PROFILE_PICTURE_DATA_PNG,
+                'user_settings_profile_picture.png'),
+            takeout_domain.TakeoutImage(
+                self.PROFILE_PICTURE_DATA_WEBP,
+                'user_settings_profile_picture.webp')
         ]
         self.assertEqual(len(expected_images), len(observed_images))
         for i, _ in enumerate(expected_images):
@@ -2021,10 +2054,17 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'rb',
             encoding=None
         ) as f:
-            raw_image = f.read()
+            raw_image_png = f.read()
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.webp'),
+            'rb',
+            encoding=None
+        ) as f:
+            raw_image_webp = f.read()
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_USER, self.GENERIC_USERNAME)
-        fs.commit('profile_picture.png', raw_image, mimetype='image/png')
+        fs.commit('profile_picture.png', raw_image_png, mimetype='image/png')
+        fs.commit('profile_picture.webp', raw_image_webp, mimetype='image/webp')
 
         user_takeout_object = takeout_service.export_data_for_user(
             self.USER_ID_1)

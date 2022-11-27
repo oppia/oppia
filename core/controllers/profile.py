@@ -578,9 +578,18 @@ class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         ) as zfile:
             zfile.writestr('oppia_takeout_data.json', user_data_json_string)
             for image in user_images:
-                decoded_png = utils.convert_png_data_url_to_binary(
-                    image.b64_image_data)
-                zfile.writestr('images/' + image.image_export_path, decoded_png)
+                if image.b64_image_data.startswith(utils.PNG_DATA_URL_PREFIX):
+                    decoded_png = utils.convert_png_or_webp_data_url_to_binary(
+                        image.b64_image_data, 'png')
+                    zfile.writestr(
+                        'images/' + image.image_export_path, decoded_png)
+                elif image.b64_image_data.startswith(
+                    utils.DATA_URL_FORMAT_PREFIX % 'webp'
+                ):
+                    decoded_webp = utils.convert_png_or_webp_data_url_to_binary(
+                        image.b64_image_data, 'webp')
+                    zfile.writestr(
+                        'images/' + image.image_export_path, decoded_webp)
 
         # Render file for download.
         self.render_downloadable_file(

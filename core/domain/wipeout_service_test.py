@@ -5713,8 +5713,8 @@ class WipeoutServiceVerifyProfilePictureIsDeletedTests(
             feconf.ENTITY_TYPE_USER, self.USER_1_USERNAME)
         self.filename_png = 'profile_picture.png'
         self.filename_webp = 'profile_picture.webp'
-        png_binary = utils.convert_png_data_url_to_binary(
-            user_services.DEFAULT_IDENTICON_DATA_URL)
+        png_binary = utils.convert_png_or_webp_data_url_to_binary(
+            user_services.DEFAULT_IDENTICON_DATA_URL, 'png')
         self.fs.commit(self.filename_png, png_binary)
         self.fs.commit(self.filename_webp, png_binary)
 

@@ -399,7 +399,8 @@ def fetch_gravatar(email: str) -> str:
     else:
         if response.ok:
             if imghdr.what(None, h=response.content) == 'png':
-                return utils.convert_png_binary_to_data_url(response.content)
+                return utils.convert_png_or_webp_binary_to_data_url(
+                    response.content, 'png')
         else:
             logging.error(
                 '[Status %s] Failed to fetch Gravatar from %s' %
@@ -1416,19 +1417,17 @@ def update_profile_picture_data_url(
     username = user_settings.username
     if username is None:
         raise utils.ValidationError(
-            'User does not have a valid username, having value None.')
+            'User should have a non-None username.')
     # Ruling out the possibility of different types for mypy type checking.
-    assert isinstance(username, str)
+    # assert isinstance(username, str)
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
     filename_png = 'profile_picture.png'
-    png_binary = utils.convert_png_data_url_to_binary(
-        profile_picture_data_url)
+    png_binary = utils.convert_png_or_webp_data_url_to_binary(
+        profile_picture_data_url, 'png')
     fs.commit(filename_png, png_binary, mimetype='image/png')
 
-    profile_picture_binary = utils.convert_png_data_url_to_binary(
-        profile_picture_data_url)
     output = io.BytesIO()
-    image = Image.open(io.BytesIO(profile_picture_binary)).convert('RGB')
+    image = Image.open(io.BytesIO(png_binary)).convert('RGB')
     image.save(output, 'webp')
     webp_binary = output.getvalue()
     filename_webp = 'profile_picture.webp'

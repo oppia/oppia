@@ -489,7 +489,7 @@ def delete_user(
     _delete_models(user_id, models.Names.LEARNER_GROUP)
 
 
-def _verify_profile_picture_is_deleted(username: str) -> bool:
+def _verify_profile_picture_is_deleted(username: Optional[str]) -> bool:
     """Verify that the profile picture is deleted.
 
     Args:
@@ -503,10 +503,16 @@ def _verify_profile_picture_is_deleted(username: str) -> bool:
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
     filename_png = 'profile_picture.png'
     filename_webp = 'profile_picture.webp'
-    if fs.isfile(filename_png) or fs.isfile(filename_webp):
+    if fs.isfile(filename_png):
         logging.error(
-            'Profile picture is not deleted of user having '
-            'username %s.' % (username)
+            '%s Profile picture having png is not deleted for user having '
+            'username %s.' % (WIPEOUT_LOGS_PREFIX, username)
+        )
+        return False
+    elif fs.isfile(filename_webp):
+        logging.error(
+            '%s Profile picture having webp is not deleted for user having '
+            'username %s.' % (WIPEOUT_LOGS_PREFIX, username)
         )
         return False
     return True

@@ -30,7 +30,6 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain
@@ -2440,20 +2439,25 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             username_change_audit_model.new_username, self.NEW_USERNAME)
 
     def test_profile_picture_is_missing_raises_error(self) -> None:
-        old_fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_USER, self.OLD_USERNAME)
-        old_fs.delete('profile_picture.png')
-        old_fs.delete('profile_picture.webp')
-        csrf_token = self.get_new_csrf_token()
+        def _mock_generation(_: str) -> None:
+            """Mock generate_initial_profile_picture to return None."""
+        with self.swap(
+            user_services,
+            'generate_initial_profile_picture',
+            _mock_generation
+        ):
+            self.signup(self.BLOG_ADMIN_EMAIL, self.EDITOR_USERNAME)
+            csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json(
-            '/updateusernamehandler',
-            {
-                'old_username': self.OLD_USERNAME,
-                'new_username': self.NEW_USERNAME},
-            csrf_token=csrf_token)
+            response = self.put_json(
+                '/updateusernamehandler',
+                {
+                    'old_username': self.EDITOR_USERNAME,
+                    'new_username': self.NEW_USERNAME},
+                csrf_token=csrf_token,
+                expected_status_int=302)
 
-        self.assertEqual(response['error'], '')
+            self.assertEqual(response, '')
 
 
 class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):

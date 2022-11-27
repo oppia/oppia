@@ -48,7 +48,7 @@ from typing import ( # isort:skip
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
 PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
-WEBP_DATA_URL_PREFIX = 'data:image/webp;base64,'
+DATA_URL_FORMAT_PREFIX = 'data:image/%s;base64,'
 SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 
@@ -398,45 +398,56 @@ def get_url_scheme(url: str) -> str:
     return urllib.parse.urlparse(url).scheme
 
 
-def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
-    """Converts a PNG base64 data URL to a PNG binary data.
+def convert_png_or_webp_data_url_to_binary(
+    image_data_url: str, file_type: str
+) -> bytes:
+    """Converts a PNG or WEBP base64 data URL to a PNG binary data.
 
     Args:
         image_data_url: str. A string that is to be interpreted as a PNG
-            data URL.
+            or WEBP data URL.
+        file_type: str. Type of the data url, webp or png.
 
     Returns:
-        bytes. Binary content of the PNG created from the data URL.
+        bytes. Binary content of the PNG or WEBP created from the data URL.
 
     Raises:
         Exception. The given string does not represent a PNG data URL.
     """
-    if image_data_url.startswith(PNG_DATA_URL_PREFIX):
+    if image_data_url.startswith(DATA_URL_FORMAT_PREFIX % file_type):
         return base64.b64decode(
             urllib.parse.unquote(
-                image_data_url[len(PNG_DATA_URL_PREFIX):]))
+                image_data_url[len(DATA_URL_FORMAT_PREFIX % file_type):]))
     else:
-        raise Exception('The given string does not represent a PNG data URL.')
+        raise Exception(
+            'The given string does not represent a %s data URL.' % file_type)
 
 
-def convert_png_binary_to_data_url(content: bytes) -> str:
-    """Converts a PNG image string (represented by 'content') to a data URL.
+def convert_png_or_webp_binary_to_data_url(
+    content: bytes, file_type: str
+) -> str:
+    """Converts a PNG or WEBP image string (represented by 'content')
+    to a data URL.
 
     Args:
-        content: str. PNG binary file content.
+        content: str. PNG or WEBP binary file content.
+        file_type: str. Type of the binary data, webp or png.
 
     Returns:
-        str. Data URL created from the binary content of the PNG.
+        str. Data URL created from the binary content of the PNG or WEBP.
 
     Raises:
         Exception. The given binary string does not represent a PNG image.
+        Exception. The given binary string does not represent a WEBP image.
     """
-    if imghdr.what(None, h=content) == 'png':
+    if imghdr.what(None, h=content) == file_type:
         return '%s%s' % (
-            PNG_DATA_URL_PREFIX, urllib.parse.quote(base64.b64encode(content))
+            DATA_URL_FORMAT_PREFIX % file_type,
+            urllib.parse.quote(base64.b64encode(content))
         )
     else:
-        raise Exception('The given string does not represent a PNG image.')
+        raise Exception(
+            'The given string does not represent a %s image.' % file_type)
 
 
 def is_base64_encoded(content: str) -> bool:
@@ -465,7 +476,7 @@ def convert_png_to_data_url(filepath: str) -> str:
         str. Data url created from the filepath of the PNG.
     """
     file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
-    return convert_png_binary_to_data_url(file_contents)
+    return convert_png_or_webp_binary_to_data_url(file_contents, 'png')
 
 
 def camelcase_to_hyphenated(camelcase_str: str) -> str:
