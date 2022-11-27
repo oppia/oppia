@@ -212,7 +212,7 @@ export const AppConstants = {
   CONTRIBUTION_STATS_SUBTYPE_SUBMISSION: 'submission',
   CONTRIBUTION_STATS_SUBTYPE_REVIEW: 'review',
 
-  INTERACTION_NAMES: {
+  INTERACTION_NAME: {
     END_EXPLORATION: 'End Exploration'
   },
   

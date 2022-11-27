@@ -243,7 +243,7 @@ describe('Customize Interaction Modal Component', () => {
   it('should enable Save Interaction button when no recommendation IDs' +
   ' are provided', () => {
     spyOn(component, 'getTitle').and
-      .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
+      .returnValue(AppConstants.INTERACTION_NAME.END_EXPLORATION);
 
     let className = 'oppia-exploration-id-input';
 
@@ -257,7 +257,7 @@ describe('Customize Interaction Modal Component', () => {
   it('should enable Save Interaction button when exploration IDs' +
   ' are provided', () => {
     spyOn(component, 'getTitle').and
-      .returnValue(AppConstants.INTERACTION_NAMES.END_EXPLORATION);
+      .returnValue(AppConstants.INTERACTION_NAME.END_EXPLORATION);
 
     let inputField = document.createElement('input');
     let className = 'oppia-exploration-id-input';
