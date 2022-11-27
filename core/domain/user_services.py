@@ -397,7 +397,7 @@ def fetch_gravatar(email: str) -> str:
         if response.ok:
             if imghdr.what(None, h=response.content) == 'png':
                 return utils.convert_png_or_webp_binary_to_data_url(
-                    response.content)
+                    response.content, 'png')
         else:
             logging.error(
                 '[Status %s] Failed to fetch Gravatar from %s' %

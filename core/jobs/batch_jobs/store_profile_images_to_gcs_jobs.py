@@ -31,27 +31,16 @@ from core.platform import models
 
 from PIL import Image
 import apache_beam as beam
-from typing import Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
-    from apache_beam.io.gcp import gcsio_test
 
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class StoreProfilePictureToGCSJob(base_jobs.JobBase):
     """Store profile picture to GCS job."""
-
-    def __init__(
-        self,
-        pipeline: beam.Pipeline,
-        client: Optional[gcsio_test.FakeGcsClient] = None
-    ) -> None:
-        super().__init__(pipeline=pipeline)
-        self.client = client
-        self.pipeline = pipeline
 
     @staticmethod
     def _filepath_png(
@@ -134,8 +123,7 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
         write_png_files_to_gcs = (
             users_with_valid_username
             | 'Map files for png' >> beam.Map(self._filepath_png)
-            | 'Write png file to GCS' >> gcs_io.WriteFile(
-                client=self.client, mode_is_binary=True, mime_type='image/png')
+            | 'Write png file to GCS' >> gcs_io.WriteFile(mime_type='image/png')
         )
 
         total_png_images = (
@@ -149,7 +137,7 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
             users_with_valid_username
             | 'Map files for webp' >> beam.Map(self._filepath_webp)
             | 'Write webp file to GCS' >> gcs_io.WriteFile(
-                client=self.client, mode_is_binary=True, mime_type='image/webp')
+                mime_type='image/webp')
         )
 
         total_webp_images = (
@@ -183,20 +171,11 @@ def png_base64_to_webp_base64(png_base64: str) -> str:
     image.save(output, 'webp')
     webp_binary = output.getvalue()
     return utils.convert_png_or_webp_binary_to_data_url(
-        webp_binary, True)
+        webp_binary, 'webp')
 
 
 class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
     """Audit profile pictures are present in GCS."""
-
-    def __init__(
-        self,
-        pipeline: beam.Pipeline,
-        client: Optional[gcsio_test.FakeGcsClient] = None
-    ) -> None:
-        super().__init__(pipeline=pipeline)
-        self.client = client
-        self.pipeline = pipeline
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         users_with_valid_username = (
@@ -220,12 +199,12 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
                 lambda model: model.username)
             | 'Map with filename for png' >> beam.Map(
                 lambda username: f'user/{username}/profile_picture.png')
-            | 'Read png files from GCS' >> gcs_io.ReadFile(
-                client=self.client, mode_is_binary=True)
+            | 'Read png files from GCS' >> gcs_io.ReadFile()
             | 'Make tuple of username and data url for png' >> beam.Map(
                 lambda data: (
                     data[0].split('/')[1],
-                    utils.convert_png_or_webp_binary_to_data_url(data[1]))
+                    utils.convert_png_or_webp_binary_to_data_url(
+                        data[1], 'png'))
             )
         )
 
@@ -273,12 +252,12 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
                 lambda model: model.username)
             | 'Map with filename for webp' >> beam.Map(
                 lambda username: f'user/{username}/profile_picture.webp')
-            | 'Read webp files from GCS' >> gcs_io.ReadFile(
-                client=self.client, mode_is_binary=True)
+            | 'Read webp files from GCS' >> gcs_io.ReadFile()
             | 'Make tuple of username and data url for webp' >> beam.Map(
                 lambda data: (
                     data[0].split('/')[1],
-                    utils.convert_png_or_webp_binary_to_data_url(data[1], True))
+                    utils.convert_png_or_webp_binary_to_data_url(
+                        data[1], 'webp'))
             )
         )
 
