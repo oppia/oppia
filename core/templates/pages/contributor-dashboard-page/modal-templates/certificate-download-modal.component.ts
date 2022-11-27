@@ -28,7 +28,7 @@ import { ContributionAndReviewService } from '../services/contribution-and-revie
 export class CertificateDownloadModalComponent {
   @Input() suggestionType!: string;
   @Input() username!: string;
-  @Input() languageCode: string | null;
+  @Input() languageCode!: string | null;
   fromDate!: string;
   toDate!: string;
   errorMessage!: string;
