@@ -550,7 +550,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'default_outcome',
                 'new_value': {
                     'param_changes': [],
-                    'feedback': {},
+                    'feedback': {
+                        'content_id': 'feedback',
+                        'html': '<p>Content</p>'
+                    },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
@@ -566,7 +569,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'default_outcome',
                 'new_value': {
                     'param_changes': [],
-                    'feedback': {},
+                    'feedback': {
+                        'content_id': 'feedback',
+                        'html': '<p>Content</p>'
+                    },
                     'dest': 'Introduction',
                     'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
