@@ -251,7 +251,7 @@ describe('Customize Interaction Modal Component', () => {
       document, 'getElementsByClassName'
     ).withArgs(className).and.returnValue(undefined);
 
-    expect(component.buttonEnabledOnEndExploration()).toBe(true);
+    expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
   it('should enable Save Interaction button when exploration IDs' +
@@ -264,7 +264,7 @@ describe('Customize Interaction Modal Component', () => {
     inputField.classList.add(className);
     inputField.setAttribute('ng-reflect-model', 'explorationID');
 
-    expect(component.buttonEnabledOnEndExploration()).toBe(true);
+    expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
   it('should disable Save Interaction button when recommendation ID' +

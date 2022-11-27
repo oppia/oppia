@@ -273,7 +273,6 @@ export class CustomizeInteractionModalComponent
         return true;
       }
     }
-    return false;
   }
 
   isSaveInteractionButtonEnabled(): boolean {
