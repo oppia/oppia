@@ -466,7 +466,9 @@ class DraftUpgradeUtil:
     def _convert_states_v50_dict_to_v51_dict(
         cls, draft_change_list: List[exp_domain.ExplorationChange]
     ) -> List[exp_domain.ExplorationChange]:
-        """Converts draft change list from state version 50 to 51.
+        """Converts draft change list from state version 50 to 51. Adds
+        a new field dest_if_really_stuck to Outcome class to direct the
+        learner to a custom revision state.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of
@@ -490,15 +492,19 @@ class DraftUpgradeUtil:
                 )
                 answer_group_dicts: List[state_domain.AnswerGroupDict] = []
                 for answer_group_dict in new_answer_groups_dicts:
-                    outcome_dict: state_domain.OutcomeDict = []
-                    outcome_dict = ({
+                    outcome_dict: state_domain.OutcomeDict = ({
                         'dest': answer_group_dict['outcome']['dest'],
                         'dest_if_really_stuck': None,
-                        'feedback': answer_group_dict['outcome']['feedback'],
-                        'labelled_as_correct': answer_group_dict['outcome']['labelled_as_correct'],
-                        'param_changes': answer_group_dict['outcome']['param_changes'],
-                        'refresher_exploration_id': answer_group_dict['outcome']['refresher_exploration_id'],
-                        'missing_prerequisite_skill_id': answer_group_dict['outcome']['missing_prerequisite_skill_id']
+                        'feedback': (
+                            answer_group_dict['outcome']['feedback']),
+                        'labelled_as_correct': (
+                            answer_group_dict['outcome']['labelled_as_correct']),
+                        'param_changes': (
+                            answer_group_dict['outcome']['param_changes']),
+                        'refresher_exploration_id': (
+                            answer_group_dict['outcome']['refresher_exploration_id']),
+                        'missing_prerequisite_skill_id': (
+                            answer_group_dict['outcome']['missing_prerequisite_skill_id'])
                     })
                     answer_group_dicts.append({
                         'rule_specs': answer_group_dict['rule_specs'],
@@ -525,15 +531,18 @@ class DraftUpgradeUtil:
                 new_default_outcome_dict = (
                     edit_interaction_default_outcome_cmd.new_value
                 )
-                default_outcome_dict: state_domain.OutcomeDict = []
-                default_outcome_dict = ({
+                default_outcome_dict: state_domain.OutcomeDict = ({
                     'dest': new_default_outcome_dict['dest'],
                     'dest_if_really_stuck': None,
                     'feedback': new_default_outcome_dict['feedback'],
-                    'labelled_as_correct': new_default_outcome_dict['labelled_as_correct'],
-                    'param_changes': new_default_outcome_dict['param_changes'],
-                    'refresher_exploration_id': new_default_outcome_dict['refresher_exploration_id'],
-                    'missing_prerequisite_skill_id': new_default_outcome_dict['missing_prerequisite_skill_id']
+                    'labelled_as_correct': (
+                        new_default_outcome_dict['labelled_as_correct']),
+                    'param_changes': (
+                        new_default_outcome_dict['param_changes']),
+                    'refresher_exploration_id': (
+                        new_default_outcome_dict['refresher_exploration_id']),
+                    'missing_prerequisite_skill_id': (
+                        new_default_outcome_dict['missing_prerequisite_skill_id'])
                 })
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
