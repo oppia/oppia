@@ -30,6 +30,7 @@ import { ExplorationTagsService } from '../services/exploration-tags.service';
 import { ExplorationTitleService } from '../services/exploration-title.service';
 import { AlertsService } from 'services/alerts.service';
 import { ExplorationStatesService } from '../services/exploration-states.service';
+import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 
 
 interface CategoryChoices {
@@ -192,8 +193,9 @@ export class ExplorationMetadataModalComponent
     return Boolean(
       this.explorationTitleService.displayed &&
       this.explorationObjectiveService.displayed &&
-      // TODO(#13015): Remove use of unknown as a type.
-      (this.explorationObjectiveService.displayed as unknown[]).length >= 15 &&
+      (
+        this.explorationObjectiveService.displayed as ParamChange[]
+      ).length >= 15 &&
       this.explorationCategoryService.displayed &&
       this.explorationLanguageCodeService.displayed);
   }
@@ -201,22 +203,25 @@ export class ExplorationMetadataModalComponent
   ngOnInit(): void {
     this.CATEGORY_LIST_FOR_SELECT2 = [];
     this.objectiveHasBeenPreviouslyEdited = (
-      // TODO(#13015): Remove use of unknown as a type.
-      (this.explorationObjectiveService.savedMemento as unknown[]).length > 0);
+      (
+        this.explorationObjectiveService.savedMemento as ParamChange[]
+      ).length > 0);
 
     this.requireTitleToBeSpecified = (
       !this.explorationTitleService.savedMemento);
     this.requireObjectiveToBeSpecified = (
-      // TODO(#13015): Remove use of unknown as a type.
-      (this.explorationObjectiveService.savedMemento as unknown[]).length < 15);
+      (
+        this.explorationObjectiveService.savedMemento as ParamChange[]
+      ).length < 15);
     this.requireCategoryToBeSpecified = (
       !this.explorationCategoryService.savedMemento);
     this.askForLanguageCheck = (
       this.explorationLanguageCodeService.savedMemento ===
       AppConstants.DEFAULT_LANGUAGE_CODE);
     this.askForTags = (
-      // TODO(#13015): Remove use of unknown as a type.
-      (this.explorationTagsService.savedMemento as unknown[]).length === 0);
+      (
+        this.explorationTagsService.savedMemento as ParamChange[]
+      ).length === 0);
 
     for (let i = 0; i < AppConstants.ALL_CATEGORIES.length; i++) {
       this.CATEGORY_LIST_FOR_SELECT2.push({

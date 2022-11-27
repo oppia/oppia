@@ -54,6 +54,7 @@ import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subt
 import { InteractionRulesRegistryService } from 'services/interaction-rules-registry.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { TextInputRuleInputs } from 'interactions/rule-input-defs';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -543,10 +544,10 @@ export class ExplorationStatesService {
   }
 
   saveConfirmedUnclassifiedAnswers(
-      stateName: string, newAnswers: AnswerGroup[]
+      stateName: string, newAnswers: AnswerGroup[] | InteractionAnswer[]
   ): void {
     this.saveStateProperty(
-      stateName, 'confirmed_unclassified_answers', newAnswers);
+      stateName, 'confirmed_unclassified_answers', newAnswers as AnswerGroup[]);
     this.stateInteractionSavedCallbacks.forEach((callback) => {
       callback(this._states.getState(stateName));
     });

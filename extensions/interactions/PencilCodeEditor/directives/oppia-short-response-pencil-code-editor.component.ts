@@ -40,7 +40,6 @@ export class ShortResponePencilCodeEditor implements OnInit {
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
-  // TODO(#13015): Remove use of unknown as a type.
   ngOnInit(): void {
     this.answerCode = (
       (this.htmlEscaperService.escapedJsonToObj(

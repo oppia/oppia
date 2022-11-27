@@ -42,10 +42,6 @@ export class SetOfUnicodeStringEditorComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
-  // TODO(#13015): Remove use of unknown as a type.
-  // The property 'value' is dependent on another property, 'localValue', from
-  // 'schema-based-editor'. Most components using 'localValue' are currently in
-  // AngularJS, so its type cannot be determined for now.
   @Input() value!: SchemaDefaultValue;
   @Output() valueChanged = new EventEmitter();
   SCHEMA: StringValidatorSchema = {

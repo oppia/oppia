@@ -56,7 +56,7 @@ INJECTABLES_TO_IGNORE: Final = [
 ]
 
 FILES_CONTAINING_UNKNOWN_TYPE: List[str] = [
-    # Do this file after removal Jquery from this file.
+    # Do this file after removing JQuery from this file.
     'extensions/objects/templates/svg-editor.component.ts',
 ]
 
@@ -436,8 +436,8 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
 
     def _check_unknown_type(self) -> concurrent_task_utils.TaskResult:
         """Prints a list of lint errors if an unknown type is used. This lint
-            check is not enabled by default. Add proper comment if unknown is
-            needed.
+        check is not enabled by default. Add proper comment if unknown is
+        needed.
 
         Returns:
             TaskResult. A TaskResult object representing the result of the
