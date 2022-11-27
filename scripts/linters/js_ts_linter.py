@@ -60,6 +60,7 @@ FILES_CONTAINING_UNKNOWN_TYPE: List[str] = [
     'extensions/objects/templates/svg-editor.component.ts',
 ]
 
+
 def _parse_js_or_ts_file(
     filepath: str, file_content: str, comment: bool = False
 ) -> Union[esprima.nodes.Module, esprima.nodes.Script]:
@@ -449,13 +450,13 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         ts_files_to_check = self.ts_filepaths
         for file_path in ts_files_to_check:
             # Not showing lint errors for files present in
-            # FILES_CONTAIN_UNKNOWN_TYPE
+            # FILES_CONTAINING_UNKNOWN_TYPE.
             if file_path in FILES_CONTAINING_UNKNOWN_TYPE:
                 continue
 
             file_content = self.file_cache.read(file_path)
             for line_num, line in enumerate(file_content.split('\n')):
-                # Indexes where unknown type (: unknown) is present in a 
+                # Indexes where unknown type (: unknown) is present in a
                 # particular line.
                 unknown_type_object = (
                     re.finditer(pattern=': unknown', string=line))
@@ -474,29 +475,27 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                     # Throw error if unknown type is present.
                     if len(unknown_type):
                         failed = True
-                        for x in range(len(unknown_type)):
+                        for x in enumerate(unknown_type):
                             error_message = (
-                                '%s:%s:%s: unknown type used. Add proper comment if'
-                                ' Unknown is needed.' % (
+                                '%s:%s:%s: unknown type used. Add proper'
+                                ' comment if Unknown is needed.' % (
                                 file_path, line_num + 1, unknown_type[x]))
                             error_messages.append(error_message)
 
                     # Throw error if unknown type conversion is present.
                     if len(unknown_type_conversion):
                         failed = True
-                        for x in range(len(unknown_type_conversion)):
+                        for x in enumerate(unknown_type_conversion):
                             error_message = (
-                                '%s:%s:%s: unknown type conversion used. Add proper'
-                                ' comment if unknown is needed.' % (
-                                file_path, line_num + 1, unknown_type_conversion[x]))
+                                '%s:%s:%s: unknown type conversion used.'
+                                ' Add proper comment if unknown is needed.' % (
+                                file_path, line_num + 1,
+                                unknown_type_conversion[x]))
                             error_messages.append(error_message)
 
                 # Checking line contains comments.
                 ts_unknown_error = re.findall(pattern=r'^ *//', string=line)
-                if len(ts_unknown_error):
-                    comment_before_unknown_type = True
-                else:
-                    comment_before_unknown_type = False
+                comment_before_unknown_type = bool(len(ts_unknown_error))
 
         return concurrent_task_utils.TaskResult(
             name, failed, sorted(error_messages), sorted(error_messages))
