@@ -490,8 +490,8 @@ class DraftUpgradeUtil:
                 )
                 answer_group_dicts: List[state_domain.AnswerGroupDict] = []
                 for answer_group_dict in new_answer_groups_dicts:
-                    outcome_dict: List[state_domain.OutcomeDict] = []
-                    outcome_dict.append({
+                    outcome_dict: state_domain.OutcomeDict = []
+                    outcome_dict = ({
                         'dest': answer_group_dict['outcome']['dest'],
                         'dest_if_really_stuck': None,
                         'feedback': answer_group_dict['outcome']['feedback'],
@@ -513,7 +513,7 @@ class DraftUpgradeUtil:
                     'state_name': change.state_name,
                     'new_value': answer_group_dicts
                 })
-            if (change.property_name ==
+            elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
                   change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY):
                 # Here we use cast because this 'elif' condition forces change
@@ -522,26 +522,25 @@ class DraftUpgradeUtil:
                     exp_domain.EditExpStatePropertyInteractionDefaultOutcomeCmd,
                     change
                 )
-                new_default_outcome_dicts = (
+                new_default_outcome_dict = (
                     edit_interaction_default_outcome_cmd.new_value
                 )
-                default_outcome_dicts: List[state_domain.OutcomeDict] = []
-                for default_outcome_dict in new_default_outcome_dicts:
-                    default_outcome_dicts.append({
-                        'dest': default_outcome_dict['dest'],
-                        'dest_if_really_stuck': None,
-                        'feedback': default_outcome_dict['feedback'],
-                        'labelled_as_correct': default_outcome_dict['labelled_as_correct'],
-                        'param_changes': default_outcome_dict['param_changes'],
-                        'refresher_exploration_id': default_outcome_dict['refresher_exploration_id'],
-                        'missing_prerequisite_skill_id': default_outcome_dict['missing_prerequisite_skill_id']
-                    })
+                default_outcome_dict: state_domain.OutcomeDict = []
+                default_outcome_dict = ({
+                    'dest': new_default_outcome_dict['dest'],
+                    'dest_if_really_stuck': None,
+                    'feedback': new_default_outcome_dict['feedback'],
+                    'labelled_as_correct': new_default_outcome_dict['labelled_as_correct'],
+                    'param_changes': new_default_outcome_dict['param_changes'],
+                    'refresher_exploration_id': new_default_outcome_dict['refresher_exploration_id'],
+                    'missing_prerequisite_skill_id': new_default_outcome_dict['missing_prerequisite_skill_id']
+                })
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
                         exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
                     'state_name': change.state_name,
-                    'new_value': default_outcome_dicts
+                    'new_value': default_outcome_dict
                 })
         return draft_change_list
 
