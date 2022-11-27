@@ -25,26 +25,12 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Optional
-
-MYPY = False
-if MYPY:  # pragma: no cover
-    from apache_beam.io.gcp import gcsio_test
 
 datastore_services = models.Registry.import_datastore_services()
 
 
 class TestGCSIoWriteJob(base_jobs.JobBase):
     """Write dummy files to GCS."""
-
-    def __init__(
-        self,
-        pipeline: beam.Pipeline,
-        client: Optional[gcsio_test.FakeGcsClient] = None
-    ) -> None:
-        super().__init__(pipeline=pipeline)
-        self.client = client
-        self.pipeline = pipeline
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         write_files_to_gcs = (
@@ -64,7 +50,7 @@ class TestGCSIoWriteJob(base_jobs.JobBase):
                         }
                     ]
                 ))
-            | 'Write files to GCS' >> gcs_io.WriteFile(self.client)
+            | 'Write files to GCS' >> gcs_io.WriteFile()
         )
 
         total_files_write = (
@@ -80,15 +66,6 @@ class TestGCSIoWriteJob(base_jobs.JobBase):
 class TestGCSIoReadJob(base_jobs.JobBase):
     """Read dummy files from GCS."""
 
-    def __init__(
-        self,
-        pipeline: beam.Pipeline,
-        client: Optional[gcsio_test.FakeGcsClient] = None
-    ) -> None:
-        super().__init__(pipeline=pipeline)
-        self.client = client
-        self.pipeline = pipeline
-
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         read_files_from_gcs = (
             self.pipeline
@@ -99,8 +76,7 @@ class TestGCSIoReadJob(base_jobs.JobBase):
                         'dummy_folder/dummy_subfolder/dummy_file_2'
                     ]
                 ))
-            | 'Read files from the GCS' >> gcs_io.ReadFile(
-                self.client)
+            | 'Read files from the GCS' >> gcs_io.ReadFile()
         )
 
         total_files_read = (
@@ -130,21 +106,12 @@ class TestGCSIoReadJob(base_jobs.JobBase):
 class TestGcsIoGetFilesJob(base_jobs.JobBase):
     """Get all files with a specefic prefix."""
 
-    def __init__(
-        self,
-        pipeline: beam.Pipeline,
-        client: Optional[gcsio_test.FakeGcsClient] = None
-    ) -> None:
-        super().__init__(pipeline=pipeline)
-        self.client = client
-        self.pipeline = pipeline
-
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         get_files_of_specefic_prefix_from_gcs = (
             self.pipeline
             | 'Create PCollection of prefix that needs to be fetched' >> (
                 beam.Create(['dummy_folder/dummy_subfolder']))
-            | 'Get files with prefix' >> gcs_io.GetFiles(self.client)
+            | 'Get files with prefix' >> gcs_io.GetFiles()
         )
 
         total_files_with_prefixes = (
@@ -173,15 +140,6 @@ class TestGcsIoGetFilesJob(base_jobs.JobBase):
 class TestGcsIoDeleteJob(base_jobs.JobBase):
     """Delete dummy files from GCS."""
 
-    def __init__(
-        self,
-        pipeline: beam.Pipeline,
-        client: Optional[gcsio_test.FakeGcsClient] = None
-    ) -> None:
-        super().__init__(pipeline=pipeline)
-        self.client = client
-        self.pipeline = pipeline
-
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         delete_files_from_gcs = (
             self.pipeline
@@ -192,7 +150,7 @@ class TestGcsIoDeleteJob(base_jobs.JobBase):
                         'dummy_folder/dummy_subfolder/dummy_file_2'
                     ]
                 ))
-            | 'Delete files from the GCS' >> gcs_io.DeleteFile(self.client)
+            | 'Delete files from the GCS' >> gcs_io.DeleteFile()
         )
 
         total_files_deleted = (

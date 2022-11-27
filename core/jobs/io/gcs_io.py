@@ -19,17 +19,17 @@
 from __future__ import annotations
 
 from core.platform import models
+from core.platform.storage import cloud_storage_emulator
 
 import apache_beam as beam
-from apache_beam.io.gcp import gcsio
-from typing import Dict, Optional, Tuple, TypedDict, Union
+from typing import List, Optional, Tuple, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import app_identity_services
+    from mypy_imports import storage_services
 
-    from apache_beam.io.gcp import gcsio_test
-
+storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()
 
 
@@ -39,31 +39,6 @@ app_identity_services = models.Registry.import_app_identity_services()
 # cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
 class ReadFile(beam.PTransform): # type: ignore[misc]
     """Read files form the GCS."""
-
-    # Here we pass FakeGcsClient when we want to test the functionality locally.
-    # This ensures that our code will work fine while interacting with GCS.
-    def __init__(
-        self,
-        client: Optional[gcsio_test.FakeGcsClient] = None,
-        mode_is_binary: bool = False,
-        label: Optional[str] = None
-    ) -> None:
-        """Initializes the ReadFile PTransform.
-
-        Args:
-            client: Optional[gcsio_test.FakeGcsClient]. The GCS client to use
-                while testing. This will be None when testing on server.
-            mode_is_binary: bool. True, when the mode needs to be 'rb' and
-                False when mode needs to be 'r'. Represents to read the file
-                in binary or not.
-            label: Optional[str]. The label of the PTransform.
-        """
-        super().__init__(label=label)
-        self.client = client
-        if mode_is_binary:
-            self.mode = 'rb'
-        else:
-            self.mode = 'r'
 
     def expand(self, file_paths: beam.PCollection) -> beam.PCollection:
         """Returns PCollection with file data.
@@ -89,12 +64,8 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         Returns:
             data: Union[bytes, str]. The file data.
         """
-        gcs = gcsio.GcsIO(self.client)
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        gcs_url = f'gs://{bucket}/{file_path}'
-        file = gcs.open(gcs_url, mode=self.mode)
-        data = file.read()
-        file.close()
+        data = storage_services.get(bucket, file_path)
         return (file_path, data)
 
 
@@ -112,33 +83,19 @@ class FileObjectDict(TypedDict):
 class WriteFile(beam.PTransform): # type: ignore[misc]
     """Write files to GCS."""
 
-    # Here we pass FakeGcsClient when we want to test the functionality locally.
-    # This ensures that our code will work fine while interacting with GCS.
     def __init__(
         self,
-        client: Optional[gcsio_test.FakeGcsClient] = None,
-        mode_is_binary: bool = False,
         mime_type: str = 'application/octet-stream',
         label: Optional[str] = None
     ) -> None:
         """Initializes the WriteFile PTransform.
 
         Args:
-            client: Optional[gcsio_test.FakeGcsClient]. The GCS client to use
-                while testing. This will be None when testing on server.
-            mode_is_binary: bool. True, when the mode needs to be 'wb' and
-                False when mode needs to be 'w'. Represents to write the file
-                in binary or not.
             mime_type: str. The mime_type to assign to the file.
             label: Optional[str]. The label of the PTransform.
         """
         super().__init__(label=label)
-        self.client = client
         self.mime_type = mime_type
-        if mode_is_binary:
-            self.mode = 'wb'
-        else:
-            self.mode = 'w'
 
     def expand(self, file_objects: beam.PCollection) -> beam.PCollection:
         """Returns the PCollection of files that have written to the GCS.
@@ -164,23 +121,12 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
                 path and file data.
 
         Returns:
-            write_file: int. Returns the number of bytes that has
-            been written to GCS.
+            int. Returns the number of bytes that has been written to GCS.
         """
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        gcs = gcsio.GcsIO(self.client)
-        filepath = file_obj['filepath']
-        gcs_url = 'gs://%s/%s' % (bucket, filepath)
-        file = gcs.open(
-            filename=gcs_url,
-            mode=self.mode,
-            mime_type=self.mime_type)
-        write_file = file.write(file_obj['data'])
-        file.close()
-        # TODO(#15613): Here we use MyPy ignore because of the incomplete
-        # typing of apache_beam library and absences of stubs in Typeshed,
-        # forces MyPy to assume that the return is of type Any.
-        return write_file # type: ignore[no-any-return]
+        storage_services.commit(
+            bucket, file_obj['filepath'], file_obj['data'], self.mime_type)
+        return len(file_obj['data'])
 
 
 # TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
@@ -189,23 +135,6 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
 # cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
 class DeleteFile(beam.PTransform): # type: ignore[misc]
     """Delete files from GCS."""
-
-    # Here we pass FakeGcsClient when we want to test the functionality locally.
-    # This ensures that our code will work fine while interacting with GCS.
-    def __init__(
-        self,
-        client: Optional[gcsio_test.FakeGcsClient] = None,
-        label: Optional[str] = None
-    ) -> None:
-        """Initializes the DeleteFile PTransform.
-
-        Args:
-            client: Optional[gcsio_test.FakeGcsClient]. The GCS client to use
-                while testing. This will be None when testing on server.
-            label: Optional[str]. The label of the PTransform.
-        """
-        super().__init__(label=label)
-        self.client = client
 
     def expand(self, file_paths: beam.PCollection) -> beam.pvalue.PDone:
         """Deletes the files in given PCollection.
@@ -227,18 +156,9 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
 
         Args:
             file_path: str. The name of the file that will be deleted.
-
-        Returns:
-            delete_result: None. Returns None or error.
         """
-        gcs = gcsio.GcsIO(self.client)
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        gcs_url = f'gs://{bucket}/{file_path}'
-        delete_result = gcs.delete(gcs_url)
-        # TODO(#15613): Here we use MyPy ignore because of the incomplete
-        # typing of apache_beam library and absences of stubs in Typeshed,
-        # forces MyPy to assume that the return is of type Any.
-        return delete_result # type: ignore[no-any-return]
+        storage_services.delete(bucket, file_path)
 
 
 # TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
@@ -247,23 +167,6 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
 # cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
 class GetFiles(beam.PTransform): # type: ignore[misc]
     """Get all files with specefic prefix."""
-
-    # Here we pass FakeGcsClient when we want to test the functionality locally.
-    # This ensures that our code will work fine while interacting with GCS.
-    def __init__(
-        self,
-        client: Optional[gcsio_test.FakeGcsClient] = None,
-        label: Optional[str] = None
-    ) -> None:
-        """Initializes the GetFiles PTransform.
-
-        Args:
-            client: Optional[gcsio_test.FakeGcsClient]. The GCS client to use
-                while testing. This will be None when testing on server.
-            label: Optional[str]. The label of the PTransform.
-        """
-        super().__init__(label=label)
-        self.client = client
 
     def expand(self, prefixes: beam.PCollection) -> beam.PCollection:
         """Returns PCollection with file names.
@@ -279,7 +182,9 @@ class GetFiles(beam.PTransform): # type: ignore[misc]
             | 'Get names of the files' >> beam.Map(self._get_file_with_prefix)
         )
 
-    def _get_file_with_prefix(self, prefix: str) -> Dict[str, int]:
+    def _get_file_with_prefix(
+        self, prefix: str
+    ) -> List[cloud_storage_emulator.EmulatorBlob]:
         """Helper function to get file names with the prefix.
 
         Args:
@@ -287,12 +192,7 @@ class GetFiles(beam.PTransform): # type: ignore[misc]
                 all the files.
 
         Returns:
-            Dict[str, int]. The file name as key and size of file as value.
+            List[EmulatorBlob]. The file name as key and size of file as value.
         """
-        gcs = gcsio.GcsIO(self.client)
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        gcs_url = f'gs://{bucket}/{prefix}'
-        # TODO(#15613): Here we use MyPy ignore because of the incomplete
-        # typing of apache_beam library and absences of stubs in Typeshed,
-        # forces MyPy to assume that the return is of type Any.
-        return gcs.list_prefix(gcs_url) # type: ignore[no-any-return]
+        return storage_services.listdir(bucket, prefix)
