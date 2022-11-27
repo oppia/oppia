@@ -466,11 +466,9 @@ class DraftUpgradeUtil:
     def _convert_states_v50_dict_to_v51_dict(
         cls, draft_change_list: List[exp_domain.ExplorationChange]
     ) -> List[exp_domain.ExplorationChange]:
-        """Converts from version 50 to 51. Version 51 adds a new
-        dest_if_really_stuck field to Outcome class to redirect learners
-        to a state for strengthening concepts when they get really stuck. As
-        this is a new property and therefore doesn't affect any pre-existing
-        drafts, there should be no changes to drafts.
+        """Converts draft change list from state version 50 to 51. Adds
+        a new field dest_if_really_stuck to Outcome class to direct the
+        learner to a custom revision state.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of
@@ -479,6 +477,84 @@ class DraftUpgradeUtil:
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
+        for i, change in enumerate(draft_change_list):
+            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                    change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                # Here we use cast because this 'if' condition forces change to
+                # have type EditExpStatePropertyInteractionAnswerGroupsCmd.
+                edit_interaction_answer_groups_cmd = cast(
+                    exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,
+                    change
+                )
+                new_answer_groups_dicts = (
+                    edit_interaction_answer_groups_cmd.new_value
+                )
+                answer_group_dicts: List[state_domain.AnswerGroupDict] = []
+                for answer_group_dict in new_answer_groups_dicts:
+                    outcome_dict: state_domain.OutcomeDict = ({
+                        'dest': answer_group_dict['outcome']['dest'],
+                        'dest_if_really_stuck': None,
+                        'feedback': (
+                            answer_group_dict['outcome']['feedback']),
+                        'labelled_as_correct': (
+                            answer_group_dict
+                                ['outcome']['labelled_as_correct']),
+                        'param_changes': (
+                            answer_group_dict['outcome']['param_changes']),
+                        'refresher_exploration_id': (
+                            answer_group_dict
+                                ['outcome']['refresher_exploration_id']),
+                        'missing_prerequisite_skill_id': (
+                            answer_group_dict['outcome']
+                                ['missing_prerequisite_skill_id'])
+                    })
+                    answer_group_dicts.append({
+                        'rule_specs': answer_group_dict['rule_specs'],
+                        'outcome': outcome_dict,
+                        'training_data': answer_group_dict['training_data'],
+                        'tagged_skill_misconception_id': None
+                    })
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                    'state_name': change.state_name,
+                    'new_value': answer_group_dicts
+                })
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
+                  change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY):
+                # Here we use cast because this 'elif' condition forces change
+                # to have type EditExpStatePropertyInteractionDefaultOutcomeCmd.
+                edit_interaction_default_outcome_cmd = cast(
+                    exp_domain.EditExpStatePropertyInteractionDefaultOutcomeCmd,
+                    change
+                )
+                new_default_outcome_dict = (
+                    edit_interaction_default_outcome_cmd.new_value
+                )
+                default_outcome_dict: state_domain.OutcomeDict = ({
+                    'dest': new_default_outcome_dict['dest'],
+                    'dest_if_really_stuck': None,
+                    'feedback': new_default_outcome_dict['feedback'],
+                    'labelled_as_correct': (
+                        new_default_outcome_dict['labelled_as_correct']),
+                    'param_changes': (
+                        new_default_outcome_dict['param_changes']),
+                    'refresher_exploration_id': (
+                        new_default_outcome_dict['refresher_exploration_id']),
+                    'missing_prerequisite_skill_id': (
+                        new_default_outcome_dict
+                            ['missing_prerequisite_skill_id'])
+                })
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                    'state_name': change.state_name,
+                    'new_value': default_outcome_dict
+                })
         return draft_change_list
 
     @classmethod
