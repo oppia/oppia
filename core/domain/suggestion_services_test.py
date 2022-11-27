@@ -6297,10 +6297,10 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             return 'test_123'
 
         def mock_screenshot(
-            self,
-            html_str: str,
-            save_as: str,
-            size: Tuple[str, str]
+            self,  # pylint: disable=unused-argument
+            html_str: str,  # pylint: disable=unused-argument
+            save_as: str,  # pylint: disable=unused-argument
+            size: Tuple[str, str]  # pylint: disable=unused-argument
         ) -> List[str]:
             return []
 
@@ -6310,7 +6310,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
                     Exception,
                     'Image generation failed.'
                 ):
-                    suggestion_services._generate_contributor_certificate_image(
+                    suggestion_services._generate_contributor_certificate_image(  # pylint: disable=protected-access
                         'Template'
                     )
 

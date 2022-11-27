@@ -3222,6 +3222,6 @@ def _generate_contributor_certificate_image(template: str) -> List[str]:
             'Image generation failed.')
     # Since there are corresponfing image paths we can confirm that
     # image_paths is a list of strings.
-    assert isinstance(image_paths, List[str])
+    assert isinstance(image_paths[0], str)
 
     return image_paths
