@@ -112,11 +112,11 @@ describe('NoninteractiveMath', () => {
     fixture = TestBed.createComponent(NoninteractiveMath);
     component = fixture.componentInstance;
 
-    component.mathContentWithValue = String({
+    component.mathContentWithValue = {
       raw_latex: '\\frac{x}{y}',
       svg_filename: 'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
       '_1d784_vertical_1d306.svg'
-    });
+    };
   });
 
   it('should initialise component when user inserts a math equation', () => {
@@ -255,27 +255,27 @@ describe('NoninteractiveMath', () => {
   it('should update image when usre makes changes to the equation', () => {
     const changes: SimpleChanges = {
       mathContentWithValue: {
-        currentValue: String({
+        currentValue: {
           raw_latex: '\\frac{a}{b}',
           svg_filename:
             'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
             '_1d784_vertical_1d306.svg'
-        }),
-        previousValue: String({
+        },
+        previousValue: {
           raw_latex: '\\frac{x}{y}',
           svg_filename:
             'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
             '_1d784_vertical_1d306.svg'
-        }),
+        },
         firstChange: false,
         isFirstChange: () => false
       }
     };
-    component.mathContentWithValue = String({
+    component.mathContentWithValue = {
       raw_latex: '\\frac{a}{b}',
       svg_filename: 'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
       '_1d784_vertical_1d306.svg'
-    });
+    };
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
     spyOn(contextService, 'getEntityType').and.returnValue(
       AppConstants.ENTITY_TYPE.EXPLORATION);
