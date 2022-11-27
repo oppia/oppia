@@ -522,7 +522,7 @@ class DraftUpgradeUtil:
                     'state_name': change.state_name,
                     'new_value': answer_group_dicts
                 })
-            if (change.property_name ==
+            elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
                   change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY):
                 # Here we use cast because this 'elif' condition forces change
