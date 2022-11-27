@@ -36,6 +36,7 @@ from core.domain import rules_registry
 from core.domain import state_domain
 from core.domain import translatable_object_registry
 from core.domain import translation_domain
+from core.domain import param_domain
 from core.tests import test_utils
 from extensions.interactions import base
 
@@ -1919,6 +1920,66 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
 
+    def test_answer_group_validation_with_invalid_rules_type(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        exp_param_specs_dict = exploration.param_specs_dict
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'DragAndDropSortInput'))
+
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering',
+                    {
+                        'x': [['<p>IsEqualToOrdering rule_spec htmls</p>']]
+                    }),
+            ],
+            [],
+            None
+        )
+
+        with self.swap(state_answer_group, 'rule_specs', {}):
+            with self.assertRaisesRegex(
+                utils.ValidationError, 'Expected answer group rules to be a list, received {}'):
+                    state_answer_group.validate(interaction, exp_param_specs_dict)
+
+        with self.swap(state_answer_group, 'tagged_skill_misconception_id', '1-1'):
+            with self.assertRaisesRegex(
+                utils.ValidationError, 'Expected tagged skill misconception id to be None, received 1-1'):
+                    state_answer_group.validate(interaction, exp_param_specs_dict)
+
+        with self.swap(state_answer_group, 'tagged_skill_misconception_id', 20):
+            with self.assertRaisesRegex(
+                utils.ValidationError, 'Expected tagged skill misconception id to be a str, received 20'):
+                    state_answer_group.validate(interaction, exp_param_specs_dict, tagged_skill_misconception_id_required=True)
+
+        with self.swap(state_answer_group, 'tagged_skill_misconception_id', 'Id'):
+            with self.assertRaisesRegex(
+                utils.ValidationError, 'Expected the format of tagged skill misconception id to be <skill_id>-<misconception_id>, received Id'):
+                    state_answer_group.validate(interaction, exp_param_specs_dict, tagged_skill_misconception_id_required=True)
+       
+        with self.swap(state_answer_group, 'rule_specs', []):
+            with self.swap(state_answer_group, 'tagged_skill_misconception_id', '111111111111-1'):
+                with self.assertRaisesRegex(
+                    utils.ValidationError, 'There must be at least one rule for each answer group.'):
+                        state_answer_group.validate(interaction, exp_param_specs_dict, tagged_skill_misconception_id_required=True)
+
+        with self.swap(state_answer_group, 'rule_specs', [state_domain.RuleSpec(
+                    'X',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test']
+                            }
+                    })]):
+            with self.assertRaisesRegex(utils.ValidationError, 'Unrecognized rule type: X'):
+                    state_answer_group.validate(interaction, exp_param_specs_dict)
+    
     def test_convert_html_fields_in_state_with_drag_and_drop_interaction(
         self
     ) -> None:
