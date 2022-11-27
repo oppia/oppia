@@ -215,7 +215,7 @@ export const AppConstants = {
   INTERACTION_NAME: {
     END_EXPLORATION: 'End Exploration'
   },
-  
+
   CONTRIBUTION_STATS_SUBTYPE_CORRECTION: 'correction',
   CONTRIBUTION_STATS_TYPES: {
     TRANSLATION_CONTRIBUTION: {
