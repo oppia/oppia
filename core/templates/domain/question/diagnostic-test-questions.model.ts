@@ -21,8 +21,8 @@
 import { Question } from './QuestionObjectFactory';
 
 export class DiagnosticTestQuestionsModel {
-  _mainQuestion: Question;
-  _backupQuestion: Question;
+  private _mainQuestion: Question;
+  private _backupQuestion: Question;
 
   constructor(
       mainQuestion: Question,

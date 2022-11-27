@@ -338,7 +338,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 53
+CURRENT_STATE_SCHEMA_VERSION = 54
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -558,7 +558,6 @@ ES_LOCALHOST_PORT = 9200
 # auth information during deployment.
 ES_CLOUD_ID = None
 ES_USERNAME = None
-ES_PASSWORD = None
 
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
 # Port when switching to prod server. Keep this in sync with redis.conf in the
@@ -1095,9 +1094,10 @@ LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER = (
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
 EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
 CLASSROOM_ADMIN_DATA_HANDLER_URL = '/classroom_admin_data_handler'
-CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
+NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 CLASSROOM_HANDLER_URL = '/classroom'
 CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
+CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'

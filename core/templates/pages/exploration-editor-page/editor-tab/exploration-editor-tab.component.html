@@ -70,6 +70,10 @@
       <div class="exp-editor-content-container"  joyrideStep="editorTabTourTutorialComplete" [stepContent]="EditorTabTourTutorialComplete"></div>
       <oppia-unresolved-answers-overview></oppia-unresolved-answers-overview>
     </div>
+    <div class="exp-state-version-history">
+      <div><strong>Version History</strong></div>
+      <oppia-state-version-history [validationErrorIsShown]="validationErrorIsShown"></oppia-state-version-history>
+    </div>
   </div>
   <attribution-guide></attribution-guide>
 </div>
@@ -94,6 +98,9 @@
     .exp-editor-main-editor {
       margin-right: 0;
       width: 100%;
+    }
+    .exp-state-version-history {
+      display: none;
     }
   }
   md-checkbox.checkpoint-selection-checkbox.md-icon {

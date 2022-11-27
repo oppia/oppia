@@ -38,15 +38,15 @@ describe('NeedsGuidingResponsesTask component', function() {
     answerStats: [],
     stateStats: {
       totalAnswersCount,
-      usefulFeedbackCount: null,
-      totalHitCount: null,
-      firstHitCount: null,
-      numTimesSolutionViewed: null,
-      numCompletions: null
+      usefulFeedbackCount: 0,
+      totalHitCount: 0,
+      firstHitCount: 0,
+      numTimesSolutionViewed: 0,
+      numCompletions: 0
     },
-    cstPlaythroughIssues: null,
-    eqPlaythroughIssues: null,
-    misPlaythroughIssues: null
+    cstPlaythroughIssues: [],
+    eqPlaythroughIssues: [],
+    misPlaythroughIssues: []
   } as SupportingStateStats;
 
   class MockNgbModal {
