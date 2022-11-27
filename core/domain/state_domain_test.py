@@ -1932,7 +1932,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
 
-    def test_answer_group_validation_with_invalid_rules_type(self) -> None:
+    def test_answer_group_validation_with_invalid_rule_spec_type(self) -> None:
+        """Test validating answer group with invalid rule_spec type."""
         exploration = exp_domain.Exploration.create_default_exploration('0')
         exp_param_specs_dict = exploration.param_specs_dict
         interaction = (
@@ -1960,6 +1961,95 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 utils.ValidationError, 'Expected answer group rules to be a list, received {}'):
                     state_answer_group.validate(interaction, exp_param_specs_dict)
 
+    def test_answer_group_validation_with_unrecognized_rule(self) -> None:
+        """Test validating answer group with unrecognized rule type."""
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        exp_param_specs_dict = exploration.param_specs_dict
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'DragAndDropSortInput'))
+
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering',
+                    {
+                        'x': [['<p>IsEqualToOrdering rule_spec htmls</p>']]
+                    }),
+            ],
+            [],
+            None
+        )
+
+        with self.swap(state_answer_group, 'rule_specs', [state_domain.RuleSpec(
+                    'X',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test']
+                            }
+                    })]):
+            with self.assertRaisesRegex(utils.ValidationError, 'Unrecognized rule type: X'):
+                    state_answer_group.validate(interaction, exp_param_specs_dict)
+
+    def test_answer_group_validation_with_empty_rule_specs(self) -> None:
+        """Test validating answer group with empty rule_specs."""
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        exp_param_specs_dict = exploration.param_specs_dict
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'DragAndDropSortInput'))
+
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering',
+                    {
+                        'x': [['<p>IsEqualToOrdering rule_spec htmls</p>']]
+                    }),
+            ],
+            [],
+            None
+        )
+    
+        with self.swap(state_answer_group, 'rule_specs', []):
+            with self.swap(state_answer_group, 'tagged_skill_misconception_id', '111111111111-1'):
+                with self.assertRaisesRegex(
+                    utils.ValidationError, 'There must be at least one rule for each answer group.'):
+                        state_answer_group.validate(interaction, exp_param_specs_dict, tagged_skill_misconception_id_required=True)
+
+    def test_answer_group_validation_with_invalid_tagged_skill_misconception_ids(self) -> None:
+        """Test validating answer group with invalid tagged_skill_misconception_id's."""
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        exp_param_specs_dict = exploration.param_specs_dict
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'DragAndDropSortInput'))
+
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering',
+                    {
+                        'x': [['<p>IsEqualToOrdering rule_spec htmls</p>']]
+                    }),
+            ],
+            [],
+            None
+        )
+
         with self.swap(state_answer_group, 'tagged_skill_misconception_id', '1-1'):
             with self.assertRaisesRegex(
                 utils.ValidationError, 'Expected tagged skill misconception id to be None, received 1-1'):
@@ -1974,23 +2064,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(
                 utils.ValidationError, 'Expected the format of tagged skill misconception id to be <skill_id>-<misconception_id>, received Id'):
                     state_answer_group.validate(interaction, exp_param_specs_dict, tagged_skill_misconception_id_required=True)
-       
-        with self.swap(state_answer_group, 'rule_specs', []):
-            with self.swap(state_answer_group, 'tagged_skill_misconception_id', '111111111111-1'):
-                with self.assertRaisesRegex(
-                    utils.ValidationError, 'There must be at least one rule for each answer group.'):
-                        state_answer_group.validate(interaction, exp_param_specs_dict, tagged_skill_misconception_id_required=True)
-
-        with self.swap(state_answer_group, 'rule_specs', [state_domain.RuleSpec(
-                    'X',
-                    {
-                        'x': {
-                            'contentId': 'rule_input_Contains',
-                            'normalizedStrSet': ['Test']
-                            }
-                    })]):
-            with self.assertRaisesRegex(utils.ValidationError, 'Unrecognized rule type: X'):
-                    state_answer_group.validate(interaction, exp_param_specs_dict)
     
     def test_convert_html_fields_in_state_with_drag_and_drop_interaction(
         self
