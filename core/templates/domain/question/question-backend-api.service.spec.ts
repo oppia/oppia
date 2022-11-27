@@ -237,7 +237,7 @@ describe('Question backend Api service', () => {
         // throws an error only in the frontend test and
         // not in the backend test.
         // @ts-ignore
-        ['1'], 'abc' as unknown as number, true
+        ['1'], 'abc' as number, true
       ).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();

@@ -68,7 +68,7 @@ export class ExplorationStatesService {
 
   stateInteractionSavedCallbacks: ((state: State) => void)[] = [];
   private _states: States | null = null;
-  private _refreshGraphEventEmitter: EventEmitter<unknown> = new EventEmitter();
+  private _refreshGraphEventEmitter: EventEmitter<string> = new EventEmitter();
 
   constructor(
     private angularNameService: AngularNameService,
@@ -210,7 +210,7 @@ export class ExplorationStatesService {
   };
 
   private _getElementsInFirstSetButNotInSecond(
-      setA: Set<unknown>, setB: Set<unknown>
+      setA: Set<string>, setB: Set<string>
   ): string[] {
     let diffList = Array.from(setA).filter((element) => {
       return !setB.has(element);
@@ -791,7 +791,7 @@ export class ExplorationStatesService {
     this.stateInteractionSavedCallbacks.push(callback);
   }
 
-  get onRefreshGraph(): EventEmitter<unknown> {
+  get onRefreshGraph(): EventEmitter<string> {
     return this._refreshGraphEventEmitter;
   }
 }

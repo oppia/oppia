@@ -185,7 +185,7 @@ describe('NoninteractiveSkillreview', () => {
     try {
       component.openConceptCard(e);
       flush();
-    // Unknown type is used because we don't know actual type of unknown.
+    // Unknown type is used because we don't know actual type of error.
     } catch (e: unknown) {
       error = e as Error;
       expect(error.message.indexOf('Error: close') !== -1).toBeTrue();

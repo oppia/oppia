@@ -58,6 +58,8 @@ INJECTABLES_TO_IGNORE: Final = [
 FILES_CONTAINING_UNKNOWN_TYPE: List[str] = [
     # Do this file after removing jQuery from this file.
     'extensions/objects/templates/svg-editor.component.ts',
+    # Do this file after completing the migration of whole AngularJS to Angular.
+    'extensions/rich_text_components/rte-output-display.component.ts',
 ]
 
 

@@ -167,7 +167,7 @@ export class ConceptCardManagerService {
     }
   }
 
-  get onLearnerGetsReallyStuck(): EventEmitter<unknown> {
+  get onLearnerGetsReallyStuck(): EventEmitter<string> {
     return this._learnerReallyStuckEventEmitter;
   }
 }
