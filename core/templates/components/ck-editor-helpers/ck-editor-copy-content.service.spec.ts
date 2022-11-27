@@ -63,7 +63,7 @@ describe('Ck editor copy content service', () => {
   it('should not copy and paste if copy mode is not active', () => {
     expect(service.copyModeActive).toBe(false);
 
-    const pElement = generateContent('<p>Hello</p>');
+    const pElement = generateContent('<p>Hello<!--comment--></p>');
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(pElement);
@@ -77,7 +77,7 @@ describe('Ck editor copy content service', () => {
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
 
-    const pElement = generateContent('<p>Hello</p>');
+    const pElement = generateContent('<p>Hello<!--comment--></p>');
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(pElement);
@@ -93,7 +93,7 @@ describe('Ck editor copy content service', () => {
     expect(service.copyModeActive).toBe(true);
 
     // eslint-disable-next-line quotes
-    let listHtml = `<ul><li>Parent bullet<ul><li>Child bullet<ul>\
+    let listHtml = `<ul><li>Parent bullet<!--comment--><ul><li>Child bullet<ul>\
 <li>Grandchild bullet</li></ul></li></ul></li></ul>`;
     const listElement = generateContent(listHtml);
 
