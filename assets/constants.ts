@@ -4983,6 +4983,11 @@ export default {
     "direction": "ltr",
     "decimal_separator": ","
   }, {
+    "code": "am",
+    "description": "አማርኛ (Amharic)",
+    "direction": "ltr",
+    "decimal_separator": "."
+  }, {
     "code": "az",
     "description": "Azeri (Azerbaijani)",
     "direction": "ltr",
@@ -5349,6 +5354,11 @@ export default {
     "id": "sq",
     "description": "shqip (Albanian)",
     "relatedLanguages": ["sq"],
+    "direction": "ltr"
+  }, {
+    "id": "am",
+    "description": "አማርኛ (Amharic)",
+    "relatedLanguages": ["am"],
     "direction": "ltr"
   }, {
     "id": "ar",
@@ -6907,7 +6917,6 @@ export default {
 
   "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico",
 
-  "CAN_FETCH_VERSION_HISTORY_DATA": false,
   "METADATA_PROPERTIES": [
     "title", "category", "objective", "language_code", "tags", "blurb",
     "author_notes", "states_schema_version", "init_state_name", "param_specs",

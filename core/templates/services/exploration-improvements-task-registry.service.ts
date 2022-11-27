@@ -165,10 +165,10 @@ export class StateTasks implements Iterable<ExplorationTask> {
  */
 @Injectable({providedIn: 'root'})
 export class ExplorationImprovementsTaskRegistryService {
-  private config: ExplorationImprovementsConfig;
-  private expStats: ExplorationStats;
-  private tasksByState: Map<string, StateTasks>;
-  private openTasksByType: ReadonlyMap<ExplorationTaskType, ExplorationTask[]>;
+  private config!: ExplorationImprovementsConfig;
+  private expStats!: ExplorationStats;
+  private tasksByState!: Map<string, StateTasks>;
+  private openTasksByType!: ReadonlyMap<ExplorationTaskType, ExplorationTask[]>;
 
   initialize(
       config: ExplorationImprovementsConfig,
@@ -240,7 +240,7 @@ export class ExplorationImprovementsTaskRegistryService {
     this.expStats = this.expStats.createNewWithStateDeleted(oldStateName);
     const oldStateTasks = this.tasksByState.get(oldStateName);
 
-    for (const oldTask of oldStateTasks) {
+    for (const oldTask of (oldStateTasks as StateTasks)) {
       if (oldTask.isOpen()) {
         this.popOpenTask(oldTask);
       }
@@ -256,7 +256,7 @@ export class ExplorationImprovementsTaskRegistryService {
     const oldStateTasks = this.tasksByState.get(oldStateName);
     const newStateTasks = new StateTasks(
       newStateName,
-      new Map(oldStateTasks.map(oldTask => [
+      new Map((oldStateTasks as StateTasks).map(oldTask => [
         oldTask.taskType,
         ExplorationTaskModel.createFromBackendDict({
           ...oldTask.toBackendDict(),
@@ -265,17 +265,17 @@ export class ExplorationImprovementsTaskRegistryService {
       ])),
       new SupportingStateStats(
         this.expStats.getStateStats(newStateName),
-        oldStateTasks.supportingStats.answerStats,
-        oldStateTasks.supportingStats.cstPlaythroughIssues,
-        oldStateTasks.supportingStats.eqPlaythroughIssues,
-        oldStateTasks.supportingStats.misPlaythroughIssues));
+        (oldStateTasks as StateTasks).supportingStats.answerStats,
+        (oldStateTasks as StateTasks).supportingStats.cstPlaythroughIssues,
+        (oldStateTasks as StateTasks).supportingStats.eqPlaythroughIssues,
+        (oldStateTasks as StateTasks).supportingStats.misPlaythroughIssues));
 
     for (const newTask of newStateTasks) {
       if (newTask.isOpen()) {
         this.pushOpenTask(newTask);
       }
     }
-    for (const oldTask of oldStateTasks) {
+    for (const oldTask of (oldStateTasks as StateTasks)) {
       if (oldTask.isOpen()) {
         this.popOpenTask(oldTask);
       }
@@ -287,7 +287,7 @@ export class ExplorationImprovementsTaskRegistryService {
   }
 
   onStateInteractionSaved(state: State): void {
-    this.refreshStateTasks(state.name);
+    this.refreshStateTasks(state.name as string);
   }
 
   getOpenHighBounceRateTasks(): HbrTask[] {
@@ -315,7 +315,7 @@ export class ExplorationImprovementsTaskRegistryService {
     if (!this.tasksByState.has(stateName)) {
       throw new Error('Unknown state with name: ' + stateName);
     }
-    return this.tasksByState.get(stateName);
+    return this.tasksByState.get(stateName) as StateTasks;
   }
 
   getAllStateTasks(): StateTasks[] {
@@ -382,23 +382,23 @@ export class ExplorationImprovementsTaskRegistryService {
     for (const task of openTasks) {
       const stateNameReferences = (
         stateNameReferencesByTaskType.get(task.taskType));
-      if (stateNameReferences.has(task.targetId)) {
+      if ((stateNameReferences as Set<unknown>).has(task.targetId)) {
         throw new Error(
           'Found duplicate task of type "' + task.taskType + '" targeting ' +
           'state "' + task.targetId + '"');
       } else {
-        stateNameReferences.add(task.targetId);
+        (stateNameReferences as Set<unknown>).add(task.targetId);
       }
     }
     for (const [stateName, taskTypes] of resolvedTaskTypesByStateName) {
       for (const taskType of taskTypes) {
         const stateNameReferences = stateNameReferencesByTaskType.get(taskType);
-        if (stateNameReferences.has(stateName)) {
+        if ((stateNameReferences as Set<unknown>).has(stateName)) {
           throw new Error(
             'Found duplicate task of type "' + taskType + '" targeting state ' +
             '"' + stateName + '"');
         } else {
-          stateNameReferences.add(stateName);
+          (stateNameReferences as Set<unknown>).add(stateName);
         }
       }
     }
@@ -453,9 +453,9 @@ export class ExplorationImprovementsTaskRegistryService {
   private refreshStateTasks(stateName: string): void {
     const stateTasks = this.tasksByState.get(stateName);
     const tasksWithOldStatus: [ExplorationTask, string][] = (
-      stateTasks.map(task => [task, task.getStatus()]));
+      (stateTasks as StateTasks).map(task => [task, task.getStatus()]));
 
-    stateTasks.refresh(this.expStats, this.config);
+    (stateTasks as StateTasks).refresh(this.expStats, this.config);
 
     for (const [task, oldStatus] of tasksWithOldStatus) {
       if (task.getStatus() === oldStatus) {
@@ -470,13 +470,14 @@ export class ExplorationImprovementsTaskRegistryService {
 
   /** Pre-condition: task is missing from the openTasksByType data structure. */
   private pushOpenTask(task: ExplorationTask): void {
-    this.openTasksByType.get(task.taskType).push(task);
+    (this.openTasksByType.get(task.taskType) as ExplorationTask[]).push(task);
   }
 
   /** Pre-condition: task is present in the openTasksByType data structure. */
   private popOpenTask(task: ExplorationTask): void {
     const arrayWithTask = this.openTasksByType.get(task.taskType);
-    arrayWithTask.splice(arrayWithTask.indexOf(task), 1);
+    (arrayWithTask as ExplorationTask[]).splice(
+      (arrayWithTask as ExplorationTask[]).indexOf(task), 1);
   }
 }
 

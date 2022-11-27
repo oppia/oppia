@@ -111,6 +111,10 @@
         <contributor-stats [type]="defaultContributionType">
         </contributor-stats>
       </div>
+      <div *ngIf="accomplishmentsTabIsEnabled && isAccomplishmentsTabActive() && activeTabSubtype === 'badges'">
+        <contributor-badges>
+        </contributor-badges>
+      </div>
     </div>
   </div>
 </div>
