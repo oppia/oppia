@@ -84,7 +84,7 @@ export class NoninteractiveMath implements OnInit, OnChanges {
     }
     const mathExpressionContent = this.htmlEscaperService.escapedJsonToObj(
       this.mathContentWithValue) as MathExpression;
-    if (mathExpressionContent as unknown as string === '') {
+    if (typeof mathExpressionContent === 'string') {
       return;
     }
     if (mathExpressionContent.hasOwnProperty('raw_latex')) {

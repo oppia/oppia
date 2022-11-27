@@ -435,7 +435,8 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
 
     def _check_unknown_type(self) -> concurrent_task_utils.TaskResult:
         """Prints a list of lint errors if an unknown type is used. This lint
-            check is not enabled by default. Add proper comment if unknown is needed.
+            check is not enabled by default. Add proper comment if unknown is
+            needed.
 
         Returns:
             TaskResult. A TaskResult object representing the result of the
@@ -447,18 +448,21 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         comment_before_unknown_type = False
         ts_files_to_check = self.ts_filepaths
         for file_path in ts_files_to_check:
-            # Not showing lint errors for files present in FILES_CONTAIN_UNKNOWN_TYPE
+            # Not showing lint errors for files present in
+            # FILES_CONTAIN_UNKNOWN_TYPE
             if file_path in FILES_CONTAINING_UNKNOWN_TYPE:
                 continue
 
             file_content = self.file_cache.read(file_path)
             for line_num, line in enumerate(file_content.split('\n')):
-                # Indexes where unknown type (: unknown) is present in a particular
-                # line.
-                unknown_type_object = re.finditer(pattern=': unknown', string=line)
-                unknown_type = [index.start() for index in unknown_type_object]
-                # Indexes where unknown type conversion (as unknown) is present in
-                # a particular line.
+                # Indexes where unknown type (: unknown) is present in a 
+                # particular line.
+                unknown_type_object = (
+                    re.finditer(pattern=': unknown', string=line))
+                unknown_type = (
+                    [index.start() for index in unknown_type_object])
+                # Indexes where unknown type conversion (as unknown) is
+                # present in a particular line.
                 unknown_type_conversion_object = (
                     re.finditer(pattern='as unknown', string=line))
                 unknown_type_conversion = (
