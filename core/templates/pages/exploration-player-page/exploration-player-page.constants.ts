@@ -39,12 +39,12 @@ export const ExplorationPlayerConstants = {
   // The time delay after all the hints are exhausted, or after
   // the concept card is used. This is the stage when the learner
   // is said to be really stuck.
-  WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC: 15000,
+  WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC: 150000,
 
   // The time delay after all the hints are exhausted, or after
   // the concept card is used. This is the stage when the learner
   // is said to be really stuck.
-  WAIT_BEFORE_REALLY_STUCK_MSEC: 16000,
+  WAIT_BEFORE_REALLY_STUCK_MSEC: 160000,
 
   // The threshold for incorrect answers submitted after either
   // exhausting all the hints, or after using the concept card,
