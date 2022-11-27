@@ -492,13 +492,13 @@ class DraftUpgradeUtil:
                 for answer_group_dict in new_answer_groups_dicts:
                     outcome_dict: List[state_domain.OutcomeDict] = []
                     outcome_dict.append({
-                        'dest': outcome_dict['dest'],
+                        'dest': answer_group_dict['outcome']['dest'],
                         'dest_if_really_stuck': None,
-                        'feedback': outcome_dict['feedback'],
-                        'labelled_as_correct': outcome_dict['labelled_as_correct'],
-                        'param_changes': outcome_dict['param_changes'],
-                        'refresher_exploration_id': outcome_dict['refresher_exploration_id'],
-                        'missing_prerequisite_skill_id': outcome_dict['missing_prerequisite_skill_id']
+                        'feedback': answer_group_dict['outcome']['feedback'],
+                        'labelled_as_correct': answer_group_dict['outcome']['labelled_as_correct'],
+                        'param_changes': answer_group_dict['outcome']['param_changes'],
+                        'refresher_exploration_id': answer_group_dict['outcome']['refresher_exploration_id'],
+                        'missing_prerequisite_skill_id': answer_group_dict['outcome']['missing_prerequisite_skill_id']
                     })
                     answer_group_dicts.append({
                         'rule_specs': answer_group_dict['rule_specs'],
