@@ -1729,7 +1729,7 @@ TRANSLATION_SUBMITTER_CERTIFICATE = """
                         line-height: 32px;
                         text-align: center; 
                         color: #8F9899;">
-                      for your dedication and time in translating 
+                      for their dedication and time in translating 
                       <span style="color: #00645C;">Oppia’s</span>
                       basic maths lessons to 
                       <span style="color: #00645C;">
@@ -1902,7 +1902,7 @@ QUESTION_SUBMITTER_CERTIFICATE = """
                       Math Classroom, which supports our mission of improving 
                       access to quality education.
                       <br><br> 
-                      We confirm that  {} has contributed 
+                      We confirm that {} has contributed 
                       {} hours 
                       to Oppia from <br>
                       {}  <br>

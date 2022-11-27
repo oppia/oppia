@@ -240,7 +240,7 @@ export class ContributorStatsComponent {
     if (response.translation_contribution_stats.length > 0) {
       response.translation_contribution_stats.map((stat) => {
         const translationContributionStatsData = this
-          .statsData?.translationContribution.get(stat.language_code);
+          .statsData.translationContribution.get(stat.language_code);
         if (translationContributionStatsData === undefined) {
           this.statsData?.translationContribution.set(
             stat.language_code,
@@ -259,7 +259,7 @@ export class ContributorStatsComponent {
     if (response.translation_review_stats.length > 0) {
       response.translation_review_stats.map((stat) => {
         const translationReviewStatsData = this
-          .statsData?.translationReview.get(stat.language_code);
+          .statsData.translationReview.get(stat.language_code);
         if (translationReviewStatsData === undefined) {
           this.statsData.translationReview.set(
             stat.language_code,
@@ -369,7 +369,8 @@ export class ContributorStatsComponent {
   }
 
   openCertificateDownloadModal(
-      suggestionType: string, languageCode: string | null): void {
+      suggestionType: string, languageCode: string | null
+  ): void {
     const modalRef = this.modalService.open(
       CertificateDownloadModalComponent, {
         size: 'lg',

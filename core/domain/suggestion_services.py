@@ -48,6 +48,7 @@ from typing import (
     Any, Callable, Dict, Final, List, Literal, Mapping, Match, Optional,
     Sequence, Set, Tuple, Union, cast, overload
 )
+hti = Html2Image()
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -2990,8 +2991,11 @@ def generate_contributor_certificate(
 
     Raises:
         Exception. The suggestion type is invalid.
+        Exception. There is no user for the given username.
     """
     user_id = user_services.get_user_id_from_username(username)
+    if user_id is None:
+        raise Exception('There is no user for the given username.')
     date = datetime.datetime.now().strftime('%d %b %Y')
     template = ''
 
@@ -3006,7 +3010,14 @@ def generate_contributor_certificate(
     else:
         raise Exception('The suggestion type is invalid.')
 
-    return _generate_contributor_certificate_image(template)
+    image_paths = _generate_contributor_certificate_image(template)
+    if len(image_paths) == 0:
+        raise Exception('Image generation failed.')
+    # Since we have found image paths we can make sure that the first element
+    # of image paths are in string type.
+    assert isinstance(image_paths[0], str)
+
+    return image_paths[0]
 
 
 def _generate_translation_contributor_certificate(
@@ -3014,7 +3025,7 @@ def _generate_translation_contributor_certificate(
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     username: str,
-    user_id: Optional[str],
+    user_id: str,
     date: str
 ) -> str:
     """Generates a certificate for a user's translation contributions.
@@ -3048,19 +3059,26 @@ def _generate_translation_contributor_certificate(
         constants.SUPPORTED_AUDIO_LANGUAGES), None)
     if language is None:
         raise Exception('The provided language is invalid.')
+    # Since we have found a corresponding language for the given language code
+    # we can make sure that language code is not None.
+    assert isinstance(language_code, str)
     language_description = language['description']
     if language_description.find(' (') != -1:
         language_description = language_description[
             language_description.find('(') + 1:language_description.find(')')]
+    print('=======TO DATE')
+    print(to_date)
+    print(to_date_to_fetch_contributions)
 
     suggestions = (
         suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_submitted_within_given_dates(
-              from_date,
-              to_date_to_fetch_contributions,
-              user_id,
-              language_code
-            ))
+        .get_translation_suggestions_submitted_within_given_dates(
+            from_date,
+            to_date_to_fetch_contributions,
+            user_id,
+            language_code
+        )
+    )
 
     words_count = 0
     for model in suggestions:
@@ -3091,16 +3109,16 @@ def _generate_translation_contributor_certificate(
         '/assets/images/contributor_dashboard/oppia-logo.jpg')
 
     certificate_template = feconf.TRANSLATION_SUBMITTER_CERTIFICATE.format(
-      logo_path,
-      username,
-      language_description,
-      language_description,
-      username,
-      str(hours_contributed),
-      from_date.strftime('%d %b %Y'),
-      to_date.strftime('%d %b %Y'),
-      signature,
-      date
+        logo_path,
+        username,
+        language_description,
+        language_description,
+        username,
+        str(hours_contributed),
+        from_date.strftime('%d %b %Y'),
+        to_date.strftime('%d %b %Y'),
+        signature,
+        date
     )
 
     return certificate_template
@@ -3110,7 +3128,7 @@ def _generate_question_contributor_certificate(
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     username: str,
-    user_id: Optional[str],
+    user_id: str,
     date: str
 ) -> str:
     """Generates a certificate for a user's question contributions.
@@ -3146,11 +3164,17 @@ def _generate_question_contributor_certificate(
     minutes_contributed = 0
     for model in suggestions:
         suggestion = get_suggestion_from_model(model)
+        # Retrieve the html content that is emphasized on the
+        # Contributor Dashboard pages. This content is what stands
+        # out for each suggestion when a user views a list of
+        # suggestions.
+        get_html_representing_suggestion = (
+            SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
+                suggestion.suggestion_type]
+        )
+        html_content = get_html_representing_suggestion(suggestion)
 
-        content = suggestion.change.question_dict[
-            'question_state_data']['content']['html']
-
-        if 'oppia-noninteractive-image' in content:
+        if 'oppia-noninteractive-image' in html_content:
             minutes_contributed += 20
         else:
             minutes_contributed += 12
@@ -3164,14 +3188,14 @@ def _generate_question_contributor_certificate(
         '/assets/images/contributor_dashboard/oppia-logo.jpg')
 
     certificate_template = feconf.QUESTION_SUBMITTER_CERTIFICATE.format(
-      logo_path,
-      username,
-      username,
-      str(hours_contributed),
-      from_date.strftime('%d %b %Y'),
-      to_date.strftime('%d %b %Y'),
-      signature,
-      date
+        logo_path,
+        username,
+        username,
+        str(hours_contributed),
+        from_date.strftime('%d %b %Y'),
+        to_date.strftime('%d %b %Y'),
+        signature,
+        date
     )
 
     return certificate_template
@@ -3184,12 +3208,11 @@ def _generate_contributor_certificate_image(template: str) -> Any:
         template: str. The html template to create the image.
 
     Returns:
-        Any. The path of the generated image.
+        str. The path of the generated image.
 
     Raises:
         Exception. Image generation failed.
     """
-    hti = Html2Image()
     filename = str(uuid.uuid4()) + '.png'
 
     image_paths = hti.screenshot(
@@ -3198,7 +3221,4 @@ def _generate_contributor_certificate_image(template: str) -> Any:
             constants.CONTRIBUTOR_CERTIFICATE_HEIGHT
         ))
 
-    if len(image_paths) == 0:
-        raise Exception('Image generation failed.')
-
-    return image_paths[0]
+    return image_paths

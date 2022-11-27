@@ -1898,9 +1898,34 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
-            'exp1', 1, suggestion_models.STATUS_IN_REVIEW, self.owner_id,
-            'reviewer_1', change_cmd, score_category,
+            'exp1', 1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
+            self.OWNER_USERNAME, change_cmd, score_category,
             'exploration.exp1.thread_6', 'hi')
+        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        from_date_str = from_date.strftime('%Y-%m-%d')
+        to_date = datetime.datetime.today()
+        to_date_str = to_date.strftime('%Y-%m-%d')
+
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_custom_response(
+            '/contributorcertificate/%s/%s?language=%s&'
+            'from_date=%s&to_date=%s' % (
+                self.OWNER_USERNAME, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi', from_date_str, to_date_str
+            ),
+            'image/png'
+        )
+
+        self.assertEqual(
+            response.headers['Content-Disposition'],
+            'attachment; filename=certificate.png')
+
+        self.logout()
+
+    def test_get_contributor_certificate_raises_invalid_date_exception(
+        self
+    ) -> None:
         from_date = datetime.datetime.today() - datetime.timedelta(days=1)
         from_date_str = from_date.strftime('%Y-%m-%d')
         to_date = datetime.datetime.today() + datetime.timedelta(days=1)
@@ -1908,13 +1933,18 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_custom_response(
-            '/contributorcertificate/%s/%s/%s/%s/%s' % (
+        response = self.get_json(
+            '/contributorcertificate/%s/%s?language=%s&'
+            'from_date=%s&to_date=%s' % (
                 self.OWNER_USERNAME, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                'hi', from_date_str, to_date_str), 'image/png')
+                'hi', from_date_str, to_date_str
+            ),
+            expected_status_int=400
+        )
 
         self.assertEqual(
-            response.headers['Content-Disposition'],
-            'attachment; filename=certificate.png')
+            response['error'],
+            'To date should not be a future date.'
+        )
 
         self.logout()

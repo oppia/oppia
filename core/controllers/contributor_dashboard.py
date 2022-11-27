@@ -927,14 +927,20 @@ class ContributorStatsSummariesHandler(
         self.render_json(self.values)
 
 
-class ContributorCertificateHandler(base.BaseHandler):
+class ContributorCertificateHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Returns contributor certificate."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'username': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_USERNAME_LENGTH
+                }]
             }
         },
         'suggestion_type': {
@@ -942,37 +948,52 @@ class ContributorCertificateHandler(base.BaseHandler):
                 'type': 'basestring',
                 'choices': feconf.SUGGESTION_TYPE_CHOICES
             }
-        },
-        'language': {
-            'schema': {
-                'type': 'basestring'
-            }
-        },
-        'from_date': {
-            'schema': {
-                'type': 'basestring'
-            }
-        },
-        'to_date': {
-            'schema': {
-                'type': 'basestring'
-            }
-        },
+        }
     }
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
+        'GET': {
+            'from_date': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.DATE_REGEX
+                    }]
+                }
+            },
+            'to_date': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.DATE_REGEX
+                    }]
+                }
+            },
+            'language': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                },
+                'default_value': None
+            },
+        }
     }
 
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
     def get(
         self,
-        username,
-        suggestion_type,
-        language,
-        from_date,
-        to_date
+        username: str,
+        suggestion_type: str
     ) -> None:
         """Handles GET requests."""
+        assert self.normalized_request is not None
+        language = self.normalized_request['language']
+        from_date = self.normalized_request['from_date']
+        to_date = self.normalized_request['to_date']
+
         from_datetime = datetime.datetime.strptime(from_date, '%Y-%m-%d')
         to_datetime = datetime.datetime.strptime(to_date, '%Y-%m-%d')
         if to_datetime.date() > datetime.datetime.now().date():
@@ -982,7 +1003,6 @@ class ContributorCertificateHandler(base.BaseHandler):
         file = suggestion_services.generate_contributor_certificate(
             username, suggestion_type, language, from_datetime,
             to_datetime)
-
 
         # TODO(#16632): Certificate file should not be saved into the file
         # system.

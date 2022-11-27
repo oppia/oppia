@@ -69,8 +69,7 @@ export class ContributionAndReviewBackendApiService {
     '/updatequestionsuggestionhandler/<suggestion_id>');
 
   private CONTRIBUTOR_CERTIFICATE_HANDLER_URL = (
-    '/contributorcertificate/<username>/<suggestion_type>/<language>/' +
-    '<from_date>/<to_date>');
+    '/contributorcertificate/<username>/<suggestion_type>');
 
   private SUBMITTED_QUESTION_SUGGESTIONS = (
     'SUBMITTED_QUESTION_SUGGESTIONS');
@@ -213,20 +212,27 @@ export class ContributionAndReviewBackendApiService {
   async downloadContributorCertificateAsync(
       username: string,
       suggestionType: string,
-      languageCode: string,
+      language: string | null,
       fromDate: string,
       toDate: string
   ): Promise<Blob> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.CONTRIBUTOR_CERTIFICATE_HANDLER_URL, {
         username: username,
-        suggestion_type: suggestionType,
-        language: languageCode,
-        from_date: fromDate,
-        to_date: toDate
+        suggestion_type: suggestionType
       }
     );
+    const params = {
+      from_date: fromDate,
+      to_date: toDate,
+      ...(language && {language})
+    };
     return this.http.get<Blob>(
-      url, {responseType: 'blob' as 'json'}).toPromise();
+      url,
+      {
+        params,
+        responseType: 'blob' as 'json'
+      }
+    ).toPromise();
   }
 }

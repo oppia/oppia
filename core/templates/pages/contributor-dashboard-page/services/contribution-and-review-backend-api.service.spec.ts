@@ -322,8 +322,8 @@ describe('Contribution and review backend API service', () => {
     spyOn(carbas, 'downloadContributorCertificateAsync').and.callThrough();
     const successHandler = jasmine.createSpy('success');
     const failureHandler = jasmine.createSpy('failure');
-    const url = '/contributorcertificate/user/translate_content/hi/' +
-      '2022-01-01/2022-01-02';
+    const url = '/contributorcertificate/user/translate_content?' +
+      'from_date=2022-01-01&to_date=2022-01-02&language=hi';
     const response = new Blob();
 
     carbas.downloadContributorCertificateAsync(
