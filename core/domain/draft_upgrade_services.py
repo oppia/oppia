@@ -490,8 +490,16 @@ class DraftUpgradeUtil:
                 )
                 answer_group_dicts: List[state_domain.AnswerGroupDict] = []
                 for answer_group_dict in new_answer_groups_dicts:
-                    outcome_dict: List[state_domain.OutcomeDict] = answer_group_dict['outcome']
-                    outcome_dict['dest_if_really_stuck'] = None
+                    outcome_dict: List[state_domain.OutcomeDict] = []
+                    outcome_dict.append({
+                        'dest': outcome_dict['dest'],
+                        'dest_if_really_stuck': None,
+                        'feedback': outcome_dict['feedback'],
+                        'labelled_as_correct': outcome_dict['labelled_as_correct'],
+                        'param_changes': outcome_dict['param_changes'],
+                        'refresher_exploration_id': outcome_dict['refresher_exploration_id'],
+                        'missing_prerequisite_skill_id': outcome_dict['missing_prerequisite_skill_id']
+                    })
                     answer_group_dicts.append({
                         'rule_specs': answer_group_dict['rule_specs'],
                         'outcome': outcome_dict,
