@@ -477,23 +477,25 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                     # Throw error if unknown type is present.
                     if len(unknown_type):
                         failed = True
-                        for x, y in enumerate(unknown_type):
-                            error_message = (
-                                '%s:%s:%s: unknown type used. Add proper'
-                                ' comment if Unknown is needed.' % (
-                                file_path, line_num + 1, unknown_type[x]))
-                            error_messages.append(error_message)
+                        for index, unknown in enumerate(unknown_type):
+                            if unknown is None:
+                                error_message = (
+                                    '%s:%s:%s: unknown type used. Add proper'
+                                    ' comment if Unknown is needed.' % (
+                                    file_path, line_num + 1, unknown_type[index]))
+                                error_messages.append(error_message)
 
                     # Throw error if unknown type conversion is present.
                     if len(unknown_type_conversion):
                         failed = True
-                        for x, y in enumerate(unknown_type_conversion):
-                            error_message = (
-                                '%s:%s:%s: unknown type conversion used.'
-                                ' Add proper comment if unknown is needed.' % (
-                                file_path, line_num + 1,
-                                unknown_type_conversion[x]))
-                            error_messages.append(error_message)
+                        for index, unknown in enumerate(unknown_type_conversion):
+                            if unknown is None:
+                                error_message = (
+                                    '%s:%s:%s: unknown type conversion used.'
+                                    ' Add proper comment if unknown is needed.' % (
+                                    file_path, line_num + 1,
+                                    unknown_type_conversion[index]))
+                                error_messages.append(error_message)
 
                 # Checking line contains comments.
                 ts_unknown_error = re.findall(pattern=r'^ *//', string=line)
