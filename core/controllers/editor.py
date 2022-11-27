@@ -1569,22 +1569,3 @@ class LearnerAnswerInfoHandler(
         stats_services.delete_learner_answer_info(
             entity_type, state_reference, learner_answer_info_id)
         self.render_json({})
-
-
-class FixCommitCommandsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Handles the request to fix the commit commands of a particular
-    exploration.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
-
-    @acl_decorators.can_access_admin_page
-    def post(self) -> None:
-        """Handles POST request to fix the commit commands."""
-
-        exp_services.fix_commit_commands()
-        self.render_json({})
