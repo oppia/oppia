@@ -63,7 +63,7 @@ describe('Ck editor copy content service', () => {
   it('should not copy and paste if copy mode is not active', () => {
     expect(service.copyModeActive).toBe(false);
 
-    const pElement = generateContent('<p>Hello<!--comment--></p>');
+    const pElement = generateContent('<p>Hello</p>');
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(pElement);
