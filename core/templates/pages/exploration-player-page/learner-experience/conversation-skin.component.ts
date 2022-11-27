@@ -168,6 +168,7 @@ export class ConversationSkinComponent {
   solutionForState: Solution | null = null;
   isLearnerReallyStuck: boolean = false;
   continueToReviseStateButtonIsVisible: boolean = false;
+  showInteraction: boolean = true;
 
   // The fields are used to customize the component for the diagnostic player,
   // question player, and exploration player page.
@@ -1110,6 +1111,7 @@ export class ConversationSkinComponent {
   triggerRedirectionToStuckState(): void {
     // Redirect the learner.
     this.nextCard = this.nextCardIfStuck;
+    this.showInteraction = false;
     this.showPendingCard();
   }
 

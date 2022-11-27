@@ -10,7 +10,7 @@
       <oppia-tutor-card [displayedCard]="displayedCard"
                         [displayedCardWasCompletedInPrevSession]="isDisplayedCardCompletedInPrevSession()"
                         [avatarImageIsShown]="true"
-                        [shouldHideInteraction]="continueToReviseStateButtonIsVisible"
+                        [shouldHideInteraction]="continueToReviseStateButtonIsVisible || !showInteraction"
                         [startCardChangeAnimation]="startCardChangeAnimation"
                         [userIsLoggedIn]="isLoggedIn"
                         [collectionSummary]="collectionSummary"
