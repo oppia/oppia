@@ -152,6 +152,36 @@ class JsTsLintTests(test_utils.LinterTestBase):
             ]
         self.validate(lint_task_report, expected_messages, 1)
 
+    def test_check_unknown_type(self) -> None:
+        def mock_compile_all_ts_files() -> None:
+            cmd = (
+                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
+                '%s -target %s -typeRoots %s %s %s typings/*') % (
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
+                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    'true', 'es5', './node_modules/@types',
+                    INVALID_CONSTANT_AJS_FILEPATH,
+                    INVALID_CONSTANT_FILEPATH)
+            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+
+        compile_all_ts_files_swap = self.swap(
+            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
+
+        with compile_all_ts_files_swap:
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
+                [], [INVALID_CONSTANT_FILEPATH], FILE_CACHE
+            ).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
+        expected_messages = [
+            'Please ensure that the constant ADMIN_TABS is initialized '
+            'from the value from the corresponding Angular constants file '
+            '(the *.constants.ts file). Please create one in the Angular '
+            'constants file if it does not exist there.'
+            ]
+        self.validate(lint_task_report, expected_messages, 1)
+
     def test_check_duplicate_constant_declaration_in_separate_files(
         self
     ) -> None:

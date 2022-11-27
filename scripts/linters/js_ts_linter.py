@@ -482,17 +482,20 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                                 error_message = (
                                     '%s:%s:%s: unknown type used. Add proper'
                                     ' comment if Unknown is needed.' % (
-                                    file_path, line_num + 1, unknown_type[index]))
+                                    file_path, line_num + 1,
+                                    unknown_type[index]))
                                 error_messages.append(error_message)
 
                     # Throw error if unknown type conversion is present.
                     if len(unknown_type_conversion):
                         failed = True
-                        for index, unknown in enumerate(unknown_type_conversion):
+                        for index, unknown in enumerate(
+                                unknown_type_conversion):
                             if unknown is None:
                                 error_message = (
                                     '%s:%s:%s: unknown type conversion used.'
-                                    ' Add proper comment if unknown is needed.' % (
+                                    ' Add proper comment if unknown is needed'
+                                    ' with proper explanation.' % (
                                     file_path, line_num + 1,
                                     unknown_type_conversion[index]))
                                 error_messages.append(error_message)
