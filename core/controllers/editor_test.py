@@ -361,6 +361,8 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
@@ -405,6 +407,8 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
@@ -449,6 +453,8 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
@@ -495,6 +501,8 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
@@ -588,7 +596,10 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {
+                            'value': False
+                        }
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -616,7 +627,10 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {
+                            'value': False
+                        }
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -644,7 +658,10 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {
+                            'value': False
+                        }
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -3532,3 +3549,55 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         self.assertTrue(fs.isfile(filepath))
 
         self.logout()
+
+
+class FixCommitCommandsHandlerTests(BaseEditorControllerTests):
+    EXP_ID = 'Q4POXOibJEH6'
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.save_new_valid_exploration(self.EXP_ID, self.editor_id)
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': 'add_state',
+                    'state_name': '1'
+                })
+            ], ''
+        )
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': 'add_state',
+                    'state_name': 'END'
+                })
+            ], ''
+        )
+        metadata_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                self.EXP_ID + '-' + '3'))
+        metadata_model.commit_cmds = []
+        metadata_model.update_timestamps()
+        metadata_model.put()
+
+    def test_commit_commands_are_fixed(self) -> None:
+        """Tests that the commit commands are fixed."""
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        self.post_json(
+            '/fix_commit_commands/',
+            data=None,
+            csrf_token=csrf_token,
+            expected_status_int=200
+        )
+
+        metadata_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                self.EXP_ID + '-' + '3'))
+
+        self.assertEqual(
+            metadata_model.commit_cmds,
+            [{'cmd': 'add_state', 'state_name': 'END'}]
+        )
