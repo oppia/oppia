@@ -44,17 +44,20 @@ import { LoaderService } from 'services/loader.service';
   templateUrl: './question-editor.component.html'
 })
 export class QuestionEditorComponent implements OnInit, OnDestroy {
-  @Input() userCanEditQuestion: boolean;
-  @Input() misconceptionsBySkill: MisconceptionSkillMap;
-  @Input() question: Question;
-  @Input() questionId: string;
-  @Input() questionStateData: State;
   @Output() questionChange = new EventEmitter<void>();
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() userCanEditQuestion!: boolean;
+  @Input() misconceptionsBySkill!: MisconceptionSkillMap;
+  @Input() question!: Question;
+  @Input() questionId!: string;
+  @Input() questionStateData!: State;
+  interactionIsShown!: boolean;
+  oppiaBlackImgUrl!: string;
+  stateEditorIsInitialized!: boolean;
 
   componentSubscriptions = new Subscription();
-  interactionIsShown: boolean;
-  oppiaBlackImgUrl: string;
-  stateEditorIsInitialized: boolean;
 
   constructor(
     private changeDetectionRef: ChangeDetectorRef,
@@ -196,7 +199,10 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     }
     this.solutionValidityService.init(['question']);
     const stateData = this.questionStateData;
-    stateData.interaction.defaultOutcome.setDestination(null);
+    const outcome = stateData.interaction.defaultOutcome;
+    if (outcome) {
+      outcome.setDestination(this.questionId);
+    }
     if (stateData) {
       this.stateEditorService.onStateEditorInitialized.emit(stateData);
 

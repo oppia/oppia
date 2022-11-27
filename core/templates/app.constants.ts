@@ -105,6 +105,14 @@ export const AppConstants = {
     UNICODE_STRING: 'UnicodeString',
   },
 
+  // Flag to toggle the support for a new state to direct the learners
+  // to if they get stuck.
+  DEST_IF_REALLY_STUCK_FEAT_ENABLED: false,
+
+  INTERACTION_NAMES: {
+    TEXT_INPUT: 'TextInput'
+  },
+
   // The maximum number of nodes to show in a row of the state graph.
   MAX_NODES_PER_ROW: 4,
   // The following variable must be at least 3. It represents the maximum
@@ -206,5 +214,26 @@ export const AppConstants = {
 
   INTERACTION_NAMES: {
     END_EXPLORATION: 'End Exploration'
-  }
+  },
+  
+  CONTRIBUTION_STATS_SUBTYPE_CORRECTION: 'correction',
+  CONTRIBUTION_STATS_TYPES: {
+    TRANSLATION_CONTRIBUTION: {
+      NAME: 'translationContribution',
+      DISPLAY_NAME: 'Translation Contributions'
+    },
+    TRANSLATION_REVIEW: {
+      NAME: 'translationReview',
+      DISPLAY_NAME: 'Translation Reviews'
+    },
+    QUESTION_CONTRIBUTION: {
+      NAME: 'questionContribution',
+      DISPLAY_NAME: 'Question Contributions'
+    },
+    QUESTION_REVIEW: {
+      NAME: 'questionReview',
+      DISPLAY_NAME: 'Question Reviews'
+    }
+  },
+  CONTRIBUTOR_BADGE_INITIAL_LEVELS: [1, 10, 20, 50, 100, 200, 300, 400, 500]
 } as const;

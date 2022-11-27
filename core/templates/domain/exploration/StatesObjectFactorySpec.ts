@@ -63,6 +63,9 @@ describe('States Object Factory', () => {
           },
           placeholder: {
             value: new SubtitledUnicode('Type your answer here.', '')
+          },
+          catchMisspellings: {
+            value: false
           }
         },
         default_outcome: {
@@ -159,6 +162,9 @@ describe('States Object Factory', () => {
           },
           placeholder: {
             value: new SubtitledUnicode('Type your answer here.', '')
+          },
+          catchMisspellings: {
+            value: false
           }
         },
         default_outcome: {
@@ -224,7 +230,10 @@ describe('States Object Factory', () => {
               unicode_str: ''
             }
           },
-          rows: { value: 1 }
+          rows: { value: 1 },
+          catchMisspellings: {
+            value: false
+          }
         },
         default_outcome: {
           dest: 'new state',
@@ -477,7 +486,10 @@ describe('States Object Factory', () => {
                 unicode_str: ''
               }
             },
-            rows: { value: 1 }
+            rows: { value: 1 },
+            catchMisspellings: {
+              value: false
+            }
           },
           default_outcome: {
             dest: 'new state',
@@ -835,6 +847,9 @@ describe('States Object Factory', () => {
               },
               placeholder: {
                 value: new SubtitledUnicode('Type your answer here.', '')
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             default_outcome: {

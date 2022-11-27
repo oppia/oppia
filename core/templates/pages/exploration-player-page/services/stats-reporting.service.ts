@@ -202,7 +202,7 @@ export class StatsReportingService {
       });
 
     this.statesVisited.add(stateName);
-    this.siteAnalyticsService.registerNewCard(1);
+    this.siteAnalyticsService.registerNewCard(1, this.explorationId);
 
     this.stateStopwatch.reset();
     this.explorationStarted = true;
@@ -277,7 +277,8 @@ export class StatsReportingService {
   // on the oldStateName.
   recordStateTransition(
       oldStateName: string, newStateName: string, answer: string,
-      oldParams: Object, isFirstHit: boolean): void {
+      oldParams: Object, isFirstHit: boolean,
+      chapterNumber: string, cardCount: string, language: string): void {
     this.createDefaultStateStatsMappingIfMissing(newStateName);
     this.aggregatedStats.state_stats_mapping[
       newStateName].total_hit_count += 1;
@@ -316,14 +317,31 @@ export class StatsReportingService {
     if (!this.statesVisited.has(newStateName)) {
       this.statesVisited.add(newStateName);
       this.siteAnalyticsService.registerNewCard(
-        this.statesVisited.size);
+        this.statesVisited.size,
+        this.explorationId);
     }
     let numberOfStatesVisited = this.statesVisited.size;
     if (numberOfStatesVisited === this.MINIMUM_NUMBER_OF_VISITED_STATES) {
       let urlParams = this.urlService.getUrlParams();
+      this.siteAnalyticsService.registerLessonEngagedWithEvent(
+        this.explorationId,
+        language
+      );
       if (urlParams.hasOwnProperty('classroom_url_fragment')) {
-        this.siteAnalyticsService.registerClassroomLessonActiveUse(
-          this.topicName, this.explorationId);
+        this.siteAnalyticsService.registerClassroomLessonEngagedWithEvent(
+          urlParams.classroom_url_fragment,
+          this.topicName,
+          this.explorationTitle,
+          this.explorationId,
+          chapterNumber,
+          cardCount,
+          language
+        );
+      } else {
+        this.siteAnalyticsService.registerCommunityLessonEngagedWithEvent(
+          this.explorationId,
+          language
+        );
       }
       this.siteAnalyticsService.registerLessonActiveUse();
     }
@@ -354,7 +372,13 @@ export class StatsReportingService {
 
   // The type of params is declared as Object since it can vary depending
   // on the stateName.
-  recordExplorationCompleted(stateName: string, params: Object): void {
+  recordExplorationCompleted(
+      stateName: string,
+      params: Object,
+      chapterNumber: string,
+      cardCount: string,
+      language: string
+  ): void {
     this.aggregatedStats.num_completions += 1;
     this.currentStateName = stateName;
 
@@ -384,7 +408,14 @@ export class StatsReportingService {
     let urlParams = this.urlService.getUrlParams();
     if (urlParams.hasOwnProperty('classroom_url_fragment')) {
       this.siteAnalyticsService.registerCuratedLessonCompleted(
-        this.topicName, this.explorationId);
+        urlParams.classroom_url_fragment,
+        this.topicName,
+        this.explorationTitle,
+        this.explorationId,
+        chapterNumber,
+        cardCount,
+        language
+      );
     }
 
     this.postStatsToBackend();

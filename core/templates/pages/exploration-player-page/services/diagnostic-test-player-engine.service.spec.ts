@@ -411,11 +411,17 @@ describe('Diagnostic test engine service', () => {
         outcomeObjectFactory
           .createNew('default', '', '', []), 1, 0, 'default_outcome'
       );
-      answerClassificationResult.outcome.labelledAsCorrect = false;
+
+      // Setting it as correct answer so this will mark the skill as passed and
+      // move to the next pending skill ID. And as per the spy, the next
+      // fetching of skill ID will trigger a rejection handler.
+      answerClassificationResult.outcome.labelledAsCorrect = true;
 
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
       spyOn(alertsService, 'addWarning');
+      spyOn(diagnosticTestPlayerEngineService, 'isDiagnosticTestFinished')
+        .and.returnValue(false);
 
       fetchDiagnosticTestQuestionsAsyncSpy.and.returnValue(Promise.reject());
 
@@ -426,6 +432,101 @@ describe('Diagnostic test engine service', () => {
 
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to load the questions.');
+    }));
+
+  it(
+    'should be able to get next question after skipping the current question',
+    fakeAsync(() => {
+      let initSuccessCb = jasmine.createSpy('success');
+
+      // A linear graph with 3 nodes.
+      const topicIdToPrerequisiteTopicIds = {
+        topicId1: [],
+        topicId2: ['topicId1'],
+        topicId3: ['topicId2']
+      };
+
+      const diagnosticTestCurrentTopicStatusModel = {
+        skillId1: new DiagnosticTestQuestionsModel(question1, question2)
+      };
+
+      const diagnosticTestTopicTrackerModel = (
+        new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds));
+
+      let fetchDiagnosticTestQuestionsAsyncSpy = spyOn(
+        questionBackendApiService, 'fetchDiagnosticTestQuestionsAsync');
+
+      fetchDiagnosticTestQuestionsAsyncSpy.and.returnValue(
+        Promise.resolve(diagnosticTestCurrentTopicStatusModel));
+
+      // Initially, the current question should be undefined since the engine
+      // is not initialized.
+      expect(diagnosticTestPlayerEngineService.getCurrentQuestion()).toEqual(
+        undefined);
+
+      diagnosticTestPlayerEngineService.init(
+        diagnosticTestTopicTrackerModel, initSuccessCb);
+      tick();
+
+      spyOn(diagnosticTestPlayerEngineService, 'getNextQuestionAsync')
+        .and.returnValue(Promise.resolve(question3));
+
+      let successCallback = () => {};
+
+      diagnosticTestPlayerEngineService.skipCurrentQuestion(successCallback);
+      tick();
+
+      expect(diagnosticTestPlayerEngineService.getNextQuestionAsync)
+        .toHaveBeenCalled();
+    }));
+
+  it(
+    'should be able to finish test if no more questions is left for testing',
+    fakeAsync(() => {
+      let initSuccessCb = jasmine.createSpy('success');
+
+      // A linear graph with 3 nodes.
+      const topicIdToPrerequisiteTopicIds = {
+        topicId1: [],
+        topicId2: ['topicId1'],
+        topicId3: ['topicId2']
+      };
+
+      const diagnosticTestCurrentTopicStatusModel = {
+        skillId1: new DiagnosticTestQuestionsModel(question1, question2)
+      };
+
+      const diagnosticTestTopicTrackerModel = (
+        new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds));
+
+      let fetchDiagnosticTestQuestionsAsyncSpy = spyOn(
+        questionBackendApiService, 'fetchDiagnosticTestQuestionsAsync');
+
+      fetchDiagnosticTestQuestionsAsyncSpy.and.returnValue(
+        Promise.resolve(diagnosticTestCurrentTopicStatusModel));
+
+      // Initially, the current question should be undefined since the engine
+      // is not initialized.
+      expect(diagnosticTestPlayerEngineService.getCurrentQuestion()).toEqual(
+        undefined);
+
+      diagnosticTestPlayerEngineService.init(
+        diagnosticTestTopicTrackerModel, initSuccessCb);
+      tick();
+
+      spyOn(diagnosticTestPlayerEngineService, 'getNextQuestionAsync')
+        .and.returnValue(Promise.reject());
+      spyOn(diagnosticTestPlayerEngineService, 'getRecommendedTopicIds');
+
+      let successCallback = () => {};
+
+      diagnosticTestPlayerEngineService.skipCurrentQuestion(successCallback);
+      tick();
+
+      expect(diagnosticTestPlayerEngineService.getNextQuestionAsync)
+        .toHaveBeenCalled();
+      expect(diagnosticTestPlayerEngineService.getRecommendedTopicIds)
+        .toHaveBeenCalled();
     }));
 
   it(

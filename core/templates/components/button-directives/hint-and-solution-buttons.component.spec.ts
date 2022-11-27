@@ -20,7 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
+import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
@@ -131,6 +131,9 @@ describe('HintAndSolutionButtonsComponent', () => {
           },
           placeholder: {
             value: 1,
+          },
+          catchMisspellings: {
+            value: false
           }
         },
         hints: [],
@@ -171,7 +174,7 @@ describe('HintAndSolutionButtonsComponent', () => {
     ' card is opened', fakeAsync(() => {
     let oldCard: StateCard = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
-      null, RecordedVoiceovers.createEmpty(),
+      {} as Interaction, RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
     spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
@@ -247,8 +250,6 @@ describe('HintAndSolutionButtonsComponent', () => {
     ' interaction supports hints', () => {
     spyOn(hintsAndSolutionManagerService, 'isHintViewable')
       .and.returnValues(false, true, true);
-
-    component.displayedCard = null;
 
     expect(component.isHintButtonVisible(0)).toBe(false);
 

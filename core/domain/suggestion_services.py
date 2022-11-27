@@ -134,6 +134,18 @@ def create_suggestion(
 ) -> suggestion_registry.SuggestionEditStateContent: ...
 
 
+@overload
+def create_suggestion(
+    suggestion_type: str,
+    target_type: str,
+    target_id: str,
+    target_version_at_submission: int,
+    author_id: str,
+    change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+    description: Optional[str]
+) -> suggestion_registry.BaseSuggestion: ...
+
+
 def create_suggestion(
     suggestion_type: str,
     target_type: str,
@@ -894,10 +906,7 @@ def resubmit_rejected_suggestion(
     suggestion_id: str,
     summary_message: str,
     author_id: str,
-    change: Union[
-        exp_domain.ExplorationChange,
-        question_domain.QuestionSuggestionChange
-    ]
+    change: change_domain.BaseChange
 ) -> None:
     """Resubmit a rejected suggestion with the given suggestion_id.
 
@@ -906,7 +915,7 @@ def resubmit_rejected_suggestion(
         summary_message: str. The message provided by the author to
             summarize new suggestion.
         author_id: str. The ID of the author creating the suggestion.
-        change: ExplorationChange. The new change to apply to the suggestion.
+        change: BaseChange. The new change to apply to the suggestion.
 
     Raises:
         Exception. The summary message is empty.
@@ -1187,8 +1196,8 @@ def get_translation_suggestions_in_review_by_exp_ids(
 
 
 def get_suggestions_with_translatable_explorations(
-    suggestions: List[suggestion_registry.SuggestionTranslateContent]
-) -> List[suggestion_registry.SuggestionTranslateContent]:
+    suggestions: Sequence[suggestion_registry.SuggestionTranslateContent]
+) -> Sequence[suggestion_registry.SuggestionTranslateContent]:
     """Filters the supplied suggestions for those suggestions that have
     translatable exploration content. That is, the following are true:
     - The suggestion's change content corresponds to an existing exploration
@@ -1489,9 +1498,37 @@ def get_submitted_suggestions(
     ])
 
 
+@overload
+def get_submitted_suggestions_by_offset(
+    user_id: str,
+    suggestion_type: Literal['add_question'],
+    limit: int,
+    offset: int
+) -> Tuple[
+    Sequence[suggestion_registry.SuggestionAddQuestion], int
+]: ...
+
+
+@overload
+def get_submitted_suggestions_by_offset(
+    user_id: str,
+    suggestion_type: Literal['translate_content'],
+    limit: int,
+    offset: int
+) -> Tuple[
+    Sequence[suggestion_registry.SuggestionTranslateContent], int
+]: ...
+
+
+@overload
 def get_submitted_suggestions_by_offset(
     user_id: str, suggestion_type: str, limit: int, offset: int
-) -> Tuple[List[suggestion_registry.BaseSuggestion], int]:
+) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]: ...
+
+
+def get_submitted_suggestions_by_offset(
+    user_id: str, suggestion_type: str, limit: int, offset: int
+) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]:
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
 
@@ -2400,6 +2437,7 @@ def update_translation_contribution_stats_at_submission(
         suggestion: Suggestion. The suggestion domain object that is being
             submitted.
     """
+    content_word_count = 0
     exp_opportunity = (
         opportunity_services.get_exploration_opportunity_summary_by_id(
             suggestion.target_id))
@@ -2409,9 +2447,14 @@ def update_translation_contribution_stats_at_submission(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    content_plain_text = html_cleaner.strip_html_tags(
-        suggestion.change.translation_html)
-    content_word_count = len(content_plain_text.split())
+    if isinstance(suggestion.change.translation_html, list):
+        for content in suggestion.change.translation_html:
+            content_plain_text = html_cleaner.strip_html_tags(content)
+            content_word_count += len(content_plain_text.split())
+    else:
+        content_plain_text = html_cleaner.strip_html_tags(
+            suggestion.change.translation_html)
+        content_word_count = len(content_plain_text.split())
 
     translation_contribution_stat_model = (
         suggestion_models.TranslationContributionStatsModel.get(
@@ -2457,6 +2500,7 @@ def update_translation_contribution_stats_at_review(
         suggestion: Suggestion. The suggestion domain object that is being
             reviewed.
     """
+    content_word_count = 0
     exp_opportunity = (
         opportunity_services.get_exploration_opportunity_summary_by_id(
             suggestion.target_id))
@@ -2466,9 +2510,14 @@ def update_translation_contribution_stats_at_review(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    content_plain_text = html_cleaner.strip_html_tags(
-        suggestion.change.translation_html)
-    content_word_count = len(content_plain_text.split())
+    if isinstance(suggestion.change.translation_html, list):
+        for content in suggestion.change.translation_html:
+            content_plain_text = html_cleaner.strip_html_tags(content)
+            content_word_count += len(content_plain_text.split())
+    else:
+        content_plain_text = html_cleaner.strip_html_tags(
+            suggestion.change.translation_html)
+        content_word_count = len(content_plain_text.split())
 
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
@@ -2534,6 +2583,7 @@ def update_translation_review_stats(
     Raises:
         Exception. The final_reviewer_id of the suggestion should not be None.
     """
+    content_word_count = 0
     if suggestion.final_reviewer_id is None:
         raise Exception(
             'The final_reviewer_id in the suggestion should not be None.'
@@ -2550,9 +2600,14 @@ def update_translation_review_stats(
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
 
-    content_plain_text = html_cleaner.strip_html_tags(
-        suggestion.change.translation_html)
-    content_word_count = len(content_plain_text.split())
+    if isinstance(suggestion.change.translation_html, list):
+        for content in suggestion.change.translation_html:
+            content_plain_text = html_cleaner.strip_html_tags(content)
+            content_word_count += len(content_plain_text.split())
+    else:
+        content_plain_text = html_cleaner.strip_html_tags(
+            suggestion.change.translation_html)
+        content_word_count = len(content_plain_text.split())
 
     translation_review_stat_model = (
         # This function is called when reviewing a translation and hence
