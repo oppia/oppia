@@ -45,10 +45,9 @@ from core.platform import models
 
 from html2image import Html2Image
 from typing import (
-    Any, Callable, Dict, Final, List, Literal, Mapping, Match, Optional,
+    Callable, Dict, Final, List, Literal, Mapping, Match, Optional,
     Sequence, Set, Tuple, Union, cast, overload
 )
-hti = Html2Image()
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -3066,9 +3065,6 @@ def _generate_translation_contributor_certificate(
     if language_description.find(' (') != -1:
         language_description = language_description[
             language_description.find('(') + 1:language_description.find(')')]
-    print('=======TO DATE')
-    print(to_date)
-    print(to_date_to_fetch_contributions)
 
     suggestions = (
         suggestion_models.GeneralSuggestionModel
@@ -3201,18 +3197,19 @@ def _generate_question_contributor_certificate(
     return certificate_template
 
 
-def _generate_contributor_certificate_image(template: str) -> Any:
+def _generate_contributor_certificate_image(template: str) -> List[str]:
     """Generates an image from the html string.
 
     Args:
         template: str. The html template to create the image.
 
     Returns:
-        str. The path of the generated image.
+        List[str]. The paths of the generated images.
 
     Raises:
         Exception. Image generation failed.
     """
+    hti = Html2Image()
     filename = str(uuid.uuid4()) + '.png'
 
     image_paths = hti.screenshot(
@@ -3220,5 +3217,11 @@ def _generate_contributor_certificate_image(template: str) -> Any:
             constants.CONTRIBUTOR_CERTIFICATE_WIDTH,
             constants.CONTRIBUTOR_CERTIFICATE_HEIGHT
         ))
+    if len(image_paths) == 0:
+        raise Exception(
+            'Image generation failed.')
+    # Since there are corresponfing image paths we can confirm that
+    # image_paths is a list of strings.
+    assert isinstance(image_paths, List[str])
 
     return image_paths

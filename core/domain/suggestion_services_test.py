@@ -15,10 +15,10 @@
 """Tests for suggestion related services."""
 
 from __future__ import annotations
-from html2image import Html2Image
 
 import datetime
 import os
+import uuid
 
 from core import feconf
 from core import utils
@@ -46,7 +46,8 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, Final, List, Mapping, Union
+from html2image import Html2Image
+from typing import Dict, Final, List, Mapping, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -6169,7 +6170,8 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         question_state_data = test_question_dict[
             'question_state_data']
         question_state_data['content'][
-            'html'] = '<oppia-noninteractive-image src=abc></oppia-noninteractive-image>'
+            'html'
+        ] = '<oppia-noninteractive-image></oppia-noninteractive-image>'
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
@@ -6288,12 +6290,34 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
                 to_date
             )
 
+    def test_generate_certificate_throws_exception(
+        self
+    ) -> None:
+        def mock_uuid() -> str:
+            return 'test_123'
+
+        def mock_screenshot(
+            self,
+            html_str: str,
+            save_as: str,
+            size: Tuple[str, str]
+        ) -> List[str]:
+            return []
+
+        with self.swap(uuid, 'uuid4', mock_uuid):
+            with self.swap(Html2Image, 'screenshot', mock_screenshot):
+                with self.assertRaisesRegex(
+                    Exception,
+                    'Image generation failed.'
+                ):
+                    suggestion_services._generate_contributor_certificate_image(
+                        'Template'
+                    )
+
     def test_generate_certificate_throws_no_file_paths_exception(
         self
     ) -> None:
-        def mock_screenshot(
-            template: str   
-        ) -> Any:
+        def mock_generate_image() -> List[str]:
             return []
         suggestion_change: Dict[
             str, Union[str, float, question_domain.QuestionDict]
@@ -6339,7 +6363,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         with self.swap(
             suggestion_services,
             '_generate_contributor_certificate_image',
-            mock_screenshot
+            mock_generate_image
         ):
             with self.assertRaisesRegex(
                 Exception,
