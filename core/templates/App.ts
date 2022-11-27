@@ -110,8 +110,8 @@ angular.module('oppia').config([
       }
     }
     OppiaAngularRootComponent.contextService = (
-      // Remove Unkown property 'contextService' error after migration and
-      // removal of JQuery.
+      // TODO(#13015): Remove use of unknown as a type.
+      // Unknown has been used here becuase of use of JQuery.
       ugs.ContextService as unknown as ContextService);
     // Refer: https://docs.angularjs.org/guide/migration
     // #migrate1.5to1.6-ng-services-$location

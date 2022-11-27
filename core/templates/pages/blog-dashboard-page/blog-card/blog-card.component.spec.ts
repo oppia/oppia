@@ -76,7 +76,9 @@ describe('Blog Dashboard Tile Component', () => {
     component = fixture.componentInstance;
     // This throws "Type WindowRef is not assignable to type
     // desire type." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. We cannot
+    // do 'window.MathJax = mockMathJs' because
+    // 'MathJax' is a private class.
     // @ts-ignore
     mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
     sampleBlogPostSummary = {

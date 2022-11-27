@@ -68,7 +68,8 @@ describe('Blog Dashboard Page Component', () => {
     component = fixture.componentInstance;
     // This throws "Type 'MockWindowRef' is not assignable to type desire"
     // We need to suppress this error because of the need to test
-    // validations.
+    // validations. This throws an error because the type of the
+    // variable is WindowRef and the type of the value is MockWindowRef.
     // @ts-ignore
     mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
     blogDashboardPageService = TestBed.inject(BlogDashboardPageService);

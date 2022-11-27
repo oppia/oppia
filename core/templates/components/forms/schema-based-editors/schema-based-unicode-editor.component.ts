@@ -60,7 +60,6 @@ implements ControlValueAccessor, OnInit, Validator {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() disabled!: boolean;
-  // UI configuration. May be undefined if the schema does not specify it.
   @Input() uiConfig!: {
     rows: string[]; placeholder: string; 'coding_mode': string;
   } | undefined;
@@ -75,7 +74,8 @@ implements ControlValueAccessor, OnInit, Validator {
     extraKeys: { Tab: (cm: CodeMirror.Editor) => void };
     indentWithTabs: boolean;
     lineNumbers: boolean;
-    readOnly?: string; mode?: string;
+    readOnly?: string;
+    mode?: string;
   } = {
     // Convert tabs to spaces.
       extraKeys: {

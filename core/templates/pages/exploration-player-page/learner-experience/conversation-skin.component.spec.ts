@@ -1823,7 +1823,11 @@ describe('Conversation skin component', () => {
 
     // This throws "Type object is not assignable to type
     // 'JQLite'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This
+    // throws an error because the type of
+    // componentInstance.contentContainer is
+    // JQLite and not JQuery. This is because
+    // JQuery is not defined in the test file.
     // @ts-ignore
     spyOn(window, '$').and.returnValue({
       offset: () => {
@@ -1844,7 +1848,11 @@ describe('Conversation skin component', () => {
     let animateSpy = jasmine.createSpy('jquery spy');
     // This throws "Type object is not assignable to type
     // 'JQLite'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This
+    // throws an error because the type of
+    // componentInstance.contentContainer is
+    // JQLite and not JQuery. This is because
+    // JQuery is not defined in the test file.
     // @ts-ignore
     spyOn(window, '$').and.returnValue({
       animate: animateSpy
@@ -2339,7 +2347,9 @@ describe('Conversation skin component', () => {
       'State 2', '<p>Content</p>', '',
       // This throws "Type null is not assignable to type
       // 'string'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This
+      // throws an error only in the frontend test and
+      // not in the frontend.
       // @ts-ignore
       null as Interaction, null as RecordedVoiceovers,
       writtenTranslationsObjectFactory.createEmpty(),

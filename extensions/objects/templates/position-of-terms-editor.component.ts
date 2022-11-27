@@ -23,11 +23,6 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 
-export interface PositionOfTerm {
-  readonly name: 'string';
-  readonly humanReadableName: 'string';
-}
-
 @Component({
   selector: 'position-of-terms-editor',
   templateUrl: './position-of-terms-editor.component.html',

@@ -97,7 +97,8 @@ describe('NoninteractiveSkillreview', () => {
     spyOn(contextService, 'removeCustomEntityContext');
     // This throws "Type object is not assignable to type
     // 'MouseEvent'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This
+    // throws an error only in the test environment.
     // @ts-ignore
     let e = {
       currentTarget: {
@@ -127,7 +128,8 @@ describe('NoninteractiveSkillreview', () => {
     spyOn(contextService, 'removeCustomEntityContext');
     // This throws "Type object is not assignable to type
     // 'MouseEvent'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This
+    // throws an error only in the test environment.
     // @ts-ignore
     let e = {
       currentTarget: {
@@ -158,7 +160,8 @@ describe('NoninteractiveSkillreview', () => {
   '\'cancel\', \'escape key press\' or \'backdrop click\'', fakeAsync(() => {
     // This throws "Type object is not assignable to type
     // 'MouseEvent'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This
+    // throws an error only in the test environment.
     // @ts-ignore
     let e = {
       currentTarget: {
@@ -194,7 +197,8 @@ describe('NoninteractiveSkillreview', () => {
     fakeAsync(() => {
       // This throws "Type object is not assignable to type
       // 'MouseEvent'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This
+      // throws an error only in the test environment.
       // @ts-ignore
       let e = {
         currentTarget: {

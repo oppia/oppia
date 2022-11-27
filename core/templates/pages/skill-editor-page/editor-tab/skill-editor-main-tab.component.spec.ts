@@ -140,7 +140,7 @@ describe('Skill editor main tab component', () => {
   it('should change subtopic when selected topic is changed', () => {
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'string'" We need to suppress this error because of the need to test
-    // validations.
+    // validations. This throws an error because the value is null.
     // @ts-ignore
     component.changeSelectedTopic(null);
     component.assignedSkillTopicData = assignedSkillTopicData;

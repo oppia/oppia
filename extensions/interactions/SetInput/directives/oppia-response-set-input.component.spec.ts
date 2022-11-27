@@ -61,10 +61,6 @@ describe('ResponseSetInputComponent', () => {
   it('should initialise component when user submits answer', () => {
     component.ngOnInit();
 
-    // This throws "Type string[] is not assignable to type
-    // 'string'." We need to suppress this error
-    // because of the need to test validations.
-    // @ts-ignore
-    expect(component.escapedAnswer).toEqual(['answer1'] as string);
+    expect(component.escapedAnswer).toEqual(String(['answer1']));
   });
 });

@@ -73,7 +73,8 @@ describe('Translation topic service', () => {
 
       // This throws "Argument of type 'null' is not assignable to parameter
       // of type 'string'" We need to suppress this error because of the need
-      // to test validations.
+      // to test validations. This error is thrown because the topic name is
+      // null.
       // @ts-ignore
       translationTopicService.setActiveTopicName(null);
       $flushPendingTasks();

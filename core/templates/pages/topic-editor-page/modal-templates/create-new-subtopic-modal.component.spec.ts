@@ -119,7 +119,11 @@ describe('create new subtopic modal', function() {
     topicUpdateService = TestBed.inject(TopicUpdateService);
     // This throws "Type 'TopicEditorStateService' is not assignable
     // to type desire". We need to suppress this error because of
-    // the need to test validations.
+    // the need to test validations. This is because the function
+    // getTopic() in the class MockTopicEditorStateService returns
+    // a Topic object which is not the same as the Topic object
+    // returned by the function getTopic() in the class
+    // TopicEditorStateService.
     // @ts-ignore
     topicEditorStateService = TestBed.inject(TopicEditorStateService) as
       jasmine.SpyObj<MockTopicEditorStateService>;

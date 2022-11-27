@@ -127,14 +127,16 @@ describe('Topics List Component', () => {
       jasmine.SpyObj<AlertsService>;
     // This throws "Type object is not assignable to type
     // 'EditableTopicBackendApiService'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This error is thrown because
+    // the type of editableTopicBackendApiService is a mock.
     // @ts-ignore
     editableTopicBackendApiService = (
       TestBed.inject(EditableTopicBackendApiService)) as
       MockEditableBackendApiService;
     // This throws "Type object is not assignable to type
     // 'NgbModal'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This error is thrown because
+    // the type of mockNgbModal is a mock.
     // @ts-ignore
     mockNgbModal = (TestBed.inject(NgbModal)) as MockNgbModal;
     topicsAndSkillsDashboardBackendApiService = TestBed.inject(

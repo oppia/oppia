@@ -58,7 +58,10 @@ describe('Apply validation directive', () => {
       id: 'isAtLeast',
       // This throws "Type object is not assignable to type
       // 'Validator[]'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This is
+      // because 'validators' is of type 'any' and we cannot
+      // do 'validators = new Validator();' because
+      // 'Validator' is a private class.
       // @ts-ignore
       minValue: -2.5
     }] as Validator[];

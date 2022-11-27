@@ -453,7 +453,10 @@ describe('Creator Dashboard Page Component', () => {
       spyOn(creatorDashboardBackendApiService, 'fetchDashboardDataAsync')
         // This throws "Type object is not assignable to type
         // 'CreatorDashboardData'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This throws an
+        // error only in the case of strict checks and we need to
+        // suppress this error because the case where the returned
+        // data is an empty object is also important to test.
         // @ts-ignore
         .and.returnValue(Promise.resolve({
           dashboardStats: CreatorDashboardStats
@@ -472,13 +475,19 @@ describe('Creator Dashboard Page Component', () => {
           collectionsList: dashboardData.collections_list.map(
             // This throws "Type object is not assignable to type
             // 'CreatorDashboardData'." We need to suppress this error
-            // because of the need to test validations.
+            // because of the need to test validations. This throws an
+            // error only in the case of strict checks and we need to
+            // suppress this error because the case where the returned
+            // data is an empty object is also important to test.
             // @ts-ignore
             (collectionSummary: CollectionSummary) => CollectionSummary
               .createFromBackendDict(
                 // This throws "Type object is not assignable to type
                 // 'CreatorDashboardData'." We need to suppress this error
-                // because of the need to test validations.
+                // because of the need to test validations. This throws an
+                // error only in the case of strict checks and we need to
+                // suppress this error because the case where the returned
+                // data is an empty object is also important to test.
                 // @ts-ignore
                 collectionSummary as CollectionSummaryBackendDict))
         } as CreatorDashboardData));

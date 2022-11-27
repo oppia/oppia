@@ -79,7 +79,10 @@ describe('Translation opportunities component', () => {
     }).compileComponents();
     // This throws "Type windowref is not assignable to type
     // desire." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This error
+    // is thrown because the type of windowRef is WindowRef
+    // and we are assigning a value of type Window which is
+    // a native browser object.
     // @ts-ignore
     translationModal = TestBed.createComponent(
       TranslationModalComponent) as NgbModalRef;

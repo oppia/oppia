@@ -454,7 +454,8 @@ describe('Topic Editor Navbar', () => {
     spyOn(topicEditorStateService, 'saveTopic').and.callFake(
       // This throws "Cannot set properties of undefined (setting
       // 'topicIsPublished')". We need to suppress this error because
-      // we can't return a true value here for spyOn.
+      // we can't return a true value here for spyOn. We need to
+      // return a promise here because the function is async.
       // @ts-ignore
       (commitMessage: string, successCallback: () => void) => {
         successCallback();
@@ -574,7 +575,13 @@ describe('Topic Editor Navbar', () => {
       componentInstance.showTopicEditOptions = true;
       spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and
         .returnValue(
-          // Use unknown for test validation.
+          // Use unknown for test validation. We need to return a promise
+          // here because the function is async. We can't return a true
+          // value here for spyOn. This throws "Argument of type
+          // 'Promise<unknown>' is not assignable to parameter of type
+          // 'Promise<void>'. Type 'unknown' is not assignable to type
+          // 'void'". We need to suppress this error because we can't
+          // return a true value here for spyOn.
           Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>);
       spyOn(topicEditorStateService, 'setTopicRights');
 
@@ -601,7 +608,13 @@ describe('Topic Editor Navbar', () => {
       });
       spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and
         .returnValue(
-          // Use unknown for test validation.
+          // Use unknown for test validation. We need to return a promise
+          // here because the function is async. We can't return a true
+          // value here for spyOn. This throws "Argument of type
+          // 'Promise<unknown>' is not assignable to parameter of type
+          // 'Promise<void>'. Type 'unknown' is not assignable to type
+          // 'void'". We need to suppress this error because we can't
+          // return a true value here for spyOn.
           Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>);
 
       componentInstance.unpublishTopic();
@@ -613,7 +626,13 @@ describe('Topic Editor Navbar', () => {
   it('should publish topic when user clicks the \'publish\' button',
     fakeAsync(() => {
       spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
-        // Use unknown for test validation.
+        // Use unknown for test validation. We need to return a promise
+        // here because the function is async. We can't return a true
+        // value here for spyOn. This throws "Argument of type
+        // 'Promise<unknown>' is not assignable to parameter of type
+        // 'Promise<void>'. Type 'unknown' is not assignable to type
+        // 'void'". We need to suppress this error because we can't
+        // return a true value here for spyOn.
         Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>);
       spyOn(alertsService, 'addSuccessMessage');
       componentInstance.topicRights = TopicRights.createFromBackendDict({

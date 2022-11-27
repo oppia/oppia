@@ -135,7 +135,8 @@ describe('Create New Skill Modal Service', () => {
     mockSkillCreationBackendApiService = (
       // This throws "Type 'MockSkillCreationBackendApiService' is not
       // assignable to type desire". We need to suppress this error because of
-      // the need to test validations.
+      // the need to test validations. This happens because the
+      // MockSkillCreationBackendApiService is a class and not an interface.
       // @ts-ignore
       TestBed.inject(SkillCreationBackendApiService) as
     MockSkillCreationBackendApiService);

@@ -148,13 +148,15 @@ export const bootstrapAsync = async(
  * A utility function to get coverage of the upgraded component class.
  * @param {string} kebabCaseName - Name of the upgraded component in kebab-case.
  * @param {string} camelCaseName - Name of the upgraded component in camelCase.
- * @param {string[]} upgradedComponentTypes - An array consisting of only
+ * @param {unknown} upgradedComponentTypes - An array consisting of only
  *   one element. That element is the type of the upgraded component.
  */
 export const setupAndGetUpgradedComponentAsync = async(
     kebabCaseName: string,
     camelCaseName: string,
-    // Unknown type is used because component can be of any type.
+    // Unknown type is used here because the type of the component
+    // is not known. This is because the component is dynamically
+    // created.
     upgradedComponentTypes: unknown): Promise<string> => {
   let template = '<' + kebabCaseName + '></' + kebabCaseName + '>';
   @Component({

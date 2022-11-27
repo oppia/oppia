@@ -27,6 +27,8 @@ import { CustomFormsComponentsModule } from './forms/custom-forms-directives/cus
 import { DynamicContentModule } from './interaction-display/dynamic-content.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from 'modules/material.module';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because ObjectComponentsModule are not strictly typed
 // yet.
@@ -35,6 +37,8 @@ import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { RecommendationsModule } from './recommendations/recommendations.module';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because RichTextComponentsModule are not strictly typed
 // yet.
@@ -42,6 +46,8 @@ import { CommonElementsModule } from './common-layout-directives/common-elements
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { OppiaCkEditor4Module } from './ck-editor-helpers/ckeditor4.module';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because BaseModule are not strictly typed
 // yet.
@@ -167,31 +173,43 @@ import { ReviewTestPageComponent } from 'pages/review-test-page/review-test-page
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 import { AnswerContentModalComponent } from './common-layout-directives/common-elements/answer-content-modal.component';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because DynamicComponentModule are not strictly typed
 // yet.
 // @ts-ignore
 import { VisualizationSortedTilesComponent } from 'visualizations/oppia-visualization-sorted-tiles.component';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because DynamicComponentModule are not strictly typed
 // yet.
 // @ts-ignore
 import { OppiaVisualizationClickHexbinsComponent } from 'visualizations/oppia-visualization-click-hexbins.directive';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because DynamicComponentModule are not strictly typed
 // yet.
 // @ts-ignore
 import { OppiaVisualizationFrequencyTableComponent } from 'visualizations/oppia-visualization-frequency-table.directive';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because DynamicComponentModule are not strictly typed
 // yet.
 // @ts-ignore
 import { OppiaVisualizationEnumeratedFrequencyTableComponent } from 'visualizations/oppia-visualization-enumerated-frequency-table.directive';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because DynamicComponentModule are not strictly typed
 // yet.
 // @ts-ignore
 import { RandomSelectorComponent } from 'value_generators/templates/random-selector.component';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because DynamicComponentModule are not strictly typed
 // yet.
@@ -215,6 +233,8 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { ComponentOverviewComponent } from './copy-url/copy-url.component';
 import { MatMenuModule} from '@angular/material/menu';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because DynamicComponentModule are not strictly typed
 // yet.

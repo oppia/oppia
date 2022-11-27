@@ -42,7 +42,7 @@ export class ResponePencilCodeEditor implements OnInit {
 
   ngOnInit(): void {
     this.answerCode = (
-      (this.htmlEscaperService.escapedJsonToObj((this.answer)) as Answer).code);
+      (this.htmlEscaperService.escapedJsonToObj(this.answer) as Answer).code);
   }
 }
 

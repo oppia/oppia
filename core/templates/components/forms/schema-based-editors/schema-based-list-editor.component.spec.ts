@@ -118,7 +118,9 @@ describe('Schema Based List Editor Component', () => {
     component.localValue = [
       // This throws "Type 'undefined' is not assignable to type
       // 'SchemaDefaultValue'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This error
+      // is thrown because the type of validators is
+      // OppiaValidator[] but we are assigning an object to it.
       // @ts-ignore
       'item1', undefined];
 
@@ -218,7 +220,9 @@ describe('Schema Based List Editor Component', () => {
       component.showDuplicatesWarning = false;
       // This throws "Type object is not assignable to type
       // 'OppiaValidator[]'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This error
+      // is thrown because the type of validators is
+      // OppiaValidator[] but we are assigning an object to it.
       // @ts-ignore
       component.validators = [
         {

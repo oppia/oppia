@@ -57,7 +57,8 @@ export class TranslateTextBackendApiService {
       expId: string, expVersion: string, contentId: string, stateName: string,
       languageCode: string, contentHtml: string | string[],
       translationHtml: string | string[], imagesData: ImagesData[],
-      dataFormat: string): Promise<Object> {
+      dataFormat: string
+  ): Promise<Object> {
     const postData: Data = {
       suggestion_type: 'translate_content',
       target_type: 'exploration',

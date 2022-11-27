@@ -75,7 +75,9 @@ describe('Topic editor state service', () => {
         skillIdToDescriptionDict: {},
         skillIdToRubricsDict: {},
         classroomUrlFragment: 'url_fragment'
-      // Use unknown for test validation.
+      // Use unknown for test validation. This is not a real type. This is
+      // just to test the validation of the type. This is done to avoid
+      // using any.
       } as unknown as FetchTopicResponse);
     }
 
@@ -178,7 +180,8 @@ describe('Topic editor state service', () => {
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
     // This throws "Type 'EditableTopicBackendApiService' is not
     // assignable to type desire". We need to suppress this error because of
-    // the need to test validations.
+    // the need to test validations. This is because the backend api service
+    // returns an unknown type.
     // @ts-ignore
     mockEditableTopicBackendApiService = (TestBed.inject(
       EditableTopicBackendApiService)) as
@@ -294,7 +297,8 @@ describe('Topic editor state service', () => {
     spyOn(alertsService, 'addWarning');
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'string'" We need to suppress this error because of the need to test
-    // validations.
+    // validations. This is because the backend api service returns an unknown
+    // type.
     // @ts-ignore
     topicEditorStateService.loadSubtopicPage(null, null);
     tick();

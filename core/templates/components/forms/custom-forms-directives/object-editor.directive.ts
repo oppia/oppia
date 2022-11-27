@@ -247,7 +247,8 @@ ControlValueAccessor, Validator {
       );
       this.viewContainerRef.clear();
       // Unknown is type is used because it is default property of
-      // createComponent.
+      // createComponent. This is used to access the instance of the
+      // component created. The type of the instance is not known.
       const componentRef = this.viewContainerRef.createComponent<unknown>(
         componentFactory) as ComponentRef<ObjectEditor>;
 

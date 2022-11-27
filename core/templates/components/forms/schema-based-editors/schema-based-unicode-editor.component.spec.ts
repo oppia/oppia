@@ -83,7 +83,10 @@ describe('Schema Based Unicode Editor', () => {
   it('should instantiate codemirror on initialization', fakeAsync(() => {
     // This throws "Type object is not assignable to type
     // 'CodeMirror.Editor'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This is because
+    // the type of the object returned by the CodeMirror function
+    // is not the same as the type of the object returned by
+    // the CodeMirror.fromTextArea function.
     // @ts-ignore
     let cm = {
       getOption: () => 2,

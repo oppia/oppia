@@ -44,7 +44,9 @@ describe('Testing RemoveDuplicatesInArrayPipe', () => {
     expect(() => {
       // This throws "Type object is not assignable to type
       // 'string[]'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. We cannot
+      // do 'pipe.transform(123)' because
+      // '123' is not a string array.
       // @ts-ignore
       pipe.transform({
         filter: undefined

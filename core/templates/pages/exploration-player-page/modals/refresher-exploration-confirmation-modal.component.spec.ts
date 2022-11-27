@@ -76,11 +76,13 @@ describe('Refresher Exploration Confirmation Modal', () => {
     componentInstance.refresherExplorationId = 'test_id';
     // This throws "Type object is not assignable to type
     // 'UrlService'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This is
+    // because the UrlService is a native class and we
+    // need to mock it.
     // @ts-ignore
-    mockUrlService = (TestBed.inject(UrlService));
-    windowRef = (TestBed.inject(WindowRef));
-    ngbActiveModal = (TestBed.inject(NgbActiveModal));
+    mockUrlService = TestBed.inject(UrlService);
+    windowRef = TestBed.inject(WindowRef);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
 
   it('should create', () => {

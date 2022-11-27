@@ -22,6 +22,8 @@ import { BlogCardPreviewModalComponent } from './blog-card-preview-modal.compone
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore

@@ -24,6 +24,8 @@ import { CookieModule } from 'ngx-cookie';
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore

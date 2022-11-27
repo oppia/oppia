@@ -60,7 +60,7 @@ export class EventBusService {
       (event: T): void => {
         try {
           action.call(callbackContext, event);
-        // Type unknown is used because we don't know actual type of unknown.
+        // Type unknown is used because we don't know actual type of the error.
         } catch (error: unknown) {
           if (error instanceof Error) {
             this._errorHandler(error);

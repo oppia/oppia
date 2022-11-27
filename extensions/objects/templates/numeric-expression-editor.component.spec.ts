@@ -98,6 +98,8 @@ describe('NumericExpressionEditor', () => {
       mockGuppyObject as GuppyObject);
     // This throws "Type 'null' is not assignable to type 'string'".
     // We need to suppress this error because we are testing validations here.
+    // Validation here refers to the 'if' checks defined in ngOnInit() which
+    // replaces 'value' with empty strings if null or undefined.
     // @ts-ignore
     component.value = null;
     MockGuppy.focused = false;

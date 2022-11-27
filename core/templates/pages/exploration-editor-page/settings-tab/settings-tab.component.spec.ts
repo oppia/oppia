@@ -468,7 +468,8 @@ describe('Settings Tab Component', () => {
       explorationInitStateNameService.init('First State');
       // This throws "Argument of type 'null' is not assignable to
       // parameter of type 'state'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This throws an
+      // error because the state name is invalid.
       // @ts-ignore
       spyOn(explorationStatesService, 'getState').and.returnValue(null);
       spyOn(alertsService, 'addWarning');

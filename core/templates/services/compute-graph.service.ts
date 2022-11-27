@@ -66,7 +66,9 @@ export class ComputeGraphService {
               source: stateName,
               // This throws "TS2322: Type 'string | null' is not assignable
               // to type 'string'" We need to suppress this error because the
-              // value is explicitly checked above in the if condition.
+              // value is explicitly checked above in the if condition. This
+              // error is thrown because the type of outcome.destIfReallyStuck
+              // is string | null.
               // @ts-ignore
               target: groups[h].outcome.destIfReallyStuck,
               linkProperty: null,

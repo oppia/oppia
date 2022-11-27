@@ -203,7 +203,7 @@ describe('Training Data Service', () => {
 
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'Outcome'." We need to suppress this error because of the need to
-    // test validations.
+    // test validations. This throws an error because the outcome is null.
     // @ts-ignore
     expect(trainingDataService.getAllPotentialOutcomes(
       new State(

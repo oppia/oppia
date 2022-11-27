@@ -61,7 +61,8 @@ describe('Pie Chart component', () => {
 
     // This throws "Type object is not assignable to type
     // 'google.visualization.PieChart'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This error is thrown
+    // because the chart is not initialized.
     // @ts-ignore
     mockedChart = {
       draw: () => { },
@@ -140,7 +141,8 @@ describe('Pie Chart component', () => {
     };
     // This throws "Type 'null' is not assignable to
     // parameter of type 'Piechart'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This error is thrown
+    // because the chart is not initialized.
     // @ts-ignore
     component.chart = null;
     component.ngAfterViewInit();

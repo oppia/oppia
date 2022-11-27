@@ -51,7 +51,9 @@ describe('PositionOfTerms', () => {
     component.localValue = (
       // This throws "Type object is not assignable to type
       // 'PositionOfTerm'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This error
+      // is thrown because the type of localValue is PositionOfTerm
+      // and we are assigning a string to it.
       // @ts-ignore
       component.positionOfTerms[0]);
     component.onChangePosition('lhs');

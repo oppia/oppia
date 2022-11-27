@@ -23,6 +23,35 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { SchemaDefaultValue } from 'services/schema-default-value.service';
 
+interface ListOfTabsEditorSchema {
+  type: 'list';
+  items: {
+    type: 'dict';
+    properties: [{
+      name: 'title';
+      description: 'Tab title';
+      schema: {
+        type: 'unicode';
+        validators: [{
+          id: 'is_nonempty';
+        }];
+      };
+    }, {
+      name: 'content';
+      description: 'Tab content';
+      schema: {
+        type: 'html';
+        ui_config: {
+          hide_complex_extensions: true;
+        };
+      };
+    }];
+  };
+  ui_config: {
+    add_element_text: 'Add new tab';
+  };
+}
+
 @Component({
   selector: 'list-of-tabs-editor',
   templateUrl: './list-editor.component.html',
@@ -35,7 +64,7 @@ export class ListOfTabsEditorComponent implements OnInit {
   @Input() modalId!: symbol;
   @Input() value!: SchemaDefaultValue;
   @Output() valueChanged = new EventEmitter();
-  SCHEMA = {
+  SCHEMA: ListOfTabsEditorSchema = {
     type: 'list',
     items: {
       type: 'dict',
@@ -71,8 +100,7 @@ export class ListOfTabsEditorComponent implements OnInit {
     }
   }
 
-  // Unknown is used because we don't know which kind of schema populates.
-  getSchema(): unknown {
+  getSchema(): ListOfTabsEditorSchema {
     return this.SCHEMA;
   }
 

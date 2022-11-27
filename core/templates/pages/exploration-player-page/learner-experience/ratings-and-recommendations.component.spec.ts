@@ -179,7 +179,8 @@ describe('Ratings and recommendations component', () => {
 
     // This throws "Type 'null' is not assignable to parameter of type
     // 'QuestionPlayerConfig'." We need to suppress this error because
-    // of the need to test validations.
+    // of the need to test validations. This throws an error because
+    // the value is null.
     // @ts-ignore
     componentInstance.questionPlayerConfig = null;
 

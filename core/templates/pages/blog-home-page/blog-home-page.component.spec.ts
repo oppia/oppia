@@ -37,6 +37,8 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { BlogHomePageConstants } from './blog-home-page.constants';
 import { BlogPostSummary, BlogPostSummaryBackendDict } from 'domain/blog/blog-post-summary.model';
 import { AlertsService } from 'services/alerts.service';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore

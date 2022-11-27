@@ -64,8 +64,8 @@ describe('Flag Exploration modal', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(FlagExplorationModalComponent);
     component = fixture.componentInstance;
-    focusManagerService = (TestBed.inject(FocusManagerService));
-    ngbActiveModal = (TestBed.inject(NgbActiveModal));
+    focusManagerService = TestBed.inject(FocusManagerService);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
 
   it('should create', () => {

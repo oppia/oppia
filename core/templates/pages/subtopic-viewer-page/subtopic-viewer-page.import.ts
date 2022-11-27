@@ -21,7 +21,7 @@ import 'zone.js';
 
 // This throws "TS2307". We need to
 // suppress this error because uiValidate come from angular-ui-validate
-// dependency.
+// dependency. We can't import it directly.
 // @ts-ignore
 import uiValidate from 'angular-ui-validate';
 

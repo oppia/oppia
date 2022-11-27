@@ -33,6 +33,8 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { TranslateTextService } from '../services/translate-text.service';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore
@@ -123,7 +125,8 @@ describe('Translation Modal Component', () => {
     component.contentPanel = new RteOutputDisplayComponent(
       // This throws "Argument of type 'null' is not assignable to parameter of
       // type 'ViewContainerRef'." We need to suppress this error because of
-      // the need to test validations.
+      // the need to test validations. This is because the component is not
+      // strictly typed yet.
       // @ts-ignore
       null, null, new ElementRef({offsetHeight: 200}), null);
     getUserContributionRightsDataAsyncSpy = spyOn(

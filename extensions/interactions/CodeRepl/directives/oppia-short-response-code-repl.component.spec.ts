@@ -63,7 +63,9 @@ describe('ShortResponseCodeRepl', () => {
 
     // This throws "Type object is not assignable to type
     // 'string'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This is because
+    // the backend dict has a lot of optional fields, and we
+    // need to test validations for each of these fields.
     // @ts-ignore
     expect(component.escapedAnswer).toEqual({
       code: "# Type your code here.\nprint('hello')",

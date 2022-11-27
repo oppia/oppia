@@ -57,7 +57,8 @@ describe('Exploration Save Modal component', () => {
 
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'DiffNodeData'." We need to suppress this error because of the need
-    // to test validations.
+    // to test validations. This error is thrown because the diffData is null
+    // when the component is initialized.
     // @ts-ignore
     component.diffData = null;
     component.isExplorationPrivate = isExplorationPrivate;

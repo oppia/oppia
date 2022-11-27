@@ -112,15 +112,11 @@ describe('NoninteractiveMath', () => {
     fixture = TestBed.createComponent(NoninteractiveMath);
     component = fixture.componentInstance;
 
-    // This throws "Type object is not assignable to type
-    // 'string'." We need to suppress this error
-    // because of the need to test validations.
-    // @ts-ignore
-    component.mathContentWithValue = {
+    component.mathContentWithValue = String({
       raw_latex: '\\frac{x}{y}',
       svg_filename: 'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
       '_1d784_vertical_1d306.svg'
-    } as string;
+    });
   });
 
   it('should initialise component when user inserts a math equation', () => {
@@ -259,39 +255,27 @@ describe('NoninteractiveMath', () => {
   it('should update image when usre makes changes to the equation', () => {
     const changes: SimpleChanges = {
       mathContentWithValue: {
-        // This throws "Type object is not assignable to type
-        // 'string'." We need to suppress this error
-        // because of the need to test validations.
-        // @ts-ignore
-        currentValue: {
+        currentValue: String({
           raw_latex: '\\frac{a}{b}',
           svg_filename:
             'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
             '_1d784_vertical_1d306.svg'
-        } as string,
-        // This throws "Type object is not assignable to type
-        // 'string'." We need to suppress this error
-        // because of the need to test validations.
-        // @ts-ignore
-        previousValue: {
+        }),
+        previousValue: String({
           raw_latex: '\\frac{x}{y}',
           svg_filename:
             'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
             '_1d784_vertical_1d306.svg'
-        } as string,
+        }),
         firstChange: false,
         isFirstChange: () => false
       }
     };
-    // This throws "Type object is not assignable to type
-    // 'string'." We need to suppress this error
-    // because of the need to test validations.
-    // @ts-ignore
-    component.mathContentWithValue = {
+    component.mathContentWithValue = String({
       raw_latex: '\\frac{a}{b}',
       svg_filename: 'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
       '_1d784_vertical_1d306.svg'
-    } as string;
+    });
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
     spyOn(contextService, 'getEntityType').and.returnValue(
       AppConstants.ENTITY_TYPE.EXPLORATION);

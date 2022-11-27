@@ -242,7 +242,8 @@ describe('NumberWithUnitsValidationService', () => {
       toMathjsCompatibleString: () => {
         // This throws "Type null is not assignable to type
         // 'string'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This
+        // function is not used in the validations.
         // @ts-ignore
         return null as string;
       },

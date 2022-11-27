@@ -38,7 +38,8 @@ describe('Exploration Diff Service', () => {
     explorationGraphChangeList = [{
       // This throws "Type object is not assignable to type
       // 'ExplorationChange'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This error is
+      // thrown because the command is invalid.
       // @ts-ignore
       changeList: [{
         cmd: 'invalidCommand',

@@ -31,7 +31,8 @@ export class YamlService {
     return yaml.dump(objectToBeStringified);
   }
 
-  // Unknown comes from dependency yaml load.
+  // TODO(#13015): Remove use of unknown as a type.
+  // Unknown has been used here becuase of use of dependency yaml load.
   parse(yamlStringToBeParsed: string): unknown {
     return yaml.load(yamlStringToBeParsed);
   }

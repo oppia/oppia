@@ -24,6 +24,13 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { SchemaDefaultValue } from 'services/schema-default-value.service';
 
+interface ListOfUnicodeStringSchema {
+  type: 'list';
+  items: {
+    type: 'unicode';
+  };
+}
+
 @Component({
   selector: 'list-of-unicode-string-editor',
   templateUrl: './list-editor.component.html',
@@ -36,7 +43,7 @@ export class ListOfUnicodeStringEditorComponent implements OnInit {
   @Input() modalId!: symbol;
   @Input() value!: SchemaDefaultValue;
   @Output() valueChanged = new EventEmitter();
-  SCHEMA = {
+  SCHEMA: ListOfUnicodeStringSchema = {
     type: 'list',
     items: {
       type: 'unicode'
@@ -50,8 +57,7 @@ export class ListOfUnicodeStringEditorComponent implements OnInit {
     }
   }
 
-  // Unknown is used because we don't know which kind of schema populates.
-  getSchema(): unknown {
+  getSchema(): ListOfUnicodeStringSchema {
     return this.SCHEMA;
   }
 

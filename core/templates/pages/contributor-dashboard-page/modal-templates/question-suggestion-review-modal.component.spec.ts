@@ -330,7 +330,8 @@ describe('Question Suggestion Review Modal component', () => {
     component.suggestionId = suggestionId;
     component.misconceptionsBySkill = misconceptionsBySkill;
     // This throws "TS2322". We need to suppress this error because
-    // not all of the data is needed to run these tests.
+    // not all of the data is needed to run these tests. This is because
+    // the component is initialized with the data from the backend.
     // @ts-ignore
     component.suggestionIdToContribution = suggestionIdToContribution;
 
@@ -673,7 +674,8 @@ describe('Question Suggestion Review Modal component', () => {
       let details2 = component.allContributions['2'].details;
       // This throws "Type 'null' is not assignable to type
       // 'ActiveContributionDetailsDict'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This error is thrown
+      // because the details are null.
       // @ts-ignore
       component.allContributions['2'].details = null;
 
@@ -683,7 +685,8 @@ describe('Question Suggestion Review Modal component', () => {
       component.goToNextItem();
       // This throws "Type 'null' is not assignable to type
       // 'ActiveContributionDetailsDict'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This error is thrown
+      // because the details are null.
       // @ts-ignore
       component.allContributions['1'].details = null;
 

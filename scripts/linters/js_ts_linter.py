@@ -56,7 +56,7 @@ INJECTABLES_TO_IGNORE: Final = [
 ]
 
 FILES_CONTAINING_UNKNOWN_TYPE: List[str] = [
-    # Do this file after removing JQuery from this file.
+    # Do this file after removing jQuery from this file.
     'extensions/objects/templates/svg-editor.component.ts',
 ]
 
@@ -475,7 +475,7 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                     # Throw error if unknown type is present.
                     if len(unknown_type):
                         failed = True
-                        for x in enumerate(unknown_type):
+                        for x in range(len(unknown_type)):
                             error_message = (
                                 '%s:%s:%s: unknown type used. Add proper'
                                 ' comment if Unknown is needed.' % (
@@ -485,7 +485,7 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                     # Throw error if unknown type conversion is present.
                     if len(unknown_type_conversion):
                         failed = True
-                        for x in enumerate(unknown_type_conversion):
+                        for x in range(len(unknown_type_conversion)):
                             error_message = (
                                 '%s:%s:%s: unknown type conversion used.'
                                 ' Add proper comment if unknown is needed.' % (

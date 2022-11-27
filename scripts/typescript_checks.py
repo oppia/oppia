@@ -93,7 +93,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/contributor-dashboard-admin-page/contributor-dashboard-admin-page.component.ts',
     'core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts',
     'core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.ts',
-    'core/templates/pages/contributor-dashboard-page/contributor-dashboard-page.component.ts',
     'core/templates/pages/contributor-dashboard-page/contributor-dashboard-page.constants.ajs.spec.ts',
     'core/templates/pages/contributor-dashboard-page/contributor-dashboard-page.import.ts',
     'core/templates/pages/contributor-dashboard-page/services/translate-text.service.ts',

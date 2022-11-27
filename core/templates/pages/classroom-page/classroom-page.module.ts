@@ -22,6 +22,8 @@ import { NgModule } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { BackgroundBannerModule } from 'components/common-layout-directives/common-elements/background-banner.module';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because base.module are not strictly typed yet.
 // @ts-ignore
@@ -29,6 +31,8 @@ import { BaseModule } from 'base-components/base.module';
 import { ClassroomPageComponent } from './classroom-page.component';
 import { ClassroomPageRootComponent } from './classroom-page-root.component';
 import { ClassroomPageRoutingModule } from './classroom-page-routing.module';
+// TODO(sll): Remove this once the directive is migrated to Angular.
+
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore

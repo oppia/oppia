@@ -68,7 +68,8 @@ describe('Exploration data service', function() {
   };
   // This throws "Type object is not assignable to type
   // FetchExplorationBackendResponse." We need to suppress this error
-  // because of the need to test validations.
+  // because of the need to test validations. This error is thrown
+  // because the data is not of the type FetchExplorationBackendResponse.
   // @ts-ignore
   let sampleExploration: FetchExplorationBackendResponse = {
     can_edit: true,

@@ -146,7 +146,7 @@ describe('Base Content Component', () => {
     fixture = TestBed.createComponent(BaseContentComponent);
     componentInstance = fixture.componentInstance;
     loaderService = TestBed.inject(LoaderService);
-    loaderService = (loaderService) as jasmine.SpyObj<LoaderService>;
+    loaderService = loaderService as jasmine.SpyObj<LoaderService>;
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
     keyboardShortcutService = (keyboardShortcutService) as
      jasmine.SpyObj<KeyboardShortcutService>;

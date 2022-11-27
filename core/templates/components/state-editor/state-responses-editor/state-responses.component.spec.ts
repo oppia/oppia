@@ -292,7 +292,8 @@ describe('State Responses Component', () => {
       (value, values, callback) => {
         // This throws "Argument of type 'null' is not assignable to
         // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This throws an error
+        // because the value passed is null.
         // @ts-ignore
         callback(null, null);
       });
@@ -396,7 +397,8 @@ describe('State Responses Component', () => {
       (options, callback) => {
         // This throws "Argument of type 'null' is not assignable to
         // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This throws an error
+        // because the value passed is null.
         // @ts-ignore
         callback(null, null);
       });
@@ -489,7 +491,8 @@ describe('State Responses Component', () => {
       (newAnswerChoices, callback) => {
         // This throws "Argument of type 'null' is not assignable to
         // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This throws an error
+        // because the value passed is null.
         // @ts-ignore
         callback(null);
       }
@@ -914,7 +917,8 @@ describe('State Responses Component', () => {
       (value, callback) => {
         // This throws "Argument of type 'null' is not assignable to
         // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This throws an error
+        // because the callback is called with null as an argument.
         // @ts-ignore
         callback(null);
       });
@@ -954,7 +958,8 @@ describe('State Responses Component', () => {
       (taggedSkillMisconceptionId, callback) => {
         // This throws "Argument of type 'null' is not assignable to
         // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This throws an error
+        // because the callback is called with null as an argument.
         // @ts-ignore
         callback(null);
       }
@@ -976,7 +981,8 @@ describe('State Responses Component', () => {
       (feedback, callback) => {
         // This throws "Argument of type 'null' is not assignable to
         // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This throws an error
+        // because the callback is called with null as an argument.
         // @ts-ignore
         callback(null);
       }
@@ -993,7 +999,8 @@ describe('State Responses Component', () => {
       .and.callFake((dest, callback) => {
         // This throws "Argument of type 'null' is not assignable to
         // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This throws an error
+        // because the callback is called with null as an argument.
         // @ts-ignore
         callback(null);
       });
@@ -1009,7 +1016,8 @@ describe('State Responses Component', () => {
       .and.callFake((destIfReallyStuck, callback) => {
         // This throws "Argument of type 'null' is not assignable to
         // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This throws an error
+        // because the callback is called with null as an argument.
         // @ts-ignore
         callback(null);
       });
@@ -1026,7 +1034,8 @@ describe('State Responses Component', () => {
       (labelledAsCorrect, callback) => {
         // This throws "Argument of type 'null' is not assignable to
         // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This throws an error
+        // because the callback is called with null as an argument.
         // @ts-ignore
         callback(null);
       }
@@ -1044,7 +1053,8 @@ describe('State Responses Component', () => {
       (rules, callback) => {
         // This throws "Argument of type 'null' is not assignable to
         // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This throws an error
+        // because the callback is called with null as an argument.
         // @ts-ignore
         callback(null);
       }
@@ -1070,7 +1080,8 @@ describe('State Responses Component', () => {
       ({feedback, dest}, callback) => {
         // This throws "Argument of type 'null' is not assignable to
         // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This throws an error
+        // because the callback is called with null as an argument.
         // @ts-ignore
         callback(null);
       }
@@ -1088,7 +1099,8 @@ describe('State Responses Component', () => {
       .and.callFake((dest, callback) => {
         // This throws "Argument of type 'null' is not assignable to
         // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This throws an error
+        // because the callback is called with null as an argument.
         // @ts-ignore
         callback(null);
       });
@@ -1105,7 +1117,8 @@ describe('State Responses Component', () => {
       .and.callFake((destIfReallyStuck, callback) => {
         // This throws "Argument of type 'null' is not assignable to
         // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This throws an error
+        // because the callback is called with null as an argument.
         // @ts-ignore
         callback(null);
       });
@@ -1122,7 +1135,8 @@ describe('State Responses Component', () => {
       ({labelledAsCorrect}, callback) => {
         // This throws "Argument of type 'null' is not assignable to
         // parameter of type 'AnswerGroup[]'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This throws an error
+        // because the callback is called with null as an argument.
         // @ts-ignore
         callback(null);
       }
@@ -1177,7 +1191,8 @@ describe('State Responses Component', () => {
     ' is a falsy value', () => {
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'Outcome'." We need to suppress this error because of the need to
-    // test validations.
+    // test validations. This throws an error because the callback is called
+    // with null as an argument.
     // @ts-ignore
     expect(component.summarizeDefaultOutcome(null, 'Continue', 0, true))
       .toBe('');

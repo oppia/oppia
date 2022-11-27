@@ -97,7 +97,9 @@ describe('Statistics Tab Component', () => {
 
     // This throws "Argument of type 'null' is not assignable to
     // parameter of type 'State'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This throws an
+    // error because the state with name 'Introduction' is not
+    // present in the states object.
     // @ts-ignore
     spyOn(statesObjectFactory, 'createFromBackendDict').and.returnValue(null);
 

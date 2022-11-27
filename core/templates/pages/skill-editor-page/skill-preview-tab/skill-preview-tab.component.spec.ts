@@ -112,7 +112,9 @@ class MockQuestionBackendApiService {
   async fetchQuestionsAsync() {
     // This throws "Type object is not assignable to type
     // 'QuestionBackendDict'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This happens
+    // because the backend dict is not a valid QuestionBackendDict,
+    // but we need to test validations.
     // @ts-ignore
     return Promise.resolve([questionDict as unknown as QuestionBackendDict]);
   }

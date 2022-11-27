@@ -66,7 +66,6 @@ implements ControlValueAccessor, Validator {
   // length.
 
   @Input() len!: number;
-  // UI configuration. May be undefined.
   @Input() uiConfig!: {'add_element_text': string};
   @Input() validators!: OppiaValidator[];
   @Input() labelForFocusTarget!: string;
