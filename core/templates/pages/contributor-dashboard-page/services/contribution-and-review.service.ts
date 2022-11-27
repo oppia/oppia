@@ -291,7 +291,7 @@ export class ContributionAndReviewService {
   async downloadContributorCertificateAsync(
       username: string,
       suggestionType: string,
-      languageCode: string,
+      languageCode: string | null,
       fromDate: string,
       toDate: string
   ): Promise<Blob> {

@@ -26,12 +26,12 @@ import { ContributionAndReviewService } from '../services/contribution-and-revie
   templateUrl: './certificate-download-modal.component.html'
 })
 export class CertificateDownloadModalComponent {
-  @Input() suggestionType: string;
-  @Input() username: string;
-  @Input() languageCode?: string;
-  fromDate: string;
-  toDate: string;
-  errorMessage: string;
+  @Input() suggestionType!: string;
+  @Input() username!: string;
+  @Input() languageCode: string | null;
+  fromDate!: string;
+  toDate!: string;
+  errorMessage!: string;
   errorsFound = false;
   certificateDownloading = false;
   datesSelected = false;
