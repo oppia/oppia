@@ -16,7 +16,7 @@
  * @fileoverview Constants for the creator dashboard page.
  */
 
-interface TabDetails {
+export interface TabDetails {
   ariaLabel: string;
   tabName: string;
   description: string;
@@ -65,3 +65,6 @@ export const ContributorDashboardConstants = {
   DEFAULT_OPPORTUNITY_LANGUAGE_CODE: 'hi',
   DEFAULT_OPPORTUNITY_TOPIC_NAME: 'All'
 } as const;
+
+export type ContributorDashboardKey = keyof typeof
+  ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS;

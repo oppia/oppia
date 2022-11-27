@@ -41,6 +41,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { InitializeAnswerGroups } from 'components/state-editor/state-interaction-editor/state-interaction-editor.component';
 
 interface UpdateActiveAnswerGroupDest {
   dest: string;
@@ -609,7 +610,9 @@ export class ResponsesService {
     return this._answerGroupsChangedEventEmitter;
   }
 
-  get onInitializeAnswerGroups(): EventEmitter<string | Interaction> {
+  get onInitializeAnswerGroups(): (
+    EventEmitter<string | Interaction | InitializeAnswerGroups>
+  ) {
     return this._initializeAnswerGroupsEventEmitter;
   }
 }

@@ -43,6 +43,16 @@ import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { State } from 'domain/state/StateObjectFactory';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { InteractionAnswer } from 'interactions/answer-defs';
+
+export interface InitializeAnswerGroups {
+  interactionId: string;
+  answerGroups: AnswerGroup[];
+  defaultOutcome: Outcome;
+  confirmedUnclassifiedAnswers: readonly InteractionAnswer[];
+}
 
 @Component({
   selector: 'oppia-state-interaction-editor',
@@ -297,7 +307,7 @@ export class StateInteractionEditorComponent
             answerGroups: stateData.interaction.answerGroups,
             defaultOutcome: stateData.interaction.defaultOutcome,
             confirmedUnclassifiedAnswers: (
-              stateData.interaction.confirmedUnclassifiedAnswers)
+              stateData.interaction.confirmedUnclassifiedAnswers),
           });
 
           this._updateInteractionPreview();
