@@ -446,7 +446,7 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
             lint check.
         """
         name = 'Unknown type'
-        error_messages = []
+        error_messages: List[str] = []
         failed = False
         comment_before_unknown_type = False
         ts_files_to_check = self.ts_filepaths
