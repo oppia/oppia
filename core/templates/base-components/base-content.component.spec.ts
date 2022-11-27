@@ -176,7 +176,7 @@ describe('Base Content Component', () => {
     spyOn(keyboardShortcutService, 'bindNavigationShortcuts');
     windowRef.nativeWindow.location.hostname = 'oppiaserver.appspot.com';
     componentInstance.ngOnInit();
-    expect(componentInstance.loadingMessage).toEqual('');
+    expect(componentInstance.loadingMessage).toEqual('Test Message');
     expect(keyboardShortcutService.bindNavigationShortcuts).toHaveBeenCalled();
     expect(componentInstance.iframed).toEqual(isIframed);
     expect(componentInstance.getHeaderText()).toEqual('Page Title');
