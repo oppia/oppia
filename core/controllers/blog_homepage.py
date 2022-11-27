@@ -36,6 +36,11 @@ BLOG_POST_EDITOR: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
 MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST: Final = (
     feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST
 )
+MAX_CHARS_IN_BLOG_POST_URL: Final = (
+    constants.MAX_CHARS_IN_BLOG_POST_TITLE
+    + len('-')
+    + constants.BLOG_POST_ID_LENGTH
+)
 
 
 class BlogCardSummaryDict(TypedDict):
@@ -237,7 +242,11 @@ class BlogPostDataHandler(
         'blog_post_url': {
             'schema': {
                 'type': 'basestring'
-            }
+            },
+            'validators': [{
+                'id': 'has_length_at_most',
+                'max_value': MAX_CHARS_IN_BLOG_POST_URL
+            }]
         }
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -499,8 +508,7 @@ class BlogPostViewedEventHandler(
                 'type': 'basestring',
                 'validators': [{
                     'id': 'has_length_at_most',
-                    'max_value': (
-                        constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT)
+                    'max_value': MAX_CHARS_IN_BLOG_POST_URL
                 }]
             }
         }
@@ -538,8 +546,7 @@ class BlogPostReadEventHandler(
                 'type': 'basestring',
                 'validators': [{
                     'id': 'has_length_at_most',
-                    'max_value': (
-                        constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT)
+                    'max_value': MAX_CHARS_IN_BLOG_POST_URL
                 }]
             }
         }
@@ -577,8 +584,7 @@ class BlogPostExitedEventHandler(
                 'type': 'basestring',
                 'validators': [{
                     'id': 'has_length_at_most',
-                    'max_value': (
-                        constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT)
+                    'max_value': MAX_CHARS_IN_BLOG_POST_URL
                 }]
             }
         }

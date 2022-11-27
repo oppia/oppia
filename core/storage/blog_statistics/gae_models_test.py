@@ -53,7 +53,6 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.event_model_one = (
             blog_stats_models.BlogPostViewedEventLogEntryModel(
                 id='event_model_1',
-                author_id=self.USER_ONE_ID,
                 blog_post_id=self.BLOG_POST_ONE_ID
             )
         )
@@ -63,7 +62,6 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.event_model_two = (
             blog_stats_models.BlogPostViewedEventLogEntryModel(
                 id='event_model_2',
-                author_id=self.USER_ONE_ID,
                 blog_post_id=self.BLOG_POST_ONE_ID
             )
         )
@@ -73,7 +71,6 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.event_model_three = (
             blog_stats_models.BlogPostViewedEventLogEntryModel(
                 id='event_model_3',
-                author_id=self.USER_ONE_ID,
                 blog_post_id=self.BLOG_POST_ONE_ID
             )
         )
@@ -83,7 +80,6 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.event_model_four = (
             blog_stats_models.BlogPostViewedEventLogEntryModel(
                 id='event_model_4',
-                author_id=self.USER_TWO_ID,
                 blog_post_id=self.BLOG_POST_TWO_ID
             )
         )
@@ -99,14 +95,13 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_create_and_get_event_models(self) -> None:
         entity_id = (
             blog_stats_models.BlogPostViewedEventLogEntryModel.create(
-                self.BLOG_POST_TWO_ID, self.USER_TWO_ID
+                self.BLOG_POST_TWO_ID
             )
         )
         event_model = blog_stats_models.BlogPostViewedEventLogEntryModel.get(
             entity_id)
 
         self.assertEqual(event_model.blog_post_id, self.BLOG_POST_TWO_ID)
-        self.assertEqual(event_model.author_id, self.USER_TWO_ID)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -118,7 +113,6 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -128,14 +122,6 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                 .get_export_policy(),
             expected_export_policy_dict
         )
-
-    def test_has_reference_to_user_id(self) -> None:
-        self.assertTrue(
-            blog_stats_models.BlogPostViewedEventLogEntryModel
-                .has_reference_to_user_id(self.USER_ONE_ID))
-        self.assertFalse(
-            blog_stats_models.BlogPostViewedEventLogEntryModel
-                .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
 
 
 class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
@@ -156,7 +142,6 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
         self.event_model_one = blog_stats_models.BlogPostReadEventLogEntryModel(
             id='event_model_1',
-            author_id=self.USER_ONE_ID,
             blog_post_id=self.BLOG_POST_ONE_ID
         )
         self.event_model_one.update_timestamps()
@@ -165,7 +150,6 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.event_model_two = (
             blog_stats_models.BlogPostReadEventLogEntryModel(
                 id='event_model_2',
-                author_id=self.USER_ONE_ID,
                 blog_post_id=self.BLOG_POST_ONE_ID
             )
         )
@@ -175,7 +159,6 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.event_model_three = (
             blog_stats_models.BlogPostReadEventLogEntryModel(
                 id='event_model_3',
-                author_id=self.USER_ONE_ID,
                 blog_post_id=self.BLOG_POST_ONE_ID
             )
         )
@@ -185,7 +168,6 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.event_model_four = (
             blog_stats_models.BlogPostReadEventLogEntryModel(
                 id='event_model_4',
-                author_id=self.USER_TWO_ID,
                 blog_post_id=self.BLOG_POST_TWO_ID
             )
         )
@@ -201,14 +183,13 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_create_and_get_event_models(self) -> None:
         entity_id = (
             blog_stats_models.BlogPostReadEventLogEntryModel.create(
-                self.BLOG_POST_TWO_ID, self.USER_TWO_ID
+                self.BLOG_POST_TWO_ID
             )
         )
         event_model = blog_stats_models.BlogPostReadEventLogEntryModel.get(
             entity_id)
 
         self.assertEqual(event_model.blog_post_id, self.BLOG_POST_TWO_ID)
-        self.assertEqual(event_model.author_id, self.USER_TWO_ID)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -220,7 +201,6 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -230,14 +210,6 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                 .get_export_policy(),
             expected_export_policy_dict
         )
-
-    def test_has_reference_to_user_id(self) -> None:
-        self.assertTrue(
-            blog_stats_models.BlogPostReadEventLogEntryModel
-                .has_reference_to_user_id(self.USER_ONE_ID))
-        self.assertFalse(
-            blog_stats_models.BlogPostReadEventLogEntryModel
-                .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
 
 
 class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
@@ -259,7 +231,6 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.event_model_one = (
             blog_stats_models.BlogPostExitedEventLogEntryModel(
                 id='event_model_1',
-                author_id=self.USER_ONE_ID,
                 blog_post_id=self.BLOG_POST_ONE_ID,
                 time_user_stayed_on_blog_post=10.05
             )
@@ -270,7 +241,6 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.event_model_two = (
             blog_stats_models.BlogPostExitedEventLogEntryModel(
                 id='event_model_2',
-                author_id=self.USER_ONE_ID,
                 blog_post_id=self.BLOG_POST_ONE_ID,
                 time_user_stayed_on_blog_post=9.05
             )
@@ -281,7 +251,6 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.event_model_three = (
             blog_stats_models.BlogPostExitedEventLogEntryModel(
                 id='event_model_3',
-                author_id=self.USER_ONE_ID,
                 blog_post_id=self.BLOG_POST_ONE_ID,
                 time_user_stayed_on_blog_post=6.5
             )
@@ -292,7 +261,6 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.event_model_four = (
             blog_stats_models.BlogPostExitedEventLogEntryModel(
                 id='event_model_4',
-                author_id=self.USER_TWO_ID,
                 blog_post_id=self.BLOG_POST_TWO_ID,
                 time_user_stayed_on_blog_post=8
             )
@@ -309,14 +277,13 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_create_and_get_event_models(self) -> None:
         entity_id = (
             blog_stats_models.BlogPostExitedEventLogEntryModel.create(
-                self.BLOG_POST_TWO_ID, self.USER_TWO_ID, 0.5
+                self.BLOG_POST_TWO_ID, 0.5
             )
         )
         event_model = blog_stats_models.BlogPostExitedEventLogEntryModel.get(
             entity_id)
 
         self.assertEqual(event_model.blog_post_id, self.BLOG_POST_TWO_ID)
-        self.assertEqual(event_model.author_id, self.USER_TWO_ID)
         self.assertEqual(event_model.time_user_stayed_on_blog_post, 0.5)
 
     def test_get_model_association_to_user(self) -> None:
@@ -329,7 +296,6 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'time_user_stayed_on_blog_post': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -341,14 +307,6 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                 .get_export_policy(),
             expected_export_policy_dict
         )
-
-    def test_has_reference_to_user_id(self) -> None:
-        self.assertTrue(
-            blog_stats_models.BlogPostExitedEventLogEntryModel
-                .has_reference_to_user_id(self.USER_ONE_ID))
-        self.assertFalse(
-            blog_stats_models.BlogPostExitedEventLogEntryModel
-                .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
 
 
 class BlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):

@@ -62,6 +62,7 @@ describe('Blog Dashboard Statistics Component', () => {
     '02': 200,
     '03': 400,
     '04': 100,
+    '05': 200,
     '06': 300,
     '07': 100,
     '08': 200
@@ -71,6 +72,7 @@ describe('Blog Dashboard Statistics Component', () => {
     '02': 200,
     '03': 400,
     '04': 100,
+    '05': 200,
     '06': 300,
     '07': 100,
     '08': 200
@@ -80,6 +82,7 @@ describe('Blog Dashboard Statistics Component', () => {
     '02': 200,
     '03': 400,
     '04': 100,
+    '05': 200,
     '06': 300,
     '07': 100,
     '08': 200,
@@ -94,6 +97,7 @@ describe('Blog Dashboard Statistics Component', () => {
       '02': 200,
       '03': 400,
       '04': 100,
+      '05': 200,
       '06': 300,
       '07': 100,
       '08': 200,
@@ -107,6 +111,7 @@ describe('Blog Dashboard Statistics Component', () => {
       '02': 200,
       '03': 400,
       '04': 100,
+      '05': 200,
       '06': 300,
       '07': 100,
       '08': 200,
@@ -674,6 +679,7 @@ describe('Blog Dashboard Statistics Component', () => {
       '02': 2,
       '03': 4,
       '04': 1,
+      '05': 2,
       '06': 3,
       '07': 1,
       '08': 2
@@ -702,7 +708,7 @@ describe('Blog Dashboard Statistics Component', () => {
     expect(blogDashboardBackendApiService.fetchBlogPostViewsStatsAsync)
       .not.toHaveBeenCalled();
     expect(component.xAxisLabels).toEqual(
-      ['13-Nov', '14-Nov', '15-Nov', '16-Nov', '17-Nov', '18-Nov', '19-Nov']
+      ['13 Nov', '14 Nov', '15 Nov', '16 Nov', '17 Nov', '18 Nov', '19 Nov']
     );
   }));
 
@@ -720,8 +726,8 @@ describe('Blog Dashboard Statistics Component', () => {
     expect(component.loadingChartSpinnerShown).toBeTrue();
     expect(component.xAxisLabels).toEqual(
       [
-        'Feb-22', 'Mar-22', 'Apr-22', 'May-22', 'Jun-22', 'Jul-22', 'Aug-22',
-        'Sep-22', 'Oct-22', 'Nov-22', 'Dec-22'
+        'Jan 22', 'Feb 22', 'Mar 22', 'Apr 22', 'May 22', 'Jun 22', 'Jul 22',
+        'Aug 22', 'Sep 22', 'Oct 22', 'Nov 22', 'Dec 22'
       ]
     );
     expect(component.plotStatsGraph).toHaveBeenCalled();
@@ -740,7 +746,7 @@ describe('Blog Dashboard Statistics Component', () => {
 
     expect(component.loadingChartSpinnerShown).toBeTrue();
     expect(component.xAxisLabels).toEqual(
-      ['1', '2', '3', '4', '5', '6', '7']);
+      ['1', '2', '3', '4', '5', '6', '7', '8']);
     expect(component.plotStatsGraph).toHaveBeenCalled();
   });
 
@@ -757,8 +763,8 @@ describe('Blog Dashboard Statistics Component', () => {
 
     expect(component.loadingChartSpinnerShown).toBeTrue();
     expect(component.readingTimeChartShown).toBeTrue();
-    expect(component.xAxisLabels).toEqual(Object(
-      BlogDashboardPageConstants.READING_TIME_BUCKET_KEYS_TO_DISPLAY).values);
+    expect(component.xAxisLabels).toEqual(Object.values(
+      BlogDashboardPageConstants.READING_TIME_BUCKET_KEYS_TO_DISPLAY));
     expect(component.plotStatsGraph).toHaveBeenCalled();
   });
 });

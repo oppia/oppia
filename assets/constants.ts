@@ -5975,10 +5975,8 @@ export default {
   // in /learn/math/fractions/revision/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
-  // This represents the maximum number of characters in the URL fragment for
-  // the blog post. It is generated using blog post title which can be 65
-  // characters long and the blog post id which is 12 characters long.
-  "MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT": 78,
+  // This is same as base_models.ID_Length.
+  "BLOG_POST_ID_LENGTH": 12,
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,

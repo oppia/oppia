@@ -529,7 +529,7 @@ export class BlogStatisticsTabComponent implements OnInit {
     // Create and fill the bars.
 
     // This throws argument of 'Type 'number | undefined' is not assignable to
-    // type string | number | boolean'. This comes when data  is entered in d3
+    // type string | number | boolean'. This comes when data is entered in d3
     // Selection as '.data' dependancy of d3 return 'number | undefined'. We
     // need to suppress this error because of strict type checking.
     // @ts-ignore

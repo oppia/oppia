@@ -175,7 +175,7 @@ class BlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
         # Validate with invalid format.
         self.stats_obj.blog_post_id = 'invalidBlogPostId'
         self._assert_valid_reading_time_stats_domain_obj(
-            'Blog ID invalidBlogPostId is invalid'
+            'Blog Post ID invalidBlogPostId is invalid'
         )
 
         # Here we use MyPy ignore because we are assigning a None value

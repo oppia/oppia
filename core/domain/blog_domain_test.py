@@ -198,7 +198,9 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_url_fragment_for_blog_post(
             'Blog Post URL Fragment field should not be empty.', '')
         url_fragment = 'very-very-long' * 30
-        url_fragment_char_limit = constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
+        url_fragment_char_limit = (
+            blog_domain.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
+        )
         self._assert_valid_url_fragment_for_blog_post(
             'Blog Post URL Fragment field should not exceed %d characters.'
             % (url_fragment_char_limit), url_fragment)
@@ -505,7 +507,9 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_valid_url_fragment_for_blog_post(
             'Blog Post URL Fragment field should not be empty.', '')
         url_fragment = 'very-very-long' * 30
-        url_fragment_char_limit = constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
+        url_fragment_char_limit = (
+            blog_domain.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
+        )
         self._assert_valid_url_fragment_for_blog_post(
             'Blog Post URL Fragment field should not exceed %d characters.'
             % (url_fragment_char_limit), url_fragment)

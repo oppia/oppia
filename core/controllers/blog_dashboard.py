@@ -218,7 +218,11 @@ class BlogPostHandler(
         'blog_post_id': {
             'schema': {
                 'type': 'basestring'
-            }
+            },
+            'validators': [{
+                'id': 'has_length_at_most',
+                'max_value': constants.BLOG_POST_ID_LENGTH
+            }]
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -366,7 +370,11 @@ class BlogDashboardBlogPostStatisticsHandler(
         'blog_post_id': {
             'schema': {
                 'type': 'basestring'
-            }
+            },
+            'validators': [{
+                'id': 'has_length_at_most',
+                'max_value': constants.BLOG_POST_ID_LENGTH
+            }]
         },
         'chart_type': {
             'schema': {

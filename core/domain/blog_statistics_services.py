@@ -772,7 +772,7 @@ def add_missing_stat_keys_with_default_values_in_views_stats(stats: Union[
     blog_statistics_domain.AuthorBlogPostViewsAggregatedStats
 ]:
     """Returns aggregated views stats domain object with added missing keys with
-    default values.We maintain views_by_hour for past 3 days
+    default values. We maintain views_by_hour for past 3 days
     (including the ongoing day) and views_by_date keyed to 3 months (including
     the ongoing month). If any of the day or month is missing (i.e no user
     viewed the blog post on that day or month), we add it to the domain object.
@@ -876,7 +876,7 @@ def add_missing_stat_keys_with_default_values_in_reads_stats(stats: Union[
     blog_statistics_domain.AuthorBlogPostReadsAggregatedStats
 ]:
     """Returns aggregated reads stats domain object with added missing keys with
-    default values.We maintain reads_by_hour for past 3 days
+    default values. We maintain reads_by_hour for past 3 days
     (including the ongoing day) and reads_by_date keyed to 3 months (including
     the ongoing month). If any of the day or month is missing (i.e no user
     viewed the blog post on that day or month), we add it to the domain object.
@@ -1055,7 +1055,7 @@ class BlogPostReadEventHandler(event_services.BaseEventHandler):
         """Perform in-request processing of recording blog post read events.
 
         Args:
-            blog_post_id: str. ID of the blog post that was resd.
+            blog_post_id: str. ID of the blog post that was read.
             author_id: str. User ID of the author of the blog post.
         """
         blog_stats_models.BlogPostReadEventLogEntryModel.create(

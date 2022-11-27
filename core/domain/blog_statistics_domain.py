@@ -891,7 +891,7 @@ class BlogPostReadingTime:
 
         if len(self.blog_post_id) != BLOG_POST_ID_LENGTH:
             raise utils.ValidationError(
-                'Blog ID %s is invalid' % self.blog_post_id)
+                'Blog Post ID %s is invalid' % self.blog_post_id)
 
 
 class AuthorBlogPostViewsAggregatedStats:

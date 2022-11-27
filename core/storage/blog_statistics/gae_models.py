@@ -44,8 +44,6 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
     # ID of blog post currently being viewed.
     blog_post_id = datastore_services.StringProperty(
         indexed=True, required=True)
-    # User ID of the author of the blog post.
-    author_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -76,14 +74,12 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
     def create(
             cls,
             blog_post_id: str,
-            author_id: str,
     ) -> str:
         """Creates a new blog post viewed event entry."""
         entity_id = cls.get_new_event_entity_id(blog_post_id)
         event_entity = cls(
             id=entity_id,
-            blog_post_id=blog_post_id,
-            author_id=author_id)
+            blog_post_id=blog_post_id)
         event_entity.update_timestamps()
         event_entity.put()
         return entity_id
@@ -102,23 +98,8 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
         should be exported.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether EventModel references user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return cls.query(
-            cls.author_id == user_id
-        ).get(keys_only=True) is not None
 
 
 class BlogPostReadEventLogEntryModel(base_models.BaseModel):
@@ -133,8 +114,6 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
     # ID of blog post currently being read.
     blog_post_id = datastore_services.StringProperty(
         indexed=True, required=True)
-    # User ID of the author of the blog post.
-    author_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -162,15 +141,14 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def create(
             cls,
-            blog_post_id: str,
-            author_id: str,
+            blog_post_id: str
     ) -> str:
         """Creates a new blog post read event entry."""
         entity_id = cls.get_new_event_entity_id(blog_post_id)
         event_entity = cls(
             id=entity_id,
-            blog_post_id=blog_post_id,
-            author_id=author_id)
+            blog_post_id=blog_post_id
+        )
         event_entity.update_timestamps()
         event_entity.put()
         return entity_id
@@ -190,23 +168,8 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
         should be exported.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether EventModel references user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return cls.query(
-            cls.author_id == user_id
-        ).get(keys_only=True) is not None
 
 
 class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
@@ -221,8 +184,6 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
     # ID of blog post being exited.
     blog_post_id = datastore_services.StringProperty(
         indexed=True, required=True)
-    # User ID of the author of the blog post.
-    author_id = datastore_services.StringProperty(indexed=True, required=True)
     # Time user stayed on the blog post.
     time_user_stayed_on_blog_post = (
         datastore_services.FloatProperty(indexed=True, required=True))
@@ -254,7 +215,6 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
     def create(
             cls,
             blog_post_id: str,
-            author_id: str,
             time_user_stayed_on_blog_post: float,
     ) -> str:
         """Creates a new blog post exited event entry."""
@@ -262,7 +222,6 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
         event_entity = cls(
             id=entity_id,
             blog_post_id=blog_post_id,
-            author_id=author_id,
             time_user_stayed_on_blog_post=time_user_stayed_on_blog_post)
         event_entity.update_timestamps()
         event_entity.put()
@@ -283,24 +242,9 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'time_user_stayed_on_blog_post': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE)
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether EventModel references user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return cls.query(
-            cls.author_id == user_id
-        ).get(keys_only=True) is not None
 
 
 class BlogPostViewsAggregatedStatsModel(base_models.BaseModel):
