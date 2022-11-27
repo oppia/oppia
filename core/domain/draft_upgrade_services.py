@@ -476,35 +476,35 @@ class DraftUpgradeUtil:
             list(ExplorationChange). The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
-            # if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-            #         change.property_name ==
-            #         exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-            #     # Here we use cast because this 'if' condition forces change to
-            #     # have type EditExpStatePropertyInteractionAnswerGroupsCmd.
-            #     edit_interaction_answer_groups_cmd = cast(
-            #         exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,
-            #         change
-            #     )
-            #     new_answer_groups_dicts = (
-            #         edit_interaction_answer_groups_cmd.new_value
-            #     )
-            #     answer_group_dicts: List[state_domain.AnswerGroupDict] = []
-            #     for answer_group_dict in new_answer_groups_dicts:
-            #         outcome_dict: List[state_domain.OutcomeDict] = answer_group_dict['outcome']
-            #         outcome_dict['dest_if_really_stuck'] = None
-            #         answer_group_dicts.append({
-            #             'rule_specs': answer_group_dict['rule_specs'],
-            #             'outcome': outcome_dict,
-            #             'training_data': answer_group_dict['training_data'],
-            #             'tagged_skill_misconception_id': None
-            #         })
-            #     draft_change_list[i] = exp_domain.ExplorationChange({
-            #         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            #         'property_name': (
-            #             exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
-            #         'state_name': change.state_name,
-            #         'new_value': answer_group_dicts
-            #     })
+            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                    change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                # Here we use cast because this 'if' condition forces change to
+                # have type EditExpStatePropertyInteractionAnswerGroupsCmd.
+                edit_interaction_answer_groups_cmd = cast(
+                    exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,
+                    change
+                )
+                new_answer_groups_dicts = (
+                    edit_interaction_answer_groups_cmd.new_value
+                )
+                answer_group_dicts: List[state_domain.AnswerGroupDict] = []
+                for answer_group_dict in new_answer_groups_dicts:
+                    outcome_dict: List[state_domain.OutcomeDict] = answer_group_dict['outcome']
+                    outcome_dict['dest_if_really_stuck'] = None
+                    answer_group_dicts.append({
+                        'rule_specs': answer_group_dict['rule_specs'],
+                        'outcome': outcome_dict,
+                        'training_data': answer_group_dict['training_data'],
+                        'tagged_skill_misconception_id': None
+                    })
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                    'state_name': change.state_name,
+                    'new_value': answer_group_dicts
+                })
             if (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
                   change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY):
