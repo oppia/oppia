@@ -93,7 +93,7 @@ describe('Ck editor copy content service', () => {
     expect(service.copyModeActive).toBe(true);
 
     // eslint-disable-next-line quotes
-    let listHtml = `<ul><li>Parent bullet<!--comment--><ul><li>Child bullet<ul>\
+    let listHtml = `<ul><li>Parent bullet<ul><!--comment--><li>Child bullet<ul>\
 <li>Grandchild bullet</li></ul></li></ul></li></ul>`;
     const listElement = generateContent(listHtml);
 
