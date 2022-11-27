@@ -486,8 +486,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 }]
             })
         ]
-        # Version 30 replaces the tagged_misconception_id in version 29
-        # with tagged_skill_misconception_id.
+        # Version 51 adds the dest_if_really_stuck field.
         expected_draft_change_list_v51 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -522,7 +521,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 }]
             })
         ]
-        # Migrate exploration to state schema version 30.
+        # Migrate exploration to state schema version 51.
         self.create_and_migrate_new_exploration('50', '51')
         # Migrate the draft change list's state schema to the migrated
         # exploration's schema.
@@ -543,6 +542,60 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             expected_draft_change_list_v51_dict_list,
             migrated_draft_change_list_v51_dict_list)
+
+        draft_change_list_v50_2 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'default_outcome',
+                'new_value': {
+                    'param_changes': [],
+                    'feedback': {},
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                }
+            })
+        ]
+        # Version 51 adds the dest_if_really_stuck field.
+        expected_draft_change_list_v51_2 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'default_outcome',
+                'new_value': {
+                    'param_changes': [],
+                    'feedback': {},
+                    'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                }
+            })
+        ]
+        # Migrate exploration to state schema version 51.
+        self.create_and_migrate_new_exploration('50', '51')
+        # Migrate the draft change list's state schema to the migrated
+        # exploration's schema.
+        migrated_draft_change_list_v51_2 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v50_2, 1, 2, self.EXP_ID)
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v51_2 is not None
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        expected_draft_change_list_v51_dict_list_2 = [
+            change.to_dict() for change in expected_draft_change_list_v51_2
+        ]
+        migrated_draft_change_list_v51_dict_list_2 = [
+            change.to_dict() for change in migrated_draft_change_list_v51_2
+        ]
+        self.assertEqual(
+            expected_draft_change_list_v51_dict_list_2,
+            migrated_draft_change_list_v51_dict_list_2)
 
     def test_convert_states_v49_dict_to_v50_dict(self) -> None:
         draft_change_list_v49 = [

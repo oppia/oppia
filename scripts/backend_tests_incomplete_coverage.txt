@@ -33,7 +33,6 @@ core.domain.collection_domain_test
 core.domain.change_domain_test
 core.domain.collection_services_test
 core.domain.config_domain_test
-core.domain.draft_upgrade_services_test
 core.domain.email_manager_test
 core.domain.event_services_test
 core.domain.exp_domain_test
