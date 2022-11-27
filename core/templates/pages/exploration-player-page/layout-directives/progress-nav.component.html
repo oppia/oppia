@@ -51,5 +51,11 @@
                            (clickContinueButton)="clickContinueButton.emit()"
                            class="d-block continue-button">
     </oppia-continue-button>
+    <oppia-continue-button *ngIf="!shouldContinueButtonBeShown() && showContinueToReviseButton"
+                           [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL"
+                           [isLearnAgainButton]="isLearnAgainButton"
+                           (clickContinueButton)="clickContinueToReviseButton.emit()"
+                           class="d-block continue-button">
+    </oppia-continue-button>
   </div>
 </div>

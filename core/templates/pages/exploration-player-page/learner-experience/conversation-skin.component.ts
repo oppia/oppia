@@ -132,7 +132,6 @@ export class ConversationSkinComponent {
   OPPIA_AVATAR_IMAGE_URL: string;
   displayedCard: StateCard;
   upcomingInlineInteractionHtml;
-  timeout: NodeJS.Timeout | null = null;
   responseTimeout: NodeJS.Timeout | null = null;
   DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
@@ -168,6 +167,8 @@ export class ConversationSkinComponent {
   submitButtonIsDisabled = true;
   solutionForState: Solution | null = null;
   isLearnerReallyStuck: boolean = false;
+  continueToReviseStateButtonIsVisible: boolean = false;
+  showInteraction: boolean = true;
 
   // The fields are used to customize the component for the diagnostic player,
   // question player, and exploration player page.
@@ -311,6 +312,7 @@ export class ConversationSkinComponent {
           this.solutionForState = newCard.getSolution();
           this.numberOfIncorrectSubmissions = 0;
           this.nextCardIfStuck = null;
+          this.continueToReviseStateButtonIsVisible = false;
           this.triggerIfLearnerStuckAction();
         }
       )
@@ -1060,22 +1062,20 @@ export class ConversationSkinComponent {
   }
 
   triggerIfLearnerStuckAction(): void {
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
-    }
     if (this.responseTimeout) {
       clearTimeout(this.responseTimeout);
       this.responseTimeout = null;
     }
     this.responseTimeout = setTimeout(() => {
-      if (this.nextCardIfStuck) {
+      if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
         // Let the learner know about the redirection to a state
         // for clearing concepts.
         this.playerTranscriptService.addNewResponseToExistingFeedback(
           this.translateService.instant(
             'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE')
         );
+        // Enable visibility of ContinueToRevise button.
+        this.continueToReviseStateButtonIsVisible = true;
       } else if (this.solutionForState !== null &&
         this.numberOfIncorrectSubmissions >=
         ExplorationPlayerConstants.
@@ -1085,20 +1085,9 @@ export class ConversationSkinComponent {
         this.hintsAndSolutionManagerService.releaseSolution();
       }
     }, ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
-    this.timeout = setTimeout(() => {
-      if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
-        // Redirect the learner.
-        this.nextCard = this.nextCardIfStuck;
-        this.showPendingCard();
-      }
-    }, ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
   }
 
   triggerIfLearnerStuckActionDirectly(): void {
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
-    }
     if (this.responseTimeout) {
       clearTimeout(this.responseTimeout);
       this.responseTimeout = null;
@@ -1108,10 +1097,8 @@ export class ConversationSkinComponent {
       this.playerTranscriptService.addNewResponseToExistingFeedback(
         this.translateService.instant(
           'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE'));
-      setTimeout(() => {
-        this.nextCard = this.nextCardIfStuck;
-        this.showPendingCard();
-      }, 10000);
+      // Enable visibility of ContinueToRevise button.
+      this.continueToReviseStateButtonIsVisible = true;
     } else if (this.solutionForState !== null &&
       this.numberOfIncorrectSubmissions >=
       ExplorationPlayerConstants.
@@ -1119,6 +1106,13 @@ export class ConversationSkinComponent {
       // Release solution if it exists.
       this.hintsAndSolutionManagerService.releaseSolution();
     }
+  }
+
+  triggerRedirectionToStuckState(): void {
+    // Redirect the learner.
+    this.nextCard = this.nextCardIfStuck;
+    this.showInteraction = false;
+    this.showPendingCard();
   }
 
   showQuestionAreNotAvailable(): void {
@@ -1505,19 +1499,19 @@ export class ConversationSkinComponent {
 
       this.upcomingInlineInteractionHtml = null;
       this.upcomingInteractionInstructions = null;
-    }, TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC);
+    }, 0.1 * TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC);
 
     setTimeout(() => {
       this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
       this.scrollToTop();
     },
-    TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
+    0.1 * TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
       0.5 * TIME_FADEIN_MSEC);
 
     setTimeout(() => {
       this.startCardChangeAnimation = false;
     },
-    TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + TIME_FADEIN_MSEC +
+    0.1 * TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + TIME_FADEIN_MSEC +
     this.TIME_PADDING_MSEC);
 
     this.playerPositionService.onNewCardOpened.emit(this.nextCard);
