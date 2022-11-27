@@ -6290,22 +6290,22 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
                 to_date
             )
 
+    def mock_screenshot(
+        self,
+        html_str: str,  # pylint: disable=unused-argument
+        save_as: str,  # pylint: disable=unused-argument
+        size: Tuple[str, str]  # pylint: disable=unused-argument
+    ) -> List[str]:
+        return []
+
     def test_generate_certificate_throws_exception(
         self
     ) -> None:
         def mock_uuid() -> str:
             return 'test_123'
 
-        def mock_screenshot(
-            self,  # pylint: disable=unused-argument
-            html_str: str,  # pylint: disable=unused-argument
-            save_as: str,  # pylint: disable=unused-argument
-            size: Tuple[str, str]  # pylint: disable=unused-argument
-        ) -> List[str]:
-            return []
-
         with self.swap(uuid, 'uuid4', mock_uuid):
-            with self.swap(Html2Image, 'screenshot', mock_screenshot):
+            with self.swap(Html2Image, 'screenshot', self.mock_screenshot):
                 with self.assertRaisesRegex(
                     Exception,
                     'Image generation failed.'
@@ -6313,66 +6313,3 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
                     suggestion_services._generate_contributor_certificate_image(  # pylint: disable=protected-access
                         'Template'
                     )
-
-    def test_generate_certificate_throws_no_file_paths_exception(
-        self
-    ) -> None:
-        def mock_generate_image() -> List[str]:
-            return []
-        suggestion_change: Dict[
-            str, Union[str, float, question_domain.QuestionDict]
-        ] = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-            'question_dict': {
-                'id': 'test_id',
-                'version': 12,
-                'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
-            },
-            'skill_id': 1,
-            'skill_difficulty': 0.3
-        }
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(suggestion_change['question_dict'], dict)
-        test_question_dict: question_domain.QuestionDict = (
-            suggestion_change['question_dict']
-        )
-
-        question_state_data = test_question_dict[
-            'question_state_data']
-        question_state_data['content'][
-            'html'] = '<p>No image content</p>'
-        suggestion_models.GeneralSuggestionModel.create(
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            feconf.ENTITY_TYPE_SKILL,
-            'skill_1', 1,
-            suggestion_models.STATUS_ACCEPTED, self.author_id,
-            'reviewer_2', suggestion_change, 'category1',
-            'thread_1', 'en')
-        username = user_services.get_username(self.author_id)
-        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
-        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
-
-        with self.swap(
-            suggestion_services,
-            '_generate_contributor_certificate_image',
-            mock_generate_image
-        ):
-            with self.assertRaisesRegex(
-                Exception,
-                'Image generation failed.'
-            ):
-                suggestion_services.generate_contributor_certificate(
-                    username,
-                    feconf.SUGGESTION_TYPE_ADD_QUESTION,
-                    None,
-                    from_date,
-                    to_date
-                )

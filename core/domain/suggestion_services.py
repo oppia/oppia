@@ -3009,14 +3009,9 @@ def generate_contributor_certificate(
     else:
         raise Exception('The suggestion type is invalid.')
 
-    image_paths = _generate_contributor_certificate_image(template)
-    if len(image_paths) == 0:
-        raise Exception('Image generation failed.')
-    # Since we have found image paths we can make sure that the first element
-    # of image paths are in string type.
-    assert isinstance(image_paths[0], str)
+    image_path = _generate_contributor_certificate_image(template)
 
-    return image_paths[0]
+    return image_path
 
 
 def _generate_translation_contributor_certificate(
@@ -3197,14 +3192,14 @@ def _generate_question_contributor_certificate(
     return certificate_template
 
 
-def _generate_contributor_certificate_image(template: str) -> List[str]:
+def _generate_contributor_certificate_image(template: str) -> str:
     """Generates an image from the html string.
 
     Args:
         template: str. The html template to create the image.
 
     Returns:
-        List[str]. The paths of the generated images.
+        str. The paths of the generated images.
 
     Raises:
         Exception. Image generation failed.
@@ -3224,4 +3219,4 @@ def _generate_contributor_certificate_image(template: str) -> List[str]:
     # image_paths is a list of strings.
     assert isinstance(image_paths[0], str)
 
-    return image_paths
+    return image_paths[0]
