@@ -1497,19 +1497,19 @@ export class ConversationSkinComponent {
 
       this.upcomingInlineInteractionHtml = null;
       this.upcomingInteractionInstructions = null;
-    }, TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC);
+    }, 0.1 * TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC);
 
     setTimeout(() => {
       this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
       this.scrollToTop();
     },
-    TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
+    0.1 * TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
       0.5 * TIME_FADEIN_MSEC);
 
     setTimeout(() => {
       this.startCardChangeAnimation = false;
     },
-    TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + TIME_FADEIN_MSEC +
+    0.1 * TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + TIME_FADEIN_MSEC +
     this.TIME_PADDING_MSEC);
 
     this.playerPositionService.onNewCardOpened.emit(this.nextCard);
