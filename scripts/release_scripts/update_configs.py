@@ -125,7 +125,7 @@ def check_updates_to_terms_of_service(
     release_feconf_path: str, personal_access_token: str
 ) -> None:
     """Checks if updates are made to terms of service and updates
-    REGISTRATION_PAGE_LAST_UPDATED_UTC in feconf.py if there are updates.
+    TERMS_PAGE_LAST_UPDATED_UTC in feconf.py if there are updates.
 
     Args:
         release_feconf_path: str. The path to feconf file in release
@@ -161,9 +161,9 @@ def check_updates_to_terms_of_service(
             feconf_lines = f.readlines()
         with utils.open_file(release_feconf_path, 'w') as f:
             for line in feconf_lines:
-                if line.startswith('REGISTRATION_PAGE_LAST_UPDATED_UTC'):
+                if line.startswith('TERMS_PAGE_LAST_UPDATED_UTC'):
                     line = (
-                        'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+                        'TERMS_PAGE_LAST_UPDATED_UTC = '
                         'datetime.datetime(%s, %s, %s, %s, %s, %s)\n' % (
                             time_tuple))
                 f.write(line)

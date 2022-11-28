@@ -101,6 +101,43 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.swap_check_frontend_coverage = self.swap(
             check_frontend_test_coverage, 'main', mock_check_frontend_coverage)
 
+    def test_chrome_bin_setup_with_google_chrome(self) -> None:
+        isfile_swap = self.swap(
+            os.path, 'isfile', lambda path: path == '/usr/bin/google-chrome'
+        )
+        with isfile_swap:
+            run_frontend_tests.setup_chrome_bin_env_variable()
+        self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/google-chrome')
+
+    def test_chrome_bin_setup_with_wsl_chrome_browser(self) -> None:
+        isfile_swap = self.swap(
+            os.path,
+            'isfile',
+            lambda path: path == '/mnt/c/Program Files (x86)/Google/'
+                                 'Chrome/Application/chrome.exe'
+        )
+        with isfile_swap:
+            run_frontend_tests.setup_chrome_bin_env_variable()
+        self.assertEqual(
+            os.environ['CHROME_BIN'],
+            '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'
+        )
+
+    def test_chrome_bin_setup_with_error(self) -> None:
+
+        print_arr = []
+        def mock_print(msg: str) -> None:
+            print_arr.append(msg)
+
+        isfile_swap = self.swap(os.path, 'isfile', lambda _: False)
+        print_swap = self.swap(builtins, 'print', mock_print)
+
+        with print_swap, isfile_swap, self.assertRaisesRegex(
+            Exception, 'Chrome not found.'
+        ):
+            run_frontend_tests.setup_chrome_bin_env_variable()
+        self.assertIn('Chrome is not found, stopping...', print_arr)
+
     def test_run_dtslint_type_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap:
             run_frontend_tests.run_dtslint_type_tests()
