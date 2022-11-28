@@ -198,7 +198,8 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             with mock_e2e_test_suites, webdriverio_test_suite_files_swap:
                 with self.assertRaisesRegex(
                     Exception, 'The e2e test suites that have been extracted'
-                               ' from wdio.conf.js are empty.'):
+                               ' from wdio.conf.js are empty.'
+                ):
                     check_e2e_tests_are_captured_in_ci.main()
 
     def test_main_with_missing_file_from_webdriverio_conf_file_fail(
@@ -261,14 +262,16 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 EXPECTED_CI_LIST = [
     """name: End-to-End tests
 jobs:
-  e2e_additional_editor_and_player:
+  e2e_test:
+    strategy:
+      matrix:
+        suite:
+          - threeWords
+          - fourWords
     steps:
-      - name: Run Additional Editor E2E Test
+      - name: Run E2E test ${{ matrix.suite }}
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_e2e_tests --suite="threeWords" --prod_env
-      - name: Run Additional Player E2E Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_e2e_tests --suite="fourWords" --prod_env
+        run: python -m scripts.run_e2e_tests --suite=${{ matrix.suite }}
 """]
 
 EXPECTED_WEBDRIVERIO_CONF_FILE = """var path = require('path')

@@ -16,7 +16,7 @@
  * @fileoverview Component for the state version history button.
  */
 
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { StateVersionHistoryModalComponent } from 'pages/exploration-editor-page/modal-templates/state-version-history-modal.component';
 import { StateDiffData, VersionHistoryService } from 'pages/exploration-editor-page/services/version-history.service';
@@ -26,6 +26,8 @@ import { StateDiffData, VersionHistoryService } from 'pages/exploration-editor-p
   templateUrl: './state-version-history.component.html'
 })
 export class StateVersionHistoryComponent {
+  @Input() validationErrorIsShown!: boolean;
+
   constructor(
     private versionHistoryService: VersionHistoryService,
     private ngbModal: NgbModal
