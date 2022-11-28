@@ -104,7 +104,7 @@ describe('DEV MODE Test', function() {
 describe('Donation flow', function() {
   it('should be able to donate via PayPal', async function() {
     await browser.url('/donate');
-    const iframeElement = $('.e2e-test-donate-page-iframe');
+    let iframeElement = $('.e2e-test-donate-page-iframe');
     await waitFor.presenceOf(
       iframeElement,
       'Donorbox Iframe taking too long to appear.'
