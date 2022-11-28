@@ -568,7 +568,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
             this.urlService.getClassroomUrlFragmentFromUrl(),
             this.urlService.getTopicUrlFragmentFromLearnerUrl(),
             Object.keys(this.scorePerSkillMapping).toString(),
-            this.totalQuestions,
+            Object.keys(questionStateData).length,
             this.totalScore
           );
         }
