@@ -22,7 +22,6 @@ from core.jobs import job_test_utils
 from core.jobs.batch_jobs import test_gcs_io_job
 from core.jobs.types import job_run_result
 from core.platform import models
-from core.platform.storage import cloud_storage_emulator
 
 from typing import List
 
@@ -45,7 +44,7 @@ class TestGCSIoWriteJobTests(job_test_utils.JobTestBase):
         ])
 
 
-def write_files_to_gcs() -> List[cloud_storage_emulator.EmulatorBlob]:
+def write_files_to_gcs() -> List[str]:
     """Write dummy files to GCS."""
     bucket = app_identity_services.get_gcs_resource_bucket_name()
     fileobjects = [
@@ -73,12 +72,9 @@ def write_files_to_gcs() -> List[cloud_storage_emulator.EmulatorBlob]:
     storage_services.commit(
         bucket, filepath_1, data_1, 'application/octet-stream')
 
-    emulator_blob_1 = cloud_storage_emulator.EmulatorBlob(
-        filepath_0, data_0, 'application/octet-stream')
-    emulator_blob_2 = cloud_storage_emulator.EmulatorBlob(
-        filepath_1, data_1, 'application/octet-stream')
-
-    return [emulator_blob_1, emulator_blob_2]
+    return [
+        'dummy_folder/dummy_subfolder/dummy_file_1',
+        'dummy_folder/dummy_subfolder/dummy_file_2']
 
 
 class TestGCSIoReadJobTests(job_test_utils.JobTestBase):

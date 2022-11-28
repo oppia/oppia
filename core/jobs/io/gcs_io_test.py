@@ -23,7 +23,6 @@ from core.domain import user_services
 from core.jobs import job_test_utils
 from core.jobs.io import gcs_io
 from core.platform import models
-from core.platform.storage import cloud_storage_emulator
 
 import apache_beam as beam
 
@@ -138,10 +137,6 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
             bucket, filepath_1, string, 'application/octet-stream')
         storage_services.commit(
             bucket, filepath_2, string, 'application/octet-stream')
-        emulator_blob_1 = cloud_storage_emulator.EmulatorBlob(
-            filepath_1, string, 'application/octet-stream')
-        emulator_blob_2 = cloud_storage_emulator.EmulatorBlob(
-            filepath_2, string, 'application/octet-stream')
         prefixes = ['dummy_folder/dummy_subfolder']
         filepath_p_collec = (
             self.pipeline
@@ -150,7 +145,10 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
         )
         self.assert_pcoll_equal(
             filepath_p_collec, [
-                [emulator_blob_1, emulator_blob_2]
+                [
+                    'dummy_folder/dummy_subfolder/dummy_file_1',
+                    'dummy_folder/dummy_subfolder/dummy_file_2'
+                ]
             ])
 
     def test_check_correct_filepath_is_passing(self) -> None:
