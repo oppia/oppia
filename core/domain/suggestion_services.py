@@ -43,7 +43,7 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 
-from html2image import Html2Image
+import html2image
 from typing import (
     Callable, Dict, Final, List, Literal, Mapping, Match, Optional,
     Sequence, Set, Tuple, Union, cast, overload
@@ -3204,7 +3204,7 @@ def _generate_contributor_certificate_image(template: str) -> str:
     Raises:
         Exception. Image generation failed.
     """
-    hti = Html2Image()
+    hti = html2image.Html2Image()
     filename = str(uuid.uuid4()) + '.png'
 
     image_paths = hti.screenshot(
