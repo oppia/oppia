@@ -11,7 +11,7 @@
       <div class="row">
         <div class="col-sm-7">
           <div class="oppia-donation-card-content-wide oppia-donate-page-video-section bg-white mt-0 d-block border text-dark">
-            <div class="mb-5"
+            <div class="mb-5 bg-white"
                  [innerHTML]="'I18N_DONATE_PAGE_VISION_TEXT' | translate">
             </div>
             <iframe class="oppia-donate-page-video"
@@ -551,7 +551,7 @@
     max-width: 800px;
   }
   .oppia-donate-page-banner {
-    background-image: url('/assets/images/donate/donate-page-banner.webp');
+    background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)), url('/assets/images/donate/donate-page-banner.webp');
     background-size: cover;
     height: 350px;
   }
