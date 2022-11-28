@@ -48,7 +48,7 @@ import { GraphDataService } from '../services/graph-data.service';
 import { ExplorationNextContentIdIndexService } from '../services/exploration-next-content-id-index.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { VersionHistoryService } from '../services/version-history.service';
-import { StateVersionHistoryResponse, VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
+import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 import { ContextService } from 'services/context.service';
 
 @Component({
@@ -68,6 +68,7 @@ export class ExplorationEditorTabComponent
     explorationId: string;
     stateName: string;
     index: number = 0;
+    validationErrorIsShown: boolean = false;
     joyRideSteps: string[] = [
       'editorTabTourContainer',
       'editorTabTourContentEditorTab',
@@ -327,6 +328,13 @@ export class ExplorationEditorTabComponent
       this.explorationWarningsService.updateWarnings();
     }
 
+    getLastEditedVersionNumberInCaseOfError(): number {
+      return (
+        this.versionHistoryService.fetchedStateVersionNumbers[
+          this.versionHistoryService
+            .getCurrentPositionInStateVersionHistoryList()]);
+    }
+
     initStateEditor(): void {
       this.stateName = this.stateEditorService.getActiveStateName();
       this.stateEditorService.setStateNames(
@@ -362,6 +370,7 @@ export class ExplorationEditorTabComponent
         }
 
         this.versionHistoryService.resetStateVersionHistory();
+        this.validationErrorIsShown = false;
         this.versionHistoryService.insertStateVersionHistoryData(
           this.versionHistoryService.getLatestVersionOfExploration(),
           stateData, '');
@@ -372,12 +381,16 @@ export class ExplorationEditorTabComponent
           this.versionHistoryBackendApiService.fetchStateVersionHistoryAsync(
             this.contextService.getExplorationId(), stateData.name,
             this.versionHistoryService.getLatestVersionOfExploration()
-          ).then((response: StateVersionHistoryResponse) => {
-            this.versionHistoryService.insertStateVersionHistoryData(
-              response.lastEditedVersionNumber,
-              response.stateInPreviousVersion,
-              response.lastEditedCommitterUsername
-            );
+          ).then((response) => {
+            if (response !== null) {
+              this.versionHistoryService.insertStateVersionHistoryData(
+                response.lastEditedVersionNumber,
+                response.stateInPreviousVersion,
+                response.lastEditedCommitterUsername
+              );
+            } else {
+              this.validationErrorIsShown = true;
+            }
           });
         }
 

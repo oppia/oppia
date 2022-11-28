@@ -1088,6 +1088,7 @@ describe('Conversation skin component', () => {
     tick(
       ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
     tick(ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
+
     expect(solutionSpy).toHaveBeenCalled();
     expect(redirectionSpy).not.toHaveBeenCalled();
     flush();
@@ -1100,6 +1101,8 @@ describe('Conversation skin component', () => {
     spyOn(translateService, 'instant').and.callThrough();
     spyOn(playerTranscriptService, 'addNewResponseToExistingFeedback');
 
+    expect(componentInstance.continueToReviseStateButtonIsVisible).
+      toEqual(false);
     componentInstance.nextCardIfStuck = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
@@ -1107,11 +1110,11 @@ describe('Conversation skin component', () => {
     componentInstance.triggerIfLearnerStuckAction();
     tick(
       ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
-    tick(ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
+
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE');
-    expect(componentInstance.nextCard).toEqual(
-      componentInstance.nextCardIfStuck);
+    expect(componentInstance.continueToReviseStateButtonIsVisible).
+      toEqual(true);
     flush();
   }));
 
@@ -1125,6 +1128,7 @@ describe('Conversation skin component', () => {
       true, 'answer', 'Html', 'XyzID');
     componentInstance.numberOfIncorrectSubmissions = 3;
     componentInstance.triggerIfLearnerStuckActionDirectly();
+
     expect(solutionSpy).toHaveBeenCalled();
     expect(redirectionSpy).not.toHaveBeenCalled();
   }));
@@ -1134,17 +1138,32 @@ describe('Conversation skin component', () => {
     spyOn(translateService, 'instant').and.callThrough();
     spyOn(componentInstance, 'showPendingCard');
     spyOn(playerTranscriptService, 'addNewResponseToExistingFeedback');
-
+    expect(componentInstance.continueToReviseStateButtonIsVisible).
+      toEqual(false);
     componentInstance.nextCardIfStuck = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
       [], null, '', null);
     componentInstance.triggerIfLearnerStuckActionDirectly();
+
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE');
-    tick(10000);
+    expect(componentInstance.continueToReviseStateButtonIsVisible).
+      toEqual(true);
+  }));
+
+  it('should redirect the learner to stuck state', fakeAsync(() => {
+    spyOn(componentInstance, 'showPendingCard');
+    componentInstance.nextCardIfStuck = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'EndExploration', null),
+      [], null, null, '', null);
+
+    componentInstance.triggerRedirectionToStuckState();
+
     expect(componentInstance.nextCard).toEqual(
       componentInstance.nextCardIfStuck);
+    expect(componentInstance.showPendingCard).toHaveBeenCalled();
   }));
 
   it('should fetch completed chapters count if user is logged in',

@@ -30,7 +30,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Any, Dict, List, Optional, Tuple, TypedDict, Union
+from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -41,8 +41,11 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class UnformattedModelGroupDict(TypedDict):
-    """Dictionary representing an unformatted model group."""
+class UnformattedModelGroupForVerificationJobDict(TypedDict):
+    """Dictionary representing an unformatted model group for the
+    VerifyVersionHistoryModelsJob which verifies whether the version history
+    models were created correctly.
+    """
 
     all_exp_models: List[exp_domain.Exploration]
     exp_models_vlatest: List[exp_domain.Exploration]
@@ -53,11 +56,44 @@ class UnformattedModelGroupDict(TypedDict):
     )
 
 
-class FormattedModelGroupDict(TypedDict):
-    """Dictionary representing a formatted model group."""
+class FormattedModelGroupForVerificationJobDict(TypedDict):
+    """Dictionary representing a formatted model group for the
+    VerifyVersionHistoryModelsJob which verifies whether the version history
+    models were created correctly.
+    """
 
     exp_vlatest: exp_domain.Exploration
     all_explorations: List[exp_domain.Exploration]
+    snapshot_metadata_models: List[Optional[
+        exp_models.ExplorationSnapshotMetadataModel]]
+    version_history_models: (
+        List[Optional[exp_models.ExplorationVersionHistoryModel]]
+    )
+
+
+class UnformattedModelGroupForComputationJobDict(TypedDict):
+    """Dictionary representing an unformatted model group for the
+    ComputeExplorationVersionHistoryJob which verifies whether the version
+    history models were created correctly.
+    """
+
+    all_exp_models: List[exp_models.ExplorationModel]
+    exp_models_vlatest: List[exp_models.ExplorationModel]
+    snapshot_metadata_models: List[Optional[
+        exp_models.ExplorationSnapshotMetadataModel]]
+    version_history_models: (
+        List[Optional[exp_models.ExplorationVersionHistoryModel]]
+    )
+
+
+class FormattedModelGroupForComputationJobDict(TypedDict):
+    """Dictionary representing a formatted model group for the
+    ComputeExplorationVersionHistoryJob which verifies whether the version
+    history models were created correctly.
+    """
+
+    exp_vlatest: exp_models.ExplorationModel
+    all_explorations: List[exp_models.ExplorationModel]
     snapshot_metadata_models: List[Optional[
         exp_models.ExplorationSnapshotMetadataModel]]
     version_history_models: (
@@ -69,22 +105,21 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
     """Verifies that the creation or modification of the version history
     models is correct. It does not consult those explorations for which
     version history could not be created due to many reasons such as invalid
-    change list, outdated states schema version etc. It checks the correctness
-    for those explorations for which the version histories were created
-    successfully.
+    change list. It checks the correctness for those explorations for which the
+    version histories were created successfully.
     """
 
     def generate_exploration_from_snapshot(
         self, snapshot_model: exp_models.ExplorationSnapshotContentModel
     ) -> Optional[exp_models.ExplorationModel]:
-        """Returns the exploration model with given id at version 1.
+        """Generates exploration model from given snapshot content model.
 
         Args:
             snapshot_model: ExplorationSnapshotContentModel. The snapshot
-                content model at v1.
+                content model.
 
         Returns:
-            ExplorationModel. The exploration model at version 1.
+            ExplorationModel. The exploration model.
         """
         with datastore_services.get_ndb_context():
             try:
@@ -101,23 +136,26 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 return None
 
     def convert_to_formatted_model_group(
-        self, model_group: UnformattedModelGroupDict
-    ) -> Optional[FormattedModelGroupDict]:
-        """Returns True if the given model group is valid.
+        self, model_group: UnformattedModelGroupForVerificationJobDict
+    ) -> Optional[FormattedModelGroupForVerificationJobDict]:
+        """Converts the given unformatted model group into a formatted one.
 
         Args:
-            model_group: UnformattedModelGroupDict. The model group to be
-                checked.
+            model_group: UnformattedModelGroupForVerificationJobDict.
+                The unformatted model group for the verification job which is
+                to be converted into formatted model group.
 
         Returns:
-            bool. Whether the given model group is valid or not.
+            Optional[FormattedModelGroupForVerificationJobDict]. The formatted
+            version of the given model group.
         """
         all_exp_models = model_group['all_exp_models']
         exp_models_vlatest = model_group['exp_models_vlatest']
         snapshot_metadata_models = model_group['snapshot_metadata_models']
         version_history_models = model_group['version_history_models']
 
-        response_dict: Optional[FormattedModelGroupDict] = None
+        response_dict: Optional[
+            FormattedModelGroupForVerificationJobDict] = None
 
         model_group_is_valid = len(exp_models_vlatest) == 1
         if model_group_is_valid: # pragma: no cover
@@ -193,12 +231,14 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         return response_dict
 
     def verify_version_history_models(
-        self, model_group: FormattedModelGroupDict
+        self, model_group: FormattedModelGroupForVerificationJobDict
     ) -> Tuple[str, bool]:
         """Verifies that the version history models were created correctly.
 
         Args:
-            model_group: FormattedModelGroupDict. The formatted model group.
+            model_group: FormattedModelGroupForVerificationJobDict. The
+                formatted model group for the computation job for which version
+                history models are to be verified.
 
         Returns:
             Tuple[str, bool]. The pair of exploration id and whether the
@@ -268,7 +308,16 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
     def get_exploration_from_model(
         self, exploration_model: exp_models.ExplorationModel
     ) -> Optional[exp_domain.Exploration]:
-        """Gets Exploration object from model."""
+        """Gets Exploration domain object from exploration model.
+
+        Args:
+            exploration_model: ExplorationModel. The exploration model which is
+                to be converted into Exploration domain object.
+
+        Returns:
+            Optional[exp_domain.Exploration]. The Exploration domain object
+            for the given exploration model.
+        """
         try:
             exploration = exp_fetchers.get_exploration_from_model(
                 exploration_model
@@ -452,29 +501,32 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
     """Computes and populates the version history data for an exploration."""
 
     def convert_to_formatted_model_group(
-        self, model_group: UnformattedModelGroupDict
-    ) -> Optional[FormattedModelGroupDict]:
-        """Returns True if the given model group is valid .
+        self, model_group: UnformattedModelGroupForComputationJobDict
+    ) -> Optional[FormattedModelGroupForComputationJobDict]:
+        """Converts the given unformatted model group into a formatted one.
 
         Args:
-            model_group: UnformattedModelGroupDict. The model group to be
-                checked.
+            model_group: UnformattedModelGroupForComputationJobDict.
+                The unformatted model group for the computation job which is
+                to be converted into formatted model group.
 
         Returns:
-            bool. Whether the given model group is valid or nots.
+            Optional[FormattedModelGroupForComputationJobDict]. The formatted
+            version of the given model group.
         """
         all_exp_models = model_group['all_exp_models']
         exp_models_vlatest = model_group['exp_models_vlatest']
         snapshot_metadata_models = model_group['snapshot_metadata_models']
         version_history_models = model_group['version_history_models']
 
-        response_dict: Optional[FormattedModelGroupDict] = None
+        response_dict: Optional[
+            FormattedModelGroupForComputationJobDict] = None
 
         model_group_is_valid = len(exp_models_vlatest) == 1
         if model_group_is_valid: # pragma: no cover
             exp_model_vlatest = exp_models_vlatest[0]
 
-            all_explorations: List[Optional[exp_domain.Exploration]] = (
+            all_explorations: List[Optional[exp_models.ExplorationModel]] = (
                 [None] * exp_model_vlatest.version
             )
             for exp_model in all_exp_models:
@@ -526,7 +578,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     # No entity in the above lists are None if the model group
                     # is valid.
                     explorations_without_none: List[
-                        exp_domain.Exploration] = []
+                        exp_models.ExplorationModel] = []
                     for exploration in all_explorations:
                         if exploration is not None:
                             explorations_without_none.append(exploration)
@@ -675,12 +727,8 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 return int(change.version_number)
         return None
 
-    # Here we use type Any because the custom dict FormattedModelGroupDict is
-    # not compatible here as because the explorations in that dict are of type
-    # Exploration domain object. On the other hand, we are using
-    # ExplorationModels in this job.
     def create_version_history_models(
-        self, model_group: Any
+        self, model_group: FormattedModelGroupForComputationJobDict
     ) -> Union[
         Tuple[str, List[exp_models.ExplorationVersionHistoryModel]],
         Tuple[
@@ -693,11 +741,22 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         """Creates the version history models for a particular exploration.
 
         Args:
-            model_group: FormattedModelGroupDict. The formatted model group.
+            model_group: FormattedModelGroupForComputationJobDict.
+                The formatted model group for the computation job for which
+                version history models are to be created.
 
         Returns:
-            Tuple[str, List[exp_models.ExplorationVersionHistoryModel]].
-            The exploration id along with the created version history models.
+            Union[
+                Tuple[str, List[exp_models.ExplorationVersionHistoryModel]],
+                Tuple[
+                    str,
+                    List[exp_models.ExplorationVersionHistoryModel],
+                    Union[Exception, str],
+                    int
+                ]
+            ]. The tuple of exploration id along with the created version
+            history or the tuple of exploration id along with error message
+            and version number of the exploration in case of any error.
         """
         with datastore_services.get_ndb_context():
             exp_vlatest = model_group['exp_vlatest']
@@ -869,14 +928,14 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
     def generate_exploration_from_snapshot(
         self, snapshot_model: exp_models.ExplorationSnapshotContentModel
     ) -> Optional[exp_models.ExplorationModel]:
-        """Returns the exploration model with given id at version 1.
+        """Generates exploration model from given snapshot content model.
 
         Args:
             snapshot_model: ExplorationSnapshotContentModel. The snapshot
-                content model at v1.
+                content model.
 
         Returns:
-            ExplorationModel. The exploration model at version 1.
+            ExplorationModel. The exploration model.
         """
         with datastore_services.get_ndb_context():
             try:
