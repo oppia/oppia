@@ -186,6 +186,7 @@
     "ngx-toastr": "^13.2.1",
     "ngx-translate-cache": "^9.0.2",
     "ngx-trim-directive": "^1.1.0",
+    "popper.js": "^1.16.1",
     "proxy-polyfill": "^0.3.2",
     "requireindex": "^1.2.0",
     "rxjs": "^6.0.0",

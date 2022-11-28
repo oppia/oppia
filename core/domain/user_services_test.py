@@ -670,7 +670,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_email_prefs.can_receive_subscription_email,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
-    def test_add_user_to_android_list(self) -> None:
+    def test_add_user_to_mailing_list(self) -> None:
         def _mock_add_or_update_user_status(
             unused_email: str,
             merge_fields: Dict[str, str],
@@ -689,8 +689,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             _mock_add_or_update_user_status)
         with fn_swap:
             self.assertTrue(
-                user_services.add_user_to_android_list(
-                    'email@example.com', 'Name'))
+                user_services.add_user_to_mailing_list(
+                    'email@example.com', 'Name', 'Android'))
 
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'

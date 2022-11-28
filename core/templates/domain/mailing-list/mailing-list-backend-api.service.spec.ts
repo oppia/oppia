@@ -18,10 +18,10 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { AndroidUpdatesBackendApiService } from './android-updates-backend-api.service';
+import { MailingListBackendApiService } from './mailing-list-backend-api.service';
 
 describe('Android updates backend api service', () => {
-  let aubas: AndroidUpdatesBackendApiService;
+  let aubas: MailingListBackendApiService;
   let httpTestingController: HttpTestingController;
   let successHandler: jasmine.Spy<jasmine.Func>;
   let failHandler: jasmine.Spy<jasmine.Func>;
@@ -30,7 +30,7 @@ describe('Android updates backend api service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    aubas = TestBed.inject(AndroidUpdatesBackendApiService);
+    aubas = TestBed.inject(MailingListBackendApiService);
     httpTestingController = TestBed.inject(HttpTestingController);
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
@@ -42,11 +42,11 @@ describe('Android updates backend api service', () => {
 
   it('should use the rejection handler if the backend request failed.',
     fakeAsync(() => {
-      aubas.subscribeUserToAndroidList('email@example.com', 'name').then(
+      aubas.subscribeUserToMailingList('email@example.com', 'name', 'Web').then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/androidlistsubscriptionhandler');
+        '/mailinglistsubscriptionhandler');
       expect(req.request.method).toEqual('PUT');
 
       req.flush({
@@ -62,18 +62,19 @@ describe('Android updates backend api service', () => {
   );
 
   it('should subscribe user to android list' +
-  'when calling subscribeUserToAndroidList', fakeAsync(() => {
+  'when calling subscribeUserToMailingList', fakeAsync(() => {
     let email = 'email@example.com';
     let name = 'username';
     let payload = {
       email: email,
       name: name,
+      tag: 'Android'
     };
-    aubas.subscribeUserToAndroidList(email, name)
+    aubas.subscribeUserToMailingList(email, name, 'Android')
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/androidlistsubscriptionhandler');
+      '/mailinglistsubscriptionhandler');
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
 

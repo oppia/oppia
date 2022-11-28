@@ -1,144 +1,693 @@
 <div class="donate-page">
-  <div class="oppia-page-card oppia-static-content e2e-test-donate-page">
-    <div class="oppia-donation-card-content-wide">
-      <div class="oppia-donate-options">
-        <div *ngIf="windowIsNarrow">
-          <h1 class="oppia-donate-h1"><span [innerHTML]="'I18N_DONATE_PAGE_TITLE' | translate"></span></h1>
+  <div class="oppia-donate-page-banner">
+    <div class="container">
+      <h1 class="text-light oppia-donate-page-heading">
+        {{ 'I18N_DONATE_PAGE_TITLE' | translate }}
+      </h1>
+    </div>
+  </div>
+  <div class="oppia-page-card mt-0 mb-0 bg-white">
+    <div class="container oppia-donate-page-main-content-container">
+      <div class="row">
+        <div class="col-sm-7">
+          <div class="oppia-donation-card-content-wide oppia-donate-page-video-section bg-white mt-0 d-block border text-dark">
+            <div class="mb-5 bg-white"
+                 [innerHTML]="'I18N_DONATE_PAGE_VISION_TEXT' | translate">
+            </div>
+            <iframe class="oppia-donate-page-video"
+                    src="https://www.youtube.com/embed/oJQrQK8cdoM"
+                    title="YouTube video player"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+            </iframe>
+          </div>
         </div>
-        <div *ngIf="!windowIsNarrow">
-          <h1 class="oppia-donate-h1"><span [innerHTML]="'I18N_DONATE_PAGE_TITLE' | translate"></span></h1>
-        </div>
-        <div class="text-center">
-          <form ngNoForm action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-            <input type="hidden" name="cmd" value="_s-xclick">
-            <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
-            <button type="submit" class="btn oppia-donate-options-button e2e-test-paypal-donate-button" tabindex="0" (click)="onDonateThroughPayPal()">
-              PayPal
-            </button>
-          </form>
-        </div>
-        <div class="text-center">
-          <form ngNoForm action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-            <input type="hidden" name="cmd" value="_s-xclick">
-            <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
-            <button class="btn oppia-donate-options-button e2e-test-credit-card-donate-button" tabindex="0" (click)="onDonateThroughPayPal()">
-              Credit Card
-            </button>
-          </form>
-        </div>
-        <div class="text-center">
-          <a (click)="onDonateThroughAmazon()" class="btn oppia-donate-options-button" tabindex="0">Amazon Smile</a>
-        </div>
-        <h2 class="oppia-gift-funds-text">
-          <span [innerHTML]="'I18N_DONATE_PAGE_IMAGE_TITLE' | translate"></span>
-        </h2>
-        <div class="oppia-donate-img-container text-center">
-          <img [src]="donateImgUrl" alt="Server costs, student outreach, marketing">
-        </div>
-      </div>
-      <div class="oppia-donate-info">
-        <div class="position-relative oppia-meet-contributors-iframe-container">
-          <iframe title="Meet Oppia's Contributors"
-                  width="100%"
-                  height="100%"
-                  src="https://www.youtube.com/embed/OConyxG7HaM?rel=0&cc_lang_pref=en&cc_load_policy=1"
-                  frameborder="0"
-                  allowfullscreen
-                  class="position-absolute w-100 h-100 oppia-meet-contributors-iframe">
-          </iframe>
-        </div>
-        <h3 class="oppia-donate-h3">
-          <em>
-            <span [innerHTML]="'I18N_DONATE_PAGE_VIDEO_SUBTITLE' | translate"></span>
-          </em>
-        </h3>
-        <div class="oppia-vision-text-container">
-          <p class="oppia-vision-text">
-            <span [innerHTML]="'I18N_DONATE_PAGE_VISION_TEXT_ONE' | translate"></span>
-          </p>
-          <p class="oppia-vision-text">
-            <span [innerHTML]="'I18N_DONATE_PAGE_VISION_TEXT_TWO' | translate"></span>
-          </p>
+        <div class="col-sm-5">
+          <div>
+            <script src="https://donorbox.org/widget.js" paypalExpress="false"></script>
+            <iframe src="https://donorbox.org/embed/test-campaign-628"
+                    name="donorbox"
+                    allowpaymentrequest="allowpaymentrequest"
+                    seamless="seamless"
+                    frameborder="0"
+                    scrolling="no"
+                    height="650px"
+                    width="100%"
+                    class="donate-page-iframe e2e-test-donate-page-iframe"
+                    title="donorbox">
+            </iframe>
+          </div>
         </div>
       </div>
-
+    </div>
+  </div>
+  <div class="oppia-page-card mt-0 mb-0 oppia-donate-page-section-gray-bg">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row container donate-page-section-heading">
+            <span>
+              {{ 'I18N_DONATE_PAGE_HEADING_1' | translate }}
+              <span class="oppia-donate-page-text-color">
+                {{ 'I18N_DONATE_PAGE_HEADING_2' | translate }}
+              </span>
+            </span>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="oppia-donate-page-feature-text-container">
+                <div class="oppia-donate-page-text-color oppia-donate-page-feature-text">
+                  1,500,000+
+                </div>
+                <div>{{ 'I18N_DONATE_PAGE_STATISTIC_1' | translate }}</div>
+              </div>
+              <div class="oppia-donate-page-feature-text-container">
+                <div class="oppia-donate-page-text-color oppia-donate-page-feature-text">
+                  2,000
+                </div>
+                <div>{{ 'I18N_DONATE_PAGE_STATISTIC_2' | translate }}</div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="oppia-donate-page-feature-text-container">
+                <div class="oppia-donate-page-text-color oppia-donate-page-feature-text">
+                  1
+                </div>
+                <div>{{ 'I18N_DONATE_PAGE_STATISTIC_3' | translate }}</div>
+              </div>
+              <div class="oppia-donate-page-feature-text-container">
+                <div class="oppia-donate-page-text-color oppia-donate-page-feature-text">
+                  100+
+                </div>
+                <div>{{ 'I18N_DONATE_PAGE_STATISTIC_4' | translate }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-5">
+            <div class="col-sm-6">
+              <a class="btn oppia-donate-page-watch-video-btn"
+                 href="https://youtu.be/OConyxG7HaM">
+                {{ 'I18N_DONATE_PAGE_WATCH_VIDEO_BUTTON_TEXT' | translate }}
+              </a>
+            </div>
+            <div class="col-sm-6">
+              <!-- TODO(#16643): Update Blog URL after blog migration is complete -->
+              <a class="btn oppia-donate-page-read-blog-btn"
+                 href="https://medium.com/oppia-org">
+                {{ 'I18N_DONATE_PAGE_READ_BLOG_BUTTON_TEXT' | translate }}
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <picture class="oppia-donate-page-learner-img-container">
+            <source type="image/webp"
+                    [srcset]="getImageSet('/donate/oppia-donate-learner', 'webp')">
+            <source type="image/png"
+                    [srcset]="getImageSet('/donate/oppia-donate-learner', 'png')">
+            <img [src]="getStaticImageUrl('/donate/oppia-donate-learner', 'png')"
+                 class="img-fluid"
+                 height="400px"
+                 width="400px"
+                 loading="lazy"
+                 alt="Logo of Oppia containing photos of learners">
+          </picture>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-page-card mt-0 mb-0 bg-white">
+    <div class="container">
+      <div class="row">
+        <div class="donate-page-section-heading oppia-donate-page-text-color donate-page-spending-explanation-heading">
+          {{ 'I18N_DONATE_PAGE_BUDGET_HEADING' | translate }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="oppia-donate-page-money-card">
+            <div class="container">
+              <div class="row">
+                <img class="oppia-donate-page-money-icon"
+                     [src]="getStaticImageUrl('/donate/oppia-donate-outreach.svg')"
+                     alt="">
+              </div>
+              <div class="row oppia-donate-page-money-main-text">
+                {{ 'I18N_DONATE_PAGE_BUDGET_SUBHEADING_1' | translate }}
+              </div>
+              <hr class="w-25 oppia-donate-page-hr">
+              <div class="row oppia-donate-page-money-sub-text">
+                {{ 'I18N_DONATE_PAGE_BUDGET_SUBHEADING_EXPLANATION_1' | translate }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="oppia-donate-page-money-card">
+            <div class="container">
+              <div class="row">
+                <img class="oppia-donate-page-money-icon"
+                     [src]="getStaticImageUrl('/donate/oppia-donate-spread-word.svg')"
+                     alt="">
+              </div>
+              <div class="row oppia-donate-page-money-main-text">
+                {{ 'I18N_DONATE_PAGE_BUDGET_SUBHEADING_2' | translate }}
+              </div>
+              <hr class="w-25 oppia-donate-page-hr">
+              <div class="row oppia-donate-page-money-sub-text">
+                {{ 'I18N_DONATE_PAGE_BUDGET_SUBHEADING_EXPLANATION_2' | translate }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="oppia-donate-page-money-card">
+            <div class="container">
+              <div class="row">
+                <img class="oppia-donate-page-money-icon"
+                     [src]="getStaticImageUrl('/donate/oppia-donate-maintenance.svg')"
+                     alt="">
+              </div>
+              <div class="row oppia-donate-page-money-main-text">
+                {{ 'I18N_DONATE_PAGE_BUDGET_SUBHEADING_3' | translate }}
+              </div>
+              <hr class="w-25 oppia-donate-page-hr">
+              <div class="row oppia-donate-page-money-sub-text">
+                {{ 'I18N_DONATE_PAGE_BUDGET_SUBHEADING_EXPLANATION_3' | translate }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-page-card mt-0 mb-0 oppia-donate-page-section-gray-bg">
+    <div class="row justify-content-center">
+      <div class="donate-page-section-heading">
+        {{ 'I18N_DONATE_PAGE_LEARNER_FEEDBACK_SECTION_HEADING' | translate }}
+      </div>
+    </div>
+    <div id="donate-page-learner-carousel" class="carousel slide" data-ride="carousel">
+      <ol class="carousel-indicators">
+        <li data-target="#donate-page-learner-carousel" data-slide-to="0" class="active"></li>
+        <li data-target="#donate-page-learner-carousel" data-slide-to="1"></li>
+        <li data-target="#donate-page-learner-carousel" data-slide-to="2"></li>
+      </ol>
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <div class="container">
+            <div class="row justify-content-center pt-5">
+              <div class="oppia-donate-page-carousel-img-wrapper">
+                <picture>
+                  <source type="image/webp" [srcset]="getImageSet('/splash/Gaurav', 'webp')">
+                  <source type="image/png" [srcset]="getImageSet('/splash/Gaurav', 'png')">
+                  <img [src]="getStaticImageUrl('/splash/Gaurav', 'png')"
+                       class="rounded-circle oppia-donate-contributor-img"
+                       alt="Logo of Oppia containing photo of a learner">
+                </picture>
+              </div>
+            </div>
+            <div class="row">
+              <div class="carousel-caption text-dark mb-5">
+                <div class="text-center h2">
+                  {{ 'I18N_DONATE_PAGE_LEARNER_FEEDBACK_PLACE_TEXT_1' | translate }}
+                </div>
+                <p class="text-center oppia-donate-student-feedback-text">
+                  “{{ 'I18N_DONATE_PAGE_LEARNER_FEEDBACK_TEXT_1' | translate }}”
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="container">
+            <div class="row justify-content-center pt-5">
+              <div class="oppia-donate-page-carousel-img-wrapper">
+                <picture>
+                  <source type="image/webp" [srcset]="getImageSet('/splash/mira', 'webp')">
+                  <source type="image/png" [srcset]="getImageSet('/splash/mira', 'png')">
+                  <img [src]="getStaticImageUrl('/splash/mira', 'png')"
+                       class="rounded-circle oppia-donate-contributor-img"
+                       alt="Logo of Oppia containing photo of a learner">
+                </picture>
+              </div>
+            </div>
+            <div class="row">
+              <div class="carousel-caption text-dark mb-5">
+                <div class="text-center h2">
+                  {{ 'I18N_DONATE_PAGE_LEARNER_FEEDBACK_PLACE_TEXT_2' | translate }}
+                </div>
+                <p class="text-center oppia-donate-student-feedback-text">
+                  “{{ 'I18N_DONATE_PAGE_LEARNER_FEEDBACK_TEXT_2' | translate }}”
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="container">
+            <div class="row justify-content-center pt-5">
+              <div class="oppia-donate-page-carousel-img-wrapper">
+                <picture>
+                  <source type="image/webp" [srcset]="getImageSet('/splash/Dheeraj', 'webp')">
+                  <source type="image/png" [srcset]="getImageSet('/splash/Dheeraj', 'png')">
+                  <img [src]="getStaticImageUrl('/splash/Dheeraj', 'png')"
+                       class="rounded-circle oppia-donate-contributor-img"
+                       alt="Logo of Oppia containing photo of a learner">
+                </picture>
+              </div>
+            </div>
+            <div class="row">
+              <div class="carousel-caption text-dark mb-5">
+                <div class="text-center h2">
+                  {{ 'I18N_DONATE_PAGE_LEARNER_FEEDBACK_PLACE_TEXT_3' | translate }}
+                </div>
+                <p class="text-center oppia-donate-student-feedback-text">
+                  “{{ 'I18N_DONATE_PAGE_LEARNER_FEEDBACK_TEXT_3' | translate }}”
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-control-prev"
+           type="button"
+           data-target="#donate-page-learner-carousel"
+           data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </div>
+      <div class="carousel-control-next"
+           type="button"
+           data-target="#donate-page-learner-carousel"
+           data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-page-card mt-0 mb-0 bg-white">
+    <div class="container">
+      <div class="row">
+        <div class="donate-page-section-heading oppia-donate-page-text-color mb-5">
+          {{ 'I18N_DONATE_PAGE_FAQ_HEADING_TEXT' | translate }}
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="mb-3">
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header class="font-weight-bold oppia-donate-faq-title">
+                  <mat-panel-title>
+                    {{ 'I18N_DONATE_PAGE_FAQ_QUESTION_1' | translate }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="pt-4">
+                  {{ 'I18N_DONATE_PAGE_FAQ_ANSWER_1' | translate }}
+                </p>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+          <div class="mb-3">
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header class="font-weight-bold oppia-donate-faq-title">
+                  <mat-panel-title>
+                    {{ 'I18N_DONATE_PAGE_FAQ_QUESTION_2' | translate }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="pt-4">
+                  {{ 'I18N_DONATE_PAGE_FAQ_ANSWER_2' | translate }}
+                </p>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+          <div class="mb-3">
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header class="font-weight-bold oppia-donate-faq-title">
+                  <mat-panel-title>
+                    {{ 'I18N_DONATE_PAGE_FAQ_QUESTION_3' | translate }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="pt-4">
+                  {{ 'I18N_DONATE_PAGE_FAQ_ANSWER_3' | translate }}
+                </p>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+          <div class="mb-3">
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header class="font-weight-bold oppia-donate-faq-title">
+                  <mat-panel-title>
+                    {{ 'I18N_DONATE_PAGE_FAQ_QUESTION_4' | translate }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="pt-4">
+                  {{ 'I18N_DONATE_PAGE_FAQ_ANSWER_4_1' | translate }}
+                </p>
+                <p>
+                  {{ 'I18N_DONATE_PAGE_FAQ_ANSWER_4_2' | translate }}
+                </p>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+          <div class="mb-3">
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header class="font-weight-bold oppia-donate-faq-title">
+                  <mat-panel-title>
+                    {{ 'I18N_DONATE_PAGE_FAQ_QUESTION_5' | translate }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="pt-4">
+                  {{ 'I18N_DONATE_PAGE_FAQ_ANSWER_5' | translate }}
+                </p>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+          <div class="mb-3">
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header class="font-weight-bold oppia-donate-faq-title">
+                  <mat-panel-title>
+                    {{ 'I18N_DONATE_PAGE_FAQ_QUESTION_6' | translate }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="pt-4">
+                  {{ 'I18N_DONATE_PAGE_FAQ_ANSWER_6' | translate }}
+                </p>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+          <div class="mb-3">
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header class="font-weight-bold oppia-donate-faq-title">
+                  <mat-panel-title>
+                    {{ 'I18N_DONATE_PAGE_FAQ_QUESTION_7' | translate }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="pt-4">
+                  {{ 'I18N_DONATE_PAGE_FAQ_ANSWER_7' | translate }}
+                </p>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+          <div class="mb-3">
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header class="font-weight-bold oppia-donate-faq-title">
+                  <mat-panel-title>
+                    {{ 'I18N_DONATE_PAGE_FAQ_QUESTION_8' | translate }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="pt-4">
+                  {{ 'I18N_DONATE_PAGE_FAQ_ANSWER_8' | translate }}
+                </p>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+          <div class="mb-3">
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header class="font-weight-bold oppia-donate-faq-title">
+                  <mat-panel-title>
+                    {{ 'I18N_DONATE_PAGE_FAQ_QUESTION_9' | translate }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="pt-4">
+                  {{ 'I18N_DONATE_PAGE_FAQ_ANSWER_9' | translate }}
+                </p>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+          <div class="mb-3">
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header class="font-weight-bold oppia-donate-faq-title">
+                  <mat-panel-title>
+                    {{ 'I18N_DONATE_PAGE_FAQ_QUESTION_10' | translate }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p class="pt-4">
+                  {{ 'I18N_DONATE_PAGE_FAQ_ANSWER_10' | translate }}
+                </p>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="oppia-page-card mt-0 mb-0 bg-white">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-7">
+          <div class="donate-page-section-heading oppia-donate-page-text-color mb-5">
+            {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_TEXT_1' | translate }}
+          </div>
+          <div class="mb-5">
+            <div class="donate-page-subscribe-text">
+              {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_TEXT_2' | translate }}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="p-5">
+            <div class="m-4">
+              <label id="name">
+                {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_NAME_LABEL_TEXT' | translate }}
+              </label>
+              <input class="w-100"
+                     type="text"
+                     [(ngModel)]="name"
+                     [ngModelOptions]="{standalone: true}"
+                     required="true"
+                     aria-labelledby="name">
+            </div>
+            <div class="m-4">
+              <label id="email">
+                {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_EMAIL_LABEL_TEXT' | translate }}
+                <span class="oppia-donate-asterisk-color">*</span>
+              </label>
+              <input class="w-100"
+                     type="email"
+                     [(ngModel)]="emailAddress"
+                     [ngModelOptions]="{standalone: true}"
+                     required="true"
+                     aria-labelledby="email">
+            </div>
+            <div class="text-center m-4">
+              <button [disabled]="!validateEmailAddress()"
+                      (click)="subscribeToMailingList()"
+                      class="btn oppia-donate-subscribe-button">
+                {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_SUBSCRIBE_LABEL_TEXT' | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-8">
+          <img class="oppia-donate-page-avatar-img" [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
+        </div>
+      </div>
     </div>
   </div>
 </div>
 <style>
-  h1.oppia-donate-h1 {
+  .oppia-donate-asterisk-color {
+    color: #ff3a44;
+    font-weight: 700;
+  }
+  .oppia-donate-subscribe-button {
+    background: #00645c;
+    border-radius: 4px;
     color: #fff;
-    font-size: 1.5em;
-    line-height: 1.7em;
-    margin-top: 60px;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    width: 100%;
+  }
+  .oppia-donate-contributor-img {
+    max-width: 200px;
+  }
+  .oppia-donate-page-avatar-img {
+    margin-bottom: -53px;
+    margin-left: 70px;
+    position: relative;
+    z-index: 100;
+  }
+  .oppia-donate-page .carousel-control-prev-icon,
+  .oppia-donate-page .carousel-control-next-icon {
+    background-color: #094142;
+    background-image: none;
+    background-size: 100%, 100%;
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+  }
+
+  .oppia-donate-page .carousel-control-next-icon:after {
+    color: #fff;
+    content: '>';
+    font-size: 25px;
+  }
+
+  .oppia-donate-page .carousel-control-prev-icon:after {
+    color: #fff;
+    content: '<';
+    font-size: 25px;
+  }
+
+  .oppia-donate-student-feedback-text {
+    margin: 0 auto;
+    max-width: 800px;
+  }
+  .oppia-donate-page-banner {
+    background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)), url('/assets/images/donate/donate-page-banner.webp');
+    background-size: cover;
+    height: 350px;
+  }
+  .oppia-donate-page-main-content-container {
+    margin-top: -97px;
+  }
+  .oppia-donate-page-heading {
+    padding-top: 120px;
+    position: relative;
     text-align: center;
+    text-shadow: 1px 1px #000;
+    z-index: 10;
   }
-  h3.oppia-donate-h3 {
-    font-size: .80em;
-    font-weight: normal;
-    margin: 2.33em 0;
-    text-align: center;
-  }
-  .donate-page .oppia-donation-card-content-wide {
-    margin: 40px auto 80px;
-    min-height: 670px;
-    overflow: auto;
-  }
-  .donate-page .oppia-donate-options {
-    background-color: #009688;
+  .oppia-donate-page-img {
     display: block;
-    float: right;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    padding: 10px 10px 35px 10px;
-    width: 340px;
+    filter: grayscale(40%);
+    margin-right: 30px;
+    margin-top: -80px;
+    text-align: right;
+    z-index: -10;
   }
-  .donate-page .btn.oppia-donate-options-button {
+  .oppia-donate-page-video {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+  }
+  .donate-page-section-heading {
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 400;
+  }
+  .oppia-donate-page-section-gray-bg {
+    background: #f4f4f4;
+  }
+  .oppia-donate-page-learner-img-container {
+    display: block;
+    text-align: center;
+  }
+  .oppia-donate-page-text-color {
+    color: #015c53;
+  }
+  .oppia-donate-page-feature-text {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-weight: 700;
+    margin-top: 50px;
+  }
+  .oppia-donate-page-money-card {
+    box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 24%);
+    margin: 20px;
+    padding: 35px;
+  }
+  .oppia-donate-page-money-icon {
+    display: block;
+    margin: 0 auto;
+  }
+  .oppia-donate-page-money-main-text {
+    color: #252b42;
+    display: block;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 23px;
+    font-weight: 400;
+    padding-top: 10px;
+    text-align: center;
+  }
+  .oppia-donate-page-money-sub-text {
+    color: #737373;
+    display: block;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    padding-top: 10px;
+    text-align: center;
+  }
+  .donate-page .oppia-page-card {
+    box-shadow: none;
+  }
+  .oppia-donate-page-watch-video-btn {
     background-color: #00645c;
     border-radius: 4px;
-    color: rgba(255,255,255,1.0);
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    height: 40px;
-    letter-spacing: 0.7px;
-    margin: 10px auto;
-    width: 180px;
-  }
-  .donate-page .btn.oppia-donate-options-button:hover,
-  .donate-page .btn.oppia-donate-options-button:focus {
-    background-color: #3d9991;
-    color: rgba(255,255,255,1);
-  }
-  .donate-page .oppia-donate-info {
-    float: left;
-    padding-bottom: 30px;
-    width: calc(100% - 340px);
-  }
-  .donate-page .oppia-gift-funds-text {
     color: #fff;
-    font-size: 24px;
-    margin-bottom: 20px;
-    margin-top: 20px;
+    margin: 10px auto;
+    width: 100%;
   }
-  .donate-page .oppia-donate-img-container {
-    margin-bottom: 16px;
+  .oppia-donate-page-read-blog-btn {
+    border: 1px solid #00645c;
+    border-radius: 4px;
+    color: #00645c;
+    margin: 10px auto;
+    width: 100%;
   }
-  .donate-page .oppia-meet-contributors-iframe-container {
-    height: 0;
-    margin: 60px auto 0 auto;
-    padding-bottom: 56.25%;
-    width: 70%;
+  .oppia-donate-page-feature-text-container {
+    height: 50px;
   }
-  .donate-page .oppia-meet-contributors-iframe {
-    left: 0;
-    top: 0;
+  .donate-page-spending-explanation-heading {
+    padding-left: 30px;
   }
-  .donate-page .oppia-vision-text-container {
+  .oppia-donate-page-hr {
+    background-color: #e74040;
+    border: none;
+    color: #e74040;
+    height: 1px;
+  }
+  .oppia-donate-page-carousel-img-wrapper {
+    height: 400px;
+  }
+  .oppia-donate-page-carousel-img-wrapper img {
+    display: block;
     margin: 0 auto;
-    width: 70%;
   }
-  .donate-page .oppia-vision-text {
-    font-size: 0.825em;
+  .donate-page .mat-expansion-panel-header,
+  .donate-page .mat-expansion-panel-header:hover {
+    background: #c6dcda;
+    height: auto;
+    padding: 10px;
+  }
+  .donate-page-subscribe-text {
+    max-width: 400px;
+  }
+  @media (hover: none) {
+    .donate-page .mat-expansion-panel:not(.mat-expanded):not([aria-disabled='true'])
+    .donate-page .mat-expansion-panel-header:hover {
+      background: #c6dcda;
+      height: auto;
+      padding: 10px;
+    }
+  }
+  .carousel-indicators li {
+    background-color: #00645c;
+  }
+  .donate-page .oppia-donation-card-content-wide {
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 24%);
+    margin: 40px auto 80px;
+    margin-bottom: 80px;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: auto;
+    padding: 30px 55px 30px 45px;
   }
 
   @media (max-width: 600px) {
@@ -147,15 +696,6 @@
       flex-direction: column-reverse;
       width: 100%;
     }
-    .donate-page .oppia-donate-info {
-      width: 100%;
-    }
-    .donate-page .oppia-donate-options {
-      width: 100%;
-    }
-    .oppia-donate-info, .oppia-donate-options {
-      flex: 1;
-    }
   }
   @media only screen and (max-width: 1160px) and (min-width: 600px) {
     .oppia-donation-card-content-wide {
@@ -163,9 +703,20 @@
       flex-direction: row-reverse;
       width: 100%;
     }
-
-    .oppia-donate-info, .oppia-donate-options {
-      flex: 1;
+  }
+  @media (max-width: 700px) {
+    .oppia-donate-page-carousel-img-wrapper {
+      height: 500px;
     }
+  }
+  @media (max-width: 400px) {
+    .oppia-donate-page-carousel-img-wrapper {
+      height: 600px;
+    }
+  }
+  .donate-page-iframe {
+    max-height: none;
+    max-width: 500px;
+    min-width: 250px;
   }
 </style>

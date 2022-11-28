@@ -20,7 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, EventEmitter, ElementRef } from '@angular/core';
 import { TestBed, fakeAsync, tick, flushMicrotasks } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
-import { AndroidUpdatesBackendApiService } from 'domain/android-updates/android-updates-backend-api.service';
+import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
 
 import { AndroidPageComponent } from './android-page.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -61,7 +61,7 @@ class MockTranslateService {
 describe('Android page', () => {
   let translateService: TranslateService;
   let pageTitleService: PageTitleService;
-  let androidUpdatesBackendApiService: AndroidUpdatesBackendApiService;
+  let mailingListBackendApiService: MailingListBackendApiService;
   let alertsService: AlertsService;
 
   beforeEach(async() => {
@@ -70,7 +70,7 @@ describe('Android page', () => {
       declarations: [AndroidPageComponent, MockTranslatePipe],
       providers: [
         AlertsService,
-        AndroidUpdatesBackendApiService,
+        MailingListBackendApiService,
         UrlInterpolationService,
         PageTitleService,
         {
@@ -89,8 +89,8 @@ describe('Android page', () => {
       AndroidPageComponent);
     component = androidPageComponent.componentInstance;
     alertsService = TestBed.inject(AlertsService);
-    androidUpdatesBackendApiService = TestBed.inject(
-      AndroidUpdatesBackendApiService);
+    mailingListBackendApiService = TestBed.inject(
+      MailingListBackendApiService);
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
   });
@@ -166,7 +166,7 @@ describe('Android page', () => {
       tick();
       component.emailAddress = 'validEmail@example.com';
       component.name = 'validName';
-      spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
         .and.returnValue(Promise.resolve(true));
 
       component.subscribeToAndroidList();
@@ -184,7 +184,7 @@ describe('Android page', () => {
       tick();
       component.emailAddress = 'validEmail@example.com';
       component.name = 'validName';
-      spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
         .and.returnValue(Promise.resolve(false));
 
       component.subscribeToAndroidList();
@@ -203,7 +203,7 @@ describe('Android page', () => {
       tick();
       component.emailAddress = 'validEmail@example.com';
       component.name = 'validName';
-      spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
         .and.returnValue(Promise.reject(false));
 
       component.subscribeToAndroidList();
