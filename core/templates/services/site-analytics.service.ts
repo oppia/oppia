@@ -402,7 +402,7 @@ export class SiteAnalyticsService {
       totalScore: number
   ): void {
     this._sendEventToGoogleAnalytics(
-      'practice_session_end', {
+      'practice_session_complete', {
         classroom_name: classroomName,
         topic_name: topicName,
         practice_session_id: stringifiedSubtopicIds,

@@ -677,7 +677,7 @@ describe('Site Analytics Service', () => {
         'math', 'topic', '1,2,3', 10, 10);
 
       expect(gtagSpy).toHaveBeenCalledWith(
-        'event', 'practice_session_end',
+        'event', 'practice_session_complete',
         {
           classroom_name: 'math',
           topic_name: 'topic',
