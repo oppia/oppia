@@ -275,7 +275,7 @@ export class VersionHistoryService {
     this.latestVersionOfExploration = version;
   }
 
-  getCurrentPositionInStateVersionHistoryList(): number | null {
+  getCurrentPositionInStateVersionHistoryList(): number {
     return this.currentPositionInStateVersionHistoryList;
   }
 
@@ -296,7 +296,7 @@ export class VersionHistoryService {
       this.currentPositionInStateVersionHistoryList + 1);
   }
 
-  getCurrentPositionInMetadataVersionHistoryList(): number | null {
+  getCurrentPositionInMetadataVersionHistoryList(): number {
     return this.currentPositionInMetadataVersionHistoryList;
   }
 
