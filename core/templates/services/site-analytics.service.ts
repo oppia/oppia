@@ -76,8 +76,6 @@ export class SiteAnalyticsService {
   }
 
   registerNewSignupEvent(srcElement: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'OnboardingEngagement', 'signup', 'AccountSignUp');
     this._sendEventToGoogleAnalytics('sign_up', {
       source_element: srcElement
     });
