@@ -46,7 +46,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from html2image import Html2Image
+import html2image
 from typing import Dict, Final, List, Mapping, Tuple, Union
 
 MYPY = False
@@ -6305,7 +6305,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             return 'test_123'
 
         with self.swap(uuid, 'uuid4', mock_uuid):
-            with self.swap(Html2Image, 'screenshot', self.mock_screenshot):
+            with self.swap(html2image.Html2Image, 'screenshot', self.mock_screenshot):
                 with self.assertRaisesRegex(
                     Exception,
                     'Image generation failed.'
