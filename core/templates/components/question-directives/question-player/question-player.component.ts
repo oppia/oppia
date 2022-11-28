@@ -556,13 +556,6 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
             QuestionPlayerConstants.HASH_PARAM.length));
 
         if (resultHashString) {
-          this.siteAnalyticsService.registerPracticeSessionEndEvent(
-            this.urlService.getClassroomUrlFragmentFromUrl(),
-            this.urlService.getTopicUrlFragmentFromLearnerUrl(),
-            Object.keys(this.scorePerSkillMapping).toString(),
-            this.totalQuestions,
-            this.totalScore
-          );
           this.initResults();
           let questionStateData = JSON.parse(resultHashString);
           this.calculateScores(questionStateData);
@@ -571,6 +564,13 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
           }
 
           this.testIsPassed = this.hasUserPassedTest();
+          this.siteAnalyticsService.registerPracticeSessionEndEvent(
+            this.urlService.getClassroomUrlFragmentFromUrl(),
+            this.urlService.getTopicUrlFragmentFromLearnerUrl(),
+            Object.keys(this.scorePerSkillMapping).toString(),
+            this.totalQuestions,
+            this.totalScore
+          );
         }
       });
 
