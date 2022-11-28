@@ -159,7 +159,7 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
 class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
     """Audit profile pictures are present in GCS."""
 
-    def _png_base64_to_webp_base64(png_base64: str) -> str:
+    def _png_base64_to_webp_base64(self, png_base64: str) -> str:
         """Convert png base64 to webp base64.
 
         Args:

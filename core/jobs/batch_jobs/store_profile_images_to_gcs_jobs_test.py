@@ -135,7 +135,7 @@ class AuditProfilePictureFromGCSJobTests(job_test_utils.JobTestBase):
         filepath_png = f'user/{username}/profile_picture.png'
         filepath_webp = f'user/{username}/profile_picture.webp'
         png_binary = utils.convert_png_data_url_to_binary(data_url)
-        webp_binary = self._push_file_to_gcs(png_binary)
+        webp_binary = self._get_webp_binary_data(png_binary)
         storage_services.commit(bucket, filepath_png, png_binary, None)
         storage_services.commit(bucket, filepath_webp, webp_binary, None)
 
@@ -209,11 +209,14 @@ class AuditProfilePictureFromGCSJobTests(job_test_utils.JobTestBase):
             user_services.DEFAULT_IDENTICON_DATA_URL)
         valid_image_png_binary = utils.convert_png_data_url_to_binary(
             VALID_IMAGE)
-        webp_binary = self._push_file_to_gcs(valid_image_png_binary)
+        webp_binary = self._get_webp_binary_data(valid_image_png_binary)
         storage_services.commit(bucket, filepath_png, png_binary, None)
         storage_services.commit(bucket, filepath_webp, webp_binary, None)
 
         self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='TOTAL PNG IMAGES ITERATED ON GCS SUCCESS: 1'
+            ),
             job_run_result.JobRunResult(
                 stdout='TOTAL WEBP IMAGES ITERATED ON GCS SUCCESS: 1'
             ),
