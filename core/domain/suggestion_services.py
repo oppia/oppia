@@ -3207,6 +3207,8 @@ def _generate_contributor_certificate_image(template: str) -> str:
     hti = html2image.Html2Image()
     filename = str(uuid.uuid4()) + '.png'
 
+    # TODO(#16632): Certificate file should not be saved into the file
+    # system.
     image_paths = hti.screenshot(
         html_str=template, save_as=filename, size=(
             constants.CONTRIBUTOR_CERTIFICATE_WIDTH,

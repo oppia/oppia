@@ -2,13 +2,16 @@
   <div class="stats-contribution-type-mobile-container">
     <div class="dropdown-label">Type</div>
     <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
-      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleMobileDropdown()">
+      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected"
+           (click)="toggleMobileDropdown()">
         {{selectedContributionType}}
-        <span class="fas fa-sort-down oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': mobileDropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+        <span class="fas fa-sort-down oppia-contributions-dropdown-arrow"
+              [ngStyle]="{ 'transform': mobileDropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
         </span>
       </div>
 
-      <div *ngIf="mobileDropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
+      <div *ngIf="mobileDropdownShown"
+           class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
         <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
              (click)="selectOption(option.contributionType)"
              *ngFor="let option of options"
@@ -26,13 +29,16 @@
   </div>
   <div class="stats-contribution-type-container">
     <div #dropdown class="oppia-stats-type-selector-container e2e-test-topic-selector">
-      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleDropdown()">
+      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected"
+           (click)="toggleDropdown()">
         {{selectedContributionType}}
-        <span class="fas fa-caret-down oppia-stats-type-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+        <span class="fas fa-caret-down oppia-stats-type-selector-inner-container-arrow"
+              [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
         </span>
       </div>
 
-      <div *ngIf="dropdownShown" class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
+      <div *ngIf="dropdownShown"
+           class="oppia-stats-type-selector-dropdown-container e2e-test-topic-selector-dropdown">
         <div class="oppia-stats-type-selector-dropdown-option e2e-test-topic-selector-option"
              *ngFor="let option of options"
              (click)="selectOption(option.contributionType)"

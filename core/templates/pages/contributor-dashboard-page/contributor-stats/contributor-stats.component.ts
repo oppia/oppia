@@ -293,7 +293,8 @@ export class ContributorStatsComponent {
   }
 
   createTranslationContributionStat(
-      stat: TranslationContributionBackendDict): TranslationContributionStats {
+      stat: TranslationContributionBackendDict
+  ): TranslationContributionStats {
     return {
       firstContributionDate: stat.first_contribution_date,
       lastContributionDate: stat.last_contribution_date,
@@ -304,7 +305,8 @@ export class ContributorStatsComponent {
   }
 
   createTranslationReviewStat(
-      stat: TranslationReviewBackendDict): TranslationReviewStats {
+      stat: TranslationReviewBackendDict
+  ): TranslationReviewStats {
     return {
       firstContributionDate: stat.first_contribution_date,
       lastContributionDate: stat.last_contribution_date,
@@ -317,7 +319,8 @@ export class ContributorStatsComponent {
   }
 
   createQuestionContributionStat(
-      stat: QuestionContributionBackendDict): QuestionContributionStats {
+      stat: QuestionContributionBackendDict
+  ): QuestionContributionStats {
     return {
       firstContributionDate: stat.first_contribution_date,
       lastContributionDate: stat.last_contribution_date,
@@ -329,7 +332,8 @@ export class ContributorStatsComponent {
   }
 
   createQuestionReviewStat(
-      stat: QuestionReviewBackendDict): QuestionReviewStats {
+      stat: QuestionReviewBackendDict
+  ): QuestionReviewStats {
     return {
       firstContributionDate: stat.first_contribution_date,
       lastContributionDate: stat.last_contribution_date,
@@ -349,8 +353,7 @@ export class ContributorStatsComponent {
   }
 
   goToPreviousPage(page: PageableStats): void {
-    if (
-      page.currentPageStartIndex === 0) {
+    if (page.currentPageStartIndex === 0) {
       throw new Error('There are no more pages before this one.');
     }
     page.currentPageStartIndex -= this.ITEMS_PER_PAGE;
@@ -375,13 +378,7 @@ export class ContributorStatsComponent {
       CertificateDownloadModalComponent, {
         size: 'lg',
         backdrop: 'static',
-        injector: this.injector,
-        // TODO(#12768): Remove the backdropClass & windowClass once the
-        // rte-component-modal is migrated to Angular. Currently, the custom
-        // class is used for correctly stacking AngularJS modal on top of
-        // Angular modal.
-        backdropClass: 'forced-modal-stack',
-        windowClass: 'forced-modal-stack'
+        injector: this.injector
       });
     modalRef.componentInstance.suggestionType = suggestionType;
     modalRef.componentInstance.username = this.username;
