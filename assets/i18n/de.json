@@ -72,6 +72,7 @@
 	"I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT": "Benachrichtige mich",
 	"I18N_ANDROID_PAGE_UPDATES_SUBTEXT": "Und hören möchtest, wann die App <br>in deiner Sprache verfügbar ist? <span class=\"oppia-android-bold-text\">Wir benachrichtigen dich!</span>",
 	"I18N_ANDROID_PAGE_VERSIONS_SUPPORTED_TEXT": "Wir unterstützen alle Android-Versionen ab Lollipop (Android 5).",
+	"I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_2": "Bitte überprüfe deine Rechtschreibung.",
 	"I18N_BLOG_AUTHOR_PROFILE_PAGE_BREADCRUMB": "Autorenprofile",
 	"I18N_BLOG_AUTHOR_PROFILE_PAGE_TITLE": "Blog | Autor | Oppia",
 	"I18N_BLOG_AUTHOR_PROFILE_PAGE_TOTAL_POSTS_DISPLAY": "<[totalNumber]> Beiträge",

@@ -101,6 +101,7 @@
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_2": "Användarstatistik",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING": "Översikt",
 	"I18N_DELETE_ACCOUNT_PAGE_REDIRECT_INFO": "Detta kommer ta dig till en sida där du kan radera ditt Oppia-konto.",
+	"I18N_DIAGNOSTIC_TEST_RESULT_TEXT_FOR_TWO_TOPICS": "Baserat på dina svar rekommenderar vi att du startar med något av dessa ämnen.",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Dra en bild till detta område",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Ladda upp en fil",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Inaktiverad utforskning",
