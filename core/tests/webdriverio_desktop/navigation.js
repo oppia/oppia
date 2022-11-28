@@ -194,7 +194,11 @@ describe('Static Pages Tour', function() {
   it('should visit the Donate page', async function() {
     await browser.url('/donate');
     await waitFor.pageToFullyLoad();
-    expect(await $('.e2e-test-donate-page').isExisting()).toBe(true);
+    let iframeElement = $('.e2e-test-donate-page-iframe');
+    await waitFor.presenceOf(
+      iframeElement,
+      'Donorbox Iframe taking too long to appear.'
+    );
   });
 
   it('should visit the Partnerships page', async function() {
