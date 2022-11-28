@@ -43,7 +43,7 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
     """Store profile picture to GCS job."""
 
     @staticmethod
-    def _filepath_png(
+    def _generate_png_file_object(
         user_model: user_models.UserSettingsModel
     ) -> gcs_io.FileObjectDict:
         """Returns file object for png images to write to the GCS.
@@ -66,7 +66,7 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
         return file_dict
 
     @staticmethod
-    def _filepath_webp(
+    def _generate_webp_file_object(
         user_model: user_models.UserSettingsModel
     ) -> gcs_io.FileObjectDict:
         """Returns file object for webp images to write to the GCS.
@@ -122,7 +122,7 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
 
         write_png_files_to_gcs = (
             users_with_valid_username
-            | 'Map files for png' >> beam.Map(self._filepath_png)
+            | 'Map files for png' >> beam.Map(self._generate_png_file_object)
             | 'Write png file to GCS' >> gcs_io.WriteFile(mime_type='image/png')
         )
 
@@ -135,7 +135,7 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
 
         write_webp_files_to_gcs = (
             users_with_valid_username
-            | 'Map files for webp' >> beam.Map(self._filepath_webp)
+            | 'Map files for webp' >> beam.Map(self._generate_webp_file_object)
             | 'Write webp file to GCS' >> gcs_io.WriteFile(
                 mime_type='image/webp')
         )
@@ -156,26 +156,25 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
         )
 
 
-def png_base64_to_webp_base64(png_base64: str) -> str:
-    """Convert png base64 to webp base64.
-
-    Args:
-        png_base64: str. The png base64 string.
-
-    Returns:
-        str. The webp base64 string.
-    """
-    png_binary = utils.convert_png_data_url_to_binary(png_base64)
-    output = io.BytesIO()
-    image = Image.open(io.BytesIO(png_binary)).convert('RGB')
-    image.save(output, 'webp')
-    webp_binary = output.getvalue()
-    return utils.convert_png_or_webp_binary_to_data_url(
-        webp_binary, 'webp')
-
-
 class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
     """Audit profile pictures are present in GCS."""
+
+    def _png_base64_to_webp_base64(png_base64: str) -> str:
+        """Convert png base64 to webp base64.
+
+        Args:
+            png_base64: str. The png base64 string.
+
+        Returns:
+            str. The webp base64 string.
+        """
+        png_binary = utils.convert_png_data_url_to_binary(png_base64)
+        output = io.BytesIO()
+        image = Image.open(io.BytesIO(png_binary)).convert('RGB')
+        image.save(output, 'webp')
+        webp_binary = output.getvalue()
+        return utils.convert_png_or_webp_binary_to_data_url(
+            webp_binary, 'webp')
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         users_with_valid_username = (
@@ -188,7 +187,7 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
 
         username_with_profile_data = (
             users_with_valid_username
-            | 'map username and data url' >> beam.Map(
+            | 'Map username and data url' >> beam.Map(
                 lambda model: (model.username, model.profile_picture_data_url))
         )
 
@@ -264,7 +263,8 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
         username_with_profile_data_webp = (
             username_with_profile_data
             | 'Convert to webp base64 string' >> beam.Map(
-                lambda data: (data[0], png_base64_to_webp_base64(data[1])))
+                lambda data: (
+                    data[0], self._png_base64_to_webp_base64(data[1])))
         )
 
         mismatched_webp_images_on_gcs_and_model = (

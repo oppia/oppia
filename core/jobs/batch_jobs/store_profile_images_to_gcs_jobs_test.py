@@ -122,16 +122,20 @@ class AuditProfilePictureFromGCSJobTests(job_test_utils.JobTestBase):
             profile_picture_data_url=VALID_IMAGE
         )
 
+    def _get_webp_binary_data(self, png_binary: bytes) -> bytes:
+        """Convert png binary data to webp binary data."""
+        output = io.BytesIO()
+        image = Image.open(io.BytesIO(png_binary)).convert('RGB')
+        image.save(output, 'webp')
+        return output.getvalue()
+
     def _push_file_to_gcs(self, username: str, data_url: str) -> None:
         """Push file to the fake gcs client."""
         bucket = app_identity_services.get_gcs_resource_bucket_name()
         filepath_png = f'user/{username}/profile_picture.png'
         filepath_webp = f'user/{username}/profile_picture.webp'
         png_binary = utils.convert_png_data_url_to_binary(data_url)
-        output = io.BytesIO()
-        image = Image.open(io.BytesIO(png_binary)).convert('RGB')
-        image.save(output, 'webp')
-        webp_binary = output.getvalue()
+        webp_binary = self._push_file_to_gcs(png_binary)
         storage_services.commit(bucket, filepath_png, png_binary, None)
         storage_services.commit(bucket, filepath_webp, webp_binary, None)
 
@@ -191,6 +195,34 @@ class AuditProfilePictureFromGCSJobTests(job_test_utils.JobTestBase):
             job_run_result.JobRunResult(
                 stderr=(
                     'The user having username test_2, has incompatible webp '
+                    'image on GCS and png in the model.'
+                )
+            )
+        ])
+
+    def test_same_png_different_webp_on_gcs_and_in_model(self) -> None:
+        self.put_multi([self.user_1])
+        bucket = app_identity_services.get_gcs_resource_bucket_name()
+        filepath_png = f'user/{self.user_1.username}/profile_picture.png'
+        filepath_webp = f'user/{self.user_1.username}/profile_picture.webp'
+        png_binary = utils.convert_png_data_url_to_binary(
+            user_services.DEFAULT_IDENTICON_DATA_URL)
+        valid_image_png_binary = utils.convert_png_data_url_to_binary(
+            VALID_IMAGE)
+        webp_binary = self._push_file_to_gcs(valid_image_png_binary)
+        storage_services.commit(bucket, filepath_png, png_binary, None)
+        storage_services.commit(bucket, filepath_webp, webp_binary, None)
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='TOTAL WEBP IMAGES ITERATED ON GCS SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult(
+                stdout='TOTAL MISMATCHED WEBP IMAGES SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult(
+                stderr=(
+                    'The user having username test_1, has incompatible webp '
                     'image on GCS and png in the model.'
                 )
             )
