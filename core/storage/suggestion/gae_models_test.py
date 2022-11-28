@@ -178,7 +178,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            suggestion_models.STATUS_IN_REVIEW, 'test_author',
+            suggestion_models.STATUS_ACCEPTED, 'test_author',
             'reviewer_1', self.change_cmd, self.score_category,
             'exploration.exp1.thread_6', 'hi')
         to_date = datetime.datetime.now()
@@ -198,7 +198,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            suggestion_models.STATUS_IN_REVIEW, 'test_author',
+            suggestion_models.STATUS_ACCEPTED, 'test_author',
             'reviewer_1', self.change_cmd, self.score_category,
             'exploration.exp1.thread_6', 'hi')
         to_date = datetime.datetime.now()
