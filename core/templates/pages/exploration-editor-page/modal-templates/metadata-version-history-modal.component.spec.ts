@@ -28,7 +28,6 @@ import { MetadataVersionHistoryModalComponent } from './metadata-version-history
 import { ExplorationMetadata } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
-import { AlertsService } from 'services/alerts.service';
 
 describe('Metadata version history modal', () => {
   let component: MetadataVersionHistoryModalComponent;
@@ -39,7 +38,6 @@ describe('Metadata version history modal', () => {
   let contextService: ContextService;
   let explorationMetadata: ExplorationMetadata;
   let paramSpecObjectFactory: ParamSpecObjectFactory;
-  let alertsService: AlertsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -67,7 +65,6 @@ describe('Metadata version history modal', () => {
     );
     contextService = TestBed.inject(ContextService);
     paramSpecObjectFactory = TestBed.inject(ParamSpecObjectFactory);
-    alertsService = TestBed.inject(AlertsService);
 
     explorationMetadata = new ExplorationMetadata(
       'title', 'category', 'objective', 'en',
@@ -266,7 +263,7 @@ describe('Metadata version history modal', () => {
     ).toEqual(1);
   }));
 
-  it('should be show alert message if the backend api fails', fakeAsync(() => {
+  it('should be show error message if the backend api fails', fakeAsync(() => {
     spyOn(
       versionHistoryService, 'shouldFetchNewMetadataVersionHistory'
     ).and.returnValue(true);
@@ -283,15 +280,13 @@ describe('Metadata version history modal', () => {
     spyOn(
       versionHistoryBackendApiService, 'fetchMetadataVersionHistoryAsync'
     ).and.resolveTo(null);
-    spyOn(alertsService, 'addWarning').and.callFake(() => {});
+
+    expect(component.validationErrorIsShown).toBeFalse();
 
     component.fetchPreviousVersionHistory();
     tick();
 
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Could not fetch the version history data. ' +
-      'Please reload the page and try again.'
-    );
+    expect(component.validationErrorIsShown).toBeTrue();
   }));
 
   it('should update the left and right side yaml strings on initialization',
@@ -312,4 +307,10 @@ describe('Metadata version history modal', () => {
       ).toEqual('YAML STRING');
       expect(component.fetchPreviousVersionHistory).toHaveBeenCalled();
     }));
+
+  it('should get the last edited version number in case of error', () => {
+    versionHistoryService.insertMetadataVersionHistoryData(4, null, '');
+
+    expect(component.getLastEditedVersionNumberInCaseOfError()).toEqual(4);
+  });
 });
