@@ -104,16 +104,11 @@ describe('DEV MODE Test', function() {
 describe('Donation flow', function() {
   it('should be able to donate via PayPal', async function() {
     await browser.url('/donate');
-    var payPalButton = $('.e2e-test-paypal-donate-button');
-    await action.click('PayPal button', payPalButton);
-    expect(await browser.getUrl()).toContain('www.paypal.com');
-  });
-
-  it('should be able to donate via credit card', async function() {
-    await browser.url('/donate');
-    var creditCardButton = $('.e2e-test-credit-card-donate-button');
-    await action.click('Credit Card button', creditCardButton);
-    expect(await browser.getUrl()).toContain('www.paypal.com');
+    const iframeElement = $('.e2e-test-donate-page-iframe');
+    await waitFor.presenceOf(
+      iframeElement,
+      'Donorbox Iframe taking too long to appear.'
+    );
   });
 });
 

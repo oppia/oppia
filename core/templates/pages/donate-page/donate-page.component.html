@@ -34,7 +34,7 @@
                     scrolling="no"
                     height="650px"
                     width="100%"
-                    class="donate-page-iframe"
+                    class="donate-page-iframe e2e-test-donate-page-iframe">
                     title="donorbox">
             </iframe>
           </div>
@@ -217,8 +217,7 @@
                   <source type="image/webp" [srcset]="getImageSet('/splash/mira', 'webp')">
                   <source type="image/png" [srcset]="getImageSet('/splash/mira', 'png')">
                   <img [src]="getStaticImageUrl('/splash/mira', 'png')"
-                       class="rounded-circle"
-                       width="200px"
+                       class="rounded-circle oppia-donate-contributor-img"
                        alt="Logo of Oppia containing photo of a learner">
                 </picture>
               </div>
@@ -243,8 +242,7 @@
                   <source type="image/webp" [srcset]="getImageSet('/splash/Dheeraj', 'webp')">
                   <source type="image/png" [srcset]="getImageSet('/splash/Dheeraj', 'png')">
                   <img [src]="getStaticImageUrl('/splash/Dheeraj', 'png')"
-                       class="rounded-circle"
-                       width="200px"
+                       class="rounded-circle oppia-donate-contributor-img"
                        alt="Logo of Oppia containing photo of a learner">
                 </picture>
               </div>
@@ -280,7 +278,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-12 pl-5 pr-5">
+        <div>
           <div class="mb-3">
             <mat-accordion>
               <mat-expansion-panel>
@@ -436,34 +434,26 @@
             {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_TEXT_1' | translate }}
           </div>
           <div class="mb-5">
-            <div>
+            <div class="donate-page-subscribe-text">
               {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_TEXT_2' | translate }}
-            </div>
-            <div>
-              {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_TEXT_3' | translate }}
-            </div>
-            <div>
-              {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_TEXT_4' | translate }}
-            </div>
-            <div>
-              {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_TEXT_5' | translate }}
             </div>
           </div>
         </div>
         <div class="col-md-5">
           <div class="p-5">
             <div class="m-4">
-              <label>
+              <label id="name">
                 {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_NAME_LABEL_TEXT' | translate }}
               </label>
               <input class="w-100"
                      type="text"
                      [(ngModel)]="name"
                      [ngModelOptions]="{standalone: true}"
-                     required="true">
+                     required="true"
+                     aria-labelledby="name">
             </div>
             <div class="m-4">
-              <label>
+              <label id="email">
                 {{ 'I18N_DONATE_PAGE_SUBSCRIBE_SECTION_EMAIL_LABEL_TEXT' | translate }}
                 <span class="oppia-donate-asterisk-color">*</span>
               </label>
@@ -471,7 +461,8 @@
                      type="email"
                      [(ngModel)]="emailAddress"
                      [ngModelOptions]="{standalone: true}"
-                     required="true">
+                     required="true"
+                     aria-labelledby="email">
             </div>
             <div class="text-center m-4">
               <button [disabled]="!validateEmailAddress()"
@@ -543,7 +534,7 @@
     max-width: 800px;
   }
   .oppia-donate-page-banner {
-    background-image: url('/assets/images/donate/donate-page-banner.jpg');
+    background-image: url('/assets/images/donate/donate-page-banner.webp');
     background-size: cover;
     height: 350px;
   }
@@ -554,6 +545,7 @@
     padding-top: 120px;
     position: relative;
     text-align: center;
+    text-shadow: 1px 1px #000;
     z-index: 10;
   }
   .oppia-donate-page-img {
@@ -655,6 +647,9 @@
     background: #c6dcda;
     height: auto;
     padding: 10px;
+  }
+  .donate-page-subscribe-text {
+    max-width: 400px;
   }
   @media (hover: none) {
     .donate-page .mat-expansion-panel:not(.mat-expanded):not([aria-disabled='true'])
