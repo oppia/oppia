@@ -6292,12 +6292,19 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
 
     def mock_screenshot(
         self,
-        html_str: str,  # pylint: disable=unused-argument
-        save_as: str,  # pylint: disable=unused-argument
-        size: Tuple[str, str]  # pylint: disable=unused-argument
+        html_str: str,
+        save_as: str,
+        size: Tuple[str, str]
     ) -> List[str]:
-        self.assertEquals(html_str, 'Template')
-        self.assertEquals(save_as, 'test_123.png')
+        self.assertEqual(html_str, 'Template')
+        self.assertEqual(save_as, 'test_123.png')
+        self.assertEqual(
+            size,
+            (
+                constants.CONTRIBUTOR_CERTIFICATE_WIDTH,
+                constants.CONTRIBUTOR_CERTIFICATE_HEIGHT
+            )
+        )
         return []
 
     def test_generate_certificate_throws_exception(
