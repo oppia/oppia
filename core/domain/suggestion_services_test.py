@@ -6296,6 +6296,8 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         save_as: str,  # pylint: disable=unused-argument
         size: Tuple[str, str]  # pylint: disable=unused-argument
     ) -> List[str]:
+        self.assertEquals(html_str, 'Template')
+        self.assertEquals(save_as, 'test_123.png')
         return []
 
     def test_generate_certificate_throws_exception(
@@ -6305,7 +6307,11 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             return 'test_123'
 
         with self.swap(uuid, 'uuid4', mock_uuid):
-            with self.swap(html2image.Html2Image, 'screenshot', self.mock_screenshot):
+            with self.swap(
+                html2image.Html2Image,
+                'screenshot',
+                self.mock_screenshot
+            ):
                 with self.assertRaisesRegex(
                     Exception,
                     'Image generation failed.'
