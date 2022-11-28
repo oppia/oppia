@@ -20,13 +20,13 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, TestBed } from '@angular/core/testing';
 
-import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { ResponsesService, UpdateActiveAnswerGroup } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
+import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {
   StateEditorService,
   // eslint-disable-next-line max-len
@@ -261,42 +261,29 @@ describe('Responses Service', () => {
     responsesService.init(interactionData);
     stateEditorService.setInteraction(interactionData);
 
-    const updatedAnswerGroup = {
-      rules: [new Rule(
+    const updatedAnswerGroup = new AnswerGroup(
+      [new Rule(
         'Contains', {
           x: {
             contentId: 'rule_input_Contains',
             normalizedStrSet: ['correct']
           },
         }, {})],
-      outcome: new Outcome(
+      new Outcome(
         'State', null,
         new SubtitledHtml('', 'This is a new feedback text'),
         true, [], 'test', 'test_skill_id'
       ),
-      destIfReallyStuck: null,
-      trainingData: ['This is training data text'],
-      taggedSkillMisconceptionId: '',
-      toBackendDict: jasmine.createSpy('toBackendDict'),
-    };
+      ['This is training data text'],
+      ''
+    );
+
     const callbackSpy = jasmine.createSpy('callback');
-    responsesService.updateAnswerGroup(0, updatedAnswerGroup as UpdateActiveAnswerGroup, callbackSpy);
+    responsesService.updateAnswerGroup(0, updatedAnswerGroup, callbackSpy);
 
     // Reassign only updated properties.
     const expectedAnswerGroup = interactionData.answerGroups;
-    expectedAnswerGroup[0].rules = updatedAnswerGroup.rules;
-    expectedAnswerGroup[0].taggedSkillMisconceptionId =
-      updatedAnswerGroup.taggedSkillMisconceptionId;
-    expectedAnswerGroup[0].outcome.feedback =
-      updatedAnswerGroup.outcome.feedback;
-    expectedAnswerGroup[0].outcome.dest = updatedAnswerGroup.outcome.dest;
-    expectedAnswerGroup[0].outcome.refresherExplorationId =
-      updatedAnswerGroup.outcome.refresherExplorationId;
-    expectedAnswerGroup[0].outcome.missingPrerequisiteSkillId =
-      updatedAnswerGroup.outcome.missingPrerequisiteSkillId;
-    expectedAnswerGroup[0].outcome.labelledAsCorrect =
-      updatedAnswerGroup.outcome.labelledAsCorrect;
-    expectedAnswerGroup[0].trainingData = updatedAnswerGroup.trainingData;
+    expectedAnswerGroup[0] = updatedAnswerGroup;
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(responsesService.getAnswerGroup(0)).toEqual(expectedAnswerGroup[0]);
@@ -911,7 +898,7 @@ describe('Responses Service', () => {
     );
 
     // Save first time.
-    responsesService.save(updatedAnswerGroups, updatedDefaultOutcome, () => { });
+    responsesService.save(updatedAnswerGroups, updatedDefaultOutcome, () => {});
 
     updatedDefaultOutcome = outcomeObjectFactory.createNew(
       'Hola',

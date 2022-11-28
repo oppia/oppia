@@ -194,6 +194,7 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
 
         suggestion_1_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id='111',
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id='user1',
             change_cmd=change_dict,
@@ -211,7 +212,7 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=(
-                    'SUGGESTION TARGET PROCESSED ERROR: "(1, '
+                    'SUGGESTION TARGET PROCESSED ERROR: "(\'111\', '
                     '\'Content ID invalid_id does not exist in the exploration'
                     '\')": 1')),
         ])

@@ -1157,7 +1157,7 @@ describe('Conversation skin component', () => {
     componentInstance.nextCardIfStuck = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, null, '', null);
+      [], null, '', null);
 
     componentInstance.triggerRedirectionToStuckState();
 

@@ -65,7 +65,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
   languageOptions!: ExplorationLanguageInfo[];
   currentGlobalLanguageCode!: string;
   directiveSubscriptions = new Subscription();
-  translationFetchingModelRef: NgbModalRef;
+  translationFetchingModelRef!: NgbModalRef;
 
   ngOnInit(): void {
     this.currentGlobalLanguageCode = (

@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for the CkEditor copy toolbar component.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, discardPeriodicTasks, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { BrowserDynamicTestingModule } from
   '@angular/platform-browser-dynamic/testing';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { EventEmitter } from '@angular/core';
 
 import { ContentLanguageSelectorComponent } from
   // eslint-disable-next-line max-len
@@ -43,6 +44,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
 import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
+import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 
 class MockContentTranslationLanguageService {
   currentLanguageCode!: string;
@@ -73,6 +75,7 @@ class MockI18nLanguageCodeService {
 describe('Content language selector component', () => {
   let component: ContentLanguageSelectorComponent;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
+  let contentTranslationManagerService: ContentTranslationManagerService;
   let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
   let playerTranscriptService: PlayerTranscriptService;
   let imagePreloaderService: ImagePreloaderService;
@@ -110,6 +113,8 @@ describe('Content language selector component', () => {
     }).compileComponents();
     contentTranslationLanguageService = TestBed.get(
       ContentTranslationLanguageService);
+    contentTranslationManagerService = TestBed.get(
+      ContentTranslationManagerService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
     imagePreloaderService = TestBed.get(ImagePreloaderService);
@@ -130,76 +135,86 @@ describe('Content language selector component', () => {
     ]);
   });
 
-  it('should correctly select an option when refresh is not needed', () => {
-    const setCurrentContentLanguageCodeSpy = spyOn(
-      contentTranslationLanguageService,
-      'setCurrentContentLanguageCode');
+  it('should correctly select an option when refresh is not needed',
+    fakeAsync(() => {
+      let mockOnStateCardContentUpdate = new EventEmitter<void>();
+      spyOnProperty(
+        contentTranslationManagerService, 'onStateCardContentUpdate'
+      ).and.returnValue(mockOnStateCardContentUpdate);
+      component.ngOnInit();
+      const setCurrentContentLanguageCodeSpy = spyOn(
+        contentTranslationLanguageService,
+        'setCurrentContentLanguageCode');
 
-    const card = StateCard.createNewCard(
-      'State 1', '<p>Content</p>', '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict({
-        id: 'GraphInput',
-        answer_groups: [
-          {
-            outcome: {
-              dest: 'State',
-              dest_if_really_stuck: null,
-              feedback: {
-                html: '',
-                content_id: 'This is a new feedback text',
+      const card = StateCard.createNewCard(
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict({
+          id: 'GraphInput',
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'State',
+                dest_if_really_stuck: null,
+                feedback: {
+                  html: '',
+                  content_id: 'This is a new feedback text',
+                },
+                refresher_exploration_id: 'test',
+                missing_prerequisite_skill_id: 'test_skill_id',
+                labelled_as_correct: true,
+                param_changes: [],
               },
-              refresher_exploration_id: 'test',
-              missing_prerequisite_skill_id: 'test_skill_id',
-              labelled_as_correct: true,
-              param_changes: [],
+              rule_specs: [],
+              training_data: [],
+              tagged_skill_misconception_id: '',
             },
-            rule_specs: [],
-            training_data: [],
-            tagged_skill_misconception_id: '',
+          ],
+          default_outcome: {
+            dest: 'Hola',
+            dest_if_really_stuck: null,
+            feedback: {
+              content_id: '',
+              html: '',
+            },
+            labelled_as_correct: true,
+            param_changes: [],
+            refresher_exploration_id: 'test',
+            missing_prerequisite_skill_id: 'test_skill_id',
           },
-        ],
-        default_outcome: {
-          dest: 'Hola',
-          dest_if_really_stuck: null,
-          feedback: {
-            content_id: '',
-            html: '',
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            rows: {
+              value: true,
+            },
+            placeholder: {
+              value: 1,
+            },
           },
-          labelled_as_correct: true,
-          param_changes: [],
-          refresher_exploration_id: 'test',
-          missing_prerequisite_skill_id: 'test_skill_id',
-        },
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          rows: {
-            value: true,
-          },
-          placeholder: {
-            value: 1,
-          },
-        },
-        hints: [],
-        solution: {
-          answer_is_exclusive: true,
-          correct_answer: 'test_answer',
-          explanation: {
-            content_id: '2',
-            html: 'test_explanation1',
-          },
-        }
-      }),
-      RecordedVoiceovers.createEmpty(),
-      'content', audioTranslationLanguageService);
-    spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
-    spyOn(imagePreloaderService, 'restartImagePreloader');
+          hints: [],
+          solution: {
+            answer_is_exclusive: true,
+            correct_answer: 'test_answer',
+            explanation: {
+              content_id: '2',
+              html: 'test_explanation1',
+            },
+          }
+        }),
+        RecordedVoiceovers.createEmpty(),
+        'content', audioTranslationLanguageService);
+      spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
+      spyOn(imagePreloaderService, 'restartImagePreloader');
 
-    component.onSelectLanguage('fr');
+      component.onSelectLanguage('fr');
 
-    expect(setCurrentContentLanguageCodeSpy).toHaveBeenCalledWith('fr');
-    expect(component.selectedLanguageCode).toBe('fr');
-    expect(imagePreloaderService.restartImagePreloader).toHaveBeenCalled();
-  });
+      expect(setCurrentContentLanguageCodeSpy).toHaveBeenCalledWith('fr');
+      expect(component.selectedLanguageCode).toBe('fr');
+      expect(imagePreloaderService.restartImagePreloader).toHaveBeenCalled();
+
+      mockOnStateCardContentUpdate.emit(null);
+      tick();
+      discardPeriodicTasks();
+    }));
 
   it('should correctly open the refresh required modal when refresh is ' +
      'needed', () => {

@@ -38,6 +38,7 @@ import { Hint, HintBackendDict } from 'domain/exploration/HintObjectFactory';
 import { Outcome, OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFactory';
 import { RecordedVoiceOverBackendDict, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
+import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 
 export type StatePropertyValues = (
   AnswerGroup[] |
@@ -48,7 +49,8 @@ export type StatePropertyValues = (
   ParamChange[] |
   RecordedVoiceovers |
   string |
-  SubtitledHtml
+  SubtitledHtml |
+  BaseTranslatableObject
 );
 export type StatePropertyDictValues = (
   AnswerGroupBackendDict[] |

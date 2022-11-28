@@ -61,6 +61,12 @@ interface ContentsMapping {
   [contentId: string]: TranslatableField;
 }
 
+interface ContentExtractors {
+  [fieldName: string]: (
+    x: TranslatableField | BaseTranslatableObject | BaseTranslatableObject[]
+  ) => TranslatableField[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -171,25 +177,25 @@ export class ExplorationStatesService {
   };
 
   private _CONTENT_EXTRACTORS = {
-    answer_groups: (answerGroups: AnswerGroup[]) => {
-      let contents = [];
+    answer_groups: (answerGroups: BaseTranslatableObject[]) => {
+      let contents: TranslatableField[] = [];
       answerGroups.forEach(
         answerGroup => {
           contents = contents.concat(answerGroup.getAllContents());
         });
       return contents;
     },
-    default_outcome: (defaultOutcome: Outcome) => {
+    default_outcome: (defaultOutcome: BaseTranslatableObject) => {
       return defaultOutcome ? defaultOutcome.getAllContents() : [];
     },
-    hints: (hints: Hint[]) => {
-      let contents = [];
+    hints: (hints: BaseTranslatableObject[]) => {
+      let contents: TranslatableField[] = [];
       hints.forEach(hint => {
         contents = contents.concat(hint.getAllContents());
       });
       return contents;
     },
-    solution: (solution: Solution) => {
+    solution: (solution: BaseTranslatableObject) => {
       return solution ? solution.getAllContents() : [];
     },
     widget_customization_args: (
@@ -197,33 +203,36 @@ export class ExplorationStatesService {
       return customizationArgs ? Interaction.getCustomizationArgContents(
         customizationArgs) : [];
     }
-  };
+  } as ContentExtractors;
 
   _extractContentIds(
-      backendName: string,
-      value: StatePropertyValues): Set<string[]> {
-    let contents = this._CONTENT_EXTRACTORS[backendName](value);
-    return new Set(contents.map(content => content.contentId));
+      backendName: string, value: StatePropertyValues
+  ): Set<string> {
+    let contents: TranslatableField[] = this._CONTENT_EXTRACTORS[backendName](
+      value as BaseTranslatableObject | BaseTranslatableObject[]);
+    return new Set(contents.map(content => (content.contentId as string)));
   }
 
   _verifyChangesInitialContents(
       backendName: string, value: StatePropertyValues): void {
-    let contents: SubtitledHtml[];
+    let contents: TranslatableField[];
 
     if (backendName === 'content') {
       contents = [value as SubtitledHtml];
     } else if (this._CONTENT_EXTRACTORS.hasOwnProperty(backendName)) {
-      contents = this._CONTENT_EXTRACTORS[backendName](value);
+      contents = this._CONTENT_EXTRACTORS[backendName](
+        value as BaseTranslatableObject | BaseTranslatableObject[]);
     } else {
       return;
     }
 
     for (const content of contents) {
-      if (!this.initalContentsMapping.hasOwnProperty(content.contentId)) {
+      const contentId = content.contentId as string;
+      if (!this.initalContentsMapping.hasOwnProperty(contentId)) {
         continue;
       }
 
-      let intialContent = this.initalContentsMapping[content.contentId];
+      let intialContent = this.initalContentsMapping[contentId];
       if (
         JSON.stringify(BaseTranslatableObject.getContentValue(content)) ===
         JSON.stringify(BaseTranslatableObject.getContentValue(intialContent))) {
@@ -241,8 +250,8 @@ export class ExplorationStatesService {
           backdropClass: 'forced-modal-stack',
           windowClass: 'forced-modal-stack'
         });
-      modalRef.componentInstance.contentId = content.contentId;
-      this.initalContentsMapping[content.contentId] = content;
+      modalRef.componentInstance.contentId = contentId;
+      this.initalContentsMapping[contentId] = content;
     }
   }
 
