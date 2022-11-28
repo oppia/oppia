@@ -150,8 +150,8 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
 
   subscribeToAndroidList(): void {
     this.mailingListBackendApiService.subscribeUserToMailingList(
-      String(this.emailAddress),
-      String(this.name),
+      this.emailAddress,
+      this.name,
       AppConstants.MAILING_LIST_ANDROID_TAG
     ).then((status) => {
       if (status) {

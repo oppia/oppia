@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ThanksForSubscribingModalComponent.
+ * @fileoverview Unit tests for thanks for subscribing modal component.
  */
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
@@ -32,7 +32,7 @@ class MockActiveModal {
   }
 }
 
-describe('ThanksForSubscribingModalComponent', function() {
+describe('Thanks for subscribing modal component', function() {
   let component: ThanksForSubscribingModalComponent;
   let fixture: ComponentFixture<ThanksForSubscribingModalComponent>;
   let ngbActiveModal: NgbActiveModal;
