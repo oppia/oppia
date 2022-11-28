@@ -2453,7 +2453,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': self.NEW_USERNAME},
                 csrf_token=csrf_token,
                 expected_status_int=400)
-    
+
         self.assertEqual(response['error'], (
             'The user with username %s does not have a profile '
             'picture with png extension.' % self.EDITOR_USERNAME))
@@ -2468,10 +2468,11 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': self.NEW_USERNAME},
                 csrf_token=csrf_token,
                 expected_status_int=400)
-    
+
         self.assertEqual(response['error'], (
             'The user with username %s does not have a profile '
             'picture with webp extension.' % self.EDITOR_USERNAME))
+
 
 class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
     """Tests NumberOfDeletionRequestsHandler."""
