@@ -1697,13 +1697,13 @@ class UpdateUsernameHandler(
             feconf.ENTITY_TYPE_USER, new_username)
 
         if not old_fs.isfile('profile_picture.png'):
-            self.InvalidInputException(
+            raise self.InvalidInputException(
                 'The user with username %s does not have a '
                 'profile picture with png extension.' % (old_username)
             )
 
         if not old_fs.isfile('profile_picture.webp'):
-            self.InvalidInputException(
+            raise self.InvalidInputException(
                 'The user with username %s does not have a '
                 'profile picture with webp extension.' % (old_username)
             )
