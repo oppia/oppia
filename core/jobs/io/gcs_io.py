@@ -19,10 +19,9 @@
 from __future__ import annotations
 
 from core.platform import models
-from core.platform.storage import cloud_storage_emulator
 
 import apache_beam as beam
-from typing import List, Optional, Tuple, TypedDict, Union
+from typing import List, Optional, Tuple, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -31,6 +30,8 @@ if MYPY:  # pragma: no cover
 
 storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()
+
+BUCKET = app_identity_services.get_gcs_resource_bucket_name()
 
 
 # TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
@@ -55,17 +56,16 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
             | 'Read the file' >> beam.Map(self._read_file)
         )
 
-    def _read_file(self, file_path: str) -> Tuple[str, Union[bytes, str]]:
+    def _read_file(self, file_path: str) -> Tuple[str, bytes]:
         """Helper function to read the contents of a file.
 
         Args:
             file_path: str. The name of the file that will be read.
 
         Returns:
-            data: Union[bytes, str]. The file data.
+            data: Tuple[str, bytes]. The file data.
         """
-        bucket = app_identity_services.get_gcs_resource_bucket_name()
-        data = storage_services.get(bucket, file_path)
+        data = storage_services.get(BUCKET, file_path)
         return (file_path, data)
 
 
@@ -73,7 +73,7 @@ class FileObjectDict(TypedDict):
     """Dictionary representing file object that will be written to GCS."""
 
     filepath: str
-    data: Union[bytes, str]
+    data: bytes
 
 
 # TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
@@ -123,9 +123,8 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
         Returns:
             int. Returns the number of bytes that has been written to GCS.
         """
-        bucket = app_identity_services.get_gcs_resource_bucket_name()
         storage_services.commit(
-            bucket, file_obj['filepath'], file_obj['data'], self.mime_type)
+            BUCKET, file_obj['filepath'], file_obj['data'], self.mime_type)
         return len(file_obj['data'])
 
 
@@ -157,8 +156,7 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
         Args:
             file_path: str. The name of the file that will be deleted.
         """
-        bucket = app_identity_services.get_gcs_resource_bucket_name()
-        storage_services.delete(bucket, file_path)
+        storage_services.delete(BUCKET, file_path)
 
 
 # TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
@@ -182,9 +180,7 @@ class GetFiles(beam.PTransform): # type: ignore[misc]
             | 'Get names of the files' >> beam.Map(self._get_file_with_prefix)
         )
 
-    def _get_file_with_prefix(
-        self, prefix: str
-    ) -> List[cloud_storage_emulator.EmulatorBlob]:
+    def _get_file_with_prefix(self, prefix: str) -> List[str]:
         """Helper function to get file names with the prefix.
 
         Args:
@@ -192,7 +188,12 @@ class GetFiles(beam.PTransform): # type: ignore[misc]
                 all the files.
 
         Returns:
-            List[EmulatorBlob]. The file name as key and size of file as value.
+            filepaths: List[str]. The file name as key and size of file
+            as value.
         """
-        bucket = app_identity_services.get_gcs_resource_bucket_name()
-        return storage_services.listdir(bucket, prefix)
+        list_of_blobs = storage_services.listdir(BUCKET, prefix)
+        filepaths = []
+        for blob in list_of_blobs:
+            filepaths.append(blob.name)
+        filepaths.sort()
+        return filepaths
