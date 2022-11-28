@@ -161,6 +161,8 @@ import { AuthService } from 'services/auth.service';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
+import { ThanksForDonatingModalComponent } from 'pages/donate-page/thanks-for-donating-modal.component';
+import { ThanksForSubscribingModalComponent } from 'pages/donate-page/thanks-for-subscribing-modal.component';
 
 @NgModule({
   imports: [
@@ -266,6 +268,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
     SupplementalCardComponent,
+    ThanksForDonatingModalComponent,
+    ThanksForSubscribingModalComponent,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -382,6 +386,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     SupplementalCardComponent,
+    ThanksForDonatingModalComponent,
+    ThanksForSubscribingModalComponent,
     ThumbnailDisplayComponent,
     TutorCardComponent,
     ThumbnailUploaderComponent,
@@ -511,6 +517,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     SupplementalCardComponent,
     TakeBreakModalComponent,
     ThreadTableComponent,
+    ThanksForDonatingModalComponent,
+    ThanksForSubscribingModalComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,

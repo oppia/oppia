@@ -35,6 +35,8 @@ from core.domain import takeout_service
 from core.domain import user_services
 from core.domain import wipeout_service
 
+from typing import Dict
+from typing_extensions import TypedDict
 
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
@@ -148,8 +150,18 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
         self.render_json({})
 
 
-class AndroidListSubscriptionHandler(base.BaseHandler):
-    """Adds user to Android mailing list."""
+class MailingListSubscriptionHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of MailingListSubscriptionHandler's
+    normalized_request dictionary.
+    """
+
+    email: str
+    name: str
+    tag: str
+
+
+class MailingListSubscriptionHandler(base.BaseHandler):
+    """Adds user to the mailing list."""
 
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
@@ -170,6 +182,14 @@ class AndroidListSubscriptionHandler(base.BaseHandler):
                         'id': 'is_nonempty'
                     }]
                 }
+            },
+            'tag': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_nonempty'
+                    }]
+                }
             }
         }
     }
@@ -177,9 +197,11 @@ class AndroidListSubscriptionHandler(base.BaseHandler):
     @acl_decorators.open_access
     def put(self):
         """Handles PUT request."""
-        email = self.normalized_payload.get('email')
-        name = self.normalized_payload.get('name')
-        status = user_services.add_user_to_android_list(email, name)
+        assert self.normalized_payload is not None
+        email = self.normalized_payload['email']
+        name = self.normalized_payload['name']
+        tag = self.normalized_payload['tag']
+        status = user_services.add_user_to_mailing_list(email, name, tag)
         self.render_json({'status': status})
 
 

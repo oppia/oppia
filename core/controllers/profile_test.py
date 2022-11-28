@@ -965,11 +965,11 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
         self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
-class AndroidListSubscriptionHandlerTests(test_utils.GenericTestBase):
+class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
 
     def test_put_function(self):
         swap_add_fn = self.swap(
-            user_services, 'add_user_to_android_list', lambda *args: True)
+            user_services, 'add_user_to_mailing_list', lambda *args: True)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
@@ -977,9 +977,10 @@ class AndroidListSubscriptionHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         with swap_add_fn:
             json_response = self.put_json(
-                '/androidlistsubscriptionhandler', {
+                '/mailinglistsubscriptionhandler', {
                     'email': 'email@example.com',
-                    'name': 'Name'
+                    'name': 'Name',
+                    'tag': 'Web'
                 }, csrf_token=csrf_token)
             self.assertEqual(json_response, {'status': True})
 
@@ -989,7 +990,7 @@ class AndroidListSubscriptionHandlerTests(test_utils.GenericTestBase):
         def raise_exception():
             raise Exception('Backend error')
         swap_add_fn = self.swap(
-            user_services, 'add_user_to_android_list', raise_exception)
+            user_services, 'add_user_to_mailing_list', raise_exception)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
@@ -997,16 +998,17 @@ class AndroidListSubscriptionHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         with swap_add_fn:
             self.put_json(
-                '/androidlistsubscriptionhandler', {
+                '/mailinglistsubscriptionhandler', {
                     'email': 'email@example.com',
-                    'name': 'Name'
+                    'name': 'Name',
+                    'tag': 'Web'
                 }, csrf_token=csrf_token, expected_status_int=500)
 
         self.logout()
 
     def test_invalid_inputs(self):
         swap_add_fn = self.swap(
-            user_services, 'add_user_to_android_list', lambda *args: True)
+            user_services, 'add_user_to_mailing_list', lambda *args: True)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
@@ -1014,15 +1016,24 @@ class AndroidListSubscriptionHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         with swap_add_fn:
             self.put_json(
-                '/androidlistsubscriptionhandler', {
+                '/mailinglistsubscriptionhandler', {
                     'email': 'invalidemail.com',
-                    'name': 'Name'
+                    'name': 'Name',
+                    'tag': 'Web'
                 }, csrf_token=csrf_token, expected_status_int=400)
 
             self.put_json(
-                '/androidlistsubscriptionhandler', {
+                '/mailinglistsubscriptionhandler', {
                     'email': 'email@example.com',
-                    'name': ''
+                    'name': '',
+                    'tag': 'Web'
+                }, csrf_token=csrf_token, expected_status_int=400)
+
+            self.put_json(
+                '/mailinglistsubscriptionhandler', {
+                    'email': 'email@example.com',
+                    'name': 'Name',
+                    'tag': ''
                 }, csrf_token=csrf_token, expected_status_int=400)
 
         self.logout()
