@@ -256,6 +256,14 @@ describe('Progress nav component', () => {
     }).toThrowError('Target card index out of bounds.');
   });
 
+  it('should be able to skip the question', () => {
+    spyOn(componentInstance.skipQuestion, 'emit');
+
+    componentInstance.skipCurrentQuestion();
+
+    expect(componentInstance.skipQuestion.emit).toHaveBeenCalled();
+  });
+
   it('should tell if interaction have submit nav button', () => {
     componentInstance.interactionId = 'ImageClickInput';
 

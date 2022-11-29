@@ -125,6 +125,8 @@ export class SettingsTabComponent
 
   addOnBlur: boolean = true;
 
+  validationErrorIsShown: boolean = false;
+
   constructor(
     private alertsService: AlertsService,
     private changeListService: ChangeListService,
@@ -332,6 +334,7 @@ export class SettingsTabComponent
 
   async updateMetadataVersionHistory(): Promise<void> {
     this.versionHistoryService.resetMetadataVersionHistory();
+    this.validationErrorIsShown = false;
 
     const explorationData = (
       await this.explorationDataService.getDataAsync(() => {}));
@@ -353,14 +356,18 @@ export class SettingsTabComponent
           this.contextService.getExplorationId(),
           this.versionHistoryService.getLatestVersionOfExploration() as number
         );
-      this.versionHistoryService.insertMetadataVersionHistoryData(
-        (metadataVersionHistory as MetadataVersionHistoryResponse)
-          .lastEditedVersionNumber,
-        (metadataVersionHistory as MetadataVersionHistoryResponse)
-          .metadataInPreviousVersion,
-        (metadataVersionHistory as MetadataVersionHistoryResponse)
-          .lastEditedCommitterUsername
-      );
+      if (metadataVersionHistory !== null) {
+        this.versionHistoryService.insertMetadataVersionHistoryData(
+          (metadataVersionHistory as MetadataVersionHistoryResponse)
+            .lastEditedVersionNumber,
+          (metadataVersionHistory as MetadataVersionHistoryResponse)
+            .metadataInPreviousVersion,
+          (metadataVersionHistory as MetadataVersionHistoryResponse)
+            .lastEditedCommitterUsername
+        );
+      } else {
+        this.validationErrorIsShown = true;
+      }
     }
   }
 
