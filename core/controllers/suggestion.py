@@ -92,7 +92,11 @@ SuggestionsProviderHandlerArgsSchemaDictType = Dict[
         str,
         Dict[
             str,
-            Optional[Dict[str, Union[str, List[Dict[str, Union[str, int]]]]]]
+            Union[
+                Optional[
+                    Dict[str, Union[str, List[Dict[str, Union[str, int]]]]]],
+                bool
+            ]
         ]
     ]
 ]
@@ -677,6 +681,7 @@ class ReviewableSuggestionsHandlerNormalizedRequestDict(TypedDict):
 
     limit: int
     offset: int
+    newest_first: bool
     exploration_id: Optional[str]
 
 
@@ -752,8 +757,8 @@ class ReviewableSuggestionsHandler(
             target_type, suggestion_type)
         limit = self.normalized_request['limit']
         offset = self.normalized_request['offset']
-        newest_first = self.normalized_request.get('newest_first')
-        exploration_id = self.normalized_request.get('exploration_id')
+        newest_first = self.normalized_request['newest_first']
+        exploration_id = self.normalized_request['exploration_id']
         exp_ids = [exploration_id] if exploration_id else []
 
         suggestions: Sequence[suggestion_registry.BaseSuggestion] = []
