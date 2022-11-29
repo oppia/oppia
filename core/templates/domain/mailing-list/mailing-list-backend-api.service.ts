@@ -20,11 +20,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export interface AndroidListReturnStatusData {
+export interface MailingListReturnStatusData {
   status: boolean;
 }
 
-export interface AndroidListPayload {
+export interface MailingListPayload {
   email: string;
   name: string;
 }
@@ -32,14 +32,14 @@ export interface AndroidListPayload {
 @Injectable({
   providedIn: 'root'
 })
-export class AndroidUpdatesBackendApiService {
+export class MailingListBackendApiService {
   constructor(private http: HttpClient) {}
 
   private async _putRequestAsync(
-      handlerUrl: string, payload: AndroidListPayload
+      handlerUrl: string, payload: MailingListPayload
   ): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.http.put<AndroidListReturnStatusData>(
+      this.http.put<MailingListReturnStatusData>(
         handlerUrl, payload).toPromise()
         .then(response => {
           resolve(response.status);
@@ -49,18 +49,19 @@ export class AndroidUpdatesBackendApiService {
     });
   }
 
-  async subscribeUserToAndroidList(
-      email: string, name: string
+  async subscribeUserToMailingList(
+      email: string, name: string, tag: string
   ): Promise<boolean> {
     let payload = {
       email: email,
       name: name,
+      tag: tag
     };
     return this._putRequestAsync(
-      '/androidlistsubscriptionhandler', payload);
+      '/mailinglistsubscriptionhandler', payload);
   }
 }
 
 angular.module('oppia').factory(
-  'AndroidUpdatesBackendApiService',
-  downgradeInjectable(AndroidUpdatesBackendApiService));
+  'MailingListBackendApiService',
+  downgradeInjectable(MailingListBackendApiService));
