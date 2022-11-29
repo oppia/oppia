@@ -19,7 +19,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SubtopicPreviewTab } from './subtopic-preview-tab.component';
-import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/TopicObjectFactory';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
@@ -31,12 +31,11 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 describe('SubtopicPreviewTab', () => {
   let component: SubtopicPreviewTab;
   let fixture: ComponentFixture<SubtopicPreviewTab>;
-  let topicObjectFactory: TopicObjectFactory;
   let topicEditorStateService: TopicEditorStateService;
   let topicEditorRoutingService: TopicEditorRoutingService;
   let subtopicPage: SubtopicPage;
   let subtopic: Subtopic;
-  let topic = null;
+  let topic: Topic;
   let subtopicPageContentsDict = SubtopicPageContents.createFromBackendDict({
     subtitled_html: {
       html: 'test content',
@@ -73,14 +72,17 @@ describe('SubtopicPreviewTab', () => {
   });
 
   beforeEach(() => {
-    topicObjectFactory = TestBed.get(TopicObjectFactory);
     topicEditorStateService = TestBed.get(TopicEditorStateService);
     topicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
 
     fixture = TestBed.createComponent(SubtopicPreviewTab);
     component = fixture.componentInstance;
 
-    topic = topicObjectFactory.createInterstitialTopic();
+    topic = new Topic(
+      'id', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+    );
     subtopic = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic.setThumbnailFilename('thumbnailFilename.svg');
     subtopic.setThumbnailBgColor('#FFFFFF');
@@ -127,8 +129,6 @@ describe('SubtopicPreviewTab', () => {
       .returnValue(subtopicPageLoadedEventEmitter);
     // The ngOnInit is called to add the directiveSubscriptions.
     component.ngOnInit();
-    component.subtopicPage = null;
-    component.pageContents = null;
     component.htmlData = '';
 
     subtopicPageLoadedEventEmitter.emit();

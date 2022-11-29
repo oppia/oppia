@@ -23,8 +23,12 @@ from core.controllers import base
 from core.domain import subtopic_page_services
 from core.domain import topic_fetchers
 
+from typing import Dict
 
-class SubtopicViewerPage(base.BaseHandler):
+
+class SubtopicViewerPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Renders the subtopic viewer page."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -43,25 +47,43 @@ class SubtopicViewerPage(base.BaseHandler):
             }
         }
     }
-
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_subtopic_viewer_page
-    def get(self, *args):
+    def get(self, *args: str) -> None:
         """Handles GET requests."""
 
         self.render_template('subtopic-viewer-page.mainpage.html')
 
 
-class SubtopicPageDataHandler(base.BaseHandler):
+class SubtopicPageDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Manages the data that needs to be displayed to a learner on the
     subtopic page.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'subtopic_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_subtopic_viewer_page
-    def get(self, topic_name, subtopic_id):
+    def get(self, topic_name: str, subtopic_id: int) -> None:
         """Handles GET requests.
 
         Args:

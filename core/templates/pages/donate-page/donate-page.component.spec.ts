@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for donate page.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { EventEmitter } from '@angular/core';
+import { TestBed, fakeAsync, tick, flushMicrotasks } from '@angular/core/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 
 import { DonatePageComponent } from './donate-page.component';
@@ -29,10 +29,15 @@ import { WindowDimensionsService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PageTitleService } from 'services/page-title.service';
+import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
+import { AlertsService } from 'services/alerts.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 class MockWindowRef {
   _window = {
     location: {
+      hash: '#thank-you',
       _href: '',
       get href() {
         return this._href;
@@ -42,7 +47,8 @@ class MockWindowRef {
       },
       replace: (val: string) => {}
     },
-    gtag: () => {}
+    gtag: () => {},
+    onhashchange: () => {}
   };
 
   get nativeWindow() {
@@ -63,10 +69,14 @@ describe('Donate page', () => {
   let translateService: TranslateService;
   let pageTitleService: PageTitleService;
   let windowRef: MockWindowRef;
+  let mailingListBackendApiService: MailingListBackendApiService;
+  let alertsService: AlertsService;
+  let ngbModal: NgbModal;
 
   beforeEach(async() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [
         DonatePageComponent,
         MockTranslatePipe
@@ -89,7 +99,8 @@ describe('Donate page', () => {
           useClass: MockTranslateService
         },
         PageTitleService
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   });
 
@@ -100,6 +111,10 @@ describe('Donate page', () => {
     component = donatePageComponent.componentInstance;
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
+    alertsService = TestBed.inject(AlertsService);
+    mailingListBackendApiService = TestBed.inject(
+      MailingListBackendApiService);
+    ngbModal = TestBed.inject(NgbModal);
   });
 
   it('should successfully instantiate the component from beforeEach block',
@@ -137,31 +152,6 @@ describe('Donate page', () => {
       'I18N_DONATE_PAGE_BROWSER_TAB_TITLE');
   });
 
-  it('should donate throught amazon sucessfully', (done) => {
-    spyOn(siteAnalyticsServiceStub, 'registerGoToDonationSiteEvent')
-      .and.callThrough();
-
-    component.onDonateThroughAmazon();
-    expect(siteAnalyticsServiceStub.registerGoToDonationSiteEvent)
-      .toHaveBeenCalledWith('Amazon');
-
-    setTimeout(() => {
-      expect(windowRef.nativeWindow.location.href).toBe(
-        'https://smile.amazon.com/ch/81-1740068');
-
-      done();
-    }, 150);
-  });
-
-  it('should donate throught paypal sucessfully', () => {
-    spyOn(siteAnalyticsServiceStub, 'registerGoToDonationSiteEvent')
-      .and.callThrough();
-
-    component.onDonateThroughPayPal();
-    expect(siteAnalyticsServiceStub.registerGoToDonationSiteEvent)
-      .toHaveBeenCalledWith('PayPal');
-  });
-
   it('should unsubscribe on component destruction', () => {
     component.directiveSubscriptions.add(
       translateService.onLangChange.subscribe(() => {
@@ -172,4 +162,89 @@ describe('Donate page', () => {
 
     expect(component.directiveSubscriptions.closed).toBe(true);
   });
+
+  it('should validate email address correctly', () => {
+    component.emailAddress = 'invalidEmail';
+    expect(component.validateEmailAddress()).toBeFalse();
+
+    component.emailAddress = 'validEmail@example.com';
+    expect(component.validateEmailAddress()).toBeTrue();
+  });
+
+  it('should add user to mailing list and return status',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addInfoMessage');
+      component.ngOnInit();
+      tick();
+      component.emailAddress = 'validEmail@example.com';
+      component.name = 'validName';
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
+        .and.returnValue(Promise.resolve(true));
+
+      component.subscribeToMailingList();
+
+      flushMicrotasks();
+
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        'Done!', 1000);
+    }));
+
+  it('should fail to add user to mailing list and return status',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addInfoMessage');
+      component.ngOnInit();
+      tick();
+      component.emailAddress = 'validEmail@example.com';
+      component.name = 'validName';
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
+        .and.returnValue(Promise.resolve(false));
+
+      component.subscribeToMailingList();
+
+      flushMicrotasks();
+
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
+        'to be added to the mailing list.', 10000);
+    }));
+
+  it('should reject request to the mailing list correctly',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addInfoMessage');
+      component.ngOnInit();
+      tick();
+      component.emailAddress = 'validEmail@example.com';
+      component.name = 'validName';
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
+        .and.returnValue(Promise.reject(false));
+
+      component.subscribeToMailingList();
+
+      flushMicrotasks();
+
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
+        'to be added to the mailing list.', 10000);
+    }));
+
+  it('should get image set', () => {
+    spyOn(component, 'getStaticImageUrl');
+
+    component.getImageSet('abc', 'png');
+
+    expect(component.getStaticImageUrl).toHaveBeenCalled();
+  });
+
+  it('should show thank you modal on hash change',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open');
+      component.ngOnInit();
+
+      expect(ngbModal.open).not.toHaveBeenCalled();
+
+      windowRef.nativeWindow.onhashchange();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+    }));
 });

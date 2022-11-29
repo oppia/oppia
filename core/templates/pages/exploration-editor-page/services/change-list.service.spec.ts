@@ -62,8 +62,16 @@ class MockWindowRef {
 }
 
 class MockExplorationDataService1 {
-  explorationId: 0;
-  autosaveChangeListAsync(changeList, successCb, errorCb) {
+  explorationId!: 0;
+  autosaveChangeListAsync(
+      changeList: string[],
+      successCb: (
+        arg0: {
+          changes_are_mergeable: boolean;
+          is_version_of_draft_valid: boolean;
+        }) => void,
+      errorCb: () => void
+  ) {
     successCb({
       changes_are_mergeable: true,
       is_version_of_draft_valid: false,
@@ -76,8 +84,16 @@ class MockExplorationDataService1 {
 }
 
 class MockExplorationDataService2 {
-  explorationId: 0;
-  autosaveChangeListAsync(changeList, successCb, errorCb) {
+  explorationId!: 0;
+  autosaveChangeListAsync(
+      changeList: string[],
+      successCb: (
+        arg0: {
+          changes_are_mergeable: boolean;
+          is_version_of_draft_valid: boolean;
+        }) => void,
+      errorCb: () => void
+  ) {
     successCb({
       changes_are_mergeable: false,
       is_version_of_draft_valid: false,
@@ -90,8 +106,12 @@ class MockExplorationDataService2 {
 }
 
 class MockExplorationDataService3 {
-  explorationId: 0;
-  autosaveChangeListAsync(changeList, successCb, errorCb) {
+  explorationId!: 0;
+  autosaveChangeListAsync(
+      changeList: string[],
+      successCb: () => void,
+      errorCb: () => void
+  ) {
     errorCb();
   }
 
@@ -115,10 +135,10 @@ describe('Change List Service when changes are mergable', () => {
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
   let internetConnectivityService: InternetConnectivityService;
-  let autosaveInfoModalsService: AutosaveInfoModalsService = null;
+  let autosaveInfoModalsService: AutosaveInfoModalsService;
 
-  let alertsSpy = null;
-  let mockExplorationDataService = null;
+  let alertsSpy: jasmine.Spy;
+  let mockExplorationDataService: MockExplorationDataService1;
   let mockEventEmitter = new EventEmitter();
 
   beforeEach(async(() => {
@@ -152,11 +172,11 @@ describe('Change List Service when changes are mergable', () => {
     alertsService = TestBed.inject(AlertsService);
 
     spyOn(autosaveInfoModalsService, 'showVersionMismatchModal')
-      .and.returnValue(null);
+      .and.returnValue();
     spyOn(autosaveInfoModalsService, 'showNonStrictValidationFailModal')
-      .and.returnValue(null);
+      .and.returnValue();
     alertsSpy = spyOn(alertsService, 'addWarning')
-      .and.returnValue(null);
+      .and.returnValue();
   });
 
   it('should set loading message when initialized', () => {
@@ -167,7 +187,7 @@ describe('Change List Service when changes are mergable', () => {
 
   it('should save changes after deleting a state ' +
     'when calling \'deleteState\'', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
@@ -181,7 +201,7 @@ describe('Change List Service when changes are mergable', () => {
 
   it('should save changes after adding a state ' +
     'when calling \'addState\'', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
@@ -194,9 +214,9 @@ describe('Change List Service when changes are mergable', () => {
   }));
 
   it('should add Written Translation', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
-    changeListService.loadingMessage = null;
+    changeListService.loadingMessage = '';
     changeListService.addWrittenTranslation(
       'contentId', 'dataFormat',
       'languageCode', 'stateName', 'translationHtml');
@@ -213,7 +233,7 @@ describe('Change List Service when changes are mergable', () => {
 
   it('should save changes after renaming a state ' +
     'when calling \'renameState\'', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
@@ -227,7 +247,7 @@ describe('Change List Service when changes are mergable', () => {
 
   it('should save changes after editing exploration property ' +
     'when calling \'editExplorationProperty\'', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
@@ -242,7 +262,7 @@ describe('Change List Service when changes are mergable', () => {
 
   it('should save changes after editing state property ' +
     'when calling \'editExplorationProperty\'', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
@@ -346,10 +366,10 @@ describe('Change List Service when changes are not mergable', () => {
   let changeListService: ChangeListService;
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
-  let autosaveInfoModalsService: AutosaveInfoModalsService = null;
+  let autosaveInfoModalsService: AutosaveInfoModalsService;
 
-  let alertsSpy = null;
-  let mockExplorationDataService = null;
+  let alertsSpy: jasmine.Spy;
+  let mockExplorationDataService: MockExplorationDataService1;
 
   beforeEach(async(() => {
     mockWindowRef = new MockWindowRef();
@@ -375,17 +395,17 @@ describe('Change List Service when changes are not mergable', () => {
     alertsService = TestBed.inject(AlertsService);
 
     spyOn(autosaveInfoModalsService, 'showVersionMismatchModal')
-      .and.returnValue(null);
+      .and.returnValue();
     spyOn(autosaveInfoModalsService, 'showNonStrictValidationFailModal')
-      .and.returnValue(null);
+      .and.returnValue();
     alertsSpy = spyOn(alertsService, 'addWarning')
-      .and.returnValue(null);
+      .and.returnValue();
   });
 
   it('should undo and save changes when calling \'undoLastChange\'', () => {
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.returnValue(null);
+      .and.returnValue();
     changeListService.explorationChangeList.length = 2;
 
     changeListService.undoLastChange();
@@ -409,9 +429,9 @@ describe('Change List Service when internet is available', () => {
   let mockWindowRef: MockWindowRef;
   let onInternetStateChangeEventEmitter = new EventEmitter();
 
-  let alertsSpy = null;
-  let mockExplorationDataService = null;
-  let mockAutosaveInfoModalsService = null;
+  let alertsSpy: jasmine.Spy;
+  let mockExplorationDataService: MockExplorationDataService3;
+  let mockAutosaveInfoModalsService: MockAutosaveInfoModalsService;
 
   beforeEach(async(() => {
     mockWindowRef = new MockWindowRef();
@@ -449,13 +469,13 @@ describe('Change List Service when internet is available', () => {
     changeListService = TestBed.inject(ChangeListService);
     alertsService = TestBed.inject(AlertsService);
     alertsSpy = spyOn(alertsService, 'addWarning')
-      .and.returnValue(null);
+      .and.returnValue();
   });
 
   it('should undo and save changes when calling \'undoLastChange\'', () => {
     let saveSpy = spyOn(
       changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.returnValue(null);
+      .and.returnValue();
     changeListService.temporaryListOfChanges = [{
       cmd: 'add_state',
       state_name: 'stateName'

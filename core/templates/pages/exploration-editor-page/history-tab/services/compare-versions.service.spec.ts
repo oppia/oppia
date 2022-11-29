@@ -21,6 +21,16 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ExplorationSnapshot, VersionTreeService } from 'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { CompareVersionsService } from './compare-versions.service';
+import { StateBackendDict } from 'domain/state/StateObjectFactory';
+
+interface stateDetails {
+  contentStr: string;
+  ruleDests: string[];
+}
+
+interface StatesData {
+  A?: stateDetails;
+}[];
 
 describe('Compare versions service', () => {
   let cvs: CompareVersionsService;
@@ -62,13 +72,16 @@ describe('Compare versions service', () => {
   //    links
   // Only information accessed by getDiffGraphData is included in the return
   // value.
-  let _getStatesAndMetadata = function(statesDetails) {
-    let statesData = {};
+  let _getStatesAndMetadata = function(statesDetails: StatesData) {
+    let statesData: Record<string, StateBackendDict> = {};
     for (let stateName in statesDetails) {
+      let stateDetail = statesDetails[
+        stateName as keyof StatesData] as stateDetails;
       let newStateData = {
+        classifier_model_id: null,
         content: {
           content_id: 'content',
-          html: statesDetails[stateName].contentStr
+          html: stateDetail.contentStr
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -79,6 +92,12 @@ describe('Compare versions service', () => {
         interaction: {
           id: 'EndExploration',
           answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            buttonText: {
+              value: 'Continue'
+            }
+          },
           default_outcome: {
             dest: 'default',
             dest_if_really_stuck: null,
@@ -88,10 +107,14 @@ describe('Compare versions service', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: null
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
-          hints: []
+          hints: [],
+          solution: null,
         },
+        linked_skill_id: null,
+        next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,
         written_translations: {
@@ -100,9 +123,14 @@ describe('Compare versions service', () => {
             default_outcome: {}
           }
         },
+        card_is_checkpoint: true
       };
+      // This throws "Argument of type 'null' is not assignable to parameter of
+      // type 'AnswerGroup[]'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
       newStateData.interaction.answer_groups =
-          statesDetails[stateName].ruleDests.map(function(ruleDestName) {
+          stateDetail.ruleDests.map(function(ruleDestName) {
             return {
               outcome: {
                 dest: ruleDestName,
@@ -110,12 +138,15 @@ describe('Compare versions service', () => {
                 feedback: [],
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
               },
               rule_specs: [],
+              training_data: [],
+              tagged_skill_misconception_id: null,
             };
           });
-      statesData[stateName] = newStateData;
+      statesData[stateName as keyof StatesData] = newStateData;
     }
     let explorationMetadataDict = {
       title: 'An exploration',

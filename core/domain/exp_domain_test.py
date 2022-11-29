@@ -35,7 +35,7 @@ from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Tuple, Union
+from typing import Dict, Final, List, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1563,8 +1563,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     def test_continue_interaction(self) -> None:
         """Tests Continue interaction."""
         self.set_interaction_for_state(self.state, 'Continue')
-        self.state.interaction.customization_args[
-          'buttonText'].value.unicode_str = 'Continueeeeeeeeeeeeeeeeee'
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to 'SubtitledUnicode' type, and this
+        # is done because here we are accessing 'buttontext' key from continue
+        # customization arg whose value is always of SubtitledUnicode type.
+        subtitled_unicode_continue_ca_arg = cast(
+            state_domain.SubtitledUnicode,
+            self.state.interaction.customization_args[
+                'buttonText'
+            ].value
+        )
+        subtitled_unicode_continue_ca_arg.unicode_str = (
+            'Continueeeeeeeeeeeeeeeeee'
+        )
         self._assert_validation_error(
           self.new_exploration, (
             'The `continue` interaction text length should be atmost '
@@ -2197,26 +2208,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
             'rule_specs': [
                 {
-                    'rule_type': 'HasElementXAtPositionY',
-                    'inputs': {
-                        'x': 'ca_choices_0',
-                        'y': 4
-                    }
-                },
-                {
-                    'rule_type': 'IsEqualToOrdering',
-                    'inputs': {
-                        'x': [
-                            [
-                            'ca_choices_0', 'ca_choices_1', 'ca_choices_2'
-                            ],
-                            [
-                            'ca_choices_3'
-                            ]
-                        ]
-                    }
-                },
-                {
                     'rule_type': (
                         'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
                     'inputs': {
@@ -2245,6 +2236,26 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                             ],
                             [
                             'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'HasElementXAtPositionY',
+                    'inputs': {
+                        'x': 'ca_choices_0',
+                        'y': 4
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_3'
+                            ],
+                            [
+                            'ca_choices_0', 'ca_choices_1', 'ca_choices_2'
                             ]
                         ]
                     }
@@ -2402,21 +2413,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml('ca_choices_2', '<p>3</p>')
         ]
 
-        self.state.interaction.customization_args[
-            'allowMultipleItemsInSamePosition'].value = True
-
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Rule - 1 of answer group 0 '
-            'does not have the enough position to match for the '
-            'HasElementXAtPositionY rule above.'
-        ):
-            self.new_exploration.validate(strict=True)
-        rule_specs.remove(rule_specs[0])
-        rule_specs.remove(rule_specs[0])
-
-        self.state.interaction.customization_args[
-            'allowMultipleItemsInSamePosition'].value = False
-
         with self.assertRaisesRegex(
             utils.ValidationError, 'The rule \'0\' of answer group \'0\' '
             'having rule type - IsEqualToOrderingWithOneItemAtIncorrectPosition'
@@ -2437,11 +2433,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state.interaction.customization_args[
             'allowMultipleItemsInSamePosition'].value = True
         with self.assertRaisesRegex(
-            utils.ValidationError, 'The rule \'1\' of answer group \'0\', '
+            utils.ValidationError, 'The rule \'3\' of answer group \'0\', '
             'the value 1 and value 2 cannot be same when rule type is '
             'HasElementXBeforeElementY of DragAndDropSortInput interaction.'
         ):
             self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[1])
+        rule_specs.remove(rule_specs[1])
         rule_specs.remove(rule_specs[1])
 
         self._assert_validation_error(
@@ -4215,7 +4213,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Please fix the following issues before saving this exploration: '
             '1. The following states are not reachable from the initial state: '
             'End 2. It is impossible to complete the exploration from the '
-            'following states: Stuck State, Introduction'):
+            'following states: Introduction, Stuck State'):
             exploration.validate(strict=True)
 
     def test_update_init_state_name_with_invalid_state(self) -> None:
@@ -4335,7 +4333,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             }
         }
         state_interaction_cust_args: Dict[
-            str, Dict[str, Union[Dict[str, str], int]]
+            str, Dict[str, Union[state_domain.SubtitledUnicodeDict, int]]
         ] = {
             'placeholder': {
                 'value': {
@@ -4343,7 +4341,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'unicode_str': ''
                 }
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {'value': False}
         }
         state.update_next_content_id_index(3)
         state.update_content(
@@ -6603,7 +6602,301 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT: Final = YAML_CONTENT_V56
+    YAML_CONTENT_V58: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 6
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: (untitled state)
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+        catchMisspellings:
+          value: false
+      default_outcome:
+        dest: END
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 53
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V59: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 59
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 6
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: (untitled state)
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+        catchMisspellings:
+          value: false
+      default_outcome:
+        dest: END
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 54
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT: Final = YAML_CONTENT_V59
 
     def test_load_from_v46_with_item_selection_input_interaction(self) -> None:
         """Tests the migration of ItemSelectionInput rule inputs."""
@@ -6738,7 +7031,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -6844,7 +7137,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: Title
 """)
@@ -6998,7 +7291,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7114,7 +7407,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: Title
 """)
@@ -7229,7 +7522,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7302,7 +7595,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: Title
 """)
@@ -7437,7 +7730,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -7525,7 +7818,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -7706,7 +7999,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -7828,7 +8121,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -7968,7 +8261,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8054,7 +8347,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -8167,7 +8460,7 @@ language_code: hi
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8239,7 +8532,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -8570,7 +8863,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8719,7 +9012,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -9000,7 +9293,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9159,7 +9452,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -9309,7 +9602,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9406,7 +9699,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -9609,7 +9902,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9733,7 +10026,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -9856,7 +10149,7 @@ states:
       solution:
         answer_is_exclusive: true
         correct_answer:
-          - <p>1</p>
+          - ca_choices_20
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
@@ -9931,7 +10224,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10019,7 +10312,7 @@ states:
       solution:
         answer_is_exclusive: true
         correct_answer:
-        - <p>1</p>
+        - ca_choices_20
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
@@ -10075,7 +10368,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -10219,7 +10512,7 @@ states:
       solution:
         answer_is_exclusive: true
         correct_answer:
-          - <p>  </p>
+          - ca_choices_23
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
@@ -10296,7 +10589,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10404,7 +10697,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -10568,7 +10861,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10673,7 +10966,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -10809,7 +11102,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10905,7 +11198,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -11058,11 +11351,6 @@ states:
             x: ca_choices_27
             y: 4
           rule_type: HasElementXAtPositionY
-        - inputs:
-            x:
-            - - ca_choices_29
-            - - ca_choices_28
-          rule_type: IsEqualToOrdering
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -11163,7 +11451,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11289,7 +11577,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -11353,6 +11641,17 @@ states:
             - - ca_choices_27
               - ca_choices_28
             - - ca_choices_26
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x: ca_choices_27
+            y: 4
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x:
+            - - ca_choices_29
+              - ca_choices_27
+              - ca_choices_28
+              - ca_choices_26
           rule_type: IsEqualToOrdering
         tagged_skill_misconception_id: null
         training_data: []
@@ -11448,7 +11747,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11483,6 +11782,17 @@ states:
             - - ca_choices_28
             - - ca_choices_29
           rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x: ca_choices_27
+            y: 4
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x:
+            - - ca_choices_29
+              - ca_choices_27
+              - ca_choices_28
+              - ca_choices_26
+          rule_type: IsEqualToOrdering
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
@@ -11560,7 +11870,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -11735,7 +12045,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11844,7 +12154,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -12149,7 +12459,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12263,6 +12573,8 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_34
@@ -12344,7 +12656,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -12479,7 +12791,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 58
+schema_version: 59
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12511,6 +12823,8 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_34
@@ -12574,7 +12888,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 53
+states_schema_version: 54
 tags: []
 title: ''
 """)
@@ -12737,65 +13051,75 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(state3, 'ItemSelectionInput')
         self.set_interaction_for_state(state4, 'DragAndDropSortInput')
 
+        ca_placeholder_value_dict: state_domain.SubtitledUnicodeDict = {
+            'content_id': 'ca_placeholder_0',
+            'unicode_str': 'Enter here.'
+        }
         customization_args_dict1: Dict[
-            str, Dict[str, Union[Dict[str, str], int]]
+            str, Dict[str, Union[state_domain.SubtitledUnicodeDict, int]]
         ] = {
             'placeholder': {
-                'value': {
-                    'content_id': 'ca_placeholder_0',
-                    'unicode_str': 'Enter here.'
-                }
+                'value': ca_placeholder_value_dict
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {
+                'value': False
+            }
         }
+
+        choices_subtitled_html_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>This is value1 for MultipleChoice</p>'
+            },
+            {
+                'content_id': 'ca_choices_1',
+                'html': '<p>This is value2 for MultipleChoice</p>'
+            }
+        ]
         customization_args_dict2: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], bool]]
+            str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], bool]]
         ] = {
-            'choices': {'value': [
-                {
-                    'content_id': 'ca_choices_0',
-                    'html': '<p>This is value1 for MultipleChoice</p>'
-                },
-                {
-                    'content_id': 'ca_choices_1',
-                    'html': '<p>This is value2 for MultipleChoice</p>'
-                }
-            ]},
+            'choices': {'value': choices_subtitled_html_dicts},
             'showChoicesInShuffledOrder': {'value': True}
         }
+
+        choices_subtitled_html_dicts = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>This is value1 for ItemSelection</p>'
+            },
+            {
+                'content_id': 'ca_choices_1',
+                'html': '<p>This is value2 for ItemSelection</p>'
+            },
+            {
+                'content_id': 'ca_choices_2',
+                'html': '<p>This is value3 for ItemSelection</p>'
+            }
+        ]
         customization_args_dict3: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], int]]
+            str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], int]]
         ] = {
-            'choices': {'value': [
-                {
-                    'content_id': 'ca_choices_0',
-                    'html': '<p>This is value1 for ItemSelection</p>'
-                },
-                {
-                    'content_id': 'ca_choices_1',
-                    'html': '<p>This is value2 for ItemSelection</p>'
-                },
-                {
-                    'content_id': 'ca_choices_2',
-                    'html': '<p>This is value3 for ItemSelection</p>'
-                }
-            ]},
+            'choices': {'value': choices_subtitled_html_dicts},
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 2}
         }
+
+        choices_subtitled_html_dicts = [
+          {
+              'content_id': 'ca_choices_0',
+              'html': '<p>This is value1 for DragAndDropSortInput</p>'
+          },
+          {
+              'content_id': 'ca_choices_1',
+              'html': '<p>This is value2 for DragAndDropSortInput</p>'
+          }
+        ]
         customization_args_dict4: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], bool]]
+            str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], bool]]
         ] = {
-            'choices': {'value': [
-                {
-                    'content_id': 'ca_choices_0',
-                    'html': '<p>This is value1 for DragAndDropSortInput</p>'
-                },
-                {
-                    'content_id': 'ca_choices_1',
-                    'html': '<p>This is value2 for DragAndDropSortInput</p>'
-                }
-            ]},
+            'choices': {'value': choices_subtitled_html_dicts},
             'allowMultipleItemsInSamePosition': {'value': True}
         }
 
@@ -12971,6 +13295,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -13212,6 +13539,9 @@ class ExplorationChangesMergeabilityUnitTests(
                         'content_id': 'ca_placeholder_0',
                         'unicode_str': ''
                     }
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'cmd': 'edit_state_property',
@@ -13373,6 +13703,9 @@ class ExplorationChangesMergeabilityUnitTests(
                         'content_id': 'ca_placeholder_0',
                         'unicode_str': ''
                     }
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'cmd': 'edit_state_property',
@@ -13428,6 +13761,9 @@ class ExplorationChangesMergeabilityUnitTests(
                         'content_id': 'ca_placeholder_0',
                         'unicode_str': ''
                     }
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'cmd': 'edit_state_property',
@@ -13574,6 +13910,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'property_name': 'widget_customization_args',
@@ -13590,6 +13929,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 'rows':
                 {
                     'value': 2
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'cmd': 'edit_state_property'
@@ -13614,6 +13956,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 'rows':
                 {
                     'value': 2
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'property_name': 'widget_customization_args',
@@ -13870,6 +14215,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'property_name': 'widget_customization_args',
@@ -13886,6 +14234,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 'rows':
                 {
                     'value': 2
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'cmd': 'edit_state_property'
@@ -13910,6 +14261,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 'rows':
                 {
                     'value': 2
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'property_name': 'widget_customization_args',
@@ -14007,6 +14361,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'property_name': 'widget_customization_args',
@@ -14023,6 +14380,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 'rows':
                 {
                     'value': 2
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'cmd': 'edit_state_property'
@@ -15757,6 +16117,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'new_value': test_dict
@@ -16193,6 +16556,9 @@ class ExplorationChangesMergeabilityUnitTests(
                         'unicode_str': '',
                         'content_id': 'ca_placeholder_0'
                     }
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -16606,6 +16972,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'state_name': 'Introduction',
@@ -16619,6 +16988,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -16853,6 +17225,9 @@ class ExplorationChangesMergeabilityUnitTests(
                         'unicode_str': 'Placeholder',
                         'content_id': 'ca_placeholder_0'
                     }
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'state_name': 'Introduction',
@@ -16867,6 +17242,9 @@ class ExplorationChangesMergeabilityUnitTests(
                         'unicode_str': 'Placeholder Changed.',
                         'content_id': 'ca_placeholder_0'
                     }
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -16976,6 +17354,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'state_name': 'Introduction',
@@ -16989,6 +17370,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -17249,6 +17633,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'state_name': 'Introduction',
@@ -17262,6 +17649,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -17592,6 +17982,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'state_name': 'Introduction',
@@ -17605,6 +17998,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -17833,6 +18229,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'cmd': 'edit_state_property',
@@ -18145,6 +18544,9 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'rows': {
                     'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
                 }
             },
             'cmd': 'edit_state_property',
@@ -18270,6 +18672,9 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'rows': {
                         'value': 1
+                    },
+                    'catchMisspellings': {
+                        'value': False
                     }
                 },
                 'cmd': 'edit_state_property',

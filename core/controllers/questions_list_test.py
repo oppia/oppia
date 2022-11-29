@@ -29,7 +29,7 @@ from core.tests import test_utils
 
 class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -64,7 +64,7 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
 
 class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
 
-    def test_get_questions_succeeds(self):
+    def test_get_questions_succeeds(self) -> None:
         for _ in range(4):
             question_id = question_services.get_new_question_id()
             self.save_new_question(
@@ -145,17 +145,17 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             self.assertFalse(more)
         self.logout()
 
-    def test_get_fails_when_offset_not_valid(self):
+    def test_get_fails_when_offset_not_valid(self) -> None:
         self.get_json('%s/%s?offset=a' % (
             feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id),
                       expected_status_int=400)
 
-    def test_get_fails_when_skill_id_not_valid(self):
+    def test_get_fails_when_skill_id_not_valid(self) -> None:
         self.get_json('%s/%s?offset=0' % (
             feconf.QUESTIONS_LIST_URL_PREFIX, '1,2'),
                       expected_status_int=400)
 
-    def test_get_fails_when_skill_does_not_exist(self):
+    def test_get_fails_when_skill_does_not_exist(self) -> None:
         self.get_json('%s/%s?offset=0' % (
             feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id_3),
                       expected_status_int=404)
@@ -163,7 +163,7 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
 
 class QuestionCountDataHandlerTests(BaseQuestionsListControllerTests):
 
-    def test_get_question_count_succeeds(self):
+    def test_get_question_count_succeeds(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         question_id = question_services.get_new_question_id()
         question_id_1 = question_services.get_new_question_id()
@@ -204,13 +204,15 @@ class QuestionCountDataHandlerTests(BaseQuestionsListControllerTests):
             ))
         self.assertEqual(json_response['total_question_count'], 1)
 
-    def test_get_question_count_when_no_question_is_assigned_to_skill(self):
+    def test_get_question_count_when_no_question_is_assigned_to_skill(
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         json_response = self.get_json(
             '%s/%s' % (feconf.QUESTION_COUNT_URL_PREFIX, self.skill_id))
         self.assertEqual(json_response['total_question_count'], 0)
 
-    def test_get_question_count_fails_with_invalid_skill_ids(self):
+    def test_get_question_count_fails_with_invalid_skill_ids(self) -> None:
         self.get_json(
             '%s/%s' % (feconf.QUESTION_COUNT_URL_PREFIX, 'id1'),
             expected_status_int=400)
