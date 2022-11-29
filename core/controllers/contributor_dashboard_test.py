@@ -464,7 +464,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.owner_id, change_dict, 'description')
 
-        # Create a translation suggestion for exploration 1 with a different language.
+        # Create a translation suggestion in Spanish.
         change_dict = {
             'cmd': 'add_translation',
             'content_id': 'content',
