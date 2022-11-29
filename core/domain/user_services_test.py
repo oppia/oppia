@@ -41,7 +41,8 @@ from core.tests import test_utils
 
 import requests_mock
 
-from typing import Dict, Final, List
+from typing import Dict, List
+from typing_extensions import Final
 
 MYPY = False
 if MYPY: # pragma: no cover

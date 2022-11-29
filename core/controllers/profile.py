@@ -35,8 +35,8 @@ from core.domain import takeout_service
 from core.domain import user_services
 from core.domain import wipeout_service
 
-from typing import Dict
 from typing_extensions import TypedDict
+
 
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""

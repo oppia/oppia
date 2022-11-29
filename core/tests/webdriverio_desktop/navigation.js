@@ -15,7 +15,6 @@
 /**
  * @fileoverview End-to-end tests for general site navigation.
  */
-var action = require('../webdriverio_utils/action.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var waitFor = require('../webdriverio_utils/waitFor.js');
