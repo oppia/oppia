@@ -1769,8 +1769,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.reviewer_id_1, 'pt')
 
         # Get reviewable translation suggestions in Hindi.
-        language_to_filter = "hi"
-        suggestions, offset = (
+        language_to_filter = 'hi'
+        suggestions = (
             suggestion_services.
             get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1, self.opportunity_summary_ids,
@@ -1786,8 +1786,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         expected_language_code_list = ['hi', 'hi']
         self.assertEqual(actual_language_code_list, expected_language_code_list)
 
-        # Get reviewable translation suggestions in Spanish, which there are none.
-        language_to_filter = "es"
+        # Get reviewable translation suggestions in Spanish (there are none).
+        language_to_filter = 'es'
         suggestions, offset = (
             suggestion_services.
             get_reviewable_translation_suggestions_by_offset(
@@ -1803,7 +1803,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         ]
         expected_language_code_list = []
         self.assertEqual(actual_language_code_list, expected_language_code_list)
-
 
     def test_get_reviewable_question_suggestions(self) -> None:
         # Add a few translation suggestions in different languages.
