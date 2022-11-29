@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from core import feconf
+from core.domain import image_services
 from core.domain import user_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import user_settings_profile_picture_jobs
@@ -183,17 +184,14 @@ class FixInvalidProfilePictureJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout='USER MODELS ITERATED SUCCESS: 1'
-            ),
-            job_run_result.JobRunResult(
-                stdout='DEFAULT PROFILE PICTURE SUCCESS: 1'
             )
         ])
 
     def test_default_profile_picture_report(self) -> None:
         self.put_multi([self.user_5])
         with self.swap_to_always_return(
-            user_services, 'fetch_gravatar',
-            user_services.DEFAULT_IDENTICON_DATA_URL
+            image_services, 'get_image_dimensions',
+            (76, 76)
         ):
             self.assert_job_output_is([
                 job_run_result.JobRunResult(

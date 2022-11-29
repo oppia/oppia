@@ -20,8 +20,10 @@ from __future__ import annotations
 
 import io
 import logging
+import os
 
 from core import utils
+from core.domain import image_services
 from core.domain import user_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -148,8 +150,7 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
 
         try:
             imgdata = utils.convert_png_data_url_to_binary(profile_picture_data)
-            image = Image.open(io.BytesIO(imgdata))
-            width, height = image.size
+            height, width = image_services.get_image_dimensions(imgdata)
         except Exception:
             logging.exception('ERRORED EXCEPTION MIGRATION')
             user_model.profile_picture_data_url = (
@@ -160,13 +161,23 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
             user_services.DEFAULT_IDENTICON_DATA_URL or (
                 width == 76 and height == 76)
         ):
+            with utils.open_file(
+                os.path.join(
+                    'assets', 'images', 'avatar', 'user_blue_150px.png'),
+                'rb',
+                encoding=None
+            ) as f:
+                raw_image_png = f.read()
             user_model.profile_picture_data_url = (
-                user_services.fetch_gravatar(user_model.email))
+                utils.convert_png_binary_to_data_url(raw_image_png))
 
         # Here we need to check for the default image again because there is a
         # possibility that in the above check we are not able to generate the
         # gravatar for the user having default image and we want to keep track
         # of all the default images.
+        imgdata = utils.convert_png_data_url_to_binary(
+            user_model.profile_picture_data_url)
+        height, width = image_services.get_image_dimensions(imgdata)
         if (
             user_model.profile_picture_data_url ==
             user_services.DEFAULT_IDENTICON_DATA_URL or (
