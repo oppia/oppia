@@ -4002,19 +4002,3 @@ def rollback_exploration_to_safe_state(exp_id: str) -> int:
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exp_id])
     return last_known_safe_version
-
-
-def fix_commit_commands() -> None:
-    """Fixes the commit commands for a problematic exploration with
-    ID Q4POXOibJEH6.
-    """
-    snapshot_id = exp_models.ExplorationModel.get_snapshot_id(
-        'Q4POXOibJEH6', 3)
-    snapshot_metadata = exp_models.ExplorationSnapshotMetadataModel.get(
-        snapshot_id)
-    snapshot_metadata.commit_cmds.append(exp_domain.ExplorationChange({
-        'cmd': 'add_state',
-        'state_name': 'END'
-    }).to_dict())
-    snapshot_metadata.update_timestamps()
-    snapshot_metadata.put()
