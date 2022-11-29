@@ -41,6 +41,20 @@ BUCKET = app_identity_services.get_gcs_resource_bucket_name()
 class ReadFile(beam.PTransform): # type: ignore[misc]
     """Read files form the GCS."""
 
+    def __init__(
+        self,
+        bucket: str = BUCKET,
+        label: Optional[str] = None
+    ) -> None:
+        """Initializes the ReadFile PTransform.
+
+        Args:
+            bucket: str. The bucket name on the GCS.
+            label: Optional[str]. The label of the PTransform.
+        """
+        super().__init__(label=label)
+        self.bucket = bucket
+
     def expand(self, file_paths: beam.PCollection) -> beam.PCollection:
         """Returns PCollection with file data.
 
@@ -65,7 +79,7 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         Returns:
             data: Tuple[str, bytes]. The file data.
         """
-        data = storage_services.get(BUCKET, file_path)
+        data = storage_services.get(self.bucket, file_path)
         return (file_path, data)
 
 
@@ -86,16 +100,19 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
     def __init__(
         self,
         mime_type: str = 'application/octet-stream',
+        bucket: str = BUCKET,
         label: Optional[str] = None
     ) -> None:
         """Initializes the WriteFile PTransform.
 
         Args:
             mime_type: str. The mime_type to assign to the file.
+            bucket: str. The bucket name on the GCS.
             label: Optional[str]. The label of the PTransform.
         """
         super().__init__(label=label)
         self.mime_type = mime_type
+        self.bucket = bucket
 
     def expand(self, file_objects: beam.PCollection) -> beam.PCollection:
         """Returns the PCollection of files that have written to the GCS.
@@ -124,7 +141,7 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
             int. Returns the number of bytes that has been written to GCS.
         """
         storage_services.commit(
-            BUCKET, file_obj['filepath'], file_obj['data'], self.mime_type)
+            self.bucket, file_obj['filepath'], file_obj['data'], self.mime_type)
         return len(file_obj['data'])
 
 
@@ -134,6 +151,20 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
 # cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
 class DeleteFile(beam.PTransform): # type: ignore[misc]
     """Delete files from GCS."""
+
+    def __init__(
+        self,
+        bucket: str = BUCKET,
+        label: Optional[str] = None
+    ) -> None:
+        """Initializes the DeleteFile PTransform.
+
+        Args:
+            bucket: str. The bucket name on the GCS.
+            label: Optional[str]. The label of the PTransform.
+        """
+        super().__init__(label=label)
+        self.bucket = bucket
 
     def expand(self, file_paths: beam.PCollection) -> beam.pvalue.PDone:
         """Deletes the files in given PCollection.
@@ -156,7 +187,7 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
         Args:
             file_path: str. The name of the file that will be deleted.
         """
-        storage_services.delete(BUCKET, file_path)
+        storage_services.delete(self.bucket, file_path)
 
 
 # TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
@@ -165,6 +196,20 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
 # cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
 class GetFiles(beam.PTransform): # type: ignore[misc]
     """Get all files with specefic prefix."""
+
+    def __init__(
+        self,
+        bucket: str = BUCKET,
+        label: Optional[str] = None
+    ) -> None:
+        """Initializes the GetFiles PTransform.
+
+        Args:
+            bucket: str. The bucket name on the GCS.
+            label: Optional[str]. The label of the PTransform.
+        """
+        super().__init__(label=label)
+        self.bucket = bucket
 
     def expand(self, prefixes: beam.PCollection) -> beam.PCollection:
         """Returns PCollection with file names.
@@ -191,9 +236,7 @@ class GetFiles(beam.PTransform): # type: ignore[misc]
             filepaths: List[str]. The file name as key and size of file
             as value.
         """
-        list_of_blobs = storage_services.listdir(BUCKET, prefix)
-        filepaths = []
-        for blob in list_of_blobs:
-            filepaths.append(blob.name)
-        filepaths.sort()
-        return filepaths
+        list_of_blobs = storage_services.listdir(self.bucket, prefix)
+        return list(
+            sorted(blob.name for blob in list_of_blobs)
+        )
