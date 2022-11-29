@@ -1426,10 +1426,7 @@ def update_profile_picture_data_url(
         profile_picture_data_url, 'png')
     fs.commit(filename_png, png_binary, mimetype='image/png')
 
-    output = io.BytesIO()
-    image = Image.open(io.BytesIO(png_binary)).convert('RGB')
-    image.save(output, 'webp')
-    webp_binary = output.getvalue()
+    webp_binary = utils.convert_png_binary_to_webp_binary(png_binary)
     filename_webp = 'profile_picture.webp'
     fs.commit(filename_webp, webp_binary, mimetype='image/webp')
 

@@ -5703,28 +5703,64 @@ class WipeoutServiceVerifyProfilePictureIsDeletedTests(
 
     USER_1_EMAIL: Final = 'some@email.com'
     USER_1_USERNAME: Final = 'username1'
+    USER_2_EMAIL: Final = 'user2@email.com'
+    USER_2_USERNAME: Final = 'username2'
 
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
 
-        self.fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_USER, self.USER_1_USERNAME)
         self.filename_png = 'profile_picture.png'
         self.filename_webp = 'profile_picture.webp'
-        png_binary = utils.convert_png_or_webp_data_url_to_binary(
+        self.png_binary = utils.convert_png_or_webp_data_url_to_binary(
             user_services.DEFAULT_IDENTICON_DATA_URL, 'png')
-        self.fs.commit(self.filename_png, png_binary)
-        self.fs.commit(self.filename_webp, png_binary)
+        self.webp_binary = utils.convert_png_binary_to_webp_binary(
+            self.png_binary)
+
+        self.fs_1 = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.USER_1_USERNAME)
+        self.fs_1.commit(self.filename_png, self.png_binary)
+        self.fs_1.commit(self.filename_webp, self.webp_binary)
+
+        self.fs_2 = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.USER_2_USERNAME)
+        self.fs_2.commit(self.filename_png, self.png_binary)
+        self.fs_2.commit(self.filename_webp, self.webp_binary)
 
     def test_profile_picture_is_removed(self) -> None:
-        self.assertTrue(self.fs.isfile(self.filename_png))
-        self.assertTrue(self.fs.isfile(self.filename_webp))
+        self.assertTrue(self.fs_1.isfile(self.filename_png))
+        self.assertTrue(self.fs_1.isfile(self.filename_webp))
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-        self.assertFalse(self.fs.isfile(self.filename_png))
-        self.assertFalse(self.fs.isfile(self.filename_webp))
+        self.assertFalse(self.fs_1.isfile(self.filename_png))
+        self.assertFalse(self.fs_1.isfile(self.filename_webp))
+
+    def test_log_error_when_profile_pictures_are_missing(self) -> None:
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            wipeout_service.pre_delete_user(self.user_2_id)
+            self.process_and_flush_pending_tasks()
+            wipeout_service.delete_user(
+                wipeout_service.get_pending_deletion_request(self.user_2_id))
+            self.fs_2.commit(self.filename_png, self.png_binary)
+            self.assertFalse(wipeout_service.verify_user_deleted(
+                self.user_2_id))
+            self.assertEqual(
+                logs[0], (
+                    '[WIPEOUT] Profile picture having png is not deleted for '
+                    'user having username username2.'))
+            self.fs_2.delete(self.filename_png)
+
+            self.fs_2.commit(self.filename_webp, self.webp_binary)
+            self.assertFalse(wipeout_service.verify_user_deleted(
+                self.user_2_id))
+            self.maxDiff = None
+            self.assertEqual(
+                logs[1], (
+                    '[WIPEOUT] Profile picture having webp is not deleted for '
+                    'user having username username2.'))

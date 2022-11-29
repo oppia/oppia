@@ -23,6 +23,7 @@ import datetime
 import hashlib
 import imghdr
 import itertools
+import io
 import json
 import os
 import random
@@ -35,6 +36,7 @@ import urllib.parse
 import urllib.request
 import zlib
 
+from PIL import Image
 from core import feconf
 from core.constants import constants
 
@@ -396,6 +398,21 @@ def get_url_scheme(url: str) -> str:
         str. Returns the URL scheme.
     """
     return urllib.parse.urlparse(url).scheme
+
+
+def convert_png_binary_to_webp_binary(png_binary: bytes) -> bytes:
+    """Convert png binary to webp binary.
+
+    Args:
+        png_binary: bytes. The binary content of png.
+
+    Returns:
+        bytes. The binary content of webp.
+    """
+    output = io.BytesIO()
+    image = Image.open(io.BytesIO(png_binary)).convert('RGB')
+    image.save(output, 'webp')
+    return output.getvalue()
 
 
 def convert_png_or_webp_data_url_to_binary(
