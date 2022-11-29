@@ -268,16 +268,6 @@ describe('Customize Interaction Modal Component', () => {
   });
 
   it('should disable Save Interaction button when recommendation ID' +
-  ' is null', () => {
-    let inputField = document.createElement('input');
-    let className = 'oppia-exploration-id-input';
-    inputField.classList.add(className);
-    inputField.setAttribute('ng-reflect-model', null);
-
-    expect(component.isSaveInteractionButtonEnabled()).toBe(false);
-  });
-
-  it('should disable Save Interaction button when recommendation ID' +
   ' is undefined', () => {
     let inputField = document.createElement('input');
     let className = 'oppia-exploration-id-input';
