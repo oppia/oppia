@@ -57,7 +57,10 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
     def _update_content_id_in_translation_suggestions(
         suggestions: List[suggestion_models.GeneralSuggestionModel],
         exp_model: exp_models.ExplorationModel
-    ) -> result.Result[List[suggestion_models.GeneralSuggestionModel]]:
+    ) -> result.Result[
+        List[suggestion_models.GeneralSuggestionModel],
+        Tuple[str, Exception]
+    ]:
         """Updates content id in translation suggestion.
 
         Args:
@@ -79,21 +82,25 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
         )
 
         for suggestion in suggestions:
-            suggestion_content_id = suggestion.change_cmd['content_id']
-            old_to_new_content_id_in_state = old_to_new_content_id_mapping[
-                suggestion.change_cmd['state_name']
-            ]
-            if suggestion_content_id not in old_to_new_content_id_in_state:
-                return result.Err(
-                    (
-                        suggestion.id,
-                        'Content ID %s does not exist in the exploration'
-                        % suggestion_content_id
+            try:
+                suggestion_content_id = suggestion.change_cmd['content_id']
+                old_to_new_content_id_in_state = old_to_new_content_id_mapping[
+                    suggestion.change_cmd['state_name']
+                ]
+                if suggestion_content_id not in old_to_new_content_id_in_state:
+                    return result.Err(
+                        (
+                            suggestion.id,
+                            'Content ID %s does not exist in the exploration'
+                            % suggestion_content_id
+                        )
                     )
-                )
 
-            suggestion.change_cmd['content_id'] = (
-                old_to_new_content_id_in_state[suggestion_content_id])
+                suggestion.change_cmd['content_id'] = (
+                    old_to_new_content_id_in_state[suggestion_content_id])
+            except Exception as e:
+                logging.exception(e)
+                return result.Err((suggestion.id, e))
 
         return result.Ok(suggestions)
 
