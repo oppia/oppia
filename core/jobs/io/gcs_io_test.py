@@ -105,15 +105,13 @@ class DeleteFileTest(job_test_utils.PipelinedTestBase):
             | 'Delete file from GCS' >> gcs_io.DeleteFile()
         )
         self.assert_pcoll_equal(filepath_p_collec, [None])
+        self.assertFalse(storage_services.isfile(bucket, file_path))
 
     def test_check_correct_files_are_passing(self) -> None:
         file_path = 'dummy_folder/dummy_subfolder/dummy_file'
         file_paths = [file_path]
 
-        # Here we use MyPy ignore because it raises an error for not having
-        # typing for "_". The underscore is representing the "self" which
-        # is getting passed by the gcs_io.
-        def _mock_delete(_, filepath: str) -> str: # type: ignore[no-untyped-def]
+        def _mock_delete(unused_self: gcs_io.DeleteFile, filepath: str) -> str: # pylint: disable=unused-argument
             return filepath
 
         with self.swap(gcs_io.DeleteFile, '_delete_file', _mock_delete):
@@ -154,10 +152,9 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
     def test_check_correct_filepath_is_passing(self) -> None:
         file_paths = ['dummy_folder/dummy_subfolder']
 
-        # Here we use MyPy ignore because it raises an error for not having
-        # typing for "_". The underscore is representing the "self" which
-        # is getting passed by the gcs_io.
-        def _mock_list_prefix(_, filepath: str) -> str: # type: ignore[no-untyped-def]
+        def _mock_list_prefix(
+            unused_self: gcs_io.GetFiles, filepath: str
+        ) -> str: # pylint: disable=unused-argument
             return filepath
 
         with self.swap(
