@@ -303,7 +303,7 @@ class ReviewableOpportunitiesHandler(
                 },
                 'default_value': None
             },
-            'language': {
+            'language_code': {
                 'schema': {
                     'type': 'basestring'
                 },

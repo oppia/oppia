@@ -482,21 +482,21 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'language': 'es'})
+            params={'language_code': 'es'})
         # Should only return opportunities in Spanish.
         self.assertEqual(
             response['opportunities'], [self.expected_opportunity_dict_2])
 
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'language': 'hi'})
+            params={'language_code': 'hi'})
         # Should only return opportunities in Hindi.
         self.assertEqual(
             response['opportunities'], [self.expected_opportunity_dict_1])
 
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'language': 'pt'})
+            params={'language_code': 'pt'})
         # Should be empty.
         self.assertEqual(
             response['opportunities'], [])
