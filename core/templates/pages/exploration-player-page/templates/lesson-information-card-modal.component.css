@@ -321,18 +321,18 @@
 }
 
 .save-progress-menu {
-  animation: slideUp 0.8s;
+
   background-color: #fff;
   border-radius: 10px;
   height: auto;
   left: 50%;
-  max-width: 450px;
+  max-width: 495px;
   position: fixed;
   top: 8vh;
   transform: translateX(-50%);
   width: 100%;
   z-index: 4;
-}
+ }
 
 .save-progress-menu h3 {
   font-family: capriola, sans-serif;
