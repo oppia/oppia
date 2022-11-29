@@ -37,6 +37,8 @@ import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-b
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factory';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 class MockPlatformFeatureService {
   get status(): object {
@@ -62,6 +64,7 @@ describe('Ratings and recommendations component', () => {
   let assetsBackendApiService: AssetsBackendApiService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
   let topicViewerBackendApiService: TopicViewerBackendApiService;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   const mockNgbPopover = jasmine.createSpyObj(
     'NgbPopover', ['close', 'toggle']);
@@ -128,6 +131,7 @@ describe('Ratings and recommendations component', () => {
       StoryViewerBackendApiService);
     topicViewerBackendApiService = TestBed.inject(
       TopicViewerBackendApiService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   it('should populate internal properties and subscribe to event' +
@@ -137,10 +141,10 @@ describe('Ratings and recommendations component', () => {
     const mockOnRatingUpdated = new EventEmitter<void>();
     const readOnlyStoryNode1 = new ReadOnlyStoryNode(
       'node_1', '', '', [], [], [], '', false, '',
-      null, false, 'bg_color_1', 'filename_1');
+      {} as LearnerExplorationSummary, false, 'bg_color_1', 'filename_1');
     const readOnlyStoryNode2 = new ReadOnlyStoryNode(
       'node_2', '', '', [], [], [], '', false, '',
-      null, false, 'bg_color_2', 'filename_2');
+      {} as LearnerExplorationSummary, false, 'bg_color_2', 'filename_2');
 
     expect(componentInstance.inStoryMode).toBe(undefined);
     expect(componentInstance.storyViewerUrl).toBe(undefined);
@@ -176,6 +180,10 @@ describe('Ratings and recommendations component', () => {
         'topic_name', 'topic_Id', 'description',
         [], [], [], [], {}, {}, true, 'metatag', 'page_title_fragment')));
 
+    // This throws "Type 'null' is not assignable to parameter of type
+    // 'QuestionPlayerConfig'." We need to suppress this error because
+    // of the need to test validations.
+    // @ts-ignore
     componentInstance.questionPlayerConfig = null;
 
     componentInstance.ngOnInit();
@@ -266,24 +274,28 @@ describe('Ratings and recommendations component', () => {
 
   it('should redirect to sign in page when user clicks on signin button',
     fakeAsync(() => {
+      spyOn(siteAnalyticsService, 'registerNewSignupEvent');
       spyOn(userService, 'getLoginUrlAsync').and.returnValue(
         Promise.resolve('login_url'));
 
-      componentInstance.signIn();
+      componentInstance.signIn('.sign-in-button');
       tick();
 
       expect(userService.getLoginUrlAsync).toHaveBeenCalled();
+      expect(siteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
     }));
 
   it('should reload the page if user clicks on signin button and ' +
     'login url is not available', fakeAsync(() => {
+    spyOn(siteAnalyticsService, 'registerNewSignupEvent');
     spyOn(userService, 'getLoginUrlAsync').and.returnValue(
       Promise.resolve(''));
 
-    componentInstance.signIn();
+    componentInstance.signIn('.sign-in-button');
     tick();
 
     expect(userService.getLoginUrlAsync).toHaveBeenCalled();
+    expect(siteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
   }));
 
   it('should save user\'s sign up section preference to localStorage', () => {

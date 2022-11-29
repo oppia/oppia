@@ -385,6 +385,16 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
 
+        # Raises error for usernames which don't exist, if
+        # 'get_user_id_from_username' called with strict.
+        with self.assertRaisesRegex(
+            Exception,
+            'No user_id found for the given username: fakeUsername'
+        ):
+            user_services.get_user_id_from_username(
+                'fakeUsername', strict=True
+            )
+
     def test_get_multi_user_ids_from_usernames(self) -> None:
         auth_id1 = 'someUser1'
         username1 = 'username1'
@@ -435,6 +445,17 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_multi_user_ids_from_usernames([]), []
         )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No user_id found for the username: fakeusername1'
+        ):
+            user_services.get_multi_user_ids_from_usernames(
+                ['fakeUsername1', 'USERNAME1', 'fakeUsername3',
+                'fakeUsername4', 'fakeUsername5', 'fakeUsername6',
+                'fakeUsername7', username2, 'fakeUsername9'],
+                strict=True
+            )
 
     def test_get_user_settings_from_username_returns_user_settings(
         self
@@ -649,7 +670,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_email_prefs.can_receive_subscription_email,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
-    def test_add_user_to_android_list(self) -> None:
+    def test_add_user_to_mailing_list(self) -> None:
         def _mock_add_or_update_user_status(
             unused_email: str,
             merge_fields: Dict[str, str],
@@ -668,8 +689,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             _mock_add_or_update_user_status)
         with fn_swap:
             self.assertTrue(
-                user_services.add_user_to_android_list(
-                    'email@example.com', 'Name'))
+                user_services.add_user_to_mailing_list(
+                    'email@example.com', 'Name', 'Android'))
 
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'
@@ -2222,6 +2243,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ):
             user_services.get_checkpoints_in_order('Introduction', states)
 
+    def test_raises_error_if_sync_logged_in_learner_checkpoint_with_invalid_id(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No ExplorationUserDataModel found for the given user and '
+            'exploration ids: invalid_user_id, exp_1'
+        ):
+            user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version(   # pylint: disable=line-too-long
+                'invalid_user_id', 'exp_1', strict=True
+            )
+
 
 class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
     """Tests whether user checkpoint progress is updated correctly"""
@@ -2276,6 +2309,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: Introduction
         feedback:

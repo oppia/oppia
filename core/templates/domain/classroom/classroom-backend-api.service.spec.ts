@@ -212,7 +212,7 @@ describe('Classroom backend API service', function() {
 
     service.getNewClassroomIdAsync().then(successHandler, failHandler);
     let req = httpTestingController.expectOne(
-      '/classroom_id_handler');
+      '/new_classroom_id_handler');
     expect(req.request.method).toEqual('GET');
     req.flush({classroom_id: 'classroomId'});
 
@@ -231,7 +231,7 @@ describe('Classroom backend API service', function() {
 
       service.getNewClassroomIdAsync().then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/classroom_id_handler');
+        '/new_classroom_id_handler');
       expect(req.request.method).toEqual('GET');
 
       req.flush('Invalid request', {
@@ -501,6 +501,46 @@ describe('Classroom backend API service', function() {
       req.flush('Error: Failed to check classroom url fragment.', {
         status: 500,
         statusText: 'Error: Failed to check classroom url fragment.'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }));
+
+  it('should be able to get classroom id', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let service = classroomBackendApiService;
+
+    service.getClassroomIdAsync('math').then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/classroom_id_handler/math');
+    expect(req.request.method).toEqual('GET');
+    req.flush({classroom_id: 'classroomId'});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith('classroomId');
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(
+    'should handle errorcallback while getting the classroom id',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let service = classroomBackendApiService;
+
+      service.getClassroomIdAsync('math').then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/classroom_id_handler/math');
+      expect(req.request.method).toEqual('GET');
+
+      req.flush('Invalid request', {
+        status: 400,
+        statusText: 'Invalid request'
       });
 
       flushMicrotasks();

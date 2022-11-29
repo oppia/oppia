@@ -35,12 +35,13 @@ import { LearnerLocalNavBackendApiService } from '../services/learner-local-nav-
   templateUrl: './learner-local-nav.component.html'
 })
 export class LearnerLocalNavComponent implements OnInit {
-  explorationId: string = null;
-  canEdit: boolean = null;
-  version: number = null;
-  username: string = '';
+  canEdit: boolean = false;
+  // The following property is set to null when the
+  // user is not logged in.
+  username: string | null = '';
   feedbackOptionIsShown: boolean = true;
-  @ViewChild('feedbackPopOver') feedbackPopOver: NgbPopover;
+  explorationId!: string;
+  @ViewChild('feedbackPopOver') feedbackPopOver!: NgbPopover;
 
   constructor(
     private ngbModal: NgbModal,
@@ -89,12 +90,14 @@ export class LearnerLocalNavComponent implements OnInit {
 
   ngOnInit(): void {
     this.explorationId = this.explorationEngineService.getExplorationId();
-    this.version = this.explorationEngineService.getExplorationVersion();
-    this.readOnlyExplorationBackendApiService
-      .loadExplorationAsync(this.explorationId, this.version)
-      .then((exploration) => {
-        this.canEdit = exploration.can_edit;
-      });
+    let version = this.explorationEngineService.getExplorationVersion();
+    if (version) {
+      this.readOnlyExplorationBackendApiService
+        .loadExplorationAsync(this.explorationId, version)
+        .then((exploration) => {
+          this.canEdit = exploration.can_edit;
+        });
+    }
     this.loaderService.showLoadingScreen('Loading');
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.username = userInfo.getUsername();

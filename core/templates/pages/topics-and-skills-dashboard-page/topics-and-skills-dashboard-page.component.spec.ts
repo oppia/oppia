@@ -86,8 +86,7 @@ describe('Topics and skills dashboard page component', () => {
 
   it('should initialize', fakeAsync(() => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    spyOn(TopicsAndSkillsDashboardFilter, 'createDefault').and.returnValue(
-      null);
+    spyOn(TopicsAndSkillsDashboardFilter, 'createDefault').and.callThrough();
     spyOn(componentInstance, '_initDashboard');
     componentInstance.ngOnInit();
     topicsAndSkillsDashboardBackendApiService
