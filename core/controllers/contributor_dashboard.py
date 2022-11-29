@@ -307,7 +307,7 @@ class ReviewableOpportunitiesHandler(
                 'schema': {
                     'type': 'basestring'
                 },
-                'default_value': ''
+                'default_value': None
             }
         }
     }
