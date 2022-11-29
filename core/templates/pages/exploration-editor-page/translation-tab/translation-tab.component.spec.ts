@@ -37,6 +37,10 @@ import {
   JoyrideService,
   JoyrideStepsContainerService,
   JoyrideStepService
+  // This throws "Object is possibly undefined." The type undefined
+  // comes here from ngx joyride dependency. We need to suppress this
+  // error because of strict type checking.
+  // @ts-ignore
 } from 'ngx-joyride';
 
 class MockNgbModal {
@@ -72,7 +76,11 @@ describe('Translation tab component', () => {
   class MockJoyrideService {
     startTour() {
       return {
-        subscribe: (value1, value2, value3) => {
+        subscribe: (
+            value1: (arg0: { number: number }) => void,
+            value2: () => void,
+            value3: () => void
+        ) => {
           value1({number: 2});
           value1({number: 4});
           value1({number: 6});
@@ -171,13 +179,13 @@ describe('Translation tab component', () => {
     explorationStatesService.init({
       Introduction: {
         classifier_model_id: null,
-        card_is_checkpoint: null,
+        card_is_checkpoint: false,
         content: {
           content_id: 'content',
           html: 'Introduction Content'
         },
         interaction: {
-          confirmed_unclassified_answers: null,
+          confirmed_unclassified_answers: [],
           id: 'TextInput',
           customization_args: {
             placeholder: {value: {
@@ -191,7 +199,7 @@ describe('Translation tab component', () => {
           },
           answer_groups: [{
             rule_specs: [],
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null,
             outcome: {
               missing_prerequisite_skill_id: null,
@@ -325,7 +333,7 @@ describe('Translation tab component', () => {
     };
 
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-      .returnValue(Promise.resolve(null));
+      .returnValue(Promise.resolve({} as ExplorationPermissions));
 
     editabilityService.onStartTutorial();
     component.ngOnInit();
@@ -435,7 +443,15 @@ describe('Translation tab component', () => {
 
   it('should not start tutorial', () => {
     component.tutorialInProgress = false;
+    // This throws "Type 'null' is not assignable to parameter of
+    // type '{ canVoiceover: boolean; }'." We need to suppress this
+    // error because of the need to test validations.
+    // @ts-ignore
     component.permissions = null;
+    component.startTutorial();
+    component.permissions = {
+      canVoiceover: false,
+    };
     component.startTutorial();
 
     expect(component.tutorialInProgress).toBe(false);

@@ -28,17 +28,21 @@ from core import utils
 from scripts import install_python_dev_dependencies
 
 import pkg_resources
+from typing import Dict, Final, List, Optional, Set, Tuple
 
 from . import common
 
+MismatchType = Dict[str, Tuple[Optional[str], Optional[str]]]
+ValidatedMismatchType = Dict[str, Tuple[str, Optional[str]]]
+
 # This is the version that is set in install_prerequisites.sh.
-GIT_DIRECT_URL_REQUIREMENT_PATTERN = (
+GIT_DIRECT_URL_REQUIREMENT_PATTERN: Final = (
     # NOTE: Direct URLs to GitHub must specify a specific commit hash in their
     # definition. This helps stabilize the implementation we depend upon.
     re.compile(r'^(git\+git://github\.com/.*?@[0-9a-f]{40})#egg=([^\s]*)'))
 
 
-def normalize_python_library_name(library_name):
+def normalize_python_library_name(library_name: str) -> str:
     """Returns a normalized version of the python library name.
 
     Normalization of a library name means converting the library name to
@@ -95,7 +99,7 @@ def normalize_python_library_name(library_name):
     return library_name.lower()
 
 
-def normalize_directory_name(directory_name):
+def normalize_directory_name(directory_name: str) -> str:
     """Returns a normalized (lowercase) version of the directory name.
 
     Python library name strings are case insensitive which means that
@@ -119,7 +123,7 @@ def normalize_directory_name(directory_name):
     return directory_name.lower()
 
 
-def _get_requirements_file_contents():
+def _get_requirements_file_contents() -> Dict[str, str]:
     """Returns a dictionary containing all of the required normalized library
     names with their corresponding version strings listed in the
     'requirements.txt' file.
@@ -131,7 +135,7 @@ def _get_requirements_file_contents():
     Raises:
         Exception. Given URL is invalid.
     """
-    requirements_contents = collections.defaultdict()
+    requirements_contents: Dict[str, str] = collections.defaultdict()
     with utils.open_file(
         common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
         trimmed_lines = (line.strip() for line in f.readlines())
@@ -163,7 +167,19 @@ def _get_requirements_file_contents():
     return requirements_contents
 
 
-def _get_third_party_python_libs_directory_contents():
+def _dist_has_meta_data(dist: pkg_resources.Distribution) -> bool:
+    """Checks if the Distribution has meta-data.
+
+    Args:
+        dist: Distribution. The distribution.
+
+    Returns:
+        bool. The distribution has meta-data or not.
+    """
+    return dist.has_metadata('direct_url.json')
+
+
+def _get_third_party_python_libs_directory_contents() -> Dict[str, str]:
     """Returns a dictionary containing all of the normalized libraries name
     strings with their corresponding version strings installed in the
     'third_party/python_libs' directory.
@@ -175,7 +191,8 @@ def _get_third_party_python_libs_directory_contents():
     """
     direct_url_packages, standard_packages = utils.partition(
         pkg_resources.find_distributions(common.THIRD_PARTY_PYTHON_LIBS_DIR),
-        predicate=lambda dist: dist.has_metadata('direct_url.json'))
+        predicate=_dist_has_meta_data
+    )
 
     installed_packages = {
         pkg.project_name: pkg.version for pkg in standard_packages
@@ -200,7 +217,7 @@ def _get_third_party_python_libs_directory_contents():
     return directory_contents
 
 
-def _remove_metadata(library_name, version_string):
+def _remove_metadata(library_name: str, version_string: str) -> None:
     """Removes the residual metadata files pertaining to a specific library that
     was reinstalled with a new version. The reason we need this function is
     because `pip install --upgrade` upgrades libraries to a new version but
@@ -237,7 +254,7 @@ def _remove_metadata(library_name, version_string):
             shutil.rmtree(path_to_delete)
 
 
-def _rectify_third_party_directory(mismatches):
+def _rectify_third_party_directory(mismatches: MismatchType) -> None:
     """Rectifies the 'third_party/python_libs' directory state to reflect the
     current 'requirements.txt' file requirements. It takes a list of mismatches
     and corrects those mismatches by installing or uninstalling packages.
@@ -273,14 +290,24 @@ def _rectify_third_party_directory(mismatches):
     # library that the developer did not catch. The only way to enforce the
     # removal of a library is to clean out the folder and reinstall everything
     # from scratch.
-    if any(required is None for required, _ in mismatches.values()):
-        if os.path.isdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
-            shutil.rmtree(common.THIRD_PARTY_PYTHON_LIBS_DIR)
-        _reinstall_all_dependencies()
-        return
+
+    validated_mismatches: ValidatedMismatchType = {}
+    for library_name, versions in mismatches.items():
+        requirements_version, directory_version = versions
+        if requirements_version is None:
+            if os.path.isdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
+                shutil.rmtree(common.THIRD_PARTY_PYTHON_LIBS_DIR)
+            _reinstall_all_dependencies()
+            return
+        validated_mismatches[library_name] = (
+            requirements_version, directory_version
+        )
 
     git_mismatches, pip_mismatches = (
-        utils.partition(mismatches.items(), predicate=_is_git_url_mismatch))
+        utils.partition(
+            validated_mismatches.items(), predicate=_is_git_url_mismatch
+        )
+    )
 
     for normalized_library_name, versions in git_mismatches:
         requirements_version, directory_version = versions
@@ -307,13 +334,15 @@ def _rectify_third_party_directory(mismatches):
             _remove_metadata(normalized_library_name, str(directory_version))
 
 
-def _is_git_url_mismatch(mismatch_item):
+def _is_git_url_mismatch(
+    mismatch_item: Tuple[str, ValidatedMismatchType]
+) -> bool:
     """Returns whether the given mismatch item is for a GitHub URL."""
     _, (required, _) = mismatch_item
     return required.startswith('git')
 
 
-def _install_direct_url(library_name, direct_url):
+def _install_direct_url(library_name: str, direct_url: str) -> None:
     """Installs a direct URL to GitHub into the third_party/python_libs folder.
 
     Args:
@@ -328,7 +357,9 @@ def _install_direct_url(library_name, direct_url):
         no_dependencies=True)
 
 
-def _get_pip_versioned_package_string(library_name, version_string):
+def _get_pip_versioned_package_string(
+    library_name: str, version_string: str
+) -> str:
     """Returns the standard 'library==version' string for the given values.
 
     Args:
@@ -341,7 +372,7 @@ def _get_pip_versioned_package_string(library_name, version_string):
     return '%s==%s' % (library_name, version_string)
 
 
-def _install_library(library_name, version_string):
+def _install_library(library_name: str, version_string: str) -> None:
     """Installs a library with a certain version to the
     'third_party/python_libs' folder.
 
@@ -357,7 +388,7 @@ def _install_library(library_name, version_string):
     )
 
 
-def _reinstall_all_dependencies():
+def _reinstall_all_dependencies() -> None:
     """Reinstalls all of the libraries detailed in the compiled
     'requirements.txt' file to the 'third_party/python_libs' folder.
     """
@@ -368,7 +399,8 @@ def _reinstall_all_dependencies():
 
 
 def _get_possible_normalized_metadata_directory_names(
-        library_name, version_string):
+    library_name: str, version_string: str
+) -> Set[str]:
     """Returns possible normalized metadata directory names for python libraries
     installed using pip (following the guidelines of PEP-427 and PEP-376).
     This ensures that our _remove_metadata() function works as intended. More
@@ -406,7 +438,7 @@ def _get_possible_normalized_metadata_directory_names(
     }
 
 
-def verify_pip_is_installed():
+def verify_pip_is_installed() -> None:
     """Verify that pip is installed.
 
     Raises:
@@ -439,7 +471,7 @@ def verify_pip_is_installed():
         raise ImportError('Error importing pip: %s' % e) from e
 
 
-def _run_pip_command(cmd_parts):
+def _run_pip_command(cmd_parts: List[str]) -> None:
     """Run pip command with some flags and configs. If it fails try to rerun it
     with additional flags and else raise an exception.
 
@@ -469,7 +501,11 @@ def _run_pip_command(cmd_parts):
 
 
 def pip_install(
-        versioned_package, install_path, upgrade=False, no_dependencies=False):
+    versioned_package: str,
+    install_path: str,
+    upgrade: bool = False,
+    no_dependencies: bool = False
+) -> None:
     """Installs third party libraries with pip to a specific path.
 
     Args:
@@ -491,7 +527,9 @@ def pip_install(
     ] + additional_pip_args)
 
 
-def _pip_install_requirements(install_path, requirements_path):
+def _pip_install_requirements(
+    install_path: str, requirements_path: str
+) -> None:
     """Installs third party libraries from requirements files with pip.
 
     Args:
@@ -505,7 +543,7 @@ def _pip_install_requirements(install_path, requirements_path):
     ])
 
 
-def get_mismatches():
+def get_mismatches() -> MismatchType:
     """Returns a dictionary containing mismatches between the 'requirements.txt'
     file and the 'third_party/python_libs' directory. Mismatches are defined as
     the following inconsistencies:
@@ -535,7 +573,7 @@ def get_mismatches():
     requirements_contents = _get_requirements_file_contents()
     directory_contents = _get_third_party_python_libs_directory_contents()
 
-    mismatches = {}
+    mismatches: MismatchType = {}
     for normalized_library_name in requirements_contents:
         # Library exists in the directory and the requirements file.
         if normalized_library_name in directory_contents:
@@ -559,7 +597,7 @@ def get_mismatches():
     return mismatches
 
 
-def validate_metadata_directories():
+def validate_metadata_directories() -> None:
     """Validates that each library installed in the 'third_party/python_libs'
     has a corresponding metadata directory following the correct naming
     conventions detailed in PEP-427, PEP-376, and common Python guidelines.
@@ -614,7 +652,7 @@ def validate_metadata_directories():
                 normalized_library_name)
 
 
-def main():
+def main() -> None:
     """Compares the state of the current 'third_party/python_libs' directory to
     the libraries listed in the 'requirements.txt' file. If there are
     mismatches, regenerate the 'requirements.txt' file and correct the

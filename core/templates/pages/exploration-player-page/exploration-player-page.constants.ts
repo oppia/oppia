@@ -59,6 +59,16 @@ export const ExplorationPlayerConstants = {
     'I18N_PLAYER_HINT_REQUEST_STRING_2',
     'I18N_PLAYER_HINT_REQUEST_STRING_3'],
 
+  // Array of i18n IDs for nudging the learner towards checking the spelling.
+  I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS: [
+    'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_0',
+    'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_1',
+    'I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_2'
+  ],
+
+  // Threshold value of edit distance for judging an answer as a misspelling.
+  THRESHOLD_EDIT_DISTANCE_FOR_MISSPELLINGS: 2,
+
   /* This should match the CSS class defined in the tutor card directive. */
   AUDIO_HIGHLIGHT_CSS_CLASS: 'conversation-skin-audio-highlight',
 
@@ -75,6 +85,7 @@ export const ExplorationPlayerConstants = {
   DEFAULT_OUTCOME_CLASSIFICATION: 'default_outcome',
 
   EXPLORATION_MODE: {
+    DIAGNOSTIC_TEST_PLAYER: 'diagnostic_test_player',
     EXPLORATION: 'exploration',
     PRETEST: 'pretest',
     QUESTION_PLAYER: 'question_player',

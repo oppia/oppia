@@ -21,20 +21,23 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import caching_services
 
+from typing import Dict
 
-class MemoryCacheHandler(base.BaseHandler):
+
+class MemoryCacheHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handler for memory cache profile."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'GET': {},
         'DELETE': {}
     }
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     @acl_decorators.can_manage_memcache
-    def get(self):
+    def get(self) -> None:
         cache_stats = caching_services.get_memory_cache_stats()
         self.render_json({
             'total_allocation': cache_stats.total_allocated_in_bytes,
@@ -43,6 +46,6 @@ class MemoryCacheHandler(base.BaseHandler):
         })
 
     @acl_decorators.can_manage_memcache
-    def delete(self):
+    def delete(self) -> None:
         caching_services.flush_memory_caches()
         self.render_json({})

@@ -64,7 +64,6 @@ describe('Exploration engine service ', () => {
   let paramChangeObjectFactory: ParamChangeObjectFactory;
   let textInputService: InteractionRulesService;
   let outcomeObjectFactory: OutcomeObjectFactory;
-
   let explorationDict: ExplorationBackendDict;
   let paramChangeDict: ParamChangeBackendDict;
   let explorationBackendResponse: FetchExplorationBackendResponse;
@@ -313,6 +312,22 @@ describe('Exploration engine service ', () => {
       language_code: 'en',
       init_state_name: 'Start',
       draft_changes: null,
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: true,
+        edits_allowed: true
+      }
     };
 
     paramChangeDict = {
@@ -378,7 +393,9 @@ describe('Exploration engine service ', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [
+        HttpClientTestingModule,
+      ]
     });
 
     alertsService = TestBed.inject(AlertsService);
