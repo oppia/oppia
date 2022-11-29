@@ -27,6 +27,7 @@ import { EventEmitter } from '@angular/core';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { StoryReference } from 'domain/topic/story-reference-object.model';
+import { Topic } from 'domain/topic/TopicObjectFactory';
 
 describe('Topic editor page', function() {
   var ctrl = null;
@@ -38,7 +39,6 @@ describe('Topic editor page', function() {
   var UndoRedoService = null;
   var TopicEditorStateService = null;
   var UrlService = null;
-  var TopicObjectFactory = null;
   var topic = null;
 
   importAllAngularServices();
@@ -53,14 +53,17 @@ describe('Topic editor page', function() {
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     UrlService = $injector.get('UrlService');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
 
     var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic._thumbnailFilename = 'b.svg';
     var skillSummary = ShortSkillSummary.create(
       'skill1', 'Addition');
     subtopic._skillSummaries = [skillSummary];
-    topic = TopicObjectFactory.createInterstitialTopic();
+    topic = new Topic(
+      'id', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+    );
     topic._subtopics = [subtopic];
     topic._thumbnailFilename = 'a.svg';
     topic._metaTagContent = 'topic';

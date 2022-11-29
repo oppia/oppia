@@ -30,7 +30,7 @@ class MockNgbModal {
 }
 
 class MockExplorationStatesService {
-  getState(item1) {
+  getState(item1: string) {
     return {
       interaction: {
         id: 'TextInput'

@@ -2449,14 +2449,24 @@ title: Title
             self.assertEqual(response.status_int, 200)
             self.assertNotIn('<oppia-maintenance-page>', response)
 
-            response = self.testapp.post(feconf.SIGNUP_DATA_URL, params={
-                'csrf_token': self.get_new_csrf_token(),
-                'payload': json.dumps({
-                    'username': username,
-                    'agreed_to_terms': True,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                    }),
-                })
+            response = self.testapp.post(
+                feconf.SIGNUP_DATA_URL,
+                params={
+                    'csrf_token': self.get_new_csrf_token(),
+                    'payload': json.dumps(
+                        {
+                            'username': username,
+                            'agreed_to_terms': True,
+                            'default_dashboard': (
+                                constants.DASHBOARD_TYPE_LEARNER
+                            ),
+                            'can_receive_email_updates': (
+                                feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                            )
+                        }
+                    )
+                }
+            )
             self.assertEqual(response.status_int, 200)
 
     def signup_superadmin_user(self) -> None:
@@ -2648,7 +2658,7 @@ title: Title
         self,
         url: str,
         expected_content_type: str,
-        params: Optional[Dict[str, str]] = None,
+        params: Optional[Dict[str, Union[str, int, bool]]] = None,
         expected_status_int: int = 200
     ) -> webtest.TestResponse:
         """Get a response, transformed to a Python object.
@@ -2700,7 +2710,7 @@ title: Title
 
     def get_html_response(
         self, url: str,
-        params: Optional[Dict[str, str]] = None,
+        params: Optional[Dict[str, Union[str, int, bool]]] = None,
         expected_status_int: int = 200
     ) -> webtest.TestResponse:
         """Get a HTML response, transformed to a Python object.
@@ -2722,7 +2732,7 @@ title: Title
         self,
         url: str,
         expected_content_type: str,
-        params: Optional[Dict[str, str]] = None,
+        params: Optional[Dict[str, Union[str, int, bool]]] = None,
         expected_status_int: int = 200
     ) -> webtest.TestResponse:
         """Get a response other than HTML or JSON as a Python object.
@@ -3148,7 +3158,12 @@ title: Title
             ca_value = ca_spec.default_value
             traverse_schema_and_assign_content_ids(
                 ca_value, ca_spec.schema, 'ca_%s' % ca_name)
-            customization_args[ca_name] = {'value': ca_value}
+            # Here we use cast because these ca_values are fetched dynamically
+            # and contain only default types.
+            customization_args_value = cast(
+                state_domain.UnionOfCustomizationArgsDictValues, ca_value
+            )
+            customization_args[ca_name] = {'value': customization_args_value}
 
         state.update_interaction_id(interaction_id)
         state.update_interaction_customization_args(customization_args)
