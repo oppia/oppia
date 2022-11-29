@@ -111,7 +111,7 @@ class DeleteFileTest(job_test_utils.PipelinedTestBase):
         file_path = 'dummy_folder/dummy_subfolder/dummy_file'
         file_paths = [file_path]
 
-        def _mock_delete(self, filepath: str) -> str: # pylint: disable=unused-argument
+        def _mock_delete(unused_self: gcs_io.DeleteFile, filepath: str) -> str: # pylint: disable=unused-argument
             return filepath
 
         with self.swap(gcs_io.DeleteFile, '_delete_file', _mock_delete):
@@ -152,7 +152,9 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
     def test_check_correct_filepath_is_passing(self) -> None:
         file_paths = ['dummy_folder/dummy_subfolder']
 
-        def _mock_list_prefix(self, filepath: str) -> str: # pylint: disable=unused-argument
+        def _mock_list_prefix(
+            unused_self: gcs_io.GetFiles, filepath: str
+        ) -> str: # pylint: disable=unused-argument
             return filepath
 
         with self.swap(
