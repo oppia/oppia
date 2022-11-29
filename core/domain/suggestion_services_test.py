@@ -1770,7 +1770,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         # Get reviewable translation suggestions in Hindi.
         language_to_filter = 'hi'
-        suggestions = (
+        suggestions, _ = (
             suggestion_services.
             get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1, self.opportunity_summary_ids,
@@ -1788,7 +1788,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         # Get reviewable translation suggestions in Spanish (there are none).
         language_to_filter = 'es'
-        suggestions = (
+        suggestions, _ = (
             suggestion_services.
             get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1, self.opportunity_summary_ids,
