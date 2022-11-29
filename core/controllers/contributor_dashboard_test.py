@@ -450,7 +450,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     def test_get_reviewable_translation_opportunities_filtering_language( # pylint: disable=line-too-long
         self
     ) -> None:
-        # Create a translation suggestion for exploration 0.
+        # Create a translation suggestion in Hindi.
         change_dict = {
             'cmd': 'add_translation',
             'content_id': 'content',
@@ -503,7 +503,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL)
-        # Should only return all opportunities.
+        # Should return all opportunities.
         self.assertEqual(
             response['opportunities'], [self.expected_opportunity_dict_1, self.expected_opportunity_dict_2])
 
