@@ -39,6 +39,7 @@ import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factor
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 interface ResultActionButton {
   type: string;
@@ -101,7 +102,8 @@ export class RatingsAndRecommendationsComponent {
     private localStorageService: LocalStorageService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private topicViewerBackendApiService: TopicViewerBackendApiService,
-    private assetsBackendApiService: AssetsBackendApiService
+    private assetsBackendApiService: AssetsBackendApiService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -176,7 +178,8 @@ export class RatingsAndRecommendationsComponent {
     this.learnerViewRatingService.submitUserRating(ratingValue);
   }
 
-  signIn(): void {
+  signIn(srcElement: string): void {
+    this.siteAnalyticsService.registerNewSignupEvent(srcElement);
     this.userService.getLoginUrlAsync().then((loginUrl) => {
       if (loginUrl) {
         this.windowRef.nativeWindow.location = loginUrl;
