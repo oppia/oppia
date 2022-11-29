@@ -41,7 +41,7 @@ from core.domain import translation_domain
 from extensions.objects.models import objects
 
 from typing import Dict, List, Optional
-from typing_extensions import TypedDict
+from typing_extensions import Literal, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -664,6 +664,18 @@ class ExplorationVersionsDiff:
         self.old_to_new_state_names = {
             value: key for key, value in new_to_old_state_names.items()
         }
+
+
+class EditExpStatePropertyInteractionAnswerGroupsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_ANSWER_GROUPS as allowed value.
+    """
+
+    property_name: Literal['answer_groups']
+    state_name: str
+    new_value: List[state_domain.AnswerGroupDict]
+    old_value: List[state_domain.AnswerGroupDict]
 
 
 class VersionedExplorationInteractionIdsMapping:
