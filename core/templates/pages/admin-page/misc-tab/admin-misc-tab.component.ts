@@ -21,7 +21,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { FixCommitCommandBackendApiService } from 'services/fix-commit-command-backend-api.service';
 import { AdminPageConstants } from '../admin-page.constants';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
 
@@ -64,8 +63,6 @@ export class AdminMiscTabComponent {
   constructor(
     private adminBackendApiService: AdminBackendApiService,
     private adminTaskManagerService: AdminTaskManagerService,
-    private fixCommitCommandBackendApiService:
-      FixCommitCommandBackendApiService,
     private windowRef: WindowRef
   ) {}
 
@@ -294,14 +291,6 @@ export class AdminMiscTabComponent {
     this.stateName = '';
     this.numAnswers = 0;
     this.showDataExtractionQueryStatus = false;
-  }
-
-  fixCommitCommands(): void {
-    this.fixCommitCommandBackendApiService
-      .fixCommitCommandsAsync()
-      .then((message) => {
-        this.message = message;
-      });
   }
 }
 
