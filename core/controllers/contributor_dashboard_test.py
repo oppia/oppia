@@ -483,7 +483,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
             params={'language': 'es'})
-
         # Should only return opportunities in Spanish.
         self.assertEqual(
             response['opportunities'], [self.expected_opportunity_dict_2])
