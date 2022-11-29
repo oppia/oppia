@@ -72,7 +72,6 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
         suite:
-          - collections
           - accessibility
           - additionalEditorFeatures
           - additionalEditorFeaturesModals
