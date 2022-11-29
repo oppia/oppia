@@ -183,7 +183,6 @@ describe('Translation status service', () => {
         solicit_answer_details: false,
         classifier_model_id: null,
         param_changes: [],
-        next_content_id_index: 0,
         card_is_checkpoint: false,
       },
       Second: {
@@ -246,7 +245,6 @@ describe('Translation status service', () => {
         solicit_answer_details: false,
         classifier_model_id: null,
         param_changes: [],
-        next_content_id_index: 0,
         card_is_checkpoint: false,
       },
       Third: {
@@ -283,7 +281,6 @@ describe('Translation status service', () => {
         solicit_answer_details: false,
         classifier_model_id: null,
         param_changes: [],
-        next_content_id_index: 0,
         card_is_checkpoint: false,
       }
     };

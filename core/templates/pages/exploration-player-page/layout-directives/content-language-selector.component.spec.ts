@@ -211,7 +211,7 @@ describe('Content language selector component', () => {
       expect(component.selectedLanguageCode).toBe('fr');
       expect(imagePreloaderService.restartImagePreloader).toHaveBeenCalled();
 
-      mockOnStateCardContentUpdate.emit(null);
+      mockOnStateCardContentUpdate.emit();
       tick();
       discardPeriodicTasks();
     }));

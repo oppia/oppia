@@ -31,6 +31,7 @@ import { LoaderService } from 'services/loader.service';
 import { EntityTranslationsService } from 'services/entity-translations.services';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 
 interface AvailabilityStatus {
   available: boolean;
@@ -76,7 +77,6 @@ export class TranslationStatusService implements OnInit {
     this.explorationVoiceoverContentRequiredCount = 0;
     this.explorationTranslationContentNotAvailableCount = 0;
     this.explorationVoiceoverContentNotAvailableCount = 0;
-    this.entityTranslation = null;
   }
 
   _getVoiceOverStatus(
@@ -106,7 +106,7 @@ export class TranslationStatusService implements OnInit {
     if (this.entityTranslation && this.entityTranslation.hasWrittenTranslation(
       contentId)) {
       let translatedContent = this.entityTranslation.getWrittenTranslation(
-        contentId);
+        contentId) as TranslatedContent;
       if (translatedContent.translation !== '') {
         availabilityStatus.available = true;
         availabilityStatus.needsUpdate = translatedContent.needsUpdate;
@@ -119,7 +119,7 @@ export class TranslationStatusService implements OnInit {
       stateName: string, contentId: string): AvailabilityStatus {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return this._getTranslationStatus(contentId);
-    } else if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+    } else {
       this.langCode = this.translationLanguageService.getActiveLanguageCode();
       let recordedVoiceovers = (
         this.explorationStatesService.getRecordedVoiceoversMemento(stateName));
@@ -131,7 +131,7 @@ export class TranslationStatusService implements OnInit {
       contentId: string): AvailabilityStatus {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return this._getTranslationStatus(contentId);
-    } else if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+    } else {
       let recordedVoiceovers = this.stateRecordedVoiceoversService.displayed;
       return this._getVoiceOverStatus(recordedVoiceovers, contentId);
     }
@@ -241,7 +241,7 @@ export class TranslationStatusService implements OnInit {
 
   _getContentIdListRelatedToComponent(
       componentName: string, availableContentIds: string[]): string[] {
-    let contentIdList = [];
+    let contentIdList: string[] = [];
 
     if (availableContentIds.length > 0) {
       var searchKey = componentName + '_';
