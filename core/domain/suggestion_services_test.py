@@ -1788,7 +1788,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         # Get reviewable translation suggestions in Spanish (there are none).
         language_to_filter = 'es'
-        suggestions, offset = (
+        suggestions = (
             suggestion_services.
             get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1, self.opportunity_summary_ids,
