@@ -12,11 +12,7 @@ async function publishBlogAsBlogAdmin() {
   const user = await new acceptanceTests();
   const page = await user.init();
 
-  await user.goto(testConstants.URLs.home);
-  await user.clickOn("button", "OK");
-  await user.clickOn("span", "Sign in");
-  await user.type(testConstants.SignInDetails.inputField, "testadmin@example.com");
-  await user.clickOn("span", "Sign In");
+  await user.signInWithEmail("testadmin@example.com");
   
   await user.goto(testConstants.URLs.BlogDashboard, testConstants.Dashboard.MainDashboard);
 

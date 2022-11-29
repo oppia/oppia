@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer");
+const testConstants = require("./testConstants.js");
 module.exports = class acceptanceTests {
   page;
   browser;
@@ -21,6 +22,14 @@ module.exports = class acceptanceTests {
       });
 
       return await this.page;
+  }
+
+  async signInWithEmail(email) {
+    await this.goto(testConstants.URLs.home);
+    await this.clickOn("button", "OK");
+    await this.clickOn("span", "Sign in");
+    await this.type(testConstants.SignInDetails.inputField, email);
+    await this.clickOn("span", "Sign In");
   }
   
   async clickOn(tag, selector, time = 0) {
