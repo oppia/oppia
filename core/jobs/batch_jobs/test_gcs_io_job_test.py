@@ -56,7 +56,7 @@ class TestGCSIoWriteJobTests(job_test_utils.JobTestBase):
 
 def write_files_to_gcs() -> List[str]:
     """Write dummy files to GCS."""
-    
+
     file_objects: List[gcs_io.FileObjectDict] = [
         {
             'filepath': 'dummy_folder/dummy_subfolder/dummy_file_1',

@@ -111,10 +111,7 @@ class DeleteFileTest(job_test_utils.PipelinedTestBase):
         file_path = 'dummy_folder/dummy_subfolder/dummy_file'
         file_paths = [file_path]
 
-        # Here we use MyPy ignore because it raises an error for not having
-        # typing for "_". The underscore is representing the "self" which
-        # is getting passed by the gcs_io.
-        def _mock_delete(self, filepath: str) -> str:
+        def _mock_delete(self, filepath: str) -> str: # pylint: disable=unused-argument
             return filepath
 
         with self.swap(gcs_io.DeleteFile, '_delete_file', _mock_delete):
@@ -155,10 +152,7 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
     def test_check_correct_filepath_is_passing(self) -> None:
         file_paths = ['dummy_folder/dummy_subfolder']
 
-        # Here we use MyPy ignore because it raises an error for not having
-        # typing for "_". The underscore is representing the "self" which
-        # is getting passed by the gcs_io.
-        def _mock_list_prefix(self, filepath: str) -> str:
+        def _mock_list_prefix(self, filepath: str) -> str: # pylint: disable=unused-argument
             return filepath
 
         with self.swap(
