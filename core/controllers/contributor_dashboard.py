@@ -345,9 +345,9 @@ class ReviewableOpportunitiesHandler(
             topic_name: str or None. A topic name for which to filter the
                 exploration opportunity summaries. If 'All' is supplied, all
                 available exploration opportunity summaries will be returned.
-            language: str. ISO 639-1 language code for which to filter the exploration
-                opportunity summaries. If it is None, all available exploration
-                opportunity summaries will be returned.
+            language: str. ISO 639-1 language code for which to filter the
+                exploration opportunity summaries. If it is None, all
+                available exploration opportunity summaries will be returned.
 
         Returns:
             list(ExplorationOpportunitySummary). A list of the matching

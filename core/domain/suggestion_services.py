@@ -1001,8 +1001,8 @@ def get_reviewable_translation_suggestions_by_offset(
             all available results are returned.
         offset: int. The number of results to skip from the beginning of all
             results matching the query.
-        language: str. ISO 639-1 language code for which to filter. If it is None, all
-            available languages will be returned.
+        language: str. ISO 639-1 language code for which to filter. If it is
+            None, all available languages will be returned.
 
     Returns:
         Tuple of (results, next_offset). Where:
