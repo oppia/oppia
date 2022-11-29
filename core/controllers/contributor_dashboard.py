@@ -317,13 +317,13 @@ class ReviewableOpportunitiesHandler(
         """Handles GET requests."""
         assert self.normalized_request is not None
         topic_name = self.normalized_request.get('topic_name')
-        language_code = self.normalized_request.get('language')
+        language = self.normalized_request.get('language_code')
         opportunity_dicts: List[
             opportunity_domain.PartialExplorationOpportunitySummaryDict
         ] = []
         if self.user_id:
             for opp in self._get_reviewable_exploration_opportunity_summaries(
-                self.user_id, topic_name, language_code
+                self.user_id, topic_name, language
             ):
                 if opp is not None:
                     opportunity_dicts.append(opp.to_dict())
