@@ -32,9 +32,7 @@ async function publishBlogAsBlogAdmin() {
 
   // uploading thumbnail image
   await user.clickOn("div", thumbnailPhotoBox);
-  const inputUploadHandle = await page.$('input[type=file]');
-  let fileToUpload = 'collection.svg';
-  inputUploadHandle.uploadFile(fileToUpload);
+  await user.uploadFile('collection.svg');
   await user.clickOn("button", " Add Thumbnail Image ");
   await page.waitForTimeout(500);
 

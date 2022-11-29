@@ -26,9 +26,7 @@ async function playUploadedAudioAsVoiceoverAdmin() {
 
   // uploading the audio
   await user.clickOn("button", uploadAudio);  // icon
-  const inputUploadHandle = await page.$('input[type=file]');
-  let fileToUpload = 'A4.mp3';
-  inputUploadHandle.uploadFile(fileToUpload);
+  await user.uploadFile('A4.mp3');
   await user.clickOn("button", " Save ");
   await user.clickOn("button", audioPlay, 500);
   await user.clickOn("i", audioPause, 1000);

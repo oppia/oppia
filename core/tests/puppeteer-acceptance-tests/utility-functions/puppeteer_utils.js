@@ -47,4 +47,10 @@ module.exports = class acceptanceTests {
     }
     await (this.page).goto(url, {waitUntil: "networkidle0"});
   }
+
+  async uploadFile(filePath) {
+    const inputUploadHandle = await (this.page).$('input[type=file]');
+    let fileToUpload = filePath;
+    inputUploadHandle.uploadFile(fileToUpload);
+  }
 };
