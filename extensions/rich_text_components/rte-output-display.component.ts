@@ -185,7 +185,8 @@ export class RteOutputDisplayComponent implements AfterViewInit {
        */
       this.show = false;
       this._updateNode();
-      setTimeout(() => this.show = true, 0);
+      const timeout = setTimeout(() => this.show = true, 0);
+      clearTimeout(timeout);
     }
   }
 }
