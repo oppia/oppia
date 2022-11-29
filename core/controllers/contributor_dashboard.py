@@ -283,7 +283,7 @@ class ReviewableOpportunitiesHandlerNormalizedRequestDict(TypedDict):
     """
 
     topic_name: Optional[str]
-    language: str
+    language_code: str
 
 
 class ReviewableOpportunitiesHandler(
