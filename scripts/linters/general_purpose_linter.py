@@ -24,6 +24,7 @@ import re
 from typing import Dict, Final, List, Pattern, Tuple, TypedDict
 
 from . import js_ts_linter
+from . import linter_utils
 from . import warranted_angular_security_bypasses
 
 from .. import build
@@ -291,13 +292,13 @@ def is_filepath_excluded_for_bad_patterns_check(
 
 
 def check_bad_pattern_in_file(
-    filepath: str, file_content: str, pattern: BadPatternRegexpDict
+    filepath: str, file_content: Tuple[str, ...], pattern: BadPatternRegexpDict
 ) -> Tuple[bool, List[str]]:
     """Detects whether the given pattern is present in the file.
 
     Args:
         filepath: str. Path of the file.
-        file_content: str. Contents of the file.
+        file_content: tuple(str). Line by line contents of the file.
         pattern: dict. (regexp(regex pattern) : Object containing details for
             the pattern to be checked. Pattern to match:
                 message: str. Message to show if pattern matches.
@@ -339,13 +340,13 @@ def check_bad_pattern_in_file(
 
 
 def check_file_type_specific_bad_pattern(
-    filepath: str, content: str
+    filepath: str, content: Tuple[str, ...]
 ) -> Tuple[bool, int, List[str]]:
     """Check the file content based on the file's extension.
 
     Args:
         filepath: str. Path of the file.
-        content: str. Contents of the file.
+        content: tuple(str). Line by line contents of the file.
 
     Returns:
         bool. True if there is bad pattern else false.
@@ -369,7 +370,7 @@ def check_file_type_specific_bad_pattern(
     return failed, total_error_count, error_messages
 
 
-class GeneralPurposeLinter:
+class GeneralPurposeLinter(linter_utils.BaseLinter):
     """Manages all the common linting functions. As an abstract base class, this
     is not intended to be used directly.
     """
@@ -425,7 +426,7 @@ class GeneralPurposeLinter:
         error_messages = []
 
         try:
-            file_content = self.file_cache.readlines(filepath)  # type: ignore[no-untyped-call]
+            file_content = self.file_cache.readlines(filepath)
         except Exception as e:
             raise Exception('%s %s' % (filepath, e)) from e
         for index, regexp_to_check in enumerate(
@@ -483,7 +484,7 @@ class GeneralPurposeLinter:
                     filepath.endswith('general_purpose_linter_test.py')))]
         failed = False
         for filepath in all_filepaths:
-            file_content = self.file_cache.readlines(filepath)  # type: ignore[no-untyped-call]
+            file_content = self.file_cache.readlines(filepath)
             total_files_checked += 1
             for pattern, error in BAD_PATTERNS.items():
                 if is_filepath_excluded_for_bad_patterns_check(
@@ -538,7 +539,7 @@ class GeneralPurposeLinter:
         failed = False
 
         for filepath in files_to_lint:
-            file_content = self.file_cache.readlines(filepath)  # type: ignore[no-untyped-call]
+            file_content = self.file_cache.readlines(filepath)
             file_length = len(file_content)
             if (
                     file_length >= 1 and
@@ -569,7 +570,7 @@ class GeneralPurposeLinter:
                     allowed_files = filepath
             if not filepath.endswith('.ts') or filepath == allowed_files:
                 continue
-            file_content = self.file_cache.read(filepath)  # type: ignore[no-untyped-call]
+            file_content = self.file_cache.read(filepath)
 
             if disallow_flag in file_content:
                 error_message = (

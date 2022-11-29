@@ -615,12 +615,13 @@ def get_multi_users_progress_in_stories(
 
 
 def get_pending_and_all_nodes_in_story(
-    user_id: str, story_id: str
+    user_id: Optional[str], story_id: str
 ) -> Dict[str, List[story_domain.StoryNode]]:
     """Returns the nodes that are pending in a story
 
     Args:
-        user_id: str. The user id of the user.
+        user_id: Optional[str]. The user id of the user, or None if
+            the user is not logged in.
         story_id: str. The id of the story.
 
     Returns:
@@ -630,7 +631,9 @@ def get_pending_and_all_nodes_in_story(
     story = get_story_by_id(story_id, strict=True)
     pending_nodes = []
 
-    completed_node_ids = get_completed_node_ids(user_id, story_id)
+    completed_node_ids = (
+        get_completed_node_ids(user_id, story_id) if user_id else []
+    )
     for node in story.story_contents.nodes:
         if node.id not in completed_node_ids:
             pending_nodes.append(node)

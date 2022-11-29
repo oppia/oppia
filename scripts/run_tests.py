@@ -59,7 +59,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     # Run backend tests.
     print('Running backend tests')
-    run_backend_tests.main(args=[])  # type: ignore[no-untyped-call]
+    run_backend_tests.main(args=[])
     print('Backend tests passed.')
 
     # Run end-to-end tests.

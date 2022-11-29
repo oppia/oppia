@@ -39,7 +39,7 @@ import { NumericInputRulesService } from 'interactions/NumericInput/directives/n
 import { PencilCodeEditorRulesService } from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { SetInputRulesService } from 'interactions/SetInput/directives/set-input-rules.service';
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
-import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
+import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { AlertsService } from 'services/alerts.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { State } from 'domain/state/StateObjectFactory';
@@ -82,20 +82,25 @@ export class TrainingDataEditorPanelComponent
    extends ConfirmOrCancelModal implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  _stateName: string | null;
-  stateName: string | null;
-  _state: State;
-  answerGroupIndex: number;
-  FOCUS_LABEL_TEST_INTERACTION_INPUT: string;
-  trainingData: TrainingData[];
-  stateContent: string;
-  answerGroupHasNonEmptyRules: boolean;
-  inputTemplate: string;
-  newAnswerIsAlreadyResolved: boolean;
-  answerSuccessfullyAdded: boolean;
-  newAnswerTemplate: string;
-  newAnswerFeedback: SubtitledHtml;
-  newAnswerOutcomeDest: string;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  _state!: State;
+  // State name is null if their is no state selected or have no active state.
+  // This is the case when the user is creating a new state.
+  _stateName!: string | null;
+  stateName!: string | null;
+  answerGroupIndex!: number;
+  FOCUS_LABEL_TEST_INTERACTION_INPUT!: string;
+  trainingData!: TrainingData[];
+  stateContent!: string;
+  answerGroupHasNonEmptyRules!: boolean;
+  inputTemplate!: string;
+  newAnswerIsAlreadyResolved!: boolean;
+  answerSuccessfullyAdded!: boolean;
+  newAnswerTemplate!: string;
+  newAnswerFeedback!: SubtitledHtml;
+  newAnswerOutcomeDest!: string;
 
   constructor(
      private ngbActiveModal: NgbActiveModal,
@@ -122,6 +127,9 @@ export class TrainingDataEditorPanelComponent
   ngOnInit(): void {
     this._stateName = this.stateEditorService.getActiveStateName();
     this.stateName = this._stateName;
+    if (!this._stateName) {
+      throw new Error('State name cannot be empty.');
+    }
     this._state = this.explorationStatesService.getState(this._stateName);
     this.answerGroupIndex = (
       this.responsesService.getActiveAnswerGroupIndex());
@@ -224,13 +232,18 @@ export class TrainingDataEditorPanelComponent
 
     // Inject RulesService dynamically.
     let rulesService = (
-      this.injector.get(RULES_SERVICE_MAPPING[rulesServiceName]));
+      this.injector.get(RULES_SERVICE_MAPPING[
+        rulesServiceName as keyof typeof RULES_SERVICE_MAPPING
+      ]) as InteractionRulesService);
 
     let newAnswerTemplate = (
       this.explorationHtmlFormatterService.getAnswerHtml(
         newAnswer, this.stateInteractionIdService.savedMemento,
         this.stateCustomizationArgsService.savedMemento));
 
+    if (!this._stateName) {
+      throw new Error('State name cannot be empty.');
+    }
     let classificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(
         this._stateName, this._state.interaction, newAnswer, rulesService));
