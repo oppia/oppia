@@ -38,15 +38,13 @@ MYPY = False
 if TYPE_CHECKING:
     from core.domain import config_domain
 
-if MYPY: # pragma: no cover
-    from mypy_imports import memory_cache_services
-
     AllowedDefaultTypes = Union[
         str, int, List[Optional[bool]], Dict[str, float]
     ]
 
     AllowedCacheableObjectTypes = Union[
         AllowedDefaultTypes,
+        config_domain.AllowedDefaultValueTypes,
         collection_domain.Collection,
         exp_domain.Exploration,
         skill_domain.Skill,
@@ -54,6 +52,11 @@ if MYPY: # pragma: no cover
         topic_domain.Topic,
         platform_parameter_domain.PlatformParameter
     ]
+
+
+if MYPY: # pragma: no cover
+    from mypy_imports import memory_cache_services
+
 
 memory_cache_services = models.Registry.import_cache_services()
 
