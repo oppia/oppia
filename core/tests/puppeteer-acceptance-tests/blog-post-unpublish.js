@@ -1,32 +1,18 @@
-const acceptanceTests = require("./utility-functions/puppeteer_utils.js");
+const e2eBlogPostAdmin = require("./utility-functions/blogAdminUtils.js");
 const testConstants = require("./utility-functions/testConstants.js");
 
 
-const blogEditBox = "e2e-test-blog-post-edit-box";
+const blogDashboard = testConstants.URLs.BlogDashboard;
 
 async function unpublishBlogAsBlogAdmin() {
-  const user = await new acceptanceTests();
-  const page = await user.init();
+  const blogPostAdmin = await new e2eBlogPostAdmin();
+  await blogPostAdmin.getInitialized();
   
-  await user.signInWithEmail("testadmin@example.com");
+  await blogPostAdmin.signInWithEmail("testadmin@example.com");
+  await blogPostAdmin.goto(blogDashboard);
+  await blogPostAdmin.unpublishBlog();
   
-  await user.goto(testConstants.URLs.BlogDashboard, testConstants.Dashboard.MainDashboard);
-
-  // published section of the blog-dashboard
-  await user.clickOn("div", " PUBLISHED ");
-  await page.waitForTimeout(500);
-  
-  // deleting a draft if present
-  try{
-    await user.clickOn("button", blogEditBox);  // an icon
-    await user.clickOn("span", "Unpublish", 100);
-    await user.clickOn("button", " Confirm ");
-  } catch {
-    console.log("no published blog post");
-  }
-  
-  console.log("Successfully unpublished a published blogs!");
-  await user.browser.close();
+  await blogPostAdmin.closeBrowser();
 };
 
 unpublishBlogAsBlogAdmin();

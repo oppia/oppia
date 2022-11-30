@@ -1,10 +1,10 @@
 const puppeteer = require("puppeteer");
 const testConstants = require("./testConstants.js");
-module.exports = class acceptanceTests {
+module.exports = class browser {
   page;
   browser;
-  
-  async init(){
+
+  async initialize(){
     /* currently, headless is set to false and the page viewport
        is maximized so that it would be easy for the developers
        to debug easily while testing.
@@ -21,7 +21,7 @@ module.exports = class acceptanceTests {
         await (this.page).setViewport({ width: 0, height: 0 });
       });
 
-      return await this.page;
+      return this.page;
   }
 
   async signInWithEmail(email) {
