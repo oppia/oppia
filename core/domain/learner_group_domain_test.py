@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from core import utils
+
 from core.domain import learner_group_domain
 from core.tests import test_utils
 
@@ -25,14 +27,16 @@ from core.tests import test_utils
 class LearnerGroupTest(test_utils.GenericTestBase):
     """Tests for LearnerGroup domain object."""
 
-    def test_initialization(self) -> None:
-        learner_group = learner_group_domain.LearnerGroup(
+    VALID_LEARNER_GROUP = learner_group_domain.LearnerGroup(
             '3232', 'title', 'description',
             ['user_1'],
             ['user_2', 'user_3', 'user_4'],
             ['user_5', 'user_6'],
             ['subtopic_1', 'subtopic_2'],
             ['story_1', 'story_2'])
+
+    def test_initialization(self) -> None:
+        learner_group = self.VALID_LEARNER_GROUP
 
         expected_learner_group_dict = {
             'group_id': '3232',
@@ -63,13 +67,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
             expected_learner_group_dict)
 
     def test_to_dict(self) -> None:
-        learner_group = learner_group_domain.LearnerGroup(
-            '3232', 'title', 'description',
-            ['user_1'],
-            ['user_2', 'user_3', 'user_4'],
-            ['user_5', 'user_6'],
-            ['subtopic_1', 'subtopic_2'],
-            ['story_1', 'story_2'])
+        learner_group = self.VALID_LEARNER_GROUP
 
         expected_learner_group_dict = {
             'group_id': '3232',
@@ -126,3 +124,11 @@ class LearnerGroupTest(test_utils.GenericTestBase):
                 ['subtopic_1', 'subtopic_2'],
                 ['story_1', 'story_2']),
             'Learner group facilitator cannot be invited to join the group.')
+
+        try:
+            # Test that valid learner group does not raise error
+            learner_group = self.VALID_LEARNER_GROUP
+            learner_group.validate()
+        except Exception as error:
+            raise utils.ValidationError(
+                'Unexpected validation error.') from error
