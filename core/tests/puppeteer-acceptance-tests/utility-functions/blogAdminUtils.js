@@ -63,8 +63,8 @@ module.exports = class e2eBlogPostAdmin {
     await (this.page).waitForTimeout(500);
 
     await (this.browserInstance).clickOn("button", blogEditOptions);  // an icon
-    await (this.browserInstance).clickOn("span", "Unpublish", 500);
-    await (this.browserInstance).clickOn("button", " Confirm ", 500);
+    await (this.browserInstance).clickOn("span", "Unpublish", 100);
+    await (this.browserInstance).clickOn("button", " Confirm ", 100);
     
     console.log("Successfully unpublished a published blogs!");
   }
