@@ -132,8 +132,8 @@ class AuditProfilePictureFromGCSJobTests(job_test_utils.JobTestBase):
     def _push_file_to_gcs(self, username: str, data_url: str) -> None:
         """Push file to the fake gcs client."""
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        filepath_png = f'user/{username}/profile_picture.png'
-        filepath_webp = f'user/{username}/profile_picture.webp'
+        filepath_png = f'user/{username}/assets/profile_picture.png'
+        filepath_webp = f'user/{username}/assets/profile_picture.webp'
         png_binary = utils.convert_png_data_url_to_binary(data_url)
         webp_binary = self._get_webp_binary_data(png_binary)
         storage_services.commit(bucket, filepath_png, png_binary, None)
@@ -203,8 +203,10 @@ class AuditProfilePictureFromGCSJobTests(job_test_utils.JobTestBase):
     def test_same_png_different_webp_on_gcs_and_in_model(self) -> None:
         self.put_multi([self.user_1])
         bucket = app_identity_services.get_gcs_resource_bucket_name()
-        filepath_png = f'user/{self.user_1.username}/profile_picture.png'
-        filepath_webp = f'user/{self.user_1.username}/profile_picture.webp'
+        filepath_png = f'user/{self.user_1.username}/assets/profile_picture.png'
+        filepath_webp = (
+            f'user/{self.user_1.username}/assets/'
+            'profile_picture.webp')
         png_binary = utils.convert_png_data_url_to_binary(
             user_services.DEFAULT_IDENTICON_DATA_URL)
         valid_image_png_binary = utils.convert_png_data_url_to_binary(

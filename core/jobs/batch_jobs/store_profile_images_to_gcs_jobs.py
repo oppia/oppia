@@ -56,7 +56,7 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
             filepath and data.
         """
         username = user_model.username
-        filepath = f'user/{username}/profile_picture.png'
+        filepath = f'user/{username}/assets/profile_picture.png'
         profile_picture_binary = utils.convert_png_data_url_to_binary(
             user_model.profile_picture_data_url)
         file_dict: gcs_io.FileObjectDict = {
@@ -79,7 +79,7 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
             filepath and data.
         """
         username = user_model.username
-        filepath = f'user/{username}/profile_picture.webp'
+        filepath = f'user/{username}/assets/profile_picture.webp'
         profile_picture_binary = utils.convert_png_data_url_to_binary(
             user_model.profile_picture_data_url)
         output = io.BytesIO()
@@ -197,7 +197,7 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
             | 'Map with username for png' >> beam.Map(
                 lambda model: model.username)
             | 'Map with filename for png' >> beam.Map(
-                lambda username: f'user/{username}/profile_picture.png')
+                lambda username: f'user/{username}/assets/profile_picture.png')
             | 'Read png files from GCS' >> gcs_io.ReadFile()
             | 'Make tuple of username and data url for png' >> beam.Map(
                 lambda data: (
@@ -250,7 +250,7 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
             | 'Map with username for webp' >> beam.Map(
                 lambda model: model.username)
             | 'Map with filename for webp' >> beam.Map(
-                lambda username: f'user/{username}/profile_picture.webp')
+                lambda username: f'user/{username}/assets/profile_picture.webp')
             | 'Read webp files from GCS' >> gcs_io.ReadFile()
             | 'Make tuple of username and data url for webp' >> beam.Map(
                 lambda data: (
