@@ -68,7 +68,8 @@ third_party/static/ckeditor-4.12.1/plugins/autolink/
 third_party/static/ckeditor-4.12.1/plugins/balloonpanel/
 third_party/static/ckeditor-4.12.1/plugins/balloontoolbar/
 third_party/static/ckeditor-4.12.1/plugins/bbcode/
-third_party/static/ckeditor-4.12.1/plugins/bidi/third_party/static/ckeditor-4.12.1/plugins/cloudservices/
+third_party/static/ckeditor-4.12.1/plugins/bidi/
+third_party/static/ckeditor-4.12.1/plugins/cloudservices/
 third_party/static/ckeditor-4.12.1/plugins/codesnippet/
 third_party/static/ckeditor-4.12.1/plugins/codesnippetgeshi/
 third_party/static/ckeditor-4.12.1/plugins/colorbutton/
