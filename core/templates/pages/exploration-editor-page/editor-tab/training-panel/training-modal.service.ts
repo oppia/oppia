@@ -55,8 +55,8 @@ export class TrainingModalService {
   */
   openTrainUnresolvedAnswerModal(
       unhandledAnswer: InteractionAnswer,
-      interactionId: string | null,
-      answerIndex: number | null): void {
+      interactionId: string,
+      answerIndex: number): void {
     this.alertsService.clearWarnings();
 
     let modalRef: NgbModalRef = this.ngbModal.open(TrainingModalComponent, {

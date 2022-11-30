@@ -36,6 +36,7 @@ from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
+from extensions import domain
 
 from typing import Dict, Final, List, Optional, TypedDict, Union, cast
 
@@ -1395,6 +1396,28 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
+    def test_validate_translation_html_rte_tags(self) -> None:
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'], False, self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.change.translation_html = (
+            '<oppia-noninteractive-image></oppia-noninteractive-image>')
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Image tag does not have \'alt-with-value\' attribute.'
+        ):
+            suggestion.validate()
+
     def test_validate_language_code_fails_when_language_codes_do_not_match(
         self
     ) -> None:
@@ -2615,6 +2638,28 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'image.png', 'question_suggestions', 'skill1',
             original_image_content, 'image', True)
 
+        image_and_region_ca_dict: domain.ImageAndRegionDict = {
+            'imagePath': 'image.png',
+            'labeledRegions': [
+                {
+                    'label': 'Region1',
+                    'region': {
+                        'regionType': 'Rectangle',
+                        'area': [
+                            [
+                                0.2644628099173554,
+                                0.21807065217391305
+                            ],
+                            [
+                                0.9201101928374655,
+                                0.8847373188405797
+                            ]
+                        ]
+                    }
+                }
+            ]
+        }
+
         # Here, the expected type for `solution` key is SolutionDict but
         # for testing purposes here we are providing None which causes
         # MyPy to throw `Incompatible types` error. Thus to avoid the
@@ -2654,27 +2699,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'imageAndRegions': {
-                        'value': {
-                            'imagePath': 'image.png',
-                            'labeledRegions': [
-                                {
-                                    'label': 'Region1',
-                                    'region': {
-                                        'regionType': 'Rectangle',
-                                        'area': [
-                                            [
-                                                0.2644628099173554,
-                                                0.21807065217391305
-                                            ],
-                                            [
-                                                0.9201101928374655,
-                                                0.8847373188405797
-                                            ]
-                                        ]
-                                    }
-                                }
-                            ]
-                        }
+                        'value': image_and_region_ca_dict
                     },
                     'highlightRegionsOnHover': {
                         'value': False

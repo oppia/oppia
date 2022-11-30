@@ -32,19 +32,21 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 
+from typing import List
+
 
 class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
 
-    def _record_completion(self, user_id, STORY_ID, node_id):
+    def _record_completion(
+        self, user_id: str, STORY_ID: str, node_id: str
+    ) -> None:
         """Records the completion of a node in the context of a story."""
         story_services.record_completed_node_in_story_context(
             user_id, STORY_ID, node_id)
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Completes the sign up process for the various users."""
         super().setUp()
-        self.VIEWER_EMAIL = 'viewer@example.com'
-        self.VIEWER_USERNAME = 'viewer'
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -87,10 +89,10 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             self.STORY_URL_FRAGMENT)
         story.meta_tag_content = 'story meta content'
 
-        exp_summary_dicts = (
+        self.exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_7], user=self.admin))
-        self.node_1 = {
+        self.node_1: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_1,
             'title': 'Title 1',
             'description': 'Description 1',
@@ -103,11 +105,9 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_1,
-            'exp_summary_dict': exp_summary_dicts[1],
-            'completed': False
+            'exploration_id': self.EXP_ID_1
         }
-        self.node_2 = {
+        self.node_2: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_2,
             'title': 'Title 2',
             'description': 'Description 2',
@@ -120,11 +120,9 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_0,
-            'exp_summary_dict': exp_summary_dicts[0],
-            'completed': True
+            'exploration_id': self.EXP_ID_0
         }
-        self.node_3 = {
+        self.node_3: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_3,
             'title': 'Title 3',
             'description': 'Description 3',
@@ -137,9 +135,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_7,
-            'exp_summary_dict': exp_summary_dicts[2],
-            'completed': False
+            'exploration_id': self.EXP_ID_7
         }
         story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1),
@@ -170,14 +166,16 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
 
 
 class StoryPageTests(BaseStoryViewerControllerTests):
-    def test_any_user_can_access_story_viewer_page(self):
+    def test_any_user_can_access_story_viewer_page(self) -> None:
         self.get_html_response(
             '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
 
 
 class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
 
-    def test_can_not_access_story_viewer_page_with_unpublished_story(self):
+    def test_can_not_access_story_viewer_page_with_unpublished_story(
+        self
+    ) -> None:
         new_story_id = 'new_story_id'
         new_story_url_fragment = 'title-two'
         story = story_domain.Story.create_default_story(
@@ -189,7 +187,9 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
             expected_status_int=404)
 
-    def test_can_not_access_story_viewer_page_with_unpublished_topic(self):
+    def test_can_not_access_story_viewer_page_with_unpublished_topic(
+        self
+    ) -> None:
         new_story_id = 'new_story_id'
         new_story_url_fragment = 'title-three'
         self.save_new_topic(
@@ -209,7 +209,58 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
             expected_status_int=404)
 
-    def test_get(self):
+    def test_get(self) -> None:
+        node_1 = {
+            'id': self.NODE_ID_1,
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'thumbnail_filename': 'image_1.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': self.EXP_ID_1,
+            'exp_summary_dict': self.exp_summary_dicts[1],
+            'completed': False
+        }
+        node_2 = {
+            'id': self.NODE_ID_2,
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'thumbnail_filename': 'image_2.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'destination_node_ids': ['node_1'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': self.EXP_ID_0,
+            'exp_summary_dict': self.exp_summary_dicts[0],
+            'completed': True
+        }
+        node_3 = {
+            'id': self.NODE_ID_3,
+            'title': 'Title 3',
+            'description': 'Description 3',
+            'thumbnail_filename': 'image_3.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': self.EXP_ID_7,
+            'exp_summary_dict': self.exp_summary_dicts[2],
+            'completed': False
+        }
         json_response = self.get_json(
             '%s/staging/topic/%s'
             % (feconf.STORY_DATA_HANDLER, self.STORY_URL_FRAGMENT))
@@ -217,7 +268,7 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             'story_id': self.STORY_ID,
             'story_title': 'Title',
             'story_description': 'Description',
-            'story_nodes': [self.node_2, self.node_1, self.node_3],
+            'story_nodes': [node_2, node_1, node_3],
             'topic_name': 'Topic',
             'meta_tag_content': 'story meta content'
         }
@@ -226,9 +277,24 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
 
 class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
-    def test_redirect_when_node_id_does_not_refer_to_the_first_node(self):
-        self.NEW_USER_EMAIL = 'newUser@newUser.com'
-        self.NEW_USER_USERNAME = 'newUser'
+    def test_cannot_access_story_progress_handler_if_user_is_not_logged_in(
+        self
+    ) -> None:
+        self.logout()
+        response = self.get_json(
+            '%s/staging/topic/%s/%s' % (
+                feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
+                self.NODE_ID_3),
+            expected_status_int=401
+        )
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.'
+        )
+
+    def test_redirect_when_node_id_does_not_refer_to_the_first_node(
+        self
+    ) -> None:
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.login(self.NEW_USER_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
@@ -240,9 +306,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                 'http://localhost/learn/staging/topic/story/title-one',
                 response.headers['location'])
 
-    def test_redirect_for_returning_user_with_completed_nodes(self):
-        self.NEW_USER_EMAIL = 'newUser@newUser.com'
-        self.NEW_USER_USERNAME = 'newUser'
+    def test_redirect_for_returning_user_with_completed_nodes(self) -> None:
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.login(self.NEW_USER_EMAIL)
         story_services.record_completed_node_in_story_context(
@@ -258,11 +322,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                 'http://localhost/learn/staging/topic/story/title-one',
                 response.headers['location'])
 
-    def test_redirect_for_single_node_story(self):
+    def test_redirect_for_single_node_story(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.STORY_URL_FRAGMENT = 'story-two'
-        self.NEW_USER_EMAIL = 'newUser@newUser.com'
-        self.NEW_USER_USERNAME = 'newUser'
 
         self.save_new_valid_exploration(
             self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End',
@@ -274,9 +336,6 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             self.STORY_URL_FRAGMENT)
         story.meta_tag_content = 'story meta content'
 
-        exp_summary_dicts = (
-            summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                [self.EXP_ID_0], user=self.admin))
         self.node_1 = {
             'id': self.NODE_ID_1,
             'title': 'Title 1',
@@ -290,9 +349,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_1,
-            'exp_summary_dict': exp_summary_dicts[0],
-            'completed': False
+            'exploration_id': self.EXP_ID_1
         }
         story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1)
@@ -326,9 +383,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                 'http://localhost/learn/staging/topic-frag/story/story-two',
                 response.headers['location'])
 
-    def test_redirect_to_next_node(self):
-        self.NEW_USER_EMAIL = 'newUser@newUser.com'
-        self.NEW_USER_USERNAME = 'newUser'
+    def test_redirect_to_next_node(self) -> None:
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.login(self.NEW_USER_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
@@ -343,7 +398,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                 response.headers['location']
             )
 
-    def test_post_fails_when_new_structures_not_enabled(self):
+    def test_post_fails_when_new_structures_not_enabled(self) -> None:
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', False):
             self.post_json(
@@ -353,7 +408,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                 ), {}, csrf_token=csrf_token, expected_status_int=404
             )
 
-    def test_post_succeeds_when_story_and_node_exist(self):
+    def test_post_succeeds_when_story_and_node_exist(self) -> None:
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
@@ -367,7 +422,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self.assertEqual(json_response['next_node_id'], self.NODE_ID_3)
         self.assertFalse(json_response['ready_for_review_test'])
 
-    def test_post_returns_empty_list_when_earlier_chapter_is_completed(self):
+    def test_post_returns_empty_list_when_earlier_chapter_is_completed(
+        self
+    ) -> None:
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
@@ -381,7 +438,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self.assertIsNone(json_response['next_node_id'])
         self.assertFalse(json_response['ready_for_review_test'])
 
-    def test_post_fails_when_story_does_not_exist(self):
+    def test_post_fails_when_story_does_not_exist(self) -> None:
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
@@ -391,7 +448,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                 ), {}, csrf_token=csrf_token, expected_status_int=404
             )
 
-    def test_post_fails_when_node_does_not_exist(self):
+    def test_post_fails_when_node_does_not_exist(self) -> None:
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
@@ -401,7 +458,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                 ), {}, csrf_token=csrf_token, expected_status_int=404
             )
 
-    def test_post_fails_when_node_id_schema_is_invalid(self):
+    def test_post_fails_when_node_id_schema_is_invalid(self) -> None:
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
@@ -411,7 +468,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                 ), {}, csrf_token=csrf_token, expected_status_int=400
             )
 
-    def test_post_fails_when_story_is_not_published_in_story_mode(self):
+    def test_post_fails_when_story_is_not_published_in_story_mode(self) -> None:
         topic_services.unpublish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
         csrf_token = self.get_new_csrf_token()
@@ -423,7 +480,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                 ), {}, csrf_token=csrf_token, expected_status_int=404
             )
 
-    def test_post_returns_empty_list_when_user_completes_story(self):
+    def test_post_returns_empty_list_when_user_completes_story(self) -> None:
         csrf_token = self.get_new_csrf_token()
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.STORY_ID, self.NODE_ID_2)
@@ -440,7 +497,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self.assertIsNone(json_response['next_node_id'])
         self.assertFalse(json_response['ready_for_review_test'])
 
-    def test_post_returns_ready_for_review_when_acquired_skills_exist(self):
+    def test_post_returns_ready_for_review_when_acquired_skills_exist(
+        self
+    ) -> None:
         csrf_token = self.get_new_csrf_token()
         self.save_new_skill(
             'skill_1', self.admin_id, description='Skill Description')
@@ -449,13 +508,14 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             self._create_valid_question_data('ABC'), ['skill_1'])
         question_services.create_new_question_skill_link(
             self.admin_id, 'question_1', 'skill_1', 0.3)
+        old_value: List[str] = []
         changelist = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS),
                 'node_id': self.NODE_ID_1,
-                'old_value': [],
+                'old_value': old_value,
                 'new_value': ['skill_1']
             })
         ]
@@ -478,7 +538,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self.assertIsNone(json_response['next_node_id'])
         self.assertTrue(json_response['ready_for_review_test'])
 
-    def test_mark_story_and_topic_as_incomplete_and_partially_learnt(self):
+    def test_mark_story_and_topic_as_incomplete_and_partially_learnt(
+        self
+    ) -> None:
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
@@ -495,7 +557,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             learner_progress_services.get_all_incomplete_story_ids(
                 self.viewer_id)), 1)
 
-    def test_mark_story_and_topic_as_completed_and_learnt(self):
+    def test_mark_story_and_topic_as_completed_and_learnt(self) -> None:
         csrf_token = self.get_new_csrf_token()
         learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID)
@@ -524,9 +586,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             learner_progress_services.get_all_completed_story_ids(
                 self.viewer_id)), 1)
 
-    def test_mark_topic_as_learnt_and_story_as_completed(self):
-        self.NEW_USER_EMAIL = 'newUser@newUser.com'
-        self.NEW_USER_USERNAME = 'newUser'
+    def test_mark_topic_as_learnt_and_story_as_completed(self) -> None:
 
         self.save_new_valid_exploration(
             self.EXP_ID_3, self.admin_id, title='Title 3', end_state_name='End',
@@ -538,9 +598,6 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             self.STORY_URL_FRAGMENT_TWO)
         story.meta_tag_content = 'story meta content'
 
-        exp_summary_dicts = (
-            summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                [self.EXP_ID_3], user=self.admin))
         self.node_1 = {
             'id': self.NODE_ID_1,
             'title': 'Title 1',
@@ -554,9 +611,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_3,
-            'exp_summary_dict': exp_summary_dicts[0],
-            'completed': False
+            'exploration_id': self.EXP_ID_3
         }
         story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1)
@@ -590,7 +645,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             learner_progress_services.get_all_completed_story_ids(
                 self.viewer_id)), 1)
 
-        def _mock_none_function(_):
+        def _mock_none_function(_: str) -> None:
             """Mocks None."""
             return None
 
@@ -610,7 +665,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                     ['Could not find a story corresponding to %s '
                      'id.' % self.STORY_ID])
 
-    def test_remove_topic_from_learn(self):
+    def test_remove_topic_from_learn(self) -> None:
         learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID)
         self.assertEqual(

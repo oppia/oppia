@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, TypedDict
 
 
 class ListsDataDict(TypedDict):
-    members: List[Dict[str, str]]
+    members: List[Dict[str, Any]]
     update_existing: bool
 
 
@@ -22,10 +22,11 @@ class Lists:
 
 
 class ListMembers:
+    tags: MemberTags = ...
     def create(
             self,
             list_id: Optional[str],
-            data: Dict[str, str]
+            data: Dict[str, Any]
     ) -> Dict[str, Any]: ...
 
     def get(
@@ -46,4 +47,12 @@ class ListMembers:
             self,
             list_id: Optional[str],
             subscriber_hash: str,
+    ) -> Dict[str, Any]: ...
+
+class MemberTags:
+    def update(
+        self,
+        list_id: Optional[str],
+        subscriber_hash: str,
+        data: Dict[str, Any]
     ) -> Dict[str, Any]: ...

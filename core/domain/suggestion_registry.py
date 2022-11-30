@@ -38,9 +38,12 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
+from extensions import domain
 
 from typing import (
-    Any, Callable, Dict, List, Mapping, Optional, Set, Type, TypedDict, Union)
+    Any, Callable, Dict, List, Mapping, Optional, Set, Type, TypedDict, Union,
+    cast
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -303,11 +306,12 @@ class BaseSuggestion:
             'Subclasses of BaseSuggestion should implement '
             'populate_old_value_of_change.')
 
-    # TODO(#16047): Here we use type Any because BaseSuggestion class is not
-    # implemented according to the strict typing which forces us to use Any
-    # here so that MyPy does not throw errors for different types of values
-    # used in sub-classes. Once this BaseSuggestion is refactored, we can
-    # remove type Any from here.
+    # TODO(#16047): Here we use type Any because the method pre_update_validate
+    # is used inside sub-classes with different argument types, which according
+    # to MyPy violates the 'Liskov substitution principle' and throws an error
+    # in every sub-class where this pre_update_validate method is used. So, to
+    # avoid the error in every sub-class, we have used Any type here but once
+    # this BaseSuggestion class is refactored, we can remove type Any from here.
     def pre_update_validate(self, change: Any) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
@@ -695,6 +699,9 @@ class SuggestionTranslateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.change.language_code)
 
+        if isinstance(self.change.translation_html, str):
+            html_cleaner.validate_rte_tags(self.change.translation_html)
+
         if self.language_code is None:
             raise utils.ValidationError('language_code cannot be None')
 
@@ -1041,17 +1048,18 @@ class SuggestionAddQuestion(BaseSuggestion):
         # Drop Sort have ck editor that includes the images of the interactions
         # so that references for those images are included as html strings.
         if question.question_state_data.interaction.id == 'ImageClickInput':
-            # TODO(#15982): Currently, we have broader type for interaction
-            # customization args and due to this we have to use assert to
-            # narrow down the type. So, once each customization_arg is defined
-            # explicitly, we can remove this todo.
-            assert isinstance(
+            # Here we use cast because we are narrowing down the type from
+            # various types of cust. arg values to ImageAndRegionDict, and
+            # here we are sure that the type is always going to be
+            # ImageAndRegionDict because imageAndRegions customization arg
+            # object always contain values of type ImageAndRegionDict.
+            customization_arg_image_dict = cast(
+                domain.ImageAndRegionDict,
                 question.question_state_data.interaction.customization_args[
-                    'imageAndRegions'].value, dict
+                    'imageAndRegions'].value
             )
             new_image_filenames.append(
-                question.question_state_data.interaction.customization_args[
-                    'imageAndRegions'].value['imagePath'])
+                customization_arg_image_dict['imagePath'])
         fs_services.copy_images(
             self.image_context, self.target_id, feconf.ENTITY_TYPE_QUESTION,
             question_dict['id'], new_image_filenames)
@@ -1390,6 +1398,24 @@ class TranslationContributionStatsDict(TypedDict):
     contribution_dates: Set[datetime.date]
 
 
+class TranslationContributionStatsFrontendDict(TypedDict):
+    """Dictionary representing the TranslationContributionStats
+    object for frontend.
+    """
+
+    language_code: Optional[str]
+    topic_id: Optional[str]
+    submitted_translations_count: int
+    submitted_translation_word_count: int
+    accepted_translations_count: int
+    accepted_translations_without_reviewer_edits_count: int
+    accepted_translation_word_count: int
+    rejected_translations_count: int
+    rejected_translation_word_count: int
+    first_contribution_date: str
+    last_contribution_date: str
+
+
 class TranslationContributionStats:
     """Domain object for the TranslationContributionStatsModel."""
 
@@ -1473,6 +1499,37 @@ class TranslationContributionStats:
             'contribution_dates': self.contribution_dates
         }
 
+    # TODO(#16051): TranslationContributionStats to use first_contribution_date
+    # and last_contribution_date.
+    def to_frontend_dict(self) -> TranslationContributionStatsFrontendDict:
+        """Returns a dict representation of a TranslationContributionStats
+        domain object for frontend.
+
+        Returns:
+            dict. A dict representation of a TranslationContributionStats
+            domain object for frontend.
+        """
+        sorted_contribution_dates = sorted(self.contribution_dates)
+        return {
+            'language_code': self.language_code,
+            'topic_id': self.topic_id,
+            'submitted_translations_count': self.submitted_translations_count,
+            'submitted_translation_word_count': (
+                self.submitted_translation_word_count),
+            'accepted_translations_count': self.accepted_translations_count,
+            'accepted_translations_without_reviewer_edits_count': (
+                self.accepted_translations_without_reviewer_edits_count),
+            'accepted_translation_word_count': (
+                self.accepted_translation_word_count),
+            'rejected_translations_count': self.rejected_translations_count,
+            'rejected_translation_word_count': (
+                self.rejected_translation_word_count),
+            'first_contribution_date': (
+                sorted_contribution_dates[0].strftime('%b %Y')),
+            'last_contribution_date': (
+                sorted_contribution_dates[-1].strftime('%b %Y'))
+        }
+
 
 class TranslationReviewStatsDict(TypedDict):
     """Dictionary representing the TranslationReviewStats object."""
@@ -1487,6 +1544,22 @@ class TranslationReviewStatsDict(TypedDict):
     accepted_translations_with_reviewer_edits_count: int
     first_contribution_date: datetime.date
     last_contribution_date: datetime.date
+
+
+class TranslationReviewStatsFrontendDict(TypedDict):
+    """Dictionary representing the TranslationReviewStats
+    object for frontend.
+    """
+
+    language_code: str
+    topic_id: str
+    reviewed_translations_count: int
+    reviewed_translation_word_count: int
+    accepted_translations_count: int
+    accepted_translation_word_count: int
+    accepted_translations_with_reviewer_edits_count: int
+    first_contribution_date: str
+    last_contribution_date: str
 
 
 class TranslationReviewStats:
@@ -1542,6 +1615,31 @@ class TranslationReviewStats:
             'last_contribution_date': self.last_contribution_date,
         }
 
+    def to_frontend_dict(self) -> TranslationReviewStatsFrontendDict:
+        """Returns a dict representation of a TranslationReviewStats
+        domain object for frontend.
+
+        Returns:
+            dict. A dict representation of a TranslationReviewStats
+            domain object for frontend.
+        """
+        return {
+            'language_code': self.language_code,
+            'topic_id': self.topic_id,
+            'reviewed_translations_count': self.reviewed_translations_count,
+            'reviewed_translation_word_count': (
+                self.reviewed_translation_word_count),
+            'accepted_translations_count': self.accepted_translations_count,
+            'accepted_translation_word_count': (
+                self.accepted_translation_word_count),
+            'accepted_translations_with_reviewer_edits_count': (
+                self.accepted_translations_with_reviewer_edits_count),
+            'first_contribution_date': (
+                self.first_contribution_date.strftime('%b %Y')),
+            'last_contribution_date': (
+                self.last_contribution_date.strftime('%b %Y'))
+        }
+
 
 class QuestionContributionStatsDict(TypedDict):
     """Dictionary representing the QuestionContributionStats object."""
@@ -1553,6 +1651,19 @@ class QuestionContributionStatsDict(TypedDict):
     accepted_questions_without_reviewer_edits_count: int
     first_contribution_date: datetime.date
     last_contribution_date: datetime.date
+
+
+class QuestionContributionStatsFrontendDict(TypedDict):
+    """Dictionary representing the QuestionContributionStats
+    object for frontend.
+    """
+
+    topic_id: str
+    submitted_questions_count: int
+    accepted_questions_count: int
+    accepted_questions_without_reviewer_edits_count: int
+    first_contribution_date: str
+    last_contribution_date: str
 
 
 class QuestionContributionStats:
@@ -1599,6 +1710,27 @@ class QuestionContributionStats:
             'last_contribution_date': self.last_contribution_date
         }
 
+    def to_frontend_dict(self) -> QuestionContributionStatsFrontendDict:
+        """Returns a dict representation of a QuestionContributionStats
+        domain object for frontend.
+
+        Returns:
+            dict. A dict representation of a QuestionContributionStats
+            domain object for frontend.
+        """
+        return {
+            'topic_id': self.topic_id,
+            'submitted_questions_count': self.submitted_questions_count,
+            'accepted_questions_count': (
+                self.accepted_questions_count),
+            'accepted_questions_without_reviewer_edits_count': (
+                self.accepted_questions_without_reviewer_edits_count),
+            'first_contribution_date': (
+                self.first_contribution_date.strftime('%b %Y')),
+            'last_contribution_date': (
+                self.last_contribution_date.strftime('%b %Y'))
+        }
+
 
 class QuestionReviewStatsDict(TypedDict):
     """Dictionary representing the QuestionReviewStats object."""
@@ -1610,6 +1742,19 @@ class QuestionReviewStatsDict(TypedDict):
     accepted_questions_with_reviewer_edits_count: int
     first_contribution_date: datetime.date
     last_contribution_date: datetime.date
+
+
+class QuestionReviewStatsFrontendDict(TypedDict):
+    """Dictionary representing the QuestionReviewStats
+    object for frontend.
+    """
+
+    topic_id: str
+    reviewed_questions_count: int
+    accepted_questions_count: int
+    accepted_questions_with_reviewer_edits_count: int
+    first_contribution_date: str
+    last_contribution_date: str
 
 
 class QuestionReviewStats:
@@ -1654,6 +1799,27 @@ class QuestionReviewStats:
             'first_contribution_date': (
                 self.first_contribution_date),
             'last_contribution_date': self.last_contribution_date
+        }
+
+    def to_frontend_dict(self) -> QuestionReviewStatsFrontendDict:
+        """Returns a dict representation of a QuestionContributionStats
+        domain object for frontend.
+
+        Returns:
+            dict. A dict representation of a QuestionContributionStats
+            domain object for frontend.
+        """
+        return {
+            'topic_id': self.topic_id,
+            'reviewed_questions_count': self.reviewed_questions_count,
+            'accepted_questions_count': (
+                self.accepted_questions_count),
+            'accepted_questions_with_reviewer_edits_count': (
+                self.accepted_questions_with_reviewer_edits_count),
+            'first_contribution_date': (
+                self.first_contribution_date.strftime('%b %Y')),
+            'last_contribution_date': (
+                self.last_contribution_date.strftime('%b %Y'))
         }
 
 

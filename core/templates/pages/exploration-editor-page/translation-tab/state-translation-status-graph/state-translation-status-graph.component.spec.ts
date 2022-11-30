@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for stateTranslationStatusGraph.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { Subscription } from 'rxjs';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -122,8 +122,8 @@ describe('State Translation Status Graph Component', () => {
   });
 
   describe('when translation tab is busy', () => {
-    let showTranslationTabBusyModalspy = null;
-    let testSubscriptions = null;
+    let showTranslationTabBusyModalspy: jasmine.Spy;
+    let testSubscriptions: Subscription;
 
     beforeEach(() => {
       component.isTranslationTabBusy = true;
@@ -148,5 +148,18 @@ describe('State Translation Status Graph Component', () => {
         expect(stateEditorService.setActiveStateName).not.toHaveBeenCalled();
         expect(showTranslationTabBusyModalspy).toHaveBeenCalled();
       });
+
+    it('should throw error if state name is null', fakeAsync(() => {
+      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+      component.isTranslationTabBusy = false;
+      expect(() => {
+        // This throws "Argument of type 'null' is not assignable to parameter
+        // of type 'String'." We need to suppress this error
+        // because of the need to test validations.
+        // @ts-ignore
+        component.onClickStateInMap(null);
+        tick();
+      }).toThrowError('Active state name cannot be null.');
+    }));
   });
 });

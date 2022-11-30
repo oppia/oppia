@@ -22,14 +22,16 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
 
+from typing import Final
+
 
 class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
     """Test permissions for learners to view collections."""
 
-    COLLECTION_ID = 'cid'
-    OTHER_EDITOR_EMAIL = 'another@example.com'
+    COLLECTION_ID: Final = 'cid'
+    OTHER_EDITOR_EMAIL: Final = 'another@example.com'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Before each individual test, create a dummy collection."""
         super().setUp()
 
@@ -42,19 +44,25 @@ class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
 
         self.save_new_valid_collection(self.COLLECTION_ID, self.editor_id)
 
-    def test_unpublished_collections_are_invisible_to_logged_out_users(self):
+    def test_unpublished_collections_are_invisible_to_logged_out_users(
+        self
+    ) -> None:
         self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
             expected_status_int=404)
 
-    def test_unpublished_collections_are_invisible_to_unconnected_users(self):
+    def test_unpublished_collections_are_invisible_to_unconnected_users(
+        self
+    ) -> None:
         self.login(self.NEW_USER_EMAIL)
         self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
             expected_status_int=404)
         self.logout()
 
-    def test_unpublished_collections_are_invisible_to_other_editors(self):
+    def test_unpublished_collections_are_invisible_to_other_editors(
+        self
+    ) -> None:
         self.signup(self.OTHER_EDITOR_EMAIL, 'othereditorusername')
 
         self.save_new_valid_collection('cid2', self.OTHER_EDITOR_EMAIL)
@@ -65,13 +73,15 @@ class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
             expected_status_int=404)
         self.logout()
 
-    def test_unpublished_collections_are_visible_to_their_editors(self):
+    def test_unpublished_collections_are_visible_to_their_editors(
+        self
+    ) -> None:
         self.login(self.EDITOR_EMAIL)
         self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
         self.logout()
 
-    def test_unpublished_collections_are_visible_to_admins(self):
+    def test_unpublished_collections_are_visible_to_admins(self) -> None:
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.login(self.MODERATOR_EMAIL)
@@ -79,20 +89,24 @@ class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
         self.logout()
 
-    def test_published_collections_are_visible_to_logged_out_users(self):
+    def test_published_collections_are_visible_to_logged_out_users(
+        self
+    ) -> None:
         rights_manager.publish_collection(self.editor, self.COLLECTION_ID)
 
         self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
 
-    def test_published_collections_are_visible_to_logged_in_users(self):
+    def test_published_collections_are_visible_to_logged_in_users(
+        self
+    ) -> None:
         rights_manager.publish_collection(self.editor, self.COLLECTION_ID)
 
         self.login(self.NEW_USER_EMAIL)
         self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
 
-    def test_invalid_collection_error(self):
+    def test_invalid_collection_error(self) -> None:
         self.login(self.EDITOR_EMAIL)
         self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, 'none'),
@@ -103,13 +117,13 @@ class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
 class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
     """Test the collection viewer controller using a sample collection."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-    def test_welcome_collection(self):
+    def test_welcome_collection(self) -> None:
         """Test a learner's progression through the default collection."""
         collection_services.load_demo('0')
 

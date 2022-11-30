@@ -29,16 +29,19 @@ import { ContextService } from 'services/context.service';
 })
 export class AddAudioTranslationModalComponent
    extends ConfirmOrCancelModal implements OnInit {
-   @Input() audioFile: File;
-   @Input() generatedFilename: string;
-   @Input() isAudioAvailable: boolean;
-   @Input() languageCode: string;
+   // These properties are initialized using Angular lifecycle hooks
+   // and we need to do non-null assertion. For more information, see
+   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+   @Input() audioFile!: File;
+   @Input() generatedFilename!: string;
+   @Input() isAudioAvailable!: boolean;
+   @Input() languageCode!: string;
 
-   uploadedFile: Blob;
-   droppedFile: File;
-   saveButtonText: string;
-   saveInProgress: boolean;
-   errorMessage: string;
+   uploadedFile!: Blob | null;
+   droppedFile!: File;
+   saveButtonText!: string;
+   saveInProgress!: boolean;
+   errorMessage!: string | null;
    BUTTON_TEXT_SAVE: string = 'Save';
    BUTTON_TEXT_SAVING: string = 'Saving...';
    ERROR_MESSAGE_BAD_FILE_UPLOAD: string = (
@@ -54,7 +57,7 @@ export class AddAudioTranslationModalComponent
 
    isAudioTranslationValid(): boolean {
      return (
-       this.uploadedFile &&
+       Boolean(this.uploadedFile) &&
        this.uploadedFile !== null &&
        this.uploadedFile.size !== null &&
        this.uploadedFile.size > 0);
@@ -76,24 +79,28 @@ export class AddAudioTranslationModalComponent
        this.saveInProgress = true;
        let explorationId = (
          this.contextService.getExplorationId());
-
-       Promise.resolve(
-         this.assetsBackendApiService.saveAudio(
-           explorationId, this.generatedFilename, this.uploadedFile)
-       ).then((response) => {
-         this.ngbActiveModal.close({
-           languageCode: this.languageCode,
-           filename: this.generatedFilename,
-           fileSizeBytes: this.uploadedFile.size,
-           durationSecs: response.duration_secs
+       let file = this.uploadedFile;
+       if (file) {
+         Promise.resolve(
+           this.assetsBackendApiService.saveAudio(
+             explorationId, this.generatedFilename, file)
+         ).then((response) => {
+           if (file) {
+             this.ngbActiveModal.close({
+               languageCode: this.languageCode,
+               filename: this.generatedFilename,
+               fileSizeBytes: file.size,
+               durationSecs: response.duration_secs
+             });
+           }
+         }, (errorResponse) => {
+           this.errorMessage = (
+             errorResponse.error || this.ERROR_MESSAGE_BAD_FILE_UPLOAD);
+           this.uploadedFile = null;
+           this.saveButtonText = this.BUTTON_TEXT_SAVE;
+           this.saveInProgress = false;
          });
-       }, (errorResponse) => {
-         this.errorMessage = (
-           errorResponse.error || this.ERROR_MESSAGE_BAD_FILE_UPLOAD);
-         this.uploadedFile = null;
-         this.saveButtonText = this.BUTTON_TEXT_SAVE;
-         this.saveInProgress = false;
-       });
+       }
      }
    }
 
