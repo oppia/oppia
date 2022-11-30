@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core import utils
-from core.constants import constants
 from core.domain import blog_domain
 from core.domain import blog_services
 from core.platform import models

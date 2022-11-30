@@ -23,7 +23,7 @@ import datetime
 from core import utils
 from core.constants import constants
 
-from typing import Dict, TypedDict, Union, overload
+from typing import Dict, TypedDict, Union
 
 
 def _repack_views_stats(
