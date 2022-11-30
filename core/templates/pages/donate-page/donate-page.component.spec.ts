@@ -238,12 +238,13 @@ describe('Donate page', () => {
   it('should show thank you modal on hash change',
     fakeAsync(() => {
       spyOn(ngbModal, 'open');
+      windowRef.nativeWindow.location.hash = '#nothing';
       component.ngOnInit();
 
       expect(ngbModal.open).not.toHaveBeenCalled();
 
-      windowRef.nativeWindow.onhashchange();
-      tick();
+      windowRef.nativeWindow.location.hash = '#thank-you';
+      component.showThanksForDonatingModal();
 
       expect(ngbModal.open).toHaveBeenCalled();
     }));
