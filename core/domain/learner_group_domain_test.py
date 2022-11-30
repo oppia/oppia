@@ -126,7 +126,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
             'Learner group facilitator cannot be invited to join the group.')
 
         try:
-            # Test that valid learner group does not raise error
+            # Test that valid learner group does not raise error.
             learner_group = self.VALID_LEARNER_GROUP
             learner_group.validate()
         except Exception as error:
