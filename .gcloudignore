@@ -1,4 +1,4 @@
-# Various compiled, temporary, and hidden files
+# Various compiled, temporary, and hidden files.
 *~
 *.pyc
 *.pyo
@@ -8,17 +8,18 @@
 .*
 __pycache__/
 
-# Markdown files
+# Markdown files.
 *.md
 
-# Typescript files in core they are not needed as we compile webpack.
+# Typescript files in core and extension they are not needed as
+# we compile webpack which contains these files.
 core/**/*.ts
 extensions/**/*.ts
 
-# Python test files
+# Python test files.
 *_test.py
 
-# Other folders to ignore
+# Other folders to ignore.
 /backend_prod_files/webpack_bundles/
 /core/tests/
 /local_compiled_js_for_test/
