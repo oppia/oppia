@@ -25,13 +25,13 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import List, Optional, TypedDict
+from typing import List, Optional, TypedDict, Final
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
-MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT = (
+MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT: Final = (
     constants.MAX_CHARS_IN_BLOG_POST_TITLE
     + len('-')
     + constants.BLOG_POST_ID_LENGTH

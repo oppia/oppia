@@ -21,23 +21,9 @@ from __future__ import annotations
 import datetime
 
 from core import utils
+from core.constants import constants
 
 from typing import Dict, TypedDict, Union, overload
-
-# This is same as base_models.ID_Length.
-BLOG_POST_ID_LENGTH = 12
-
-
-@overload
-def _repack_views_stats(
-    stats: BlogPostViewsAggregatedStats,
-) -> None: ...
-
-
-@overload
-def _repack_views_stats(
-    stats: AuthorBlogPostViewsAggregatedStats,
-) -> None: ...
 
 
 def _repack_views_stats(
@@ -62,18 +48,6 @@ def _repack_views_stats(
     }
 
 
-@overload
-def _repack_reads_stats(
-    stats: BlogPostReadsAggregatedStats,
-) -> None: ...
-
-
-@overload
-def _repack_reads_stats(
-    stats: AuthorBlogPostReadsAggregatedStats,
-) -> None: ...
-
-
 def _repack_reads_stats(
     stats: Union[
         BlogPostReadsAggregatedStats,
@@ -95,18 +69,6 @@ def _repack_reads_stats(
     stats.reads_by_hour = {
         k: stats.reads_by_hour[k] for k in list(stats.reads_by_hour)[:3]
     }
-
-
-@overload
-def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
-    stats: BlogPostViewsAggregatedStats,
-) -> Dict[str, int]: ...
-
-
-@overload
-def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
-    stats: AuthorBlogPostViewsAggregatedStats,
-) -> Dict[str, int]: ...
 
 
 def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
@@ -147,18 +109,6 @@ def _generate_past_twenty_four_hour_views_stats_from_views_by_hour(
         '_' + k: todays_stats[k] for k in list(todays_stats)[:current_hour + 1]
     })
     return hourly_stats
-
-
-@overload
-def _generate_past_week_views_stats_from_views_by_date(
-    stats: BlogPostViewsAggregatedStats,
-) -> Dict[str, int]: ...
-
-
-@overload
-def _generate_past_week_views_stats_from_views_by_date(
-    stats: AuthorBlogPostViewsAggregatedStats,
-) -> Dict[str, int]: ...
 
 
 def _generate_past_week_views_stats_from_views_by_date(
@@ -205,18 +155,6 @@ def _generate_past_week_views_stats_from_views_by_date(
     return weekly_stats
 
 
-@overload
-def _generate_monthly_views_from_views_by_date(
-    stats: BlogPostViewsAggregatedStats,
-) -> Dict[str, int]: ...
-
-
-@overload
-def _generate_monthly_views_from_views_by_date(
-    stats: AuthorBlogPostViewsAggregatedStats,
-) -> Dict[str, int]: ...
-
-
 def _generate_monthly_views_from_views_by_date(
     stats: Union[
         BlogPostViewsAggregatedStats,
@@ -244,18 +182,6 @@ def _generate_monthly_views_from_views_by_date(
     return stats_dict
 
 
-@overload
-def _generate_yearly_views_from_views_by_month(
-    stats: BlogPostViewsAggregatedStats,
-) -> Dict[str, int]: ...
-
-
-@overload
-def _generate_yearly_views_from_views_by_month(
-    stats: AuthorBlogPostViewsAggregatedStats,
-) -> Dict[str, int]: ...
-
-
 def _generate_yearly_views_from_views_by_month(
     stats: Union[
         BlogPostViewsAggregatedStats,
@@ -281,18 +207,6 @@ def _generate_yearly_views_from_views_by_month(
             stats.views_by_month[current_year])
     }
     return stats_dict
-
-
-@overload
-def _generate_past_twenty_four_hour_reads_stats_from_reads_by_hour(
-    stats: BlogPostReadsAggregatedStats,
-) -> Dict[str, int]: ...
-
-
-@overload
-def _generate_past_twenty_four_hour_reads_stats_from_reads_by_hour(
-    stats: AuthorBlogPostReadsAggregatedStats,
-) -> Dict[str, int]: ...
 
 
 def _generate_past_twenty_four_hour_reads_stats_from_reads_by_hour(
@@ -333,18 +247,6 @@ def _generate_past_twenty_four_hour_reads_stats_from_reads_by_hour(
         '_' + k: todays_stats[k] for k in list(todays_stats)[:current_hour + 1]
     })
     return hourly_stats
-
-
-@overload
-def _generate_past_week_reads_stats_from_reads_by_date(
-    stats: BlogPostReadsAggregatedStats,
-) -> Dict[str, int]: ...
-
-
-@overload
-def _generate_past_week_reads_stats_from_reads_by_date(
-    stats: AuthorBlogPostReadsAggregatedStats,
-) -> Dict[str, int]: ...
 
 
 def _generate_past_week_reads_stats_from_reads_by_date(
@@ -391,18 +293,6 @@ def _generate_past_week_reads_stats_from_reads_by_date(
     return weekly_stats
 
 
-@overload
-def _generate_monthly_reads_from_reads_by_date(
-    stats: BlogPostReadsAggregatedStats,
-) -> Dict[str, int]: ...
-
-
-@overload
-def _generate_monthly_reads_from_reads_by_date(
-    stats: AuthorBlogPostReadsAggregatedStats,
-) -> Dict[str, int]: ...
-
-
 def _generate_monthly_reads_from_reads_by_date(
     stats: Union[
         BlogPostReadsAggregatedStats,
@@ -428,18 +318,6 @@ def _generate_monthly_reads_from_reads_by_date(
             stats.reads_by_date[current_month_year])
     }
     return stats_dict
-
-
-@overload
-def _generate_yearly_reads_from_reads_by_month(
-    stats: BlogPostReadsAggregatedStats,
-) -> Dict[str, int]: ...
-
-
-@overload
-def _generate_yearly_reads_from_reads_by_month(
-    stats: AuthorBlogPostReadsAggregatedStats,
-) -> Dict[str, int]: ...
 
 
 def _generate_yearly_reads_from_reads_by_month(
@@ -469,18 +347,6 @@ def _generate_yearly_reads_from_reads_by_month(
     return stats_dict
 
 
-@overload
-def _generate_all_reads_from_reads_by_month(
-    stats: BlogPostReadsAggregatedStats,
-) -> Dict[str, Dict[str, int]]: ...
-
-
-@overload
-def _generate_all_reads_from_reads_by_month(
-    stats: AuthorBlogPostReadsAggregatedStats,
-) -> Dict[str, Dict[str, int]]: ...
-
-
 def _generate_all_reads_from_reads_by_month(
     stats: Union[
         BlogPostReadsAggregatedStats,
@@ -508,18 +374,6 @@ def _generate_all_reads_from_reads_by_month(
         } for k in list(stats.reads_by_month)
     }
     return stats_dict
-
-
-@overload
-def _generate_all_views_from_views_by_month(
-    stats: BlogPostViewsAggregatedStats,
-) -> Dict[str, Dict[str, int]]: ...
-
-
-@overload
-def _generate_all_views_from_views_by_month(
-    stats: AuthorBlogPostViewsAggregatedStats,
-) -> Dict[str, Dict[str, int]]: ...
 
 
 def _generate_all_views_from_views_by_month(
@@ -705,7 +559,7 @@ class BlogPostViewsAggregatedStats:
             raise utils.ValidationError(
                 'Blog Post ID must be a string, but got %r' % self.blog_post_id)
 
-        if len(self.blog_post_id) != BLOG_POST_ID_LENGTH:
+        if len(self.blog_post_id) != constants.BLOG_POST_ID_LENGTH:
             raise utils.ValidationError(
                 'Blog ID %s is invalid' % self.blog_post_id)
 
@@ -788,7 +642,7 @@ class BlogPostReadsAggregatedStats:
             raise utils.ValidationError(
                 'Blog Post ID must be a string, but got %r' % self.blog_post_id)
 
-        if len(self.blog_post_id) != BLOG_POST_ID_LENGTH:
+        if len(self.blog_post_id) != constants.BLOG_POST_ID_LENGTH:
             raise utils.ValidationError(
                 'Blog ID %s is invalid' % self.blog_post_id)
 
@@ -889,7 +743,7 @@ class BlogPostReadingTime:
             raise utils.ValidationError(
                 'Blog Post ID must be a string, but got %r' % self.blog_post_id)
 
-        if len(self.blog_post_id) != BLOG_POST_ID_LENGTH:
+        if len(self.blog_post_id) != constants.BLOG_POST_ID_LENGTH:
             raise utils.ValidationError(
                 'Blog Post ID %s is invalid' % self.blog_post_id)
 

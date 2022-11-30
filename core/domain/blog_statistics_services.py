@@ -34,8 +34,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import blog_stats_models
     from mypy_imports import transaction_services
 
-(blog_stats_models,) = models.Registry.import_models(
-    [models.Names.BLOG_STATISTICS, ])
+(blog_stats_models,) = models.Registry.import_models([
+    models.Names.BLOG_STATISTICS,
+])
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -228,7 +229,8 @@ def save_blog_post_views_stats_model(
     )
     if blog_post_views_aggregated_stats is None:
         raise Exception(
-            'No blog post views stats model exists for the given blog_post_id.'
+            'No blog post views stats model exists for the given %s.' %
+            views_stats.blog_post_id
         )
 
     blog_post_views_aggregated_stats.views_by_hour = views_stats.views_by_hour
@@ -260,7 +262,8 @@ def save_blog_post_reads_stats_model(
     )
     if blog_post_reads_aggregated_stats is None:
         raise Exception(
-            'No blog post reads stats model exists for the given blog_post_id.'
+            'No blog post reads stats model exists for the given %s.' %
+            reads_stats.blog_post_id
         )
 
     blog_post_reads_aggregated_stats.reads_by_hour = reads_stats.reads_by_hour
@@ -1035,9 +1038,7 @@ class BlogPostViewedEventHandler(event_services.BaseEventHandler):
             blog_post_id: str. ID of the blog post that was viewed.
             author_id: str. User ID of the author of the blog post.
         """
-        blog_stats_models.BlogPostViewedEventLogEntryModel.create(
-            blog_post_id, author_id
-        )
+        blog_stats_models.BlogPostViewedEventLogEntryModel.create(blog_post_id)
         update_views_stats(blog_post_id, author_id)
 
 
@@ -1058,9 +1059,7 @@ class BlogPostReadEventHandler(event_services.BaseEventHandler):
             blog_post_id: str. ID of the blog post that was read.
             author_id: str. User ID of the author of the blog post.
         """
-        blog_stats_models.BlogPostReadEventLogEntryModel.create(
-            blog_post_id, author_id
-        )
+        blog_stats_models.BlogPostReadEventLogEntryModel.create(blog_post_id)
         update_reads_stats(blog_post_id, author_id)
 
 
@@ -1085,7 +1084,7 @@ class BlogPostExitedEventHandler(event_services.BaseEventHandler):
                 the blog post to read it.
         """
         blog_stats_models.BlogPostExitedEventLogEntryModel.create(
-            blog_post_id, author_id, time_taken_to_read_blog_post
+            blog_post_id, time_taken_to_read_blog_post
         )
         update_reading_time_stats(
             blog_post_id,

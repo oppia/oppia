@@ -994,7 +994,8 @@ class BlogPostEventHandlersTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'No blog post views stats model exists for the given blog_post_id.'
+            'No blog post views stats model exists for the given %s.' %
+            self.blog_post.id
         ):
             blog_statistics_services.save_blog_post_views_stats_model(
                 views_domain_obj)
@@ -1015,7 +1016,8 @@ class BlogPostEventHandlersTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'No blog post reads stats model exists for the given blog_post_id.'
+            'No blog post reads stats model exists for the given %s.'
+            % self.blog_post.id
         ):
             blog_statistics_services.save_blog_post_reads_stats_model(
                 reads_domain_obj)
